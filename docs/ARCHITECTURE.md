@@ -53,7 +53,7 @@ gabbro/
 │   ├── autotype/         # Linux auto-type (ADR-017): keysym, XTEST inject, active-window read, trigger IPC, sequences, fill orchestration (Linux-only)
 │   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics, crash_writer, autotype_{spike,window,trigger} (diagnostics), gabbro-autotype (shipped trigger client); wordlist gen; gen_fixtures
 ├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + crash-safety (kill mid-write) + frozen golden fixtures (FIXTURES.md)
-├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, BiometricHelper (+ Robolectric tests)
+├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, BiometricHelper + BiometricStore (per-vault; + Robolectric tests)
 ├── docs/                 # ARCHITECTURE, LEARNINGS, SECURITY, AI_*; decisions/ (ADRs); artefacts/
 ├── test/  integration_test/  test_driver/   # Flutter widget/unit + Linux real-FFI device suites
 ├── test_data/            # Sample import files + migration_vaults/ (hardware migration corpus, one vault per VERSION + MIGRATION_TESTS.md)
@@ -147,15 +147,15 @@ Net-first throughout: pin current behaviour green BEFORE changing it.
 - [ ] 10. [PIN] a vault written on "Android" (fast Argon params) opens on "Linux" and keeps its auth after a sync round-trip (cross-version already partly covered by `cross_version_sync_*`)
 
 **D. Kotlin — biometric per-vault (`BiometricHelperTest`, Robolectric for prefs)**
-- [ ] 0. [NET] pin current single-vault flow green + must-not-regress sweep BEFORE any change: enroll -> authenticate round-trip, `isEnrolled` true/false, `unenroll` clears
-- [ ] 11. [RED] enroll A, enroll B -> both `isEnrolled` true
-- [ ] 12. [RED] unenroll A leaves B enrolled (needs `unenroll(vaultPath)`)
-- [ ] 13. [PIN] each vault gets a distinct KeyStore alias (hardware-ignored assertion + prefs-key assertion)
-- [ ] 14. [RED -> hardware] enroll -> authenticate returns the right vault's passphrase per vault (hardware `@Ignore`, in the device matrix)
+- [x] 0. [NET] pinned: single-vault `isEnrolled` contract green (Robolectric) + partial-enrolment guard added; enroll/authenticate/unenroll are `@Ignore` (AndroidKeyStore not backed by Robolectric) -> the fix must split prefs bookkeeping from key lifecycle to make 11-13 unit-testable
+- [x] 11. store A + store B -> both `isEnrolled` true (green via new `BiometricStore` seam)
+- [x] 12. `forget`/`unenroll(vaultPath)` A leaves B enrolled (green via seam)
+- [x] 13. distinct KeyStore alias per vault (green via seam); `BiometricHelper` refactored to per-vault alias + prefs, channel updated
+- [x] 14. enroll -> authenticate per vault: HARDWARE-VERIFIED 2026-07-06 on device (mock vaults A/B/C). Passed: reported bug (B survives enrolling C), disable-independence, change-passphrase staleness, Android->Linux->Android sync round-trip. Key-invalidation left as optional.
 
 **E. Dart — drop the global bool, gate on per-vault enrollment (widget tests)**
-- [ ] 15. [RED] enabling biometric on B does not affect C (drop the global `settings.jsonc` bool; the UI derives per-vault state from `isEnrolled(vaultPath)`)
-- [ ] 16. [PIN] unlock screen shows biometric only for the vault it's enrolled on — both phone and tablet two-pane paths (the two-layout-paths trap)
+- [x] 15. enabling biometric on B doesn't affect C: global `settings.jsonc` bool REMOVED; UI gates on `isEnrolled(vaultPath)` only; `unenroll(vaultPath)` threaded through security/change-passphrase/tablet call sites (green)
+- [x] 16. unlock offers biometric only for the enrolled vault: gate removed from widget, `vaultPath` now a required param on both phone + tablet paths (two-layout trap structurally prevented); per-vault display pinned in unlock_screen_test
 
 ---
 

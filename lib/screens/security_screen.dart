@@ -43,10 +43,12 @@ Future<void> _defaultBiometricEnroll(
   });
 }
 
-Future<void> _defaultBiometricUnenroll() async {
+Future<void> _defaultBiometricUnenroll(String vaultPath) async {
   if (!Platform.isAndroid) return;
   try {
-    await _biometricChannel.invokeMethod<void>('unenroll');
+    await _biometricChannel.invokeMethod<void>('unenroll', {
+      'vaultPath': vaultPath,
+    });
   } catch (_) {}
 }
 
@@ -65,7 +67,7 @@ class SecurityScreen extends StatefulWidget {
   final Future<bool> Function(String vaultPath) onBiometricIsEnrolled;
   final Future<void> Function(List<int> passphrase, String vaultPath)
   onBiometricEnroll;
-  final Future<void> Function() onBiometricUnenroll;
+  final Future<void> Function(String vaultPath) onBiometricUnenroll;
 
   SecurityScreen({
     super.key,
@@ -114,9 +116,8 @@ class _SecurityScreenState extends State<SecurityScreen> {
 
   Future<void> _handleBiometricToggle(bool enable, AppLocalizations l) async {
     if (!enable) {
-      await widget.onBiometricUnenroll();
+      await widget.onBiometricUnenroll(widget.vaultPath ?? '');
       setState(() => _biometricEnrolled = false);
-      _update(_settings.copyWith(biometricUnlock: false));
       return;
     }
 
@@ -176,7 +177,6 @@ class _SecurityScreenState extends State<SecurityScreen> {
       await widget.onBiometricEnroll(passphrase, widget.vaultPath ?? '');
       if (mounted) {
         setState(() => _biometricEnrolled = true);
-        _update(_settings.copyWith(biometricUnlock: true));
       }
     } catch (e) {
       if (mounted) {

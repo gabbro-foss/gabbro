@@ -205,7 +205,6 @@ class _AutofillUnlockAppState extends State<_AutofillUnlockApp> {
           onUnlock: widget.onUnlock,
           onUnlocked: _onUnlocked,
           blockPassphraseCopyPaste: widget.settings.blockPassphraseCopyPaste,
-          biometricEnabled: widget.settings.biometricUnlock,
         ),
       ),
     );
@@ -387,7 +386,6 @@ class _AutofillSaveAppState extends State<_AutofillSaveApp> {
           await _loadContext();
         },
         blockPassphraseCopyPaste: widget.settings.blockPassphraseCopyPaste,
-        biometricEnabled: widget.settings.biometricUnlock,
       );
     }
     final ctx = _context;
@@ -776,10 +774,6 @@ class _GabbroAppState extends State<GabbroApp>
     vaultAlias: alias,
     blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
     registry: _registry,
-    biometricEnabled: _settings.biometricUnlock,
-    onBiometricInvalidated: () => updateSettings(
-      _settings.copyWith(biometricUnlock: false),
-    ),
   );
 
   Widget _buildHome() {

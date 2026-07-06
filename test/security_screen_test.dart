@@ -12,7 +12,7 @@ Widget _buildScreen({
   Future<bool> Function(String)? onBiometricIsEnrolled,
   Future<bool> Function()? onBiometricAvailable,
   Future<void> Function(List<int>, String)? onBiometricEnroll,
-  Future<void> Function()? onBiometricUnenroll,
+  Future<void> Function(String)? onBiometricUnenroll,
   String? vaultPath,
 }) => testApp(SecurityScreen(
   settings: settings,
@@ -22,7 +22,7 @@ Widget _buildScreen({
   onBiometricIsEnrolled: onBiometricIsEnrolled ?? (_) async => false,
   onBiometricAvailable: onBiometricAvailable ?? () async => false,
   onBiometricEnroll: onBiometricEnroll ?? (_, _) async {},
-  onBiometricUnenroll: onBiometricUnenroll ?? () async {},
+  onBiometricUnenroll: onBiometricUnenroll ?? (_) async {},
 ));
 
 void main() {
@@ -169,12 +169,10 @@ void main() {
       expect(tile.value, isTrue);
     });
 
-    testWidgets('biometric toggle OFF when isEnrolled returns false even if setting is true',
-        (tester) async {
+    testWidgets('biometric toggle OFF when isEnrolled returns false', (tester) async {
       await tester.pumpWidget(_buildScreen(
         isAndroid: true,
         vaultPath: '/vault/b.gabbro',
-        settings: const AppSettings(biometricUnlock: true),
         onBiometricIsEnrolled: (_) async => false,
       ));
       await tester.pump();
@@ -186,24 +184,20 @@ void main() {
       expect(tile.value, isFalse);
     });
 
-    testWidgets('tapping toggle OFF calls unenroll and calls onUpdate with false', (tester) async {
-      bool unenrolled = false;
-      AppSettings? updated;
+    testWidgets('tapping toggle OFF calls unenroll with this vault path', (tester) async {
+      String? unenrolledPath;
       await tester.pumpWidget(_buildScreen(
         isAndroid: true,
         vaultPath: '/vault/a.gabbro',
-        settings: const AppSettings(biometricUnlock: true),
-        onUpdate: (s) => updated = s,
         onBiometricIsEnrolled: (_) async => true,
-        onBiometricUnenroll: () async { unenrolled = true; },
+        onBiometricUnenroll: (path) async { unenrolledPath = path; },
       ));
       await tester.pump(); // let initState isEnrolled resolve
       await tester.scrollUntilVisible(
         find.widgetWithText(SwitchListTile, 'Enable biometric unlock'), 300);
       await tester.tap(find.widgetWithText(SwitchListTile, 'Enable biometric unlock'));
       await tester.pumpAndSettle();
-      expect(unenrolled, isTrue);
-      expect(updated?.biometricUnlock, isFalse);
+      expect(unenrolledPath, '/vault/a.gabbro');
     });
 
     testWidgets('tapping toggle ON when unavailable shows error and does not update setting',

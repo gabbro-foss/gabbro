@@ -138,7 +138,7 @@ abstract class GabbroUnlockHostActivity : FlutterFragmentActivity() {
                             },
                         )
                     "unenroll" -> {
-                        BiometricHelper.unenroll(this)
+                        BiometricHelper.unenroll(this, vaultPath)
                         result.success(null)
                     }
                     else -> result.notImplemented()

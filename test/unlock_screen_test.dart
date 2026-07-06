@@ -57,10 +57,8 @@ Widget _buildScreen({
   String? vaultAlias,
   VaultRegistry? registry,
   void Function(String path, String alias)? onVaultSwitch,
-  bool biometricEnabled = false,
   Future<bool> Function(String)? onBiometricIsEnrolled,
   Future<List<int>?> Function(String)? onBiometricAuthenticate,
-  void Function()? onBiometricInvalidated,
   bool? isAndroid,
   Future<void> Function()? onCancelTap,
   Future<bool> Function(String)? onVaultIsReadable,
@@ -82,10 +80,8 @@ Widget _buildScreen({
       vaultAlias: vaultAlias,
       registry: registry,
       onVaultSwitch: onVaultSwitch,
-      biometricEnabled: biometricEnabled,
       onBiometricIsEnrolled: onBiometricIsEnrolled ?? (_) async => false,
       onBiometricAuthenticate: onBiometricAuthenticate ?? (_) async => null,
-      onBiometricInvalidated: onBiometricInvalidated,
       isAndroid: isAndroid,
       onCancelTap: onCancelTap ?? () async {},
       onVaultIsReadable: onVaultIsReadable ?? (_) async => true,
@@ -148,7 +144,6 @@ Widget _biometricAtScale(
         vaultPath: '/tmp/test.gabbro',
         onEstimateEntropy: _fakeEntropy,
         yubikeyRecords: const [],
-        biometricEnabled: true,
         onBiometricIsEnrolled: (_) async => true,
         onBiometricAuthenticate: onAuth ?? (_) async => null,
         onVaultIsReadable: (_) async => true,
@@ -445,7 +440,6 @@ void main() {
       (tester) async {
     await tester.pumpWidget(_buildScreen(
       yubikeyRecords: [_fakeRecord()],
-      biometricEnabled: true,
       onBiometricIsEnrolled: (_) async => true,
     ));
     await tester.pump(); // enrollment probe settles
@@ -691,23 +685,16 @@ void main() {
   // ── biometric button ──────────────────────────────────────────────────────
 
   group('biometric button', () {
-    testWidgets('not shown when biometricEnabled is false', (tester) async {
-      await tester.pumpWidget(_buildScreen(biometricEnabled: false));
-      expect(find.text('Use biometrics'), findsNothing);
-    });
-
-    testWidgets('not shown when biometricEnabled true but not enrolled', (tester) async {
+    testWidgets('not shown when this vault is not enrolled', (tester) async {
       await tester.pumpWidget(_buildScreen(
-        biometricEnabled: true,
         onBiometricIsEnrolled: (_) async => false,
       ));
       await tester.pump(); // allow initState async to settle
       expect(find.text('Use biometrics'), findsNothing);
     });
 
-    testWidgets('shown when biometricEnabled true and enrolled', (tester) async {
+    testWidgets('shown when this vault is enrolled (no global flag)', (tester) async {
       await tester.pumpWidget(_buildScreen(
-        biometricEnabled: true,
         onBiometricIsEnrolled: (_) async => true,
       ));
       await tester.pump();
@@ -716,7 +703,6 @@ void main() {
 
     testWidgets('passphrase field always present alongside biometric button', (tester) async {
       await tester.pumpWidget(_buildScreen(
-        biometricEnabled: true,
         onBiometricIsEnrolled: (_) async => true,
       ));
       await tester.pump();
@@ -727,7 +713,6 @@ void main() {
     testWidgets('tapping biometric button calls onBiometricAuthenticate', (tester) async {
       bool called = false;
       await tester.pumpWidget(_buildScreen(
-        biometricEnabled: true,
         onBiometricIsEnrolled: (_) async => true,
         onBiometricAuthenticate: (_) async { called = true; return null; },
       ));
@@ -773,7 +758,6 @@ void main() {
 
     testWidgets('biometric cancelled shows hint message', (tester) async {
       await tester.pumpWidget(_buildScreen(
-        biometricEnabled: true,
         onBiometricIsEnrolled: (_) async => true,
         onBiometricAuthenticate: (_) async => null,
       ));
@@ -789,29 +773,24 @@ void main() {
 
     testWidgets('BIOMETRIC_INVALIDATED exception hides button and shows error',
         (tester) async {
-      bool invalidatedCalled = false;
       await tester.pumpWidget(_buildScreen(
-        biometricEnabled: true,
         onBiometricIsEnrolled: (_) async => true,
         onBiometricAuthenticate: (_) async {
           throw PlatformException(code: 'BIOMETRIC_INVALIDATED');
         },
-        onBiometricInvalidated: () => invalidatedCalled = true,
       ));
       await tester.pump();
       await tester.tap(find.text('Use biometrics'));
       await tester.pumpAndSettle();
 
-      // Button must disappear (biometricEnrolled reset to false).
+      // Button must disappear: the native side auto-unenrolled this vault, so
+      // the local enrolled state resets to false. No global setting to clear.
       expect(find.text('Use biometrics'), findsNothing);
-      // onBiometricInvalidated must have been called.
-      expect(invalidatedCalled, isTrue);
     });
 
     testWidgets('other PlatformException shows biometric cancelled message',
         (tester) async {
       await tester.pumpWidget(_buildScreen(
-        biometricEnabled: true,
         onBiometricIsEnrolled: (_) async => true,
         onBiometricAuthenticate: (_) async {
           throw PlatformException(code: 'SOME_OTHER_ERROR');
@@ -833,7 +812,6 @@ void main() {
     testWidgets('biometric success calls unlock and navigates', (tester) async {
       bool unlockCalled = false;
       await tester.pumpWidget(_buildScreen(
-        biometricEnabled: true,
         onBiometricIsEnrolled: (_) async => true,
         onBiometricAuthenticate: (_) async => [1, 2, 3],
         onUnlock: (_, _) async => unlockCalled = true,

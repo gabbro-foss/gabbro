@@ -37,8 +37,7 @@ ChangePassphraseScreen _screen({
   List<YubikeyRecordData>? yubikeyRecords,
   Future<void> Function(List<int>, List<int>, String, String)? onConfirmYubikey,
   Future<void> Function(List<YubikeyRecordData>, String, String)? onConfirmAnyYubikey,
-  bool biometricEnabled = false,
-  Future<void> Function()? onDisableBiometric,
+  Future<void> Function(String)? onDisableBiometric,
   Future<bool> Function(String)? onBiometricIsEnrolled,
   EntropyResult Function(String)? onEstimateEntropy,
 }) =>
@@ -50,8 +49,7 @@ ChangePassphraseScreen _screen({
       yubikeyRecords: yubikeyRecords ?? [],
       onConfirmYubikey: onConfirmYubikey ?? (_, _, _, _) async {},
       onConfirmAnyYubikey: onConfirmAnyYubikey ?? (_, _, _) async {},
-      biometricEnabled: biometricEnabled,
-      onDisableBiometric: onDisableBiometric ?? () async {},
+      onDisableBiometric: onDisableBiometric ?? (_) async {},
       onBiometricIsEnrolled: onBiometricIsEnrolled ?? (_) async => false,
     );
 
@@ -61,8 +59,7 @@ Widget _buildScreen({
   List<YubikeyRecordData>? yubikeyRecords,
   Future<void> Function(List<int>, List<int>, String, String)? onConfirmYubikey,
   Future<void> Function(List<YubikeyRecordData>, String, String)? onConfirmAnyYubikey,
-  bool biometricEnabled = false,
-  Future<void> Function()? onDisableBiometric,
+  Future<void> Function(String)? onDisableBiometric,
   Future<bool> Function(String)? onBiometricIsEnrolled,
   EntropyResult Function(String)? onEstimateEntropy,
 }) =>
@@ -72,7 +69,6 @@ Widget _buildScreen({
       yubikeyRecords: yubikeyRecords,
       onConfirmYubikey: onConfirmYubikey,
       onConfirmAnyYubikey: onConfirmAnyYubikey,
-      biometricEnabled: biometricEnabled,
       onDisableBiometric: onDisableBiometric,
       onBiometricIsEnrolled: onBiometricIsEnrolled,
       onEstimateEntropy: onEstimateEntropy,
@@ -339,7 +335,7 @@ void main() {
       (tester) async {
     var disableCalled = false;
     await _pumpPushed(tester, _screen(
-      onDisableBiometric: () async => disableCalled = true,
+      onDisableBiometric: (_) async => disableCalled = true,
     ));
     await _fillAndSubmit(tester);
 
@@ -353,7 +349,7 @@ void main() {
     var disableCalled = false;
     await _pumpPushed(tester, _screen(
       yubikeyRecords: [_fakeRecord()],
-      onDisableBiometric: () async => disableCalled = true,
+      onDisableBiometric: (_) async => disableCalled = true,
     ));
     await _fillAndSubmit(tester, yubikeyPin: '123456');
 
@@ -366,10 +362,9 @@ void main() {
       (tester) async {
     var disableCalled = false;
     await tester.pumpWidget(_buildScreen(
-      biometricEnabled: true,
       onBiometricIsEnrolled: (_) async => true,
       onChangePassphrase: (_, _) async => throw Exception('change failed'),
-      onDisableBiometric: () async => disableCalled = true,
+      onDisableBiometric: (_) async => disableCalled = true,
     ));
     await _fillAndSubmit(tester);
 
@@ -378,13 +373,12 @@ void main() {
   });
 
   testWidgets(
-      'N4: biometric ON globally but NOT enrolled for this vault -> no disable, normal success',
+      'N4: this vault NOT enrolled on this device -> no disable, normal success',
       (tester) async {
     var disableCalled = false;
     await _pumpPushed(tester, _screen(
-      biometricEnabled: true, // global flag on...
-      onBiometricIsEnrolled: (_) async => false, // ...but this vault isn't enrolled
-      onDisableBiometric: () async => disableCalled = true,
+      onBiometricIsEnrolled: (_) async => false, // this vault isn't enrolled here
+      onDisableBiometric: (_) async => disableCalled = true,
     ));
     await _fillAndSubmit(tester);
 
@@ -402,9 +396,8 @@ void main() {
       (tester) async {
     var disableCalled = false;
     await _pumpPushed(tester, _screen(
-      biometricEnabled: true,
       onBiometricIsEnrolled: (_) async => true,
-      onDisableBiometric: () async => disableCalled = true,
+      onDisableBiometric: (_) async => disableCalled = true,
     ));
     await _fillAndSubmit(tester);
 

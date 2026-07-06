@@ -83,7 +83,7 @@ Future<void> _defaultConfirmAnyYubikey(
 
 const _biometricChannel = MethodChannel('app.gabbro.gabbro/biometric');
 
-Future<void> _defaultDisableBiometric() async {}
+Future<void> _defaultDisableBiometric(String vaultPath) async {}
 
 Future<bool> _defaultBiometricIsEnrolled(String vaultPath) async {
   if (!Platform.isAndroid) return false;
@@ -116,18 +116,13 @@ class ChangePassphraseScreen extends StatefulWidget {
   final Future<void> Function(List<YubikeyRecordData> records, String pin, String transport)
       onConfirmAnyYubikey;
 
-  /// Whether biometric unlock is currently enabled for this vault
-  /// (`settings.biometricUnlock`). When true, a successful passphrase change
-  /// disables biometric via [onDisableBiometric] — its stored secret is bound to
-  /// the old passphrase — and informs the user.
-  final bool biometricEnabled;
+  /// Disables biometric for [vaultPath] (unenroll on the native side). Wired by
+  /// the parent. A successful passphrase change makes the stored secret stale
+  /// (it is bound to the old passphrase), so it is disabled and the user informed.
+  final Future<void> Function(String vaultPath) onDisableBiometric;
 
-  /// Disables biometric unlock (unenroll + clear the setting). Wired by the parent.
-  final Future<void> Function() onDisableBiometric;
-
-  /// Per-vault biometric enrollment check. `biometricEnabled` is the global
-  /// setting; the secret is stored per vault, so disable only fires when *this*
-  /// vault is actually enrolled.
+  /// Per-vault, device-local biometric enrollment check. Disable only fires when
+  /// *this* vault is actually enrolled on this device.
   final Future<bool> Function(String vaultPath) onBiometricIsEnrolled;
 
   const ChangePassphraseScreen({
@@ -139,7 +134,6 @@ class ChangePassphraseScreen extends StatefulWidget {
     this.yubikeyRecords,
     this.onConfirmYubikey = _defaultConfirmYubikey,
     this.onConfirmAnyYubikey = _defaultConfirmAnyYubikey,
-    this.biometricEnabled = false,
     this.onDisableBiometric = _defaultDisableBiometric,
     this.onBiometricIsEnrolled = _defaultBiometricIsEnrolled,
   });
@@ -178,11 +172,11 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
   void initState() {
     super.initState();
     _yubikeyRecords = widget.yubikeyRecords ?? _detectYubikeyRecords();
-    if (widget.biometricEnabled) {
-      widget.onBiometricIsEnrolled(widget.vaultPath).then((enrolled) {
-        if (mounted) setState(() => _biometricEnrolled = enrolled);
-      });
-    }
+    // Per-vault, device-local: resolve whether THIS vault is enrolled on this
+    // device, so a passphrase change disables its now-stale biometric secret.
+    widget.onBiometricIsEnrolled(widget.vaultPath).then((enrolled) {
+      if (mounted) setState(() => _biometricEnrolled = enrolled);
+    });
   }
 
   List<YubikeyRecordData> _detectYubikeyRecords() {
@@ -287,7 +281,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
         var message = l.changePassphraseSuccess;
         if (_biometricEnrolled) {
           try {
-            await widget.onDisableBiometric();
+            await widget.onDisableBiometric(widget.vaultPath);
           } catch (_) {
             // best-effort; the passphrase change already succeeded.
           }

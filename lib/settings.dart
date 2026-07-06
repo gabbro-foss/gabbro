@@ -23,7 +23,6 @@ class AppSettings {
   final AlphabetBarPosition alphabetBarPosition;
   final bool blockPassphraseCopyPaste;
   final LanguageChoice language;
-  final bool biometricUnlock;
   final double tabletListPaneWidth;
 
   /// Persisted SAF tree URI of the Android `.gabbro` export destination folder
@@ -43,7 +42,6 @@ class AppSettings {
     this.alphabetBarPosition = AlphabetBarPosition.left,
     this.blockPassphraseCopyPaste = true,
     this.language = LanguageChoice.system,
-    this.biometricUnlock = false,
     this.tabletListPaneWidth = 260.0,
     this.androidExportFolderUri = '',
   });
@@ -63,7 +61,6 @@ class AppSettings {
     'alphabet_bar_position': alphabetBarPosition.name,
     'block_passphrase_copy_paste': blockPassphraseCopyPaste,
     'language': language.name,
-    'biometric_unlock': biometricUnlock,
     'tablet_list_pane_width': tabletListPaneWidth,
     'android_export_folder_uri': androidExportFolderUri,
   };
@@ -92,7 +89,6 @@ class AppSettings {
       language: LanguageChoice.values.byName(
         json['language'] as String? ?? 'system',
       ),
-      biometricUnlock: json['biometric_unlock'] as bool? ?? false,
       tabletListPaneWidth: (json['tablet_list_pane_width'] as num?)
               ?.toDouble()
               .clamp(180.0, 900.0) ??
@@ -148,7 +144,6 @@ class AppSettings {
     AlphabetBarPosition? alphabetBarPosition,
     bool? blockPassphraseCopyPaste,
     LanguageChoice? language,
-    bool? biometricUnlock,
     double? tabletListPaneWidth,
     String? androidExportFolderUri,
   }) => AppSettings(
@@ -162,7 +157,6 @@ class AppSettings {
     alphabetBarPosition: alphabetBarPosition ?? this.alphabetBarPosition,
     blockPassphraseCopyPaste: blockPassphraseCopyPaste ?? this.blockPassphraseCopyPaste,
     language: language ?? this.language,
-    biometricUnlock: biometricUnlock ?? this.biometricUnlock,
     tabletListPaneWidth: tabletListPaneWidth ?? this.tabletListPaneWidth,
     androidExportFolderUri:
         androidExportFolderUri ?? this.androidExportFolderUri,
@@ -243,11 +237,6 @@ class AppSettings {
   //        | "hr" | "hu" | "it" | "ja" | "kk" | "ko" | "lt" | "lv" | "nb" | "nn" | "pl"
   //        | "ptBr" | "ptPt" | "ru" | "sk" | "sl" | "srLatn" | "sv" | "uk" | "zhCn" | "zhTw"
   "language": "${language.name}",
-
-  // Use biometrics (fingerprint/face) to unlock instead of typing the passphrase.
-  // Android only. Stores the passphrase encrypted on-device. Default: false.
-  // Options: true | false
-  "biometric_unlock": $biometricUnlock,
 
   // Width of the list pane in the tablet / landscape two-pane layout (dp).
   // Drag the divider in the app to resize; this value is updated automatically.

@@ -4,7 +4,6 @@ import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyPermanentlyInvalidatedException
 import android.security.keystore.KeyProperties
-import android.util.Base64
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
@@ -15,16 +14,18 @@ import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 
+/**
+ * Biometric enrolment is per vault: each vault gets its own AndroidKeyStore key
+ * (alias via [BiometricStore.keyAlias]) and its own SharedPreferences slot (via
+ * [BiometricStore]). Enrolling or unenrolling one vault never touches another.
+ * Biometric is also per device — the key is hardware-bound and never travels with the
+ * vault file, so a vault synced across devices carries no biometric state.
+ */
 object BiometricHelper {
 
     private const val KEYSTORE_PROVIDER = "AndroidKeyStore"
-    private const val KEY_ALIAS = "gabbro_biometric_key"
     private const val TRANSFORMATION = "AES/GCM/NoPadding"
     private const val GCM_TAG_BITS = 128
-    private const val PREFS_FILE = "gabbro_biometric"
-    private const val KEY_CIPHERTEXT = "ct"
-    private const val KEY_IV = "iv"
-    private const val KEY_VAULT_PATH = "vault_path"
 
     // ── Public API ────────────────────────────────────────────────────────────
 
@@ -33,12 +34,8 @@ object BiometricHelper {
             .canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG) ==
                 BiometricManager.BIOMETRIC_SUCCESS
 
-    fun isEnrolled(context: Context, vaultPath: String): Boolean {
-        val p = prefs(context)
-        return p.contains(KEY_CIPHERTEXT) &&
-               p.contains(KEY_IV) &&
-               p.getString(KEY_VAULT_PATH, null) == vaultPath
-    }
+    fun isEnrolled(context: Context, vaultPath: String): Boolean =
+        BiometricStore.has(context, vaultPath)
 
     fun enroll(
         activity: FragmentActivity,
@@ -50,9 +47,9 @@ object BiometricHelper {
         onError: (String) -> Unit,
     ) {
         try {
-            deleteKey()
-            generateKey()
-            val cipher = encryptCipher()
+            deleteKey(vaultPath)
+            generateKey(vaultPath)
+            val cipher = encryptCipher(vaultPath)
             val executor = ContextCompat.getMainExecutor(activity)
             BiometricPrompt(activity, executor, object : BiometricPrompt.AuthenticationCallback() {
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
@@ -62,7 +59,7 @@ object BiometricHelper {
                         val iv = c.iv
                         val ciphertext = c.doFinal(passphrase)
                         passphrase.fill(0)
-                        storeEncrypted(activity, vaultPath, ciphertext, iv)
+                        BiometricStore.store(activity, vaultPath, ciphertext, iv)
                         onSuccess()
                     } catch (e: Exception) {
                         passphrase.fill(0)
@@ -92,21 +89,17 @@ object BiometricHelper {
         onSuccess: (ByteArray) -> Unit,
         onError: (String) -> Unit,
     ) {
-        val prefs = prefs(activity)
-        val ctB64 = prefs.getString(KEY_CIPHERTEXT, null)
-        val ivB64 = prefs.getString(KEY_IV, null)
-        val storedPath = prefs.getString(KEY_VAULT_PATH, null)
-        if (ctB64 == null || ivB64 == null || storedPath != vaultPath) {
+        val stored = BiometricStore.read(activity, vaultPath)
+        if (stored == null) {
             onError("NOT_ENROLLED")
             return
         }
-        val ciphertext = Base64.decode(ctB64, Base64.NO_WRAP)
-        val iv = Base64.decode(ivB64, Base64.NO_WRAP)
+        val (ciphertext, iv) = stored
 
         val cipher = try {
-            decryptCipher(iv)
+            decryptCipher(vaultPath, iv)
         } catch (e: KeyPermanentlyInvalidatedException) {
-            unenroll(activity)
+            unenroll(activity, vaultPath)
             onError("KEY_INVALIDATED")
             return
         } catch (e: Exception) {
@@ -134,37 +127,18 @@ object BiometricHelper {
             BiometricPrompt.CryptoObject(cipher))
     }
 
-    fun unenroll(context: Context) {
-        prefs(context).edit()
-            .remove(KEY_CIPHERTEXT)
-            .remove(KEY_IV)
-            .apply()
-        deleteKey()
+    fun unenroll(context: Context, vaultPath: String) {
+        BiometricStore.forget(context, vaultPath)
+        deleteKey(vaultPath)
     }
 
     // ── Private helpers ───────────────────────────────────────────────────────
 
-    private fun prefs(context: Context) =
-        context.getSharedPreferences(PREFS_FILE, Context.MODE_PRIVATE)
-
-    private fun storeEncrypted(
-        context: Context,
-        vaultPath: String,
-        ciphertext: ByteArray,
-        iv: ByteArray,
-    ) {
-        prefs(context).edit()
-            .putString(KEY_CIPHERTEXT, Base64.encodeToString(ciphertext, Base64.NO_WRAP))
-            .putString(KEY_IV, Base64.encodeToString(iv, Base64.NO_WRAP))
-            .putString(KEY_VAULT_PATH, vaultPath)
-            .apply()
-    }
-
-    private fun generateKey() {
+    private fun generateKey(vaultPath: String) {
         KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, KEYSTORE_PROVIDER).apply {
             init(
                 KeyGenParameterSpec.Builder(
-                    KEY_ALIAS,
+                    BiometricStore.keyAlias(vaultPath),
                     KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT,
                 )
                     .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
@@ -178,22 +152,23 @@ object BiometricHelper {
         }
     }
 
-    private fun getKey(): SecretKey {
+    private fun getKey(vaultPath: String): SecretKey {
         val ks = KeyStore.getInstance(KEYSTORE_PROVIDER).also { it.load(null) }
-        return ks.getKey(KEY_ALIAS, null) as SecretKey
+        return ks.getKey(BiometricStore.keyAlias(vaultPath), null) as SecretKey
     }
 
-    private fun deleteKey() {
+    private fun deleteKey(vaultPath: String) {
         val ks = KeyStore.getInstance(KEYSTORE_PROVIDER).also { it.load(null) }
-        if (ks.containsAlias(KEY_ALIAS)) ks.deleteEntry(KEY_ALIAS)
+        val alias = BiometricStore.keyAlias(vaultPath)
+        if (ks.containsAlias(alias)) ks.deleteEntry(alias)
     }
 
-    private fun encryptCipher(): Cipher =
-        Cipher.getInstance(TRANSFORMATION).also { it.init(Cipher.ENCRYPT_MODE, getKey()) }
+    private fun encryptCipher(vaultPath: String): Cipher =
+        Cipher.getInstance(TRANSFORMATION).also { it.init(Cipher.ENCRYPT_MODE, getKey(vaultPath)) }
 
-    private fun decryptCipher(iv: ByteArray): Cipher =
+    private fun decryptCipher(vaultPath: String, iv: ByteArray): Cipher =
         Cipher.getInstance(TRANSFORMATION).also {
-            it.init(Cipher.DECRYPT_MODE, getKey(), GCMParameterSpec(GCM_TAG_BITS, iv))
+            it.init(Cipher.DECRYPT_MODE, getKey(vaultPath), GCMParameterSpec(GCM_TAG_BITS, iv))
         }
 
     private fun buildPromptInfo(

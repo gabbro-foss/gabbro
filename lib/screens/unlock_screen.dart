@@ -204,20 +204,15 @@ class UnlockScreen extends StatefulWidget {
   /// Null → falls back to GabbroApp.maybeOf(context)?.switchToVault(…).
   final void Function(String path, String alias)? onVaultSwitch;
 
-  /// Whether biometric unlock is enabled in settings (from AppSettings.biometricUnlock).
-  final bool biometricEnabled;
-
   /// Returns true if a biometric credential is stored for [vaultPath].
+  /// Per-vault and device-local: false on non-Android and for any vault this
+  /// device has not enrolled. This alone decides whether the button shows.
   final Future<bool> Function(String vaultPath) onBiometricIsEnrolled;
 
   /// Performs biometric authentication and returns the decrypted passphrase
   /// bytes for [vaultPath], or null if cancelled. Throws PlatformException
   /// with code 'BIOMETRIC_INVALIDATED' if the Keystore key was invalidated.
   final Future<List<int>?> Function(String vaultPath) onBiometricAuthenticate;
-
-  /// Called when a BIOMETRIC_INVALIDATED error is received so the parent can
-  /// save biometricUnlock: false to settings.
-  final void Function()? onBiometricInvalidated;
 
   /// Aborts an in-flight YubiKey tap when the user presses Cancel.
   final Future<void> Function() onCancelTap;
@@ -267,10 +262,8 @@ class UnlockScreen extends StatefulWidget {
     this.vaultAlias,
     this.registry,
     this.onVaultSwitch,
-    this.biometricEnabled = false,
     this.onBiometricIsEnrolled = _defaultBiometricIsEnrolled,
     this.onBiometricAuthenticate = _defaultBiometricAuthenticate,
-    this.onBiometricInvalidated,
     this.onCancelTap = _defaultCancelTap,
     this.isAndroid,
     this.onVaultIsReadable = _defaultVaultIsReadable,
@@ -317,11 +310,11 @@ class _UnlockScreenState extends State<UnlockScreen>
     _yubikeyRecords = widget.yubikeyRecords ?? _detectYubikeyRecords();
     _selectedPath = widget.vaultPath;
     _probeVault();
-    if (widget.biometricEnabled) {
-      widget.onBiometricIsEnrolled(widget.vaultPath).then((enrolled) {
-        if (mounted) setState(() => _biometricEnrolled = enrolled);
-      });
-    }
+    // Per-vault, device-local: the button shows iff this device has enrolled
+    // biometric for THIS vault (false on non-Android). No global flag.
+    widget.onBiometricIsEnrolled(widget.vaultPath).then((enrolled) {
+      if (mounted) setState(() => _biometricEnrolled = enrolled);
+    });
   }
 
   List<YubikeyRecordData> _detectYubikeyRecords() {
@@ -546,11 +539,13 @@ class _UnlockScreenState extends State<UnlockScreen>
     } on PlatformException catch (e) {
       if (!mounted) return;
       if (e.code == 'BIOMETRIC_INVALIDATED') {
+        // The Keystore key was invalidated (new fingerprint enrolled); the
+        // native side auto-unenrolled this vault, so hide the button. No global
+        // setting to clear — enrollment is per-vault and device-local.
         setState(() {
           _biometricEnrolled = false;
           _errorMessage = l.biometricInvalidated;
         });
-        widget.onBiometricInvalidated?.call();
       } else {
         setState(() => _errorMessage = l.biometricCancelled);
       }

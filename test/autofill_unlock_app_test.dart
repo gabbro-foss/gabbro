@@ -55,10 +55,10 @@ void main() {
     expect(mq.textScaler.scale(10), 15.0);
   });
 
-  testWidgets('reuses UnlockScreen with registry picker, onUnlocked, biometric',
+  testWidgets('reuses UnlockScreen with registry picker and onUnlocked',
       (tester) async {
     await tester.pumpWidget(buildAutofillUnlockApp(
-      settings: AppSettings(biometricUnlock: true),
+      settings: const AppSettings(),
       registry: _twoVaults(),
       initialVaultPath: '/tmp/a.gabbro',
       channel: channel,
@@ -68,7 +68,6 @@ void main() {
     final screen = tester.widget<UnlockScreen>(find.byType(UnlockScreen));
     expect(screen.registry, isNotNull);
     expect(screen.onUnlocked, isNotNull);
-    expect(screen.biometricEnabled, isTrue);
     expect(screen.vaultPath, '/tmp/a.gabbro');
     expect(find.byType(DropdownButton<String>), findsOneWidget);
   });

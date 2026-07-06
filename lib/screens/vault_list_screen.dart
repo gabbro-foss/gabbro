@@ -1092,18 +1092,16 @@ class _VaultListScreenState extends State<VaultListScreen>
               vaultPath: widget.vaultPath,
               blockPassphraseCopyPaste:
                   cpAppState.settings.blockPassphraseCopyPaste,
-              biometricEnabled: cpAppState.settings.biometricUnlock,
               // Biometric stores the old passphrase; a change makes it stale, so
-              // unenroll it and clear the setting (the screen informs the user).
-              onDisableBiometric: () async {
+              // unenroll THIS vault (the screen informs the user).
+              onDisableBiometric: (vaultPath) async {
                 if (Platform.isAndroid) {
                   try {
-                    await _biometricChannel.invokeMethod<void>('unenroll');
+                    await _biometricChannel.invokeMethod<void>('unenroll', {
+                      'vaultPath': vaultPath,
+                    });
                   } catch (_) {}
                 }
-                cpAppState.updateSettings(
-                  cpAppState.settings.copyWith(biometricUnlock: false),
-                );
               },
             ),
           ),
@@ -1181,10 +1179,6 @@ class _VaultListScreenState extends State<VaultListScreen>
           vaultAlias: widget.vaultAlias,
           blockPassphraseCopyPaste: settings.blockPassphraseCopyPaste,
           registry: appState.registry,
-          biometricEnabled: settings.biometricUnlock,
-          onBiometricInvalidated: () => appState.updateSettings(
-            settings.copyWith(biometricUnlock: false),
-          ),
         ),
       ),
       (_) => false,

@@ -11,21 +11,20 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 
 /**
- * isEnrolled / unenroll are exercised under Robolectric with real SharedPreferences.
+ * isEnrolled is exercised under Robolectric via [BiometricStore] (real SharedPreferences).
  * The hardware paths (BiometricPrompt, AndroidKeyStore key material) stay @Ignore'd —
- * Robolectric cannot present a fingerprint or back a real Keystore-bound AES key.
+ * Robolectric cannot present a fingerprint or back a real Keystore-bound AES key. The
+ * per-vault storage contract itself is covered by BiometricStoreTest.
  */
 @RunWith(RobolectricTestRunner::class)
 class BiometricHelperTest {
 
     private lateinit var context: Context
-
-    // Mirror of BiometricHelper's private storage contract — kept in sync by these
-    // tests. If a rename here is needed, the production constant changed too.
     private val prefsFile = "gabbro_biometric"
-    private val keyCiphertext = "ct"
-    private val keyIv = "iv"
-    private val keyVaultPath = "vault_path"
+
+    // Mirror of BiometricStore's per-vault ciphertext key — the only place a test needs
+    // to poke half-written state. If this prefix changes, BiometricStore changed too.
+    private fun ctKey(vaultPath: String) = "ct_${BiometricStore.suffix(vaultPath)}"
 
     @Before
     fun setUp() {
@@ -35,13 +34,9 @@ class BiometricHelperTest {
             .edit().clear().apply()
     }
 
-    /** Simulate a prior successful enrolment by writing the stored fields directly. */
+    /** Simulate a prior successful enrolment for [vaultPath]. */
     private fun seedEnrolment(vaultPath: String) {
-        context.getSharedPreferences(prefsFile, Context.MODE_PRIVATE).edit()
-            .putString(keyCiphertext, "Y2lwaGVydGV4dA==")
-            .putString(keyIv, "aXZieXRlcw==")
-            .putString(keyVaultPath, vaultPath)
-            .apply()
+        BiometricStore.store(context, vaultPath, "ciphertext".toByteArray(), "ivbytes".toByteArray())
     }
 
     // ── isAvailable ───────────────────────────────────────────────────────────
@@ -80,33 +75,41 @@ class BiometricHelperTest {
         assertFalse(BiometricHelper.isEnrolled(context, "/vaults/other.gabbro"))
     }
 
+    @Test
+    fun isEnrolled_returns_false_on_partial_enrolment() {
+        // Net-first pin: all three fields (ciphertext, iv, matching path) are required.
+        // A half-written slot must never read as enrolled.
+        val path = "/vaults/main.gabbro"
+        context.getSharedPreferences(prefsFile, Context.MODE_PRIVATE).edit()
+            .putString(ctKey(path), "Y2lwaGVydGV4dA==").apply() // ct only, no iv / path
+        assertFalse(BiometricHelper.isEnrolled(context, path))
+    }
+
     // ── unenroll ──────────────────────────────────────────────────────────────
 
     @Test
     @Ignore("unenroll() calls deleteKey() -> KeyStore.getInstance(\"AndroidKeyStore\"), " +
-            "which Robolectric does not back (NoSuchAlgorithmException). Hardware/instrumented only.")
+            "which Robolectric does not back. The prefs-forget half is BiometricStoreTest.")
     fun unenroll_clears_stored_ciphertext_and_iv() {
-        seedEnrolment("/vaults/main.gabbro")
-        BiometricHelper.unenroll(context)
-        val prefs = context.getSharedPreferences(prefsFile, Context.MODE_PRIVATE)
-        assertFalse(prefs.contains(keyCiphertext))
-        assertFalse(prefs.contains(keyIv))
-        assertFalse(BiometricHelper.isEnrolled(context, "/vaults/main.gabbro"))
+        val path = "/vaults/main.gabbro"
+        seedEnrolment(path)
+        BiometricHelper.unenroll(context, path)
+        assertFalse(BiometricHelper.isEnrolled(context, path))
     }
 
     @Test
     @Ignore("unenroll() calls deleteKey() -> KeyStore.getInstance(\"AndroidKeyStore\"), " +
-            "which Robolectric does not back (NoSuchAlgorithmException). Hardware/instrumented only.")
+            "which Robolectric does not back. Hardware/instrumented only.")
     fun unenroll_when_not_enrolled_does_not_throw() {
-        BiometricHelper.unenroll(context)
+        BiometricHelper.unenroll(context, "/vaults/main.gabbro")
         assertFalse(BiometricHelper.isEnrolled(context, "/vaults/main.gabbro"))
     }
 
     @Test
     @Ignore("AndroidKeyStore key material is not backed by Robolectric — hardware/instrumented only")
     fun unenroll_deletes_keystore_key() {
-        // When: unenroll() is called
-        // Then: the KEY_ALIAS entry no longer exists in AndroidKeyStore
+        // When: unenroll(vaultPath) is called
+        // Then: this vault's per-vault key alias no longer exists in AndroidKeyStore
     }
 
     // ── enroll + authenticate round-trip ──────────────────────────────────────
