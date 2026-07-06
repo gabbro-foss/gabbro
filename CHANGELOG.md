@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.1.0-alpha.12] – 2026-07-06
 
 ### Added
 - **Linux desktop auto-type (X11).** With a login open in Gabbro, a global hotkey types `username⇥password↵` into the focused window; uses the login's email when it has no username.
