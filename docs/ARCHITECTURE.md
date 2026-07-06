@@ -95,18 +95,6 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Release `v0.1.0-alpha.12` — only if the full gate (`gabbro_test`) is green.**
-
-Per-vault authentication isolation is done and committed: biometric per-vault fix
-(`c2cfea5`, hardware-verified on device 2026-07-06) + cross-pollination harness
-`multi_vault_isolation_tests` (`8d72b2a` session/YubiKey, `10d89e1` sync). CHANGELOG
-entry staged under `[Unreleased]`.
-
-Steps: run `gabbro_test` green -> bump `pubspec.yaml` to `0.1.0-alpha.12` and move the
-CHANGELOG `[Unreleased]` block -> build + sign artifacts -> tag last. See
-BUILD_AND_RELEASE. First release to ship per-ABI APKs (arm64-v8a ~29 MB) instead of
-the ~76 MB universal one.
-
 ---
 
 ## Build & Release
