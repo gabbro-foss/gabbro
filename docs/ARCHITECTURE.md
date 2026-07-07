@@ -150,28 +150,42 @@ Phases 3–5.
 
 Decisions (approved): **D1** migration triggers **on unlock**, right after successful decrypt;
 best-effort — if the re-seal *write* fails, the vault stays usable at the old version (unlock does NOT
-fail), retried next unlock. **D2** migration reuses the **existing re-seal path** (the one CRUD uses:
-preserves all key records via cached `wrapping_key`/`vault_key_master`, re-derives the passphrase path
-at v10) — needs only the one tapped YubiKey's hmac, not all of them.
+fail), retried next unlock. **D2** migration is confined to unlock (+ key add/remove + passphrase
+change) — the paths that hold what's needed. Needs only the one tapped YubiKey's hmac.
 
-Phase 3 — VERSION 10 + version-dispatched X25519 (implement `keypair.rs` dispatch + bump `VERSION`=10):
-- [ ] S1 v10 direct derivation deterministic (same kdf -> same pubkey across runs).
-- [ ] S2 v10 golden-value pin: fixed kdf -> exact v10 pubkey bytes, equals `clamp(kdf[0..32])`, no `StdRng`.
-- [ ] S3 v10 != legacy: same kdf, v10 pubkey differs from v9 `StdRng` pubkey.
-- [ ] S4 legacy path byte-unchanged (P1 golden still holds after dispatch).
+Design refinement (verified against the code, "Option 1 = belt and braces"): v10 changes the
+passphrase-derivation, so a naive version bump would BRICK a p+YK vault (open re-derives X25519 at the
+stored version against old header material). Passphrase-only is safe already (`save_vault` -> full
+`seal_vault` at VERSION). For p+YK:
+- **Braces (upgrade mechanism):** migrate-on-unlock **rebuilds the passphrase material** at v10 — new
+  X25519(direct)+ml_kem+ephemeral+`passphrase_blob` re-wrapping the cached `wrapping_key`; `key_blob`s
+  survive (bound to `wrapping_key`, not the PQ header); then `reseal_vault_body` re-encrypts the body
+  under the new AAD (verified template: `add_yubikey_to_vault` etc. at `api/vault.rs:1210`).
+- **Belt (safety net):** cap `reseal_vault_body` so a body-only save **never** advances a vault across
+  the v10 boundary on its own (holds at v9 until a clean unlock migrates it). Covers the D1
+  write-failure window. Unlock always precedes CRUD, so CRUD normally sees an already-v10 vault.
+
+Phase 3 — VERSION 10 + version-dispatched X25519:
+- [✓] keypair.rs refactored onto `StaticSecret`; `x25519_keypair_for_version` dispatch + call sites
+      threaded (`vault_crypto.rs`); Cargo feature `reusable_secrets`->`static_secrets` (no new dep).
+      **VERSION still 9** (direct path dormant) until Phase 4 migration + reseal cap land.
+- [✓] S1 v10 direct derivation deterministic.  [✓] S2 v10 golden-value pin (== `clamp(kdf[0..32])`, no `StdRng`).
+- [✓] S3 v10 != legacy.  [✓] S4 legacy path byte-unchanged (P1 golden holds).
 - [ ] S5 dispatch selects correctly: v>=10 direct, v<=9 legacy; both branches byte-checked.
-- [ ] S6 fresh seal is tagged v10 on disk.
+- [ ] S6 fresh seal is tagged v10 on disk (bump `VERSION`=10 — do AFTER Phase 4 lands).
 - [ ] S7 v10 passphrase-only round-trip: seal -> open -> canary intact.
 - [ ] S8 v10 multi-key round-trip: seal -> open with each key -> canary intact.
 - [ ] S9 frozen v10 golden fixtures open: add `v10_passphrase` + `v10_multikey_2keys` to the gate.
 
-Phase 4 — auto-migration on unlock (per D1/D2):
+Phase 4 — auto-migration on unlock (per D1/D2 + refinement):
 - [ ] S10 old vault migrates on unlock (v6/v7/v8/v9): on-disk version -> 10, re-opens, canary intact.
 - [ ] S11 no data loss: entries, folders, YubiKey records all preserved.
-- [ ] S12 multi-key migrates with no extra tap (cached master/wrapping_key); opens with each key after.
+- [ ] S12 p+YK migrates with no extra tap: rebuild passphrase material via cached `wrapping_key`,
+      `key_blob`s preserved; opens with each key after.
 - [ ] S13 atomic + recoverable: `atomic_write_0600` + `.bak`; interrupted write leaves original openable.
 - [ ] S14 steady-state (P2 extended): unlocking an already-v10 vault does NOT rewrite the file.
-- [ ] S15 CRUD / passphrase-change / add-remove-key still migrate to v10 (gate migrate-to-`VERSION` tests).
+- [ ] S15 belt: `reseal_vault_body` cap — a body-only save never bumps a <v10 vault across the boundary.
+- [ ] S15b CRUD / passphrase-change / add-remove-key preserve openability (gate migrate tests green).
 
 Phase 5 — tripwire (guards the legacy read path until Release N+1):
 - [ ] S16 compat-critical invariant: P1 golden promoted to an explicit, loudly-messaged gate assertion;
