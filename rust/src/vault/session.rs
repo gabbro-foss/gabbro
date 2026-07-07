@@ -8706,3 +8706,50 @@ mod multi_vault_isolation_tests {
         teardown(&[&b, &c]);
     }
 }
+
+#[cfg(test)]
+mod read_only_unlock_tests {
+    use super::*;
+    use crate::api::vault::save_vault;
+    use crate::vault::serialization::VaultBody;
+    use serial_test::serial;
+    use std::env::temp_dir;
+
+    /// Net-first pin (RT-3 / Phase 4). Opening and closing an *already-current*
+    /// vault must NOT rewrite the file. Phase 4 adds migrate-on-unlock, which writes
+    /// only when the on-disk version is older than current -- so this steady-state
+    /// property (a current vault is never rewritten on unlock) must survive that
+    /// change, and it guards against a Phase-4 bug that re-seals on every unlock.
+    #[test]
+    #[serial]
+    fn unlock_then_lock_leaves_a_current_version_vault_byte_identical() {
+        let pass = b"read-only-unlock-pin-passphrase";
+        let mut path = temp_dir();
+        path.push("gabbro_readonly_unlock_pin.gabbro");
+
+        save_vault(
+            &VaultBody {
+                folders: vec![String::from("Work")],
+                entries: vec![],
+                ..Default::default()
+            },
+            pass,
+            &path,
+        )
+        .unwrap();
+
+        let before = std::fs::read(&path).expect("read sealed vault");
+
+        unlock_vault(pass, path.clone()).unwrap();
+        lock_vault().unwrap();
+
+        let after = std::fs::read(&path).expect("read vault after unlock+lock");
+        assert_eq!(
+            before, after,
+            "unlock+lock must not modify an already-current vault file"
+        );
+
+        let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
+    }
+}

@@ -71,4 +71,29 @@ mod tests {
         let b = X25519Keypair::from_kdf_output(&out_b);
         assert_ne!(a.public.as_bytes(), b.public.as_bytes());
     }
+
+    /// Golden-value pin (net-first for RT-3). The current `StdRng`-based derivation
+    /// must produce these EXACT public-key bytes for a fixed KDF output. This locks
+    /// the legacy (v<=9) X25519 derivation byte-for-byte: a `rand`/`x25519-dalek`
+    /// bump that silently changes the key stream is caught here (it would otherwise
+    /// brick every existing vault), and the VERSION-10 refactor can prove it leaves
+    /// this legacy path unchanged. Doubles as the seed for the Phase 5 tripwire.
+    #[test]
+    fn x25519_legacy_derivation_matches_frozen_golden_public_key() {
+        let mut kdf_output = [0u8; 96];
+        for (i, b) in kdf_output.iter_mut().enumerate() {
+            *b = i as u8;
+        }
+        let keypair = X25519Keypair::from_kdf_output(&kdf_output);
+        const GOLDEN_PUBLIC: [u8; 32] = [
+            144, 93, 1, 63, 6, 234, 162, 180, 92, 255, 17, 134, 180, 251, 100, 90, 216, 163, 187,
+            209, 72, 97, 38, 52, 186, 26, 252, 161, 3, 68, 221, 122,
+        ];
+        assert_eq!(
+            keypair.public.as_bytes(),
+            &GOLDEN_PUBLIC,
+            "legacy StdRng X25519 derivation drifted from the frozen golden value -- \
+             a dependency bump changed the key stream; this WOULD brick every v<=9 vault"
+        );
+    }
 }
