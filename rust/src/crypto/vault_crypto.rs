@@ -69,6 +69,25 @@ fn x25519_keypair_for_version(version: u8, kdf_output: &[u8; 96]) -> X25519Keypa
     }
 }
 
+/// The version a body-only re-seal may tag a vault with (RT-3 "belt"). A body-only
+/// re-seal (CRUD save with a cached `vault_key_master`) does NOT rebuild the
+/// passphrase material, so it must never advance a vault ACROSS the X25519
+/// derivation boundary — doing so would make the next open derive the new-style
+/// key against old header material and brick the vault. It caps just below the
+/// boundary until a full migration (on unlock) rebuilds the material. A vault
+/// already at/past the boundary is safe to carry to the current [`VERSION`].
+fn capped_reseal_version(material_version: u8) -> u8 {
+    capped_reseal_version_for(material_version, VERSION)
+}
+
+fn capped_reseal_version_for(material_version: u8, current: u8) -> u8 {
+    if material_version >= X25519_DIRECT_MIN_VERSION {
+        current
+    } else {
+        current.min(X25519_DIRECT_MIN_VERSION - 1)
+    }
+}
+
 /// Derives the passphrase-only vault key using the combiner that matches a
 /// vault's file version: VERSION 8+ folds the KEM transcript into the HKDF `info`
 /// (transcript-bound); v2–7 use the legacy combiner so older vaults still open.
@@ -700,7 +719,9 @@ pub fn reseal_vault_body(
     vault_key_master: &[u8; 32],
     plaintext: &[u8],
 ) -> Result<(), String> {
-    sealed.version = VERSION; // migrate to current version; header_aad reflects this
+    // Migrate toward the current version, but never across the X25519 derivation
+    // boundary on a body-only re-seal (see capped_reseal_version — RT-3 belt).
+    sealed.version = capped_reseal_version(sealed.version);
     let aad = sealed.header_aad();
     let (new_ciphertext, new_nonce) = aes_gcm::encrypt_with_aad(vault_key_master, plaintext, &aad)?;
     sealed.ciphertext = new_ciphertext;
@@ -830,6 +851,88 @@ pub fn change_vault_passphrase_with_keys(
         alias: sealed.alias.clone(),
         passphrase_blob: new_passphrase_blob,
     })
+}
+
+/// Migrates a multi-key vault's passphrase-derivation material to `target_version`
+/// and re-encrypts the body — WITHOUT re-tapping any YubiKey (RT-3 "braces").
+///
+/// Used on unlock to carry a p+YK vault across the X25519 derivation boundary. The
+/// caller supplies the passphrase and the `wrapping_key`/`vault_key_master` already
+/// recovered during unlock. The passphrase path (argon2 salt, X25519 at the target
+/// version, ML-KEM, ephemeral, hkdf salt, `passphrase_blob`) is regenerated; the
+/// `key_blob`s are preserved unchanged (they are bound to `wrapping_key`, not the PQ
+/// header); the body is re-encrypted under `vault_key_master` with the new header AAD.
+// TODO(RT-3 Phase 4): remove once the session unlock path calls this. Currently
+// exercised only by unit tests; the migrate-on-unlock wiring lands next.
+#[allow(dead_code)]
+pub fn migrate_multikey_to_version(
+    sealed: &SealedVault,
+    passphrase: &[u8],
+    wrapping_key: &[u8; 32],
+    vault_key_master: &[u8; 32],
+    plaintext: &[u8],
+    target_version: u8,
+) -> Result<SealedVault, String> {
+    let params = Argon2idParams::default();
+    let mut argon2_salt = [0u8; 32];
+    OsRng.fill_bytes(&mut argon2_salt);
+
+    let kdf_output = Zeroizing::new(derive_key(passphrase, &argon2_salt, &params)?);
+    let x25519_keypair = x25519_keypair_for_version(target_version, &kdf_output);
+    let ml_kem_keypair = ml_kem_keypair_for_version(target_version, &kdf_output);
+
+    let (ml_kem_ciphertext, ml_kem_secret) = ml_kem_keypair
+        .encapsulation_key
+        .encapsulate(&mut OsRng)
+        .map_err(|e| format!("ML-KEM encapsulation failed: {e:?}"))?;
+
+    let ephemeral_secret = EphemeralSecret::random_from_rng(OsRng);
+    let ephemeral_public = X25519PublicKey::from(&ephemeral_secret);
+    let x25519_secret = ephemeral_secret.diffie_hellman(&x25519_keypair.public);
+
+    let mut hkdf_salt = [0u8; 32];
+    OsRng.fill_bytes(&mut hkdf_salt);
+
+    let ml_kem_secret_bytes: Zeroizing<[u8; 32]> = Zeroizing::new(
+        (*ml_kem_secret)
+            .try_into()
+            .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
+    );
+    let x25519_secret_bytes = Zeroizing::new(*x25519_secret.as_bytes());
+    // Multi-key mode uses the plain (non-transcript-bound) combiner at every
+    // version, matching seal_vault_with_keys / open_vault_with_key_record.
+    let intermediate_key = Zeroizing::new(derive_vault_key(
+        &ml_kem_secret_bytes,
+        &x25519_secret_bytes,
+        &hkdf_salt,
+    ));
+
+    let (pb_ct, pb_nonce) = aes_gcm::encrypt(&intermediate_key, &wrapping_key[..])?;
+    let mut passphrase_blob = Vec::with_capacity(12 + pb_ct.len());
+    passphrase_blob.extend_from_slice(&pb_nonce);
+    passphrase_blob.extend_from_slice(&pb_ct);
+
+    let mut migrated = SealedVault {
+        version: target_version,
+        params,
+        argon2_salt,
+        hkdf_salt,
+        nonce: [0u8; 12],
+        ml_kem_ciphertext: ml_kem_ciphertext.to_vec(),
+        x25519_ephemeral_public: *ephemeral_public.as_bytes(),
+        ciphertext: vec![],
+        yubikey_records: sealed.yubikey_records.clone(),
+        alias: sealed.alias.clone(),
+        passphrase_blob,
+    };
+    let (ciphertext, nonce) = if target_version >= AAD_MIN_VERSION {
+        aes_gcm::encrypt_with_aad(vault_key_master, plaintext, &migrated.header_aad())?
+    } else {
+        aes_gcm::encrypt(vault_key_master, plaintext)?
+    };
+    migrated.ciphertext = ciphertext;
+    migrated.nonce = nonce;
+    Ok(migrated)
 }
 
 #[cfg(test)]
@@ -1157,6 +1260,56 @@ mod tests {
                 salt: [0x44u8; 32],
             },
         ]
+    }
+
+    /// S15 (belt): a body-only re-seal must never advance a vault across the v10
+    /// X25519 boundary. Pure/version-independent so the boundary is pinned now.
+    #[test]
+    fn capped_reseal_version_never_crosses_the_x25519_boundary() {
+        // Current build is v10.
+        assert_eq!(capped_reseal_version_for(9, 10), 9, "v9 material must NOT jump to v10");
+        assert_eq!(capped_reseal_version_for(6, 10), 9, "old material advances only to the boundary-1");
+        assert_eq!(capped_reseal_version_for(10, 10), 10, "already-v10 material carries to current");
+        assert_eq!(capped_reseal_version_for(11, 10), 10, "material ahead of current pins to current");
+        // Current build is still v9 (today): behaviour is unchanged, always 9.
+        assert_eq!(capped_reseal_version_for(9, 9), 9);
+        assert_eq!(capped_reseal_version_for(6, 9), 9);
+    }
+
+    /// S10/S11/S12 (braces, unit level): a p+YK vault sealed with legacy (v<=9)
+    /// material migrates to v10 without a re-tap — key_blobs preserved, body intact,
+    /// and it re-opens with EACH registered key under the v10 direct derivation.
+    #[test]
+    fn migrate_multikey_to_v10_rebuilds_and_reopens_with_each_key() {
+        let passphrase = b"multikey migration passphrase";
+        let plaintext = b"multi-key body that must survive migration";
+        let keys = two_test_keys();
+
+        // Fresh seal = current build (v9) legacy X25519 material.
+        let sealed = seal_vault_with_keys(passphrase, &keys, plaintext, None).unwrap();
+        assert!(sealed.version < 10, "precondition: legacy-material vault");
+
+        // Recover wrapping_key + master via one key (what unlock caches).
+        let (recovered, master, wrapping) =
+            open_vault_with_key_record(passphrase, &keys[0].hmac_secret, &keys[0].credential_id, &sealed)
+                .unwrap();
+        assert_eq!(recovered, plaintext);
+        let wrapping = wrapping.expect("multi-key vault yields a wrapping_key");
+
+        // Migrate to v10 (direct X25519), no re-tap.
+        let migrated =
+            migrate_multikey_to_version(&sealed, passphrase, &wrapping, &master, plaintext, 10)
+                .unwrap();
+        assert_eq!(migrated.version, 10);
+        assert_eq!(migrated.yubikey_records.len(), 2, "both key_blobs preserved");
+
+        // Opens with EACH key at v10, body intact.
+        for k in &keys {
+            let (pt, _, _) =
+                open_vault_with_key_record(passphrase, &k.hmac_secret, &k.credential_id, &migrated)
+                    .unwrap();
+            assert_eq!(pt, plaintext, "v10-migrated vault must open with each registered key");
+        }
     }
 
     #[test]
