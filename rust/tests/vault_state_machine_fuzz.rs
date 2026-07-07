@@ -150,13 +150,11 @@ impl Model {
     }
 }
 
-/// After every mutation: the file is at the current VERSION, and EVERY registered
-/// key opens the vault under the current passphrase with the canary intact (the
-/// core brick-prevention property). `log` is the running operation history, printed
-/// verbatim if any assertion blows so the failure is reproducible.
 /// Every registered key opens the vault under the current passphrase with the
 /// canary intact (the core brick-prevention property), regardless of on-disk
-/// VERSION. Used at baseline, where a pre-current fixture is not yet migrated.
+/// VERSION. `log` is the running operation history, printed verbatim if any
+/// assertion blows so the failure is reproducible. Used at baseline, where a
+/// pre-current fixture is not yet migrated.
 fn assert_unlockable(path: &Path, model: &Model, pool: &[KeyMat; 4], log: &[String]) {
     for &r in &model.registered {
         let k = &pool[r];
@@ -177,15 +175,31 @@ fn assert_unlockable(path: &Path, model: &Model, pool: &[KeyMat; 4], log: &[Stri
     }
 }
 
+/// After every mutation: the vault is never bricked (opens with every registered
+/// key, canary intact) and its on-disk version is consistent with the RT-3 rules.
+/// A passphrase change rebuilds the whole passphrase path, so it migrates the vault
+/// to the current VERSION. A passphrase-less add/remove cannot rebuild the v10
+/// material, so the belt keeps the vault below the derivation boundary (migration
+/// to v10 happens on unlock, not here). Fixtures start at v6/v7/v8 (< current), and
+/// change_passphrase always uses a fresh passphrase, so `passphrase != FIXTURE`
+/// reliably marks "a migrating op has run".
 fn assert_invariants(path: &Path, model: &Model, pool: &[KeyMat; 4], log: &[String]) {
     let on_disk = read_vault(path)
         .unwrap_or_else(|e| panic!("read_vault failed after [{}]: {e}", log.join(" -> ")));
-    assert_eq!(
-        on_disk.version,
-        VERSION,
-        "version must be current after every mutation; history: [{}]",
-        log.join(" -> ")
-    );
+    if model.passphrase != FIXTURE_PASSPHRASE {
+        assert_eq!(
+            on_disk.version, VERSION,
+            "a passphrase change must migrate the vault to the current VERSION; history: [{}]",
+            log.join(" -> ")
+        );
+    } else {
+        assert!(
+            on_disk.version < VERSION,
+            "belt: passphrase-less add/remove must NOT force a pre-v10 vault across the \
+             derivation boundary (stays < current until unlock migrates it); history: [{}]",
+            log.join(" -> ")
+        );
+    }
     assert_unlockable(path, model, pool, log);
 }
 
