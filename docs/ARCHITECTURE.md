@@ -71,7 +71,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 656 | 17 |
-| Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 14 | 0 |
+| Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 16 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust sync-walk batched apply (`cargo test --release --lib sync_walk_batched_apply_matches_checker -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -171,11 +171,11 @@ Phase 3 — VERSION 10 + version-dispatched X25519:
       **VERSION still 9** (direct path dormant) until Phase 4 migration + reseal cap land.
 - [✓] S1 v10 direct derivation deterministic.  [✓] S2 v10 golden-value pin (== `clamp(kdf[0..32])`, no `StdRng`).
 - [✓] S3 v10 != legacy.  [✓] S4 legacy path byte-unchanged (P1 golden holds).
-- [ ] S5 dispatch selects correctly: v>=10 direct, v<=9 legacy; both branches byte-checked.
-- [ ] S6 fresh seal is tagged v10 on disk (bump `VERSION`=10 — do AFTER Phase 4 lands).
-- [ ] S7 v10 passphrase-only round-trip: seal -> open -> canary intact.
-- [ ] S8 v10 multi-key round-trip: seal -> open with each key -> canary intact.
-- [ ] S9 frozen v10 golden fixtures open: add `v10_passphrase` + `v10_multikey_2keys` to the gate.
+- [✓] S5 dispatch selects correctly: gate opens v6-9 (legacy) + v10 (direct); migration test crosses v9->v10.
+- [✓] S6 fresh seal is tagged v10 on disk (VERSION=10).
+- [✓] S7 v10 passphrase-only round-trip: `v10_passphrase` fixture opens (canary); seal/open tests at v10.
+- [✓] S8 v10 multi-key round-trip: `v10_multikey_2keys` opens with each key.
+- [✓] S9 frozen v10 golden fixtures added to the gate (`v10_passphrase` + `v10_multikey_2keys`).
 
 Phase 4 — auto-migration on unlock (per D1/D2 + refinement): DONE (VERSION now 10).
 Session wiring: `unlock_vault` -> `migrate_passphrase_vault_on_unlock` (full re-seal); multi-key
@@ -189,17 +189,17 @@ re-tap). Both best-effort per D1 (`let _ =`). Crypto: `migrate_multikey_to_versi
       + `verify_and_sync_backup`) — same atomic path as every save (crash_safety gate covers interruption).
 - [✓] S14 steady-state (P2 at v10): unlocking an already-v10 vault does NOT rewrite the file.
 - [✓] S15 belt: `capped_reseal_version` — a body-only save never bumps a <v10 vault across the boundary.
-- [ ] S15b CRUD / passphrase-change / add-remove-key preserve openability (gate — NEXT).
+- [✓] S15b CRUD / passphrase-change / add-remove-key preserve openability; `change_passphrase` migrates.
 
-Phase 3 remaining: [✓] S6 fresh seal tagged v10 (VERSION=10). S5/S7/S8/S9 land with the gate step.
-
-**GATE STATUS: the backward-compat gate is expected RED right now** — VERSION=10 changed the migration
-semantics (multikey mutations no longer force version==current; that's the belt). NEXT step (needs a
-gate run): adjust the rotation helper assertion to openability (approved) + add v10 fixtures.
+**GATE STATUS: backward-compat gate GREEN 16/16** (`cargo test --release --test vault_backward_compat`).
+Rotation tests assert the belt (stays <v10) + openability; passphrase change migrates to v10; v10
+fixtures added. `change_vault_passphrase_with_keys` now derives new material at current VERSION.
 
 Phase 5 — tripwire (guards the legacy read path until Release N+1):
-- [ ] S16 compat-critical invariant: P1 golden promoted to an explicit, loudly-messaged gate assertion;
-      fail the build on drift. In-code comment marks `StdRng` + ChaCha12 as frozen (`keypair.rs`).
+- [✓] S16 compat-critical invariant: `x25519_legacy_derivation_matches_frozen_golden_public_key`
+      (loud message; fails the build if the `StdRng` stream drifts). `keypair.rs` module doc marks
+      `StdRng` + ChaCha12 as a frozen, compat-critical invariant. (Same guard now also applies to the
+      v10 direct golden, S2.)
 
 Phase 6 — release-gate proof (maintainer runs): full backward-compat gate, `cargo test`,
 `flutter test`, Android leg; hardware matrix (Linux + Android) on **mock** vaults; add a v10 vault to
