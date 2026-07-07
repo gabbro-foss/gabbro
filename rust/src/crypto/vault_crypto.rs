@@ -862,9 +862,6 @@ pub fn change_vault_passphrase_with_keys(
 /// version, ML-KEM, ephemeral, hkdf salt, `passphrase_blob`) is regenerated; the
 /// `key_blob`s are preserved unchanged (they are bound to `wrapping_key`, not the PQ
 /// header); the body is re-encrypted under `vault_key_master` with the new header AAD.
-// TODO(RT-3 Phase 4): remove once the session unlock path calls this. Currently
-// exercised only by unit tests; the migrate-on-unlock wiring lands next.
-#[allow(dead_code)]
 pub fn migrate_multikey_to_version(
     sealed: &SealedVault,
     passphrase: &[u8],
@@ -1276,38 +1273,47 @@ mod tests {
         assert_eq!(capped_reseal_version_for(6, 9), 9);
     }
 
-    /// S10/S11/S12 (braces, unit level): a p+YK vault sealed with legacy (v<=9)
-    /// material migrates to v10 without a re-tap — key_blobs preserved, body intact,
-    /// and it re-opens with EACH registered key under the v10 direct derivation.
+    /// S10/S11/S12 (braces, unit level): a p+YK vault with legacy (v9 `StdRng`)
+    /// material migrates ACROSS the boundary to v10 without a re-tap — key_blobs
+    /// preserved, body intact, re-opens with EACH key under the v10 direct
+    /// derivation. Version-independent (builds the v9 source via migration), so it
+    /// holds whether the current build is v9 or v10.
     #[test]
-    fn migrate_multikey_to_v10_rebuilds_and_reopens_with_each_key() {
+    fn migrate_multikey_across_x25519_boundary_v9_to_v10_reopens_with_each_key() {
         let passphrase = b"multikey migration passphrase";
         let plaintext = b"multi-key body that must survive migration";
         let keys = two_test_keys();
 
-        // Fresh seal = current build (v9) legacy X25519 material.
         let sealed = seal_vault_with_keys(passphrase, &keys, plaintext, None).unwrap();
-        assert!(sealed.version < 10, "precondition: legacy-material vault");
-
-        // Recover wrapping_key + master via one key (what unlock caches).
-        let (recovered, master, wrapping) =
-            open_vault_with_key_record(passphrase, &keys[0].hmac_secret, &keys[0].credential_id, &sealed)
-                .unwrap();
-        assert_eq!(recovered, plaintext);
+        let (_, master, wrapping) = open_vault_with_key_record(
+            passphrase,
+            &keys[0].hmac_secret,
+            &keys[0].credential_id,
+            &sealed,
+        )
+        .unwrap();
         let wrapping = wrapping.expect("multi-key vault yields a wrapping_key");
 
-        // Migrate to v10 (direct X25519), no re-tap.
-        let migrated =
-            migrate_multikey_to_version(&sealed, passphrase, &wrapping, &master, plaintext, 10)
-                .unwrap();
-        assert_eq!(migrated.version, 10);
-        assert_eq!(migrated.yubikey_records.len(), 2, "both key_blobs preserved");
-
-        // Opens with EACH key at v10, body intact.
+        // Build a legacy (v9, StdRng X25519) multi-key vault.
+        let v9 =
+            migrate_multikey_to_version(&sealed, passphrase, &wrapping, &master, plaintext, 9).unwrap();
+        assert_eq!(v9.version, 9);
+        // It opens as a genuine v9 vault (legacy derivation) with each key.
         for k in &keys {
             let (pt, _, _) =
-                open_vault_with_key_record(passphrase, &k.hmac_secret, &k.credential_id, &migrated)
-                    .unwrap();
+                open_vault_with_key_record(passphrase, &k.hmac_secret, &k.credential_id, &v9).unwrap();
+            assert_eq!(pt, plaintext);
+        }
+
+        // Migrate across the boundary to v10 (direct X25519) — no re-tap.
+        let v10 =
+            migrate_multikey_to_version(&v9, passphrase, &wrapping, &master, plaintext, 10).unwrap();
+        assert_eq!(v10.version, 10);
+        assert_eq!(v10.yubikey_records.len(), 2, "both key_blobs preserved");
+
+        for k in &keys {
+            let (pt, _, _) =
+                open_vault_with_key_record(passphrase, &k.hmac_secret, &k.credential_id, &v10).unwrap();
             assert_eq!(pt, plaintext, "v10-migrated vault must open with each registered key");
         }
     }

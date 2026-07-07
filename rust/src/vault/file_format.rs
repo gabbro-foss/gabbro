@@ -73,7 +73,11 @@ pub struct YubiKeyRecord {
 pub const MAGIC: &[u8; 6] = b"GABBRO";
 
 /// Current file format version (written by this build).
-pub const VERSION: u8 = 9;
+///
+/// VERSION 10 (RT-3): X25519 static secret derived directly from KDF bytes [0..32]
+/// (no `StdRng`). Vaults v2–9 keep the legacy `StdRng` derivation on read and
+/// auto-migrate to v10 on unlock.
+pub const VERSION: u8 = 10;
 
 /// Oldest version this build can still read.
 const VERSION_MIN_READABLE: u8 = 2;
