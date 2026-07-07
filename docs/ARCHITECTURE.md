@@ -178,13 +178,15 @@ Phase 3 — VERSION 10 + version-dispatched X25519:
 - [ ] S9 frozen v10 golden fixtures open: add `v10_passphrase` + `v10_multikey_2keys` to the gate.
 
 Phase 4 — auto-migration on unlock (per D1/D2 + refinement):
-- [ ] S10 old vault migrates on unlock (v6/v7/v8/v9): on-disk version -> 10, re-opens, canary intact.
-- [ ] S11 no data loss: entries, folders, YubiKey records all preserved.
-- [ ] S12 p+YK migrates with no extra tap: rebuild passphrase material via cached `wrapping_key`,
-      `key_blob`s preserved; opens with each key after.
+Crypto layer done & green (VERSION still 9): `migrate_multikey_to_version` (braces) +
+`capped_reseal_version` (belt) in `vault_crypto.rs`; unit-tested (multikey v9->v10 round-trip re-opens
+with each key; cap boundary). NEXT (after pause): session unlock wiring + VERSION->10 + gate + fixtures.
+- [~] S10 old vault migrates on unlock (v6/v7/v8/v9): crypto primitive proven; session wiring pending.
+- [~] S11 no data loss (entries/folders/YK records): proven for the multikey primitive; session pending.
+- [~] S12 p+YK migrates with no extra tap (cached `wrapping_key`, key_blobs preserved): crypto green.
 - [ ] S13 atomic + recoverable: `atomic_write_0600` + `.bak`; interrupted write leaves original openable.
 - [ ] S14 steady-state (P2 extended): unlocking an already-v10 vault does NOT rewrite the file.
-- [ ] S15 belt: `reseal_vault_body` cap — a body-only save never bumps a <v10 vault across the boundary.
+- [✓] S15 belt: `capped_reseal_version` — a body-only save never bumps a <v10 vault across the boundary.
 - [ ] S15b CRUD / passphrase-change / add-remove-key preserve openability (gate migrate tests green).
 
 Phase 5 — tripwire (guards the legacy read path until Release N+1):
