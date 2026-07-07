@@ -95,6 +95,24 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
+**RT-3 — X25519 key derivation depends on `rand::StdRng` (robustness / latent vault-brick).**
+Surfaced by an internal red-team pass. `crypto/keypair.rs` derives the X25519 static secret via
+`StdRng::from_seed(kdf[0..32])` for **all** vault versions (2–9); the F-02 fix moved ML-KEM off
+`StdRng` but left X25519 on it. Not a confidentiality break (key stays Argon2id-bounded) — it is an
+availability risk: a future `rand` / `x25519-dalek` major bump could re-derive different keys and
+brick every existing vault. Mitigated today by the `Cargo.lock` pin + the backward-compat gate
+(frozen fixtures fail to open if the stream changes). **Decision pending — pick one:**
+- **A (lighter, recommended):** no format bump. Add an explicit gate assertion that fails if a fixed
+  seed re-derives a different X25519 key, and document `StdRng` + ChaCha12 as a compat-critical
+  invariant. Protects all vaults, no migration risk.
+- **B (full fix):** bump to VERSION 10, dispatch X25519 derivation on version (v≥10 = direct
+  `clamp(kdf[0..32])`, no PRNG; v≤9 = legacy `StdRng`), add fixtures + migration-on-save. Removes the
+  PRNG for **new** vaults only — the legacy path must persist to read v2–9, so existing vaults keep
+  the risk.
+
+Approach when picked: net-first (pin current behaviour green), then canon-TDD scenario list before
+code. Any VERSION-10 route is a vault-format change → full backward-compat TDD.
+
 ---
 
 ## Build & Release
