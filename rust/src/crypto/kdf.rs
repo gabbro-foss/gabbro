@@ -31,7 +31,8 @@ impl Argon2idParams {
 /// Derives 96 bytes of key material from a passphrase and salt.
 ///
 /// The output is split by the caller:
-///   bytes [0..32]  → X25519 private-key seed (routed through StdRng, then clamped)
+///   bytes [0..32]  → X25519 private-key seed (VERSION 10+ used directly; VERSION
+///                    2–9 routed through StdRng — see crypto::keypair, RT-3)
 ///   bytes [32..64] → ML-KEM-1024 `d` (KeyGen seed for the PKE keypair)
 ///   bytes [64..96] → ML-KEM-1024 `z` (KeyGen implicit-rejection secret)
 ///
