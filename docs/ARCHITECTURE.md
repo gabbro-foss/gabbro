@@ -136,30 +136,46 @@ crypto step is a frozen public standard whose output can't drift).
 
 **Phased plan (tick as we go).**
 
-Phase 0 — docs (this block). [ ] committed, code untouched.
+Phase 0 — docs (this block). [✓] committed (7a54898), code untouched.
 
 Phase 1 — net-first (pin CURRENT v9 behaviour green, before touching production):
-- [ ] Confirm/trace real wiring: unlock/lock read paths, X25519 derivation, save-path re-seal.
-- [ ] Pin: frozen v9 fixture opens; current X25519 derivation is deterministic; unlock/lock are
-      currently read-only (no write). Green against current code.
+- [✓] Confirm/trace real wiring: unlock/lock read-only (`session.rs` -> `load_vault`, no write);
+      X25519 `from_kdf_output` (all seal/open paths); `VERSION=9` single source (`file_format.rs:76`).
+- [✓] Pin, green against current code: P1 X25519 golden-value pin (`keypair.rs`); P2 unlock+lock leave
+      a current-version vault byte-identical (`session.rs`). P3 (v9 opens, passphrase + 2-key) already
+      covered by the gate. frozen v6-v9 fixtures already open+migrate via the backward-compat gate.
 
-Phase 2 — canon-TDD scenario list, then STOP for maintainer review (no test/prod code before sign-off).
+Phase 2 — canon-TDD scenario list. [✓] APPROVED (scenarios + D1/D2 below). Red-first per scenario in
+Phases 3–5.
 
-Phase 3 — implement VERSION 10 (red-first per scenario):
-- [ ] `keypair.rs`: version-dispatched X25519 — v>=10 direct `clamp(kdf[0..32])`, v<=9 legacy `StdRng`.
-- [ ] Bump `CURRENT_VERSION` to 10; seal path writes v10.
-- [ ] Frozen v10 golden fixture + regenerate helper; v9 fixture retained for the read path.
+Decisions (approved): **D1** migration triggers **on unlock**, right after successful decrypt;
+best-effort — if the re-seal *write* fails, the vault stays usable at the old version (unlock does NOT
+fail), retried next unlock. **D2** migration reuses the **existing re-seal path** (the one CRUD uses:
+preserves all key records via cached `wrapping_key`/`vault_key_master`, re-derives the passphrase path
+at v10) — needs only the one tapped YubiKey's hmac, not all of them.
 
-Phase 4 — auto-migration:
-- [ ] Upgrade-on-unlock/lock: on open, if `version < CURRENT`, re-seal in place at v10 via
-      `atomic_write_0600` + `.bak` (crash-safe, reversible); no extra YubiKey tap; only fires on
-      version mismatch (steady-state v10 vaults are never written on unlock).
-- [ ] Confirm existing save paths (passphrase change, CRUD) already re-seal at v10.
+Phase 3 — VERSION 10 + version-dispatched X25519 (implement `keypair.rs` dispatch + bump `VERSION`=10):
+- [ ] S1 v10 direct derivation deterministic (same kdf -> same pubkey across runs).
+- [ ] S2 v10 golden-value pin: fixed kdf -> exact v10 pubkey bytes, equals `clamp(kdf[0..32])`, no `StdRng`.
+- [ ] S3 v10 != legacy: same kdf, v10 pubkey differs from v9 `StdRng` pubkey.
+- [ ] S4 legacy path byte-unchanged (P1 golden still holds after dispatch).
+- [ ] S5 dispatch selects correctly: v>=10 direct, v<=9 legacy; both branches byte-checked.
+- [ ] S6 fresh seal is tagged v10 on disk.
+- [ ] S7 v10 passphrase-only round-trip: seal -> open -> canary intact.
+- [ ] S8 v10 multi-key round-trip: seal -> open with each key -> canary intact.
+- [ ] S9 frozen v10 golden fixtures open: add `v10_passphrase` + `v10_multikey_2keys` to the gate.
+
+Phase 4 — auto-migration on unlock (per D1/D2):
+- [ ] S10 old vault migrates on unlock (v6/v7/v8/v9): on-disk version -> 10, re-opens, canary intact.
+- [ ] S11 no data loss: entries, folders, YubiKey records all preserved.
+- [ ] S12 multi-key migrates with no extra tap (cached master/wrapping_key); opens with each key after.
+- [ ] S13 atomic + recoverable: `atomic_write_0600` + `.bak`; interrupted write leaves original openable.
+- [ ] S14 steady-state (P2 extended): unlocking an already-v10 vault does NOT rewrite the file.
+- [ ] S15 CRUD / passphrase-change / add-remove-key still migrate to v10 (gate migrate-to-`VERSION` tests).
 
 Phase 5 — tripwire (guards the legacy read path until Release N+1):
-- [ ] Gate assertion: fixed seed must re-derive the known X25519 key; fail loudly on drift.
-- [ ] Document `StdRng` + ChaCha12 as a compat-critical invariant in an in-code comment
-      (`keypair.rs`) beside the tripwire test.
+- [ ] S16 compat-critical invariant: P1 golden promoted to an explicit, loudly-messaged gate assertion;
+      fail the build on drift. In-code comment marks `StdRng` + ChaCha12 as frozen (`keypair.rs`).
 
 Phase 6 — release-gate proof (maintainer runs): full backward-compat gate, `cargo test`,
 `flutter test`, Android leg; hardware matrix (Linux + Android) on **mock** vaults; add a v10 vault to
