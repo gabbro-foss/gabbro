@@ -38,6 +38,13 @@ const AAD_MIN_VERSION: u8 = 7;
 /// vaults still open. YubiKey-mode derivation is unaffected at every version (F-03).
 const TRANSCRIPT_BINDING_MIN_VERSION: u8 = 8;
 
+/// First file-format version that derives the X25519 static secret directly from
+/// KDF bytes [0..32] (clamp, no PRNG). Vaults below this route the derivation
+/// through `rand::StdRng` (ChaCha12) and must keep doing so to remain readable
+/// (RT-3). Removing the legacy path is a Release N+1 task once no <v10 vault
+/// remains; see keypair.rs for the frozen-stream invariant.
+const X25519_DIRECT_MIN_VERSION: u8 = 10;
+
 /// Derives the ML-KEM keypair using the path that matches a vault's file
 /// version: VERSION 6+ uses FIPS keygen, VERSION 2–5 use the legacy path so
 /// vaults sealed by older builds still open. Seal paths pass [`VERSION`] (new
@@ -47,6 +54,18 @@ fn ml_kem_keypair_for_version(version: u8, kdf_output: &[u8; 96]) -> MlKemKeypai
         MlKemKeypair::from_kdf_output_fips(kdf_output)
     } else {
         MlKemKeypair::from_kdf_output_legacy(kdf_output)
+    }
+}
+
+/// Derives the X25519 keypair using the path that matches a vault's file version:
+/// VERSION 10+ derives directly from KDF bytes [0..32] (no PRNG); VERSION 2–9 use
+/// the legacy `StdRng` path so existing vaults still open. Seal paths pass
+/// [`VERSION`]; open paths pass the parsed `sealed.version`.
+fn x25519_keypair_for_version(version: u8, kdf_output: &[u8; 96]) -> X25519Keypair {
+    if version >= X25519_DIRECT_MIN_VERSION {
+        X25519Keypair::from_kdf_output_direct(kdf_output)
+    } else {
+        X25519Keypair::from_kdf_output_legacy(kdf_output)
     }
 }
 
@@ -108,7 +127,7 @@ pub(crate) fn seal_vault_with_params(
 
     // Step 2: derive keypairs from passphrase
     let kdf_output = Zeroizing::new(derive_key(passphrase, &argon2_salt, &params)?);
-    let x25519_keypair = X25519Keypair::from_kdf_output(&kdf_output);
+    let x25519_keypair = x25519_keypair_for_version(VERSION, &kdf_output);
     let ml_kem_keypair = ml_kem_keypair_for_version(VERSION, &kdf_output);
 
     // Step 3: ML-KEM encapsulate → shared secret A
@@ -172,7 +191,7 @@ pub(crate) fn seal_vault_with_params(
 pub fn open_vault(passphrase: &[u8], sealed: &SealedVault) -> Result<Vec<u8>, String> {
     // Step 1: re-derive keypairs from passphrase
     let kdf_output = Zeroizing::new(derive_key(passphrase, &sealed.argon2_salt, &sealed.params)?);
-    let x25519_keypair = X25519Keypair::from_kdf_output(&kdf_output);
+    let x25519_keypair = x25519_keypair_for_version(sealed.version, &kdf_output);
     let ml_kem_keypair = ml_kem_keypair_for_version(sealed.version, &kdf_output);
 
     // Step 2: ML-KEM decapsulate → shared secret A
@@ -241,7 +260,7 @@ pub fn seal_vault_with_yubikey(
     OsRng.fill_bytes(&mut argon2_salt);
 
     let kdf_output = Zeroizing::new(derive_key(passphrase, &argon2_salt, &params)?);
-    let x25519_keypair = X25519Keypair::from_kdf_output(&kdf_output);
+    let x25519_keypair = x25519_keypair_for_version(VERSION, &kdf_output);
     let ml_kem_keypair = ml_kem_keypair_for_version(VERSION, &kdf_output);
 
     let mut encap_rng = OsRng;
@@ -310,7 +329,7 @@ pub fn open_vault_with_yubikey(
     sealed: &SealedVault,
 ) -> Result<Vec<u8>, String> {
     let kdf_output = Zeroizing::new(derive_key(passphrase, &sealed.argon2_salt, &sealed.params)?);
-    let x25519_keypair = X25519Keypair::from_kdf_output(&kdf_output);
+    let x25519_keypair = x25519_keypair_for_version(sealed.version, &kdf_output);
     let ml_kem_keypair = ml_kem_keypair_for_version(sealed.version, &kdf_output);
 
     let ml_kem_ct_bytes: &[u8; 1568] = sealed
@@ -388,7 +407,7 @@ pub fn seal_vault_with_keys(
     OsRng.fill_bytes(&mut argon2_salt);
 
     let kdf_output = Zeroizing::new(derive_key(passphrase, &argon2_salt, &params)?);
-    let x25519_keypair = X25519Keypair::from_kdf_output(&kdf_output);
+    let x25519_keypair = x25519_keypair_for_version(VERSION, &kdf_output);
     let ml_kem_keypair = ml_kem_keypair_for_version(VERSION, &kdf_output);
 
     let mut encap_rng = OsRng;
@@ -494,7 +513,7 @@ pub fn open_vault_with_key_record(
     sealed: &SealedVault,
 ) -> Result<(Vec<u8>, Zeroizing<[u8; 32]>, Option<Zeroizing<[u8; 32]>>), String> {
     let kdf_output = Zeroizing::new(derive_key(passphrase, &sealed.argon2_salt, &sealed.params)?);
-    let x25519_keypair = X25519Keypair::from_kdf_output(&kdf_output);
+    let x25519_keypair = x25519_keypair_for_version(sealed.version, &kdf_output);
     let ml_kem_keypair = ml_kem_keypair_for_version(sealed.version, &kdf_output);
 
     let ml_kem_ct_bytes: &[u8; 1568] = sealed
@@ -706,7 +725,7 @@ pub fn change_vault_passphrase_with_keys(
         &sealed.argon2_salt,
         &sealed.params,
     )?);
-    let old_x25519 = X25519Keypair::from_kdf_output(&old_kdf);
+    let old_x25519 = x25519_keypair_for_version(sealed.version, &old_kdf);
     let old_ml_kem = ml_kem_keypair_for_version(sealed.version, &old_kdf);
 
     let ml_kem_ct_bytes: &[u8; 1568] = sealed
@@ -762,7 +781,7 @@ pub fn change_vault_passphrase_with_keys(
     OsRng.fill_bytes(&mut new_argon2_salt);
 
     let new_kdf = Zeroizing::new(derive_key(new_passphrase, &new_argon2_salt, &new_params)?);
-    let new_x25519 = X25519Keypair::from_kdf_output(&new_kdf);
+    let new_x25519 = x25519_keypair_for_version(sealed.version, &new_kdf);
     let new_ml_kem = ml_kem_keypair_for_version(sealed.version, &new_kdf);
 
     let mut encap_rng = OsRng;
@@ -917,7 +936,7 @@ mod tests {
         let mut argon2_salt = [0u8; 32];
         OsRng.fill_bytes(&mut argon2_salt);
         let kdf_output = Zeroizing::new(derive_key(passphrase, &argon2_salt, &params).unwrap());
-        let x25519_keypair = X25519Keypair::from_kdf_output(&kdf_output);
+        let x25519_keypair = X25519Keypair::from_kdf_output_legacy(&kdf_output);
         let ml_kem_keypair = MlKemKeypair::from_kdf_output_legacy(&kdf_output);
 
         let mut encap_rng = OsRng;
@@ -1665,7 +1684,8 @@ mod tests {
         let kdf_output = Zeroizing::new(
             crate::crypto::kdf::derive_key(passphrase, &argon2_salt, &params).unwrap(),
         );
-        let x25519_keypair = crate::crypto::keypair::X25519Keypair::from_kdf_output(&kdf_output);
+        let x25519_keypair =
+            crate::crypto::keypair::X25519Keypair::from_kdf_output_legacy(&kdf_output);
         let ml_kem_keypair = MlKemKeypair::from_kdf_output_fips(&kdf_output);
         let (ml_kem_ct, ml_kem_secret) = ml_kem_keypair
             .encapsulation_key
