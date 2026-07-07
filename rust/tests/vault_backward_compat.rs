@@ -269,6 +269,34 @@ fn v9_multikey_opens_with_each_registered_key() {
     assert_opens_with(&p, YK2_HMAC, YK2_CRED, "YK2");
 }
 
+#[test]
+fn v10_passphrase_only_opens() {
+    // A v10 passphrase-only vault (X25519 derived directly from the KDF, no StdRng)
+    // must open under the current build and yield the canary.
+    let p = fixture("v10_passphrase.gabbro");
+    assert_eq!(
+        read_vault(&p).unwrap().version,
+        10,
+        "fixture must be VERSION 10"
+    );
+    let body = load_vault(FIXTURE_PASSPHRASE, &p)
+        .expect("current build must open the v10 passphrase-only golden vault");
+    assert_canary(&body);
+}
+
+#[test]
+fn v10_multikey_opens_with_each_registered_key() {
+    // A v10 passphrase + YK1 + YK2 vault must open with EITHER registered key.
+    let p = fixture("v10_multikey_2keys.gabbro");
+    assert_eq!(
+        read_vault(&p).unwrap().version,
+        10,
+        "fixture must be VERSION 10"
+    );
+    assert_opens_with(&p, YK1_HMAC, YK1_CRED, "YK1");
+    assert_opens_with(&p, YK2_HMAC, YK2_CRED, "YK2");
+}
+
 /// Walks the full key-loss / key-rotation journey on a temp copy of `fixture_name`,
 /// driving the *real* bridge functions the Flutter app calls. A passphrase-less
 /// add/remove routes through `reseal_vault_body`, which re-binds the body to the new

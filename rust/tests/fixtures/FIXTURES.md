@@ -20,6 +20,8 @@ that let the 2026-06-08 brick through).
 | `v8_multikey_2keys.gabbro` | 8 | `master` (pre-v9) | passphrase + YK1 + YK2 |
 | `v9_passphrase.gabbro` | 9 | current `master` (granular sync; crypto == v8) | passphrase only |
 | `v9_multikey_2keys.gabbro` | 9 | current `master` | passphrase + YK1 + YK2 |
+| `v10_passphrase.gabbro` | 10 | current `master` (RT-3: X25519 direct from KDF, no StdRng) | passphrase only |
+| `v10_multikey_2keys.gabbro` | 10 | current `master` | passphrase + YK1 + YK2 |
 
 (Table grows as the harness grows — see the test list at the top of
 `../vault_backward_compat.rs`.)
