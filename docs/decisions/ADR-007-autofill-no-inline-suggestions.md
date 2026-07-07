@@ -18,7 +18,7 @@ channels. Android keyboards are a known risk vector:
 - Keyboard apps have full access to every keystroke typed into any field.
 - Several major keyboards (Samsung Keyboard, Gboard) maintain proprietary
   clipboard history rings that survive `Clipboard.setData('')` clear calls —
-  a limitation already documented in LEARNINGS.md.
+  a known platform limitation.
 - Delegating credential display to a keyboard app introduces a third party
   into the credential delivery path that Gabbro cannot audit or control.
 - Inline suggestions require the keyboard to render Gabbro's credential data

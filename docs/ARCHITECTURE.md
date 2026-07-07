@@ -16,7 +16,7 @@ Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
 
 **Authentication (app access):** Passphrase always; a FIDO2/WebAuthn hardware key (YubiKey) is strongly recommended but **not enforced** — a passphrase-only vault is the default. When keys are used: v1 Ed25519 (hardware constraint), target ML-DSA-44 once Yubico ships PQ-capable hardware (ADR-005), min 2 keys (primary + backup), max 4. Auto-lock: 30s default, configurable.
 
-**YubiKey NFC / NDEF OTP:** a YubiKey's OTP slot 1 (an NDEF URI) would open a browser when tapped on Android. Gabbro suppresses this via `NfcConfiguration().skipNdefCheck(true)` and by re-arming foreground dispatch after `stopNfcDiscovery`; OTP slot 1 can stay enabled (no `ykman` workaround). Full diagnosis in LEARNINGS.md.
+**YubiKey NFC / NDEF OTP:** a YubiKey's OTP slot 1 (an NDEF URI) would open a browser when tapped on Android. Gabbro suppresses this via `NfcConfiguration().skipNdefCheck(true)` and by re-arming foreground dispatch after `stopNfcDiscovery`; OTP slot 1 can stay enabled (no `ykman` workaround).
 
 **Vault file format:** `.gabbro` binary. Plaintext header (magic, version, Argon2id params + salt, HKDF salt, nonce, ML-KEM ciphertext, X25519 ephemeral pubkey) + AES-256-GCM encrypted body (JSON-serialised entries). Self-contained; auth tag detects tampering.
 
@@ -54,7 +54,7 @@ gabbro/
 │   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics, crash_writer, autotype_{spike,window,trigger} (diagnostics), gabbro-autotype (shipped trigger client); wordlist gen; gen_fixtures
 ├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + crash-safety (kill mid-write) + frozen golden fixtures (FIXTURES.md)
 ├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, BiometricHelper + BiometricStore (per-vault; + Robolectric tests)
-├── docs/                 # ARCHITECTURE, LEARNINGS, SECURITY, AI_*; decisions/ (ADRs); artefacts/
+├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, AI_*; decisions/ (ADRs); artefacts/
 ├── test/  integration_test/  test_driver/   # Flutter widget/unit + Linux real-FFI device suites
 ├── test_data/            # Sample import files + migration_vaults/ (hardware migration corpus, one vault per VERSION + MIGRATION_TESTS.md)
 ├── assets/               # fonts, images, help/; public_suffix_list.dat (autofill eTLD+1)
@@ -96,22 +96,88 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 ### Next task
 
 **RT-3 — X25519 key derivation depends on `rand::StdRng` (robustness / latent vault-brick).**
-Surfaced by an internal red-team pass. `crypto/keypair.rs` derives the X25519 static secret via
+Surfaced by an internal red-team pass. `crypto/keypair.rs:29` derives the X25519 static secret via
 `StdRng::from_seed(kdf[0..32])` for **all** vault versions (2–9); the F-02 fix moved ML-KEM off
-`StdRng` but left X25519 on it. Not a confidentiality break (key stays Argon2id-bounded) — it is an
-availability risk: a future `rand` / `x25519-dalek` major bump could re-derive different keys and
-brick every existing vault. Mitigated today by the `Cargo.lock` pin + the backward-compat gate
-(frozen fixtures fail to open if the stream changes). **Decision pending — pick one:**
-- **A (lighter, recommended):** no format bump. Add an explicit gate assertion that fails if a fixed
-  seed re-derives a different X25519 key, and document `StdRng` + ChaCha12 as a compat-critical
-  invariant. Protects all vaults, no migration risk.
-- **B (full fix):** bump to VERSION 10, dispatch X25519 derivation on version (v≥10 = direct
-  `clamp(kdf[0..32])`, no PRNG; v≤9 = legacy `StdRng`), add fixtures + migration-on-save. Removes the
-  PRNG for **new** vaults only — the legacy path must persist to read v2–9, so existing vaults keep
-  the risk.
+`StdRng` but left X25519 on it.
 
-Approach when picked: net-first (pin current behaviour green), then canon-TDD scenario list before
-code. Any VERSION-10 route is a vault-format change → full backward-compat TDD.
+**The problem, plain English.** Every vault is opened with a key rebuilt from your passphrase by a
+fixed recipe. One step of that recipe borrows a random-number helper from an outside library (`rand`)
+to stretch part of the key. That helper must produce the *exact same bytes forever*, but the library
+never promised it would — a future major version of `rand` / `x25519-dalek` could quietly produce a
+different key and **permanently lock every existing vault** (no data leak — the passphrase still
+protects everything — but the file would never open again). This is an *availability* risk, not a
+confidentiality one. The same mistake exists in one other place — the legacy ML-KEM keygen
+(`ml_kem.rs:63`), but only for v2–5 vaults (a full-source PRNG sweep found no others; every other
+crypto step is a frozen public standard whose output can't drift).
+
+**Decision (settled).** Take the full fix, plus auto-migration, in two stages. Rationale:
+- We are **pre-public**: no external user holds an old-format vault, so we owe no stranger backward
+  compatibility and can change the format cleanly now.
+- The goal is that *new vaults carry zero library-drift risk* and *old vaults upgrade themselves
+  invisibly* — without the user having to run a passphrase change or a CRUD save.
+- An alarm-only option (a tripwire test, no format bump) was rejected as the endpoint: it removes the
+  risk from *no* vault. It survives only as a temporary guard on the legacy read path (see below).
+
+**Understanding to mirror (maintainer's summary, confirmed):**
+- Bump vault format to **VERSION 10**; v10 derives X25519 directly from `kdf[0..32]` (clamp, no PRNG).
+- Add **upgrade-on-unlock/lock** to the existing save-path upgrades (passphrase change, CRUD already
+  re-seal at the current version). A vault upgrades the **first time it is opened or saved** after the
+  release — a file sitting untouched on disk stays v9 until something opens it.
+- Add a **tripwire test** protecting old vaults while the legacy read path exists: it fails the build
+  if a fixed seed ever re-derives a different X25519 key (i.e. if the library's stream drifts).
+- Keep the **legacy derivation code temporarily** — it is a *read-once bridge*: you must decrypt an old
+  vault with the old recipe before you can re-seal it as v10. You cannot migrate a file you cannot open.
+- v9 (and any v2–9) vaults **still open — no export/reimport, ever**. First open decrypts via the legacy
+  path, then re-seals in place as v10. Data is preserved end to end.
+- Net result: **Release N** bumps every vault to v10 as it is opened/saved; **Release N+1** deletes the
+  legacy code + tripwire once the maintainer confirms no ≤v9 vault remains. All before public release.
+
+---
+
+**Phased plan (tick as we go).**
+
+Phase 0 — docs (this block). [ ] committed, code untouched.
+
+Phase 1 — net-first (pin CURRENT v9 behaviour green, before touching production):
+- [ ] Confirm/trace real wiring: unlock/lock read paths, X25519 derivation, save-path re-seal.
+- [ ] Pin: frozen v9 fixture opens; current X25519 derivation is deterministic; unlock/lock are
+      currently read-only (no write). Green against current code.
+
+Phase 2 — canon-TDD scenario list, then STOP for maintainer review (no test/prod code before sign-off).
+
+Phase 3 — implement VERSION 10 (red-first per scenario):
+- [ ] `keypair.rs`: version-dispatched X25519 — v>=10 direct `clamp(kdf[0..32])`, v<=9 legacy `StdRng`.
+- [ ] Bump `CURRENT_VERSION` to 10; seal path writes v10.
+- [ ] Frozen v10 golden fixture + regenerate helper; v9 fixture retained for the read path.
+
+Phase 4 — auto-migration:
+- [ ] Upgrade-on-unlock/lock: on open, if `version < CURRENT`, re-seal in place at v10 via
+      `atomic_write_0600` + `.bak` (crash-safe, reversible); no extra YubiKey tap; only fires on
+      version mismatch (steady-state v10 vaults are never written on unlock).
+- [ ] Confirm existing save paths (passphrase change, CRUD) already re-seal at v10.
+
+Phase 5 — tripwire (guards the legacy read path until Release N+1):
+- [ ] Gate assertion: fixed seed must re-derive the known X25519 key; fail loudly on drift.
+- [ ] Document `StdRng` + ChaCha12 as a compat-critical invariant in an in-code comment
+      (`keypair.rs`) beside the tripwire test.
+
+Phase 6 — release-gate proof (maintainer runs): full backward-compat gate, `cargo test`,
+`flutter test`, Android leg; hardware matrix (Linux + Android) on **mock** vaults; add a v10 vault to
+`test_data/migration_vaults/`.
+
+Phase 7 — deferred to Release N+1 (NOT this release), once the maintainer confirms no ≤v9 vault remains:
+- [ ] Delete legacy X25519 (and legacy ML-KEM) derivation + the tripwire.
+- [ ] **Min supported version becomes v10.** A ≤v9 file handed to this build must be rejected with a
+      clear "unsupported version — upgrade via the interim release" error, never a panic/brick.
+- [ ] Convert the v2–9 gate fixtures from "must open" into a **graceful-rejection** test (assert the
+      too-old error, not a crash). Backward-compat corpus floor moves to v10 and grows from there.
+- [ ] `test_data/migration_vaults/`: keep pre-v10 files as historical artifacts (they still open under
+      Release N); add a v10 vault; live gate floor = v10.
+- [ ] See [VAULT_UPGRADE_PATH.md](VAULT_UPGRADE_PATH.md) — the interim release is a mandatory stepping
+      stone (skipping it strands a ≤v9 vault).
+
+Approach: net-first (Phase 1) before any change; canon-TDD list-first (Phase 2) is the checkpoint —
+STOP for review before writing code. VERSION 10 is a vault-format change → full backward-compat TDD.
 
 ---
 

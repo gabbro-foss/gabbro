@@ -395,8 +395,8 @@ The Proton report scored **8 findings** (1 medium, 7 low) and recorded **6 unsco
 - **L-1 (from 905, 913):** Naive XOR-in-process-memory obfuscation is anti-defence — the key sits next to the ciphertext. If gabbro ever needs in-memory hardening beyond `Zeroize`, the correct answer is OS keyring offload (Linux `libsecret`, Android `Keystore`), not in-process XOR.
 - **L-2 (from 906, 907, 908):** Plaintext secrets crossing FFI boundaries (gabbro: Rust → JNI → Kotlin → Android Autofill) cannot be zeroized by the originating language. Minimise the lifetime of such strings — release them on the Kotlin side immediately after `FillResponse` is built.
 - **L-3 (from 301):** For the iOS port (V2+), use `kSecAttrAccessibleWhenUnlockedThisDeviceOnly` for any Keychain-stored secret. Add to ARCHITECTURE.md Bikeshed when iOS work starts.
-- **L-4 (from 102):** Gabbro's choice of a single binary `.gabbro` file (no SQLite, no WAL) avoids an entire class of "deleted user data lingers" bugs. Worth keeping in `LEARNINGS.md` as a *positive* architectural decision that paid off.
-- **L-5 (from 901):** Gabbro's "no backend, no sync server" choice avoids the entire TLS-cipher-suite review surface. Also worth a `LEARNINGS.md` note.
+- **L-4 (from 102):** Gabbro's choice of a single binary `.gabbro` file (no SQLite, no WAL) avoids an entire class of "deleted user data lingers" bugs. Worth recording as a *positive* architectural decision that paid off.
+- **L-5 (from 901):** Gabbro's "no backend, no sync server" choice avoids the entire TLS-cipher-suite review surface. Worth recording as a positive decision too.
 - **L-6 (general):** Recurity Labs' methodology was code-review + dynamic testing + memory forensics (Frida, Burp, MobSF, core-dump parsing). Gabbro now runs a `gcore` memory-forensics self-test (Appendix C item 6) — it immediately surfaced F-11, vindicating the "dynamic testing finds what code review misses" lesson. Extending it (YubiKey path, GUI process) remains a pre-v1 task.
 
 ---

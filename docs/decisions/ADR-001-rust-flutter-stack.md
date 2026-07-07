@@ -38,11 +38,3 @@ security-critical backend, connected via flutter_rust_bridge.
 - flutter_rust_bridge adds a dependency to manage
 ```
 
----
-
-That's everything! Save those three files to their correct locations:
-```
-docs/ARCHITECTURE.md
-docs/LEARNINGS.md
-docs/decisions/ADR-001-rust-flutter-stack.md
-

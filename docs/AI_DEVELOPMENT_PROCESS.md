@@ -63,7 +63,7 @@ catalogued in `AI_AUTHORSHIP_AND_IP.md` applies here:
 - the vault file format, the session model, the importer scope (three, not N);
 - GPL-3.0-only and the reasoning behind it.
 
-These are recorded in the ADRs, `ARCHITECTURE.md`, `LEARNINGS.md`, and the commit
+These are recorded in the ADRs, `ARCHITECTURE.md`, and the commit
 history — documentation that predates the generated code. That is the opposite of
 "forgetting the code exists." The architect specifies structure; the model fills
 it in. The direction is unambiguously human.

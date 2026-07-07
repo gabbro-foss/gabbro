@@ -1,5 +1,5 @@
 //! Vault-format backward-compatibility harness — the safety net for the
-//! 2026-06-08 vault-brick incident (see `docs/LEARNINGS.md`).
+//! 2026-06-08 vault-brick incident.
 //!
 //! # Why this file exists
 //!

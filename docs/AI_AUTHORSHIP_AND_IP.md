@@ -58,7 +58,7 @@ The following were human decisions, not AI suggestions:
 - The importer scope decision (three importers, not N)
 - Numerous design bugs caught independently during development
 
-The ADRs, `ARCHITECTURE.md`, `LEARNINGS.md`, and commit messages are exactly
+The ADRs, `ARCHITECTURE.md`, and commit messages are exactly
 the documentation the article says establishes meaningful human authorship.
 They predate the generated code and show the architect specifying structure
 before the AI built it.
