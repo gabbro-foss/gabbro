@@ -1,9 +1,9 @@
 # Gabbro crack-me challenge
 
-**Published:** 2026-06-26  
+**Published:** 2026-07-07  
 **Status:** Not cracked
 
-`decryptMe_2026-06-26.gabbro` is a real Gabbro vault, sealed with a 
+`decryptMe_2026-07-07.gabbro` is a real Gabbro vault, sealed with a 
 randomly-generated passphrase and two registered YubiKeys.
 
 ---

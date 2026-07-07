@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Security
+- Crack-me challenge refreshed to a new vault (current vault format). Challenge parameters (passphrase, proof string, key configuration) are deliberately undocumented — see `challenge/README.md`. Superseded challenge vaults were retired.
+
 ## [0.1.0-alpha.12] – 2026-07-06
 
 ### Added
@@ -211,7 +216,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Export screen: "Include date in filename" toggle. When off, the exported filename is `alias.gabbro` / `alias.json` (stable name for rsync/file-sync workflows). Default: on. Available on both Linux and Android.
-- Crack-me vault challenge: `challenge/decryptMe_2026-06-01.gabbro` — a real vault sealed with a 256-char random passphrase and two YubiKeys, published for public security testing. Proof of crack = vault note contents + passphrase + method; reward is two YubiKey keys. See `challenge/README.md`.
+- Crack-me vault challenge published for public security testing: a real Gabbro vault in `challenge/`. Rules, submission, and reward are in `challenge/README.md`; challenge parameters are intentionally not documented here.
 - `docs/SECURITY.md`: user-facing security overview covering both auth modes, encryption scheme, local-first argument, verified claims, known limitations (F-01, F-03), threat model, and two comparison tables.
 - Supply-chain audit (Track A Phase 1): `cargo audit` (4 warnings, none exploitable), `flutter pub outdated` (all direct deps current), VS Code extensions reviewed (3 official). Results recorded in `docs/AI_SECURITY_AUDIT.md`.
 
