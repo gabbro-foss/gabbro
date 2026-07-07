@@ -802,8 +802,13 @@ pub fn change_vault_passphrase_with_keys(
     OsRng.fill_bytes(&mut new_argon2_salt);
 
     let new_kdf = Zeroizing::new(derive_key(new_passphrase, &new_argon2_salt, &new_params)?);
-    let new_x25519 = x25519_keypair_for_version(sealed.version, &new_kdf);
-    let new_ml_kem = ml_kem_keypair_for_version(sealed.version, &new_kdf);
+    // Derive the NEW passphrase material at the CURRENT version: a passphrase change
+    // regenerates the whole passphrase path, so it also migrates the vault to the
+    // current format (RT-3). key_blobs (under the unchanged wrapping_key) and the
+    // body are preserved. The OLD material above stays at sealed.version to decrypt
+    // the existing passphrase_blob.
+    let new_x25519 = x25519_keypair_for_version(VERSION, &new_kdf);
+    let new_ml_kem = ml_kem_keypair_for_version(VERSION, &new_kdf);
 
     let mut encap_rng = OsRng;
     let (new_ml_kem_ct, new_ml_kem_secret) = new_ml_kem
@@ -839,7 +844,7 @@ pub fn change_vault_passphrase_with_keys(
     // Step 5: Return new SealedVault with fresh PQ material and passphrase_blob.
     // key_blobs, body, and alias are unchanged — vault_key_master is stable.
     Ok(SealedVault {
-        version: sealed.version,
+        version: VERSION,
         params: new_params,
         argon2_salt: new_argon2_salt,
         hkdf_salt: new_hkdf_salt,

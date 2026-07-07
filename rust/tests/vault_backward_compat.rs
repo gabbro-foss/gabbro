@@ -34,10 +34,11 @@
 //!   3. User can still unlock vault A with **both** YK1 and YK3.
 //!   4. User loses YK1, so the user adds YK4.
 //!   5. User can still unlock vault A with **both** YK3 and YK4.
-//!   6. This scenario STILL WORKS if vault A has been bumped *n* versions between
-//!      any of the steps above (every add/remove re-seals and migrates the file to
-//!      the current VERSION, so we assert the on-disk version == current after each
-//!      mutation, starting from both a v6 and a v7 golden fixture).
+//!   6. This scenario STILL WORKS across format versions: a passphrase-less
+//!      add/remove re-seals the body but (post RT-3) keeps the vault below the v10
+//!      derivation boundary (the belt), so we assert it stays below AND still opens
+//!      with every key. Migration to v10 happens on unlock (tested in
+//!      session::migrate_on_unlock_tests). Runs from v6/v7/v8/v9 golden fixtures.
 //!
 //! Encoded in `yubikey_rotation_survives_key_loss_and_version_bumps`.
 //!
@@ -269,11 +270,12 @@ fn v9_multikey_opens_with_each_registered_key() {
 }
 
 /// Walks the full key-loss / key-rotation journey on a temp copy of `fixture_name`,
-/// driving the *real* bridge functions the Flutter app calls. Every add/remove
-/// routes through `reseal_vault_body`, which re-binds the body to the new header
-/// (AAD) and migrates the file to the current VERSION — so after each mutation we
-/// assert the on-disk version is current, proving the scenario holds even as the
-/// vault is "bumped n versions between steps".
+/// driving the *real* bridge functions the Flutter app calls. A passphrase-less
+/// add/remove routes through `reseal_vault_body`, which re-binds the body to the new
+/// header (AAD) but — post RT-3 — will NOT force the vault across the v10 derivation
+/// boundary (the belt: it has no passphrase to rebuild the material). So after each
+/// mutation we assert the vault stays below the boundary AND still opens with every
+/// surviving key. Migration to v10 happens on unlock (session::migrate_on_unlock_tests).
 fn run_rotation_scenario(fixture_name: &str) {
     let tv = temp_copy(fixture_name);
     let path = tv.path.as_path();
@@ -302,10 +304,13 @@ fn run_rotation_scenario(fixture_name: &str) {
     )
     .expect("add YK3");
     remove_yubikey_from_vault(&pt, &master, YK2_CRED, path).expect("remove lost YK2");
-    assert_eq!(
-        read_vault(path).unwrap().version,
-        VERSION,
-        "after add/remove the vault must be migrated to the current VERSION"
+    // A passphrase-less key mutation cannot rebuild the v10 passphrase material, so
+    // the belt (capped_reseal_version) holds the vault below the derivation boundary.
+    // Migration to v10 happens on unlock (session::migrate_on_unlock_tests). The
+    // guarantee here is no brick: it still opens with each surviving key (Steps 3/5).
+    assert!(
+        read_vault(path).unwrap().version < VERSION,
+        "belt: add/remove must NOT force a pre-v10 vault across the derivation boundary"
     );
 
     // Step 3: user can still unlock vault A with BOTH YK1 and YK3.
@@ -330,10 +335,9 @@ fn run_rotation_scenario(fixture_name: &str) {
     )
     .expect("add YK4");
     remove_yubikey_from_vault(&pt, &master, YK1_CRED, path).expect("remove lost YK1");
-    assert_eq!(
-        read_vault(path).unwrap().version,
-        VERSION,
-        "after the second rotation the vault must again be at the current VERSION"
+    assert!(
+        read_vault(path).unwrap().version < VERSION,
+        "belt: the second passphrase-less rotation likewise stays below the boundary until unlock migrates"
     );
 
     // Step 5: user can still unlock vault A with BOTH YK3 and YK4.
@@ -472,8 +476,9 @@ fn wrong_old_passphrase_rejected_and_vault_left_openable() {
 ///
 /// At the end the vault has a NEW passphrase AND new keys (YK3, YK4) and must still
 /// open with `new passphrase + YK3/YK4`; the old passphrase and the removed keys
-/// must all be refused; the canary survives every step; the on-disk version is
-/// current after every mutation.
+/// must all be refused; the canary survives every step. Passphrase-less rotations
+/// stay below the v10 boundary (belt); the passphrase change migrates to current,
+/// after which further rotations remain at current.
 fn run_passphrase_rotation_scenario(fixture_name: &str) {
     const NEW_PASSPHRASE: &[u8] = b"vault B rotated passphrase -- mid journey";
     let tv = temp_copy(fixture_name);
@@ -500,10 +505,11 @@ fn run_passphrase_rotation_scenario(fixture_name: &str) {
     )
     .expect("add YK3");
     remove_yubikey_from_vault(&pt, &master, YK2_CRED, path).expect("remove lost YK2");
-    assert_eq!(
-        read_vault(path).unwrap().version,
-        VERSION,
-        "version current after rotation 1"
+    // Belt: a passphrase-less rotation stays below the v10 boundary (no re-tap/no
+    // passphrase to rebuild the material). The passphrase change in Step 3 migrates.
+    assert!(
+        read_vault(path).unwrap().version < VERSION,
+        "belt: passphrase-less rotation stays below the boundary until a migrating op runs"
     );
 
     // Step 3: change the passphrase on the multi-key vault. Get the master via a
