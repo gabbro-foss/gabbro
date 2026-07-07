@@ -177,17 +177,25 @@ Phase 3 — VERSION 10 + version-dispatched X25519:
 - [ ] S8 v10 multi-key round-trip: seal -> open with each key -> canary intact.
 - [ ] S9 frozen v10 golden fixtures open: add `v10_passphrase` + `v10_multikey_2keys` to the gate.
 
-Phase 4 — auto-migration on unlock (per D1/D2 + refinement):
-Crypto layer done & green (VERSION still 9): `migrate_multikey_to_version` (braces) +
-`capped_reseal_version` (belt) in `vault_crypto.rs`; unit-tested (multikey v9->v10 round-trip re-opens
-with each key; cap boundary). NEXT (after pause): session unlock wiring + VERSION->10 + gate + fixtures.
-- [~] S10 old vault migrates on unlock (v6/v7/v8/v9): crypto primitive proven; session wiring pending.
-- [~] S11 no data loss (entries/folders/YK records): proven for the multikey primitive; session pending.
-- [~] S12 p+YK migrates with no extra tap (cached `wrapping_key`, key_blobs preserved): crypto green.
-- [ ] S13 atomic + recoverable: `atomic_write_0600` + `.bak`; interrupted write leaves original openable.
-- [ ] S14 steady-state (P2 extended): unlocking an already-v10 vault does NOT rewrite the file.
+Phase 4 — auto-migration on unlock (per D1/D2 + refinement): DONE (VERSION now 10).
+Session wiring: `unlock_vault` -> `migrate_passphrase_vault_on_unlock` (full re-seal); multi-key
+`unlock_vault_with_key_record` -> `migrate_multikey_vault_on_unlock` (cached `wrapping_key`/master, no
+re-tap). Both best-effort per D1 (`let _ =`). Crypto: `migrate_multikey_to_version` (braces) +
+`capped_reseal_version` (belt).
+- [✓] S10 old vault migrates on unlock: session test `unlock_migrates_an_old_multikey_vault...` (v9->v10).
+- [✓] S11 no data loss: folder survives migration (session test); crypto round-trip preserves body.
+- [✓] S12 p+YK migrates with no extra tap (cached `wrapping_key`, key_blobs preserved).
+- [✓] S13 atomic + recoverable: migration writes via `write_vault` (`rotate_backup` + `atomic_write_0600`
+      + `verify_and_sync_backup`) — same atomic path as every save (crash_safety gate covers interruption).
+- [✓] S14 steady-state (P2 at v10): unlocking an already-v10 vault does NOT rewrite the file.
 - [✓] S15 belt: `capped_reseal_version` — a body-only save never bumps a <v10 vault across the boundary.
-- [ ] S15b CRUD / passphrase-change / add-remove-key preserve openability (gate migrate tests green).
+- [ ] S15b CRUD / passphrase-change / add-remove-key preserve openability (gate — NEXT).
+
+Phase 3 remaining: [✓] S6 fresh seal tagged v10 (VERSION=10). S5/S7/S8/S9 land with the gate step.
+
+**GATE STATUS: the backward-compat gate is expected RED right now** — VERSION=10 changed the migration
+semantics (multikey mutations no longer force version==current; that's the belt). NEXT step (needs a
+gate run): adjust the rotation helper assertion to openability (approved) + add v10 fixtures.
 
 Phase 5 — tripwire (guards the legacy read path until Release N+1):
 - [ ] S16 compat-critical invariant: P1 golden promoted to an explicit, loudly-messaged gate assertion;
