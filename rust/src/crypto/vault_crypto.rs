@@ -989,11 +989,11 @@ mod tests {
     }
 
     #[test]
-    fn seal_vault_produces_version_9() {
+    fn seal_vault_produces_version_10() {
         let sealed = seal_vault(b"pass", b"data", None).unwrap();
         assert_eq!(
-            sealed.version, 9,
-            "new vaults are sealed as VERSION 9 (crypto identical to v8; body gains per-field change-times)"
+            sealed.version, 10,
+            "new vaults are sealed as VERSION 10 (X25519 derived directly from the KDF, no StdRng)"
         );
     }
 

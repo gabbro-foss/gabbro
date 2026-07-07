@@ -47,13 +47,16 @@
 //!   transcript (ct_M ‖ ephemeral_x25519_pub ‖ static_x25519_pub), so the
 //!   passphrase-only vault key is transcript-bound from inside the KDF, not only
 //!   via the AAD. YubiKey-mode key derivation is unchanged (F-03).
-//! VERSION 9 (current): identical header LAYOUT and cryptography to VERSION 8 —
+//! VERSION 9: identical header LAYOUT and cryptography to VERSION 8 —
 //!   crypto is byte-for-byte unchanged. The only change is in the encrypted body
 //!   JSON: each entry's metadata gains `field_times` (per-field change-times) for
 //!   granular, field-level sync. The bump exists so an OLDER build refuses a v9
 //!   vault (fail-closed) instead of opening it and silently stripping the new
 //!   per-field times on its next save.
-//! Reads v2–9; always writes VERSION 9.
+//! VERSION 10 (current): the X25519 static secret is derived directly from KDF
+//!   bytes [0..32] (clamp, no `StdRng`); v2–9 keep the legacy `StdRng` derivation
+//!   on read and auto-migrate to v10 on unlock (RT-3). Header LAYOUT unchanged.
+//! Reads v2–10; always writes VERSION 10.
 
 use crate::crypto::kdf::Argon2idParams;
 
@@ -432,7 +435,7 @@ mod tests {
 
     fn test_vault() -> SealedVault {
         SealedVault {
-            version: VERSION, // 7
+            version: VERSION,
             params: Argon2idParams {
                 m_cost: 65536,
                 t_cost: 25,
@@ -631,9 +634,9 @@ mod tests {
     }
 
     #[test]
-    fn fresh_vault_is_version_9() {
-        assert_eq!(VERSION, 9);
-        assert_eq!(test_vault().version, 9);
+    fn fresh_vault_is_version_10() {
+        assert_eq!(VERSION, 10);
+        assert_eq!(test_vault().version, 10);
     }
 
     #[test]
