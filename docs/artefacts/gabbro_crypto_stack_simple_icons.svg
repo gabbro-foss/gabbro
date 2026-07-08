@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Gabbro crypto stack - SIMPLE view WITH ICONS + plain-language LAYER bands.
+  Hand-authored, self-contained SVG (this file IS the source; there is no .dot).
+  Companion to gabbro_crypto_stack_simple.svg (same wording, no icons/bands).
+  Palette: viridis (perceptually uniform, colour-blind + greyscale friendly, ADR-003).
+  7 layers map dark->light top->bottom. Meaning never rests on colour alone: each
+  step also has an icon, a name, and a plain-language layer label. Not for review.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="930" height="1300" viewBox="0 0 930 1300" font-family="Helvetica, Arial, sans-serif">
+
+  <defs>
+    <marker id="arr" markerWidth="10" markerHeight="10" refX="7.5" refY="5" orient="auto">
+      <path d="M1,1 L8,5 L1,9" fill="none" stroke="#666" stroke-width="1.6"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arrK" markerWidth="10" markerHeight="10" refX="7.5" refY="5" orient="auto">
+      <path d="M1,1 L8,5 L1,9" fill="none" stroke="#22794f" stroke-width="1.6"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+
+    <!-- icons in a 32x32 box, stroked; scaled up where used -->
+    <g id="ic_dots" fill="#333" stroke="none">
+      <circle cx="5" cy="16" r="2.6"/><circle cx="13" cy="16" r="2.6"/>
+      <circle cx="21" cy="16" r="2.6"/><circle cx="29" cy="16" r="2.6"/>
+    </g>
+    <g id="ic_hourglass" fill="none" stroke="#333" stroke-width="1.7" stroke-linejoin="round">
+      <path d="M7,5 H25 M7,27 H25"/>
+      <path d="M8,6 L16,16 L8,26" fill="#333" fill-opacity="0.12"/>
+      <path d="M24,6 L16,16 L24,26" fill="#333" fill-opacity="0.12"/>
+    </g>
+    <g id="ic_swap" fill="none" stroke="#333" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6,12 H24"/><path d="M20,8 L24,12 L20,16"/>
+      <path d="M26,21 H8"/><path d="M12,17 L8,21 L12,25"/>
+    </g>
+    <g id="ic_swap_q" fill="none" stroke="#333" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6,13 H24"/><path d="M20,9 L24,13 L20,17"/>
+      <path d="M26,22 H8"/><path d="M12,18 L8,22 L12,26"/>
+      <ellipse cx="16" cy="16" rx="15" ry="6.5" transform="rotate(28 16 16)" stroke-opacity="0.5"/>
+      <circle cx="29" cy="10.5" r="1.8" fill="#333" stroke="none"/>
+    </g>
+    <g id="ic_funnel" fill="#333" fill-opacity="0.12" stroke="#333" stroke-width="1.7" stroke-linejoin="round">
+      <path d="M5,7 H27 L18,18 V26 H14 V18 Z"/>
+    </g>
+    <g id="ic_usbkey" fill="none" stroke="#333" stroke-width="1.7" stroke-linejoin="round">
+      <rect x="11" y="4" width="10" height="24" rx="3" fill="#333" fill-opacity="0.10"/>
+      <circle cx="16" cy="10" r="2.2"/><path d="M13,17 H19 M13,21 H19"/>
+    </g>
+    <g id="ic_key" fill="none" stroke="#333" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="10" cy="11" r="5" fill="#333" fill-opacity="0.10"/>
+      <path d="M13.5,14.5 L26,27"/><path d="M21,22 L24,19 M23.5,24.5 L26.5,21.5"/>
+    </g>
+    <g id="ic_lock" fill="none" stroke="#333" stroke-width="1.7" stroke-linejoin="round">
+      <path d="M10,15 V11 a6,6 0 0 1 12,0 V15"/>
+      <rect x="8" y="15" width="16" height="13" rx="2.5" fill="#333" fill-opacity="0.10"/>
+      <circle cx="16" cy="20" r="1.6" fill="#333" stroke="none"/><path d="M16,21.5 V24"/>
+    </g>
+    <g id="ic_doc" fill="none" stroke="#333" stroke-width="1.7" stroke-linejoin="round">
+      <path d="M9,4 H21 L25,8 V28 H9 Z" fill="#333" fill-opacity="0.08"/>
+      <path d="M21,4 V8 H25"/><path d="M12,14 H21 M12,18 H21 M12,22 H18"/>
+    </g>
+  </defs>
+
+  <text x="465" y="42" text-anchor="middle" font-size="28" font-weight="bold" fill="#222">How Gabbro protects your vault</text>
+  <text x="465" y="68" text-anchor="middle" font-size="16" fill="#666">the simple picture &#183; read the layer names down the left, or the steps down the middle</text>
+
+  <!-- ===================== background layer bands (viridis, light) ===================== -->
+  <g stroke="none">
+    <rect x="10" y="84"   width="910" height="122" rx="16" fill="#DDD1E0"/>
+    <rect x="10" y="218"  width="910" height="166" rx="16" fill="#DDDBE8"/>
+    <rect x="10" y="396"  width="910" height="208" rx="16" fill="#DAE4EB"/>
+    <rect x="10" y="616"  width="910" height="166" rx="16" fill="#D7EBEA"/>
+    <rect x="10" y="794"  width="910" height="154" rx="16" fill="#DBF2E7"/>
+    <rect x="10" y="960"  width="910" height="166" rx="16" fill="#EFF8DB"/>
+    <rect x="10" y="1138" width="910" height="142" rx="16" fill="#FEFBD8"/>
+  </g>
+  <line x1="165" y1="92" x2="165" y2="1272" stroke="#FFFFFF" stroke-width="2.5"/>
+
+  <!-- ===================== layer names (left column, viridis dark) ===================== -->
+  <g text-anchor="middle" font-weight="bold" font-size="21">
+    <text x="87" y="152"  fill="#440154">Unlock</text>
+    <text x="87" y="294"  fill="#453781">Brute-force</text><text x="87" y="320" fill="#453781">shield</text>
+    <text x="87" y="490"  fill="#2c5f83">Double</text><text x="87" y="516" fill="#2c5f83">lock</text>
+    <text x="87" y="692"  fill="#15716c">Combined</text><text x="87" y="718" fill="#15716c">lock</text>
+    <text x="87" y="878"  fill="#22794f">Keys</text>
+    <text x="87" y="1051" fill="#566f1c">Encryption</text>
+    <text x="87" y="1217" fill="#7d7010">Vault</text>
+  </g>
+
+  <!-- ===================== connectors ===================== -->
+  <g stroke="#666" stroke-width="1.8" fill="none">
+    <path d="M545,190 V234" marker-end="url(#arr)"/>
+    <path d="M545,368 C545,392 346,388 346,412" marker-end="url(#arr)"/>
+    <path d="M545,368 C545,392 744,388 744,412" marker-end="url(#arr)"/>
+    <path d="M346,546 C346,608 545,626 545,632" marker-end="url(#arr)"/>
+    <path d="M744,546 C744,608 545,626 545,632" marker-end="url(#arr)"/>
+    <path d="M545,766 V814" marker-end="url(#arr)"/>
+    <path d="M545,924 V976" marker-end="url(#arr)"/>
+    <path d="M545,1110 V1154" marker-end="url(#arr)"/>
+  </g>
+  <path d="M748,869 H727" stroke="#22794f" stroke-width="1.8" fill="none" stroke-dasharray="6 4" marker-end="url(#arrK)"/>
+
+  <!-- ===================== step boxes ===================== -->
+  <!-- 1. passphrase -->
+  <rect x="365" y="100" width="360" height="90" rx="12" fill="#B499BB" stroke="#3a3a3a"/>
+  <use xlink:href="#ic_dots" transform="translate(383,118) scale(1.7)"/>
+  <text x="453" y="140" font-size="22" font-weight="bold" fill="#1c1c1c">Your passphrase</text>
+  <text x="453" y="168" font-size="17.5" fill="#222">the one secret only you know</text>
+
+  <!-- 2. Argon2id -->
+  <rect x="365" y="234" width="360" height="134" rx="12" fill="#B4AFCD" stroke="#3a3a3a"/>
+  <use xlink:href="#ic_hourglass" transform="translate(383,274) scale(1.7)"/>
+  <text x="453" y="268" font-size="22" font-weight="bold" fill="#1c1c1c">Argon2id</text>
+  <text x="453" y="293" font-size="17" font-style="italic" fill="#453781">a password-hardening function</text>
+  <text x="453" y="316" font-size="17.5" fill="#222">turns your passphrase into a key,</text>
+  <text x="453" y="338" font-size="17.5" fill="#222">so slow it's brute-force resistant</text>
+
+  <!-- 3a. X25519 -->
+  <rect x="176" y="412" width="340" height="134" rx="12" fill="#ADC3D2" stroke="#3a3a3a"/>
+  <use xlink:href="#ic_swap" transform="translate(194,452) scale(1.7)"/>
+  <text x="264" y="446" font-size="22" font-weight="bold" fill="#1c1c1c">X25519</text>
+  <text x="264" y="471" font-size="17" font-style="italic" fill="#2c5f83">a key-exchange method</text>
+  <text x="264" y="494" font-size="17.5" fill="#222">the classic, proven kind</text>
+  <text x="264" y="516" font-size="17.5" fill="#222">that secures much of the web</text>
+
+  <!-- 3b. ML-KEM -->
+  <rect x="574" y="412" width="340" height="134" rx="12" fill="#ADC3D2" stroke="#3a3a3a"/>
+  <use xlink:href="#ic_swap_q" transform="translate(592,452) scale(1.7)"/>
+  <text x="662" y="446" font-size="22" font-weight="bold" fill="#1c1c1c">ML-KEM-1024</text>
+  <text x="662" y="471" font-size="17" font-style="italic" fill="#2c5f83">a key-exchange method too</text>
+  <text x="662" y="494" font-size="17.5" fill="#222">a newer kind, resists</text>
+  <text x="662" y="516" font-size="17.5" fill="#222">future quantum computers</text>
+
+  <!-- both-locks caption -->
+  <text x="545" y="572" text-anchor="middle" font-size="18" font-style="italic" fill="#333">we use both, so your vault stays</text>
+  <text x="545" y="594" text-anchor="middle" font-size="18" font-style="italic" fill="#333">safe even if one is ever broken</text>
+
+  <!-- 4. HKDF -->
+  <rect x="365" y="632" width="360" height="134" rx="12" fill="#A6D3D1" stroke="#3a3a3a"/>
+  <use xlink:href="#ic_funnel" transform="translate(383,672) scale(1.7)"/>
+  <text x="453" y="666" font-size="22" font-weight="bold" fill="#1c1c1c">HKDF</text>
+  <text x="453" y="691" font-size="17" font-style="italic" fill="#15716c">a key-mixing function</text>
+  <text x="453" y="714" font-size="17.5" fill="#222">blends the two into a single</text>
+  <text x="453" y="736" font-size="17.5" fill="#222">master key</text>
+
+  <!-- 5. Master key -->
+  <rect x="365" y="814" width="360" height="110" rx="12" fill="#AEE2C9" stroke="#3a3a3a"/>
+  <use xlink:href="#ic_key" transform="translate(383,842) scale(1.7)"/>
+  <text x="453" y="850" font-size="22" font-weight="bold" fill="#1c1c1c">Master key</text>
+  <text x="453" y="878" font-size="17.5" fill="#222">opens your vault — and nothing</text>
+  <text x="453" y="900" font-size="17.5" fill="#222">on your device stores it</text>
+
+  <!-- 5b. YubiKey (optional) -->
+  <rect x="748" y="804" width="164" height="130" rx="12" fill="#AEE2C9" stroke="#22794f" stroke-width="1.6" stroke-dasharray="7 4"/>
+  <use xlink:href="#ic_usbkey" transform="translate(760,845) scale(1.5)"/>
+  <text x="812" y="842" font-size="18" font-weight="bold" fill="#1c1c1c">YubiKey</text>
+  <text x="812" y="862" font-size="14.5" font-style="italic" fill="#22794f">a physical key</text>
+  <text x="812" y="881" font-size="14.5" fill="#222">optional — plug</text>
+  <text x="812" y="899" font-size="14.5" fill="#222">in or tap</text>
+
+  <!-- 6. AES -->
+  <rect x="365" y="976" width="360" height="134" rx="12" fill="#DBF0AF" stroke="#3a3a3a"/>
+  <use xlink:href="#ic_lock" transform="translate(383,1016) scale(1.7)"/>
+  <text x="453" y="1010" font-size="22" font-weight="bold" fill="#1c1c1c">AES-256-GCM</text>
+  <text x="453" y="1035" font-size="17" font-style="italic" fill="#566f1c">the encryption itself</text>
+  <text x="453" y="1058" font-size="17.5" fill="#222">scrambles everything in your vault</text>
+  <text x="453" y="1080" font-size="17.5" fill="#222">so only the master key can undo it</text>
+
+  <!-- 7. file -->
+  <rect x="365" y="1154" width="360" height="110" rx="12" fill="#FEF5A8" stroke="#3a3a3a"/>
+  <use xlink:href="#ic_doc" transform="translate(383,1182) scale(1.7)"/>
+  <text x="453" y="1190" font-size="22" font-weight="bold" fill="#1c1c1c">Your .gabbro file</text>
+  <text x="453" y="1218" font-size="17.5" fill="#222">one sealed file on your device —</text>
+  <text x="453" y="1240" font-size="17.5" fill="#222">no servers, no cloud, no account</text>
+
+</svg>
