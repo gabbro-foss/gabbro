@@ -50,7 +50,7 @@ honest answer differs between the two.
 
 ## Test 1 — human design and direction: Gabbro passes clearly
 
-This is not close. The architect (Rob) drove every consequential design decision
+This is not close. The architect (the maintainer) drove every consequential design decision
 *before* the code existed, and the repository proves it. The same evidence
 catalogued in `AI_AUTHORSHIP_AND_IP.md` applies here:
 
@@ -163,5 +163,5 @@ than as a marketing claim.
 
 ---
 
-*This document was written collaboratively by Rob (project owner and architect)
+*This document was written collaboratively by the maintainer (project owner and architect)
 and Claude (Opus 4.8, AI development partner) on 8 June 2026.*

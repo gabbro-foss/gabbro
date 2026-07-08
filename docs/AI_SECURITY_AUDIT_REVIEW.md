@@ -17,7 +17,7 @@
 |---------|------|--------|
 | **R-01** original audit's "no exploitable defect" claim falsified by fuzzer; needs a correction note | Doc | **Fixed** (2026-06-14) — dated correction note + softened OWASP input-validation row in `AI_SECURITY_AUDIT.md`. |
 | **R-02** Android Auto Backup silently uploads the vault to Google Drive | Medium | **Fixed** (commit `90a2095`, 2026-06-11) — `allowBackup="false"` + `dataExtractionRules` + `fullBackupContent` (all domains excluded), 3 Robolectric merged-manifest tests, APK verified via `aapt dump xmltree`; hardware-verified on device (`pkgFlags` has no `ALLOW_BACKUP`; `bmgr backupnow` → "Backup is not allowed"; upgrade-in-place, unlock, autofill unaffected) |
-| **R-03** no pre-save vault backup rotation (availability gap) | Medium | **Fixed** (branch `r03-vault-backup-rework`, 2026-06-12) — automatic `.bak` safety copy (= last *verified* save) + corruption-recovery UX + restore-from-backup-file. Claude Fable 5's first pass was component-green but failed the hardware matrix; diagnosed and reworked by Claude Opus 4.8 + Rob. Linux hardware 14/14; Android emulator verified. See R-03 below. |
+| **R-03** no pre-save vault backup rotation (availability gap) | Medium | **Fixed** (branch `r03-vault-backup-rework`, 2026-06-12) — automatic `.bak` safety copy (= last *verified* save) + corruption-recovery UX + restore-from-backup-file. Claude Fable 5's first pass was component-green but failed the hardware matrix; diagnosed and reworked by Claude Opus 4.8 + maintainer. Linux hardware 14/14; Android emulator verified. See R-03 below. |
 | **R-04** Linux process is dumpable; no `PR_SET_DUMPABLE(0)` / `RLIMIT_CORE(0)` | Low | **Fixed** (2026-06-14; portal-conflict follow-up 2026-06-15) — `harden_process()` in `rust/src/hardening.rs`, called from `init_app()`. `RLIMIT_CORE=0` is permanent; `PR_SET_DUMPABLE(0)` is the baseline but **raised only around an open native file dialog** (ref-counted in `runPicker`), because a non-dumpable process blocks `xdg-desktop-portal` from reading its `/proc` — which had broken every Linux file dialog. yama `ptrace_scope`≥1 covers the picker window. Fork-based regression guard in `hardening.rs`. Needs Linux hardware re-verify (no-core-dump **and** a working file dialog). |
 | **R-05** no stated position on swap exposure of key material | Low | **Fixed** (2026-06-14) — `SECURITY.md` threat model recommends encrypted swap; `mlock`/`madvise` deferred to expert review. |
 | **R-06** Dart-heap secret exposure undocumented; GUI-process forensics pending | Low | **Fixed** (2026-06-14) — measured by root gcore of the live GUI: passphrase + viewed password present unlocked (3/5) and after lock (3/4); documented as F-12 in `AI_SECURITY_AUDIT.md` + `SECURITY.md`. Same-uid dump path closed by R-04. |
@@ -168,7 +168,7 @@ device-to-device transfer), and OEM migration tools do not all honour the
 blanket flag — declare the intent at every layer. Because the rules exclude
 *all* app-private domains, the vault, `settings.jsonc` and `vaults.jsonc`
 (alias-bearing metadata) are covered in one stroke, and future app-private
-files are excluded by default. **Scope boundary (Rob, 2026-06-11):** this must
+files are excluded by default. **Scope boundary (maintainer, 2026-06-11):** this must
 not — and by mechanism cannot — affect user-driven export/backup of `.gabbro`
 files via SAF to shared storage (e.g. rsync→NAS 3-2-1 flows); the backup
 framework rules only govern the app-private storage root. Hardware-verify on
@@ -186,12 +186,12 @@ ransomware, or accidental deletion.
 **Recommendation.** Before each save, rotate the existing `.gabbro` file to a
 sibling backup (`.gabbro.bak`, or N generations). Cheap; would have turned the
 2026-06-08 bricking into a non-event; complements (does not duplicate) the
-backward-compat gate. Decide the retention policy with Rob (single `.bak` is
+backward-compat gate. Decide the retention policy with the maintainer (single `.bak` is
 probably enough; N generations costs disk for large File entries).
 
-**Resolution (Claude Opus 4.8 + Rob, 2026-06-12; branch `r03-vault-backup-rework`).**
+**Resolution (Claude Opus 4.8 + maintainer, 2026-06-12; branch `r03-vault-backup-rework`).**
 Claude Fable 5's first attempt was component-green but failed the hardware
-matrix in several distinct ways; Claude Opus 4.8 and Rob diagnosed and reworked
+matrix in several distinct ways; Claude Opus 4.8 and the maintainer diagnosed and reworked
 it. Per issue raised during remediation:
 
 - **Save-path rotation (the core ask).** `write_vault` rotates the previous save
@@ -227,7 +227,7 @@ it. Per issue raised during remediation:
   toggling a security setting) it threw inside layout and spammed
   `DiagnosticsProperty<void>`. The fetch is guarded: it falls back to the empty
   state and clears the stale selection after the frame.
-- **No actual recovery path (new feature, Rob-mandated).** "Restore from a
+- **No actual recovery path (new feature, maintainer-mandated).** "Restore from a
   backup file": the user picks their own off-device 3-2-1 `.gabbro`; the bridge
   validates it parses, then writes it over the corrupt vault, which then opens
   with the user's credentials. Offered in both states; refuses a non-vault file,

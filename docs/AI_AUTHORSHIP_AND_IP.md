@@ -100,6 +100,6 @@ practice rather than as a legal hedge.
 
 ---
 
-*This document was written collaboratively by Rob (project owner and architect)
+*This document was written collaboratively by the maintainer (project owner and architect)
 and Claude (AI development partner) on 29 April 2026, at the close of the
 Android build polish session.*
