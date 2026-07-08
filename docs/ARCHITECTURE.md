@@ -95,12 +95,12 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Release prep — VERSION 10 (robustness/security bump).** RT-3 migrate-on-unlock is
-hardware-verified: Linux + S23 green (migrate + real vaults intact + v9->v10 p+YK sync
-integrity, 2026-07-08; see `test_data/migration_vaults/MIGRATION_TESTS.md`). GrapheneOS held
-at v9 as the fallback; tablet is v9_p-only. Follow
-[BUILD_AND_RELEASE.md](BUILD_AND_RELEASE.md): version bump (pubspec), CHANGELOG, build + sign
-Linux tarball + APKs, push commits, tag last.
+**Repo -> GitHub Org (going public, pre-v1).** Create a free GitHub Organization
+(e.g. `gabbro-app`; `gabbro` may be taken) — that is the first step for this session.
+Then **transfer** (not fork) the repo into it — keeps history/issues/stars and redirects
+the old URL. After transfer: `git remote set-url` and grep the whole repo for the old
+URL/handle, updating every affected place (about screen, README, this file, CI/workflows,
+package metadata, in-app links) before implementing. Optional: read-only Codeberg mirror.
 
 ---
 
@@ -124,15 +124,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   ML-KEM derivation + the frozen-golden tripwire; min supported version → v10 (≤v9 rejected gracefully,
   never bricked); convert the v2–9 gate fixtures to a graceful-rejection test; migration-vault + gate
   corpus floor → v10. Must ship Release N (v10 auto-migrate) first — see VAULT_UPGRADE_PATH.md.
-
-### Going public (pre-v1)
-- **Repo -> GitHub Org.** Before flipping the repo public, create a free Organization
-  (e.g. `gabbro-app`; `gabbro` may be taken) and **transfer** (not fork) the repo into it —
-  keeps full history/issues/stars and redirects the old URL; standalone project namespace,
-  still on GitHub. Then `git remote set-url` and **grep the whole repo for the old URL/handle
-  and update every affected place** before implementing — not just docs: about screen, README,
-  this file, CI/workflows, package metadata, links in-app. Optional: read-only Codeberg mirror
-  for redundancy.
 
 ### Code Quality
 - **Auto-type: unlock-then-type + cold start (ADR-017 Phase 4).** A trigger while the
