@@ -95,11 +95,11 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Post the external crypto-review question.** Drafted and ready (Q1-primary + optional
-follow-ups; narrow ask — the construction only: the passphrase-derived hybrid combiner /
-transcript binding / header AAD). Post to a public venue (Cryptography Stack Exchange /
-RustCrypto / a PQ list) with the technical stack diagram
-(`docs/artefacts/gabbro_crypto_stack_flow.svg`) attached. v1 direction in commit 9f158b5.
+**Await crypto-review responses.** The construction question (passphrase-derived hybrid
+combiner / transcript binding) was posted to Cryptography Stack Exchange (2026-07-08). When
+replies arrive, evaluate them against the construction and decide any action: a SECURITY.md
+note, a design change, or close as confirmed. Optional follow-up on RustCrypto for
+implementation-specific angles. v1 direction in commit 9f158b5.
 
 ---
 
