@@ -95,20 +95,12 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**RT-3 — VERSION 10 (X25519 derived directly from the KDF, no `rand::StdRng`).** Implementation
-COMPLETE and gate-green: full `gabbro_test` run 2026-07-07 passed — Rust `cargo test` 664,
-backward-compat 16/16, state-machine fuzz, Flutter 1257, Android 148, clippy (only the fuzz invariant
-needed adjusting for the belt). Fresh vaults seal v10; v2–9 auto-migrate to v10 on unlock
-(passphrase-only via full re-seal; p+YK via `migrate_multikey_to_version` with cached
-`wrapping_key`/master, no re-tap). Belt (`capped_reseal_version`) blocks a passphrase-less save from
-crossing the boundary; a passphrase change also migrates. Legacy `StdRng` X25519 (+ legacy ML-KEM) kept
-as a read-once bridge, guarded by the frozen-golden tripwire (`keypair.rs`). Rationale in the RT-3
-commit history; upgrade path in [VAULT_UPGRADE_PATH.md](VAULT_UPGRADE_PATH.md); Release N+1 cleanup is
-in the Bikeshed.
-
-**Only remaining before release: hardware verification (maintainer).** Run the RT-3 migrate-on-unlock matrix
-in `test_data/migration_vaults/MIGRATION_TESTS.md` — Android tablet first, then Linux / S23 /
-GrapheneOS. Green there → release decision (a robustness/security bump is warranted).
+**Release prep — VERSION 10 (robustness/security bump).** RT-3 migrate-on-unlock is
+hardware-verified: Linux + S23 green (migrate + real vaults intact + v9->v10 p+YK sync
+integrity, 2026-07-08; see `test_data/migration_vaults/MIGRATION_TESTS.md`). GrapheneOS held
+at v9 as the fallback; tablet is v9_p-only. Follow
+[BUILD_AND_RELEASE.md](BUILD_AND_RELEASE.md): version bump (pubspec), CHANGELOG, build + sign
+Linux tarball + APKs, push commits, tag last.
 
 ---
 
