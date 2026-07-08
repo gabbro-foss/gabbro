@@ -129,8 +129,10 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - **Repo -> GitHub Org.** Before flipping the repo public, create a free Organization
   (e.g. `gabbro-app`; `gabbro` may be taken) and **transfer** (not fork) the repo into it —
   keeps full history/issues/stars and redirects the old URL; standalone project namespace,
-  still on GitHub. Then `git remote set-url` and update the hardcoded links (repo line in
-  this file + `README.md`). Optional: read-only Codeberg mirror for redundancy.
+  still on GitHub. Then `git remote set-url` and **grep the whole repo for the old URL/handle
+  and update every affected place** before implementing — not just docs: about screen, README,
+  this file, CI/workflows, package metadata, links in-app. Optional: read-only Codeberg mirror
+  for redundancy.
 
 ### Code Quality
 - **Auto-type: unlock-then-type + cold start (ADR-017 Phase 4).** A trigger while the
