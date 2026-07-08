@@ -1,9 +1,9 @@
 # Gabbro crack-me challenge
 
-**Published:** 2026-07-07  
+**Published:** 2026-07-08  
 **Status:** Not cracked
 
-`decryptMe_2026-07-07.gabbro` is a real Gabbro vault, sealed with a 
+`decryptMe_2026-07-08.gabbro` is a real Gabbro vault, sealed with a 
 randomly-generated passphrase and two registered YubiKeys.
 
 ---
@@ -18,7 +18,7 @@ The first person to submit valid proof **before making it public** wins **two Yu
 
 ## How to submit
 
-Email **gabbro.app@gmail.com** with:
+Email **gabbro@tuta.com** with:
 
 0. The full character string from the vault note (`decryptionProof_*`, exact, character-for-character).
 1. The master passphrase of the vault.
