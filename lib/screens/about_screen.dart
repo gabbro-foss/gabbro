@@ -8,8 +8,8 @@ import 'package:url_launcher/url_launcher.dart';
 /// no manual drift. Local/dev builds (no define) show "dev".
 const _kAppVersion = String.fromEnvironment('APP_VERSION', defaultValue: 'dev');
 
-const _kGitHubUrl = 'https://github.com/Zabamund/gabbro';
-const _kIssuesUrl = 'https://github.com/Zabamund/gabbro/issues';
+const _kGitHubUrl = 'https://github.com/gabbro-foss/gabbro';
+const _kIssuesUrl = 'https://github.com/gabbro-foss/gabbro/issues';
 const _kDonateUrl = 'https://github.com/sponsors/Zabamund';
 const _kClaudeUrl = 'https://claude.ai';
 

@@ -32,7 +32,7 @@ Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
 
 **Licence:** GPL-3.0-only (ADR-004). Play Store one-time payment is licence-compatible; F-Droid free build coexists without conflict.
 
-**Version control:** private GitHub repo at https://github.com/Zabamund/gabbro. SSH auth.
+**Version control:** private GitHub repo at https://github.com/gabbro-foss/gabbro. SSH auth.
 
 ## Project Structure
 

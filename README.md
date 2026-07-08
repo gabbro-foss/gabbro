@@ -115,7 +115,7 @@ a UX complement that allows a corruption check *before* opening the vault.
 > passwords you cannot afford to lose.
 
 Download the latest release from the
-[Releases](https://github.com/Zabamund/gabbro/releases) page,
+[Releases](https://github.com/gabbro-foss/gabbro/releases) page,
 or receive the artifact directly from the project owner.
 
 ### Linux (Arch, Debian trixie, Linux Mint)
