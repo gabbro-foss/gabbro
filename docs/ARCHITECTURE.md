@@ -95,6 +95,12 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
+**Post the external crypto-review question.** Drafted and ready (Q1-primary + optional
+follow-ups; narrow ask — the construction only: the passphrase-derived hybrid combiner /
+transcript binding / header AAD). Post to a public venue (Cryptography Stack Exchange /
+RustCrypto / a PQ list) with the technical stack diagram
+(`docs/artefacts/gabbro_crypto_stack_flow.svg`) attached. v1 direction in commit 9f158b5.
+
 ---
 
 ## Build & Release
@@ -110,9 +116,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 
 ### Security (pre-v1)
 - Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
-- Draft the free external crypto-review outreach (narrow ask: the construction only —
-  hybrid combiner / transcript binding / header AAD / vault format). Vault format is now
-  stable at VERSION 10, so this is no longer blocked. v1 direction in commit 9f158b5.
 - **RT-3 Release N+1 cleanup** (once no ≤v9 vault remains): delete legacy `StdRng` X25519 + legacy
   ML-KEM derivation + the frozen-golden tripwire; min supported version → v10 (≤v9 rejected gracefully,
   never bricked); convert the v2–9 gate fixtures to a graceful-rejection test; migration-vault + gate

@@ -61,11 +61,13 @@ Losing both means losing access. Losing one is recoverable if you have the other
 
 ### The simple version
 
+Diagram: [plain-language crypto stack](artefacts/gabbro_crypto_stack_simple_icons.svg).
+
 Unlocking your vault involves these steps:
 
 1. **Key derivation.** Your passphrase is fed into Argon2id, a deliberately slow
    hashing algorithm designed to make brute-force guessing expensive. It produces
-   192 bytes of key material from which two keypairs are derived.
+   96 bytes of key material from which two keypairs are derived.
 
 2. **Hybrid key exchange.** The derived keypairs perform a key exchange with
    values stored in the vault file: one classical (X25519), one post-quantum
@@ -82,6 +84,8 @@ Unlocking your vault involves these steps:
    fails and no data is released.
 
 ### The technical version
+
+Diagram: [full crypto stack, VERSION 10](artefacts/gabbro_crypto_stack_flow.svg).
 
 Both modes share the same first phase. The second phase differs.
 
