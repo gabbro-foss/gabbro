@@ -59,6 +59,13 @@ secret, it lives in Rust. Everything else lives in Flutter.
 
 ## Encryption
 
+<p align="center">
+  <img src="docs/artefacts/gabbro_crypto_stack_simple_icons.svg" width="460"
+       alt="How Gabbro protects your vault: your passphrase runs through Argon2id (a password-hardening step that makes brute force impractical), then two key-exchange methods in parallel — X25519 (classic) and ML-KEM-1024 (quantum-resistant) — which HKDF blends into a single master key (optionally combined with a YubiKey). AES-256-GCM then encrypts everything into your local .gabbro vault file.">
+</p>
+
+*A plain-language overview. For the version-accurate detail, see the [full technical diagram](docs/artefacts/gabbro_crypto_stack_flow.svg).*
+
 ```
 passphrase + random_salt
 → Argon2id (KDF)
