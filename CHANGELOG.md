@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.13] – 2026-07-08
+
 ### Security
 - **Vault format VERSION 10.** Existing vaults auto-upgrade the first time you unlock them (no action needed, entries unchanged). Hardens how one internal key is derived, removing a latent risk that a future library update could have left old vaults unopenable.
 - Crack-me challenge refreshed to a new vault (current vault format). Challenge parameters (passphrase, proof string, key configuration) are deliberately undocumented — see `challenge/README.md`. Superseded challenge vaults were retired.
