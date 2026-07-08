@@ -95,13 +95,6 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Repo -> GitHub Org (going public, pre-v1).** Create a free GitHub Organization
-(e.g. `gabbro-app`; `gabbro` may be taken) — that is the first step for this session.
-Then **transfer** (not fork) the repo into it — keeps history/issues/stars and redirects
-the old URL. After transfer: `git remote set-url` and grep the whole repo for the old
-URL/handle, updating every affected place (about screen, README, this file, CI/workflows,
-package metadata, in-app links) before implementing. Optional: read-only Codeberg mirror.
-
 ---
 
 ## Build & Release
@@ -124,6 +117,11 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   ML-KEM derivation + the frozen-golden tripwire; min supported version → v10 (≤v9 rejected gracefully,
   never bricked); convert the v2–9 gate fixtures to a graceful-rejection test; migration-vault + gate
   corpus floor → v10. Must ship Release N (v10 auto-migrate) first — see VAULT_UPGRADE_PATH.md.
+
+### Going public (pre-v1)
+- **Flip the repo to public.** Repo now lives in the `gabbro-foss` org (transferred; URLs
+  migrated). Flip visibility to public once the pre-v1 gates clear (crypto-review outreach
+  above is welcome-not-blocking). Optional: a read-only Codeberg mirror for redundancy.
 
 ### Code Quality
 - **Auto-type: unlock-then-type + cold start (ADR-017 Phase 4).** A trigger while the
