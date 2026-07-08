@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Project repository moved to the `gabbro-foss` GitHub organisation; in-app GitHub/Issues links updated (old links redirect).
+
 ## [0.1.0-alpha.13] – 2026-07-08
 
 ### Security
