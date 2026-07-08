@@ -72,3 +72,7 @@ app.*.map.json
 # Third-party audit PDFs (e.g. Recurity Labs Proton Pass report) — referenced by
 # docs/AI_SECURITY_AUDIT.md but not redistributed in the repo. Keep local only.
 docs/artefacts/*.pdf
+
+# Crypto-review outreach draft — working document, used when asking the question.
+# Kept local, never committed (repo is going public).
+docs/CRYPTO_REVIEW_QUESTION.md
