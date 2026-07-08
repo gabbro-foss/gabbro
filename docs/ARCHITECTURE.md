@@ -125,6 +125,13 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   never bricked); convert the v2–9 gate fixtures to a graceful-rejection test; migration-vault + gate
   corpus floor → v10. Must ship Release N (v10 auto-migrate) first — see VAULT_UPGRADE_PATH.md.
 
+### Going public (pre-v1)
+- **Repo -> GitHub Org.** Before flipping the repo public, create a free Organization
+  (e.g. `gabbro-app`; `gabbro` may be taken) and **transfer** (not fork) the repo into it —
+  keeps full history/issues/stars and redirects the old URL; standalone project namespace,
+  still on GitHub. Then `git remote set-url` and update the hardcoded links (repo line in
+  this file + `README.md`). Optional: read-only Codeberg mirror for redundancy.
+
 ### Code Quality
 - **Auto-type: unlock-then-type + cold start (ADR-017 Phase 4).** A trigger while the
   vault is locked or Gabbro is closed does nothing today. Add: prompt-unlock-then-type,
