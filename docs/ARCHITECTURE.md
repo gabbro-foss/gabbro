@@ -95,11 +95,65 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Awaiting a RustCrypto Zulip reply.** Open question posted: can folding `ssA‖ssB` through
-HKDF ever be *worse* than `HKDF(KM)`? (Sharpened draft in `docs/CRYPTO_REVIEW_QUESTION.md`,
-local-only.) The CSE thread is closed — it settled the rest: the passphrase-derived hybrid
-KEM is not load-bearing; PQ resistance = Argon2id + AES-256-GCM (ADR-018). Now leaning
-toward dropping the layer pre-release — see Bikeshed > Code Quality.
+**Drop the dual-lock (X25519 + ML-KEM) hybrid layer — vault VERSION 11.** Multi-session, on
+branch `drop-dual-lock-hybrid-kem`. Rationale + decision: ADR-018. Follow **net-first**
+(CLAUDE.md) strictly — no canon-TDD until the net is green across every path in *Must not
+regress* below.
+
+*Goal:* derive the AES-256 vault key straight from Argon2id via HKDF, deleting the
+passphrase-derived X25519 + ML-KEM key-exchange. Gabbro stays PQ-resistant on Argon2id +
+AES-256-GCM.
+
+*Construction (design locked):*
+- **Passphrase (v11):** `vault_key = HKDF-SHA256(salt = hkdf_salt, ikm = KM, info = "gabbro-vault-key-v1")`.
+  `KM = Argon2id(pass, salt)` **stays 96B** — the Argon2id call is byte-identical to the old
+  format; only the post-Argon2id step changes (localises the blast radius). `info` label text is
+  cosmetic-but-must-be-unique (final string TBD at implementation). Header **drops** `ct_M`
+  (1568B) + `ephemeral_pub` (32B).
+- **YubiKey (v11):** `combine_yubikey(HKDF(KM), hmac_secret, ...)` — `combine_yubikey` is
+  **unchanged**; only its first input's source changes. 2FA property intact (hmac-secret is the
+  real second factor, mixed downstream).
+- **Per-seal freshness** now comes from the random `hkdf_salt` alone (ADR-018).
+
+*Two-release strategy (folded into RT-3 so it stays two, not three):*
+- **This branch = v11 WRITE only.** New vaults seal v11; v2–v10 still *read* via the legacy
+  dual-lock derivation and **auto-migrate to v11 on unlock** (full re-seal), invisible to users.
+  `ml-kem` + `x25519-dalek` **stay** (needed to read/migrate old vaults) — supply-chain surface
+  unchanged this release.
+- **Later cleanup (Bikeshed "RT-3 + dual-lock cleanup", floor → v11):** once no ≤v10 vault
+  remains, delete the legacy derivations and **drop the crates** — surface → zero, nobody notices.
+
+*Must not regress (verify in code, then pin with the net):* p, p+yk, p+bio, p+yk+bio; CRUD saves
+(cached `vault_key_master` re-seal); open/unlock (version dispatch + v≤10 migrate); lock; import
+(new vault → v11); export (byte-copy, format-agnostic); sync (version-agnostic
+decrypt→merge→reseal, incl. cross-version v10↔v11); passphrase-change + YubiKey rotation
+(multi-key `wrapping_key` model).
+
+*High-risk / unknown — resolve at code-verification FIRST:* (a) does the multi-key `wrapping_key`
+derive from the dual-lock output or from `KM`? (b) the cached-master re-seal path; (c) the
+version-dispatch seams for read vs write; (d) cross-version sync reseal.
+
+*Tick-list (work through in order; check off as landed):*
+- [ ] Code-verify the high/unknown paths (a)-(d) — confirm or correct the abstract model above.
+- [ ] Functional sweep: list every *Must not regress* mechanism with its CURRENT test coverage.
+- [ ] Net: pin CURRENT behaviour green (all paths, all versions) BEFORE touching production; add
+  characterization tests for any gap the sweep finds.
+- [ ] Canon-TDD list — STOP for review — then implement the v11 write path (new HKDF derivation
+  + label).
+- [ ] Version dispatch: v11 seals new; v2–v10 read via the legacy derivation (kept).
+- [ ] Auto-migrate v≤10 → v11 on unlock (p and p+yk; no re-tap where the wrapping key is cached).
+- [ ] Header: drop `ct_M` + `ephemeral_pub` for v11; keep AES-GCM AAD covering the full header.
+- [ ] Fixtures: `v11_passphrase.gabbro` + `v11_multikey_2keys.gabbro` (rust/tests/fixtures/FIXTURES.md);
+  backward-compat gate + state-machine fuzzer green.
+- [ ] Migration-vault corpus: add one v11 `.gabbro` + a MIGRATION_TESTS.md entry.
+- [ ] Hardware matrix (maintainer): Linux + Android; p / p+yk / p+bio / p+yk+bio; migrate-on-unlock;
+  cross-version sync; real-vault integrity (no data loss).
+- [ ] Docs: ADR-018 (record v11 landed), SECURITY, README, ARCHITECTURE (Encryption line + format),
+  crypto diagrams (flow.svg / simple_icons / A4 PNG+PDF), VAULT_UPGRADE_PATH.
+- [ ] `gabbro_test` gate script updated if new tests aren't covered.
+- [ ] Release the v11 auto-migrate build; let existing vaults migrate in the field.
+- [ ] DEFERRED to the RT-3 cleanup (NOT this branch): delete legacy derivations, drop `ml-kem`
+  + `x25519-dalek`, raise floor → v11.
 
 ---
 
@@ -116,10 +170,12 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 
 ### Security (pre-v1)
 - Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
-- **RT-3 Release N+1 cleanup** (once no ≤v9 vault remains): delete legacy `StdRng` X25519 + legacy
-  ML-KEM derivation + the frozen-golden tripwire; min supported version → v10 (≤v9 rejected gracefully,
-  never bricked); convert the v2–9 gate fixtures to a graceful-rejection test; migration-vault + gate
-  corpus floor → v10. Must ship Release N (v10 auto-migrate) first — see VAULT_UPGRADE_PATH.md.
+- **RT-3 + dual-lock cleanup (merged, floor → v11)** — once no ≤v10 vault remains: delete the
+  legacy `StdRng` X25519, the legacy ML-KEM + dual-lock derivations, and the frozen-golden
+  tripwire; **drop the `ml-kem` + `x25519-dalek` crates** (supply-chain surface → zero); min
+  supported version → v11 (≤v10 rejected gracefully, never bricked); convert the v2–v10 gate
+  fixtures to a graceful-rejection test; migration-vault + gate corpus floor → v11. Must ship the
+  v11 auto-migrate release first (Current Focus task 2) — see VAULT_UPGRADE_PATH.md.
 
 ### Going public (pre-v1)
 - **Flip the repo to public.** Repo now lives in the `gabbro-foss` org (transferred; URLs
@@ -127,14 +183,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   above is welcome-not-blocking). Optional: a read-only Codeberg mirror for redundancy.
 
 ### Code Quality
-- **Drop the dual-lock (X25519 + ML-KEM) hybrid layer.** Demonstrably not load-bearing
-  (ADR-018); adds nothing to security — Gabbro stays PQ-resistant on Argon2id + AES-256-GCM,
-  and the mandatory-YubiKey premise that shaped it (ADR-005/006, superseded) is gone.
-  `ml-kem` + `x25519-dalek` are used *only* here, so removal cuts the supply-chain surface
-  from low to zero (drops both direct crates + ~6 unique transitive ones, incl. a
-  compile-time proc-macro + build-dep). Touches vault format + code/tests/hardware/backward-
-  compat, and the docs must be updated to match (ADR-018, SECURITY, README, ARCHITECTURE,
-  crypto diagrams), so **pre-release if at all**, on a **separate branch**.
 - **Auto-type: unlock-then-type + cold start (ADR-017 Phase 4).** A trigger while the
   vault is locked or Gabbro is closed does nothing today. Add: prompt-unlock-then-type,
   an opt-in setting, README key-binding examples, and package `gabbro-autotype` into the
