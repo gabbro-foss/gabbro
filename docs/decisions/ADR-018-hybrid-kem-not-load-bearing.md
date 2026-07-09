@@ -60,10 +60,21 @@ re-derived on one device.
    retracted; living docs (ARCHITECTURE, SECURITY, README, diagrams)
    to be corrected to attribute quantum resistance to Argon2id +
    AES-256-GCM.
-2. Keep the layer for now — removal is a vault-format change and the
-   Stack Exchange question ("can it make things *worse* than
-   HKDF(KM)?") is still open. Revisit keep-vs-remove when it
-   concludes.
+2. Plan to remove the hybrid layer pre-release (reverses the earlier
+   "keep for now"). Rationale: it is demonstrably not load-bearing, so
+   removal loses no security — every path falls back to the HKDF(KM)
+   baseline, still PQ-resistant via Argon2id + AES-256-GCM — and it
+   deletes the only users of `ml-kem` and `x25519-dalek`, cutting their
+   supply-chain surface (2 direct + ~6 unique transitive crates, incl.
+   a compile-time proc-macro + build-dep) to zero. Removal is a
+   vault-format change touching code/tests/hardware/backward-compat +
+   docs, so it is pre-release-only, on a separate branch, and only if
+   v1 timing allows (else the layer stays — harmless, just wasteful).
+   Tracked in ARCHITECTURE Bikeshed > Code Quality. The open "can
+   HKDF(ssA‖ssB) be *worse* than HKDF(KM)?" question (RustCrypto Zulip)
+   no longer gates this — removal lands on HKDF(KM) itself — and is
+   kept only for closure and to confirm keeping-until-removal is
+   harmless.
 3. ADR-006 marked superseded. ADR-005 marked amended: its side-claim
    that "the PQ claim rests on ML-KEM + AES-256-GCM" is corrected by
    this ADR (its actual decision — ML-DSA over hybrid signatures —

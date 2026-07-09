@@ -95,12 +95,11 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Await crypto-review responses.** First reply (Cryptography Stack Exchange, 2026-07-08)
-confirmed the passphrase-derived hybrid KEM is not load-bearing — quantum resistance is
-Argon2id + AES-256-GCM; recorded in ADR-018 and doc claims corrected. Still open: whether
-folding `ssA‖ssB` through HKDF can ever be *worse* than `HKDF(KM)` — that answer decides
-keep-vs-remove of the hybrid layer (removal = vault format bump). Optional RustCrypto
-follow-up. v1 direction in commit 9f158b5.
+**Awaiting a RustCrypto Zulip reply.** Open question posted: can folding `ssA‖ssB` through
+HKDF ever be *worse* than `HKDF(KM)`? (Sharpened draft in `docs/CRYPTO_REVIEW_QUESTION.md`,
+local-only.) The CSE thread is closed — it settled the rest: the passphrase-derived hybrid
+KEM is not load-bearing; PQ resistance = Argon2id + AES-256-GCM (ADR-018). Now leaning
+toward dropping the layer pre-release — see Bikeshed > Code Quality.
 
 ---
 
@@ -128,6 +127,14 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   above is welcome-not-blocking). Optional: a read-only Codeberg mirror for redundancy.
 
 ### Code Quality
+- **Drop the dual-lock (X25519 + ML-KEM) hybrid layer.** Demonstrably not load-bearing
+  (ADR-018); adds nothing to security — Gabbro stays PQ-resistant on Argon2id + AES-256-GCM,
+  and the mandatory-YubiKey premise that shaped it (ADR-005/006, superseded) is gone.
+  `ml-kem` + `x25519-dalek` are used *only* here, so removal cuts the supply-chain surface
+  from low to zero (drops both direct crates + ~6 unique transitive ones, incl. a
+  compile-time proc-macro + build-dep). Touches vault format + code/tests/hardware/backward-
+  compat, and the docs must be updated to match (ADR-018, SECURITY, README, ARCHITECTURE,
+  crypto diagrams), so **pre-release if at all**, on a **separate branch**.
 - **Auto-type: unlock-then-type + cold start (ADR-017 Phase 4).** A trigger while the
   vault is locked or Gabbro is closed does nothing today. Add: prompt-unlock-then-type,
   an opt-in setting, README key-binding examples, and package `gabbro-autotype` into the
