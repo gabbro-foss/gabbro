@@ -57,7 +57,8 @@ catalogued in `AI_AUTHORSHIP_AND_IP.md` applies here:
 - the security boundary — secrets never cross the Flutter/Rust bridge in
   plaintext, Rust owns all decrypted material in memory;
 - the crypto stack and the hybrid-PQC "belt and suspenders" rationale
-  (Argon2id → X25519 + ML-KEM-1024 → HKDF → AES-256-GCM);
+  (Argon2id → X25519 + ML-KEM-1024 → HKDF → AES-256-GCM) — rationale
+  retracted, ADR-018;
 - the FIDO2/YubiKey-only authentication model, and the deliberate decision *not*
   to ship TOTP;
 - the vault file format, the session model, the importer scope (three, not N);

@@ -1,7 +1,9 @@
 # ADR-005: Post-Quantum Authentication — Pure ML-DSA-44
 
 ## Status
-Accepted
+Accepted; amended by ADR-018 — the claim that Gabbro's PQ resistance
+rests on ML-KEM is incorrect (it rests on Argon2id + AES-256-GCM).
+The signature decision itself stands.
 
 ## Date
 2026-04-09

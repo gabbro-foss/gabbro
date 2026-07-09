@@ -1,7 +1,9 @@
 # ADR-006: Encryption Stack Implementation
 
 ## Status
-Accepted
+Superseded by ADR-018 — the hybrid "secure if either holds" claim is
+incorrect (both keypairs derive from the passphrase). Parameter, crate,
+and byte-layout decisions remain accurate.
 
 ## Date
 2026-04-09
@@ -61,8 +63,6 @@ Note: hybrid *key exchange* is the right tradeoff here. ADR-005
 rejected hybrid *signatures* for authentication — that reasoning
 does not carry over. Ephemeral key material is cheap to compose;
 signature protocol complexity is not.
-
-### 3. Argon2id parameters as a serializable struct
 
 ### 3. Argon2id parameters as a serializable struct
 

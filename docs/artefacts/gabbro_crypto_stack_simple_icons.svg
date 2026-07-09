@@ -133,8 +133,8 @@
   <text x="662" y="516" font-size="17.5" fill="#222">future quantum computers</text>
 
   <!-- both-locks caption -->
-  <text x="545" y="572" text-anchor="middle" font-size="18" font-style="italic" fill="#333">we use both, so your vault stays</text>
-  <text x="545" y="594" text-anchor="middle" font-size="18" font-style="italic" fill="#333">safe even if one is ever broken</text>
+  <text x="545" y="572" text-anchor="middle" font-size="18" font-style="italic" fill="#333">we use both, blended into one —</text>
+  <text x="545" y="594" text-anchor="middle" font-size="18" font-style="italic" fill="#333">the vault's strength is your passphrase</text>
 
   <!-- 4. HKDF -->
   <rect x="365" y="632" width="360" height="134" rx="12" fill="#A6D3D1" stroke="#3a3a3a"/>

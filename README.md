@@ -1,6 +1,6 @@
 # Gabbro
 
-A post-quantum password manager built with security as core DNA.
+A quantum-resistant password manager.
 
 > **Status: Alpha.**
 > All vault operations implemented and tested in Rust; Flutter UI complete.
@@ -10,17 +10,17 @@ A post-quantum password manager built with security as core DNA.
 ## What is Gabbro?
 
 Gabbro is a free, open-source password manager designed for users who
-take security seriously. It combines classical and post-quantum
-cryptography to protect your secrets today and against the quantum
-computers of tomorrow.
+take security seriously. Your secrets are protected by memory-hard key
+derivation (Argon2id) and AES-256 encryption — both resistant to
+classical and quantum attack.
 
 Named after the intrusive igneous rock — hard, stable, enduring.
 
 ### Key properties
 
-- **Post-quantum cryptography** — ML-KEM (NIST standard) alongside
-  AES-256-GCM; belt and suspenders against both classical and quantum
-  threats
+- **Quantum-resistant by design** — vault security rests on Argon2id +
+  AES-256-GCM, both quantum-resistant; a hybrid X25519 + ML-KEM-1024
+  layer is additionally present (structural, not load-bearing — ADR-018)
 - **Hardware key (optional, recommended)** — FIDO2/YubiKey authentication; passphrase-only
   by default, with a minimum of two keys when keys are used (primary + backup)
 - **Rust for all secrets** — every cryptographic operation lives in
@@ -61,7 +61,7 @@ secret, it lives in Rust. Everything else lives in Flutter.
 
 <p align="center">
   <img src="docs/artefacts/gabbro_crypto_stack_simple_icons.svg" width="460"
-       alt="How Gabbro protects your vault: your passphrase runs through Argon2id (a password-hardening step that makes brute force impractical), then two key-exchange methods in parallel — X25519 (classic) and ML-KEM-1024 (quantum-resistant) — which HKDF blends into a single master key (optionally combined with a YubiKey). AES-256-GCM then encrypts everything into your local .gabbro vault file.">
+       alt="How Gabbro protects your vault: your passphrase runs through Argon2id (a password-hardening step that makes brute force impractical), then two key-exchange methods, blended by HKDF into a single master key (optionally combined with a YubiKey). AES-256-GCM then encrypts everything into your local .gabbro vault file. The vault's strength comes from your passphrase: Argon2id and AES-256-GCM are the quantum-resistant defences; the key-exchange layer is structural.">
 </p>
 
 *A plain-language overview. For the version-accurate detail, see the [full technical diagram](docs/artefacts/gabbro_crypto_stack_flow.svg).*
@@ -69,11 +69,14 @@ secret, it lives in Rust. Everything else lives in Flutter.
 ```
 passphrase + random_salt
 → Argon2id (KDF)
-→ 256-bit master key
-→ ML-KEM (post-quantum key encapsulation)
+→ X25519 + ML-KEM-1024 hybrid key exchange
+→ HKDF-SHA256 (master key; optional YubiKey factor)
 → AES-256-GCM (vault encryption)
 → encrypted vault body + auth tag
 ```
+
+Quantum resistance comes from Argon2id + AES-256-GCM; the hybrid
+key-exchange layer is structural, not load-bearing (ADR-018).
 
 Vault files use the `.gabbro` extension and are self-contained —
 all parameters needed for decryption travel with the file.

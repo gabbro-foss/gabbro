@@ -362,7 +362,7 @@ the current implementation.
 |---|---|---|---|---|
 | Local-first (no mandatory cloud) | ✓ | ✓ | ✓ (self-host) | ✓ |
 | Open source | ✓ GPL-3.0 | ✓ GPL-2.0 | ✓ AGPL-3.0 | ✓ GPL-2.0 |
-| Post-quantum encryption | ✓ ML-KEM-1024 | ✗ | ✗ | ✗ |
+| PQ KEM in stack | ✓ ML-KEM-1024 (structural, not load-bearing — ADR-018) | ✗ | ✗ | ✗ |
 | Hardware key (2FA) support | ✓ FIDO2 (optional but strongly recommended) | Optional (plugins) | Optional (TOTP / hardware token) | ✗ (GPG only) |
 | Memory-scrubbing on lock | ✓ (verified by gcore test) | ✓ (documented) | Unknown | Relies on GPG agent |
 | External cryptographic audit | **✗ none yet** | ✓ multiple | ✓ multiple (Cure53, etc.) | ✓ (GPG is audited) |
@@ -373,12 +373,16 @@ the current implementation.
 **Note:** KeePass and Bitwarden have received multiple independent security audits.
 Gabbro has not. This is the most significant gap in the table.
 
+**Note on the PQ row:** all four managers are comparably quantum-resistant at rest —
+that property comes from memory-hard KDFs + 256-bit symmetric encryption, which they
+all share. Gabbro's ML-KEM layer is present but not load-bearing (ADR-018).
+
 ### Gabbro's crypto choices vs alternatives
 
 | Decision | Gabbro | Common alternative | Why Gabbro's choice |
 |---|---|---|---|
 | KDF | Argon2id (RFC 9106) | PBKDF2-HMAC-SHA256 | Argon2id is memory-hard; PBKDF2 is not. Memory-hardness is the main defence against GPU/ASIC brute-force. Argon2id is the current OWASP and NIST recommendation. |
-| Key exchange | X25519 + ML-KEM-1024 hybrid | X25519 alone (classical) | The hybrid approach adds a post-quantum layer without weakening classical security: if ML-KEM has a flaw, X25519 still protects the vault; if a quantum computer breaks X25519, ML-KEM still protects it. |
+| Key exchange | X25519 + ML-KEM-1024 hybrid | X25519 alone (classical) | Neither KEM is load-bearing: both keypairs derive from the passphrase, so vault security rests on Argon2id + AES-256-GCM (ADR-018). The hybrid layer is retained as structure pending external review. |
 | YubiKey binding | Second HKDF pass after the hybrid combiner | Passphrase alone | Adds a hardware factor that blocks offline brute-force entirely, independent of passphrase strength. |
 | Symmetric cipher | AES-256-GCM | AES-256-CBC + HMAC, or ChaCha20-Poly1305 | AES-256-GCM is an AEAD — it authenticates as well as encrypts in a single pass. ChaCha20-Poly1305 would be an equally valid choice; AES-GCM was chosen for FIPS alignment. |
 | KDF combiner | HKDF-SHA256 (RFC 5869) | Concatenation + hash | HKDF is a standard, well-studied PRF. The random per-seal salt means even identical passphrases produce different vault keys. |
