@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Project repository moved to the `gabbro-foss` GitHub organisation; in-app GitHub/Issues links updated (old links redirect).
+- App tagline is now "A quantum-resistant password manager" (all locales). Docs clarified: quantum resistance comes from Argon2id + AES-256-GCM, not the hybrid X25519 + ML-KEM layer (ADR-018).
 
 ## [0.1.0-alpha.13] – 2026-07-08
 

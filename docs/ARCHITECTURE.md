@@ -95,11 +95,12 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Await crypto-review responses.** The construction question (passphrase-derived hybrid
-combiner / transcript binding) was posted to Cryptography Stack Exchange (2026-07-08). When
-replies arrive, evaluate them against the construction and decide any action: a SECURITY.md
-note, a design change, or close as confirmed. Optional follow-up on RustCrypto for
-implementation-specific angles. v1 direction in commit 9f158b5.
+**Await crypto-review responses.** First reply (Cryptography Stack Exchange, 2026-07-08)
+confirmed the passphrase-derived hybrid KEM is not load-bearing — quantum resistance is
+Argon2id + AES-256-GCM; recorded in ADR-018 and doc claims corrected. Still open: whether
+folding `ssA‖ssB` through HKDF can ever be *worse* than `HKDF(KM)` — that answer decides
+keep-vs-remove of the hybrid layer (removal = vault format bump). Optional RustCrypto
+follow-up. v1 direction in commit 9f158b5.
 
 ---
 
@@ -133,6 +134,8 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   release bundle (update BUILD_AND_RELEASE). Secret stays in Rust; auto-lock preserved.
 - **Autofill save loose ends.** Native review of the best-effort `eu`/`kk`/`yo` save-flow
   translations (and the `resizeColumns` label added the same way).
+- **Native-review `aboutTagline` translations** (all locales, 2026-07-09 rename): `eu` Basque
+  and `yo` Yoruba lowest confidence, `kk`/`lt` medium.
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
 
 ### V2+ / Defer
