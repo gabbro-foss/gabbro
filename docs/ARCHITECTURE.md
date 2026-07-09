@@ -153,9 +153,26 @@ decrypt→merge→reseal, incl. cross-version v10↔v11); passphrase-change + Yu
   FIXED-POSITION in `from_bytes`/`to_bytes`/`header_aad` — v11 must version-branch all three to drop them.
   The v8+ transcript-binding combiner is moot for v11 (no KEM transcript). Parse-fuzzer + gate cover this.
 
+*Sweep (item 2 functional sweep, DONE — CURRENT coverage of the Must-not-regress list):*
+- **Rust crypto/format = STRONG** on every path: p + p+yk seal/open; version dispatch; migrate on
+  save (`save_vault`/`seal_vault_with_yubikey` full re-seal) AND on unlock (`migrate_*_vault_on_unlock`);
+  export (byte-copy preserve + passphrase-only downgrade); sync incl. cross-version
+  (`cross_version_sync_loads_and_merges_a_v8_file`); passphrase-change + YK add/remove rotation.
+  Gate `vault_backward_compat.rs` has frozen fixtures **v6–v10** (passphrase + 2-key each); parse-fuzzer
+  routine; state-machine fuzzer v6–v9 (opt-in).
+- **Flutter = insulated** — user flows call Rust via callbacks; version negotiation opaque. Real-FFI
+  integration covers passphrase unlock + entry edit/history + lock->unlock. No Dart version-byte assert
+  (by design; Rust gate owns format).
+- **Android = fully insulated** — biometric stores the RAW passphrase under AndroidKeyStore; YubiKey
+  returns RAW hmac-secret. So **p+bio / p+yk+bio need no format work**.
+- **GAPS to close as characterization tests in item 3 (pre-edit):** G1 — the `v10_multikey_2keys.gabbro`
+  fixture is NOT run through `run_rotation_scenario` (belt across v10 mutations untested at the current
+  boundary). G2 — `build_passphrase_only_bytes` (export downgrade seal) has no direct unit test. G3 —
+  import path does not assert the resulting sealed VERSION == current.
+
 *Tick-list (work through in order; check off as landed):*
 - [x] Code-verify the high/unknown paths (a)-(d) — DONE; see *Findings* above.
-- [ ] Functional sweep: list every *Must not regress* mechanism with its CURRENT test coverage.
+- [x] Functional sweep: list every *Must not regress* mechanism with its CURRENT test coverage — DONE; see *Sweep* above.
 - [ ] Net: pin CURRENT behaviour green (all paths, all versions) BEFORE touching production; add
   characterization tests for any gap the sweep finds.
 - [ ] Canon-TDD list — STOP for review — then implement the v11 write path (new HKDF derivation
