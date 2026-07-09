@@ -129,12 +129,32 @@ AES-256-GCM.
 decrypt→merge→reseal, incl. cross-version v10↔v11); passphrase-change + YubiKey rotation
 (multi-key `wrapping_key` model).
 
-*High-risk / unknown — resolve at code-verification FIRST:* (a) does the multi-key `wrapping_key`
-derive from the dual-lock output or from `KM`? (b) the cached-master re-seal path; (c) the
-version-dispatch seams for read vs write; (d) cross-version sync reseal.
+*Findings (item 1 code-verification, DONE — confirms/corrects the model above):*
+- **(a) `wrapping_key` is RANDOM** (`vault_crypto.rs:460`), not derived. The passphrase path derives
+  `intermediate_key` (today = dual-lock HKDF) which only *encrypts* `wrapping_key` into `passphrase_blob`;
+  `vault_key_master` (random) encrypts the body; `key_blob` = `combine_yubikey(wrapping_key,hmac,salt)`.
+  So v11 changes ONLY `intermediate_key` -> `HKDF(KM)`; `wrapping_key`/`vault_key_master`/`combine_yubikey`/
+  `key_blob`/`passphrase_blob` untouched. Note: the *Construction* `combine_yubikey(HKDF(KM),…)` line
+  describes the **legacy single-key** path (`seal_vault_with_yubikey`); in the **live multi-key** path
+  `combine_yubikey`'s first input is the random `wrapping_key`, so it does not change at all.
+- **(b) Only multi-key body-reseal is capped.** Passphrase-only save = full re-seal (`save_vault`->`seal_vault`,
+  re-derives Argon2id every save) -> auto-migrates on save AND unlock (`migrate_passphrase_vault_on_unlock`,
+  `session.rs:88`). Single-key YK (legacy v2) = full re-seal (`save_vault_with_yubikey`). Multi-key = body-only
+  `reseal_vault_body` gated by `capped_reseal_version`. **REQUIRED: bump that boundary 10->11** (new const),
+  else a v10 body-reseal jumps to v11 while `passphrase_blob` stays dual-lock-derived -> brick. Braces
+  (`migrate_multikey_to_version`, `session.rs:151`) already do the full rebuild on unlock.
+- **(c) Dispatch confirmed.** Seal passes `VERSION`; open passes `sealed.version`. Three dispatchers
+  (`x25519_keypair_for_version`, `ml_kem_keypair_for_version`, `derive_passphrase_vault_key_for_version`)
+  branch on it; add a `v>=11` branch that derives `HKDF(KM)` and skips ML-KEM/X25519. Read/migrate keep the
+  legacy KEM for <=v10.
+- **(d) Sync folds into (b)+(c).** Sync merges into the in-memory session then persists via the SAME `do_save`
+  dispatch as CRUD — no separate seal path. Older builds refuse a v11 file fail-closed (`file_format.rs:238`).
+- **Header (biggest mechanical/risk surface):** `ml_kem_ciphertext`(1568)+`x25519_ephemeral_public`(32) are
+  FIXED-POSITION in `from_bytes`/`to_bytes`/`header_aad` — v11 must version-branch all three to drop them.
+  The v8+ transcript-binding combiner is moot for v11 (no KEM transcript). Parse-fuzzer + gate cover this.
 
 *Tick-list (work through in order; check off as landed):*
-- [ ] Code-verify the high/unknown paths (a)-(d) — confirm or correct the abstract model above.
+- [x] Code-verify the high/unknown paths (a)-(d) — DONE; see *Findings* above.
 - [ ] Functional sweep: list every *Must not regress* mechanism with its CURRENT test coverage.
 - [ ] Net: pin CURRENT behaviour green (all paths, all versions) BEFORE touching production; add
   characterization tests for any gap the sweep finds.
