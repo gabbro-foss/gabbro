@@ -1349,7 +1349,7 @@ class AppLocalizationsYo extends AppLocalizations {
   }
 
   @override
-  String get aboutTagline => 'Olugba ọrọ igbaniwọle lẹhin-kuatomu';
+  String get aboutTagline => 'Olugba ọrọ igbaniwọle tí ó lera sí kuatomu';
 
   @override
   String get aboutSourceCode => 'Koodu orisun';

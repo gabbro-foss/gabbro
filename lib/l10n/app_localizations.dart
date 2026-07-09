@@ -2632,7 +2632,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutTagline.
   ///
   /// In en, this message translates to:
-  /// **'A post-quantum password manager'**
+  /// **'A quantum-resistant password manager'**
   String get aboutTagline;
 
   /// No description provided for @aboutSourceCode.

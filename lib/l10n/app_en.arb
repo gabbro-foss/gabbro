@@ -682,7 +682,7 @@
       "version": {"type": "String"}
     }
   },
-  "aboutTagline": "A post-quantum password manager",
+  "aboutTagline": "A quantum-resistant password manager",
   "aboutSourceCode": "Source code",
   "aboutReportIssue": "Report an issue",
   "aboutSupportGabbro": "Support Gabbro",

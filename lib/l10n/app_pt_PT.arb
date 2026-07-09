@@ -598,7 +598,7 @@
       "version": {"type": "String"}
     }
   },
-  "aboutTagline": "Um gestor de palavras-passe pós-quântico",
+  "aboutTagline": "Um gestor de palavras-passe resistente a ataques quânticos",
   "aboutSourceCode": "Código fonte",
   "aboutReportIssue": "Reportar problema",
   "aboutSupportGabbro": "Apoiar o Gabbro",

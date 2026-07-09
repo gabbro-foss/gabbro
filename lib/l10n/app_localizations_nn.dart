@@ -1353,7 +1353,7 @@ class AppLocalizationsNn extends AppLocalizations {
   }
 
   @override
-  String get aboutTagline => 'Ein post-kvantepassordhandsamar';
+  String get aboutTagline => 'Ein kvanteresistent passordhandsamar';
 
   @override
   String get aboutSourceCode => 'Kjeldekode';

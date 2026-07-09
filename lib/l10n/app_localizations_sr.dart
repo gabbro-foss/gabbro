@@ -1358,7 +1358,7 @@ class AppLocalizationsSr extends AppLocalizations {
   }
 
   @override
-  String get aboutTagline => 'Postkvantni menadžer lozinki';
+  String get aboutTagline => 'Kvantno otporan menadžer lozinki';
 
   @override
   String get aboutSourceCode => 'Izvorni kod';
@@ -3371,7 +3371,7 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   }
 
   @override
-  String get aboutTagline => 'Postkvantni menadžer lozinki';
+  String get aboutTagline => 'Kvantno otporan menadžer lozinki';
 
   @override
   String get aboutSourceCode => 'Izvorni kod';

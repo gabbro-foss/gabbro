@@ -598,7 +598,7 @@
       "version": {"type": "String"}
     }
   },
-  "aboutTagline": "Postkvantový správca hesiel",
+  "aboutTagline": "Kvantovo odolný správca hesiel",
   "aboutSourceCode": "Zdrojový kód",
   "aboutReportIssue": "Nahlásiť problém",
   "aboutSupportGabbro": "Podporiť Gabbro",

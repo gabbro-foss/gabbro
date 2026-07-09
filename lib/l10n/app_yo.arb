@@ -598,7 +598,7 @@
       "version": {"type": "String"}
     }
   },
-  "aboutTagline": "Olugba ọrọ igbaniwọle lẹhin-kuatomu",
+  "aboutTagline": "Olugba ọrọ igbaniwọle tí ó lera sí kuatomu",
   "aboutSourceCode": "Koodu orisun",
   "aboutReportIssue": "Jabo isoro",
   "aboutSupportGabbro": "Ṣe atilẹyin Gabbro",

@@ -598,7 +598,7 @@
       "version": {"type": "String"}
     }
   },
-  "aboutTagline": "Постквантовий менеджер паролів",
+  "aboutTagline": "Квантово-стійкий менеджер паролів",
   "aboutSourceCode": "Вихідний код",
   "aboutReportIssue": "Повідомити про проблему",
   "aboutSupportGabbro": "Підтримати Gabbro",

@@ -1355,7 +1355,8 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get aboutTagline => 'Um gerenciador de senhas pós-quântico';
+  String get aboutTagline =>
+      'Um gerenciador de senhas resistente a ataques quânticos';
 
   @override
   String get aboutSourceCode => 'Código fonte';
@@ -3372,7 +3373,8 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   }
 
   @override
-  String get aboutTagline => 'Um gerenciador de senhas pós-quântico';
+  String get aboutTagline =>
+      'Um gerenciador de senhas resistente a ataques quânticos';
 
   @override
   String get aboutSourceCode => 'Código fonte';
@@ -5387,7 +5389,8 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   }
 
   @override
-  String get aboutTagline => 'Um gestor de palavras-passe pós-quântico';
+  String get aboutTagline =>
+      'Um gestor de palavras-passe resistente a ataques quânticos';
 
   @override
   String get aboutSourceCode => 'Código fonte';

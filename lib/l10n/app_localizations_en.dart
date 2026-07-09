@@ -1349,7 +1349,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get aboutTagline => 'A post-quantum password manager';
+  String get aboutTagline => 'A quantum-resistant password manager';
 
   @override
   String get aboutSourceCode => 'Source code';

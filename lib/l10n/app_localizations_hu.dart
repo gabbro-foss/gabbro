@@ -1353,7 +1353,7 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get aboutTagline => 'Kvantum utáni jelszókezelő';
+  String get aboutTagline => 'Kvantumálló jelszókezelő';
 
   @override
   String get aboutSourceCode => 'Forráskód';

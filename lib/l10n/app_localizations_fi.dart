@@ -1355,7 +1355,7 @@ class AppLocalizationsFi extends AppLocalizations {
   }
 
   @override
-  String get aboutTagline => 'Kvanttijälkeinen salasanahallinta';
+  String get aboutTagline => 'Kvanttiturvallinen salasanahallinta';
 
   @override
   String get aboutSourceCode => 'Lähdekoodi';

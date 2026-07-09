@@ -1359,7 +1359,7 @@ class AppLocalizationsSl extends AppLocalizations {
   }
 
   @override
-  String get aboutTagline => 'Postkvantni upravitelj gesel';
+  String get aboutTagline => 'Kvantno odporen upravitelj gesel';
 
   @override
   String get aboutSourceCode => 'Izvorna koda';

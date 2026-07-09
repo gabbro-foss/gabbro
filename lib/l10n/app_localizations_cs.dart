@@ -1356,7 +1356,7 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
-  String get aboutTagline => 'Postkvantový správce hesel';
+  String get aboutTagline => 'Kvantově odolný správce hesel';
 
   @override
   String get aboutSourceCode => 'Zdrojový kód';

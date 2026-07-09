@@ -1352,7 +1352,7 @@ class AppLocalizationsNb extends AppLocalizations {
   }
 
   @override
-  String get aboutTagline => 'En post-kvantepassordbehandler';
+  String get aboutTagline => 'En kvanteresistent passordbehandler';
 
   @override
   String get aboutSourceCode => 'Kildekode';

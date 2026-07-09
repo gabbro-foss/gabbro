@@ -598,7 +598,7 @@
       "version": {"type": "String"}
     }
   },
-  "aboutTagline": "Pēckvantumu paroļu pārvaldnieks",
+  "aboutTagline": "Kvantu izturīgs paroļu pārvaldnieks",
   "aboutSourceCode": "Pirmkods",
   "aboutReportIssue": "Ziņot par problēmu",
   "aboutSupportGabbro": "Atbalstīt Gabbro",

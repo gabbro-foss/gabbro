@@ -1357,7 +1357,7 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get aboutTagline => 'Een post-kwantum wachtwoordbeheerder';
+  String get aboutTagline => 'Een kwantumbestendige wachtwoordbeheerder';
 
   @override
   String get aboutSourceCode => 'Broncode';

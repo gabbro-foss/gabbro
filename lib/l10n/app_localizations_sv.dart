@@ -1352,7 +1352,7 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
-  String get aboutTagline => 'En post-kvantumlösenordshanterare';
+  String get aboutTagline => 'En kvantresistent lösenordshanterare';
 
   @override
   String get aboutSourceCode => 'Källkod';

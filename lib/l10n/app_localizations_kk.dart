@@ -1353,7 +1353,7 @@ class AppLocalizationsKk extends AppLocalizations {
   }
 
   @override
-  String get aboutTagline => 'Кванттан кейінгі құпия сөз менеджері';
+  String get aboutTagline => 'Кванттық шабуылдарға төзімді құпия сөз менеджері';
 
   @override
   String get aboutSourceCode => 'Бастапқы код';

@@ -598,7 +598,7 @@
       "version": {"type": "String"}
     }
   },
-  "aboutTagline": "后量子密码管理器",
+  "aboutTagline": "抗量子密码管理器",
   "aboutSourceCode": "源代码",
   "aboutReportIssue": "报告问题",
   "aboutSupportGabbro": "支持 Gabbro",

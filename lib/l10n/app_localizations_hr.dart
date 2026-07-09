@@ -1354,7 +1354,7 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
-  String get aboutTagline => 'Postkvantni upravitelj lozinki';
+  String get aboutTagline => 'Kvantno otporan upravitelj lozinki';
 
   @override
   String get aboutSourceCode => 'Izvorni kod';

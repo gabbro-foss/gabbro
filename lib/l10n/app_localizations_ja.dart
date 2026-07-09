@@ -1330,7 +1330,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get aboutTagline => 'ポスト量子パスワードマネージャー';
+  String get aboutTagline => '耐量子パスワードマネージャー';
 
   @override
   String get aboutSourceCode => 'ソースコード';

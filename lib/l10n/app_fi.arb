@@ -598,7 +598,7 @@
       "version": {"type": "String"}
     }
   },
-  "aboutTagline": "Kvanttijälkeinen salasanahallinta",
+  "aboutTagline": "Kvanttiturvallinen salasanahallinta",
   "aboutSourceCode": "Lähdekoodi",
   "aboutReportIssue": "Ilmoita ongelmasta",
   "aboutSupportGabbro": "Tue Gabbroa",

@@ -598,7 +598,7 @@
       "version": {"type": "String"}
     }
   },
-  "aboutTagline": "포스트 퀀텀 비밀번호 관리자",
+  "aboutTagline": "양자 내성 비밀번호 관리자",
   "aboutSourceCode": "소스 코드",
   "aboutReportIssue": "문제 보고",
   "aboutSupportGabbro": "Gabbro 지원",

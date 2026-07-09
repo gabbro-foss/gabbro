@@ -1331,7 +1331,7 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get aboutTagline => '포스트 퀀텀 비밀번호 관리자';
+  String get aboutTagline => '양자 내성 비밀번호 관리자';
 
   @override
   String get aboutSourceCode => '소스 코드';

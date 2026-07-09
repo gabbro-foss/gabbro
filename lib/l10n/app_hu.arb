@@ -598,7 +598,7 @@
       "version": {"type": "String"}
     }
   },
-  "aboutTagline": "Kvantum utáni jelszókezelő",
+  "aboutTagline": "Kvantumálló jelszókezelő",
   "aboutSourceCode": "Forráskód",
   "aboutReportIssue": "Hiba bejelentése",
   "aboutSupportGabbro": "Gabbro támogatása",

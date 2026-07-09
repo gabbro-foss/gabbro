@@ -1355,7 +1355,7 @@ class AppLocalizationsEt extends AppLocalizations {
   }
 
   @override
-  String get aboutTagline => 'Kvantjärgne paroolihaldur';
+  String get aboutTagline => 'Kvantkindel paroolihaldur';
 
   @override
   String get aboutSourceCode => 'Lähtekood';

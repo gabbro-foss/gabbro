@@ -598,7 +598,7 @@
       "version": {"type": "String"}
     }
   },
-  "aboutTagline": "ポスト量子パスワードマネージャー",
+  "aboutTagline": "耐量子パスワードマネージャー",
   "aboutSourceCode": "ソースコード",
   "aboutReportIssue": "問題を報告",
   "aboutSupportGabbro": "Gabbroをサポート",

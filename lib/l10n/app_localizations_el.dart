@@ -1364,7 +1364,7 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
-  String get aboutTagline => 'Μετακβαντικός διαχειριστής κωδικών';
+  String get aboutTagline => 'Κβαντικά ανθεκτικός διαχειριστής κωδικών';
 
   @override
   String get aboutSourceCode => 'Πηγαίος κώδικας';

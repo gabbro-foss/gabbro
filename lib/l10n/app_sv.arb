@@ -598,7 +598,7 @@
       "version": {"type": "String"}
     }
   },
-  "aboutTagline": "En post-kvantumlösenordshanterare",
+  "aboutTagline": "En kvantresistent lösenordshanterare",
   "aboutSourceCode": "Källkod",
   "aboutReportIssue": "Rapportera problem",
   "aboutSupportGabbro": "Stöd Gabbro",

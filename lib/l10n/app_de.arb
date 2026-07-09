@@ -598,7 +598,7 @@
       "version": {"type": "String"}
     }
   },
-  "aboutTagline": "Ein Post-Quanten-Passwortmanager",
+  "aboutTagline": "Ein quantenresistenter Passwortmanager",
   "aboutSourceCode": "Quellcode",
   "aboutReportIssue": "Problem melden",
   "aboutSupportGabbro": "Gabbro unterstützen",

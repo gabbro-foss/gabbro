@@ -1362,7 +1362,7 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
-  String get aboutTagline => 'Postkvantowy menedżer haseł';
+  String get aboutTagline => 'Menedżer haseł odporny na ataki kwantowe';
 
   @override
   String get aboutSourceCode => 'Kod źródłowy';

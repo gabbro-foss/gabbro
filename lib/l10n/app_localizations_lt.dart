@@ -1356,7 +1356,7 @@ class AppLocalizationsLt extends AppLocalizations {
   }
 
   @override
-  String get aboutTagline => 'Postkvantinis slaptažodžių tvarkyklė';
+  String get aboutTagline => 'Kvantams atspari slaptažodžių tvarkyklė';
 
   @override
   String get aboutSourceCode => 'Šaltinio kodas';

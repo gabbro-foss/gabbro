@@ -1355,7 +1355,8 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get aboutTagline => 'Un gestore di password post-quantistico';
+  String get aboutTagline =>
+      'Un gestore di password resistente ai computer quantistici';
 
   @override
   String get aboutSourceCode => 'Codice sorgente';

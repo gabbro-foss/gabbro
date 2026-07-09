@@ -598,7 +598,7 @@
       "version": {"type": "String"}
     }
   },
-  "aboutTagline": "Un gestionnaire de mots de passe post-quantique",
+  "aboutTagline": "Un gestionnaire de mots de passe résistant au quantique",
   "aboutSourceCode": "Code source",
   "aboutReportIssue": "Signaler un problème",
   "aboutSupportGabbro": "Soutenir Gabbro",

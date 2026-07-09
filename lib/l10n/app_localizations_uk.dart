@@ -1358,7 +1358,7 @@ class AppLocalizationsUk extends AppLocalizations {
   }
 
   @override
-  String get aboutTagline => 'Постквантовий менеджер паролів';
+  String get aboutTagline => 'Квантово-стійкий менеджер паролів';
 
   @override
   String get aboutSourceCode => 'Вихідний код';

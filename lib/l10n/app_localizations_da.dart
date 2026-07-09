@@ -1353,7 +1353,7 @@ class AppLocalizationsDa extends AppLocalizations {
   }
 
   @override
-  String get aboutTagline => 'En post-kvanteadgangskodeadministrator';
+  String get aboutTagline => 'En kvanteresistent adgangskodeadministrator';
 
   @override
   String get aboutSourceCode => 'Kildekode';

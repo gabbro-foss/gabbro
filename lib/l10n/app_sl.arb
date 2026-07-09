@@ -598,7 +598,7 @@
       "version": {"type": "String"}
     }
   },
-  "aboutTagline": "Postkvantni upravitelj gesel",
+  "aboutTagline": "Kvantno odporen upravitelj gesel",
   "aboutSourceCode": "Izvorna koda",
   "aboutReportIssue": "Prijavi težavo",
   "aboutSupportGabbro": "Podpri Gabbro",

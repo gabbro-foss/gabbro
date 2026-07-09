@@ -1354,7 +1354,7 @@ class AppLocalizationsLv extends AppLocalizations {
   }
 
   @override
-  String get aboutTagline => 'Pēckvantumu paroļu pārvaldnieks';
+  String get aboutTagline => 'Kvantu izturīgs paroļu pārvaldnieks';
 
   @override
   String get aboutSourceCode => 'Pirmkods';

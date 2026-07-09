@@ -598,7 +598,7 @@
       "version": {"type": "String"}
     }
   },
-  "aboutTagline": "Postkvantinis slaptažodžių tvarkyklė",
+  "aboutTagline": "Kvantams atspari slaptažodžių tvarkyklė",
   "aboutSourceCode": "Šaltinio kodas",
   "aboutReportIssue": "Pranešti apie problemą",
   "aboutSupportGabbro": "Remti Gabbro",

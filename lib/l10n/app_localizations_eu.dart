@@ -1354,7 +1354,8 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
-  String get aboutTagline => 'Kuantoarekin osteko pasahitz-kudeatzailea';
+  String get aboutTagline =>
+      'Kuantikoari erresistente den pasahitz-kudeatzailea';
 
   @override
   String get aboutSourceCode => 'Iturburu-kodea';

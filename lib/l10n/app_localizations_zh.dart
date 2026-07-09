@@ -1323,7 +1323,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get aboutTagline => '后量子密码管理器';
+  String get aboutTagline => '抗量子密码管理器';
 
   @override
   String get aboutSourceCode => '源代码';
@@ -3246,7 +3246,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   }
 
   @override
-  String get aboutTagline => '后量子密码管理器';
+  String get aboutTagline => '抗量子密码管理器';
 
   @override
   String get aboutSourceCode => '源代码';
@@ -5169,7 +5169,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   }
 
   @override
-  String get aboutTagline => '後量子密碼管理員';
+  String get aboutTagline => '抗量子密碼管理員';
 
   @override
   String get aboutSourceCode => '原始碼';
