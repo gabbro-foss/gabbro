@@ -1146,6 +1146,27 @@ mod tests {
     }
 
     #[test]
+    fn seal_vault_with_keys_produces_version_11_with_no_kem_header() {
+        // C2: the header-drop (ADR-018) applies on the MULTI-KEY seal path too, not
+        // just passphrase-only (seal_vault_produces_version_11). A v11 multi-key vault
+        // carries no ML-KEM ciphertext / X25519 ephemeral pubkey.
+        let keys = two_test_keys();
+        let sealed = seal_vault_with_keys(b"passphrase", &keys, b"data", None).unwrap();
+        assert_eq!(
+            sealed.version, 11,
+            "new multi-key vaults are sealed as VERSION 11"
+        );
+        assert!(
+            sealed.ml_kem_ciphertext.is_empty(),
+            "v11 multi-key seal carries no ML-KEM ciphertext"
+        );
+        assert_eq!(
+            sealed.x25519_ephemeral_public, [0u8; 32],
+            "v11 multi-key seal carries no X25519 ephemeral pubkey"
+        );
+    }
+
+    #[test]
     fn seal_with_two_keys_stores_two_records_with_key_blobs() {
         let keys = two_test_keys();
         let sealed = seal_vault_with_keys(b"passphrase", &keys, b"plaintext", None).unwrap();
