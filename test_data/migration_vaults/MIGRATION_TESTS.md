@@ -16,11 +16,12 @@ user `test-user`, pw `migrate-me-2026`.
 | `v8.gabbro` | 8 | `03732cd9b1b4` |
 | `v9.gabbro` | 9 | `947a82e7b933` |
 | `v10.gabbro` | 10 | `dd76d02b46aa` |
+| `v11.gabbro` | 11 | `3edd56cf4052` |
 
 Add one `vN.gabbro` per version bump; never delete old ones. Regenerate (throwaway):
 worktree at the tag that shipped VERSION N, add an example that builds a one-login
 `VaultBody` and calls `save_vault(&body, b"0123456789a", out)`, run `--release`,
-verify it opens, remove the worktree. (Current build = v10 → no worktree needed.)
+verify it opens, remove the worktree. (Current build = v11 → no worktree needed.)
 
 ---
 
