@@ -188,7 +188,8 @@ fn assert_invariants(path: &Path, model: &Model, pool: &[KeyMat; 4], log: &[Stri
         .unwrap_or_else(|e| panic!("read_vault failed after [{}]: {e}", log.join(" -> ")));
     if model.passphrase != FIXTURE_PASSPHRASE {
         assert_eq!(
-            on_disk.version, VERSION,
+            on_disk.version,
+            VERSION,
             "a passphrase change must migrate the vault to the current VERSION; history: [{}]",
             log.join(" -> ")
         );

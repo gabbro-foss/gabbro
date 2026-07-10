@@ -12,7 +12,8 @@ use std::sync::{LazyLock, Mutex};
 use crate::api::vault::{
     add_yubikey_to_vault, change_passphrase_with_keys, load_vault, load_vault_with_key_record,
     load_vault_with_yubikey, migrate_multikey_vault_on_unlock, migrate_passphrase_vault_on_unlock,
-    remove_yubikey_from_vault, reseal_vault_body, save_vault, save_vault_with_yubikey, MergeSummary,
+    remove_yubikey_from_vault, reseal_vault_body, save_vault, save_vault_with_yubikey,
+    MergeSummary,
 };
 use crate::api::vault_bridge::EntrySummaryData;
 use crate::vault::entry::{CustomField, VaultEntry};
@@ -8809,7 +8810,8 @@ mod migrate_on_unlock_tests {
             open_vault_with_key_record(pass, &keys[0].hmac_secret, &keys[0].credential_id, &sealed)
                 .unwrap();
         let wrapping = wrapping.unwrap();
-        let v9 = migrate_multikey_to_version(&sealed, pass, &wrapping, &master, &plaintext, 9).unwrap();
+        let v9 =
+            migrate_multikey_to_version(&sealed, pass, &wrapping, &master, &plaintext, 9).unwrap();
         assert_eq!(v9.version, 9, "precondition: an on-disk v9 vault");
 
         let mut path = temp_dir();

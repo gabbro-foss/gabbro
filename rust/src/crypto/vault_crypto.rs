@@ -1269,10 +1269,26 @@ mod tests {
     #[test]
     fn capped_reseal_version_never_crosses_the_x25519_boundary() {
         // Current build is v10.
-        assert_eq!(capped_reseal_version_for(9, 10), 9, "v9 material must NOT jump to v10");
-        assert_eq!(capped_reseal_version_for(6, 10), 9, "old material advances only to the boundary-1");
-        assert_eq!(capped_reseal_version_for(10, 10), 10, "already-v10 material carries to current");
-        assert_eq!(capped_reseal_version_for(11, 10), 10, "material ahead of current pins to current");
+        assert_eq!(
+            capped_reseal_version_for(9, 10),
+            9,
+            "v9 material must NOT jump to v10"
+        );
+        assert_eq!(
+            capped_reseal_version_for(6, 10),
+            9,
+            "old material advances only to the boundary-1"
+        );
+        assert_eq!(
+            capped_reseal_version_for(10, 10),
+            10,
+            "already-v10 material carries to current"
+        );
+        assert_eq!(
+            capped_reseal_version_for(11, 10),
+            10,
+            "material ahead of current pins to current"
+        );
         // Current build is still v9 (today): behaviour is unchanged, always 9.
         assert_eq!(capped_reseal_version_for(9, 9), 9);
         assert_eq!(capped_reseal_version_for(6, 9), 9);
@@ -1300,26 +1316,31 @@ mod tests {
         let wrapping = wrapping.expect("multi-key vault yields a wrapping_key");
 
         // Build a legacy (v9, StdRng X25519) multi-key vault.
-        let v9 =
-            migrate_multikey_to_version(&sealed, passphrase, &wrapping, &master, plaintext, 9).unwrap();
+        let v9 = migrate_multikey_to_version(&sealed, passphrase, &wrapping, &master, plaintext, 9)
+            .unwrap();
         assert_eq!(v9.version, 9);
         // It opens as a genuine v9 vault (legacy derivation) with each key.
         for k in &keys {
             let (pt, _, _) =
-                open_vault_with_key_record(passphrase, &k.hmac_secret, &k.credential_id, &v9).unwrap();
+                open_vault_with_key_record(passphrase, &k.hmac_secret, &k.credential_id, &v9)
+                    .unwrap();
             assert_eq!(pt, plaintext);
         }
 
         // Migrate across the boundary to v10 (direct X25519) — no re-tap.
-        let v10 =
-            migrate_multikey_to_version(&v9, passphrase, &wrapping, &master, plaintext, 10).unwrap();
+        let v10 = migrate_multikey_to_version(&v9, passphrase, &wrapping, &master, plaintext, 10)
+            .unwrap();
         assert_eq!(v10.version, 10);
         assert_eq!(v10.yubikey_records.len(), 2, "both key_blobs preserved");
 
         for k in &keys {
             let (pt, _, _) =
-                open_vault_with_key_record(passphrase, &k.hmac_secret, &k.credential_id, &v10).unwrap();
-            assert_eq!(pt, plaintext, "v10-migrated vault must open with each registered key");
+                open_vault_with_key_record(passphrase, &k.hmac_secret, &k.credential_id, &v10)
+                    .unwrap();
+            assert_eq!(
+                pt, plaintext,
+                "v10-migrated vault must open with each registered key"
+            );
         }
     }
 
