@@ -15,6 +15,10 @@ const INFO: &[u8] = b"gabbro-hybrid-kex-v1";
 /// transcript into the HKDF info — see `derive_vault_key_transcript_bound`.
 const INFO_V2: &[u8] = b"gabbro-hybrid-kex-v2";
 const INFO_YUBIKEY: &[u8] = b"gabbro-yubikey-v1";
+/// VERSION 11 vault-key label (ADR-018): the vault key is derived straight from the
+/// Argon2id output, with no X25519 + ML-KEM layer. Distinct family name from the
+/// hybrid-kex / yubikey labels above. Frozen — changing it bricks every v11 vault.
+const INFO_VAULT_KEY_V11: &[u8] = b"gabbro-vault-key-from-argon2id-v1";
 
 /// Derives a 32-byte vault encryption key from two shared secrets.
 ///
@@ -76,6 +80,26 @@ pub fn derive_vault_key_transcript_bound(
 
     let mut okm = [0u8; 32];
     hkdf.expand(&info, &mut okm)
+        .expect("32 bytes is a valid HKDF output length");
+
+    okm
+}
+
+/// Derives the 32-byte vault key for VERSION 11 vaults (ADR-018), directly from the
+/// Argon2id output — no X25519 + ML-KEM hybrid layer.
+///
+/// `km` is the full Argon2id output (the same `derive_key` call as legacy formats,
+/// byte-identical; only this post-Argon2id step changes). `salt` is the random
+/// 32-byte `hkdf_salt` stored in the vault header.
+///
+/// `vault_key = HKDF-SHA256(salt = hkdf_salt, ikm = KM, info = INFO_VAULT_KEY_V11)`.
+/// Used by the passphrase-only path (as the vault key) and the multi-key path (as
+/// the `intermediate_key` that wraps the `wrapping_key`).
+pub fn derive_vault_key_v11(km: &[u8; 96], salt: &[u8; 32]) -> [u8; 32] {
+    let hkdf = Hkdf::<Sha256>::new(Some(salt), km);
+
+    let mut okm = [0u8; 32];
+    hkdf.expand(INFO_VAULT_KEY_V11, &mut okm)
         .expect("32 bytes is a valid HKDF output length");
 
     okm
@@ -264,5 +288,66 @@ mod tests {
             &[9u8; 32], &[8u8; 32], &[7u8; 32], &ct_m, &eph, &stat,
         );
         assert_eq!(a, b, "same inputs must derive the same key");
+    }
+
+    // ── derive_vault_key_v11 (VERSION 11, no KEM — ADR-018) ────────────────────
+    // vault_key = HKDF-SHA256(salt = hkdf_salt, ikm = KM, info = v11 label),
+    // where KM is the full Argon2id output. A representative KM is 96 bytes.
+
+    /// A1 — known-answer test. Pins the exact VERSION 11 derivation forever: if the
+    /// label, hash, or input ordering ever changes, every v11 vault becomes
+    /// unopenable, so the output is frozen here as a tripwire.
+    #[test]
+    fn v11_vault_key_known_answer() {
+        let km = [0x11u8; 96];
+        let salt = [0x22u8; 32];
+        let key = derive_vault_key_v11(&km, &salt);
+        assert_eq!(
+            key,
+            [
+                0xD6u8, 0x67, 0xAB, 0xE3, 0xEF, 0x37, 0xA4, 0x81, 0xC1, 0x5C, 0x63, 0x2D, 0x17,
+                0xCA, 0x32, 0x7C, 0x90, 0xE1, 0xCA, 0x2B, 0xD9, 0x8B, 0x8A, 0x5A, 0xBB, 0x94, 0x07,
+                0xD0, 0x77, 0xF6, 0x74, 0xA2,
+            ],
+            "v11 vault-key derivation must never change (frozen KAT)"
+        );
+    }
+
+    #[test]
+    fn v11_vault_key_is_deterministic() {
+        let km = [0x33u8; 96];
+        let salt = [0x44u8; 32];
+        assert_eq!(
+            derive_vault_key_v11(&km, &salt),
+            derive_vault_key_v11(&km, &salt)
+        );
+    }
+
+    #[test]
+    fn v11_vault_key_changes_with_km() {
+        let salt = [0x44u8; 32];
+        let a = derive_vault_key_v11(&[0x33u8; 96], &salt);
+        let mut km2 = [0x33u8; 96];
+        km2[0] ^= 0x01;
+        let b = derive_vault_key_v11(&km2, &salt);
+        assert_ne!(a, b, "flipping a bit in KM must change the derived key");
+    }
+
+    #[test]
+    fn v11_vault_key_changes_with_salt() {
+        let km = [0x33u8; 96];
+        let a = derive_vault_key_v11(&km, &[0x44u8; 32]);
+        let b = derive_vault_key_v11(&km, &[0x55u8; 32]);
+        assert_ne!(a, b, "a different HKDF salt must change the derived key");
+    }
+
+    /// A2 — domain separation: the v11 label must not collide with the YubiKey
+    /// combiner even when fed the same 32-byte material and salt.
+    #[test]
+    fn v11_vault_key_differs_from_yubikey_combiner() {
+        let salt = [0x66u8; 32];
+        let v11 = derive_vault_key_v11(&[0x77u8; 96], &salt);
+        let yk = combine_yubikey(&[0x77u8; 32], &[0x77u8; 32], &salt);
+        assert_ne!(v11, yk, "distinct HKDF labels must yield distinct keys");
     }
 }

@@ -300,31 +300,16 @@ fn v10_multikey_opens_with_each_registered_key() {
 /// Walks the full key-loss / key-rotation journey on a temp copy of `fixture_name`,
 /// driving the *real* bridge functions the Flutter app calls. A passphrase-less
 /// add/remove routes through `reseal_vault_body`, which re-binds the body to the new
-/// header (AAD) but — post RT-3 — will NOT force the vault across the v10 derivation
-/// boundary (the belt: it has no passphrase to rebuild the material). So after each
-/// mutation we assert the vault stays below the boundary AND still opens with every
-/// surviving key. Migration to v10 happens on unlock (session::migrate_on_unlock_tests).
+/// header (AAD) but — post RT-3 — will NOT force the vault across the HKDF-direct
+/// derivation boundary (the belt: it has no passphrase to rebuild the material). All
+/// v6–v10 fixtures sit below that boundary (which landed at v11), so after each
+/// mutation we assert the vault stays below VERSION AND still opens with every
+/// surviving key. Migration happens on unlock (session::migrate_on_unlock_tests).
 fn run_rotation_scenario(fixture_name: &str) {
-    // Pre-boundary fixtures (v6-v9): a passphrase-less mutation caps just below the
-    // derivation boundary and never crosses it until unlock migrates.
     run_rotation_scenario_with(fixture_name, |v| {
         assert!(
             v < VERSION,
-            "belt: add/remove must NOT force a pre-v10 vault across the derivation boundary"
-        );
-    });
-}
-
-/// At-boundary variant (v10): a v10 fixture already sits AT the derivation boundary,
-/// so `capped_reseal_version` carries a passphrase-less body-reseal to the current
-/// VERSION (not below it). Pins the current no-brick behaviour: the vault stays at
-/// VERSION and still opens with every surviving key. (When v11 lands and the boundary
-/// const bumps to 11, this assertion flips to `< VERSION` like the pre-boundary case.)
-fn run_rotation_scenario_at_boundary(fixture_name: &str) {
-    run_rotation_scenario_with(fixture_name, |v| {
-        assert_eq!(
-            v, VERSION,
-            "at-boundary v10: passphrase-less rotation carries to current VERSION, no brick"
+            "belt: add/remove must NOT force a v6-v10 vault across the derivation boundary"
         );
     });
 }
@@ -402,15 +387,9 @@ fn yubikey_rotation_survives_key_loss_and_version_bumps() {
     run_rotation_scenario("v7_multikey_2keys.gabbro");
     run_rotation_scenario("v8_multikey_2keys.gabbro");
     run_rotation_scenario("v9_multikey_2keys.gabbro");
-}
-
-#[test]
-fn v10_multikey_rotation_survives_key_loss() {
-    // Same lose-YK2/add-YK3 -> lose-YK1/add-YK4 journey as above, but starting from a
-    // genuine v10 golden vault. v10 sits AT the derivation boundary, so its behaviour
-    // differs from the pre-boundary fixtures (it carries to VERSION rather than capping
-    // below it). Pins the current no-brick guarantee for a v10 multi-key vault.
-    run_rotation_scenario_at_boundary("v10_multikey_2keys.gabbro");
+    // v10 too: since the HKDF-direct boundary landed at v11, v10 now caps below it
+    // like the pre-v11 fixtures (a passphrase-less mutation stays < VERSION).
+    run_rotation_scenario("v10_multikey_2keys.gabbro");
 }
 
 #[test]

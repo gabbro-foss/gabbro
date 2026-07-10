@@ -186,11 +186,18 @@ decrypt→merge→reseal, incl. cross-version v10↔v11); passphrase-change + Yu
   FFI regenerated) — multi-key open reads each key's salt from the record. Net green: gate 17/17
   (v6–v10 multi-key still open), affected lib tests green, clippy + flutter analyze clean. No
   freeze fixture (per plan).
-- [ ] Canon-TDD list — STOP for review — then implement the v11 write path (new HKDF derivation
-  + label).
-- [ ] Version dispatch: v11 seals new; v2–v10 read via the legacy derivation (kept).
-- [ ] Auto-migrate v≤10 → v11 on unlock (p and p+yk; no re-tap where the wrapping key is cached).
-- [ ] Header: drop `ct_M` + `ephemeral_pub` for v11; keep AES-GCM AAD covering the full header.
+- [x] Canon-TDD list (reviewed) + v11 write path — DONE (code). New `derive_vault_key_v11`
+  (`hkdf.rs`, label `gabbro-vault-key-from-argon2id-v1`, frozen KAT). v11 branch wired into all 5
+  derivation sites (seal/open passphrase, seal/open multi-key, `migrate_multikey_to_version`);
+  ≤v10 keep the legacy hybrid path (tagged RT-3). `VERSION` 10→11. Core round-trips green
+  (passphrase + multi-key seal→bytes→open, 4 tests) + clippy -D warnings clean. **Full ripple +
+  backward-compat + migration = maintainer's gate (not yet run).**
+- [x] Version dispatch — DONE: seal passes VERSION(11); open/migrate branch on the parsed version.
+- [x] Header: drop `ct_M` + `ephemeral_pub` for v11 — DONE (`to_bytes`/`from_bytes`/`header_aad`
+  version-branch on `KEM_HEADER_MAX_VERSION`; AAD covers the full v11 header). `capped_reseal`
+  two-era boundary (`HKDF_DIRECT_MIN_VERSION`) so v10 body-reseal can't jump to v11 (E1/E2 green).
+- [~] Auto-migrate v≤10 → v11 on unlock — FOLDED IN (the wired on-unlock paths target VERSION, so
+  the migrate fns now produce v11). Needs gate + hardware confirmation.
 - [ ] Fixtures: `v11_passphrase.gabbro` + `v11_multikey_2keys.gabbro` (rust/tests/fixtures/FIXTURES.md);
   backward-compat gate + state-machine fuzzer green.
 - [ ] Migration-vault corpus: add one v11 `.gabbro` + a MIGRATION_TESTS.md entry.
