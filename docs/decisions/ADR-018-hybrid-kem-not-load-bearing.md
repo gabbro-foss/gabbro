@@ -82,6 +82,17 @@ re-derived on one device.
    ADR-006's "cheap passphrase change via random session key K" was
    never implemented; passphrase change is a full reseal.
 
+## Implementation
+
+Landed on branch `drop-dual-lock-hybrid-kem` as **VERSION 11 (write path)**: new
+vaults derive the vault key straight from the Argon2id output
+(`HKDF(hkdf_salt, KM, "gabbro-vault-key-from-argon2id-v1")`); the v11 header drops the
+ML-KEM ciphertext + X25519 ephemeral pubkey. v2–v10 still read via the legacy hybrid
+derivation and auto-migrate to v11 on unlock. The `ml-kem` + `x25519-dalek` crates and
+the legacy derivation code stay for that read/migrate path; both are dropped at RT-3
+(decision item 2). Living docs (ARCHITECTURE, SECURITY, README, diagrams) corrected to
+attribute quantum resistance to Argon2id + AES-256-GCM (decision item 1).
+
 ## References
 
 - https://crypto.stackexchange.com/questions/119762/

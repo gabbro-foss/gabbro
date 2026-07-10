@@ -12,13 +12,13 @@ Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
 
 **Tech stack:** Flutter (Dart) frontend, Rust backend/crypto, flutter_rust_bridge v2 (FFI).
 
-**Encryption (at rest):** Argon2id KDF → X25519 + ML-KEM-1024 hybrid key exchange → HKDF-SHA256 combiner → AES-256-GCM. Quantum resistance from Argon2id + AES-256-GCM; the hybrid KEM layer is structural, not load-bearing (ADR-018).
+**Encryption (at rest):** Argon2id KDF → HKDF-SHA256 → AES-256-GCM. Quantum resistance from Argon2id + AES-256-GCM (ADR-018). New vaults (VERSION 11+) derive the vault key straight from the Argon2id output; the removed X25519 + ML-KEM-1024 hybrid layer survives read-only to open/migrate ≤v10 vaults (dropped entirely at RT-3).
 
 **Authentication (app access):** Passphrase always; a FIDO2/WebAuthn hardware key (YubiKey) is strongly recommended but **not enforced** — a passphrase-only vault is the default. When keys are used: v1 Ed25519 (hardware constraint), target ML-DSA-44 once Yubico ships PQ-capable hardware (ADR-005), min 2 keys (primary + backup), max 4. Auto-lock: 30s default, configurable.
 
 **YubiKey NFC / NDEF OTP:** a YubiKey's OTP slot 1 (an NDEF URI) would open a browser when tapped on Android. Gabbro suppresses this via `NfcConfiguration().skipNdefCheck(true)` and by re-arming foreground dispatch after `stopNfcDiscovery`; OTP slot 1 can stay enabled (no `ykman` workaround).
 
-**Vault file format:** `.gabbro` binary. Plaintext header (magic, version, Argon2id params + salt, HKDF salt, nonce, ML-KEM ciphertext, X25519 ephemeral pubkey) + AES-256-GCM encrypted body (JSON-serialised entries). Self-contained; auth tag detects tampering.
+**Vault file format:** `.gabbro` binary. Plaintext header (magic, version, Argon2id params + salt, HKDF salt, nonce; ≤v10 also carry an ML-KEM ciphertext + X25519 ephemeral pubkey, dropped at v11) + AES-256-GCM encrypted body (JSON-serialised entries). Self-contained; auth tag detects tampering.
 
 **Vault entries:** 6 types — Login (displayed as "Password" in UI), Note, Identity, Card, File, Custom. Common fields: UUID, created, modified, folder, tags, favourite. No TOTP — YubiKey covers 2FA; keeping them separate is more secure.
 
@@ -111,10 +111,10 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
   Testing table updated (lib 654→663, backward-compat 17→16).
 - **Backward-compat gate = 16/16 GREEN**, state-machine fuzz / crash-safety / sync legs / Android /
   Flutter (1257) all GREEN. The v11 write path is fully gate-verified.
-- **v11 fixtures + migration corpus + C2/C4 DONE** (fixtures: gate 18/18 + fuzzer extended to v11;
-  C4 rotation-journey folded into the gate; C2 = `seal_vault_with_keys_produces_version_11_with_no_kem_header`;
-  corpus: `v11.gabbro` production-param). **Remaining:** docs (ADR-018, SECURITY, README, ARCHITECTURE
-  Encryption line, crypto diagrams, VAULT_UPGRADE_PATH); then the hardware matrix.
+- **v11 fixtures + migration corpus + C2/C4 + docs DONE** (fixtures: gate 18/18 + fuzzer extended to
+  v11; C4 folded into the gate; C2 = `seal_vault_with_keys_produces_version_11_with_no_kem_header`;
+  corpus: `v11.gabbro`; docs: ADR-018/SECURITY/README/ARCHITECTURE/VAULT_UPGRADE_PATH + both crypto
+  diagrams redrawn for v11). **Remaining:** gabbro_test gate script check; hardware matrix; release.
 
 **Drop the dual-lock (X25519 + ML-KEM) hybrid layer — vault VERSION 11.** Multi-session, on
 branch `drop-dual-lock-hybrid-kem`. Rationale + decision: ADR-018. Follow **net-first**
@@ -227,8 +227,10 @@ decrypt→merge→reseal, incl. cross-version v10↔v11); passphrase-change + Yu
   hardware-matrix item.
 - [ ] Hardware matrix (maintainer): Linux + Android; p / p+yk / p+bio / p+yk+bio; migrate-on-unlock;
   cross-version sync; real-vault integrity (no data loss).
-- [ ] Docs: ADR-018 (record v11 landed), SECURITY, README, ARCHITECTURE (Encryption line + format),
-  crypto diagrams (flow.svg / simple_icons / A4 PNG+PDF), VAULT_UPGRADE_PATH.
+- [x] Docs: ADR-018 (v11 landed note), SECURITY (v11 mechanism + removed single-YK mode + audit
+  notes), README (prose/ASCII/alt-text + embedded diagram), ARCHITECTURE (Encryption line + format),
+  crypto diagrams (flow.dot/svg, simple_icons.svg redrawn 6-band, A4 PNG+PDF regenerated),
+  VAULT_UPGRADE_PATH (rewritten for v10->v11 stepping stone).
 - [ ] `gabbro_test` gate script updated if new tests aren't covered.
 - [ ] Release the v11 auto-migrate build; let existing vaults migrate in the field.
 - [ ] DEFERRED to the RT-3 cleanup (NOT this branch): delete legacy derivations, drop `ml-kem`
