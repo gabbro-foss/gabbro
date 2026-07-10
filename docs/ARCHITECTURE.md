@@ -111,10 +111,10 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
   Testing table updated (lib 654→663, backward-compat 17→16).
 - **Backward-compat gate = 16/16 GREEN**, state-machine fuzz / crash-safety / sync legs / Android /
   Flutter (1257) all GREEN. The v11 write path is fully gate-verified.
-- **v11 fixtures DONE** (`v11_passphrase` + `v11_multikey_2keys`, gate 18/18, fuzzer extended to v11;
-  C4 rotation-journey folded into the gate). **Remaining:** migration-vault corpus; explicit C2
-  (multi-key no-KEM assertion); docs (ADR-018, SECURITY, README, ARCHITECTURE Encryption line,
-  crypto diagrams, VAULT_UPGRADE_PATH); then the hardware matrix.
+- **v11 fixtures + migration corpus DONE** (fixtures: gate 18/18 + fuzzer extended to v11, C4
+  folded in; corpus: `v11.gabbro` production-param). **Remaining:** explicit C2 (multi-key no-KEM
+  assertion); docs (ADR-018, SECURITY, README, ARCHITECTURE Encryption line, crypto diagrams,
+  VAULT_UPGRADE_PATH); then the hardware matrix.
 
 **Drop the dual-lock (X25519 + ML-KEM) hybrid layer — vault VERSION 11.** Multi-session, on
 branch `drop-dual-lock-hybrid-kem`. Rationale + decision: ADR-018. Follow **net-first**
@@ -222,7 +222,9 @@ decrypt→merge→reseal, incl. cross-version v10↔v11); passphrase-change + Yu
   legacy-code removal). Backward-compat gate 18/18 green (v11 open + rotation-at-boundary `== VERSION`
   + interleaved passphrase-change journeys). State-machine fuzzer extended to v11 (belt parameterised
   by starting era), green. FIXTURES.md + harness test-list updated.
-- [ ] Migration-vault corpus: add one v11 `.gabbro` + a MIGRATION_TESTS.md entry.
+- [x] Migration-vault corpus: `v11.gabbro` added (production params, opens; sha `3edd56cf4052`,
+  version byte `0b`) + MIGRATION_TESTS.md table row. Hardware v10->v11 procedure/results at the
+  hardware-matrix item.
 - [ ] Hardware matrix (maintainer): Linux + Android; p / p+yk / p+bio / p+yk+bio; migrate-on-unlock;
   cross-version sync; real-vault integrity (no data loss).
 - [ ] Docs: ADR-018 (record v11 landed), SECURITY, README, ARCHITECTURE (Encryption line + format),
