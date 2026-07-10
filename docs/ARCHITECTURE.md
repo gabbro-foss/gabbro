@@ -70,8 +70,8 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 664 | 17 |
-| Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 16 | 0 |
+| Rust (`cargo test -q`) | 667 | 17 |
+| Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 17 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust sync-walk batched apply (`cargo test --release --lib sync_walk_batched_apply_matches_checker -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -165,16 +165,16 @@ decrypt→merge→reseal, incl. cross-version v10↔v11); passphrase-change + Yu
   (by design; Rust gate owns format).
 - **Android = fully insulated** — biometric stores the RAW passphrase under AndroidKeyStore; YubiKey
   returns RAW hmac-secret. So **p+bio / p+yk+bio need no format work**.
-- **GAPS to close as characterization tests in item 3 (pre-edit):** G1 — the `v10_multikey_2keys.gabbro`
-  fixture is NOT run through `run_rotation_scenario` (belt across v10 mutations untested at the current
-  boundary). G2 — `build_passphrase_only_bytes` (export downgrade seal) has no direct unit test. G3 —
-  import path does not assert the resulting sealed VERSION == current.
+- **GAPS (CLOSED, item 3):** G1 `v10_multikey_rotation_survives_key_loss` (gate; parameterized
+  `run_rotation_scenario` — v10 sits AT the boundary, carries to VERSION not below). G2
+  `build_passphrase_only_bytes_{seals_at_current_version,opens_with_passphrase_alone}`. G3
+  `import_from_csv_persists_at_current_version`. All green against current code.
 
 *Tick-list (work through in order; check off as landed):*
 - [x] Code-verify the high/unknown paths (a)-(d) — DONE; see *Findings* above.
 - [x] Functional sweep: list every *Must not regress* mechanism with its CURRENT test coverage — DONE; see *Sweep* above.
-- [ ] Net: pin CURRENT behaviour green (all paths, all versions) BEFORE touching production; add
-  characterization tests for any gap the sweep finds.
+- [x] Net: pin CURRENT behaviour green (all paths, all versions) BEFORE touching production; add
+  characterization tests for any gap the sweep finds — DONE; G1-G3 closed (see *Sweep* above).
 - [ ] Canon-TDD list — STOP for review — then implement the v11 write path (new HKDF derivation
   + label).
 - [ ] Version dispatch: v11 seals new; v2–v10 read via the legacy derivation (kept).

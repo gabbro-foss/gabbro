@@ -305,6 +305,31 @@ fn v10_multikey_opens_with_each_registered_key() {
 /// mutation we assert the vault stays below the boundary AND still opens with every
 /// surviving key. Migration to v10 happens on unlock (session::migrate_on_unlock_tests).
 fn run_rotation_scenario(fixture_name: &str) {
+    // Pre-boundary fixtures (v6-v9): a passphrase-less mutation caps just below the
+    // derivation boundary and never crosses it until unlock migrates.
+    run_rotation_scenario_with(fixture_name, |v| {
+        assert!(
+            v < VERSION,
+            "belt: add/remove must NOT force a pre-v10 vault across the derivation boundary"
+        );
+    });
+}
+
+/// At-boundary variant (v10): a v10 fixture already sits AT the derivation boundary,
+/// so `capped_reseal_version` carries a passphrase-less body-reseal to the current
+/// VERSION (not below it). Pins the current no-brick behaviour: the vault stays at
+/// VERSION and still opens with every surviving key. (When v11 lands and the boundary
+/// const bumps to 11, this assertion flips to `< VERSION` like the pre-boundary case.)
+fn run_rotation_scenario_at_boundary(fixture_name: &str) {
+    run_rotation_scenario_with(fixture_name, |v| {
+        assert_eq!(
+            v, VERSION,
+            "at-boundary v10: passphrase-less rotation carries to current VERSION, no brick"
+        );
+    });
+}
+
+fn run_rotation_scenario_with(fixture_name: &str, check_version: impl Fn(u8)) {
     let tv = temp_copy(fixture_name);
     let path = tv.path.as_path();
 
@@ -332,14 +357,11 @@ fn run_rotation_scenario(fixture_name: &str) {
     )
     .expect("add YK3");
     remove_yubikey_from_vault(&pt, &master, YK2_CRED, path).expect("remove lost YK2");
-    // A passphrase-less key mutation cannot rebuild the v10 passphrase material, so
-    // the belt (capped_reseal_version) holds the vault below the derivation boundary.
-    // Migration to v10 happens on unlock (session::migrate_on_unlock_tests). The
-    // guarantee here is no brick: it still opens with each surviving key (Steps 3/5).
-    assert!(
-        read_vault(path).unwrap().version < VERSION,
-        "belt: add/remove must NOT force a pre-v10 vault across the derivation boundary"
-    );
+    // A passphrase-less key mutation cannot rebuild the passphrase material, so the
+    // belt (capped_reseal_version) holds the vault at/below the derivation boundary.
+    // Migration happens on unlock (session::migrate_on_unlock_tests). The guarantee
+    // here is no brick: it still opens with each surviving key (Steps 3/5).
+    check_version(read_vault(path).unwrap().version);
 
     // Step 3: user can still unlock vault A with BOTH YK1 and YK3.
     assert_opens_with(path, YK1_HMAC, YK1_CRED, "YK1 after losing YK2");
@@ -363,10 +385,7 @@ fn run_rotation_scenario(fixture_name: &str) {
     )
     .expect("add YK4");
     remove_yubikey_from_vault(&pt, &master, YK1_CRED, path).expect("remove lost YK1");
-    assert!(
-        read_vault(path).unwrap().version < VERSION,
-        "belt: the second passphrase-less rotation likewise stays below the boundary until unlock migrates"
-    );
+    check_version(read_vault(path).unwrap().version);
 
     // Step 5: user can still unlock vault A with BOTH YK3 and YK4.
     assert_opens_with(path, YK3_HMAC, YK3_CRED, "YK3 after losing YK1");
@@ -383,6 +402,15 @@ fn yubikey_rotation_survives_key_loss_and_version_bumps() {
     run_rotation_scenario("v7_multikey_2keys.gabbro");
     run_rotation_scenario("v8_multikey_2keys.gabbro");
     run_rotation_scenario("v9_multikey_2keys.gabbro");
+}
+
+#[test]
+fn v10_multikey_rotation_survives_key_loss() {
+    // Same lose-YK2/add-YK3 -> lose-YK1/add-YK4 journey as above, but starting from a
+    // genuine v10 golden vault. v10 sits AT the derivation boundary, so its behaviour
+    // differs from the pre-boundary fixtures (it carries to VERSION rather than capping
+    // below it). Pins the current no-brick guarantee for a v10 multi-key vault.
+    run_rotation_scenario_at_boundary("v10_multikey_2keys.gabbro");
 }
 
 #[test]

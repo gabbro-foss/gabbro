@@ -2977,6 +2977,63 @@ mod tests {
         let _ = std::fs::remove_file(&hash_path);
     }
 
+    #[test]
+    fn build_passphrase_only_bytes_seals_at_current_version() {
+        // The export downgrade must stamp the current format VERSION, so a version
+        // bump can never silently keep emitting old-format export files.
+        use crate::vault::file_format::{SealedVault, VERSION};
+
+        let bytes = build_passphrase_only_bytes(&VaultBody::default(), b"export passphrase")
+            .expect("build passphrase-only export bytes");
+        let sealed = SealedVault::from_bytes(&bytes).expect("parse exported bytes");
+        assert_eq!(
+            sealed.version, VERSION,
+            "passphrase-only export must be stamped the current format VERSION"
+        );
+    }
+
+    #[test]
+    fn build_passphrase_only_bytes_opens_with_passphrase_alone() {
+        // The downgraded copy must be a real, openable vault: round-trip its bytes
+        // through the passphrase-only open path (no YubiKey) and confirm contents.
+        use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+        use std::env::temp_dir;
+
+        let body = VaultBody {
+            entries: vec![VaultEntry::Note(NoteEntry {
+                meta: EntryMeta {
+                    field_times: Default::default(),
+                    history: Vec::new(),
+                    id: String::from("id-001"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::new(),
+                },
+                title: String::from("Downgrade test"),
+                content: String::from("downgraded content"),
+                custom_fields: vec![],
+                attachments: vec![],
+            })],
+            ..Default::default()
+        };
+
+        let passphrase = b"export passphrase";
+        let bytes =
+            build_passphrase_only_bytes(&body, passphrase).expect("build passphrase-only bytes");
+
+        let mut path = temp_dir();
+        path.push("gabbro_build_pp_only_test.gabbro");
+        atomic_write_0600(&path, &bytes).unwrap();
+        let recovered = load_vault(passphrase, &path).expect("open with passphrase alone");
+        let _ = std::fs::remove_file(&path);
+
+        assert_eq!(recovered.entries.len(), 1);
+        match &recovered.entries[0] {
+            VaultEntry::Note(e) => assert_eq!(e.content, "downgraded content"),
+            _ => panic!("Expected Note variant"),
+        }
+    }
+
     // ── export_vault_preserving — ADR-013 default (protection-preserving) ──────
     //
     // The security boundary: exporting a key-protected vault must keep the YubiKey
