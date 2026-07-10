@@ -40,9 +40,6 @@ use rust_lib_gabbro::vault::file_format::{SealedVault, MAGIC, VERSION};
 const FIXED_SEED: u64 = 0x6761_6262_726f_5f70; // "gabbro_p"
 const GARBAGE_CASES: usize = 4096;
 
-/// ML-KEM-1024 ciphertext length — frozen wire constant (private in file_format).
-const ML_KEM_CIPHERTEXT_LEN: usize = 1568;
-
 /// Bytes of a committed golden vault, used as the "valid" base for truncation.
 fn golden_vault_bytes() -> Vec<u8> {
     let path = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -50,20 +47,20 @@ fn golden_vault_bytes() -> Vec<u8> {
     std::fs::read(&path).expect("read golden fixture")
 }
 
-/// A structurally valid v7 header (passphrase-only: no YubiKey records, empty
-/// alias, empty passphrase_blob) with a chosen 8-byte `body_len` and `body`. The
-/// crypto content is all-zero — `from_bytes` only slices, it does not validate it —
-/// so this reaches the body-length guard exactly like a real file would.
+/// A structurally valid current-VERSION (v11) header (passphrase-only: no YubiKey
+/// records, empty alias, empty passphrase_blob) with a chosen 8-byte `body_len` and
+/// `body`. v11 dropped the ML-KEM ciphertext + X25519 ephemeral pubkey (ADR-018), so
+/// this header omits them — matching the v11 parser's layout so the attacker-chosen
+/// `body_len` lands exactly at the byte offset the body-length guard reads. The
+/// crypto content is all-zero — `from_bytes` only slices, it does not validate it.
 fn synthetic_header(body_len: u64, body: &[u8]) -> Vec<u8> {
     let mut v = Vec::new();
     v.extend_from_slice(MAGIC); // magic (6)
-    v.push(VERSION); // version (1)
+    v.push(VERSION); // version (1) — current: v11, no KEM fields
     v.extend_from_slice(&[0u8; 12]); // Argon2id params (3 x u32)
     v.extend_from_slice(&[0u8; 32]); // Argon2id salt
     v.extend_from_slice(&[0u8; 32]); // HKDF salt
     v.extend_from_slice(&[0u8; 12]); // nonce
-    v.extend_from_slice(&vec![0u8; ML_KEM_CIPHERTEXT_LEN]); // ML-KEM ciphertext
-    v.extend_from_slice(&[0u8; 32]); // X25519 ephemeral public key
     v.push(0); // YubiKey record count = 0
     v.extend_from_slice(&0u16.to_be_bytes()); // alias length = 0 (v5+)
     v.extend_from_slice(&0u16.to_be_bytes()); // passphrase_blob length = 0 (v4+)
