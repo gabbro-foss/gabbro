@@ -104,11 +104,16 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
   `capped_reseal` two-era (`HKDF_DIRECT_MIN_VERSION`); header branches on `KEM_HEADER_MAX_VERSION(10)`.
 - **Verified:** backward-compat gate 18/18, state-machine fuzzer (v11 added), C2
   (`seal_vault_with_keys_produces_version_11_with_no_kem_header`) + C4 (rotation journey), full doc set
-  + both crypto diagrams redrawn. The earlier gate failure `truncated_ml_kem_ciphertext_returns_error_not_panic`
-  is fixed (retargeted to a legacy v10 vault; the v11 seal has no KEM to truncate). Testing table
-  current (lib 664, backward-compat 18).
+  + both crypto diagrams redrawn. Two stale gate tests fixed, same class (hand-built KEM-bearing bytes
+  under a v11 version byte): `truncated_ml_kem_ciphertext_returns_error_not_panic` (retargeted to a
+  legacy v10 vault; the v11 seal has no KEM to truncate) and, from the full-gate run,
+  `oversized_body_length_returns_err_never_panics` (parse-fuzzer `synthetic_header` now builds a v11
+  header with no KEM fields so the attacker `body_len` reaches the guard). Both are test-only; the
+  parser's `checked_add` body-length guard was always correct. Testing table current (lib 664,
+  backward-compat 18).
 - **Remaining (maintainer-driven):**
-  1. `gabbro_test` full gate re-running — confirms the fix + all v11 tests green together. Expected clean.
+  1. `gabbro_test` full gate re-run — the parse-fuzzer fix is verified in isolation (4/4, clippy+fmt
+     clean); a full re-run confirms all v11 tests green together. Expected clean.
   2. Hardware matrix — **written to `gabbro/.scratchpad`** (v10→v11 migrate-on-unlock, all four auth
      modes, CRUD, rotation, cross-version sync, real-vault read-only). Devices: Linux USB-C / S23 NFC /
      tablet (1 key) / GrapheneOS (held as rollback). Mock vaults for all destructive steps.
