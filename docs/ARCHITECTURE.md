@@ -236,7 +236,7 @@ decrypt→merge→reseal, incl. cross-version v10↔v11); passphrase-change + Yu
   wholesale (`cargo test -q`, `--test vault_backward_compat`, `--test vault_state_machine_fuzz`).
 - [ ] Release the v11 auto-migrate build; let existing vaults migrate in the field.
 - [ ] DEFERRED to the RT-3 cleanup (NOT this branch): delete legacy derivations, drop `ml-kem`
-  + `x25519-dalek`, raise floor → v11.
+  + `x25519-dalek`, raise floor → v11. **Exhaustive deletion checklist: [RT3_CLEANUP.md](RT3_CLEANUP.md).**
 
 ---
 
@@ -259,6 +259,7 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   supported version → v11 (≤v10 rejected gracefully, never bricked); convert the v2–v10 gate
   fixtures to a graceful-rejection test; migration-vault + gate corpus floor → v11. Must ship the
   v11 auto-migrate release first (Current Focus task 2) — see VAULT_UPGRADE_PATH.md.
+  **Exhaustive deletion checklist: [RT3_CLEANUP.md](RT3_CLEANUP.md).**
 
 ### Going public (pre-v1)
 - **Flip the repo to public.** Repo now lives in the `gabbro-foss` org (transferred; URLs
