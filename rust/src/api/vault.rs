@@ -7,9 +7,7 @@ use std::path::Path;
 
 use sha2::{Digest, Sha256};
 
-use crate::crypto::vault_crypto::{
-    open_vault, open_vault_with_yubikey, seal_vault, seal_vault_with_yubikey,
-};
+use crate::crypto::vault_crypto::{open_vault, seal_vault};
 use crate::vault::entry::{
     CardEntry, CustomField, EntryMeta, FileEntry, LoginEntry, NoteEntry, VaultEntry,
 };
@@ -1140,47 +1138,6 @@ pub fn load_vault(passphrase: &[u8], path: &Path) -> Result<VaultBody, String> {
     deserialize_vault_body(&plaintext)
 }
 
-/// Serialize, encrypt with YubiKey, and write a vault to disk.
-#[flutter_rust_bridge::frb(ignore)]
-pub fn save_vault_with_yubikey(
-    body: &VaultBody,
-    passphrase: &[u8],
-    hmac_secret: &[u8; 32],
-    credential_id: Vec<u8>,
-    yubikey_salt: [u8; 32],
-    path: &Path,
-) -> Result<(), String> {
-    let existing_alias = read_vault(path).ok().and_then(|v| v.alias);
-    let plaintext = zeroize::Zeroizing::new(serialize_vault_body(body)?);
-    let sealed = seal_vault_with_yubikey(
-        passphrase,
-        hmac_secret,
-        credential_id,
-        yubikey_salt,
-        &plaintext,
-        existing_alias,
-    )?;
-    write_vault(&sealed, path)
-}
-
-/// Read, decrypt with YubiKey, and deserialize a vault from disk.
-#[flutter_rust_bridge::frb(ignore)]
-pub fn load_vault_with_yubikey(
-    passphrase: &[u8],
-    hmac_secret: &[u8; 32],
-    yubikey_salt: &[u8; 32],
-    path: &Path,
-) -> Result<VaultBody, String> {
-    let sealed = read_vault(path)?;
-    let plaintext = zeroize::Zeroizing::new(open_vault_with_yubikey(
-        passphrase,
-        hmac_secret,
-        yubikey_salt,
-        &sealed,
-    )?);
-    deserialize_vault_body(&plaintext)
-}
-
 /// Serialize, encrypt with multiple YubiKeys, and write a vault to disk.
 /// Requires at least 2 keys (enforces ADR-010 minimum).
 #[flutter_rust_bridge::frb(ignore)]
@@ -1512,14 +1469,12 @@ mod tests {
     // R-03 P0 (failure #4 characterization): a YubiKey-sealed vault whose bytes
     // have been overwritten with garbage must NOT open — not silently, and never
     // to an empty-but-valid vault. Proves the AES-GCM auth-tag / parse gate holds
-    // on the YubiKey unlock path, ruling out the Rust layer as the source of the
-    // device report "garbage both files -> unlocks fine to an EMPTY vault."
+    // on the (multi-key) YubiKey unlock path, ruling out the Rust layer as the
+    // source of the device report "garbage both files -> unlocks fine to an EMPTY vault."
     #[test]
     fn garbaged_yubikey_vault_does_not_open() {
-        use crate::crypto::vault_crypto::seal_vault_with_yubikey;
+        use crate::crypto::vault_crypto::YubiKeyRegistration;
         use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
-        use crate::vault::io::write_vault;
-        use crate::vault::serialization::{serialize_vault_body, VaultBody};
 
         let dir = std::env::temp_dir();
         let path = dir.join("gabbro_p0_garbage_yk_test.gabbro");
@@ -1531,6 +1486,18 @@ mod tests {
         let hmac_secret = [7u8; 32];
         let salt = [9u8; 32];
         let credential_id = vec![1u8, 2, 3, 4];
+        let keys = [
+            YubiKeyRegistration {
+                credential_id: credential_id.clone(),
+                hmac_secret,
+                salt,
+            },
+            YubiKeyRegistration {
+                credential_id: vec![5u8, 6, 7, 8],
+                hmac_secret: [8u8; 32],
+                salt: [10u8; 32],
+            },
+        ];
 
         // A real, non-empty body — so "opened empty" would be a detectable change.
         let body = VaultBody {
@@ -1550,21 +1517,12 @@ mod tests {
             })],
             ..Default::default()
         };
-        let plaintext = serialize_vault_body(&body).unwrap();
-        let sealed = seal_vault_with_yubikey(
-            passphrase,
-            &hmac_secret,
-            credential_id,
-            salt,
-            &plaintext,
-            None,
-        )
-        .unwrap();
-        write_vault(&sealed, &path).unwrap();
+        save_vault_with_keys(&body, passphrase, &keys, &path).unwrap();
 
-        // Setup sanity: with the correct credentials it opens and the entry is there.
-        let good = load_vault_with_yubikey(passphrase, &hmac_secret, &salt, &path)
-            .expect("sealed vault must open with correct credentials");
+        // Setup sanity: with a registered key it opens and the entry is there.
+        let (good, _, _) =
+            load_vault_with_key_record(passphrase, &hmac_secret, &credential_id, &path)
+                .expect("sealed vault must open with a registered key");
         assert_eq!(
             good.entries.len(),
             1,
@@ -1574,7 +1532,7 @@ mod tests {
         // the maintainer's printf scenario: overwrite the sealed bytes with garbage.
         std::fs::write(&path, b"rubbish").unwrap();
 
-        let result = load_vault_with_yubikey(passphrase, &hmac_secret, &salt, &path);
+        let result = load_vault_with_key_record(passphrase, &hmac_secret, &credential_id, &path);
         let _ = std::fs::remove_file(&path);
         let _ = std::fs::remove_file(&bak);
 

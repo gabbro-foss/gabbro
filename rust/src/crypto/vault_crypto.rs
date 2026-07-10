@@ -260,141 +260,6 @@ pub fn open_vault(passphrase: &[u8], sealed: &SealedVault) -> Result<Vec<u8>, St
     }
 }
 
-/// Encrypts plaintext under the given passphrase and YubiKey hmac-secret.
-///
-/// `yubikey_salt` is stored in the vault header (`YubiKeyRecord.salt`); it is
-/// also the salt used in `combine_yubikey`, so the caller must pass the same
-/// value to `open_vault_with_yubikey`.
-pub fn seal_vault_with_yubikey(
-    passphrase: &[u8],
-    hmac_secret: &[u8; 32],
-    credential_id: Vec<u8>,
-    yubikey_salt: [u8; 32],
-    plaintext: &[u8],
-    alias: Option<String>,
-) -> Result<SealedVault, String> {
-    let params = Argon2idParams::default();
-
-    let mut argon2_salt = [0u8; 32];
-    OsRng.fill_bytes(&mut argon2_salt);
-
-    let kdf_output = Zeroizing::new(derive_key(passphrase, &argon2_salt, &params)?);
-    let x25519_keypair = x25519_keypair_for_version(VERSION, &kdf_output);
-    let ml_kem_keypair = ml_kem_keypair_for_version(VERSION, &kdf_output);
-
-    let mut encap_rng = OsRng;
-    let (ml_kem_ciphertext, ml_kem_secret) = ml_kem_keypair
-        .encapsulation_key
-        .encapsulate(&mut encap_rng)
-        .map_err(|e| format!("ML-KEM encapsulation failed: {e:?}"))?;
-
-    let ephemeral_secret = EphemeralSecret::random_from_rng(OsRng);
-    let ephemeral_public = X25519PublicKey::from(&ephemeral_secret);
-    let x25519_secret = ephemeral_secret.diffie_hellman(&x25519_keypair.public);
-
-    let mut hkdf_salt = [0u8; 32];
-    OsRng.fill_bytes(&mut hkdf_salt);
-    let ml_kem_secret_bytes: Zeroizing<[u8; 32]> = Zeroizing::new(
-        (*ml_kem_secret)
-            .try_into()
-            .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
-    );
-    let x25519_secret_bytes = Zeroizing::new(*x25519_secret.as_bytes());
-    let intermediate_key = Zeroizing::new(derive_vault_key(
-        &ml_kem_secret_bytes,
-        &x25519_secret_bytes,
-        &hkdf_salt,
-    ));
-    let vault_key = Zeroizing::new(combine_yubikey(
-        &intermediate_key,
-        hmac_secret,
-        &yubikey_salt,
-    ));
-
-    let mut sealed = SealedVault {
-        version: VERSION,
-        params,
-        argon2_salt,
-        ml_kem_ciphertext: ml_kem_ciphertext.to_vec(),
-        x25519_ephemeral_public: *ephemeral_public.as_bytes(),
-        hkdf_salt,
-        nonce: [0u8; 12],
-        ciphertext: vec![],
-        yubikey_records: vec![YubiKeyRecord {
-            credential_id,
-            salt: yubikey_salt,
-            key_blob: vec![],
-        }],
-        alias,
-        passphrase_blob: vec![],
-    };
-    let (ciphertext, nonce) = if VERSION >= AAD_MIN_VERSION {
-        aes_gcm::encrypt_with_aad(&vault_key, plaintext, &sealed.header_aad())?
-    } else {
-        aes_gcm::encrypt(&vault_key, plaintext)?
-    };
-    sealed.ciphertext = ciphertext;
-    sealed.nonce = nonce;
-    Ok(sealed)
-}
-
-/// Decrypts a sealed vault using the given passphrase and YubiKey hmac-secret.
-///
-/// `yubikey_salt` must match `YubiKeyRecord.salt` that was used when sealing.
-pub fn open_vault_with_yubikey(
-    passphrase: &[u8],
-    hmac_secret: &[u8; 32],
-    yubikey_salt: &[u8; 32],
-    sealed: &SealedVault,
-) -> Result<Vec<u8>, String> {
-    let kdf_output = Zeroizing::new(derive_key(passphrase, &sealed.argon2_salt, &sealed.params)?);
-    let x25519_keypair = x25519_keypair_for_version(sealed.version, &kdf_output);
-    let ml_kem_keypair = ml_kem_keypair_for_version(sealed.version, &kdf_output);
-
-    let ml_kem_ct_bytes: &[u8; 1568] = sealed
-        .ml_kem_ciphertext
-        .as_slice()
-        .try_into()
-        .map_err(|_| "ML-KEM ciphertext is not 1568 bytes".to_string())?;
-    let ml_kem_ct = Ciphertext::<ml_kem::MlKem1024>::try_from(ml_kem_ct_bytes.as_ref())
-        .map_err(|e| format!("ML-KEM ciphertext decode failed: {e:?}"))?;
-    let ml_kem_secret = ml_kem_keypair
-        .decapsulation_key
-        .decapsulate(&ml_kem_ct)
-        .map_err(|e| format!("ML-KEM decapsulation failed: {e:?}"))?;
-
-    let ephemeral_public = X25519PublicKey::from(sealed.x25519_ephemeral_public);
-    let x25519_secret = x25519_keypair.secret.diffie_hellman(&ephemeral_public);
-
-    let ml_kem_secret_bytes: Zeroizing<[u8; 32]> = Zeroizing::new(
-        (*ml_kem_secret)
-            .try_into()
-            .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
-    );
-    let x25519_secret_bytes = Zeroizing::new(*x25519_secret.as_bytes());
-    let intermediate_key = Zeroizing::new(derive_vault_key(
-        &ml_kem_secret_bytes,
-        &x25519_secret_bytes,
-        &sealed.hkdf_salt,
-    ));
-    let vault_key = Zeroizing::new(combine_yubikey(
-        &intermediate_key,
-        hmac_secret,
-        yubikey_salt,
-    ));
-
-    if sealed.version >= AAD_MIN_VERSION {
-        aes_gcm::decrypt_with_aad(
-            &vault_key,
-            &sealed.ciphertext,
-            &sealed.nonce,
-            &sealed.header_aad(),
-        )
-    } else {
-        aes_gcm::decrypt(&vault_key, &sealed.ciphertext, &sealed.nonce)
-    }
-}
-
 // ── Multi-key vault (VERSION 3, minimum 2 keys) ───────────────────────────────
 
 /// Key material supplied at vault creation for one YubiKey.
@@ -512,18 +377,13 @@ pub fn seal_vault_with_keys(
     Ok(sealed)
 }
 
-/// Decrypts a multi-key vault using the passphrase and one registered YubiKey.
-///
-/// VERSION 4 path (passphrase_blob present):
+/// Decrypts a multi-key vault (VERSION 4+, passphrase_blob present) using the
+/// passphrase and one registered YubiKey:
 ///   intermediate_key → decrypt passphrase_blob → wrapping_key →
 ///   combine_yubikey(wrapping_key, hmac, salt) → decrypt key_blob → vault_key_master → body.
 ///
-/// Legacy VERSION 2 path (key_blob empty, passphrase_blob empty):
-///   intermediate_key → combine_yubikey(intermediate_key, hmac, salt) → body.
-///
 /// Returns `(plaintext, vault_key_master, wrapping_key)`.  The caller should cache
 /// both in the session for CRUD re-seals and future key-add operations.
-/// For VERSION 2 vaults `wrapping_key` is `None` — add/remove key is not supported.
 #[allow(clippy::type_complexity)]
 pub fn open_vault_with_key_record(
     passphrase: &[u8],
@@ -569,24 +429,9 @@ pub fn open_vault_with_key_record(
         .ok_or_else(|| "no YubiKey record found for this credential".to_string())?;
 
     if record.key_blob.is_empty() {
-        // Legacy VERSION 2 single-key: body encrypted directly with combine_yubikey(intermediate_key, ...).
-        let wrap_key = Zeroizing::new(combine_yubikey(
-            &intermediate_key,
-            hmac_secret,
-            &record.salt,
-        ));
-        let plaintext = if sealed.version >= AAD_MIN_VERSION {
-            aes_gcm::decrypt_with_aad(
-                &wrap_key,
-                &sealed.ciphertext,
-                &sealed.nonce,
-                &sealed.header_aad(),
-            )?
-        } else {
-            aes_gcm::decrypt(&wrap_key, &sealed.ciphertext, &sealed.nonce)?
-        };
-        // V2 has no separate wrapping_key — key add/remove not supported on legacy vaults.
-        return Ok((plaintext, wrap_key, None));
+        // Legacy VERSION 2 single-key vaults are no longer supported: no seal path
+        // can produce an empty-key_blob record, so fail closed rather than open one.
+        return Err("unsupported legacy single-key vault (empty key_blob)".to_string());
     }
 
     // VERSION 4: decrypt passphrase_blob → wrapping_key, then unwrap key_blob.
@@ -1091,160 +936,6 @@ mod tests {
         let mut as_v7 = sealed.clone();
         as_v7.version = 7;
         assert!(open_vault(passphrase, &as_v7).is_err());
-    }
-
-    // ── YubiKey variants ──────────────────────────────────────────────────────
-
-    #[test]
-    fn seal_with_yubikey_open_with_yubikey_roundtrip() {
-        let passphrase = b"correct horse battery staple";
-        let plaintext = b"my secret vault contents";
-        let hmac_secret = [0xAAu8; 32];
-        let credential_id = vec![0xBBu8; 64];
-        let yubikey_salt = [0xCCu8; 32];
-
-        let sealed = seal_vault_with_yubikey(
-            passphrase,
-            &hmac_secret,
-            credential_id,
-            yubikey_salt,
-            plaintext,
-            None,
-        )
-        .unwrap();
-        let recovered =
-            open_vault_with_yubikey(passphrase, &hmac_secret, &yubikey_salt, &sealed).unwrap();
-        assert_eq!(recovered, plaintext);
-    }
-
-    #[test]
-    fn wrong_hmac_secret_fails_to_open() {
-        let passphrase = b"correct horse battery staple";
-        let plaintext = b"secret";
-        let hmac_secret = [0xAAu8; 32];
-        let wrong_hmac = [0x00u8; 32];
-        let credential_id = vec![0xBBu8; 64];
-        let yubikey_salt = [0xCCu8; 32];
-
-        let sealed = seal_vault_with_yubikey(
-            passphrase,
-            &hmac_secret,
-            credential_id,
-            yubikey_salt,
-            plaintext,
-            None,
-        )
-        .unwrap();
-        let result = open_vault_with_yubikey(passphrase, &wrong_hmac, &yubikey_salt, &sealed);
-        assert!(result.is_err());
-    }
-
-    #[test]
-    fn wrong_passphrase_with_yubikey_fails() {
-        let plaintext = b"secret";
-        let hmac_secret = [0xAAu8; 32];
-        let credential_id = vec![0xBBu8; 64];
-        let yubikey_salt = [0xCCu8; 32];
-
-        let sealed = seal_vault_with_yubikey(
-            b"correct",
-            &hmac_secret,
-            credential_id,
-            yubikey_salt,
-            plaintext,
-            None,
-        )
-        .unwrap();
-        let result = open_vault_with_yubikey(b"wrong", &hmac_secret, &yubikey_salt, &sealed);
-        assert!(result.is_err());
-    }
-
-    #[test]
-    fn wrong_yubikey_salt_fails_to_open() {
-        let passphrase = b"passphrase";
-        let plaintext = b"secret";
-        let hmac_secret = [0xAAu8; 32];
-        let credential_id = vec![0xBBu8; 64];
-        let yubikey_salt = [0xCCu8; 32];
-        let wrong_salt = [0xDDu8; 32];
-
-        let sealed = seal_vault_with_yubikey(
-            passphrase,
-            &hmac_secret,
-            credential_id,
-            yubikey_salt,
-            plaintext,
-            None,
-        )
-        .unwrap();
-        let result = open_vault_with_yubikey(passphrase, &hmac_secret, &wrong_salt, &sealed);
-        assert!(result.is_err());
-    }
-
-    #[test]
-    fn seal_with_yubikey_stores_record_in_header() {
-        let credential_id = vec![0xBBu8; 64];
-        let yubikey_salt = [0xCCu8; 32];
-
-        let sealed = seal_vault_with_yubikey(
-            b"pass",
-            &[0xAAu8; 32],
-            credential_id.clone(),
-            yubikey_salt,
-            b"data",
-            None,
-        )
-        .unwrap();
-
-        assert_eq!(sealed.yubikey_records.len(), 1);
-        assert_eq!(sealed.yubikey_records[0].credential_id, credential_id);
-        assert_eq!(sealed.yubikey_records[0].salt, yubikey_salt);
-    }
-
-    #[test]
-    fn seal_with_yubikey_serialize_deserialize_open_roundtrip() {
-        let passphrase = b"roundtrip passphrase";
-        let plaintext = b"roundtrip secret";
-        let hmac_secret = [0x11u8; 32];
-        let credential_id = vec![0x22u8; 64];
-        let yubikey_salt = [0x33u8; 32];
-
-        let sealed = seal_vault_with_yubikey(
-            passphrase,
-            &hmac_secret,
-            credential_id,
-            yubikey_salt,
-            plaintext,
-            None,
-        )
-        .unwrap();
-        let bytes = sealed.to_bytes();
-        let recovered_sealed = SealedVault::from_bytes(&bytes).unwrap();
-        let recovered =
-            open_vault_with_yubikey(passphrase, &hmac_secret, &yubikey_salt, &recovered_sealed)
-                .unwrap();
-        assert_eq!(recovered, plaintext);
-    }
-
-    #[test]
-    fn yubikey_vault_cannot_be_opened_without_yubikey() {
-        let passphrase = b"passphrase";
-        let plaintext = b"secret";
-        let hmac_secret = [0xAAu8; 32];
-        let credential_id = vec![0xBBu8; 64];
-        let yubikey_salt = [0xCCu8; 32];
-
-        let sealed = seal_vault_with_yubikey(
-            passphrase,
-            &hmac_secret,
-            credential_id,
-            yubikey_salt,
-            plaintext,
-            None,
-        )
-        .unwrap();
-        let result = open_vault(passphrase, &sealed);
-        assert!(result.is_err());
     }
 
     // ── Multi-key vault (minimum 2 keys) ─────────────────────────────────────

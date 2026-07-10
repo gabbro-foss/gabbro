@@ -70,7 +70,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 667 | 17 |
+| Rust (`cargo test -q`) | 654 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 17 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -175,6 +175,14 @@ decrypt→merge→reseal, incl. cross-version v10↔v11); passphrase-change + Yu
 - [x] Functional sweep: list every *Must not regress* mechanism with its CURRENT test coverage — DONE; see *Sweep* above.
 - [x] Net: pin CURRENT behaviour green (all paths, all versions) BEFORE touching production; add
   characterization tests for any gap the sweep finds — DONE; G1-G3 closed (see *Sweep* above).
+- [x] Remove dead legacy single-YK (v2) path — net-first side-effect. DONE. Deleted
+  `seal/open/save/load/unlock_vault_with_yubikey`, the 3 legacy session branches, AND the legacy
+  read-fallback inside `open_vault_with_key_record` (empty-`key_blob` branch now fails closed) —
+  the third tentacle the first sweep missed. Collapsed the session `YubikeyMaterial`
+  (`vault_key_master` no longer `Option`; dropped the dead cached `hmac_secret`/`hkdf_salt`/
+  `credential_id`). Kept `combine_yubikey` + `derive_vault_key` (multi-key uses them). Ported the
+  P0 garbage-doesn't-open-empty test + 3 bridge tests to the multi-key path. Net green: gate 17/17
+  (v6–v10 multi-key still open), affected lib tests 7/7, clippy clean. No freeze fixture (per plan).
 - [ ] Canon-TDD list — STOP for review — then implement the v11 write path (new HKDF derivation
   + label).
 - [ ] Version dispatch: v11 seals new; v2–v10 read via the legacy derivation (kept).
