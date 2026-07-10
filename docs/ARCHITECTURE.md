@@ -70,8 +70,8 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 654 | 17 |
-| Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 17 | 0 |
+| Rust (`cargo test -q`) | 663 | 17 |
+| Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 16 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust sync-walk batched apply (`cargo test --release --lib sync_walk_batched_apply_matches_checker -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -95,6 +95,26 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
+**>>> SESSION STATE (READ FIRST) — v11 WRITE PATH LANDED, `gabbro_test` PASSED (1 stale test fixed) <<<**
+- **`VERSION` is now 11.** New vaults seal v11 (vault key = `derive_vault_key_v11` = HKDF over the
+  96B Argon2id output; label `gabbro-vault-key-from-argon2id-v1`, KAT-frozen in `hkdf.rs`). Header
+  drops the ML-KEM ciphertext + X25519 ephemeral pubkey for v11. Committed **`81fd5ad`, PUSHED**.
+- **6 derivation sites are v11-branched** (`sealed.version`/`VERSION`/`target_version >=
+  HKDF_DIRECT_MIN_VERSION(11)`): `seal_vault`, `open_vault`, `seal_vault_with_keys`,
+  `open_vault_with_key_record`, `migrate_multikey_to_version`, `change_vault_passphrase_with_keys`.
+  ≤v10 keep the legacy hybrid path, each `else` tagged `RT-3`. Header branches on
+  `KEM_HEADER_MAX_VERSION(10)`. `capped_reseal` is now two-era (`HKDF_DIRECT_MIN_VERSION`).
+- **`gabbro_test` ran (109min): all legs GREEN except one rust unit test, now fixed (UNCOMMITTED).**
+  `truncated_ml_kem_ciphertext_returns_error_not_panic` sealed via `seal_vault` (→ v11, no KEM), so
+  the truncate was a no-op and open succeeded. Retargeted to a manually-built legacy (v10) vault so
+  the KEM-length guard (legacy read path, RT-3-doomed) is still exercised. Green + clippy clean.
+  Testing table updated (lib 654→663, backward-compat 17→16).
+- **Backward-compat gate = 16/16 GREEN**, state-machine fuzz / crash-safety / sync legs / Android /
+  Flutter (1257) all GREEN. The v11 write path is fully gate-verified.
+- **Remaining tick-items:** commit the test fix + doc counts; v11 fixtures + migration corpus;
+  explicit C2/C4 tests; docs (ADR-018, SECURITY, README, ARCHITECTURE Encryption line,
+  crypto diagrams, VAULT_UPGRADE_PATH); then the hardware matrix.
+
 **Drop the dual-lock (X25519 + ML-KEM) hybrid layer — vault VERSION 11.** Multi-session, on
 branch `drop-dual-lock-hybrid-kem`. Rationale + decision: ADR-018. Follow **net-first**
 (CLAUDE.md) strictly — no canon-TDD until the net is green across every path in *Must not
@@ -105,11 +125,10 @@ passphrase-derived X25519 + ML-KEM key-exchange. Gabbro stays PQ-resistant on Ar
 AES-256-GCM.
 
 *Construction (design locked):*
-- **Passphrase (v11):** `vault_key = HKDF-SHA256(salt = hkdf_salt, ikm = KM, info = "gabbro-vault-key-v1")`.
+- **Passphrase (v11):** `vault_key = HKDF-SHA256(salt = hkdf_salt, ikm = KM, info = "gabbro-vault-key-from-argon2id-v1")`.
   `KM = Argon2id(pass, salt)` **stays 96B** — the Argon2id call is byte-identical to the old
-  format; only the post-Argon2id step changes (localises the blast radius). `info` label text is
-  cosmetic-but-must-be-unique (final string TBD at implementation). Header **drops** `ct_M`
-  (1568B) + `ephemeral_pub` (32B).
+  format; only the post-Argon2id step changes (localises the blast radius). Label is construction-
+  versioned (`-v1`, not the file format). Header **drops** `ct_M` (1568B) + `ephemeral_pub` (32B).
 - **YubiKey (v11):** `combine_yubikey(HKDF(KM), hmac_secret, ...)` — `combine_yubikey` is
   **unchanged**; only its first input's source changes. 2FA property intact (hmac-secret is the
   real second factor, mixed downstream).
