@@ -114,7 +114,8 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 - **v11 fixtures + migration corpus + C2/C4 + docs DONE** (fixtures: gate 18/18 + fuzzer extended to
   v11; C4 folded into the gate; C2 = `seal_vault_with_keys_produces_version_11_with_no_kem_header`;
   corpus: `v11.gabbro`; docs: ADR-018/SECURITY/README/ARCHITECTURE/VAULT_UPGRADE_PATH + both crypto
-  diagrams redrawn for v11). **Remaining:** gabbro_test gate script check; hardware matrix; release.
+  diagrams redrawn for v11). **Remaining (maintainer):** re-run `gabbro_test` (full gate, confirms
+  the truncated-test fix + all v11 tests green together); hardware matrix; release.
 
 **Drop the dual-lock (X25519 + ML-KEM) hybrid layer — vault VERSION 11.** Multi-session, on
 branch `drop-dual-lock-hybrid-kem`. Rationale + decision: ADR-018. Follow **net-first**
@@ -231,7 +232,8 @@ decrypt→merge→reseal, incl. cross-version v10↔v11); passphrase-change + Yu
   notes), README (prose/ASCII/alt-text + embedded diagram), ARCHITECTURE (Encryption line + format),
   crypto diagrams (flow.dot/svg, simple_icons.svg redrawn 6-band, A4 PNG+PDF regenerated),
   VAULT_UPGRADE_PATH (rewritten for v10->v11 stepping stone).
-- [ ] `gabbro_test` gate script updated if new tests aren't covered.
+- [x] `gabbro_test` gate: no change needed — new v11 tests live in suites the gate already runs
+  wholesale (`cargo test -q`, `--test vault_backward_compat`, `--test vault_state_machine_fuzz`).
 - [ ] Release the v11 auto-migrate build; let existing vaults migrate in the field.
 - [ ] DEFERRED to the RT-3 cleanup (NOT this branch): delete legacy derivations, drop `ml-kem`
   + `x25519-dalek`, raise floor → v11.
