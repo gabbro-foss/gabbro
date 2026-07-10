@@ -70,7 +70,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 663 | 17 |
+| Rust (`cargo test -q`) | 664 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 18 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -111,10 +111,10 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
   Testing table updated (lib 654→663, backward-compat 17→16).
 - **Backward-compat gate = 16/16 GREEN**, state-machine fuzz / crash-safety / sync legs / Android /
   Flutter (1257) all GREEN. The v11 write path is fully gate-verified.
-- **v11 fixtures + migration corpus DONE** (fixtures: gate 18/18 + fuzzer extended to v11, C4
-  folded in; corpus: `v11.gabbro` production-param). **Remaining:** explicit C2 (multi-key no-KEM
-  assertion); docs (ADR-018, SECURITY, README, ARCHITECTURE Encryption line, crypto diagrams,
-  VAULT_UPGRADE_PATH); then the hardware matrix.
+- **v11 fixtures + migration corpus + C2/C4 DONE** (fixtures: gate 18/18 + fuzzer extended to v11;
+  C4 rotation-journey folded into the gate; C2 = `seal_vault_with_keys_produces_version_11_with_no_kem_header`;
+  corpus: `v11.gabbro` production-param). **Remaining:** docs (ADR-018, SECURITY, README, ARCHITECTURE
+  Encryption line, crypto diagrams, VAULT_UPGRADE_PATH); then the hardware matrix.
 
 **Drop the dual-lock (X25519 + ML-KEM) hybrid layer — vault VERSION 11.** Multi-session, on
 branch `drop-dual-lock-hybrid-kem`. Rationale + decision: ADR-018. Follow **net-first**
