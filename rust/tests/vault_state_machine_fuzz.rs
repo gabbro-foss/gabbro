@@ -178,12 +178,20 @@ fn assert_unlockable(path: &Path, model: &Model, pool: &[KeyMat; 4], log: &[Stri
 /// After every mutation: the vault is never bricked (opens with every registered
 /// key, canary intact) and its on-disk version is consistent with the RT-3 rules.
 /// A passphrase change rebuilds the whole passphrase path, so it migrates the vault
-/// to the current VERSION. A passphrase-less add/remove cannot rebuild the v10
-/// material, so the belt keeps the vault below the derivation boundary (migration
-/// to v10 happens on unlock, not here). Fixtures start at v6/v7/v8 (< current), and
+/// to the current VERSION. A passphrase-less add/remove cannot rebuild the passphrase
+/// material, so the belt keeps the vault WITHIN its starting era: a pre-v11 fixture
+/// stays below the derivation boundary (< current, migrating to current on unlock),
+/// while a v11 fixture is already HKDF-direct and stays AT current VERSION.
 /// change_passphrase always uses a fresh passphrase, so `passphrase != FIXTURE`
-/// reliably marks "a migrating op has run".
-fn assert_invariants(path: &Path, model: &Model, pool: &[KeyMat; 4], log: &[String]) {
+/// reliably marks "a migrating op has run". `start_version` is the fixture's on-disk
+/// version before any mutation.
+fn assert_invariants(
+    path: &Path,
+    model: &Model,
+    pool: &[KeyMat; 4],
+    start_version: u8,
+    log: &[String],
+) {
     let on_disk = read_vault(path)
         .unwrap_or_else(|e| panic!("read_vault failed after [{}]: {e}", log.join(" -> ")));
     if model.passphrase != FIXTURE_PASSPHRASE {
@@ -193,10 +201,19 @@ fn assert_invariants(path: &Path, model: &Model, pool: &[KeyMat; 4], log: &[Stri
             "a passphrase change must migrate the vault to the current VERSION; history: [{}]",
             log.join(" -> ")
         );
+    } else if start_version >= VERSION {
+        // A v11 fixture is already at the HKDF-direct boundary: a passphrase-less
+        // mutation re-seals within the same era and stays AT current VERSION.
+        assert_eq!(
+            on_disk.version,
+            VERSION,
+            "belt (v11): passphrase-less add/remove stays AT current VERSION; history: [{}]",
+            log.join(" -> ")
+        );
     } else {
         assert!(
             on_disk.version < VERSION,
-            "belt: passphrase-less add/remove must NOT force a pre-v10 vault across the \
+            "belt: passphrase-less add/remove must NOT force a pre-v11 vault across the \
              derivation boundary (stays < current until unlock migrates it); history: [{}]",
             log.join(" -> ")
         );
@@ -242,11 +259,14 @@ fn random_op_sequences_preserve_unlockability() {
     let mut rng = StdRng::seed_from_u64(FIXED_SEED);
 
     // Rotate the starting fixture across versions so random op-orders also exercise
-    // the v6/v7 -> v8 migration paths (v8 has the transcript-bound passphrase combiner).
-    const FIXTURES: [&str; 3] = [
+    // the v6/v7 -> v8 migration paths (v8 has the transcript-bound passphrase combiner)
+    // and the v11 HKDF-direct era (already at the boundary — stays AT current VERSION
+    // across passphrase-less mutations).
+    const FIXTURES: [&str; 4] = [
         "v6_multikey_2keys.gabbro",
         "v7_multikey_2keys.gabbro",
         "v8_multikey_2keys.gabbro",
+        "v11_multikey_2keys.gabbro",
     ];
 
     for case in 0..cases {
@@ -260,6 +280,9 @@ fn random_op_sequences_preserve_unlockability() {
         // VERSION may be pre-current (v6/v7) until the first mutation migrates it,
         // so check unlockability only here, not the version.
         assert_unlockable(path, &model, &pool, &log);
+        let start_version = read_vault(path)
+            .unwrap_or_else(|e| panic!("baseline read_vault failed ({fixture_name}): {e}"))
+            .version;
 
         let steps = rng.gen_range(1..=MAX_STEPS);
         for _ in 0..steps {
@@ -343,7 +366,7 @@ fn random_op_sequences_preserve_unlockability() {
                 _ => unreachable!(),
             }
 
-            assert_invariants(path, &model, &pool, &log);
+            assert_invariants(path, &model, &pool, start_version, &log);
         }
 
         // Final lock-out checks once the sequence is complete.
