@@ -1737,10 +1737,24 @@ mod tests {
 
     #[test]
     fn truncated_ml_kem_ciphertext_returns_error_not_panic() {
-        // A corrupt or truncated ML-KEM ciphertext must produce Err, not panic.
+        // Legacy (pre-v11) read path only: v11 seals carry no ML-KEM ciphertext,
+        // so a truncated one is unrepresentable there. On a legacy vault the
+        // length guard must still produce Err, not panic. (RT-3 deletes the
+        // legacy KEM read path and this test with it.)
         let passphrase = b"truncated kem";
-        let mut sealed = seal_vault(passphrase, b"data", None).unwrap();
-        sealed.ml_kem_ciphertext.truncate(16); // was 1568 bytes; now obviously wrong
+        let sealed = SealedVault {
+            version: HKDF_DIRECT_MIN_VERSION - 1, // v10: last format carrying a KEM ciphertext
+            params: Argon2idParams::default(),
+            argon2_salt: [0x01u8; 32],
+            ml_kem_ciphertext: vec![0u8; 16], // was 1568 bytes; now obviously wrong
+            x25519_ephemeral_public: [0u8; 32],
+            hkdf_salt: [0u8; 32],
+            nonce: [0u8; 12],
+            ciphertext: vec![],
+            yubikey_records: vec![],
+            alias: None,
+            passphrase_blob: vec![],
+        };
         let result = open_vault(passphrase, &sealed);
         assert!(result.is_err());
         assert!(
