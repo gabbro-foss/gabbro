@@ -181,8 +181,11 @@ decrypt→merge→reseal, incl. cross-version v10↔v11); passphrase-change + Yu
   the third tentacle the first sweep missed. Collapsed the session `YubikeyMaterial`
   (`vault_key_master` no longer `Option`; dropped the dead cached `hmac_secret`/`hkdf_salt`/
   `credential_id`). Kept `combine_yubikey` + `derive_vault_key` (multi-key uses them). Ported the
-  P0 garbage-doesn't-open-empty test + 3 bridge tests to the multi-key path. Net green: gate 17/17
-  (v6–v10 multi-key still open), affected lib tests 7/7, clippy clean. No freeze fixture (per plan).
+  P0 garbage-doesn't-open-empty test + 3 bridge tests to the multi-key path. Then dropped the
+  vestigial salt param from the whole unlock chain (bridge fn + session fn + Dart `unlock_screen`;
+  FFI regenerated) — multi-key open reads each key's salt from the record. Net green: gate 17/17
+  (v6–v10 multi-key still open), affected lib tests green, clippy + flutter analyze clean. No
+  freeze fixture (per plan).
 - [ ] Canon-TDD list — STOP for review — then implement the v11 write path (new HKDF derivation
   + label).
 - [ ] Version dispatch: v11 seals new; v2–v10 read via the legacy derivation (kept).

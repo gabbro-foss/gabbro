@@ -238,26 +238,22 @@ VaultHeaderData readVaultHeader({required String path}) =>
 Future<void> setVaultAlias({required String alias}) =>
     RustLib.instance.api.crateApiVaultBridgeSetVaultAlias(alias: alias);
 
-/// Decrypt the vault at `path` using both passphrase and YubiKey hmac-secret.
+/// Decrypt the vault at `path` using the passphrase and one registered YubiKey.
 ///
-/// Handles both VERSION 2 (legacy single-key) and VERSION 3 (multi-key) vaults.
-/// For VERSION 3, caches `vault_key_master` in the session so CRUD saves
-/// never require a YubiKey re-tap.
+/// Caches `vault_key_master` in the session so CRUD saves never require a
+/// YubiKey re-tap. The per-key salt is read from the vault record, not passed in.
 ///
 /// `hmac_secret` must be exactly 32 bytes (FIDO2 hmac-secret output).
-/// `hkdf_salt` must be exactly 32 bytes (from `YubikeyRecordData.salt`).
 /// Async — Argon2id takes ~667ms on target hardware.
 Future<void> unlockVaultWithYubikey({
   required List<int> passphrase,
   required List<int> hmacSecret,
   required List<int> credentialId,
-  required List<int> hkdfSalt,
   required String path,
 }) => RustLib.instance.api.crateApiVaultBridgeUnlockVaultWithYubikey(
   passphrase: passphrase,
   hmacSecret: hmacSecret,
   credentialId: credentialId,
-  hkdfSalt: hkdfSalt,
   path: path,
 );
 

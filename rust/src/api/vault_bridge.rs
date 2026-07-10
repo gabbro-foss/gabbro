@@ -682,35 +682,23 @@ pub async fn set_vault_alias(alias: String) -> Result<(), String> {
     session::session_set_vault_alias(alias)
 }
 
-/// Decrypt the vault at `path` using both passphrase and YubiKey hmac-secret.
+/// Decrypt the vault at `path` using the passphrase and one registered YubiKey.
 ///
-/// Handles both VERSION 2 (legacy single-key) and VERSION 3 (multi-key) vaults.
-/// For VERSION 3, caches `vault_key_master` in the session so CRUD saves
-/// never require a YubiKey re-tap.
+/// Caches `vault_key_master` in the session so CRUD saves never require a
+/// YubiKey re-tap. The per-key salt is read from the vault record, not passed in.
 ///
 /// `hmac_secret` must be exactly 32 bytes (FIDO2 hmac-secret output).
-/// `hkdf_salt` must be exactly 32 bytes (from `YubikeyRecordData.salt`).
 /// Async — Argon2id takes ~667ms on target hardware.
 pub async fn unlock_vault_with_yubikey(
     passphrase: Vec<u8>,
     hmac_secret: Vec<u8>,
     credential_id: Vec<u8>,
-    hkdf_salt: Vec<u8>,
     path: String,
 ) -> Result<(), String> {
     let secret: [u8; 32] = hmac_secret
         .try_into()
         .map_err(|_| "hmac_secret must be exactly 32 bytes".to_string())?;
-    let salt: [u8; 32] = hkdf_salt
-        .try_into()
-        .map_err(|_| "hkdf_salt must be exactly 32 bytes".to_string())?;
-    session::unlock_vault_with_key_record(
-        &passphrase,
-        &secret,
-        credential_id,
-        &salt,
-        PathBuf::from(path),
-    )
+    session::unlock_vault_with_key_record(&passphrase, &secret, credential_id, PathBuf::from(path))
 }
 
 /// Create a new empty vault at `path`, sealed with `passphrase`.
@@ -792,16 +780,10 @@ pub async fn init_vault_with_keys(
         .as_slice()
         .try_into()
         .map_err(|_| "hmac_secret must be 32 bytes".to_string())?;
-    let salt: [u8; 32] = first
-        .hkdf_salt
-        .as_slice()
-        .try_into()
-        .map_err(|_| "hkdf_salt must be 32 bytes".to_string())?;
     session::unlock_vault_with_key_record(
         &passphrase,
         &secret,
         first.credential_id.clone(),
-        &salt,
         vault_path,
     )
 }
@@ -1589,7 +1571,6 @@ mod tests {
             pass.to_vec(),
             hmac_secret.to_vec(),
             credential_id,
-            hkdf_salt.to_vec(),
             path.to_str().unwrap().to_string(),
         ))
         .unwrap();
@@ -1635,7 +1616,6 @@ mod tests {
             pass.to_vec(),
             hmac_secret.to_vec(),
             credential_id.clone(),
-            hkdf_salt.to_vec(),
             path.to_str().unwrap().to_string(),
         ))
         .unwrap();
@@ -2141,20 +2121,9 @@ mod tests {
             b"passphrase".to_vec(),
             vec![0u8; 31],
             vec![0u8; 32],
-            vec![0u8; 32],
             path.to_str().unwrap().to_string(),
         ));
         assert!(result.is_err(), "31-byte hmac_secret must be rejected");
-
-        // 33-byte hkdf_salt — must be rejected before any file I/O.
-        let result = run(unlock_vault_with_yubikey(
-            b"passphrase".to_vec(),
-            vec![0u8; 32],
-            vec![0u8; 32],
-            vec![0u8; 33],
-            path.to_str().unwrap().to_string(),
-        ));
-        assert!(result.is_err(), "33-byte hkdf_salt must be rejected");
     }
 
     #[test]

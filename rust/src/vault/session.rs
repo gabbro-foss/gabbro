@@ -101,9 +101,6 @@ pub fn unlock_vault_with_key_record(
     passphrase: &[u8],
     hmac_secret: &[u8; 32],
     credential_id: Vec<u8>,
-    // Kept for signature stability with the FFI bridge; the multi-key open path
-    // reads each key's salt from the vault record, not from the caller.
-    _yubikey_salt: &[u8; 32],
     path: PathBuf,
 ) -> Result<(), String> {
     let (mut body, master, wrapping_key) =
@@ -5078,14 +5075,8 @@ mod yubikey_session_tests {
         let path = setup_multi_key_vault(old_pass);
 
         // Unlock with key 0 → vault_key_master cached → VERSION 4 path
-        unlock_vault_with_key_record(
-            old_pass,
-            &[0x11u8; 32],
-            vec![0x01u8; 64],
-            &[0x22u8; 32],
-            path.clone(),
-        )
-        .unwrap();
+        unlock_vault_with_key_record(old_pass, &[0x11u8; 32], vec![0x01u8; 64], path.clone())
+            .unwrap();
         session_change_passphrase(old_pass, new_pass).unwrap();
         lock_vault().unwrap();
 
@@ -5094,7 +5085,6 @@ mod yubikey_session_tests {
             old_pass,
             &[0x11u8; 32],
             vec![0x01u8; 64],
-            &[0x22u8; 32],
             path.clone(),
         )
         .is_err());
@@ -5102,32 +5092,19 @@ mod yubikey_session_tests {
             old_pass,
             &[0x33u8; 32],
             vec![0x02u8; 48],
-            &[0x44u8; 32],
             path.clone(),
         )
         .is_err());
 
         // New passphrase + key 0 must work
-        unlock_vault_with_key_record(
-            new_pass,
-            &[0x11u8; 32],
-            vec![0x01u8; 64],
-            &[0x22u8; 32],
-            path.clone(),
-        )
-        .unwrap();
+        unlock_vault_with_key_record(new_pass, &[0x11u8; 32], vec![0x01u8; 64], path.clone())
+            .unwrap();
         assert_eq!(list_entry_summaries().unwrap().len(), 1);
         lock_vault().unwrap();
 
         // New passphrase + key 1 must also work
-        unlock_vault_with_key_record(
-            new_pass,
-            &[0x33u8; 32],
-            vec![0x02u8; 48],
-            &[0x44u8; 32],
-            path.clone(),
-        )
-        .unwrap();
+        unlock_vault_with_key_record(new_pass, &[0x33u8; 32], vec![0x02u8; 48], path.clone())
+            .unwrap();
         assert_eq!(list_entry_summaries().unwrap().len(), 1);
 
         teardown(&path);
@@ -5147,14 +5124,7 @@ mod yubikey_session_tests {
 
         // Unlock with a registered key — proves the vault is key-protected and the
         // session is hardware-authenticated (the implicit downgrade authorization).
-        unlock_vault_with_key_record(
-            pass,
-            &[0x11u8; 32],
-            vec![0x01u8; 64],
-            &[0x22u8; 32],
-            path.clone(),
-        )
-        .unwrap();
+        unlock_vault_with_key_record(pass, &[0x11u8; 32], vec![0x01u8; 64], path.clone()).unwrap();
 
         let mut export_path = temp_dir();
         export_path.push("gabbro_downgrade_passonly_out.gabbro");
@@ -5237,26 +5207,12 @@ mod yubikey_mgmt_tests {
         let pass = b"add-key-pass";
         let path = setup_two_key_vault(pass, "add");
 
-        unlock_vault_with_key_record(
-            pass,
-            &[0x11u8; 32],
-            vec![0x01u8; 64],
-            &[0x22u8; 32],
-            path.clone(),
-        )
-        .unwrap();
+        unlock_vault_with_key_record(pass, &[0x11u8; 32], vec![0x01u8; 64], path.clone()).unwrap();
         session_add_yubikey(vec![0x03u8; 32], vec![0x55u8; 32], vec![0x66u8; 32]).unwrap();
         lock_vault().unwrap();
 
         // New credential must be able to unlock
-        unlock_vault_with_key_record(
-            pass,
-            &[0x55u8; 32],
-            vec![0x03u8; 32],
-            &[0x66u8; 32],
-            path.clone(),
-        )
-        .unwrap();
+        unlock_vault_with_key_record(pass, &[0x55u8; 32], vec![0x03u8; 32], path.clone()).unwrap();
         assert_eq!(list_entry_summaries().unwrap().len(), 1);
 
         teardown(&path);
@@ -5272,14 +5228,7 @@ mod yubikey_mgmt_tests {
         let bak = std::path::PathBuf::from(format!("{}.bak", path.display()));
         let _ = std::fs::remove_file(&bak);
 
-        unlock_vault_with_key_record(
-            pass,
-            &[0x11u8; 32],
-            vec![0x01u8; 64],
-            &[0x22u8; 32],
-            path.clone(),
-        )
-        .unwrap();
+        unlock_vault_with_key_record(pass, &[0x11u8; 32], vec![0x01u8; 64], path.clone()).unwrap();
         session_add_yubikey(vec![0x03u8; 32], vec![0x55u8; 32], vec![0x66u8; 32]).unwrap();
         lock_vault().unwrap();
 
@@ -5304,14 +5253,7 @@ mod yubikey_mgmt_tests {
         let bak = std::path::PathBuf::from(format!("{}.bak", path.display()));
         let _ = std::fs::remove_file(&bak);
 
-        unlock_vault_with_key_record(
-            pass,
-            &[0x11u8; 32],
-            vec![0x01u8; 64],
-            &[0x22u8; 32],
-            path.clone(),
-        )
-        .unwrap();
+        unlock_vault_with_key_record(pass, &[0x11u8; 32], vec![0x01u8; 64], path.clone()).unwrap();
         session_remove_yubikey(vec![0x02u8; 48]).unwrap();
         lock_vault().unwrap();
 
@@ -5334,36 +5276,17 @@ mod yubikey_mgmt_tests {
         let pass = b"remove-key-pass";
         let path = setup_two_key_vault(pass, "remove");
 
-        unlock_vault_with_key_record(
-            pass,
-            &[0x11u8; 32],
-            vec![0x01u8; 64],
-            &[0x22u8; 32],
-            path.clone(),
-        )
-        .unwrap();
+        unlock_vault_with_key_record(pass, &[0x11u8; 32], vec![0x01u8; 64], path.clone()).unwrap();
         session_remove_yubikey(vec![0x02u8; 48]).unwrap();
         lock_vault().unwrap();
 
         // Removed key must no longer work
-        let result = unlock_vault_with_key_record(
-            pass,
-            &[0x33u8; 32],
-            vec![0x02u8; 48],
-            &[0x44u8; 32],
-            path.clone(),
-        );
+        let result =
+            unlock_vault_with_key_record(pass, &[0x33u8; 32], vec![0x02u8; 48], path.clone());
         assert!(result.is_err(), "removed key must not unlock");
 
         // Remaining key must still work
-        unlock_vault_with_key_record(
-            pass,
-            &[0x11u8; 32],
-            vec![0x01u8; 64],
-            &[0x22u8; 32],
-            path.clone(),
-        )
-        .unwrap();
+        unlock_vault_with_key_record(pass, &[0x11u8; 32], vec![0x01u8; 64], path.clone()).unwrap();
         assert_eq!(list_entry_summaries().unwrap().len(), 1);
 
         teardown(&path);
@@ -5375,14 +5298,7 @@ mod yubikey_mgmt_tests {
         let pass = b"remove-last-pass";
         let path = setup_two_key_vault(pass, "remove_last");
 
-        unlock_vault_with_key_record(
-            pass,
-            &[0x11u8; 32],
-            vec![0x01u8; 64],
-            &[0x22u8; 32],
-            path.clone(),
-        )
-        .unwrap();
+        unlock_vault_with_key_record(pass, &[0x11u8; 32], vec![0x01u8; 64], path.clone()).unwrap();
 
         // Remove the second key — leaves one key on disk
         session_remove_yubikey(vec![0x02u8; 48]).unwrap();
@@ -5402,14 +5318,7 @@ mod yubikey_mgmt_tests {
         let pass = b"alias-pass";
         let path = setup_two_key_vault(pass, "alias_roundtrip");
 
-        unlock_vault_with_key_record(
-            pass,
-            &[0x11u8; 32],
-            vec![0x01u8; 64],
-            &[0x22u8; 32],
-            path.clone(),
-        )
-        .unwrap();
+        unlock_vault_with_key_record(pass, &[0x11u8; 32], vec![0x01u8; 64], path.clone()).unwrap();
         session_set_yubikey_alias(String::from("aabb"), String::from("Primary")).unwrap();
         session_set_yubikey_alias(String::from("ccdd"), String::from("Backup")).unwrap();
 
@@ -5426,25 +5335,11 @@ mod yubikey_mgmt_tests {
         let pass = b"alias-persist-pass";
         let path = setup_two_key_vault(pass, "alias_persist");
 
-        unlock_vault_with_key_record(
-            pass,
-            &[0x11u8; 32],
-            vec![0x01u8; 64],
-            &[0x22u8; 32],
-            path.clone(),
-        )
-        .unwrap();
+        unlock_vault_with_key_record(pass, &[0x11u8; 32], vec![0x01u8; 64], path.clone()).unwrap();
         session_set_yubikey_alias(String::from("aabb"), String::from("Main")).unwrap();
         lock_vault().unwrap();
 
-        unlock_vault_with_key_record(
-            pass,
-            &[0x11u8; 32],
-            vec![0x01u8; 64],
-            &[0x22u8; 32],
-            path.clone(),
-        )
-        .unwrap();
+        unlock_vault_with_key_record(pass, &[0x11u8; 32], vec![0x01u8; 64], path.clone()).unwrap();
         let aliases = session_list_yubikey_aliases().unwrap();
         assert_eq!(
             aliases.get("aabb").map(|s| s.as_str()),
@@ -5461,14 +5356,7 @@ mod yubikey_mgmt_tests {
         let pass = b"alias-empty-pass";
         let path = setup_two_key_vault(pass, "alias_empty");
 
-        unlock_vault_with_key_record(
-            pass,
-            &[0x11u8; 32],
-            vec![0x01u8; 64],
-            &[0x22u8; 32],
-            path.clone(),
-        )
-        .unwrap();
+        unlock_vault_with_key_record(pass, &[0x11u8; 32], vec![0x01u8; 64], path.clone()).unwrap();
         let aliases = session_list_yubikey_aliases().unwrap();
         assert!(aliases.is_empty(), "fresh vault must have no aliases");
 
@@ -8251,14 +8139,8 @@ mod multi_vault_isolation_tests {
         let a = passphrase_vault("6a", b"pass-a", "a-001");
         let b = multikey_vault("6b", b"pass-b", "b-001");
         let a_before = read_vault_header(&a).unwrap().yubikey_records.len();
-        unlock_vault_with_key_record(
-            b"pass-b",
-            &[0x11u8; 32],
-            vec![0x01u8; 64],
-            &[0x22u8; 32],
-            b.clone(),
-        )
-        .unwrap();
+        unlock_vault_with_key_record(b"pass-b", &[0x11u8; 32], vec![0x01u8; 64], b.clone())
+            .unwrap();
         session_add_yubikey(vec![0x03u8; 32], vec![0x55u8; 32], vec![0x66u8; 32]).unwrap();
         lock_vault().unwrap();
         assert_eq!(
@@ -8280,14 +8162,8 @@ mod multi_vault_isolation_tests {
     fn remove_yubikey_on_one_vault_leaves_another_intact() {
         let a = passphrase_vault("7a", b"pass-a", "a-001");
         let b = multikey_vault("7b", b"pass-b", "b-001");
-        unlock_vault_with_key_record(
-            b"pass-b",
-            &[0x11u8; 32],
-            vec![0x01u8; 64],
-            &[0x22u8; 32],
-            b.clone(),
-        )
-        .unwrap();
+        unlock_vault_with_key_record(b"pass-b", &[0x11u8; 32], vec![0x01u8; 64], b.clone())
+            .unwrap();
         session_remove_yubikey(vec![0x02u8; 48]).unwrap();
         lock_vault().unwrap();
         assert_eq!(
@@ -8324,26 +8200,14 @@ mod multi_vault_isolation_tests {
             "key-protected B opened passphrase-only"
         );
         assert!(
-            unlock_vault_with_key_record(
-                b"pass-b",
-                &[0x11u8; 32],
-                vec![0x01u8; 64],
-                &[0x22u8; 32],
-                b.clone()
-            )
-            .is_ok(),
+            unlock_vault_with_key_record(b"pass-b", &[0x11u8; 32], vec![0x01u8; 64], b.clone())
+                .is_ok(),
             "B did not open with its key"
         );
         lock_vault().unwrap();
         assert!(
-            unlock_vault_with_key_record(
-                b"pass-a",
-                &[0x11u8; 32],
-                vec![0x01u8; 64],
-                &[0x22u8; 32],
-                a.clone()
-            )
-            .is_err(),
+            unlock_vault_with_key_record(b"pass-a", &[0x11u8; 32], vec![0x01u8; 64], a.clone())
+                .is_err(),
             "passphrase-only A opened via a key record"
         );
         teardown(&[&a, &b]);
@@ -8404,14 +8268,8 @@ mod multi_vault_isolation_tests {
         let b = multikey_vault("10b", b"pass-b", "b-001");
         let c = passphrase_vault("10bc", b"pass-c", "c-001");
         let incoming = load_vault(b"pass-c", &c).unwrap();
-        unlock_vault_with_key_record(
-            b"pass-b",
-            &[0x11u8; 32],
-            vec![0x01u8; 64],
-            &[0x22u8; 32],
-            b.clone(),
-        )
-        .unwrap();
+        unlock_vault_with_key_record(b"pass-b", &[0x11u8; 32], vec![0x01u8; 64], b.clone())
+            .unwrap();
         session_merge_vault_from_body(incoming).unwrap();
         lock_vault().unwrap();
         assert_eq!(
@@ -8419,14 +8277,8 @@ mod multi_vault_isolation_tests {
             2,
             "sync dropped a YubiKey record"
         );
-        unlock_vault_with_key_record(
-            b"pass-b",
-            &[0x11u8; 32],
-            vec![0x01u8; 64],
-            &[0x22u8; 32],
-            b.clone(),
-        )
-        .unwrap();
+        unlock_vault_with_key_record(b"pass-b", &[0x11u8; 32], vec![0x01u8; 64], b.clone())
+            .unwrap();
         assert_eq!(
             list_entry_summaries().unwrap().len(),
             2,
@@ -8541,7 +8393,6 @@ mod migrate_on_unlock_tests {
             pass,
             &keys[0].hmac_secret,
             keys[0].credential_id.clone(),
-            &keys[0].salt,
             path.clone(),
         )
         .unwrap();
