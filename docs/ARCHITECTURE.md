@@ -115,10 +115,15 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
   tablet (1 key); GrapheneOS held on the pre-v11 build as rollback. v10→v11 migrate-on-unlock, all
   auth modes, CRUD, rotation, cross-version sync, and read-only real-vault integrity all pass. No
   vault bricked. Results recorded in `test_data/migration_vaults/MIGRATION_TESTS.md`.
-- **Remaining (maintainer-driven):**
-  1. `gabbro_test` full gate re-run — deferred to release-time by choice (was green before hardware;
-     parse-fuzzer fix verified in isolation, 4/4, clippy+fmt clean). Run once more before shipping.
-  2. Release the v11 build (see VAULT_UPGRADE_PATH.md two-release strategy).
+- **All doc work through `f3c54f2` is committed AND pushed** (`drop-dual-lock-hybrid-kem`). Working
+  tree clean; `gabbro_test` verified current (all v11 tests live in suites it runs wholesale — no
+  script change needed).
+- **Remaining (maintainer-driven), in order:**
+  1. `gabbro_test` full gate re-run — maintainer running it now. Was green before hardware;
+     parse-fuzzer fix verified in isolation (4/4, clippy+fmt clean). Expected green.
+  2. Docs cleanup pass — once the gate is green, slim this SESSION STATE block + fold the v11 story
+     into the lean narrative (Testing table already current; RT-3 stays in the Bikeshed).
+  3. Release the v11 build (see VAULT_UPGRADE_PATH.md two-release strategy).
 - If the gate comes back red, the likely spot is a v11-touched suite (`vault_backward_compat`,
   `vault_state_machine_fuzz`, lib) — not a brick. Flutter/Android are bridge-insulated.
 
