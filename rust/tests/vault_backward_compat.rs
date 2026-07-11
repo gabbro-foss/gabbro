@@ -46,15 +46,15 @@
 //!
 //! # Test list (canon TDD — implement one at a time, red → green → refactor)
 //!
-//!   ✓ v{7,8,9}_passphrase_only_opens
+//!   ✓ v{7,8,9,10,11}_passphrase_only_opens
 //!   ✓ v7_passphrase_only_migrates_to_current_version
 //!   ✓ v6_passphrase_only_opens_and_migrates
-//!   ✓ v{6,7,8,9}_multikey_opens_with_each_registered_key
-//!   ✓ yubikey_rotation_survives_key_loss_and_version_bumps   (from v6–v9)
+//!   ✓ v{6,7,8,9,10,11}_multikey_opens_with_each_registered_key
+//!   ✓ yubikey_rotation_survives_key_loss_and_version_bumps   (from v6–v11)
 //!   ✓ cannot_remove_the_last_yubikey
-//!   ✓ passphrase_change_survives_and_migrates                (vault A, from v6–v9)
+//!   ✓ passphrase_change_survives_and_migrates                (vault A, from v6–v9 + v11)
 //!   ✓ wrong_old_passphrase_rejected_and_vault_left_openable
-//!   ✓ passphrase_rotation_interleaved_with_key_loss          (vault B, from v6–v9)
+//!   ✓ passphrase_rotation_interleaved_with_key_loss          (vault B, from v6–v9 + v11)
 //!
 //! See also the opt-in (`#[ignore]`'d) state-machine fuzzer in
 //! `tests/vault_state_machine_fuzz.rs`, which randomises the ORDER of
@@ -297,14 +297,56 @@ fn v10_multikey_opens_with_each_registered_key() {
     assert_opens_with(&p, YK2_HMAC, YK2_CRED, "YK2");
 }
 
+#[test]
+fn v11_passphrase_only_opens() {
+    // A v11 passphrase-only vault (vault key derived straight from Argon2id via
+    // HKDF, no ML-KEM ciphertext in the header) must open and yield the canary.
+    // Frozen now so a future build (RT-3 legacy-code removal, v12+) that breaks
+    // v11 reads goes red before it can brick a migrated vault.
+    let p = fixture("v11_passphrase.gabbro");
+    assert_eq!(
+        read_vault(&p).unwrap().version,
+        11,
+        "fixture must be VERSION 11"
+    );
+    let body = load_vault(FIXTURE_PASSPHRASE, &p)
+        .expect("current build must open the v11 passphrase-only golden vault");
+    assert_canary(&body);
+}
+
+#[test]
+fn v11_multikey_opens_with_each_registered_key() {
+    // A v11 passphrase + YK1 + YK2 vault must open with EITHER registered key.
+    // The keyslot (combine_yubikey over the random wrapping_key) is unchanged at
+    // v11; this confirms the HKDF-direct passphrase path didn't disturb it.
+    let p = fixture("v11_multikey_2keys.gabbro");
+    assert_eq!(
+        read_vault(&p).unwrap().version,
+        11,
+        "fixture must be VERSION 11"
+    );
+    assert_opens_with(&p, YK1_HMAC, YK1_CRED, "YK1");
+    assert_opens_with(&p, YK2_HMAC, YK2_CRED, "YK2");
+}
+
 /// Walks the full key-loss / key-rotation journey on a temp copy of `fixture_name`,
 /// driving the *real* bridge functions the Flutter app calls. A passphrase-less
 /// add/remove routes through `reseal_vault_body`, which re-binds the body to the new
-/// header (AAD) but — post RT-3 — will NOT force the vault across the v10 derivation
-/// boundary (the belt: it has no passphrase to rebuild the material). So after each
-/// mutation we assert the vault stays below the boundary AND still opens with every
-/// surviving key. Migration to v10 happens on unlock (session::migrate_on_unlock_tests).
+/// header (AAD) but — post RT-3 — will NOT force the vault across the HKDF-direct
+/// derivation boundary (the belt: it has no passphrase to rebuild the material). All
+/// v6–v10 fixtures sit below that boundary (which landed at v11), so after each
+/// mutation we assert the vault stays below VERSION AND still opens with every
+/// surviving key. Migration happens on unlock (session::migrate_on_unlock_tests).
 fn run_rotation_scenario(fixture_name: &str) {
+    run_rotation_scenario_with(fixture_name, |v| {
+        assert!(
+            v < VERSION,
+            "belt: add/remove must NOT force a v6-v10 vault across the derivation boundary"
+        );
+    });
+}
+
+fn run_rotation_scenario_with(fixture_name: &str, check_version: impl Fn(u8)) {
     let tv = temp_copy(fixture_name);
     let path = tv.path.as_path();
 
@@ -332,14 +374,11 @@ fn run_rotation_scenario(fixture_name: &str) {
     )
     .expect("add YK3");
     remove_yubikey_from_vault(&pt, &master, YK2_CRED, path).expect("remove lost YK2");
-    // A passphrase-less key mutation cannot rebuild the v10 passphrase material, so
-    // the belt (capped_reseal_version) holds the vault below the derivation boundary.
-    // Migration to v10 happens on unlock (session::migrate_on_unlock_tests). The
-    // guarantee here is no brick: it still opens with each surviving key (Steps 3/5).
-    assert!(
-        read_vault(path).unwrap().version < VERSION,
-        "belt: add/remove must NOT force a pre-v10 vault across the derivation boundary"
-    );
+    // A passphrase-less key mutation cannot rebuild the passphrase material, so the
+    // belt (capped_reseal_version) holds the vault at/below the derivation boundary.
+    // Migration happens on unlock (session::migrate_on_unlock_tests). The guarantee
+    // here is no brick: it still opens with each surviving key (Steps 3/5).
+    check_version(read_vault(path).unwrap().version);
 
     // Step 3: user can still unlock vault A with BOTH YK1 and YK3.
     assert_opens_with(path, YK1_HMAC, YK1_CRED, "YK1 after losing YK2");
@@ -363,10 +402,7 @@ fn run_rotation_scenario(fixture_name: &str) {
     )
     .expect("add YK4");
     remove_yubikey_from_vault(&pt, &master, YK1_CRED, path).expect("remove lost YK1");
-    assert!(
-        read_vault(path).unwrap().version < VERSION,
-        "belt: the second passphrase-less rotation likewise stays below the boundary until unlock migrates"
-    );
+    check_version(read_vault(path).unwrap().version);
 
     // Step 5: user can still unlock vault A with BOTH YK3 and YK4.
     assert_opens_with(path, YK3_HMAC, YK3_CRED, "YK3 after losing YK1");
@@ -383,6 +419,19 @@ fn yubikey_rotation_survives_key_loss_and_version_bumps() {
     run_rotation_scenario("v7_multikey_2keys.gabbro");
     run_rotation_scenario("v8_multikey_2keys.gabbro");
     run_rotation_scenario("v9_multikey_2keys.gabbro");
+    // v10 too: since the HKDF-direct boundary landed at v11, v10 now caps below it
+    // like the pre-v11 fixtures (a passphrase-less mutation stays < VERSION).
+    run_rotation_scenario("v10_multikey_2keys.gabbro");
+    // v11 sits AT the derivation boundary (== VERSION), not below it: a v11 vault is
+    // already HKDF-direct, so a passphrase-less rotation re-seals within the same era
+    // and stays at VERSION. The guarantee is identical — no brick, opens with every
+    // surviving key across the loss/rotation journey.
+    run_rotation_scenario_with("v11_multikey_2keys.gabbro", |v| {
+        assert_eq!(
+            v, VERSION,
+            "a v11 vault stays AT the current VERSION across a passphrase-less rotation"
+        );
+    });
 }
 
 #[test]
@@ -475,6 +524,9 @@ fn passphrase_change_survives_and_migrates() {
     run_passphrase_change_scenario("v7_passphrase.gabbro");
     run_passphrase_change_scenario("v8_passphrase.gabbro");
     run_passphrase_change_scenario("v9_passphrase.gabbro");
+    // v11: a passphrase change on an already-HKDF-direct vault re-seals within the
+    // same era and stays at the current VERSION (the scenario asserts == VERSION).
+    run_passphrase_change_scenario("v11_passphrase.gabbro");
 }
 
 #[test]
@@ -508,6 +560,17 @@ fn wrong_old_passphrase_rejected_and_vault_left_openable() {
 /// stay below the v10 boundary (belt); the passphrase change migrates to current,
 /// after which further rotations remain at current.
 fn run_passphrase_rotation_scenario(fixture_name: &str) {
+    // v6-v10 sit below the derivation boundary: a passphrase-less rotation stays
+    // < VERSION (belt) until the passphrase change migrates it.
+    run_passphrase_rotation_scenario_with(fixture_name, |v| {
+        assert!(
+            v < VERSION,
+            "belt: passphrase-less rotation stays below the boundary until a migrating op runs"
+        );
+    });
+}
+
+fn run_passphrase_rotation_scenario_with(fixture_name: &str, step2_version_check: impl Fn(u8)) {
     const NEW_PASSPHRASE: &[u8] = b"vault B rotated passphrase -- mid journey";
     let tv = temp_copy(fixture_name);
     let path = tv.path.as_path();
@@ -533,12 +596,10 @@ fn run_passphrase_rotation_scenario(fixture_name: &str) {
     )
     .expect("add YK3");
     remove_yubikey_from_vault(&pt, &master, YK2_CRED, path).expect("remove lost YK2");
-    // Belt: a passphrase-less rotation stays below the v10 boundary (no re-tap/no
-    // passphrase to rebuild the material). The passphrase change in Step 3 migrates.
-    assert!(
-        read_vault(path).unwrap().version < VERSION,
-        "belt: passphrase-less rotation stays below the boundary until a migrating op runs"
-    );
+    // A passphrase-less rotation re-seals within the vault's own era (no re-tap/no
+    // passphrase to rebuild the material): pre-v11 stays below the boundary, v11
+    // stays AT it. The passphrase change in Step 3 migrates either way.
+    step2_version_check(read_vault(path).unwrap().version);
 
     // Step 3: change the passphrase on the multi-key vault. Get the master via a
     // surviving key under the CURRENT passphrase, then rotate.
@@ -624,4 +685,12 @@ fn passphrase_rotation_interleaved_with_key_loss() {
     run_passphrase_rotation_scenario("v7_multikey_2keys.gabbro");
     run_passphrase_rotation_scenario("v8_multikey_2keys.gabbro");
     run_passphrase_rotation_scenario("v9_multikey_2keys.gabbro");
+    // v11: already HKDF-direct, so the Step-2 passphrase-less rotation stays AT the
+    // current VERSION rather than below it. The rest of the journey is identical.
+    run_passphrase_rotation_scenario_with("v11_multikey_2keys.gabbro", |v| {
+        assert_eq!(
+            v, VERSION,
+            "a v11 vault stays AT the current VERSION across a passphrase-less rotation"
+        );
+    });
 }

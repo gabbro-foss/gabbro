@@ -2475,7 +2475,6 @@ fn wire__crate__api__vault_bridge__unlock_vault_with_yubikey_impl(
             let api_passphrase = <Vec<u8>>::sse_decode(&mut deserializer);
             let api_hmac_secret = <Vec<u8>>::sse_decode(&mut deserializer);
             let api_credential_id = <Vec<u8>>::sse_decode(&mut deserializer);
-            let api_hkdf_salt = <Vec<u8>>::sse_decode(&mut deserializer);
             let api_path = <String>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
@@ -2485,7 +2484,6 @@ fn wire__crate__api__vault_bridge__unlock_vault_with_yubikey_impl(
                             api_passphrase,
                             api_hmac_secret,
                             api_credential_id,
-                            api_hkdf_salt,
                             api_path,
                         )
                         .await?;

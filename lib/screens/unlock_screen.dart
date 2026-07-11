@@ -115,7 +115,6 @@ Future<void> _defaultUnlockWithYubikey(
     passphrase: passphrase,
     hmacSecret: hmacSecret,
     credentialId: credentialId,
-    hkdfSalt: hkdfSalt,
     path: path,
   );
 }
@@ -133,26 +132,12 @@ Future<void> _defaultUnlockWithAnyYubikey(
     transport: transport,
   );
 
-  // Find the matching record to retrieve the correct hkdfSalt.
-  final matchedRecord = records.firstWhere(
-    (r) => _listEqual(r.credentialId, match.credentialId),
-  );
-
   await unlockVaultWithYubikey(
     passphrase: passphrase,
     hmacSecret: match.hmac,
     credentialId: match.credentialId,
-    hkdfSalt: matchedRecord.salt,
     path: path,
   );
-}
-
-bool _listEqual(List<int> a, List<int> b) {
-  if (a.length != b.length) return false;
-  for (int i = 0; i < a.length; i++) {
-    if (a[i] != b[i]) return false;
-  }
-  return true;
 }
 
 // ── Widget ────────────────────────────────────────────────────────────────────

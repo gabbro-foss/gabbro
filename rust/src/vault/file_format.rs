@@ -53,10 +53,14 @@
 //!   granular, field-level sync. The bump exists so an OLDER build refuses a v9
 //!   vault (fail-closed) instead of opening it and silently stripping the new
 //!   per-field times on its next save.
-//! VERSION 10 (current): the X25519 static secret is derived directly from KDF
+//! VERSION 10: the X25519 static secret is derived directly from KDF
 //!   bytes [0..32] (clamp, no `StdRng`); v2–9 keep the legacy `StdRng` derivation
-//!   on read and auto-migrate to v10 on unlock (RT-3). Header LAYOUT unchanged.
-//! Reads v2–10; always writes VERSION 10.
+//!   on read and auto-migrate on unlock (RT-3). Header LAYOUT unchanged.
+//! VERSION 11 (current): the vault key is derived straight from the Argon2id output
+//!   via HKDF, dropping the X25519 + ML-KEM hybrid layer (ADR-018). The header omits
+//!   the ML-KEM ciphertext + X25519 ephemeral pubkey. v2–10 read via the legacy
+//!   hybrid derivation and auto-migrate to v11 on unlock.
+//! Reads v2–11; always writes VERSION 11.
 
 use crate::crypto::kdf::Argon2idParams;
 
@@ -77,16 +81,23 @@ pub const MAGIC: &[u8; 6] = b"GABBRO";
 
 /// Current file format version (written by this build).
 ///
-/// VERSION 10 (RT-3): X25519 static secret derived directly from KDF bytes [0..32]
-/// (no `StdRng`). Vaults v2–9 keep the legacy `StdRng` derivation on read and
-/// auto-migrate to v10 on unlock.
-pub const VERSION: u8 = 10;
+/// VERSION 11 (ADR-018): the vault key is derived straight from the Argon2id output
+/// via HKDF, with no X25519 + ML-KEM layer; the header omits the ML-KEM ciphertext
+/// and X25519 ephemeral pubkey. Vaults v2–10 keep the legacy hybrid derivation on
+/// read and auto-migrate to v11 on unlock.
+pub const VERSION: u8 = 11;
 
 /// Oldest version this build can still read.
 const VERSION_MIN_READABLE: u8 = 2;
 
 /// Size of the ML-KEM-1024 ciphertext in bytes.
 const ML_KEM_CIPHERTEXT_LEN: usize = 1568;
+
+/// Last format version whose header carries the ML-KEM ciphertext + X25519
+/// ephemeral public key. VERSION 11+ derives the vault key straight from Argon2id
+/// (ADR-018) and omits both fields from the header (`to_bytes`/`from_bytes`/
+/// `header_aad` all version-branch on this).
+const KEM_HEADER_MAX_VERSION: u8 = 10;
 
 /// The complete contents of a sealed vault file.
 #[derive(Debug, Clone, PartialEq)]
@@ -144,8 +155,11 @@ impl SealedVault {
         out.extend_from_slice(&self.argon2_salt);
         out.extend_from_slice(&self.hkdf_salt);
         // nonce excluded — authenticated implicitly by AES-GCM
-        out.extend_from_slice(&self.ml_kem_ciphertext);
-        out.extend_from_slice(&self.x25519_ephemeral_public);
+        // VERSION 11+ omits the KEM fields entirely (ADR-018).
+        if self.version <= KEM_HEADER_MAX_VERSION {
+            out.extend_from_slice(&self.ml_kem_ciphertext);
+            out.extend_from_slice(&self.x25519_ephemeral_public);
+        }
         out.push(self.yubikey_records.len() as u8);
         for record in &self.yubikey_records {
             let id_len = record.credential_id.len() as u16;
@@ -183,8 +197,11 @@ impl SealedVault {
         out.extend_from_slice(&self.argon2_salt);
         out.extend_from_slice(&self.hkdf_salt);
         out.extend_from_slice(&self.nonce);
-        out.extend_from_slice(&self.ml_kem_ciphertext);
-        out.extend_from_slice(&self.x25519_ephemeral_public);
+        // VERSION 11+ omits the ML-KEM ciphertext + X25519 ephemeral pubkey (ADR-018).
+        if self.version <= KEM_HEADER_MAX_VERSION {
+            out.extend_from_slice(&self.ml_kem_ciphertext);
+            out.extend_from_slice(&self.x25519_ephemeral_public);
+        }
 
         // YubiKey records — count byte then each record (VERSION 3 format)
         out.push(self.yubikey_records.len() as u8);
@@ -283,19 +300,24 @@ impl SealedVault {
         let nonce: [u8; 12] = data[pos..pos + 12].try_into().unwrap();
         pos += 12;
 
-        // --- ML-KEM ciphertext (1568 bytes) ---
-        if data.len() < pos + ML_KEM_CIPHERTEXT_LEN {
-            return Err("File truncated at ML-KEM ciphertext".to_string());
-        }
-        let ml_kem_ciphertext = data[pos..pos + ML_KEM_CIPHERTEXT_LEN].to_vec();
-        pos += ML_KEM_CIPHERTEXT_LEN;
+        // --- ML-KEM ciphertext + X25519 ephemeral public key ---
+        // VERSION 11+ omits both (ADR-018): empty ciphertext, zeroed pubkey.
+        let (ml_kem_ciphertext, x25519_ephemeral_public) = if version <= KEM_HEADER_MAX_VERSION {
+            if data.len() < pos + ML_KEM_CIPHERTEXT_LEN {
+                return Err("File truncated at ML-KEM ciphertext".to_string());
+            }
+            let ct = data[pos..pos + ML_KEM_CIPHERTEXT_LEN].to_vec();
+            pos += ML_KEM_CIPHERTEXT_LEN;
 
-        // --- X25519 ephemeral public key (32 bytes) ---
-        if data.len() < pos + 32 {
-            return Err("File truncated at X25519 public key".to_string());
-        }
-        let x25519_ephemeral_public: [u8; 32] = data[pos..pos + 32].try_into().unwrap();
-        pos += 32;
+            if data.len() < pos + 32 {
+                return Err("File truncated at X25519 public key".to_string());
+            }
+            let eph: [u8; 32] = data[pos..pos + 32].try_into().unwrap();
+            pos += 32;
+            (ct, eph)
+        } else {
+            (Vec::new(), [0u8; 32])
+        };
 
         // --- YubiKey records ---
         if data.len() < pos + 1 {
@@ -434,8 +456,10 @@ mod tests {
     use crate::crypto::kdf::Argon2idParams;
 
     fn test_vault() -> SealedVault {
+        // Pinned to v10 (the KEM-bearing format) so these header tests stay valid
+        // once VERSION advances past it; v11 tests use test_vault_v11().
         SealedVault {
-            version: VERSION,
+            version: 10,
             params: Argon2idParams {
                 m_cost: 65536,
                 t_cost: 25,
@@ -542,6 +566,64 @@ mod tests {
         assert_eq!(recovered.passphrase_blob.len(), 60);
     }
 
+    // ── VERSION 11 header: no ML-KEM ciphertext + no X25519 ephemeral pubkey ──────
+    // (ADR-018). A v11 vault carries an empty ml_kem_ciphertext and a zeroed
+    // x25519_ephemeral_public in memory; neither is written to / read from disk.
+
+    fn test_vault_v11() -> SealedVault {
+        let mut v = test_vault();
+        v.version = 11;
+        v.ml_kem_ciphertext = vec![];
+        v.x25519_ephemeral_public = [0u8; 32];
+        v
+    }
+
+    #[test]
+    fn v11_header_roundtrips_without_kem_fields() {
+        let original = test_vault_v11();
+        let bytes = original.to_bytes();
+        let recovered = SealedVault::from_bytes(&bytes).unwrap();
+        assert_eq!(original, recovered);
+        assert!(
+            recovered.ml_kem_ciphertext.is_empty(),
+            "v11 header carries no ML-KEM ciphertext"
+        );
+        assert_eq!(
+            recovered.x25519_ephemeral_public, [0u8; 32],
+            "v11 header carries no X25519 ephemeral pubkey"
+        );
+    }
+
+    #[test]
+    fn v11_header_is_1600_bytes_shorter_than_the_v10_layout() {
+        // v11 drops the ML-KEM ciphertext (1568) + X25519 ephemeral pubkey (32) = 1600.
+        // Same body/records so the KEM fields are the only size difference.
+        let v10 = test_vault();
+        let v11 = test_vault_v11();
+        assert_eq!(v10.to_bytes().len() - v11.to_bytes().len(), 1600);
+    }
+
+    #[test]
+    fn from_bytes_version_branches_on_kem_fields() {
+        // v10: KEM present (1568-byte ciphertext parsed back).
+        let r10 = SealedVault::from_bytes(&test_vault().to_bytes()).unwrap();
+        assert_eq!(r10.ml_kem_ciphertext.len(), 1568);
+        assert_eq!(r10.version, 10);
+        // v11: KEM absent.
+        let r11 = SealedVault::from_bytes(&test_vault_v11().to_bytes()).unwrap();
+        assert!(r11.ml_kem_ciphertext.is_empty());
+        assert_eq!(r11.version, 11);
+    }
+
+    #[test]
+    fn v11_header_aad_excludes_kem_fields() {
+        // The AAD covers the plaintext header; for v11 it must omit the 1600 bytes
+        // of KEM material, matching to_bytes so seal/open compute the same AAD.
+        let v11 = test_vault_v11();
+        let v10 = test_vault();
+        assert_eq!(v10.header_aad().len() - v11.header_aad().len(), 1600);
+    }
+
     #[test]
     fn version_2_records_readable_without_key_blob() {
         // Craft a raw VERSION 2 vault with one YubiKey record (no key_blob fields).
@@ -634,8 +716,10 @@ mod tests {
     }
 
     #[test]
-    fn fresh_vault_is_version_10() {
-        assert_eq!(VERSION, 10);
+    fn current_version_is_11() {
+        assert_eq!(VERSION, 11);
+        // test_vault() is deliberately pinned to v10 (the KEM-bearing format) so the
+        // legacy-format header tests stay valid; it is not the current version.
         assert_eq!(test_vault().version, 10);
     }
 

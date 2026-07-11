@@ -348,7 +348,6 @@ abstract class RustLibApi extends BaseApi {
     required List<int> passphrase,
     required List<int> hmacSecret,
     required List<int> credentialId,
-    required List<int> hkdfSalt,
     required String path,
   });
 
@@ -2450,7 +2449,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     required List<int> passphrase,
     required List<int> hmacSecret,
     required List<int> credentialId,
-    required List<int> hkdfSalt,
     required String path,
   }) {
     return handler.executeNormal(
@@ -2460,7 +2458,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_list_prim_u_8_loose(passphrase, serializer);
           sse_encode_list_prim_u_8_loose(hmacSecret, serializer);
           sse_encode_list_prim_u_8_loose(credentialId, serializer);
-          sse_encode_list_prim_u_8_loose(hkdfSalt, serializer);
           sse_encode_String(path, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
@@ -2474,7 +2471,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_String,
         ),
         constMeta: kCrateApiVaultBridgeUnlockVaultWithYubikeyConstMeta,
-        argValues: [passphrase, hmacSecret, credentialId, hkdfSalt, path],
+        argValues: [passphrase, hmacSecret, credentialId, path],
         apiImpl: this,
       ),
     );
@@ -2483,13 +2480,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiVaultBridgeUnlockVaultWithYubikeyConstMeta =>
       const TaskConstMeta(
         debugName: "unlock_vault_with_yubikey",
-        argNames: [
-          "passphrase",
-          "hmacSecret",
-          "credentialId",
-          "hkdfSalt",
-          "path",
-        ],
+        argNames: ["passphrase", "hmacSecret", "credentialId", "path"],
       );
 
   @override

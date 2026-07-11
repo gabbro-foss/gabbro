@@ -1,20 +1,22 @@
 // Gabbro crypto stack — source of truth for gabbro_crypto_stack_flow.svg
 // Render:  dot -Tsvg gabbro_crypto_stack_flow.dot -o gabbro_crypto_stack_flow.svg
 //
-// Reflects the implementation as of file-format VERSION 10:
-//   passphrase -> Argon2id -> X25519 + ML-KEM-1024 -> HKDF-SHA256 -> AES-256-GCM
-//   with the plaintext header bound as AES-GCM AAD (v7+), the passphrase-only
-//   combiner transcript-bound (v8+), the X25519 static secret derived directly
-//   from KDF bytes [0..32] (v10+, no PRNG), and the YubiKey multi-key keyslot
-//   layer (wrapping_key / vault_key_master / passphrase_blob / per-key key_blob).
+// Reflects the implementation as of file-format VERSION 11 (ADR-018):
+//   passphrase -> Argon2id -> HKDF-SHA256 -> AES-256-GCM
+//   The vault key is derived straight from the Argon2id output; the X25519 +
+//   ML-KEM-1024 hybrid key-exchange layer was removed as non-load-bearing.
+//   The plaintext header is bound as AES-GCM AAD (v7+); the YubiKey multi-key
+//   keyslot layer is unchanged (wrapping_key / vault_key_master / passphrase_blob
+//   / per-key key_blob). v2-v10 vaults keep the legacy hybrid derivation, read-only,
+//   to open and migrate them (dropped entirely at RT-3).
 //   Arrows read top-down as the UNLOCK / key-derivation path; sealing is the
-//   inverse (see notes). Version gating is called out where behaviour changed.
+//   inverse (see notes).
 
 digraph gabbro_crypto_stack {
   rankdir=TB;
   bgcolor="white";
   labelloc="t";
-  label=<<b>Gabbro crypto stack &#183; file-format VERSION 10</b><br/><font point-size="10">passphrase &#8594; Argon2id &#8594; X25519 + ML-KEM-1024 &#8594; HKDF-SHA256 &#8594; AES-256-GCM (header bound as AAD)</font>>;
+  label=<<b>Gabbro crypto stack &#183; file-format VERSION 11</b><br/><font point-size="10">passphrase &#8594; Argon2id &#8594; HKDF-SHA256 &#8594; AES-256-GCM (header bound as AAD)</font>>;
   fontname="Helvetica"; fontsize=14;
   node [fontname="Helvetica", fontsize=10, shape=box, style="rounded,filled", color="#444444", penwidth=1.1];
   edge [fontname="Helvetica", fontsize=9, color="#555555"];
@@ -24,36 +26,25 @@ digraph gabbro_crypto_stack {
     label="Key derivation (from passphrase)"; fontsize=11; style="rounded,dashed"; color="#B08900";
     pass   [label="passphrase", fillcolor="#FDE9C8"];
     argon  [label="Argon2id KDF\nRFC 9106 · m=64 MiB, t=25, p=4\nsalt + params from header → 96 bytes", fillcolor="#F6C667"];
-    seedx  [label="bytes 0–31\nX25519 secret scalar\n(VERSION 10+: used directly, clamp at DH;\nVERSION 2–9: via StdRng — legacy)", fillcolor="#FBE3A1"];
-    seedk  [label="bytes 32–95\nML-KEM-1024  d ∥ z\nFIPS 203 §7.1 KeyGen (VERSION 6+)", fillcolor="#FBE3A1"];
   }
   pass -> argon;
-  argon -> seedx;
-  argon -> seedk;
 
-  // ───────── Hybrid post-quantum key exchange ─────────
-  subgraph cluster_kex {
-    label="Hybrid post-quantum key exchange"; fontsize=11; style="rounded,dashed"; color="#3C8C3C";
-    mlkem  [label="ML-KEM-1024 (FIPS 203)\nencapsulate (lock) /\ndecapsulate (unlock)", fillcolor="#BFE3C0"];
-    x25519 [label="X25519 (RFC 7748)\nephemeral (lock) /\nreverse (unlock) exchange", fillcolor="#BFE3C0"];
-    hkdf   [label="HKDF-SHA256 combiner (RFC 5869)\nsalt = hkdf_salt (32B, header)\nikm = ml_kem_ss ∥ x25519_ss", fillcolor="#8FD18F"];
+  // ───────── Vault-key derivation (HKDF straight from Argon2id) ─────────
+  subgraph cluster_hkdf {
+    label="Vault-key derivation (ADR-018)"; fontsize=11; style="rounded,dashed"; color="#3C8C3C";
+    hkdf   [label="HKDF-SHA256 (RFC 5869)\nsalt = hkdf_salt (32B, header)\nikm = Argon2id output (96B)\ninfo = \"gabbro-vault-key-from-argon2id-v1\"", fillcolor="#8FD18F"];
     ik     [label="intermediate key (32B)", fillcolor="#8FD18F"];
   }
-  seedk -> mlkem;
-  seedx -> x25519;
-  mlkem -> hkdf [label=" ss_A + ct_M\n (ct_M → header)"];
-  x25519 -> hkdf [label=" ss_B\n (ephemeral pubkey → header)"];
+  argon -> hkdf;
   hkdf -> ik;
 
   // ───────── Vault type A: passphrase only ─────────
   subgraph cluster_pp {
     label="Vault type A — passphrase only"; fontsize=11; style="rounded,dashed"; color="#3F72B0";
-    tb     [label="info = \"gabbro-hybrid-kex-v2\"\n∥ ct_M ∥ ephemeral_pub ∥ static_pub\n(transcript-bound, VERSION 8+;\nv2–7: \"…-v1\", no transcript)", fillcolor="#CFE0F5"];
     vk_pp  [label="vault key = intermediate key", fillcolor="#CFE0F5"];
     aes_pp [label="AES-256-GCM\nencrypt / decrypt vault body\nAAD = plaintext header", fillcolor="#9CC2EE"];
   }
-  ik -> tb [label=" no YubiKey"];
-  tb -> vk_pp;
+  ik -> vk_pp [label=" no YubiKey"];
   vk_pp -> aes_pp;
 
   // ───────── Vault type B: passphrase + 2–4 YubiKeys ─────────
@@ -67,7 +58,7 @@ digraph gabbro_crypto_stack {
     vkm     [label="vault_key_master (random)", fillcolor="#D9A7E3"];
     aes_yk  [label="AES-256-GCM\nencrypt / decrypt vault body\nAAD = plaintext header", fillcolor="#9CC2EE"];
   }
-  ik -> pblob [label=" combiner \"…-v1\"\n unlock: decrypt"];
+  ik -> pblob [label=" unlock: decrypt"];
   pblob -> wrap;
   wrap -> combine;
   yk_hw -> combine [label=" hmac_secret_i"];
@@ -82,12 +73,12 @@ digraph gabbro_crypto_stack {
 
   // ───────── Notes ─────────
   note_aad [shape=note, fillcolor="#FFF7D6", color="#B08900",
-    label="VERSION 7+ header integrity: the entire plaintext header\n— Argon2 params, salts, ML-KEM ciphertext, X25519 pubkey,\nYubiKey records, alias, passphrase_blob — is the AES-GCM AAD.\nAny header tamper makes body decryption fail."];
-  note_v10 [shape=note, fillcolor="#FFF7D6", color="#B08900",
-    label="VERSION 10 (RT-3): the X25519 static secret is bytes [0..32]\nof the KDF output used directly (clamp at DH), removing the\nStdRng PRNG from the seal path. v2–9 keep the legacy StdRng\nderivation so existing vaults still open; derivation is\nversion-dispatched on the parsed file version."];
+    label="VERSION 7+ header integrity: the entire plaintext header\n— Argon2 params, salts, YubiKey records, alias, passphrase_blob —\nis the AES-GCM AAD. (Vaults ≤ v10 also bind the ML-KEM\nciphertext + X25519 pubkey they carry.) Any header tamper\nmakes body decryption fail."];
+  note_v11 [shape=note, fillcolor="#FFF7D6", color="#B08900",
+    label="VERSION 11 (ADR-018): the vault key is derived straight from\nthe Argon2id output via HKDF, removing the X25519 + ML-KEM-1024\nhybrid key exchange (it was non-load-bearing — both keypairs\nderived from the passphrase). v2–v10 keep the legacy hybrid\nderivation, read-only, to open and migrate them; derivation is\nversion-dispatched on the parsed file version. Dropped at RT-3."];
   note_pp [shape=note, fillcolor="#FFF7D6", color="#B08900",
-    label="Passphrase change re-runs Argon2id + KEX and re-wraps\nwrapping_key into a new passphrase_blob; key_blobs and\nthe vault body are unchanged (any one key still opens).\nYubiKey slots keep the \"…-v1\" combiner at every version."];
+    label="Passphrase change re-runs Argon2id + HKDF and re-wraps\nwrapping_key into a new passphrase_blob; key_blobs and\nthe vault body are unchanged (any one key still opens).\nYubiKey slots keep the \"…-v1\" combiner at every version."];
   body -> note_aad  [style=invis];
-  body -> note_v10  [style=invis];
+  body -> note_v11  [style=invis];
   body -> note_pp   [style=invis];
 }

@@ -620,6 +620,38 @@ Sample,https://example.net,user@example.com,s3cr3t,,no";
 
     #[test]
     #[serial]
+    fn import_from_csv_persists_at_current_version() {
+        // Import persists via the standard save dispatch, so the resulting file must
+        // be stamped the current format VERSION. Guards against import silently
+        // writing an old format after a version bump.
+        use crate::vault::file_format::VERSION;
+        use crate::vault::io::read_vault;
+
+        let pass = b"import version passphrase";
+        let path = setup_vault(pass);
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let config = CsvImportConfigData {
+            title_col: Some("name".to_string()),
+            password_col: Some("password".to_string()),
+            url_col: None,
+            username_col: None,
+            notes_col: None,
+        };
+
+        let _ = run(import_from_csv(SAMPLE_CSV.to_string(), config)).unwrap();
+
+        assert_eq!(
+            read_vault(&path).unwrap().version,
+            VERSION,
+            "import must persist the vault at the current format VERSION"
+        );
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
     fn import_from_bitwarden_skips_existing_uuids() {
         // "bw-exists" matches "existing-001" in the session — must be skipped.
         let bitwarden_with_dupe: &str = r#"{

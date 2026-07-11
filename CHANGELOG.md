@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.14] – 2026-07-11
+
+### Security
+- **Vault format VERSION 11.** New vaults derive the encryption key straight from Argon2id (via HKDF); existing vaults auto-upgrade the first time you unlock them (entries unchanged). Removes the non-load-bearing X25519 + ML-KEM hybrid layer (ADR-018); quantum resistance is unchanged (Argon2id + AES-256-GCM).
+
 ### Changed
 - Project repository moved to the `gabbro-foss` GitHub organisation; in-app GitHub/Issues links updated (old links redirect).
 - App tagline is now "A quantum-resistant password manager" (all locales). Docs clarified: quantum resistance comes from Argon2id + AES-256-GCM, not the hybrid X25519 + ML-KEM layer (ADR-018).

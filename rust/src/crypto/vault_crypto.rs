@@ -14,7 +14,9 @@ use x25519_dalek::PublicKey as X25519PublicKey;
 use zeroize::Zeroizing;
 
 use crate::crypto::aes_gcm;
-use crate::crypto::hkdf::{combine_yubikey, derive_vault_key, derive_vault_key_transcript_bound};
+use crate::crypto::hkdf::{
+    combine_yubikey, derive_vault_key, derive_vault_key_transcript_bound, derive_vault_key_v11,
+};
 use crate::crypto::kdf::{derive_key, Argon2idParams};
 use crate::crypto::keypair::X25519Keypair;
 use crate::crypto::ml_kem::MlKemKeypair;
@@ -45,6 +47,12 @@ const TRANSCRIPT_BINDING_MIN_VERSION: u8 = 8;
 /// remains; see keypair.rs for the frozen-stream invariant.
 const X25519_DIRECT_MIN_VERSION: u8 = 10;
 
+/// First file-format version that derives the vault key straight from the Argon2id
+/// output via HKDF, with no X25519 + ML-KEM layer (ADR-018). This is the second
+/// derivation boundary a body-only re-seal must not cross (see
+/// [`capped_reseal_version_for`]).
+const HKDF_DIRECT_MIN_VERSION: u8 = 11;
+
 /// Derives the ML-KEM keypair using the path that matches a vault's file
 /// version: VERSION 6+ uses FIPS keygen, VERSION 2–5 use the legacy path so
 /// vaults sealed by older builds still open. Seal paths pass [`VERSION`] (new
@@ -71,21 +79,26 @@ fn x25519_keypair_for_version(version: u8, kdf_output: &[u8; 96]) -> X25519Keypa
 
 /// The version a body-only re-seal may tag a vault with (RT-3 "belt"). A body-only
 /// re-seal (CRUD save with a cached `vault_key_master`) does NOT rebuild the
-/// passphrase material, so it must never advance a vault ACROSS the X25519
-/// derivation boundary — doing so would make the next open derive the new-style
-/// key against old header material and brick the vault. It caps just below the
-/// boundary until a full migration (on unlock) rebuilds the material. A vault
-/// already at/past the boundary is safe to carry to the current [`VERSION`].
+/// passphrase material, so it must never advance a vault ACROSS a derivation
+/// boundary — doing so would make the next open derive the new-style key against
+/// old header material and brick the vault. It caps at the top of the material's
+/// derivation era until a full migration (on unlock) rebuilds the material.
 fn capped_reseal_version(material_version: u8) -> u8 {
     capped_reseal_version_for(material_version, VERSION)
 }
 
+/// Cap `material_version` at the top of its derivation era, then at `current`.
+/// Eras (in-scope): v6–v9 legacy StdRng X25519; v10 direct X25519; v11+ HKDF-direct
+/// (no KEM). A re-seal may carry a vault to `current` only within its own era.
 fn capped_reseal_version_for(material_version: u8, current: u8) -> u8 {
-    if material_version >= X25519_DIRECT_MIN_VERSION {
-        current
+    let era_top = if material_version < X25519_DIRECT_MIN_VERSION {
+        X25519_DIRECT_MIN_VERSION - 1
+    } else if material_version < HKDF_DIRECT_MIN_VERSION {
+        HKDF_DIRECT_MIN_VERSION - 1
     } else {
-        current.min(X25519_DIRECT_MIN_VERSION - 1)
-    }
+        current
+    };
+    current.min(era_top)
 }
 
 /// Derives the passphrase-only vault key using the combiner that matches a
@@ -144,41 +157,48 @@ pub(crate) fn seal_vault_with_params(
     let mut argon2_salt = [0u8; 32];
     OsRng.fill_bytes(&mut argon2_salt);
 
-    // Step 2: derive keypairs from passphrase
+    // Step 2: KM = Argon2id output (byte-identical across formats); random hkdf_salt.
     let kdf_output = Zeroizing::new(derive_key(passphrase, &argon2_salt, &params)?);
-    let x25519_keypair = x25519_keypair_for_version(VERSION, &kdf_output);
-    let ml_kem_keypair = ml_kem_keypair_for_version(VERSION, &kdf_output);
-
-    // Step 3: ML-KEM encapsulate → shared secret A
-    let mut encap_rng = OsRng;
-    let (ml_kem_ciphertext, ml_kem_secret) = ml_kem_keypair
-        .encapsulation_key
-        .encapsulate(&mut encap_rng)
-        .map_err(|e| format!("ML-KEM encapsulation failed: {e:?}"))?;
-
-    // Step 4: X25519 ephemeral key exchange → shared secret B
-    let ephemeral_secret = EphemeralSecret::random_from_rng(OsRng);
-    let ephemeral_public = X25519PublicKey::from(&ephemeral_secret);
-    let x25519_secret = ephemeral_secret.diffie_hellman(&x25519_keypair.public);
-
-    // Step 5: HKDF combine → vault key
     let mut hkdf_salt = [0u8; 32];
     OsRng.fill_bytes(&mut hkdf_salt);
-    let ml_kem_secret_bytes: Zeroizing<[u8; 32]> = Zeroizing::new(
-        (*ml_kem_secret)
-            .try_into()
-            .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
-    );
-    let x25519_secret_bytes = Zeroizing::new(*x25519_secret.as_bytes());
-    let vault_key = Zeroizing::new(derive_passphrase_vault_key_for_version(
-        VERSION,
-        &ml_kem_secret_bytes,
-        &x25519_secret_bytes,
-        &hkdf_salt,
-        ml_kem_ciphertext.as_ref(),
-        ephemeral_public.as_bytes(),
-        x25519_keypair.public.as_bytes(),
-    ));
+
+    // Step 3-5: derive the vault key. VERSION 11+ derives it straight from Argon2id
+    // (ADR-018), with no ML-KEM ciphertext / X25519 ephemeral pubkey in the header.
+    let (vault_key, ml_kem_ciphertext, x25519_ephemeral_public) =
+        if VERSION >= HKDF_DIRECT_MIN_VERSION {
+            (
+                Zeroizing::new(derive_vault_key_v11(&kdf_output, &hkdf_salt)),
+                Vec::new(),
+                [0u8; 32],
+            )
+        } else {
+            // RT-3: delete this legacy hybrid-KEM seal branch once no <=v10 vault remains.
+            let x25519_keypair = x25519_keypair_for_version(VERSION, &kdf_output);
+            let ml_kem_keypair = ml_kem_keypair_for_version(VERSION, &kdf_output);
+            let (ct, ml_kem_secret) = ml_kem_keypair
+                .encapsulation_key
+                .encapsulate(&mut OsRng)
+                .map_err(|e| format!("ML-KEM encapsulation failed: {e:?}"))?;
+            let ephemeral_secret = EphemeralSecret::random_from_rng(OsRng);
+            let ephemeral_public = X25519PublicKey::from(&ephemeral_secret);
+            let x25519_secret = ephemeral_secret.diffie_hellman(&x25519_keypair.public);
+            let ml_kem_secret_bytes: Zeroizing<[u8; 32]> = Zeroizing::new(
+                (*ml_kem_secret)
+                    .try_into()
+                    .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
+            );
+            let x25519_secret_bytes = Zeroizing::new(*x25519_secret.as_bytes());
+            let vk = Zeroizing::new(derive_passphrase_vault_key_for_version(
+                VERSION,
+                &ml_kem_secret_bytes,
+                &x25519_secret_bytes,
+                &hkdf_salt,
+                ct.as_ref(),
+                ephemeral_public.as_bytes(),
+                x25519_keypair.public.as_bytes(),
+            ));
+            (vk, ct.to_vec(), *ephemeral_public.as_bytes())
+        };
 
     // Step 6: AES-256-GCM encrypt, binding the plaintext header as AAD for V7+.
     // Build the partial SealedVault first (empty ciphertext) so we can compute
@@ -187,8 +207,8 @@ pub(crate) fn seal_vault_with_params(
         version: VERSION,
         params,
         argon2_salt,
-        ml_kem_ciphertext: ml_kem_ciphertext.to_vec(),
-        x25519_ephemeral_public: *ephemeral_public.as_bytes(),
+        ml_kem_ciphertext,
+        x25519_ephemeral_public,
         hkdf_salt,
         nonce: [0u8; 12],   // placeholder — updated below
         ciphertext: vec![], // placeholder — updated below
@@ -208,181 +228,48 @@ pub(crate) fn seal_vault_with_params(
 
 /// Decrypts a sealed vault using the given passphrase.
 pub fn open_vault(passphrase: &[u8], sealed: &SealedVault) -> Result<Vec<u8>, String> {
-    // Step 1: re-derive keypairs from passphrase
+    // Step 1: KM = Argon2id output.
     let kdf_output = Zeroizing::new(derive_key(passphrase, &sealed.argon2_salt, &sealed.params)?);
-    let x25519_keypair = x25519_keypair_for_version(sealed.version, &kdf_output);
-    let ml_kem_keypair = ml_kem_keypair_for_version(sealed.version, &kdf_output);
 
-    // Step 2: ML-KEM decapsulate → shared secret A
-    let ml_kem_ct_bytes: &[u8; 1568] = sealed
-        .ml_kem_ciphertext
-        .as_slice()
-        .try_into()
-        .map_err(|_| "ML-KEM ciphertext is not 1568 bytes".to_string())?;
-    let ml_kem_ct = Ciphertext::<ml_kem::MlKem1024>::try_from(ml_kem_ct_bytes.as_ref())
-        .map_err(|e| format!("ML-KEM ciphertext decode failed: {e:?}"))?;
-    let ml_kem_secret = ml_kem_keypair
-        .decapsulation_key
-        .decapsulate(&ml_kem_ct)
-        .map_err(|e| format!("ML-KEM decapsulation failed: {e:?}"))?;
-
-    // Step 3: X25519 reverse exchange → shared secret B
-    let ephemeral_public = X25519PublicKey::from(sealed.x25519_ephemeral_public);
-    let x25519_secret = x25519_keypair.secret.diffie_hellman(&ephemeral_public);
-
-    // Step 4: HKDF combine → vault key
-    let ml_kem_secret_bytes: Zeroizing<[u8; 32]> = Zeroizing::new(
-        (*ml_kem_secret)
+    // Steps 2-4: re-derive the vault key. VERSION 11+ derives it straight from
+    // Argon2id (ADR-018); the header carries no ML-KEM ciphertext / ephemeral pubkey.
+    let vault_key = if sealed.version >= HKDF_DIRECT_MIN_VERSION {
+        Zeroizing::new(derive_vault_key_v11(&kdf_output, &sealed.hkdf_salt))
+    } else {
+        // RT-3: delete this legacy hybrid-KEM open branch once no <=v10 vault remains.
+        let x25519_keypair = x25519_keypair_for_version(sealed.version, &kdf_output);
+        let ml_kem_keypair = ml_kem_keypair_for_version(sealed.version, &kdf_output);
+        let ml_kem_ct_bytes: &[u8; 1568] = sealed
+            .ml_kem_ciphertext
+            .as_slice()
             .try_into()
-            .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
-    );
-    let x25519_secret_bytes = Zeroizing::new(*x25519_secret.as_bytes());
-    let vault_key = Zeroizing::new(derive_passphrase_vault_key_for_version(
-        sealed.version,
-        &ml_kem_secret_bytes,
-        &x25519_secret_bytes,
-        &sealed.hkdf_salt,
-        &sealed.ml_kem_ciphertext,
-        &sealed.x25519_ephemeral_public,
-        x25519_keypair.public.as_bytes(),
-    ));
+            .map_err(|_| "ML-KEM ciphertext is not 1568 bytes".to_string())?;
+        let ml_kem_ct = Ciphertext::<ml_kem::MlKem1024>::try_from(ml_kem_ct_bytes.as_ref())
+            .map_err(|e| format!("ML-KEM ciphertext decode failed: {e:?}"))?;
+        let ml_kem_secret = ml_kem_keypair
+            .decapsulation_key
+            .decapsulate(&ml_kem_ct)
+            .map_err(|e| format!("ML-KEM decapsulation failed: {e:?}"))?;
+        let ephemeral_public = X25519PublicKey::from(sealed.x25519_ephemeral_public);
+        let x25519_secret = x25519_keypair.secret.diffie_hellman(&ephemeral_public);
+        let ml_kem_secret_bytes: Zeroizing<[u8; 32]> = Zeroizing::new(
+            (*ml_kem_secret)
+                .try_into()
+                .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
+        );
+        let x25519_secret_bytes = Zeroizing::new(*x25519_secret.as_bytes());
+        Zeroizing::new(derive_passphrase_vault_key_for_version(
+            sealed.version,
+            &ml_kem_secret_bytes,
+            &x25519_secret_bytes,
+            &sealed.hkdf_salt,
+            &sealed.ml_kem_ciphertext,
+            &sealed.x25519_ephemeral_public,
+            x25519_keypair.public.as_bytes(),
+        ))
+    };
 
     // Step 5: AES-256-GCM decrypt — V7+ verifies header integrity via AAD.
-    if sealed.version >= AAD_MIN_VERSION {
-        aes_gcm::decrypt_with_aad(
-            &vault_key,
-            &sealed.ciphertext,
-            &sealed.nonce,
-            &sealed.header_aad(),
-        )
-    } else {
-        aes_gcm::decrypt(&vault_key, &sealed.ciphertext, &sealed.nonce)
-    }
-}
-
-/// Encrypts plaintext under the given passphrase and YubiKey hmac-secret.
-///
-/// `yubikey_salt` is stored in the vault header (`YubiKeyRecord.salt`); it is
-/// also the salt used in `combine_yubikey`, so the caller must pass the same
-/// value to `open_vault_with_yubikey`.
-pub fn seal_vault_with_yubikey(
-    passphrase: &[u8],
-    hmac_secret: &[u8; 32],
-    credential_id: Vec<u8>,
-    yubikey_salt: [u8; 32],
-    plaintext: &[u8],
-    alias: Option<String>,
-) -> Result<SealedVault, String> {
-    let params = Argon2idParams::default();
-
-    let mut argon2_salt = [0u8; 32];
-    OsRng.fill_bytes(&mut argon2_salt);
-
-    let kdf_output = Zeroizing::new(derive_key(passphrase, &argon2_salt, &params)?);
-    let x25519_keypair = x25519_keypair_for_version(VERSION, &kdf_output);
-    let ml_kem_keypair = ml_kem_keypair_for_version(VERSION, &kdf_output);
-
-    let mut encap_rng = OsRng;
-    let (ml_kem_ciphertext, ml_kem_secret) = ml_kem_keypair
-        .encapsulation_key
-        .encapsulate(&mut encap_rng)
-        .map_err(|e| format!("ML-KEM encapsulation failed: {e:?}"))?;
-
-    let ephemeral_secret = EphemeralSecret::random_from_rng(OsRng);
-    let ephemeral_public = X25519PublicKey::from(&ephemeral_secret);
-    let x25519_secret = ephemeral_secret.diffie_hellman(&x25519_keypair.public);
-
-    let mut hkdf_salt = [0u8; 32];
-    OsRng.fill_bytes(&mut hkdf_salt);
-    let ml_kem_secret_bytes: Zeroizing<[u8; 32]> = Zeroizing::new(
-        (*ml_kem_secret)
-            .try_into()
-            .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
-    );
-    let x25519_secret_bytes = Zeroizing::new(*x25519_secret.as_bytes());
-    let intermediate_key = Zeroizing::new(derive_vault_key(
-        &ml_kem_secret_bytes,
-        &x25519_secret_bytes,
-        &hkdf_salt,
-    ));
-    let vault_key = Zeroizing::new(combine_yubikey(
-        &intermediate_key,
-        hmac_secret,
-        &yubikey_salt,
-    ));
-
-    let mut sealed = SealedVault {
-        version: VERSION,
-        params,
-        argon2_salt,
-        ml_kem_ciphertext: ml_kem_ciphertext.to_vec(),
-        x25519_ephemeral_public: *ephemeral_public.as_bytes(),
-        hkdf_salt,
-        nonce: [0u8; 12],
-        ciphertext: vec![],
-        yubikey_records: vec![YubiKeyRecord {
-            credential_id,
-            salt: yubikey_salt,
-            key_blob: vec![],
-        }],
-        alias,
-        passphrase_blob: vec![],
-    };
-    let (ciphertext, nonce) = if VERSION >= AAD_MIN_VERSION {
-        aes_gcm::encrypt_with_aad(&vault_key, plaintext, &sealed.header_aad())?
-    } else {
-        aes_gcm::encrypt(&vault_key, plaintext)?
-    };
-    sealed.ciphertext = ciphertext;
-    sealed.nonce = nonce;
-    Ok(sealed)
-}
-
-/// Decrypts a sealed vault using the given passphrase and YubiKey hmac-secret.
-///
-/// `yubikey_salt` must match `YubiKeyRecord.salt` that was used when sealing.
-pub fn open_vault_with_yubikey(
-    passphrase: &[u8],
-    hmac_secret: &[u8; 32],
-    yubikey_salt: &[u8; 32],
-    sealed: &SealedVault,
-) -> Result<Vec<u8>, String> {
-    let kdf_output = Zeroizing::new(derive_key(passphrase, &sealed.argon2_salt, &sealed.params)?);
-    let x25519_keypair = x25519_keypair_for_version(sealed.version, &kdf_output);
-    let ml_kem_keypair = ml_kem_keypair_for_version(sealed.version, &kdf_output);
-
-    let ml_kem_ct_bytes: &[u8; 1568] = sealed
-        .ml_kem_ciphertext
-        .as_slice()
-        .try_into()
-        .map_err(|_| "ML-KEM ciphertext is not 1568 bytes".to_string())?;
-    let ml_kem_ct = Ciphertext::<ml_kem::MlKem1024>::try_from(ml_kem_ct_bytes.as_ref())
-        .map_err(|e| format!("ML-KEM ciphertext decode failed: {e:?}"))?;
-    let ml_kem_secret = ml_kem_keypair
-        .decapsulation_key
-        .decapsulate(&ml_kem_ct)
-        .map_err(|e| format!("ML-KEM decapsulation failed: {e:?}"))?;
-
-    let ephemeral_public = X25519PublicKey::from(sealed.x25519_ephemeral_public);
-    let x25519_secret = x25519_keypair.secret.diffie_hellman(&ephemeral_public);
-
-    let ml_kem_secret_bytes: Zeroizing<[u8; 32]> = Zeroizing::new(
-        (*ml_kem_secret)
-            .try_into()
-            .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
-    );
-    let x25519_secret_bytes = Zeroizing::new(*x25519_secret.as_bytes());
-    let intermediate_key = Zeroizing::new(derive_vault_key(
-        &ml_kem_secret_bytes,
-        &x25519_secret_bytes,
-        &sealed.hkdf_salt,
-    ));
-    let vault_key = Zeroizing::new(combine_yubikey(
-        &intermediate_key,
-        hmac_secret,
-        yubikey_salt,
-    ));
-
     if sealed.version >= AAD_MIN_VERSION {
         aes_gcm::decrypt_with_aad(
             &vault_key,
@@ -426,33 +313,44 @@ pub fn seal_vault_with_keys(
     OsRng.fill_bytes(&mut argon2_salt);
 
     let kdf_output = Zeroizing::new(derive_key(passphrase, &argon2_salt, &params)?);
-    let x25519_keypair = x25519_keypair_for_version(VERSION, &kdf_output);
-    let ml_kem_keypair = ml_kem_keypair_for_version(VERSION, &kdf_output);
-
-    let mut encap_rng = OsRng;
-    let (ml_kem_ciphertext, ml_kem_secret) = ml_kem_keypair
-        .encapsulation_key
-        .encapsulate(&mut encap_rng)
-        .map_err(|e| format!("ML-KEM encapsulation failed: {e:?}"))?;
-
-    let ephemeral_secret = EphemeralSecret::random_from_rng(OsRng);
-    let ephemeral_public = X25519PublicKey::from(&ephemeral_secret);
-    let x25519_secret = ephemeral_secret.diffie_hellman(&x25519_keypair.public);
-
     let mut hkdf_salt = [0u8; 32];
     OsRng.fill_bytes(&mut hkdf_salt);
 
-    let ml_kem_secret_bytes: Zeroizing<[u8; 32]> = Zeroizing::new(
-        (*ml_kem_secret)
-            .try_into()
-            .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
-    );
-    let x25519_secret_bytes = Zeroizing::new(*x25519_secret.as_bytes());
-    let intermediate_key = Zeroizing::new(derive_vault_key(
-        &ml_kem_secret_bytes,
-        &x25519_secret_bytes,
-        &hkdf_salt,
-    ));
+    // VERSION 11+ derives intermediate_key straight from Argon2id (ADR-018), no KEM.
+    let (intermediate_key, ml_kem_ciphertext, x25519_ephemeral_public) =
+        if VERSION >= HKDF_DIRECT_MIN_VERSION {
+            (
+                Zeroizing::new(derive_vault_key_v11(&kdf_output, &hkdf_salt)),
+                Vec::new(),
+                [0u8; 32],
+            )
+        } else {
+            // RT-3: delete this legacy hybrid-KEM seal branch once no <=v10 vault remains.
+            let x25519_keypair = x25519_keypair_for_version(VERSION, &kdf_output);
+            let ml_kem_keypair = ml_kem_keypair_for_version(VERSION, &kdf_output);
+            let (ct, ml_kem_secret) = ml_kem_keypair
+                .encapsulation_key
+                .encapsulate(&mut OsRng)
+                .map_err(|e| format!("ML-KEM encapsulation failed: {e:?}"))?;
+            let ephemeral_secret = EphemeralSecret::random_from_rng(OsRng);
+            let ephemeral_public = X25519PublicKey::from(&ephemeral_secret);
+            let x25519_secret = ephemeral_secret.diffie_hellman(&x25519_keypair.public);
+            let ml_kem_secret_bytes: Zeroizing<[u8; 32]> = Zeroizing::new(
+                (*ml_kem_secret)
+                    .try_into()
+                    .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
+            );
+            let x25519_secret_bytes = Zeroizing::new(*x25519_secret.as_bytes());
+            (
+                Zeroizing::new(derive_vault_key(
+                    &ml_kem_secret_bytes,
+                    &x25519_secret_bytes,
+                    &hkdf_salt,
+                )),
+                ct.to_vec(),
+                *ephemeral_public.as_bytes(),
+            )
+        };
 
     // wrapping_key: stable random key that mediates between passphrase and YubiKeys.
     // Encrypted under intermediate_key → passphrase_blob (enables single-tap passphrase change).
@@ -495,8 +393,8 @@ pub fn seal_vault_with_keys(
         argon2_salt,
         hkdf_salt,
         nonce: [0u8; 12],
-        ml_kem_ciphertext: ml_kem_ciphertext.to_vec(),
-        x25519_ephemeral_public: *ephemeral_public.as_bytes(),
+        ml_kem_ciphertext,
+        x25519_ephemeral_public,
         ciphertext: vec![],
         yubikey_records,
         alias,
@@ -512,18 +410,13 @@ pub fn seal_vault_with_keys(
     Ok(sealed)
 }
 
-/// Decrypts a multi-key vault using the passphrase and one registered YubiKey.
-///
-/// VERSION 4 path (passphrase_blob present):
+/// Decrypts a multi-key vault (VERSION 4+, passphrase_blob present) using the
+/// passphrase and one registered YubiKey:
 ///   intermediate_key → decrypt passphrase_blob → wrapping_key →
 ///   combine_yubikey(wrapping_key, hmac, salt) → decrypt key_blob → vault_key_master → body.
 ///
-/// Legacy VERSION 2 path (key_blob empty, passphrase_blob empty):
-///   intermediate_key → combine_yubikey(intermediate_key, hmac, salt) → body.
-///
 /// Returns `(plaintext, vault_key_master, wrapping_key)`.  The caller should cache
 /// both in the session for CRUD re-seals and future key-add operations.
-/// For VERSION 2 vaults `wrapping_key` is `None` — add/remove key is not supported.
 #[allow(clippy::type_complexity)]
 pub fn open_vault_with_key_record(
     passphrase: &[u8],
@@ -532,35 +425,39 @@ pub fn open_vault_with_key_record(
     sealed: &SealedVault,
 ) -> Result<(Vec<u8>, Zeroizing<[u8; 32]>, Option<Zeroizing<[u8; 32]>>), String> {
     let kdf_output = Zeroizing::new(derive_key(passphrase, &sealed.argon2_salt, &sealed.params)?);
-    let x25519_keypair = x25519_keypair_for_version(sealed.version, &kdf_output);
-    let ml_kem_keypair = ml_kem_keypair_for_version(sealed.version, &kdf_output);
 
-    let ml_kem_ct_bytes: &[u8; 1568] = sealed
-        .ml_kem_ciphertext
-        .as_slice()
-        .try_into()
-        .map_err(|_| "ML-KEM ciphertext is not 1568 bytes".to_string())?;
-    let ml_kem_ct = Ciphertext::<ml_kem::MlKem1024>::try_from(ml_kem_ct_bytes.as_ref())
-        .map_err(|e| format!("ML-KEM ciphertext decode failed: {e:?}"))?;
-    let ml_kem_secret = ml_kem_keypair
-        .decapsulation_key
-        .decapsulate(&ml_kem_ct)
-        .map_err(|e| format!("ML-KEM decapsulation failed: {e:?}"))?;
-
-    let ephemeral_public = X25519PublicKey::from(sealed.x25519_ephemeral_public);
-    let x25519_secret = x25519_keypair.secret.diffie_hellman(&ephemeral_public);
-
-    let ml_kem_secret_bytes: Zeroizing<[u8; 32]> = Zeroizing::new(
-        (*ml_kem_secret)
+    // VERSION 11+ derives intermediate_key straight from Argon2id (ADR-018); no KEM.
+    let intermediate_key = if sealed.version >= HKDF_DIRECT_MIN_VERSION {
+        Zeroizing::new(derive_vault_key_v11(&kdf_output, &sealed.hkdf_salt))
+    } else {
+        // RT-3: delete this legacy hybrid-KEM open branch once no <=v10 vault remains.
+        let x25519_keypair = x25519_keypair_for_version(sealed.version, &kdf_output);
+        let ml_kem_keypair = ml_kem_keypair_for_version(sealed.version, &kdf_output);
+        let ml_kem_ct_bytes: &[u8; 1568] = sealed
+            .ml_kem_ciphertext
+            .as_slice()
             .try_into()
-            .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
-    );
-    let x25519_secret_bytes = Zeroizing::new(*x25519_secret.as_bytes());
-    let intermediate_key = Zeroizing::new(derive_vault_key(
-        &ml_kem_secret_bytes,
-        &x25519_secret_bytes,
-        &sealed.hkdf_salt,
-    ));
+            .map_err(|_| "ML-KEM ciphertext is not 1568 bytes".to_string())?;
+        let ml_kem_ct = Ciphertext::<ml_kem::MlKem1024>::try_from(ml_kem_ct_bytes.as_ref())
+            .map_err(|e| format!("ML-KEM ciphertext decode failed: {e:?}"))?;
+        let ml_kem_secret = ml_kem_keypair
+            .decapsulation_key
+            .decapsulate(&ml_kem_ct)
+            .map_err(|e| format!("ML-KEM decapsulation failed: {e:?}"))?;
+        let ephemeral_public = X25519PublicKey::from(sealed.x25519_ephemeral_public);
+        let x25519_secret = x25519_keypair.secret.diffie_hellman(&ephemeral_public);
+        let ml_kem_secret_bytes: Zeroizing<[u8; 32]> = Zeroizing::new(
+            (*ml_kem_secret)
+                .try_into()
+                .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
+        );
+        let x25519_secret_bytes = Zeroizing::new(*x25519_secret.as_bytes());
+        Zeroizing::new(derive_vault_key(
+            &ml_kem_secret_bytes,
+            &x25519_secret_bytes,
+            &sealed.hkdf_salt,
+        ))
+    };
 
     let record = sealed
         .yubikey_records
@@ -569,24 +466,9 @@ pub fn open_vault_with_key_record(
         .ok_or_else(|| "no YubiKey record found for this credential".to_string())?;
 
     if record.key_blob.is_empty() {
-        // Legacy VERSION 2 single-key: body encrypted directly with combine_yubikey(intermediate_key, ...).
-        let wrap_key = Zeroizing::new(combine_yubikey(
-            &intermediate_key,
-            hmac_secret,
-            &record.salt,
-        ));
-        let plaintext = if sealed.version >= AAD_MIN_VERSION {
-            aes_gcm::decrypt_with_aad(
-                &wrap_key,
-                &sealed.ciphertext,
-                &sealed.nonce,
-                &sealed.header_aad(),
-            )?
-        } else {
-            aes_gcm::decrypt(&wrap_key, &sealed.ciphertext, &sealed.nonce)?
-        };
-        // V2 has no separate wrapping_key — key add/remove not supported on legacy vaults.
-        return Ok((plaintext, wrap_key, None));
+        // Legacy VERSION 2 single-key vaults are no longer supported: no seal path
+        // can produce an empty-key_blob record, so fail closed rather than open one.
+        return Err("unsupported legacy single-key vault (empty key_blob)".to_string());
     }
 
     // VERSION 4: decrypt passphrase_blob → wrapping_key, then unwrap key_blob.
@@ -740,41 +622,44 @@ pub fn change_vault_passphrase_with_keys(
     old_passphrase: &[u8],
     new_passphrase: &[u8],
 ) -> Result<SealedVault, String> {
-    // Step 1: Re-derive intermediate_key from old passphrase and stored PQ material.
+    // Step 1: Re-derive the OLD intermediate_key to decrypt the existing
+    // passphrase_blob. VERSION 11+ derives it straight from Argon2id (ADR-018).
     let old_kdf = Zeroizing::new(derive_key(
         old_passphrase,
         &sealed.argon2_salt,
         &sealed.params,
     )?);
-    let old_x25519 = x25519_keypair_for_version(sealed.version, &old_kdf);
-    let old_ml_kem = ml_kem_keypair_for_version(sealed.version, &old_kdf);
-
-    let ml_kem_ct_bytes: &[u8; 1568] = sealed
-        .ml_kem_ciphertext
-        .as_slice()
-        .try_into()
-        .map_err(|_| "ML-KEM ciphertext is not 1568 bytes".to_string())?;
-    let ml_kem_ct = Ciphertext::<ml_kem::MlKem1024>::try_from(ml_kem_ct_bytes.as_ref())
-        .map_err(|e| format!("ML-KEM ciphertext decode failed: {e:?}"))?;
-    let ml_kem_secret = old_ml_kem
-        .decapsulation_key
-        .decapsulate(&ml_kem_ct)
-        .map_err(|e| format!("ML-KEM decapsulation failed: {e:?}"))?;
-
-    let ephemeral_public = X25519PublicKey::from(sealed.x25519_ephemeral_public);
-    let x25519_secret = old_x25519.secret.diffie_hellman(&ephemeral_public);
-
-    let ml_kem_secret_bytes: Zeroizing<[u8; 32]> = Zeroizing::new(
-        (*ml_kem_secret)
+    let old_intermediate_key = if sealed.version >= HKDF_DIRECT_MIN_VERSION {
+        Zeroizing::new(derive_vault_key_v11(&old_kdf, &sealed.hkdf_salt))
+    } else {
+        // RT-3: delete this legacy hybrid-KEM branch once no <=v10 vault remains.
+        let old_x25519 = x25519_keypair_for_version(sealed.version, &old_kdf);
+        let old_ml_kem = ml_kem_keypair_for_version(sealed.version, &old_kdf);
+        let ml_kem_ct_bytes: &[u8; 1568] = sealed
+            .ml_kem_ciphertext
+            .as_slice()
             .try_into()
-            .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
-    );
-    let x25519_secret_bytes = Zeroizing::new(*x25519_secret.as_bytes());
-    let old_intermediate_key = Zeroizing::new(derive_vault_key(
-        &ml_kem_secret_bytes,
-        &x25519_secret_bytes,
-        &sealed.hkdf_salt,
-    ));
+            .map_err(|_| "ML-KEM ciphertext is not 1568 bytes".to_string())?;
+        let ml_kem_ct = Ciphertext::<ml_kem::MlKem1024>::try_from(ml_kem_ct_bytes.as_ref())
+            .map_err(|e| format!("ML-KEM ciphertext decode failed: {e:?}"))?;
+        let ml_kem_secret = old_ml_kem
+            .decapsulation_key
+            .decapsulate(&ml_kem_ct)
+            .map_err(|e| format!("ML-KEM decapsulation failed: {e:?}"))?;
+        let ephemeral_public = X25519PublicKey::from(sealed.x25519_ephemeral_public);
+        let x25519_secret = old_x25519.secret.diffie_hellman(&ephemeral_public);
+        let ml_kem_secret_bytes: Zeroizing<[u8; 32]> = Zeroizing::new(
+            (*ml_kem_secret)
+                .try_into()
+                .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
+        );
+        let x25519_secret_bytes = Zeroizing::new(*x25519_secret.as_bytes());
+        Zeroizing::new(derive_vault_key(
+            &ml_kem_secret_bytes,
+            &x25519_secret_bytes,
+            &sealed.hkdf_salt,
+        ))
+    };
 
     // Step 2: Decrypt passphrase_blob → wrapping_key (verifies old passphrase).
     if sealed.passphrase_blob.len() != 60 {
@@ -802,38 +687,47 @@ pub fn change_vault_passphrase_with_keys(
     OsRng.fill_bytes(&mut new_argon2_salt);
 
     let new_kdf = Zeroizing::new(derive_key(new_passphrase, &new_argon2_salt, &new_params)?);
-    // Derive the NEW passphrase material at the CURRENT version: a passphrase change
-    // regenerates the whole passphrase path, so it also migrates the vault to the
-    // current format (RT-3). key_blobs (under the unchanged wrapping_key) and the
-    // body are preserved. The OLD material above stays at sealed.version to decrypt
-    // the existing passphrase_blob.
-    let new_x25519 = x25519_keypair_for_version(VERSION, &new_kdf);
-    let new_ml_kem = ml_kem_keypair_for_version(VERSION, &new_kdf);
-
-    let mut encap_rng = OsRng;
-    let (new_ml_kem_ct, new_ml_kem_secret) = new_ml_kem
-        .encapsulation_key
-        .encapsulate(&mut encap_rng)
-        .map_err(|e| format!("ML-KEM encapsulation failed: {e:?}"))?;
-
-    let new_ephemeral_secret = EphemeralSecret::random_from_rng(OsRng);
-    let new_ephemeral_public = X25519PublicKey::from(&new_ephemeral_secret);
-    let new_x25519_secret = new_ephemeral_secret.diffie_hellman(&new_x25519.public);
-
     let mut new_hkdf_salt = [0u8; 32];
     OsRng.fill_bytes(&mut new_hkdf_salt);
 
-    let new_ml_kem_secret_bytes: Zeroizing<[u8; 32]> = Zeroizing::new(
-        (*new_ml_kem_secret)
-            .try_into()
-            .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
-    );
-    let new_x25519_secret_bytes = Zeroizing::new(*new_x25519_secret.as_bytes());
-    let new_intermediate_key = Zeroizing::new(derive_vault_key(
-        &new_ml_kem_secret_bytes,
-        &new_x25519_secret_bytes,
-        &new_hkdf_salt,
-    ));
+    // Derive the NEW passphrase material at the CURRENT version: a passphrase change
+    // regenerates the whole passphrase path, so it also migrates the vault to the
+    // current format (RT-3). key_blobs (under the unchanged wrapping_key) and the body
+    // are preserved. VERSION 11+ derives straight from Argon2id (ADR-018), no KEM.
+    let (new_intermediate_key, new_ml_kem_ciphertext, new_x25519_ephemeral_public) =
+        if VERSION >= HKDF_DIRECT_MIN_VERSION {
+            (
+                Zeroizing::new(derive_vault_key_v11(&new_kdf, &new_hkdf_salt)),
+                Vec::new(),
+                [0u8; 32],
+            )
+        } else {
+            // RT-3: delete this legacy hybrid-KEM branch once no <=v10 vault remains.
+            let new_x25519 = x25519_keypair_for_version(VERSION, &new_kdf);
+            let new_ml_kem = ml_kem_keypair_for_version(VERSION, &new_kdf);
+            let (ct, new_ml_kem_secret) = new_ml_kem
+                .encapsulation_key
+                .encapsulate(&mut OsRng)
+                .map_err(|e| format!("ML-KEM encapsulation failed: {e:?}"))?;
+            let new_ephemeral_secret = EphemeralSecret::random_from_rng(OsRng);
+            let new_ephemeral_public = X25519PublicKey::from(&new_ephemeral_secret);
+            let new_x25519_secret = new_ephemeral_secret.diffie_hellman(&new_x25519.public);
+            let new_ml_kem_secret_bytes: Zeroizing<[u8; 32]> = Zeroizing::new(
+                (*new_ml_kem_secret)
+                    .try_into()
+                    .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
+            );
+            let new_x25519_secret_bytes = Zeroizing::new(*new_x25519_secret.as_bytes());
+            (
+                Zeroizing::new(derive_vault_key(
+                    &new_ml_kem_secret_bytes,
+                    &new_x25519_secret_bytes,
+                    &new_hkdf_salt,
+                )),
+                ct.to_vec(),
+                *new_ephemeral_public.as_bytes(),
+            )
+        };
 
     // Step 4: Re-encrypt wrapping_key under the new passphrase.
     let (new_pb_ct, new_pb_nonce) = aes_gcm::encrypt(&new_intermediate_key, &wrapping_key[..])?;
@@ -849,8 +743,8 @@ pub fn change_vault_passphrase_with_keys(
         argon2_salt: new_argon2_salt,
         hkdf_salt: new_hkdf_salt,
         nonce: sealed.nonce,
-        ml_kem_ciphertext: new_ml_kem_ct.to_vec(),
-        x25519_ephemeral_public: *new_ephemeral_public.as_bytes(),
+        ml_kem_ciphertext: new_ml_kem_ciphertext,
+        x25519_ephemeral_public: new_x25519_ephemeral_public,
         ciphertext: sealed.ciphertext.clone(),
         yubikey_records: sealed.yubikey_records.clone(),
         alias: sealed.alias.clone(),
@@ -880,34 +774,46 @@ pub fn migrate_multikey_to_version(
     OsRng.fill_bytes(&mut argon2_salt);
 
     let kdf_output = Zeroizing::new(derive_key(passphrase, &argon2_salt, &params)?);
-    let x25519_keypair = x25519_keypair_for_version(target_version, &kdf_output);
-    let ml_kem_keypair = ml_kem_keypair_for_version(target_version, &kdf_output);
-
-    let (ml_kem_ciphertext, ml_kem_secret) = ml_kem_keypair
-        .encapsulation_key
-        .encapsulate(&mut OsRng)
-        .map_err(|e| format!("ML-KEM encapsulation failed: {e:?}"))?;
-
-    let ephemeral_secret = EphemeralSecret::random_from_rng(OsRng);
-    let ephemeral_public = X25519PublicKey::from(&ephemeral_secret);
-    let x25519_secret = ephemeral_secret.diffie_hellman(&x25519_keypair.public);
-
     let mut hkdf_salt = [0u8; 32];
     OsRng.fill_bytes(&mut hkdf_salt);
 
-    let ml_kem_secret_bytes: Zeroizing<[u8; 32]> = Zeroizing::new(
-        (*ml_kem_secret)
-            .try_into()
-            .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
-    );
-    let x25519_secret_bytes = Zeroizing::new(*x25519_secret.as_bytes());
-    // Multi-key mode uses the plain (non-transcript-bound) combiner at every
-    // version, matching seal_vault_with_keys / open_vault_with_key_record.
-    let intermediate_key = Zeroizing::new(derive_vault_key(
-        &ml_kem_secret_bytes,
-        &x25519_secret_bytes,
-        &hkdf_salt,
-    ));
+    // VERSION 11+ derives intermediate_key straight from Argon2id (ADR-018), no KEM.
+    let (intermediate_key, ml_kem_ciphertext, x25519_ephemeral_public) =
+        if target_version >= HKDF_DIRECT_MIN_VERSION {
+            (
+                Zeroizing::new(derive_vault_key_v11(&kdf_output, &hkdf_salt)),
+                Vec::new(),
+                [0u8; 32],
+            )
+        } else {
+            // RT-3: delete this legacy hybrid-KEM migration branch once no <=v10 vault remains.
+            let x25519_keypair = x25519_keypair_for_version(target_version, &kdf_output);
+            let ml_kem_keypair = ml_kem_keypair_for_version(target_version, &kdf_output);
+            let (ct, ml_kem_secret) = ml_kem_keypair
+                .encapsulation_key
+                .encapsulate(&mut OsRng)
+                .map_err(|e| format!("ML-KEM encapsulation failed: {e:?}"))?;
+            let ephemeral_secret = EphemeralSecret::random_from_rng(OsRng);
+            let ephemeral_public = X25519PublicKey::from(&ephemeral_secret);
+            let x25519_secret = ephemeral_secret.diffie_hellman(&x25519_keypair.public);
+            let ml_kem_secret_bytes: Zeroizing<[u8; 32]> = Zeroizing::new(
+                (*ml_kem_secret)
+                    .try_into()
+                    .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
+            );
+            let x25519_secret_bytes = Zeroizing::new(*x25519_secret.as_bytes());
+            // Multi-key mode uses the plain (non-transcript-bound) combiner at every
+            // version, matching seal_vault_with_keys / open_vault_with_key_record.
+            (
+                Zeroizing::new(derive_vault_key(
+                    &ml_kem_secret_bytes,
+                    &x25519_secret_bytes,
+                    &hkdf_salt,
+                )),
+                ct.to_vec(),
+                *ephemeral_public.as_bytes(),
+            )
+        };
 
     let (pb_ct, pb_nonce) = aes_gcm::encrypt(&intermediate_key, &wrapping_key[..])?;
     let mut passphrase_blob = Vec::with_capacity(12 + pb_ct.len());
@@ -920,8 +826,8 @@ pub fn migrate_multikey_to_version(
         argon2_salt,
         hkdf_salt,
         nonce: [0u8; 12],
-        ml_kem_ciphertext: ml_kem_ciphertext.to_vec(),
-        x25519_ephemeral_public: *ephemeral_public.as_bytes(),
+        ml_kem_ciphertext,
+        x25519_ephemeral_public,
         ciphertext: vec![],
         yubikey_records: sealed.yubikey_records.clone(),
         alias: sealed.alias.clone(),
@@ -989,11 +895,19 @@ mod tests {
     }
 
     #[test]
-    fn seal_vault_produces_version_10() {
+    fn seal_vault_produces_version_11() {
         let sealed = seal_vault(b"pass", b"data", None).unwrap();
         assert_eq!(
-            sealed.version, 10,
-            "new vaults are sealed as VERSION 10 (X25519 derived directly from the KDF, no StdRng)"
+            sealed.version, 11,
+            "new vaults are sealed as VERSION 11 (vault key derived straight from Argon2id, no KEM)"
+        );
+        assert!(
+            sealed.ml_kem_ciphertext.is_empty(),
+            "v11 seal carries no ML-KEM ciphertext"
+        );
+        assert_eq!(
+            sealed.x25519_ephemeral_public, [0u8; 32],
+            "v11 seal carries no X25519 ephemeral pubkey"
         );
     }
 
@@ -1093,160 +1007,6 @@ mod tests {
         assert!(open_vault(passphrase, &as_v7).is_err());
     }
 
-    // ── YubiKey variants ──────────────────────────────────────────────────────
-
-    #[test]
-    fn seal_with_yubikey_open_with_yubikey_roundtrip() {
-        let passphrase = b"correct horse battery staple";
-        let plaintext = b"my secret vault contents";
-        let hmac_secret = [0xAAu8; 32];
-        let credential_id = vec![0xBBu8; 64];
-        let yubikey_salt = [0xCCu8; 32];
-
-        let sealed = seal_vault_with_yubikey(
-            passphrase,
-            &hmac_secret,
-            credential_id,
-            yubikey_salt,
-            plaintext,
-            None,
-        )
-        .unwrap();
-        let recovered =
-            open_vault_with_yubikey(passphrase, &hmac_secret, &yubikey_salt, &sealed).unwrap();
-        assert_eq!(recovered, plaintext);
-    }
-
-    #[test]
-    fn wrong_hmac_secret_fails_to_open() {
-        let passphrase = b"correct horse battery staple";
-        let plaintext = b"secret";
-        let hmac_secret = [0xAAu8; 32];
-        let wrong_hmac = [0x00u8; 32];
-        let credential_id = vec![0xBBu8; 64];
-        let yubikey_salt = [0xCCu8; 32];
-
-        let sealed = seal_vault_with_yubikey(
-            passphrase,
-            &hmac_secret,
-            credential_id,
-            yubikey_salt,
-            plaintext,
-            None,
-        )
-        .unwrap();
-        let result = open_vault_with_yubikey(passphrase, &wrong_hmac, &yubikey_salt, &sealed);
-        assert!(result.is_err());
-    }
-
-    #[test]
-    fn wrong_passphrase_with_yubikey_fails() {
-        let plaintext = b"secret";
-        let hmac_secret = [0xAAu8; 32];
-        let credential_id = vec![0xBBu8; 64];
-        let yubikey_salt = [0xCCu8; 32];
-
-        let sealed = seal_vault_with_yubikey(
-            b"correct",
-            &hmac_secret,
-            credential_id,
-            yubikey_salt,
-            plaintext,
-            None,
-        )
-        .unwrap();
-        let result = open_vault_with_yubikey(b"wrong", &hmac_secret, &yubikey_salt, &sealed);
-        assert!(result.is_err());
-    }
-
-    #[test]
-    fn wrong_yubikey_salt_fails_to_open() {
-        let passphrase = b"passphrase";
-        let plaintext = b"secret";
-        let hmac_secret = [0xAAu8; 32];
-        let credential_id = vec![0xBBu8; 64];
-        let yubikey_salt = [0xCCu8; 32];
-        let wrong_salt = [0xDDu8; 32];
-
-        let sealed = seal_vault_with_yubikey(
-            passphrase,
-            &hmac_secret,
-            credential_id,
-            yubikey_salt,
-            plaintext,
-            None,
-        )
-        .unwrap();
-        let result = open_vault_with_yubikey(passphrase, &hmac_secret, &wrong_salt, &sealed);
-        assert!(result.is_err());
-    }
-
-    #[test]
-    fn seal_with_yubikey_stores_record_in_header() {
-        let credential_id = vec![0xBBu8; 64];
-        let yubikey_salt = [0xCCu8; 32];
-
-        let sealed = seal_vault_with_yubikey(
-            b"pass",
-            &[0xAAu8; 32],
-            credential_id.clone(),
-            yubikey_salt,
-            b"data",
-            None,
-        )
-        .unwrap();
-
-        assert_eq!(sealed.yubikey_records.len(), 1);
-        assert_eq!(sealed.yubikey_records[0].credential_id, credential_id);
-        assert_eq!(sealed.yubikey_records[0].salt, yubikey_salt);
-    }
-
-    #[test]
-    fn seal_with_yubikey_serialize_deserialize_open_roundtrip() {
-        let passphrase = b"roundtrip passphrase";
-        let plaintext = b"roundtrip secret";
-        let hmac_secret = [0x11u8; 32];
-        let credential_id = vec![0x22u8; 64];
-        let yubikey_salt = [0x33u8; 32];
-
-        let sealed = seal_vault_with_yubikey(
-            passphrase,
-            &hmac_secret,
-            credential_id,
-            yubikey_salt,
-            plaintext,
-            None,
-        )
-        .unwrap();
-        let bytes = sealed.to_bytes();
-        let recovered_sealed = SealedVault::from_bytes(&bytes).unwrap();
-        let recovered =
-            open_vault_with_yubikey(passphrase, &hmac_secret, &yubikey_salt, &recovered_sealed)
-                .unwrap();
-        assert_eq!(recovered, plaintext);
-    }
-
-    #[test]
-    fn yubikey_vault_cannot_be_opened_without_yubikey() {
-        let passphrase = b"passphrase";
-        let plaintext = b"secret";
-        let hmac_secret = [0xAAu8; 32];
-        let credential_id = vec![0xBBu8; 64];
-        let yubikey_salt = [0xCCu8; 32];
-
-        let sealed = seal_vault_with_yubikey(
-            passphrase,
-            &hmac_secret,
-            credential_id,
-            yubikey_salt,
-            plaintext,
-            None,
-        )
-        .unwrap();
-        let result = open_vault(passphrase, &sealed);
-        assert!(result.is_err());
-    }
-
     // ── Multi-key vault (minimum 2 keys) ─────────────────────────────────────
 
     fn two_test_keys() -> [YubiKeyRegistration; 2] {
@@ -1269,13 +1029,51 @@ mod tests {
     #[test]
     fn capped_reseal_version_never_crosses_the_x25519_boundary() {
         // Current build is v10.
-        assert_eq!(capped_reseal_version_for(9, 10), 9, "v9 material must NOT jump to v10");
-        assert_eq!(capped_reseal_version_for(6, 10), 9, "old material advances only to the boundary-1");
-        assert_eq!(capped_reseal_version_for(10, 10), 10, "already-v10 material carries to current");
-        assert_eq!(capped_reseal_version_for(11, 10), 10, "material ahead of current pins to current");
+        assert_eq!(
+            capped_reseal_version_for(9, 10),
+            9,
+            "v9 material must NOT jump to v10"
+        );
+        assert_eq!(
+            capped_reseal_version_for(6, 10),
+            9,
+            "old material advances only to the boundary-1"
+        );
+        assert_eq!(
+            capped_reseal_version_for(10, 10),
+            10,
+            "already-v10 material carries to current"
+        );
+        assert_eq!(
+            capped_reseal_version_for(11, 10),
+            10,
+            "material ahead of current pins to current"
+        );
         // Current build is still v9 (today): behaviour is unchanged, always 9.
         assert_eq!(capped_reseal_version_for(9, 9), 9);
         assert_eq!(capped_reseal_version_for(6, 9), 9);
+
+        // E1/E2 — the second (HKDF-direct) boundary at v11. When current is 11:
+        assert_eq!(
+            capped_reseal_version_for(10, 11),
+            10,
+            "E1: v10 material must NOT jump to v11 (passphrase_blob stays dual-lock-derived)"
+        );
+        assert_eq!(
+            capped_reseal_version_for(11, 11),
+            11,
+            "E2: already-v11 material carries to current"
+        );
+        assert_eq!(
+            capped_reseal_version_for(9, 11),
+            9,
+            "v9 material still caps at its own era top, even with current=11"
+        );
+        assert_eq!(
+            capped_reseal_version_for(12, 11),
+            11,
+            "material ahead of current pins to current"
+        );
     }
 
     /// S10/S11/S12 (braces, unit level): a p+YK vault with legacy (v9 `StdRng`)
@@ -1300,26 +1098,31 @@ mod tests {
         let wrapping = wrapping.expect("multi-key vault yields a wrapping_key");
 
         // Build a legacy (v9, StdRng X25519) multi-key vault.
-        let v9 =
-            migrate_multikey_to_version(&sealed, passphrase, &wrapping, &master, plaintext, 9).unwrap();
+        let v9 = migrate_multikey_to_version(&sealed, passphrase, &wrapping, &master, plaintext, 9)
+            .unwrap();
         assert_eq!(v9.version, 9);
         // It opens as a genuine v9 vault (legacy derivation) with each key.
         for k in &keys {
             let (pt, _, _) =
-                open_vault_with_key_record(passphrase, &k.hmac_secret, &k.credential_id, &v9).unwrap();
+                open_vault_with_key_record(passphrase, &k.hmac_secret, &k.credential_id, &v9)
+                    .unwrap();
             assert_eq!(pt, plaintext);
         }
 
         // Migrate across the boundary to v10 (direct X25519) — no re-tap.
-        let v10 =
-            migrate_multikey_to_version(&v9, passphrase, &wrapping, &master, plaintext, 10).unwrap();
+        let v10 = migrate_multikey_to_version(&v9, passphrase, &wrapping, &master, plaintext, 10)
+            .unwrap();
         assert_eq!(v10.version, 10);
         assert_eq!(v10.yubikey_records.len(), 2, "both key_blobs preserved");
 
         for k in &keys {
             let (pt, _, _) =
-                open_vault_with_key_record(passphrase, &k.hmac_secret, &k.credential_id, &v10).unwrap();
-            assert_eq!(pt, plaintext, "v10-migrated vault must open with each registered key");
+                open_vault_with_key_record(passphrase, &k.hmac_secret, &k.credential_id, &v10)
+                    .unwrap();
+            assert_eq!(
+                pt, plaintext,
+                "v10-migrated vault must open with each registered key"
+            );
         }
     }
 
@@ -1340,6 +1143,27 @@ mod tests {
         let result = seal_vault_with_keys(b"pass", &[key], b"data", None);
         assert!(result.is_err());
         assert!(result.unwrap_err().contains("at least 2"));
+    }
+
+    #[test]
+    fn seal_vault_with_keys_produces_version_11_with_no_kem_header() {
+        // C2: the header-drop (ADR-018) applies on the MULTI-KEY seal path too, not
+        // just passphrase-only (seal_vault_produces_version_11). A v11 multi-key vault
+        // carries no ML-KEM ciphertext / X25519 ephemeral pubkey.
+        let keys = two_test_keys();
+        let sealed = seal_vault_with_keys(b"passphrase", &keys, b"data", None).unwrap();
+        assert_eq!(
+            sealed.version, 11,
+            "new multi-key vaults are sealed as VERSION 11"
+        );
+        assert!(
+            sealed.ml_kem_ciphertext.is_empty(),
+            "v11 multi-key seal carries no ML-KEM ciphertext"
+        );
+        assert_eq!(
+            sealed.x25519_ephemeral_public, [0u8; 32],
+            "v11 multi-key seal carries no X25519 ephemeral pubkey"
+        );
     }
 
     #[test]
@@ -1934,10 +1758,24 @@ mod tests {
 
     #[test]
     fn truncated_ml_kem_ciphertext_returns_error_not_panic() {
-        // A corrupt or truncated ML-KEM ciphertext must produce Err, not panic.
+        // Legacy (pre-v11) read path only: v11 seals carry no ML-KEM ciphertext,
+        // so a truncated one is unrepresentable there. On a legacy vault the
+        // length guard must still produce Err, not panic. (RT-3 deletes the
+        // legacy KEM read path and this test with it.)
         let passphrase = b"truncated kem";
-        let mut sealed = seal_vault(passphrase, b"data", None).unwrap();
-        sealed.ml_kem_ciphertext.truncate(16); // was 1568 bytes; now obviously wrong
+        let sealed = SealedVault {
+            version: HKDF_DIRECT_MIN_VERSION - 1, // v10: last format carrying a KEM ciphertext
+            params: Argon2idParams::default(),
+            argon2_salt: [0x01u8; 32],
+            ml_kem_ciphertext: vec![0u8; 16], // was 1568 bytes; now obviously wrong
+            x25519_ephemeral_public: [0u8; 32],
+            hkdf_salt: [0u8; 32],
+            nonce: [0u8; 12],
+            ciphertext: vec![],
+            yubikey_records: vec![],
+            alias: None,
+            passphrase_blob: vec![],
+        };
         let result = open_vault(passphrase, &sealed);
         assert!(result.is_err());
         assert!(

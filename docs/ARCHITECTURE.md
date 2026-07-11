@@ -12,13 +12,13 @@ Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
 
 **Tech stack:** Flutter (Dart) frontend, Rust backend/crypto, flutter_rust_bridge v2 (FFI).
 
-**Encryption (at rest):** Argon2id KDF → X25519 + ML-KEM-1024 hybrid key exchange → HKDF-SHA256 combiner → AES-256-GCM. Quantum resistance from Argon2id + AES-256-GCM; the hybrid KEM layer is structural, not load-bearing (ADR-018).
+**Encryption (at rest):** Argon2id KDF → HKDF-SHA256 → AES-256-GCM. Quantum resistance from Argon2id + AES-256-GCM (ADR-018). New vaults (VERSION 11+) derive the vault key straight from the Argon2id output; the removed X25519 + ML-KEM-1024 hybrid layer survives read-only to open/migrate ≤v10 vaults (dropped entirely at RT-3).
 
 **Authentication (app access):** Passphrase always; a FIDO2/WebAuthn hardware key (YubiKey) is strongly recommended but **not enforced** — a passphrase-only vault is the default. When keys are used: v1 Ed25519 (hardware constraint), target ML-DSA-44 once Yubico ships PQ-capable hardware (ADR-005), min 2 keys (primary + backup), max 4. Auto-lock: 30s default, configurable.
 
 **YubiKey NFC / NDEF OTP:** a YubiKey's OTP slot 1 (an NDEF URI) would open a browser when tapped on Android. Gabbro suppresses this via `NfcConfiguration().skipNdefCheck(true)` and by re-arming foreground dispatch after `stopNfcDiscovery`; OTP slot 1 can stay enabled (no `ykman` workaround).
 
-**Vault file format:** `.gabbro` binary. Plaintext header (magic, version, Argon2id params + salt, HKDF salt, nonce, ML-KEM ciphertext, X25519 ephemeral pubkey) + AES-256-GCM encrypted body (JSON-serialised entries). Self-contained; auth tag detects tampering.
+**Vault file format:** `.gabbro` binary. Plaintext header (magic, version, Argon2id params + salt, HKDF salt, nonce; ≤v10 also carry an ML-KEM ciphertext + X25519 ephemeral pubkey, dropped at v11) + AES-256-GCM encrypted body (JSON-serialised entries). Self-contained; auth tag detects tampering.
 
 **Vault entries:** 6 types — Login (displayed as "Password" in UI), Note, Identity, Card, File, Custom. Common fields: UUID, created, modified, folder, tags, favourite. No TOTP — YubiKey covers 2FA; keeping them separate is more secure.
 
@@ -54,7 +54,7 @@ gabbro/
 │   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics, crash_writer, autotype_{spike,window,trigger} (diagnostics), gabbro-autotype (shipped trigger client); wordlist gen; gen_fixtures
 ├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + crash-safety (kill mid-write) + frozen golden fixtures (FIXTURES.md)
 ├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, BiometricHelper + BiometricStore (per-vault; + Robolectric tests)
-├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, AI_*; decisions/ (ADRs); artefacts/
+├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, RT3_CLEANUP, AI_*; decisions/ (ADRs); artefacts/
 ├── test/  integration_test/  test_driver/   # Flutter widget/unit + Linux real-FFI device suites
 ├── test_data/            # Sample import files + migration_vaults/ (hardware migration corpus, one vault per VERSION + MIGRATION_TESTS.md)
 ├── assets/               # fonts, images, help/; public_suffix_list.dat (autofill eTLD+1)
@@ -71,7 +71,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 664 | 17 |
-| Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 16 | 0 |
+| Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 18 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust sync-walk batched apply (`cargo test --release --lib sync_walk_batched_apply_matches_checker -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -95,11 +95,20 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Awaiting a RustCrypto Zulip reply.** Open question posted: can folding `ssA‖ssB` through
-HKDF ever be *worse* than `HKDF(KM)`? (Sharpened draft in `docs/CRYPTO_REVIEW_QUESTION.md`,
-local-only.) The CSE thread is closed — it settled the rest: the passphrase-derived hybrid
-KEM is not load-bearing; PQ resistance = Argon2id + AES-256-GCM (ADR-018). Now leaning
-toward dropping the layer pre-release — see Bikeshed > Code Quality.
+**Prepare and ship the v11 release — `0.1.0-alpha.14`.** Branch `drop-dual-lock-hybrid-kem`.
+v11 = new vaults derive the vault key straight from Argon2id (HKDF, ADR-018); ≤v10 still read and
+auto-migrate to v11 on unlock (so `ml-kem` + `x25519-dalek` stay this release). Dev/test/doc
+complete; full gate green 2026-07-11 (`.scratchpad`); hardware matrix green on Linux/S23/tablet
+(`test_data/migration_vaults/MIGRATION_TESTS.md`).
+
+Version + CHANGELOG already cut this session (`0.1.0-alpha.14`). Remaining, per
+[BUILD_AND_RELEASE.md](BUILD_AND_RELEASE.md):
+- [ ] Land `drop-dual-lock-hybrid-kem` (merge to `master`, or release from the branch — maintainer's call).
+- [ ] Build + sign Linux tarball; build the 3 per-ABI APKs; tag last; publish by hand on GitHub.
+
+After v11 ships and field vaults migrate → **RT-3 + dual-lock cleanup** (Bikeshed): delete the
+legacy derivations, drop `ml-kem` + `x25519-dalek`, floor → v11. Checklist:
+[RT3_CLEANUP.md](RT3_CLEANUP.md).
 
 ---
 
@@ -116,10 +125,13 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 
 ### Security (pre-v1)
 - Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
-- **RT-3 Release N+1 cleanup** (once no ≤v9 vault remains): delete legacy `StdRng` X25519 + legacy
-  ML-KEM derivation + the frozen-golden tripwire; min supported version → v10 (≤v9 rejected gracefully,
-  never bricked); convert the v2–9 gate fixtures to a graceful-rejection test; migration-vault + gate
-  corpus floor → v10. Must ship Release N (v10 auto-migrate) first — see VAULT_UPGRADE_PATH.md.
+- **RT-3 + dual-lock cleanup (merged, floor → v11)** — once no ≤v10 vault remains: delete the
+  legacy `StdRng` X25519, the legacy ML-KEM + dual-lock derivations, and the frozen-golden
+  tripwire; **drop the `ml-kem` + `x25519-dalek` crates** (supply-chain surface → zero); min
+  supported version → v11 (≤v10 rejected gracefully, never bricked); convert the v2–v10 gate
+  fixtures to a graceful-rejection test; migration-vault + gate corpus floor → v11. Must ship the
+  v11 auto-migrate release first (Current Focus task 2) — see VAULT_UPGRADE_PATH.md.
+  **Exhaustive deletion checklist: [RT3_CLEANUP.md](RT3_CLEANUP.md).**
 
 ### Going public (pre-v1)
 - **Flip the repo to public.** Repo now lives in the `gabbro-foss` org (transferred; URLs
@@ -127,14 +139,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   above is welcome-not-blocking). Optional: a read-only Codeberg mirror for redundancy.
 
 ### Code Quality
-- **Drop the dual-lock (X25519 + ML-KEM) hybrid layer.** Demonstrably not load-bearing
-  (ADR-018); adds nothing to security — Gabbro stays PQ-resistant on Argon2id + AES-256-GCM,
-  and the mandatory-YubiKey premise that shaped it (ADR-005/006, superseded) is gone.
-  `ml-kem` + `x25519-dalek` are used *only* here, so removal cuts the supply-chain surface
-  from low to zero (drops both direct crates + ~6 unique transitive ones, incl. a
-  compile-time proc-macro + build-dep). Touches vault format + code/tests/hardware/backward-
-  compat, and the docs must be updated to match (ADR-018, SECURITY, README, ARCHITECTURE,
-  crypto diagrams), so **pre-release if at all**, on a **separate branch**.
 - **Auto-type: unlock-then-type + cold start (ADR-017 Phase 4).** A trigger while the
   vault is locked or Gabbro is closed does nothing today. Add: prompt-unlock-then-type,
   an opt-in setting, README key-binding examples, and package `gabbro-autotype` into the

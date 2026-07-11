@@ -682,35 +682,23 @@ pub async fn set_vault_alias(alias: String) -> Result<(), String> {
     session::session_set_vault_alias(alias)
 }
 
-/// Decrypt the vault at `path` using both passphrase and YubiKey hmac-secret.
+/// Decrypt the vault at `path` using the passphrase and one registered YubiKey.
 ///
-/// Handles both VERSION 2 (legacy single-key) and VERSION 3 (multi-key) vaults.
-/// For VERSION 3, caches `vault_key_master` in the session so CRUD saves
-/// never require a YubiKey re-tap.
+/// Caches `vault_key_master` in the session so CRUD saves never require a
+/// YubiKey re-tap. The per-key salt is read from the vault record, not passed in.
 ///
 /// `hmac_secret` must be exactly 32 bytes (FIDO2 hmac-secret output).
-/// `hkdf_salt` must be exactly 32 bytes (from `YubikeyRecordData.salt`).
 /// Async — Argon2id takes ~667ms on target hardware.
 pub async fn unlock_vault_with_yubikey(
     passphrase: Vec<u8>,
     hmac_secret: Vec<u8>,
     credential_id: Vec<u8>,
-    hkdf_salt: Vec<u8>,
     path: String,
 ) -> Result<(), String> {
     let secret: [u8; 32] = hmac_secret
         .try_into()
         .map_err(|_| "hmac_secret must be exactly 32 bytes".to_string())?;
-    let salt: [u8; 32] = hkdf_salt
-        .try_into()
-        .map_err(|_| "hkdf_salt must be exactly 32 bytes".to_string())?;
-    session::unlock_vault_with_key_record(
-        &passphrase,
-        &secret,
-        credential_id,
-        &salt,
-        PathBuf::from(path),
-    )
+    session::unlock_vault_with_key_record(&passphrase, &secret, credential_id, PathBuf::from(path))
 }
 
 /// Create a new empty vault at `path`, sealed with `passphrase`.
@@ -792,16 +780,10 @@ pub async fn init_vault_with_keys(
         .as_slice()
         .try_into()
         .map_err(|_| "hmac_secret must be 32 bytes".to_string())?;
-    let salt: [u8; 32] = first
-        .hkdf_salt
-        .as_slice()
-        .try_into()
-        .map_err(|_| "hkdf_salt must be 32 bytes".to_string())?;
     session::unlock_vault_with_key_record(
         &passphrase,
         &secret,
         first.credential_id.clone(),
-        &salt,
         vault_path,
     )
 }
@@ -1524,28 +1506,32 @@ mod tests {
     #[test]
     #[serial]
     fn list_yubikey_records_returns_record_for_yubikey_vault() {
-        use crate::api::vault::save_vault_with_yubikey;
+        use crate::api::vault::save_vault_with_keys;
+        use crate::crypto::vault_crypto::YubiKeyRegistration;
         use std::env::temp_dir;
 
         let mut path = temp_dir();
         path.push("gabbro_bridge_yubikey_list_record_test.gabbro");
         let pass = b"test-passphrase";
-        let hmac_secret = [0x42u8; 32];
         let credential_id = vec![0xABu8; 64];
         let hkdf_salt = [0x11u8; 32];
+        let keys = [
+            YubiKeyRegistration {
+                credential_id: credential_id.clone(),
+                hmac_secret: [0x42u8; 32],
+                salt: hkdf_salt,
+            },
+            YubiKeyRegistration {
+                credential_id: vec![0xCDu8; 48],
+                hmac_secret: [0x43u8; 32],
+                salt: [0x22u8; 32],
+            },
+        ];
 
-        save_vault_with_yubikey(
-            &VaultBody::empty(),
-            pass,
-            &hmac_secret,
-            credential_id.clone(),
-            hkdf_salt,
-            &path,
-        )
-        .unwrap();
+        save_vault_with_keys(&VaultBody::empty(), pass, &keys, &path).unwrap();
 
         let records = list_vault_yubikey_records(path.to_str().unwrap().to_string()).unwrap();
-        assert_eq!(records.len(), 1, "YubiKey vault must have one record");
+        assert_eq!(records.len(), 2, "multi-key vault must have two records");
         assert_eq!(records[0].credential_id, credential_id);
         assert_eq!(records[0].salt, hkdf_salt.to_vec());
 
@@ -1556,7 +1542,8 @@ mod tests {
     #[test]
     #[serial]
     fn unlock_vault_with_yubikey_via_bridge() {
-        use crate::api::vault::save_vault_with_yubikey;
+        use crate::api::vault::save_vault_with_keys;
+        use crate::crypto::vault_crypto::YubiKeyRegistration;
         use std::env::temp_dir;
 
         let mut path = temp_dir();
@@ -1565,22 +1552,25 @@ mod tests {
         let hmac_secret = [0x77u8; 32];
         let credential_id = vec![0xCDu8; 48];
         let hkdf_salt = [0x22u8; 32];
+        let keys = [
+            YubiKeyRegistration {
+                credential_id: credential_id.clone(),
+                hmac_secret,
+                salt: hkdf_salt,
+            },
+            YubiKeyRegistration {
+                credential_id: vec![0xEFu8; 48],
+                hmac_secret: [0x88u8; 32],
+                salt: [0x33u8; 32],
+            },
+        ];
 
-        save_vault_with_yubikey(
-            &VaultBody::empty(),
-            pass,
-            &hmac_secret,
-            credential_id.clone(),
-            hkdf_salt,
-            &path,
-        )
-        .unwrap();
+        save_vault_with_keys(&VaultBody::empty(), pass, &keys, &path).unwrap();
 
         run(unlock_vault_with_yubikey(
             pass.to_vec(),
             hmac_secret.to_vec(),
             credential_id,
-            hkdf_salt.to_vec(),
             path.to_str().unwrap().to_string(),
         ))
         .unwrap();
@@ -1596,7 +1586,8 @@ mod tests {
     #[test]
     #[serial]
     fn read_vault_header_returns_alias_and_yubikey_records() {
-        use crate::api::vault::save_vault_with_yubikey;
+        use crate::api::vault::save_vault_with_keys;
+        use crate::crypto::vault_crypto::YubiKeyRegistration;
         use std::env::temp_dir;
 
         let mut path = temp_dir();
@@ -1605,23 +1596,26 @@ mod tests {
         let hmac_secret = [0x42u8; 32];
         let credential_id = vec![0xABu8; 64];
         let hkdf_salt = [0x11u8; 32];
+        let keys = [
+            YubiKeyRegistration {
+                credential_id: credential_id.clone(),
+                hmac_secret,
+                salt: hkdf_salt,
+            },
+            YubiKeyRegistration {
+                credential_id: vec![0xCDu8; 48],
+                hmac_secret: [0x43u8; 32],
+                salt: [0x22u8; 32],
+            },
+        ];
 
-        save_vault_with_yubikey(
-            &VaultBody::empty(),
-            pass,
-            &hmac_secret,
-            credential_id.clone(),
-            hkdf_salt,
-            &path,
-        )
-        .unwrap();
+        save_vault_with_keys(&VaultBody::empty(), pass, &keys, &path).unwrap();
 
         // set_vault_alias requires an unlocked session (Phase 3).
         run(unlock_vault_with_yubikey(
             pass.to_vec(),
             hmac_secret.to_vec(),
             credential_id.clone(),
-            hkdf_salt.to_vec(),
             path.to_str().unwrap().to_string(),
         ))
         .unwrap();
@@ -1632,7 +1626,7 @@ mod tests {
 
         let header = read_vault_header(path.to_str().unwrap().to_string()).unwrap();
         assert_eq!(header.alias, Some(String::from("Test Vault")));
-        assert_eq!(header.yubikey_records.len(), 1);
+        assert_eq!(header.yubikey_records.len(), 2);
         assert_eq!(header.yubikey_records[0].credential_id, credential_id);
 
         let _ = std::fs::remove_file(&path);
@@ -2127,20 +2121,9 @@ mod tests {
             b"passphrase".to_vec(),
             vec![0u8; 31],
             vec![0u8; 32],
-            vec![0u8; 32],
             path.to_str().unwrap().to_string(),
         ));
         assert!(result.is_err(), "31-byte hmac_secret must be rejected");
-
-        // 33-byte hkdf_salt — must be rejected before any file I/O.
-        let result = run(unlock_vault_with_yubikey(
-            b"passphrase".to_vec(),
-            vec![0u8; 32],
-            vec![0u8; 32],
-            vec![0u8; 33],
-            path.to_str().unwrap().to_string(),
-        ));
-        assert!(result.is_err(), "33-byte hkdf_salt must be rejected");
     }
 
     #[test]

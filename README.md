@@ -19,8 +19,9 @@ Named after the intrusive igneous rock — hard, stable, enduring.
 ### Key properties
 
 - **Quantum-resistant by design** — vault security rests on Argon2id +
-  AES-256-GCM, both quantum-resistant; a hybrid X25519 + ML-KEM-1024
-  layer is additionally present (structural, not load-bearing — ADR-018)
+  AES-256-GCM, both quantum-resistant. New vaults derive the vault key
+  straight from Argon2id (VERSION 11); an earlier X25519 + ML-KEM-1024
+  layer was removed as non-load-bearing (ADR-018)
 - **Hardware key (optional, recommended)** — FIDO2/YubiKey authentication; passphrase-only
   by default, with a minimum of two keys when keys are used (primary + backup)
 - **Rust for all secrets** — every cryptographic operation lives in
@@ -61,7 +62,7 @@ secret, it lives in Rust. Everything else lives in Flutter.
 
 <p align="center">
   <img src="docs/artefacts/gabbro_crypto_stack_simple_icons.svg" width="460"
-       alt="How Gabbro protects your vault: your passphrase runs through Argon2id (a password-hardening step that makes brute force impractical), then two key-exchange methods, blended by HKDF into a single master key (optionally combined with a YubiKey). AES-256-GCM then encrypts everything into your local .gabbro vault file. The vault's strength comes from your passphrase: Argon2id and AES-256-GCM are the quantum-resistant defences; the key-exchange layer is structural.">
+       alt="How Gabbro protects your vault: your passphrase runs through Argon2id (a password-hardening step that makes brute force impractical), then HKDF derives a single vault key (optionally combined with a YubiKey). AES-256-GCM then encrypts everything into your local .gabbro vault file. The vault's strength comes from your passphrase: Argon2id and AES-256-GCM are the quantum-resistant defences.">
 </p>
 
 *A plain-language overview. For the version-accurate detail, see the [full technical diagram](docs/artefacts/gabbro_crypto_stack_flow.svg).*
@@ -69,14 +70,15 @@ secret, it lives in Rust. Everything else lives in Flutter.
 ```
 passphrase + random_salt
 → Argon2id (KDF)
-→ X25519 + ML-KEM-1024 hybrid key exchange
-→ HKDF-SHA256 (master key; optional YubiKey factor)
+→ HKDF-SHA256 (vault key; optional YubiKey factor)
 → AES-256-GCM (vault encryption)
 → encrypted vault body + auth tag
 ```
 
-Quantum resistance comes from Argon2id + AES-256-GCM; the hybrid
-key-exchange layer is structural, not load-bearing (ADR-018).
+Quantum resistance comes from Argon2id + AES-256-GCM. New vaults
+(VERSION 11) derive the vault key directly from Argon2id; an earlier
+hybrid X25519 + ML-KEM-1024 key-exchange layer was removed as
+non-load-bearing (ADR-018), and survives read-only to migrate older vaults.
 
 Vault files use the `.gabbro` extension and are self-contained —
 all parameters needed for decryption travel with the file.
