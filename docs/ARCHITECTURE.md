@@ -95,21 +95,6 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Prepare and ship the v11 release — `0.1.0-alpha.14`.** Branch `drop-dual-lock-hybrid-kem`.
-v11 = new vaults derive the vault key straight from Argon2id (HKDF, ADR-018); ≤v10 still read and
-auto-migrate to v11 on unlock (so `ml-kem` + `x25519-dalek` stay this release). Dev/test/doc
-complete; full gate green 2026-07-11 (`.scratchpad`); hardware matrix green on Linux/S23/tablet
-(`test_data/migration_vaults/MIGRATION_TESTS.md`).
-
-Version + CHANGELOG already cut this session (`0.1.0-alpha.14`). Remaining, per
-[BUILD_AND_RELEASE.md](BUILD_AND_RELEASE.md):
-- [ ] Land `drop-dual-lock-hybrid-kem` (merge to `master`, or release from the branch — maintainer's call).
-- [ ] Build + sign Linux tarball; build the 3 per-ABI APKs; tag last; publish by hand on GitHub.
-
-After v11 ships and field vaults migrate → **RT-3 + dual-lock cleanup** (Bikeshed): delete the
-legacy derivations, drop `ml-kem` + `x25519-dalek`, floor → v11. Checklist:
-[RT3_CLEANUP.md](RT3_CLEANUP.md).
-
 ---
 
 ## Build & Release
@@ -125,13 +110,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 
 ### Security (pre-v1)
 - Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
-- **RT-3 + dual-lock cleanup (merged, floor → v11)** — once no ≤v10 vault remains: delete the
-  legacy `StdRng` X25519, the legacy ML-KEM + dual-lock derivations, and the frozen-golden
-  tripwire; **drop the `ml-kem` + `x25519-dalek` crates** (supply-chain surface → zero); min
-  supported version → v11 (≤v10 rejected gracefully, never bricked); convert the v2–v10 gate
-  fixtures to a graceful-rejection test; migration-vault + gate corpus floor → v11. Must ship the
-  v11 auto-migrate release first (Current Focus task 2) — see VAULT_UPGRADE_PATH.md.
-  **Exhaustive deletion checklist: [RT3_CLEANUP.md](RT3_CLEANUP.md).**
 
 ### Going public (pre-v1)
 - **Flip the repo to public.** Repo now lives in the `gabbro-foss` org (transferred; URLs
@@ -139,6 +117,13 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   above is welcome-not-blocking). Optional: a read-only Codeberg mirror for redundancy.
 
 ### Code Quality
+- **RT-3 + dual-lock cleanup (merged, floor → v11)** — once no ≤v10 vault remains: delete the
+  legacy `StdRng` X25519, the legacy ML-KEM + dual-lock derivations, and the frozen-golden
+  tripwire; **drop the `ml-kem` + `x25519-dalek` crates** (supply-chain surface → zero); min
+  supported version → v11 (≤v10 rejected gracefully, never bricked); convert the v2–v10 gate
+  fixtures to a graceful-rejection test; migration-vault + gate corpus floor → v11. The v11
+  auto-migrate release (alpha.14) has shipped; gated now only on field vaults migrating off ≤v10
+  — see VAULT_UPGRADE_PATH.md. **Exhaustive deletion checklist: [RT3_CLEANUP.md](RT3_CLEANUP.md).**
 - **Auto-type: unlock-then-type + cold start (ADR-017 Phase 4).** A trigger while the
   vault is locked or Gabbro is closed does nothing today. Add: prompt-unlock-then-type,
   an opt-in setting, README key-binding examples, and package `gabbro-autotype` into the

@@ -168,3 +168,8 @@ the release by hand on github.com:
 
 If a stale draft release already exists for this version, delete it first and create
 the release fresh from the tag.
+
+**Releases are immutable.** The repo has GitHub immutable releases enabled: once a
+release is published, its tag and attached assets are locked — you cannot replace an
+asset or move the tag afterwards. So verify every artifact (signature, APK certs, About
+version) *before* publishing; any fix after publish means cutting a new `alpha.N+1`.
