@@ -95,7 +95,7 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**>>> SESSION STATE (READ FIRST) — v11 COMPLETE, in maintainer verification <<<**
+**>>> SESSION STATE (READ FIRST) — v11 COMPLETE + hardware green; release pending <<<**
 - **All dev/test/doc work for v11 is DONE, committed, and PUSHED** on `drop-dual-lock-hybrid-kem`.
   `VERSION=11`: new vaults derive the vault key straight from Argon2id via HKDF (`derive_vault_key_v11`,
   label `gabbro-vault-key-from-argon2id-v1`, KAT-frozen in `hkdf.rs`); the v11 header drops the ML-KEM
@@ -111,13 +111,14 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
   header with no KEM fields so the attacker `body_len` reaches the guard). Both are test-only; the
   parser's `checked_add` body-length guard was always correct. Testing table current (lib 664,
   backward-compat 18).
+- **Hardware matrix — DONE 2026-07-11.** Full v11 matrix green on Linux (USB-C) + S23 (NFC) +
+  tablet (1 key); GrapheneOS held on the pre-v11 build as rollback. v10→v11 migrate-on-unlock, all
+  auth modes, CRUD, rotation, cross-version sync, and read-only real-vault integrity all pass. No
+  vault bricked. Results recorded in `test_data/migration_vaults/MIGRATION_TESTS.md`.
 - **Remaining (maintainer-driven):**
-  1. `gabbro_test` full gate re-run — the parse-fuzzer fix is verified in isolation (4/4, clippy+fmt
-     clean); a full re-run confirms all v11 tests green together. Expected clean.
-  2. Hardware matrix — **written to `gabbro/.scratchpad`** (v10→v11 migrate-on-unlock, all four auth
-     modes, CRUD, rotation, cross-version sync, real-vault read-only). Devices: Linux USB-C / S23 NFC /
-     tablet (1 key) / GrapheneOS (held as rollback). Mock vaults for all destructive steps.
-  3. Release the v11 build (see VAULT_UPGRADE_PATH.md two-release strategy).
+  1. `gabbro_test` full gate re-run — deferred to release-time by choice (was green before hardware;
+     parse-fuzzer fix verified in isolation, 4/4, clippy+fmt clean). Run once more before shipping.
+  2. Release the v11 build (see VAULT_UPGRADE_PATH.md two-release strategy).
 - If the gate comes back red, the likely spot is a v11-touched suite (`vault_backward_compat`,
   `vault_state_machine_fuzz`, lib) — not a brick. Flutter/Android are bridge-insulated.
 
@@ -216,13 +217,14 @@ decrypt→merge→reseal, incl. cross-version v10↔v11); passphrase-change + Yu
   derivation sites (seal/open passphrase, seal/open multi-key, `migrate_multikey_to_version`);
   ≤v10 keep the legacy hybrid path (tagged RT-3). `VERSION` 10→11. Core round-trips green
   (passphrase + multi-key seal→bytes→open, 4 tests) + clippy -D warnings clean. **Full ripple +
-  backward-compat + migration = maintainer's gate (not yet run).**
+  backward-compat + migration = maintainer's gate — ran green before hardware; re-run at release.**
 - [x] Version dispatch — DONE: seal passes VERSION(11); open/migrate branch on the parsed version.
 - [x] Header: drop `ct_M` + `ephemeral_pub` for v11 — DONE (`to_bytes`/`from_bytes`/`header_aad`
   version-branch on `KEM_HEADER_MAX_VERSION`; AAD covers the full v11 header). `capped_reseal`
   two-era boundary (`HKDF_DIRECT_MIN_VERSION`) so v10 body-reseal can't jump to v11 (E1/E2 green).
-- [~] Auto-migrate v≤10 → v11 on unlock — FOLDED IN (the wired on-unlock paths target VERSION, so
-  the migrate fns now produce v11). Needs gate + hardware confirmation.
+- [x] Auto-migrate v≤10 → v11 on unlock — FOLDED IN (the wired on-unlock paths target VERSION, so
+  the migrate fns now produce v11). Hardware-confirmed 2026-07-11 (v10→v11 migrate-on-unlock green,
+  Linux + S23 + tablet).
 - [x] Fixtures: `v11_passphrase.gabbro` + `v11_multikey_2keys.gabbro` (frozen for FUTURE compat — RT-3
   legacy-code removal). Backward-compat gate 18/18 green (v11 open + rotation-at-boundary `== VERSION`
   + interleaved passphrase-change journeys). State-machine fuzzer extended to v11 (belt parameterised
@@ -230,8 +232,10 @@ decrypt→merge→reseal, incl. cross-version v10↔v11); passphrase-change + Yu
 - [x] Migration-vault corpus: `v11.gabbro` added (production params, opens; sha `3edd56cf4052`,
   version byte `0b`) + MIGRATION_TESTS.md table row. Hardware v10->v11 procedure/results at the
   hardware-matrix item.
-- [ ] Hardware matrix (maintainer): Linux + Android; p / p+yk / p+bio / p+yk+bio; migrate-on-unlock;
-  cross-version sync; real-vault integrity (no data loss).
+- [x] Hardware matrix (maintainer): Linux + Android; p / p+yk / p+bio / p+yk+bio; migrate-on-unlock;
+  cross-version sync; real-vault integrity (no data loss). DONE 2026-07-11 — full matrix green on
+  Linux (USB-C) + S23 (NFC) + tablet (1 key); GrapheneOS held as rollback. Results in
+  `test_data/migration_vaults/MIGRATION_TESTS.md`.
 - [x] Docs: ADR-018 (v11 landed note), SECURITY (v11 mechanism + removed single-YK mode + audit
   notes), README (prose/ASCII/alt-text + embedded diagram), ARCHITECTURE (Encryption line + format),
   crypto diagrams (flow.dot/svg, simple_icons.svg redrawn 6-band, A4 PNG+PDF regenerated),

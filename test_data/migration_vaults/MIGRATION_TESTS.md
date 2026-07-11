@@ -80,3 +80,129 @@ the rollback fallback (see Ordering); tablet = single key only, so `v9_p` only.
   (passphrase + YubiKey) into the migrated v10 Linux vault; sync reported **no changes /
   no data loss**, confirming migration preserved the data exactly (independent code path
   from the migration itself).
+
+**v11 (RT-3 → drop-dual-lock), 2026-07-11:** full v11 matrix green on Linux + S23 + tablet
+(GrapheneOS held as rollback); v10 → v11 migrate-on-unlock, all auth modes, CRUD, rotation,
+cross-version sync, and read-only real-vault integrity all pass. Detail in the v11 matrix
+below (## Gabbro v11 hardware test matrix → ### Results).
+
+## Gabbro v11 hardware test matrix — drop-dual-lock-hybrid-kem
+
+Run AFTER `gabbro_test` is green and the branch is pushed. Fill in the result cells;
+fold the outcome into `test_data/migration_vaults/MIGRATION_TESTS.md` when done.
+
+### Preconditions
+- `gabbro_test` green (rust + flutter + android legs).
+- Release builds: `flutter build linux --release`, `flutter build apk --release`.
+- Vaults are MOCK only. Destructive steps NEVER touch a real vault. The real vault is
+  opened read-only (group G) to confirm no brick — no edits, no saves, no migration ops on it.
+
+### Version byte (offset 6):  v10 = `0a`,  v11 = `0b`
+- Linux:   `xxd -s 6 -l 1 <vault-path from vaults.jsonc>`
+- Android: in-app **Export** (byte-identical copy) → `adb pull /sdcard/Download/<name>.gabbro /tmp/`
+           → `xxd -s 6 -l 1 /tmp/<name>.gabbro`  (release APK not debuggable; no run-as)
+
+### Mock source vaults
+- `test_data/migration_vaults/v10.gabbro` — passphrase `0123456789a`, one login
+  (`Migration Test Login` / `test-user` / `migrate-me-2026`). The ≤v10 source to migrate.
+- Fresh v11 vaults created in-app for the new-vault paths.
+
+### Hardware
+- Linux: 1x USB-C YubiKey (USB transport).
+- S23: NFC (tap) transport.
+- Android tablet: single key only → p-only / p+bio paths; YK cells `n/a`.
+- GrapheneOS: HOLD on the pre-v11 build as the rollback fallback (see Ordering) until another
+  device has migrated cleanly. 2-key vaults use the USB-C key on Linux and the NFC key on S23
+  (never two USB taps at once).
+
+### Ordering (safety)
+Migration is one-way (v10 → v11 on first unlock). On each device finish setup and confirm the
+`0a` byte BEFORE installing the v11 build. Keep GrapheneOS un-upgraded until Linux + S23 have
+migrated cleanly, so a migration bug can't strand every device.
+
+---
+
+### Test groups
+
+#### A. New vault seals v11
+1. Create a new passphrase-only vault (passphrase of your choice). Add one login.
+2. Lock, fully close, read the version byte → expect `0b`.
+3. Create a new vault with passphrase + 2 keys (USB-C on Linux / NFC on S23). Add one login.
+4. Lock, read byte → `0b`; unlock with EACH registered key in turn.
+
+#### B. Migrate-on-unlock  v10 → v11  (the headline)
+Do this on the v11 build.
+1. Import `v10.gabbro` (source passphrase `0123456789a`) into a passphrase-only vault `v10_p`.
+   (Android: `adb push v10.gabbro /sdcard/Download/` first.) Make one CRUD edit.
+2. Import it into a p+YK vault `v10_pyk` (register the device's key). Make one CRUD edit.
+3. Lock, fully close.
+4. Open the app, unlock `v10_p` (passphrase), then `v10_pyk` (passphrase + one tap).
+5. Confirm both now read `0b`; the imported login + the CRUD edit survive; `v10_pyk` needed only
+   the normal single tap (no extra prompt).
+
+#### C. Auth-mode smoke (must not regress)
+For each: create → lock → unlock, confirm the login is readable.
+- p (passphrase only)
+- p+yk (2 keys; unlock with each)
+- p+bio (enable biometric unlock; unlock via fingerprint)          [Android only]
+- p+yk+bio (biometric + key)                                        [Android only]
+
+#### D. CRUD stays v11 (no downgrade)
+On a v11 vault: add, edit, then delete an entry. Lock, read byte → still `0b`; the surviving
+entries persist across the lock/unlock.
+
+#### E. Passphrase change + YubiKey rotation
+- p vault: change passphrase → reopens with the NEW passphrase only; old rejected.
+- p+yk vault: add a 2nd/3rd key, remove one key (keep >=1), change passphrase → still opens with
+  each surviving key + the new passphrase; removed keys + old passphrase rejected.
+
+#### F. Cross-version sync (no data loss)
+- Sync/merge a `v10_*` vault into a v11 vault and vice versa → entries merge, no loss, no brick.
+
+#### G. Real-vault integrity (READ-ONLY)
+After upgrading each device to v11, open your real vault once → not bricked, entries visible.
+No edits, no saves. (Migration occurs on first unlock; keep a backup export first if you prefer —
+your call on your own hardware.)
+
+---
+
+### Matrix (fill: pass / fail / n/a / held)
+
+| Test | Linux (USB-C) | S23 (NFC) | Tablet (1 key) | GrapheneOS | Comments |
+|------|---------------|-----------|----------------|------------|----------|
+| A  new vault -> v11 (p)           | pass | pass | pass | held | |
+| A  new vault -> v11 (p+yk)        | pass | pass | n/a | held | |
+| B  migrate v10_p -> v11           | pass | pass | pass | held | |
+| B  migrate v10_pyk -> v11         | pass | pass | n/a | held | |
+| C  p unlock                       | pass | pass | pass | held | |
+| C  p+yk unlock (each key)         | pass | pass | n/a | held | |
+| C  p+bio unlock                   | n/a | pass | pass | held | |
+| C  p+yk+bio unlock                | n/a | pass | n/a | held | |
+| D  CRUD stays v11                 | pass | pass | pass | held | |
+| E  passphrase change (p)          | pass | pass | pass | held | |
+| E  rotation + pp change (p+yk)    | pass | pass | n/a | held | |
+| F  cross-version sync v10<->v11   | pass | pass | pass (tested with v9->v11 aok) | held | cannot do the `vice versa` test, illogical test |
+| G  real vault opens (read-only)   | pass | pass | pass | held | |
+
+Legend: `n/a` = device can't run that path; `held` = kept on the pre-v11 build as rollback.
+
+### Pass criteria
+- Every `0a` vault flips to `0b` on first unlock; no entry loss anywhere.
+- New vaults seal `0b`; CRUD/sync/rotation keep them at `0b`.
+- p+yk needs only the normal single tap after migration (no extra prompt).
+- No vault — mock or real — is bricked.
+
+### Results
+
+**v11 (drop-dual-lock-hybrid-kem), 2026-07-11:**
+- **Linux (USB-C)** — groups A–G all pass: new vaults seal `0b`; `v10_p` and `v10_pyk`
+  migrated `0a` → `0b` (entries + CRUD edit intact, single tap); CRUD stays `0b`;
+  passphrase change + key rotation; real vault opens read-only, not bricked.
+- **S23 (NFC)** — A–G all pass, incl. p+bio and p+yk+bio; same migration + integrity result.
+- **Tablet (1 key)** — p-only / p+bio paths pass; YK cells `n/a`. Cross-version sync
+  exercised as v9 → v11 (aok).
+- **GrapheneOS** — `held` on the pre-v11 build as the rollback fallback throughout.
+- **F (cross-version sync)** — v10 ↔ v11 merges with no loss; the "vice versa" (v11 → v10)
+  direction is not a valid path (older build fail-closes on a v11 file), so it is n/a by design.
+
+No vault, mock or real, was bricked. Full per-cell grid in the matrix table above.
