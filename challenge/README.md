@@ -1,9 +1,9 @@
 # Gabbro crack-me challenge
 
-**Published:** 2026-07-08  
+**Published:** 2026-07-11  
 **Status:** Not cracked
 
-`decryptMe_2026-07-08.gabbro` is a real Gabbro vault, sealed with a 
+`decryptMe_2026-07-11.gabbro` is a real Gabbro vault, sealed with a 
 randomly-generated passphrase and two registered YubiKeys.
 
 ---
@@ -45,9 +45,8 @@ means bypassing the full crypto stack, not just Argon2id.
 
 Full technical description: [`docs/SECURITY.md`](../docs/SECURITY.md).
 
-Summary: Argon2id (m=64 MiB, t=25, p=4) → X25519 + ML-KEM-1024 hybrid key
-exchange → HKDF-SHA256 → second HKDF pass combining the result with the
-YubiKey hmac-secret → AES-256-GCM.
+Summary: Argon2id (m=64 MiB, t=25, p=4) → HKDF-SHA256 → second HKDF pass
+combining the result with the YubiKey hmac-secret → AES-256-GCM.
 
 ---
 
