@@ -95,6 +95,16 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
+**In flight — `anyhow` 1.0.102 -> 1.0.103, awaiting the gate.** `rust/Cargo.lock` is modified and
+**uncommitted**; the maintainer is running the full `gabbro_test`. Fixes RUSTSEC-2026-0190 (unsound
+`Error::downcast_mut`) — a warning, not a vulnerability, and Gabbro never calls it. `cargo update -p
+anyhow` moved exactly one package.
+
+- Gate green -> commit `rust/Cargo.lock` on its own.
+- Gate red -> `git checkout rust/Cargo.lock` reverts to 1.0.102; the gate was green before the bump.
+
+Nothing else open — ask the maintainer for the next task.
+
 ---
 
 ## Build & Release
