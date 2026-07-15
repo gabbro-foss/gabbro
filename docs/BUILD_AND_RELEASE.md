@@ -111,6 +111,13 @@ real fix.
    cargo test -q
    cargo clippy -- -D warnings
 
+   # Supply chain (seconds). Both read a locally cached advisory DB and take NO network,
+   # so refresh the caches first or they pass against stale data:
+   #   cargo audit          (online, refreshes ~/.cargo/advisory-db)
+   #   cargo deny fetch     (online, refreshes ~/.cargo/advisory-dbs/ — a SEPARATE cache)
+   cargo audit -n                  # RustSec advisories vs Cargo.lock
+   cargo deny --offline check      # licences (GPL-3.0 compat), yanked, wildcards, sources
+
    # Flutter integration — real Rust FFI on a device (flutter test can't load the native lib).
    # Run once per suite in integration_test/:
    cd ..

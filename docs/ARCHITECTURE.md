@@ -30,7 +30,7 @@ Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
 
 **Versioning:** SemVer (semver.org/spec/v2.0.0.html); the current version lives in `pubspec.yaml` (single source of truth). `1.0` is a public trust commitment; don't ship it prematurely. CHANGELOG.md follows Keep a Changelog 1.0.0.
 
-**Licence:** GPL-3.0-only (ADR-004). Play Store one-time payment is licence-compatible; F-Droid free build coexists without conflict.
+**Licence:** GPL-3.0-only (ADR-004). Every dependency licence must be GPL-3.0 compatible; the allow-list is `rust/deny.toml`, enforced by the `cargo deny` gate leg.
 
 **Version control:** private GitHub repo at https://github.com/gabbro-foss/gabbro. SSH auth.
 
@@ -108,6 +108,10 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
+### Features and UI/UX
+- See if vault `syncing` can do without a second `passphrase + yubikey` if and only if the current vault and the incoming vault share the same `alias`, `passphrase`, `yubikey(s)`
+- in `sync` path, we currently have `auto-merge` and `review all changes`, the `auto-merge` is additive only (check and verify) and therefore never deletes items in the receiving vault: (1) add a message that explains this (or the correct)
+
 ### Security (pre-v1)
 - Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
 
@@ -117,12 +121,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   above is welcome-not-blocking). Optional: a read-only Codeberg mirror for redundancy.
 
 ### Code Quality
-- **Supply-chain + UB + fuzz tooling in the gate.** Add to `gabbro_test`:
-  `cargo audit` (dep versions vs the RustSec advisory DB), `cargo deny` (advisories +
-  per-dep licence check + banned/yanked/duplicate crates), `cargo miri test` (undefined
-  behaviour in internal `unsafe`; cannot cross the FFI boundary, so Dart<->Rust is out of
-  scope), and more `cargo fuzz` targets aimed at vault-file parsing (the one place
-  attacker-controlled bytes enter). `audit`/`deny` are seconds-cheap; run every gate.
 - **RT-3 + dual-lock cleanup (merged, floor → v11)** — once no ≤v10 vault remains: delete the
   legacy `StdRng` X25519, the legacy ML-KEM + dual-lock derivations, and the frozen-golden
   tripwire; **drop the `ml-kem` + `x25519-dalek` crates** (supply-chain surface → zero); min
@@ -158,3 +156,12 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - No-telemetry verification guide (ripgrep scan, Wireshark, NetGuard).
 - Support model (GitHub Issues + SUPPORT.md for v1; revisit when user base exists).
 - Import: content-hash deduplication and entry-level merge.
+- `cargo miri` — **rejected, don't re-propose.** Miri cannot cross an FFI boundary, and
+  every `unsafe` block here is exactly that: `frb_generated.rs` (68, Dart bridge),
+  `hardening.rs` (12, libc), `fido/` (4, libfido2), `mem_forensics.rs` (2). `crypto/` and
+  `vault/` contain zero `unsafe`. Miri would have nothing in scope to check — and needs a
+  nightly toolchain we don't install. Revisit only if internal `unsafe` ever appears.
+- `cargo fuzz` (coverage-guided libFuzzer) — deferred: needs nightly. `tests/vault_parse_fuzz.rs`
+  already covers the attacker-controlled surface (truncation, garbage, oversized length
+  fields) on stable and caught the real `pos + body_len` overflow. Revisit as an occasional
+  soak, not a gate leg — it is unbounded by nature.
