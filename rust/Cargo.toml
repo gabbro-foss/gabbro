@@ -2,6 +2,7 @@
 name = "rust_lib_gabbro"
 version = "0.1.0"
 edition = "2021"
+license = "GPL-3.0-only"
 
 # rlib is additive (cdylib/staticlib FFI outputs unchanged); it lets in-package
 # bins/tests — e.g. the `forensics` harness — link the lib as a Rust crate.

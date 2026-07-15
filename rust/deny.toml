@@ -1,0 +1,60 @@
+# Supply-chain policy for Gabbro. Enforced by `cargo deny` in the test gate.
+#
+# Gabbro is GPL-3.0-only (ADR-004). Every dependency licence below must be
+# GPL-3.0 compatible. Adding an entry to `allow` is a legal decision, not a
+# convenience — if a new dep trips this check, the question is whether we may
+# ship it at all, not how to silence the error.
+#
+# Runs offline in the gate (`cargo deny --offline check`); the advisory DB it
+# reads is refreshed by `gabbro_test --warm`.
+
+[graph]
+# Only evaluate the targets we actually ship. Without this, cargo-deny pulls in
+# licences for platforms Gabbro never builds for (see ADR: no Apple platforms).
+targets = [
+    { triple = "x86_64-unknown-linux-gnu" },
+    { triple = "aarch64-linux-android" },
+    { triple = "armv7-linux-androideabi" },
+    { triple = "x86_64-linux-android" },
+]
+
+[advisories]
+version = 2
+# A yanked crate is one its author pulled - often because it was broken or
+# malicious. Never ship one.
+yanked = "deny"
+ignore = []
+
+[licenses]
+version = 2
+confidence-threshold = 0.9
+# Every entry verified GPL-3.0-only compatible against the tree on 2026-07-15.
+allow = [
+    "0BSD",
+    "Apache-2.0",
+    # Rust std's own targets (wasi, rustix, wit-bindgen).
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    # Gabbro itself.
+    "GPL-3.0-only",
+    "ISC",
+    "MIT",
+    "Unicode-3.0",
+    "Unlicense",
+    "Zlib",
+]
+
+[bans]
+# Duplicate versions of the same crate are tree bloat, not a legal or safety
+# problem, and we do not control our deps' pins - warn, don't fail the gate.
+multiple-versions = "warn"
+# A wildcard ("*") version requirement lets an unreviewed release in silently.
+wildcards = "deny"
+
+[sources]
+# Everything must come from crates.io. An unexpected git or private-registry
+# dependency is exactly the shape of a supply-chain attack.
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
