@@ -115,8 +115,18 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - **Flip the repo to public.** Repo now lives in the `gabbro-foss` org (transferred; URLs
   migrated). Flip visibility to public once the pre-v1 gates clear (crypto-review outreach
   above is welcome-not-blocking). Optional: a read-only Codeberg mirror for redundancy.
+- **Scan the whole git history before flipping.** Not just the working tree — every commit,
+  every branch, every tag. Looking for secrets, absolute host paths, PII. The superseded
+  crack-me vaults in history are deliberate (see [red_team_test.md](red_team_test.md)) and
+  stay. One-way door: once public, clones exist and history cannot be recalled.
 
 ### Code Quality
+- **Supply-chain + UB + fuzz tooling in the gate.** Add to `gabbro_test`:
+  `cargo audit` (dep versions vs the RustSec advisory DB), `cargo deny` (advisories +
+  per-dep licence check + banned/yanked/duplicate crates), `cargo miri test` (undefined
+  behaviour in internal `unsafe`; cannot cross the FFI boundary, so Dart<->Rust is out of
+  scope), and more `cargo fuzz` targets aimed at vault-file parsing (the one place
+  attacker-controlled bytes enter). `audit`/`deny` are seconds-cheap; run every gate.
 - **RT-3 + dual-lock cleanup (merged, floor → v11)** — once no ≤v10 vault remains: delete the
   legacy `StdRng` X25519, the legacy ML-KEM + dual-lock derivations, and the frozen-golden
   tripwire; **drop the `ml-kem` + `x25519-dalek` crates** (supply-chain surface → zero); min
