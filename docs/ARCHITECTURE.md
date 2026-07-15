@@ -54,7 +54,7 @@ gabbro/
 │   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics, crash_writer, autotype_{spike,window,trigger} (diagnostics), gabbro-autotype (shipped trigger client); wordlist gen; gen_fixtures
 ├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + crash-safety (kill mid-write) + frozen golden fixtures (FIXTURES.md)
 ├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, BiometricHelper + BiometricStore (per-vault; + Robolectric tests)
-├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, RT3_CLEANUP, AI_*; decisions/ (ADRs); artefacts/
+├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, VAULT_SYNC, RT3_CLEANUP, AI_*; decisions/ (ADRs); artefacts/
 ├── test/  integration_test/  test_driver/   # Flutter widget/unit + Linux real-FFI device suites
 ├── test_data/            # Sample import files + migration_vaults/ (hardware migration corpus, one vault per VERSION + MIGRATION_TESTS.md)
 ├── assets/               # fonts, images, help/; public_suffix_list.dat (autofill eTLD+1)

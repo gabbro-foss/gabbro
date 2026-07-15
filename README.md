@@ -292,6 +292,7 @@ flutter test integration_test/
 ## Documentation
 
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — full architecture reference
+- [`docs/VAULT_SYNC.md`](docs/VAULT_SYNC.md) — syncing one vault across devices; worked example with Syncthing (Linux) and Syncthing-Fork (Android)
 - [`docs/AI_SECURITY_AUDIT.md`](docs/AI_SECURITY_AUDIT.md) — AI-assisted security review of the crypto and vault modules (Claude Opus 4.7, 2026-05-31)
 - [`docs/AI_SECURITY_AUDIT_REVIEW.md`](docs/AI_SECURITY_AUDIT_REVIEW.md) — second-pass review of that audit (Claude Fable 5, 2026-06-11)
 - [`docs/AI_SECURITY_AUDIT_3.md`](docs/AI_SECURITY_AUDIT_3.md) — third pass: import parsers, FFI/JNI bridge, Kotlin, Dart leak channels (Claude Opus 4.8, 2026-06-25)
