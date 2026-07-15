@@ -115,10 +115,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - **Flip the repo to public.** Repo now lives in the `gabbro-foss` org (transferred; URLs
   migrated). Flip visibility to public once the pre-v1 gates clear (crypto-review outreach
   above is welcome-not-blocking). Optional: a read-only Codeberg mirror for redundancy.
-- **Scan the whole git history before flipping.** Not just the working tree — every commit,
-  every branch, every tag. Looking for secrets, absolute host paths, PII. The superseded
-  crack-me vaults in history are deliberate (see [red_team_test.md](red_team_test.md)) and
-  stay. One-way door: once public, clones exist and history cannot be recalled.
 
 ### Code Quality
 - **Supply-chain + UB + fuzz tooling in the gate.** Add to `gabbro_test`:
