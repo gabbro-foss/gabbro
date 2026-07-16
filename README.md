@@ -283,8 +283,9 @@ cd rust && cargo test
 # Flutter tests
 flutter test
 
-# Integration tests
-flutter test integration_test/
+# Real-FFI suites (need the release Rust lib; -j 1 as the Rust session is global)
+cd rust && cargo build --release --lib && cd ..
+dart test integration_test/ -j 1
 ```
 
 ---

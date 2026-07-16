@@ -82,14 +82,11 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
-**Real-FFI suites run under plain `dart test`, never `flutter drive` (non-negotiable):** they
-exercise Dart -> FFI -> crypto -> disk and touch no UI, so they need no app and no window.
-Prerequisites: the release cdylib (`cd rust && cargo build --release --lib`) — debug Argon2id
-blows the timeouts — and `-j 1`, because the Rust session is process-global and parallel suites
-clobber each other's vault. The old `flutter drive` harness failed two ways at once: a failure
-exited 0 unless every test used `testWidgets`, and the app segfaulted in NVIDIA's GL driver
-whenever the window manager resized it mid-Argon2 (upstream blits the new size from the stale
-framebuffer). A windowless suite has neither failure mode.
+**Real-FFI suites run under plain `dart test`, never `flutter drive` (non-negotiable):** they test
+Dart -> FFI -> crypto -> disk, touch no UI, and so need no window. Needs the release cdylib (debug
+Argon2id blows the timeouts) and `-j 1` (the Rust session is process-global; parallel suites clobber
+each other). Under `flutter drive` they were blind (a failure exited 0) and crashed on a WM resize
+— see LEARNINGS.md.
 
 **Test isolation (non-negotiable):** no test may touch real settings or vault folders. All
 config/data resolves through `GabbroPaths` (`lib/app_paths.dart`); `test/flutter_test_config.dart`
