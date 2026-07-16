@@ -118,16 +118,12 @@ real fix.
    cargo audit -n                  # RustSec advisories vs Cargo.lock
    cargo deny --offline check      # licences (GPL-3.0 compat), yanked, wildcards, sources
 
-   # Flutter integration — real Rust FFI on a device (flutter test can't load the native lib).
-   # Run once per suite in integration_test/. Suites must use testWidgets, never test() —
-   # a plain test() failure leaves the leg exiting 0 (see ARCHITECTURE.md Testing):
+   # Real-FFI suites — real Rust FFI, no app and no window (flutter test can't load the
+   # native lib). Needs the release cdylib built just above; -j 1 is required because the
+   # Rust session is process-global (see ARCHITECTURE.md Testing):
+   cargo build --release --lib
    cd ..
-   flutter drive --driver=test_driver/integration_test.dart \
-     --target=integration_test/vault_session_test.dart    -d linux --profile
-   flutter drive --driver=test_driver/integration_test.dart \
-     --target=integration_test/entry_edit_test.dart       -d linux --profile
-   flutter drive --driver=test_driver/integration_test.dart \
-     --target=integration_test/vault_corruption_test.dart -d linux --profile
+   dart test integration_test/ -j 1
 
    # Vault backward-compat gate — run in release (debug works but is ~6 min vs ~14 s).
    cd rust

@@ -55,7 +55,7 @@ gabbro/
 ├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + crash-safety (kill mid-write) + frozen golden fixtures (FIXTURES.md)
 ├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, BiometricHelper + BiometricStore (per-vault; + Robolectric tests)
 ├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, VAULT_SYNC, RT3_CLEANUP, AI_*; decisions/ (ADRs); artefacts/
-├── test/  integration_test/  test_driver/   # Flutter widget/unit + Linux real-FFI device suites
+├── test/  integration_test/          # Flutter widget/unit + Linux real-FFI suites (dart test)
 ├── test_data/            # Sample import files + migration_vaults/ (hardware migration corpus, one vault per VERSION + MIGRATION_TESTS.md)
 ├── assets/               # fonts, images, help/; public_suffix_list.dat (autofill eTLD+1)
 ├── challenge/            # crack-me challenge vault + rules
@@ -79,14 +79,17 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
 | Flutter (`flutter test`) | 1257 | 0 |
-| Flutter integration (`flutter drive … -d linux --profile`) | 12 | 0 |
+| Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
-**Integration suites must use `testWidgets`, not `test` (non-negotiable):** only `testWidgets`
-reaches the `integration_test` binding's result recorder, so a plain `test()` failure leaves the
-`flutter drive` leg reporting success and exiting 0 — silently blind. Enforced by a grep guard in
-`gabbro_test`. (The "integration_test plugin was not detected" warning is unrelated and cosmetic:
-it is the native Android/XCTest reporting channel, absent on Linux desktop.)
+**Real-FFI suites run under plain `dart test`, never `flutter drive` (non-negotiable):** they
+exercise Dart -> FFI -> crypto -> disk and touch no UI, so they need no app and no window.
+Prerequisites: the release cdylib (`cd rust && cargo build --release --lib`) — debug Argon2id
+blows the timeouts — and `-j 1`, because the Rust session is process-global and parallel suites
+clobber each other's vault. The old `flutter drive` harness failed two ways at once: a failure
+exited 0 unless every test used `testWidgets`, and the app segfaulted in NVIDIA's GL driver
+whenever the window manager resized it mid-Argon2 (upstream blits the new size from the stale
+framebuffer). A windowless suite has neither failure mode.
 
 **Test isolation (non-negotiable):** no test may touch real settings or vault folders. All
 config/data resolves through `GabbroPaths` (`lib/app_paths.dart`); `test/flutter_test_config.dart`
