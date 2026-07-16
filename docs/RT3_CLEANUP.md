@@ -10,6 +10,77 @@ Do NOT run this while any ≤v10 vault could still exist — it makes those vaul
 **Confirmed 2026-07-16:** maintainer's vaults all migrated; testers warned on the last release
 and warned again before the next. Cleared to proceed.
 
+---
+
+## HANDOFF — state at 2026-07-16 (read this first)
+
+**The work is PART DONE and UNCOMMITTED. Nothing below is on a branch; it is all in the
+working tree.** Committed so far (3 commits, **not pushed**): `4da04dc` (v11 pins + v11 sync
+corpus), `a0e1865` (decisions/plan), `86ce8c9` (upgrade-path docs).
+
+**Done and green** (see the ticks in §8a and §10):
+1. Net pins for v11 — absolute layout pin, reseal-cap pin, sync corpus re-minted at v11.
+2. Floor raised: `VERSION_MIN_READABLE` 2 -> 11 in `file_format.rs`, with the refusal message.
+3. `vault_backward_compat.rs` rewritten: 11 tests, all green. v6–v10 open/migrate tests gone;
+   journeys run from v11; 4 new refusal tests.
+4. The UI hole (§8a) closed: `peek_version`/`is_format_too_old` -> bridge `vault_format_too_old`
+   -> `onVaultFormatTooOld` seam -> a non-destructive banner with a tappable link; 37 locales;
+   Net A/B/C sweeps incl. every locale at 8x text.
+
+**NOT done — pick up here, in this order:**
+- [ ] **The fuzzer** (`tests/vault_state_machine_fuzz.rs`). Untouched. `FIXTURES` still lists
+  v6/v7/v8 (+v11) — those fixtures are being deleted, so it WILL break. See §8.
+- [ ] Then the actual deletions: §1–§7 (crates, modules, hkdf legacy combiners, the 6 derivation
+  sites, constants, header fields, the migrate-on-unlock hooks).
+- [ ] Then §8 fixtures (delete v6–v9, KEEP the v10 pair), §9 docs.
+- [ ] `gabbro_test` gate leg list: check it needs no edit once tests are added/removed.
+  (Backward-compat is already a leg; the new unit tests ride in `cargo test -q`. Believed
+  no edit needed — verify, do not assume.)
+- [ ] **CHANGELOG `[Unreleased]`** — nothing written yet, deliberately: RT-3 is incomplete.
+  When it lands it needs a **Security**/**Changed** entry saying v11 is now the minimum format,
+  ≤v10 vaults are refused (not damaged) with the upgrade link, and the `ml-kem` +
+  `x25519-dalek` crates are gone. Maintainer has final say on whether it warrants a release.
+- [ ] Full gate (~2h) — maintainer runs it, not the agent.
+- [ ] **Re-measure the Rust unit count** for the ARCHITECTURE Testing table. It still reads 668
+  (the last gate-measured figure). 6 unit tests were added uncommitted — 3 `peek_version`,
+  `capped_reseal_version_holds_v11_material_at_v11`, `v11_on_disk_layout_is_pinned_absolutely`,
+  `v11_header_aad_is_pinned_absolutely` — and the §1–§7 deletions will remove more. Take the real
+  number from the gate; do not do the arithmetic. Flutter (1265) and backward-compat (11) are
+  measured and current.
+
+**Verification state — what was actually run, and what was NOT:**
+
+| Suite | Result | When |
+|---|---|---|
+| `flutter test` (whole suite) | 1265 pass, 0 fail | after the l10n + UI work |
+| `flutter analyze` (prod + touched tests) | clean | after the l10n + UI work |
+| `cargo test --release --test vault_backward_compat` | 11 pass, 0 fail | **before** the final `cargo fmt` |
+| `cargo test --release --lib vault::file_format::tests::*` | pass (incl. 3 `peek_version`, 2 v11 pins) | before the final `cargo fmt` |
+| `cargo test --release --lib` corpus consumers + 2 gate legs | 5 pass | after the v11 re-mint |
+| `cargo clippy --release --lib --all-targets -- -D warnings` | clean | **after** the final `cargo fmt` |
+| `cargo fmt --check` | clean | final |
+| `cargo test -q` (full Rust) | **NOT RUN** — maintainer's gate | — |
+| Full `gabbro_test` gate (~2h) | **NOT RUN** | — |
+| Hardware matrix | **NOT RUN** | — |
+
+**The one gap to close first:** `cargo fmt` rewrapped a call in `vault_backward_compat.rs`
+(`refusal_is_distinguishable_from_a_wrong_passphrase`) AFTER those Rust tests last went green.
+Clippy compiled clean afterwards, so it is whitespace-only and near-certainly fine — but the
+Rust tests were **not re-run after the fmt**. Re-run them before trusting the green:
+`cargo test --release --test vault_backward_compat` (~7 s).
+
+**Traps found the hard way — do not re-learn these:**
+- `cargo test --exact <bare_name>` silently runs **0 tests** and prints `ok`. Always use the full
+  module path (`vault::file_format::tests::x`) and check the count, or a "pass" means nothing.
+- The corpus generator lives at `vault::session::field_merge_tests::regenerate_sync_test_corpus`
+  (not `merge_tests`).
+- Rust-layer refusal tests passing does NOT mean the app behaves: the Dart side discarded the
+  Rust error entirely and would have shown "corrupt -> Delete file". Always trace to the screen.
+- `_bareUnlock()` in `unlock_screen_test.dart` has a READABLE vault, so the existing Net A/B/C
+  sweeps never render any banner. New banners need their own sweeps (`_bareFormatTooOld()`).
+- `nn`/`yo` throw a locale-delegate warning in any all-locale widget sweep. Pre-existing and
+  app-wide; now a Bikeshed item. Tolerate that exact string, never blanket-ignore exceptions.
+
 ## 0. Decisions (agreed 2026-07-16)
 
 - **Rejection message:** `file version not supported: https://github.com/gabbro-foss/gabbro/blob/master/docs/VAULT_UPGRADE_PATH.md`
@@ -105,6 +176,34 @@ and warned again before the next. Cleared to proceed.
   **Keep the `v10_*` pair** — the most recent old format, now the rejection-test input.
 - [ ] `rust/tests/vault_state_machine_fuzz.rs`: drop v6/v7/v8 from `FIXTURES` (keep v11); the
   `start_version < VERSION` belt branch in `assert_invariants` becomes unreachable — simplify.
+  **IN PROGRESS — not yet done.**
+
+## 8a. UI: the refusal must not read as corruption (sweep 2026-07-16)
+
+Raising the floor alone makes the app tell the user their v10 vault is **corrupt** and offer to
+delete it — worse than the brick we set out to avoid. The Rust error never reaches the screen:
+
+- `unlock_screen.dart:27-39` `_defaultVaultIsReadable` probes with `readVaultHeader`; a v10 file
+  now fails `from_bytes`, so the probe returns false -> corruption banner + restore/delete offer.
+  The `.bak` is v10 too, so restore "fails" as well.
+- `unlock_screen.dart:600-603` discards the Rust text and shows the localised
+  "wrong passphrase" instead.
+
+- [x] Rust: `peek_version` / `is_format_too_old` (`file_format.rs`, no floor check) ->
+  `io::vault_format_too_old` -> bridge `vault_format_too_old`. Bridge regenerated.
+- [x] Dart: `onVaultFormatTooOld` seam (additive — the bool `onVaultIsReadable` is unchanged)
+  + `_vaultFormatTooOld` state, consulted at BOTH probe sites (mount and post-unlock-failure).
+  Its card offers no restore/delete and is not error-red; unlock controls hide as for corrupt.
+- [x] l10n: `vaultFormatTooOld` + `vaultFormatUpgradeLink` across **all 37 locales** (not 18 —
+  earlier count was wrong), reusing each locale's established vault term and the existing
+  `close` / `openInBrowser` keys.
+- [x] Tappable link via the new `lib/widgets/url_link.dart` `showUrlDialog`, extracted from
+  About's two duplicate copies (its 5 tests pin the extraction) — same show-URL-then-open
+  convention everywhere.
+- [x] Widget tests first (red), per the Rust side: behaviour (3) + Net A/B/C sweeps the
+  existing ones missed, since `_bareUnlock` has a readable vault and never renders the banner —
+  8x text on a 360px phone, short viewport, light/dark, high-contrast, `de`, tap-target,
+  labelled-tap-target, contrast.
 - [ ] `rust/src/crypto/kdf.rs`, `keypair.rs`, `ml_kem.rs`: the `StdRng`/legacy golden-value +
   `fips_differs_from_legacy` tests go with their modules.
 - [ ] `test_data/migration_vaults/v{6..10}.gabbro` stay as the historical manual corpus (never
