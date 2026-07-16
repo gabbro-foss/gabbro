@@ -7,6 +7,33 @@ readable floor to v11, and delete all of the below. Nothing here is load-bearing
 
 **Precondition:** every vault migrated to v11 (see [VAULT_UPGRADE_PATH.md](VAULT_UPGRADE_PATH.md)).
 Do NOT run this while any ≤v10 vault could still exist — it makes those vaults unopenable.
+**Confirmed 2026-07-16:** maintainer's vaults all migrated; testers warned on the last release
+and warned again before the next. Cleared to proceed.
+
+## 0. Decisions (agreed 2026-07-16)
+
+- **Rejection message** names the format version and points at the docs (not at a release tag,
+  which ages): *"This vault uses an old format (vN) that this version of Gabbro can no longer
+  open. Upgrade it with an older Gabbro release first — see the vault upgrade notes in the
+  README. Your vault file has not been modified."* So the README keeps a short upgrade note
+  even after §9 retires `VAULT_UPGRADE_PATH.md` — the message must point somewhere that exists.
+  That note states the flow concretely: **install alpha.14 → open every vault once → only then
+  install alpha.15+**. Durable because GitHub immutable releases are on: alpha.14's assets and
+  tag can never be replaced or pulled, so the reference cannot rot.
+- **Backward compatibility remains a standing gate requirement.** RT-3 raises the floor to v11;
+  it does NOT retire the mechanism. Every future bump keeps the backward-compat gate, its
+  per-version fixtures, and an upgrade path for older vaults. This is a one-off floor move to
+  shed the dual-lock crates, not a licence to drop compatibility at the next bump.
+- **Auto-migrate-on-unlock hooks: DELETE.** Version-generic, but unreachable at floor v11 (every
+  openable vault is already current) and they cost a redundant `read_vault` per unlock. Git
+  history carries them back if a v11→v12 bump needs them. Supersedes the "keep only if" in §7.
+- **The v11 KAT stays.** "Delete the frozen-golden tripwire" means the *legacy `StdRng` goldens*
+  in `keypair.rs`/`ml_kem.rs` only. `hkdf.rs::v11_vault_key_known_answer` is the tripwire proving
+  this deletion did not alter the v11 derivation — keep it forever.
+- **Net-first order:** pin current v11 behaviour green *first* (§10), then red-first the
+  rejection, then delete. The v11 header is currently pinned only *relative* to v10
+  (`v10.len() - v11.len() == 1600`) and that reference dies in this change — an absolute pin
+  must land before anything is deleted.
 
 ## 1. Crate dependencies (`rust/Cargo.toml`)
 
@@ -14,6 +41,10 @@ Do NOT run this while any ≤v10 vault could still exist — it makes those vaul
 - [ ] Remove `x25519-dalek = "2.0.1"` (feature `static_secrets`).
 - [ ] Confirm the transitive tree shrinks (ADR-018: ~6 unique transitive crates incl. a
   compile-time proc-macro/build-dep). `rand` **stays** (`OsRng` for salts / random keys).
+- [ ] Commit the regenerated `rust/Cargo.lock`.
+- [ ] Drop the `ml-kem` + `x25519-dalek` licence-attribution entries from
+  `lib/screens/about_screen.dart` (~L409, ~L454) — the About screen must not claim
+  dependencies we no longer ship.
 
 ## 2. Whole modules
 
@@ -79,6 +110,14 @@ Do NOT run this while any ≤v10 vault could still exist — it makes those vaul
   `fips_differs_from_legacy` tests go with their modules.
 - [ ] `test_data/migration_vaults/v{6..10}.gabbro` stay as the historical manual corpus (never
   deleted per MIGRATION_TESTS.md) but the RT-3 build will not open them — expected; note it there.
+- [ ] **Re-mint the sync-test corpus at v11** (sweep 2026-07-16 — missed by the original
+  checklist). `test_data/sync_test_vaults/{A,B,C}.gabbro` are **v9** and would go unopenable,
+  breaking three LIVE tests (`sync_test_corpus_converges_without_loss`,
+  `corpus_surfaces_new_entry_then_whole_entry_delete`,
+  `re_syncing_the_same_source_converges_without_loss`) plus two gate legs (sync-walk batched
+  apply, fast-merge walk). Fix: `cargo test --release regenerate_sync_test_corpus -- --ignored`,
+  which rewrites all three at the current VERSION. Mock vaults, documented passphrase — no risk;
+  the three tracked `.gabbro` files change in the diff. Do this BEFORE raising the floor.
 
 ## 9. Docs
 
@@ -89,3 +128,37 @@ Do NOT run this while any ≤v10 vault could still exist — it makes those vaul
 - [ ] Retire `VAULT_UPGRADE_PATH.md` (its v10→v11 stepping stone is complete) or re-instantiate
   it for the next bump.
 - [ ] Delete this file once the cleanup lands.
+
+## 10. Test order (net-first, then red-first)
+
+Pins land and go green against the CURRENT code before anything is deleted.
+
+**Net (green now, commit first)**
+- [x] N1 v11 fixtures open (passphrase + multikey, each key) — exists, reuse.
+- [x] N2 `hkdf.rs::v11_vault_key_known_answer` — exists, keep forever (see §0).
+- [x] N3 unlock→lock leaves a v11 vault byte-identical — exists, reuse.
+- [x] N4 **v11 layout pinned absolutely** — `file_format.rs`:
+  `v11_on_disk_layout_is_pinned_absolutely` (172 bytes) +
+  `v11_header_aad_is_pinned_absolutely` (88 bytes). Expected streams are rebuilt from the
+  format spec, not copied from `to_bytes`; self-contained so they survive `test_vault()`
+  being re-pinned to v11.
+- [x] N5 `capped_reseal_version_holds_v11_material_at_v11` extracted standalone
+  (`vault_crypto.rs`) — survives the multi-era test it is carved out of.
+- [x] N6 sync corpus re-minted at v11 (`vault::session::field_merge_tests::
+  regenerate_sync_test_corpus -- --ignored`); all five consumers green: the three live
+  merge tests + gate legs `sync_walk_batched_apply_matches_checker` and
+  `fast_merge_walk_incoming_wins_and_order_dependent`.
+
+**Red (fails now)**
+- [ ] R1 v10 passphrase fixture → `Err` with the §0 message.
+- [ ] R2 v10 multikey fixture → `Err` on the YubiKey path too.
+- [ ] R3 v6/v7/v8/v9 fixtures → same rejection (replaces today's open/migrate tests).
+- [ ] R4 **a rejected open leaves the file byte-identical on disk** — "rejected, never
+  bricked"; the documented recovery (reinstall the older release, open, upgrade) depends on it.
+- [ ] R5 `SealedVault::from_bytes` rejects v10 bytes at the parse layer.
+- [ ] R6 a v12 file still fails closed with the *newer-version* message (the ceiling must
+  survive the floor move).
+- [ ] R7 rejection is distinguishable from "wrong passphrase" — a ≤v10 user must not think
+  they mistyped.
+- [ ] R8 fuzzer `FIXTURES` → v11 only; the unreachable `start_version < VERSION` branch
+  simplified.

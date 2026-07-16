@@ -112,9 +112,15 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-gabbro_test running now:
-If gate red: fix errors/warnings
-If gate green: **RT-3 + dual-lock cleanup (merged, floor → v11)**
+- **RT-3 + dual-lock cleanup (merged, floor → v11)** — once no ≤v10 vault remains: delete the
+  legacy `StdRng` X25519, the legacy ML-KEM + dual-lock derivations, and the frozen-golden
+  tripwire; **drop the `ml-kem` + `x25519-dalek` crates** (supply-chain surface → zero); min
+  supported version → v11 (≤v10 rejected gracefully, never bricked); convert the v2–v10 gate
+  fixtures to a graceful-rejection test; migration-vault + gate corpus floor → v11. The v11
+  auto-migrate release (alpha.14) has shipped; gated now only on field vaults migrating off ≤v10
+  — see VAULT_UPGRADE_PATH.md. Also silences the `hybrid-array` 0.2.3/0.4.12 `cargo deny` duplicate
+  warning for free: `ml-kem` is its only source. **Exhaustive deletion checklist:
+  [RT3_CLEANUP.md](RT3_CLEANUP.md).**
 
 ---
 
@@ -143,15 +149,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   above is welcome-not-blocking). Optional: a read-only Codeberg mirror for redundancy.
 
 ### Code Quality
-- **RT-3 + dual-lock cleanup (merged, floor → v11)** — once no ≤v10 vault remains: delete the
-  legacy `StdRng` X25519, the legacy ML-KEM + dual-lock derivations, and the frozen-golden
-  tripwire; **drop the `ml-kem` + `x25519-dalek` crates** (supply-chain surface → zero); min
-  supported version → v11 (≤v10 rejected gracefully, never bricked); convert the v2–v10 gate
-  fixtures to a graceful-rejection test; migration-vault + gate corpus floor → v11. The v11
-  auto-migrate release (alpha.14) has shipped; gated now only on field vaults migrating off ≤v10
-  — see VAULT_UPGRADE_PATH.md. Also silences the `hybrid-array` 0.2.3/0.4.12 `cargo deny` duplicate
-  warning for free: `ml-kem` is its only source. **Exhaustive deletion checklist:
-  [RT3_CLEANUP.md](RT3_CLEANUP.md).**
 - **Auto-type: unlock-then-type + cold start (ADR-017 Phase 4).** A trigger while the
   vault is locked or Gabbro is closed does nothing today. Add: prompt-unlock-then-type,
   an opt-in setting, README key-binding examples, and package `gabbro-autotype` into the
