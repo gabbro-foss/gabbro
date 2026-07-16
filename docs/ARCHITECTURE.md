@@ -157,15 +157,13 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   translations (and the `resizeColumns` label added the same way).
 - **Native-review `aboutTagline` translations** (all locales, 2026-07-09 rename): `eu` Basque
   and `yo` Yoruba lowest confidence, `kk`/`lt` medium.
-- Gradle space-assignment deprecations (20 total, Android leg): `Properties should be assigned
-  using the 'propName = value' syntax ... deprecated ... removed in Gradle 10.0`. Split by source:
-  16 are in pub-cache plugins we don't control (`jni-1.0.0` x6, `jni_flutter-1.0.1` x5,
-  `file_picker-11.0.2` x5) — upstream-owned. **4 are ours: `rust_builder/android/build.gradle`
-  lines 3 (`group`), 4 (`version`), 29 (`namespace`), 40 (`ndkVersion`)** — change `x 'val'` to
-  `x = 'val'`. Trivial mechanical edit, BUT it's Android build config (needs hardware verification
-  before commit per project rule) and `rust_builder/` is flutter_rust_bridge-generated — confirm
-  edits survive regeneration before relying on them. Fix alongside the gradle.lockfile regen.
-  Cosmetic until Gradle 10; gate stays green.
+- Gradle space-assignment deprecations (16 remaining, Android leg): `Properties should be assigned
+  using the 'propName = value' syntax ... deprecated ... removed in Gradle 10.0`. All 16 are in
+  pub-cache plugins we don't control (`jni-1.0.0` x6, `jni_flutter-1.0.1` x5, `file_picker-11.0.2`
+  x5) — upstream-owned; wait for releases. (The 4 that were ours, in
+  `rust_builder/android/build.gradle`, are fixed — and verified to survive
+  `flutter_rust_bridge_codegen generate`, which does not own that file: the frb config scopes to
+  `rust/` -> `lib/src/rust` only.) Cosmetic until Gradle 10; gate stays green.
 - Android gate leg: `WARNING: java.lang.System::load has been called ... restricted method`. The
   caller is `net.rubygrapefruit.platform.NativeLibraryLoader` inside Gradle 8.14's own
   `native-platform-0.22-milestone-28.jar` (`gradle-8.14/lib/`), not our code or a plugin. Newer
