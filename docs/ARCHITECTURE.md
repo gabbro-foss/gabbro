@@ -82,6 +82,12 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Flutter integration (`flutter drive … -d linux --profile`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
+**Integration suites must use `testWidgets`, not `test` (non-negotiable):** only `testWidgets`
+reaches the `integration_test` binding's result recorder, so a plain `test()` failure leaves the
+`flutter drive` leg reporting success and exiting 0 — silently blind. Enforced by a grep guard in
+`gabbro_test`. (The "integration_test plugin was not detected" warning is unrelated and cosmetic:
+it is the native Android/XCTest reporting channel, absent on Linux desktop.)
+
 **Test isolation (non-negotiable):** no test may touch real settings or vault folders. All
 config/data resolves through `GabbroPaths` (`lib/app_paths.dart`); `test/flutter_test_config.dart`
 roots every `flutter test` in a throwaway temp sandbox, so even a non-isolating test reads
@@ -124,17 +130,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   above is welcome-not-blocking). Optional: a read-only Codeberg mirror for redundancy.
 
 ### Code Quality
-- **CRITICAL — the 3 `flutter drive` gate legs cannot go red.** A failing integration test still
-  exits 0, so `gabbro_test:56-58` (`report $?`) prints PASS. Verified 2026-07-16: broke one
-  assertion in `integration_test/vault_session_test.dart` (line 75) — output read
-  `00:10 +4 -1: Some tests failed.`, then `All tests passed.`, exit code 0. Cause: the
-  "integration_test plugin was not detected" warning is real, not cosmetic — results never reach
-  the driver, so it reports success regardless. Impact: all 12 integration tests (our only
-  real-FFI Linux coverage — corruption recovery, lock/unlock round-trips) give zero regression
-  protection. Candidate fixes: grep the output for `Some tests failed.`; or run
-  `flutter test integration_test/<suite> -d linux` (but debug Argon2id is slow enough to blow the
-  30s timeout — see the suite header comment); or fix plugin detection. **Also unverified: whether
-  the `flutter test` leg (`gabbro_test:55`) exits non-zero on failure — do not assume.**
 - **Release APK build currently blocked — stale `android/app/gradle.lockfile`.** As of 2026-07-16,
   `flutter build apk --release` fails at dependency resolution: the lock pins `io.flutter:*_release`
   to engine `1.0.0-c416acfe...` but the installed Flutter SDK now has engine `1.0.0-83675ed2...`

@@ -119,12 +119,15 @@ real fix.
    cargo deny --offline check      # licences (GPL-3.0 compat), yanked, wildcards, sources
 
    # Flutter integration — real Rust FFI on a device (flutter test can't load the native lib).
-   # Run once per suite in integration_test/:
+   # Run once per suite in integration_test/. Suites must use testWidgets, never test() —
+   # a plain test() failure leaves the leg exiting 0 (see ARCHITECTURE.md Testing):
    cd ..
    flutter drive --driver=test_driver/integration_test.dart \
-     --target=integration_test/vault_session_test.dart -d linux --profile
+     --target=integration_test/vault_session_test.dart    -d linux --profile
    flutter drive --driver=test_driver/integration_test.dart \
-     --target=integration_test/entry_edit_test.dart   -d linux --profile
+     --target=integration_test/entry_edit_test.dart       -d linux --profile
+   flutter drive --driver=test_driver/integration_test.dart \
+     --target=integration_test/vault_corruption_test.dart -d linux --profile
 
    # Vault backward-compat gate — run in release (debug works but is ~6 min vs ~14 s).
    cd rust
