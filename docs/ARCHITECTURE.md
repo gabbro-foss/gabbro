@@ -130,16 +130,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   above is welcome-not-blocking). Optional: a read-only Codeberg mirror for redundancy.
 
 ### Code Quality
-- **Release APK build currently blocked — stale `android/app/gradle.lockfile`.** As of 2026-07-16,
-  `flutter build apk --release` fails at dependency resolution: the lock pins `io.flutter:*_release`
-  to engine `1.0.0-c416acfe...` but the installed Flutter SDK now has engine `1.0.0-83675ed2...`
-  ("Dependency version enforced by Dependency Locking"). This is the lock working *as designed*
-  (BUILD_AND_RELEASE.md: a stale lock fails the release build after a Flutter bump). The Flutter
-  SDK was updated (flutter-bin/AUR) without regenerating the lock. Fix (release-process action,
-  not a casual edit): `cd android && ./gradlew :app:dependencies --write-locks --configuration
-  releaseRuntimeClasspath`, then re-scan `osv-scanner scan --lockfile android/app/gradle.lockfile`.
-  Debug builds and the whole gate (`:app:testDebugUnitTest`) are unaffected — only the release
-  classpath is locked. Note: alpha.14 was built before this SDK update.
 - Kotlin-version warning (Android gate leg): `WARNING: Unsupported Kotlin plugin version. The
   embedded-kotlin and kotlin-dsl plugins rely on features of Kotlin 2.0.21 that might work
   differently than in the requested version 2.2.20`. Emitted under `> Configure project :gradle` —
@@ -147,9 +137,9 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   (pulled in by `android/settings.gradle.kts:11`), which applies `kotlin-dsl` + `kotlin("jvm")
   version "2.2.20"` (lines 10-11). Gradle 8.14 embeds Kotlin 2.0.21; Flutter's build requests
   2.2.20 on top. Both versions live outside our tree (Flutter SDK install + Gradle wrapper) — we
-  set neither; upstream-owned. Cosmetic on the debug/gate path. **UNVERIFIED whether it appears in
-  release builds: could not check 2026-07-16 — the release build is blocked by the stale
-  gradle.lockfile above. Re-check once the lock is regenerated.**
+  set neither; upstream-owned. Cosmetic. Verified 2026-07-16: it appears in release builds too
+  (`./gradlew :app:assembleRelease`) — it is a configure-phase warning, so build type is
+  irrelevant. `flutter build apk` hides it (the tool suppresses Gradle's configure output).
 - **RT-3 + dual-lock cleanup (merged, floor → v11)** — once no ≤v10 vault remains: delete the
   legacy `StdRng` X25519, the legacy ML-KEM + dual-lock derivations, and the frozen-golden
   tripwire; **drop the `ml-kem` + `x25519-dalek` crates** (supply-chain surface → zero); min
