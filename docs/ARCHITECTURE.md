@@ -112,7 +112,8 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-Fix warnings from last gate run — see Bikeshed `### Code Quality` for individual items.
+If gate red: fix errors/warnings
+If gate green: build and quick smoke test on linux/android (hold back GrapheneOS until hardware green)
 
 ---
 
