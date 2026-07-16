@@ -12,14 +12,11 @@ and warned again before the next. Cleared to proceed.
 
 ## 0. Decisions (agreed 2026-07-16)
 
-- **Rejection message** names the format version and points at the docs (not at a release tag,
-  which ages): *"This vault uses an old format (vN) that this version of Gabbro can no longer
-  open. Upgrade it with an older Gabbro release first — see the vault upgrade notes in the
-  README. Your vault file has not been modified."* So the README keeps a short upgrade note
-  even after §9 retires `VAULT_UPGRADE_PATH.md` — the message must point somewhere that exists.
-  That note states the flow concretely: **install alpha.14 → open every vault once → only then
-  install alpha.15+**. Durable because GitHub immutable releases are on: alpha.14's assets and
-  tag can never be replaced or pulled, so the reference cannot rot.
+- **Rejection message:** `file version not supported: https://github.com/gabbro-foss/gabbro/blob/master/docs/VAULT_UPGRADE_PATH.md`
+  The fix it documents: install alpha.14 → open every vault once → then install alpha.15+.
+  Durable because immutable releases are on — alpha.14 can never be pulled or replaced.
+  **This supersedes §9: `VAULT_UPGRADE_PATH.md` is NOT retired** — the error message points at
+  it, so it stays and gets updated for the v11 floor.
 - **Backward compatibility remains a standing gate requirement.** RT-3 raises the floor to v11;
   it does NOT retire the mechanism. Every future bump keeps the backward-compat gate, its
   per-version fixtures, and an upgrade path for older vaults. This is a one-off floor move to
@@ -102,8 +99,10 @@ and warned again before the next. Cleared to proceed.
 
 - [ ] `rust/tests/vault_backward_compat.rs`: remove the v6–v10 open/migrate/rotation tests +
   the v11 rotation/passphrase entries that reference pre-v11 fixtures; keep the v11 tests; add a
-  "≤v10 file rejected with a clear unsupported-version error" test.
-- [ ] Delete `rust/tests/fixtures/vaults/v{6,7,8,9,10}_*.gabbro` (10 files) + their FIXTURES.md rows.
+  "≤v10 file rejected with a clear unsupported-version error" test, run against the **kept v10
+  fixtures** (a real old vault, not a synthetic one).
+- [ ] Delete `rust/tests/fixtures/vaults/v{6,7,8,9}_*.gabbro` (8 files) + their FIXTURES.md rows.
+  **Keep the `v10_*` pair** — the most recent old format, now the rejection-test input.
 - [ ] `rust/tests/vault_state_machine_fuzz.rs`: drop v6/v7/v8 from `FIXTURES` (keep v11); the
   `start_version < VERSION` belt branch in `assert_invariants` becomes unreachable — simplify.
 - [ ] `rust/src/crypto/kdf.rs`, `keypair.rs`, `ml_kem.rs`: the `StdRng`/legacy golden-value +
@@ -125,8 +124,9 @@ and warned again before the next. Cleared to proceed.
   `SECURITY.md`, `README.md`, `ARCHITECTURE.md` (Encryption line + format), the crypto diagrams
   (`flow.dot`/`flow.svg` note, `simple_icons.svg` — already KEM-free), `ADR-018` Implementation note.
 - [ ] `kdf.rs` module doc: drop the `StdRng` / bytes-[0..32] X25519-seed description.
-- [ ] Retire `VAULT_UPGRADE_PATH.md` (its v10→v11 stepping stone is complete) or re-instantiate
-  it for the next bump.
+- [ ] **Keep** `VAULT_UPGRADE_PATH.md` — the rejection message links to it (§0), so it must
+  never 404. Update it for the v11 floor: name alpha.14 as the stepping stone, state what the
+  error means and the exact fix.
 - [ ] Delete this file once the cleanup lands.
 
 ## 10. Test order (net-first, then red-first)

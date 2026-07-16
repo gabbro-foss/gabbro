@@ -2,6 +2,19 @@
 
 Why a stepping-stone release exists, and how to upgrade safely.
 
+## Got "file version not supported"?
+
+Your vault is in a format older than v11. Gabbro alpha.15 and later cannot open it.
+**Your vault file has not been changed** — it is intact and recoverable:
+
+1. Install **alpha.14** —
+   [releases](https://github.com/gabbro-foss/gabbro/releases/tag/v0.1.0-alpha.14).
+2. Open every vault once. Unlocking is enough; each upgrades itself to v11 in place.
+3. Install alpha.15 or later and carry on.
+
+Do not skip step 2 — installing a release does not upgrade files on its own; a vault
+stays at its old version until something opens it.
+
 ## Background
 
 Vaults ≤ v10 carry an X25519 + ML-KEM-1024 hybrid key-exchange layer that is
@@ -13,27 +26,28 @@ HKDF. Old vaults upgrade to v11 automatically the first time they are opened or 
 
 ## The two releases
 
-- **Release N (interim):** opens v2–v10 **and** v11. Auto-migrates any ≤v10 vault to
-  v11 on first unlock/lock (also on passphrase change / CRUD save). The hybrid-KEM
-  derivation code stays, read-only, to open older vaults.
-- **Release N+1 (RT-3):** opens **v11 only**. The legacy derivation code is removed and
-  the `ml-kem` + `x25519-dalek` crates are dropped. A ≤v10 file is rejected with a clear
-  "unsupported version" error.
+- **Release N — alpha.14 (interim):** opens v2–v10 **and** v11. Auto-migrates any ≤v10
+  vault to v11 on first unlock/lock (also on passphrase change / CRUD save). The
+  hybrid-KEM derivation code stays, read-only, to open older vaults.
+- **Release N+1 — alpha.15 (RT-3):** opens **v11 only**. The legacy derivation code is
+  removed and the `ml-kem` + `x25519-dalek` crates are dropped. A ≤v10 file is rejected
+  with `file version not supported`, linking here. The file is never modified.
 
 ## How to upgrade (mandatory order)
 
-1. Install **Release N**.
+1. Install **alpha.14**.
 2. Open every vault once (unlock is enough) → each becomes v11 in place
    (atomic write + `.bak`, no export/reimport, no extra YubiKey tap).
 3. Confirm no ≤v10 vault remains.
-4. Install **Release N+1** and continue from there.
+4. Install **alpha.15+** and continue from there.
 
-## Caveat — do not skip Release N
+## Caveat — do not skip alpha.14
 
-Release N is a **mandatory stepping stone**. Installing Release N+1 with a vault
-still ≤ v10 leaves that vault unopenable by the new build; recovery = reinstall
-Release N, open the vault to migrate it, then move on. A vault sitting untouched
-on disk stays at its old version until something opens it — installing a release
-does not migrate files on its own.
+alpha.14 is a **mandatory stepping stone**. Installing alpha.15+ with a vault still
+≤ v10 leaves that vault unopenable by the new build — but never damaged: the recovery
+is to reinstall alpha.14, open the vault to migrate it, then move on. A vault sitting
+untouched on disk stays at its old version until something opens it — installing a
+release does not migrate files on its own.
 
-All of the above happens before public release; no external user is affected.
+alpha.14 stays available permanently: the repo has GitHub immutable releases enabled,
+so its tag and assets can never be replaced or removed.
