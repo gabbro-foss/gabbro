@@ -112,8 +112,9 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
+gabbro_test running now:
 If gate red: fix errors/warnings
-If gate green: build and quick smoke test on linux/android (hold back GrapheneOS until hardware green)
+If gate green: **RT-3 + dual-lock cleanup (merged, floor → v11)**
 
 ---
 
@@ -155,22 +156,11 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   vault is locked or Gabbro is closed does nothing today. Add: prompt-unlock-then-type,
   an opt-in setting, README key-binding examples, and package `gabbro-autotype` into the
   release bundle (update BUILD_AND_RELEASE). Secret stays in Rust; auto-lock preserved.
-- **Autofill save loose ends.** Native review of the best-effort `eu`/`kk`/`yo` save-flow
-  translations (and the `resizeColumns` label added the same way).
-- **Native-review `aboutTagline` translations** (all locales, 2026-07-09 rename): `eu` Basque
-  and `yo` Yoruba lowest confidence, `kk`/`lt` medium.
 
 ### V2+ / Defer
 - **Linux biometric unlock** (laptop fingerprint readers, e.g. libfido2/PAM or `fprintd`). Fits the current per-device model unchanged: Linux would just get its own local per-vault secret store; the vault file carries no biometric state, so nothing else changes.
-- UI locales deferred (RTL layout work required): Hebrew, Kurdish.
-- Passphrase wordlists — not viable without significant pipeline work: `yo` Yoruba (no frequency ordering, complex tonal diacritics); `sr_Latn` Serbian Latin (only Cyrillic corpora; needs transliteration pipeline); `lb` Luxembourgish (small speaker base); `wa` Walloon (nothing usable, French covers Wallonia).
 - Passkey (WebAuthn discoverable credential) support.
-- Vault sync across devices.
-- Data breach alerts / HaveIBeenPwned integration.
-- Panic button / app hiding on mobile.
-- Remote app / vault deletion.
 - Custom and hideable filter chips (post-v1 user feedback gate).
-- *Broad* cross-layer integration scaffolding beyond the targeted hard-to-reach paths now in Current Focus (e.g. an exhaustive `integration_test/` × Rust `tests/` matrix). YAGNI: if users file bugs, those become the organic integration test suite.
 - Windows support.
 - Yubico partnership.
 - Destination Linux podcast outreach (when approaching public release).
@@ -178,12 +168,3 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - No-telemetry verification guide (ripgrep scan, Wireshark, NetGuard).
 - Support model (GitHub Issues + SUPPORT.md for v1; revisit when user base exists).
 - Import: content-hash deduplication and entry-level merge.
-- `cargo miri` — **rejected, don't re-propose.** Miri cannot cross an FFI boundary, and
-  every `unsafe` block here is exactly that: `frb_generated.rs` (68, Dart bridge),
-  `hardening.rs` (12, libc), `fido/` (4, libfido2), `mem_forensics.rs` (2). `crypto/` and
-  `vault/` contain zero `unsafe`. Miri would have nothing in scope to check — and needs a
-  nightly toolchain we don't install. Revisit only if internal `unsafe` ever appears.
-- `cargo fuzz` (coverage-guided libFuzzer) — deferred: needs nightly. `tests/vault_parse_fuzz.rs`
-  already covers the attacker-controlled surface (truncation, garbage, oversized length
-  fields) on stable and caught the real `pos + body_len` overflow. Revisit as an occasional
-  soak, not a gate leg — it is unbounded by nature.
