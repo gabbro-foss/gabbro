@@ -95,15 +95,7 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**In flight — `anyhow` 1.0.102 -> 1.0.103, awaiting the gate.** `rust/Cargo.lock` is modified and
-**uncommitted**; the maintainer is running the full `gabbro_test`. Fixes RUSTSEC-2026-0190 (unsound
-`Error::downcast_mut`) — a warning, not a vulnerability, and Gabbro never calls it. `cargo update -p
-anyhow` moved exactly one package.
-
-- Gate green -> commit `rust/Cargo.lock` on its own.
-- Gate red -> `git checkout rust/Cargo.lock` reverts to 1.0.102; the gate was green before the bump.
-
-Nothing else open — ask the maintainer for the next task.
+Fix warnings from last gate run — see Bikeshed `### Code Quality` for individual items.
 
 ---
 
@@ -132,13 +124,46 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   above is welcome-not-blocking). Optional: a read-only Codeberg mirror for redundancy.
 
 ### Code Quality
+- **CRITICAL — the 3 `flutter drive` gate legs cannot go red.** A failing integration test still
+  exits 0, so `gabbro_test:56-58` (`report $?`) prints PASS. Verified 2026-07-16: broke one
+  assertion in `integration_test/vault_session_test.dart` (line 75) — output read
+  `00:10 +4 -1: Some tests failed.`, then `All tests passed.`, exit code 0. Cause: the
+  "integration_test plugin was not detected" warning is real, not cosmetic — results never reach
+  the driver, so it reports success regardless. Impact: all 12 integration tests (our only
+  real-FFI Linux coverage — corruption recovery, lock/unlock round-trips) give zero regression
+  protection. Candidate fixes: grep the output for `Some tests failed.`; or run
+  `flutter test integration_test/<suite> -d linux` (but debug Argon2id is slow enough to blow the
+  30s timeout — see the suite header comment); or fix plugin detection. **Also unverified: whether
+  the `flutter test` leg (`gabbro_test:55`) exits non-zero on failure — do not assume.**
+- **Release APK build currently blocked — stale `android/app/gradle.lockfile`.** As of 2026-07-16,
+  `flutter build apk --release` fails at dependency resolution: the lock pins `io.flutter:*_release`
+  to engine `1.0.0-c416acfe...` but the installed Flutter SDK now has engine `1.0.0-83675ed2...`
+  ("Dependency version enforced by Dependency Locking"). This is the lock working *as designed*
+  (BUILD_AND_RELEASE.md: a stale lock fails the release build after a Flutter bump). The Flutter
+  SDK was updated (flutter-bin/AUR) without regenerating the lock. Fix (release-process action,
+  not a casual edit): `cd android && ./gradlew :app:dependencies --write-locks --configuration
+  releaseRuntimeClasspath`, then re-scan `osv-scanner scan --lockfile android/app/gradle.lockfile`.
+  Debug builds and the whole gate (`:app:testDebugUnitTest`) are unaffected — only the release
+  classpath is locked. Note: alpha.14 was built before this SDK update.
+- Kotlin-version warning (Android gate leg): `WARNING: Unsupported Kotlin plugin version. The
+  embedded-kotlin and kotlin-dsl plugins rely on features of Kotlin 2.0.21 that might work
+  differently than in the requested version 2.2.20`. Emitted under `> Configure project :gradle` —
+  that project is the Flutter SDK's own included build `flutter_tools/gradle/build.gradle.kts`
+  (pulled in by `android/settings.gradle.kts:11`), which applies `kotlin-dsl` + `kotlin("jvm")
+  version "2.2.20"` (lines 10-11). Gradle 8.14 embeds Kotlin 2.0.21; Flutter's build requests
+  2.2.20 on top. Both versions live outside our tree (Flutter SDK install + Gradle wrapper) — we
+  set neither; upstream-owned. Cosmetic on the debug/gate path. **UNVERIFIED whether it appears in
+  release builds: could not check 2026-07-16 — the release build is blocked by the stale
+  gradle.lockfile above. Re-check once the lock is regenerated.**
 - **RT-3 + dual-lock cleanup (merged, floor → v11)** — once no ≤v10 vault remains: delete the
   legacy `StdRng` X25519, the legacy ML-KEM + dual-lock derivations, and the frozen-golden
   tripwire; **drop the `ml-kem` + `x25519-dalek` crates** (supply-chain surface → zero); min
   supported version → v11 (≤v10 rejected gracefully, never bricked); convert the v2–v10 gate
   fixtures to a graceful-rejection test; migration-vault + gate corpus floor → v11. The v11
   auto-migrate release (alpha.14) has shipped; gated now only on field vaults migrating off ≤v10
-  — see VAULT_UPGRADE_PATH.md. **Exhaustive deletion checklist: [RT3_CLEANUP.md](RT3_CLEANUP.md).**
+  — see VAULT_UPGRADE_PATH.md. Also silences the `hybrid-array` 0.2.3/0.4.12 `cargo deny` duplicate
+  warning for free: `ml-kem` is its only source. **Exhaustive deletion checklist:
+  [RT3_CLEANUP.md](RT3_CLEANUP.md).**
 - **Auto-type: unlock-then-type + cold start (ADR-017 Phase 4).** A trigger while the
   vault is locked or Gabbro is closed does nothing today. Add: prompt-unlock-then-type,
   an opt-in setting, README key-binding examples, and package `gabbro-autotype` into the
@@ -147,6 +172,39 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   translations (and the `resizeColumns` label added the same way).
 - **Native-review `aboutTagline` translations** (all locales, 2026-07-09 rename): `eu` Basque
   and `yo` Yoruba lowest confidence, `kk`/`lt` medium.
+- **Drop `uuid`'s `v4` feature — kills the `getrandom` 0.2/0.4 duplicate.** `v4 = ["rng"]` is the
+  only thing pulling `getrandom` 0.4.2, and `uuid` is its sole parent. Replace `Uuid::new_v4()`
+  (5 call sites: `api/vault.rs`, `api/vault_bridge.rs`, `api/import.rs`, `import/google_pm.rs`,
+  `import/dashlane.rs`) with an `OsRng` + `Builder::from_random_bytes` helper (not feature-gated;
+  sets version/variant bits). Same entropy source as today, one fewer dep edge, IDs minted in one
+  place. Net-first, then canon-TDD.
+- Gradle space-assignment deprecations (20 total, Android leg): `Properties should be assigned
+  using the 'propName = value' syntax ... deprecated ... removed in Gradle 10.0`. Split by source:
+  16 are in pub-cache plugins we don't control (`jni-1.0.0` x6, `jni_flutter-1.0.1` x5,
+  `file_picker-11.0.2` x5) — upstream-owned. **4 are ours: `rust_builder/android/build.gradle`
+  lines 3 (`group`), 4 (`version`), 29 (`namespace`), 40 (`ndkVersion`)** — change `x 'val'` to
+  `x = 'val'`. Trivial mechanical edit, BUT it's Android build config (needs hardware verification
+  before commit per project rule) and `rust_builder/` is flutter_rust_bridge-generated — confirm
+  edits survive regeneration before relying on them. Fix alongside the gradle.lockfile regen.
+  Cosmetic until Gradle 10; gate stays green.
+- Android gate leg: `WARNING: java.lang.System::load has been called ... restricted method`. The
+  caller is `net.rubygrapefruit.platform.NativeLibraryLoader` inside Gradle 8.14's own
+  `native-platform-0.22-milestone-28.jar` (`gradle-8.14/lib/`), not our code or a plugin. Newer
+  JDKs require modules to declare native access; Gradle 8.14 doesn't, so the JVM warns — and the
+  warning says it becomes a hard error in a future JDK. Fix is ours to time, not upstream's to
+  ship: bump the Gradle wrapper (`android/gradle/wrapper/gradle-wrapper.properties`, currently
+  `gradle-8.14-all`) to a version whose bundled `native-platform` declares native access. A
+  wrapper bump is a full-gate change (AGP 8.11.1 / Kotlin 2.2.20 compat), not a warning tweak — do
+  it deliberately. Cosmetic until then; gate stays green.
+- `cargo deny` `no-license-field` warning on `allo-isolate` (via `flutter_rust_bridge`): the
+  published 0.1.27 manifest declares only `license-file`, no SPDX `license` field, so deny infers
+  Apache-2.0 from the file text and passes. Already fixed on their master — wait for a release.
+  Cosmetic; gate stays green. A `[[licenses.clarify]]` entry does NOT suppress it (tested
+  2026-07-16: inert, silently ignores a wrong hash and a disallowed expression) — don't retry it.
+- `cargo deny` duplicate warnings, 6 of 8 (`block-buffer`, `crypto-common`, `digest`,
+  `cpufeatures`, `libloading`, `shlex`): two deps pin incompatible versions of a shared crate.
+  Upstream-owned (`argon2` -> `digest` 0.11, `jni` -> `libloading`, `bindgen` -> `shlex`);
+  warn-only, gate stays green. Diagnosed 2026-07-16 — don't re-diagnose.
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
 
 ### V2+ / Defer
