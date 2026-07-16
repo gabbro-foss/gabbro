@@ -52,8 +52,8 @@ void main() {
     if (tmp.existsSync()) tmp.deleteSync(recursive: true);
   });
 
-  test('garbaging BOTH main and .bak makes unlock fail — never an empty vault',
-      () async {
+  testWidgets('garbaging BOTH main and .bak makes unlock fail — never an empty vault',
+      (_) async {
     // the maintainer's exact sequence: init passphrase vault -> create entry -> edit it ->
     // lock -> overwrite both files with garbage -> attempt unlock.
     await initVault(passphrase: passphrase, path: vaultPath, alias: 'IT');
@@ -115,8 +115,8 @@ void main() {
         reason: 'a failed unlock must leave the vault locked, not open and empty');
   }, timeout: const Timeout(Duration(minutes: 3)));
 
-  test('garbaging only the main file (with a good .bak) also fails unlock',
-      () async {
+  testWidgets('garbaging only the main file (with a good .bak) also fails unlock',
+      (_) async {
     // The .bak being intact must not let a garbaged main file open — restore is
     // an explicit, separate user action, never an automatic fallback on unlock.
     await initVault(passphrase: passphrase, path: vaultPath, alias: 'IT');
@@ -160,8 +160,8 @@ void main() {
         reason: 'unlock must remain failed until the user explicitly restores');
   }, timeout: const Timeout(Duration(minutes: 3)));
 
-  test('P1 acceptance: restore after corrupt-main returns the LAST edit, '
-      'not the save before it', () async {
+  testWidgets('P1 acceptance: restore after corrupt-main returns the LAST edit, '
+      'not the save before it', (_) async {
     // Reproduces the 2026-06-11 hardware failure: edit an entry twice, garbage
     // the main file, restore from .bak. Pre-P1 the .bak trailed by one save, so
     // the restored vault was missing the second edit. With ".bak == last
@@ -213,8 +213,8 @@ void main() {
         reason: 'restore must return the LAST verified save, including the 2nd edit');
   }, timeout: const Timeout(Duration(minutes: 3)));
 
-  test('restore from an external backup file replaces a corrupt vault, which '
-      'then unlocks with its entries', () async {
+  testWidgets('restore from an external backup file replaces a corrupt vault, which '
+      'then unlocks with its entries', (_) async {
     await initVault(passphrase: passphrase, path: vaultPath, alias: 'IT');
     final login = await createLoginEntry(
       folder: '',
@@ -247,8 +247,8 @@ void main() {
         reason: 'entries must be present after restoring from the backup file');
   }, timeout: const Timeout(Duration(minutes: 3)));
 
-  test('restore from a file that is not a vault is refused, leaving the corrupt '
-      'vault untouched', () async {
+  testWidgets('restore from a file that is not a vault is refused, leaving the corrupt '
+      'vault untouched', (_) async {
     await initVault(passphrase: passphrase, path: vaultPath, alias: 'IT');
     lockVault();
     File(vaultPath).writeAsBytesSync(utf8.encode('rubbish'));

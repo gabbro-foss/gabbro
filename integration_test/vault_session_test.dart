@@ -48,8 +48,8 @@ void main() {
     if (tmp.existsSync()) tmp.deleteSync(recursive: true);
   });
 
-  test('passphrase vault: init -> createEntry -> getEntry round-trips through real FFI',
-      () async {
+  testWidgets('passphrase vault: init -> createEntry -> getEntry round-trips through real FFI',
+      (_) async {
     // Real production Argon2id runs twice here (initVault + the createEntry save);
     // hence the raised per-test timeout and the profile-mode run (see file header).
     // initVault seals a new passphrase-only vault and unlocks it into session.
@@ -78,7 +78,7 @@ void main() {
     expect(got.url, 'https://example.com');
   }, timeout: const Timeout(Duration(minutes: 3)));
 
-  test('lock -> unlock with passphrase restores the persisted entry', () async {
+  testWidgets('lock -> unlock with passphrase restores the persisted entry', (_) async {
     await initVault(passphrase: passphrase, path: vaultPath, alias: 'IT');
     final login = await createLoginEntry(
       folder: '',
@@ -103,8 +103,8 @@ void main() {
     expect((reopened as VaultEntryData_Login).field0.username, 'bob');
   }, timeout: const Timeout(Duration(minutes: 3)));
 
-  test('changePassphrase re-seals; vault re-opens under the new passphrase only',
-      () async {
+  testWidgets('changePassphrase re-seals; vault re-opens under the new passphrase only',
+      (_) async {
     // Proves the Flutter FFI marshals changePassphrase's two byte-vector
     // arguments and that the real re-seal round-trips on a device. The vault-level
     // backward-compat of this path (from frozen v6/v7 bytes, multi-key) is the

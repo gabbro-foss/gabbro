@@ -84,8 +84,8 @@ void main() {
     );
   }
 
-  test('edit -> updateEntry records the prior password in unified history',
-      () async {
+  testWidgets('edit -> updateEntry records the prior password in unified history',
+      (_) async {
     final id = await seedLogin(password: 'first-pass');
 
     // Edit mode: change the password and persist through the real bridge.
@@ -102,7 +102,7 @@ void main() {
         reason: 'changing the password records the prior one in meta.history');
   }, timeout: const Timeout(Duration(minutes: 3)));
 
-  test('delete history record -> real getEntry refresh shows it gone', () async {
+  testWidgets('delete history record -> real getEntry refresh shows it gone', (_) async {
     final id = await seedLogin(password: 'first-pass');
     await updateEntry(
       entry: VaultEntryData_Login(editedPassword(id, 'second-pass')),
@@ -122,7 +122,7 @@ void main() {
         reason: 'deleting history must not touch the current password');
   }, timeout: const Timeout(Duration(minutes: 3)));
 
-  test('restore history record -> restores the prior password', () async {
+  testWidgets('restore history record -> restores the prior password', (_) async {
     final id = await seedLogin(password: 'first-pass');
     await updateEntry(
       entry: VaultEntryData_Login(editedPassword(id, 'second-pass')),
@@ -141,8 +141,8 @@ void main() {
         reason: 'restore consumes the record');
   }, timeout: const Timeout(Duration(minutes: 3)));
 
-  test('recorded history survives a real lock -> unlock disk round-trip',
-      () async {
+  testWidgets('recorded history survives a real lock -> unlock disk round-trip',
+      (_) async {
     final id = await seedLogin(password: 'first-pass');
     await updateEntry(
       entry: VaultEntryData_Login(editedPassword(id, 'second-pass')),
