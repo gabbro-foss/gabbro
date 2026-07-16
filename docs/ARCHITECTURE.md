@@ -93,6 +93,17 @@ config/data resolves through `GabbroPaths` (`lib/app_paths.dart`); `test/flutter
 roots every `flutter test` in a throwaway temp sandbox, so even a non-isolating test reads
 an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`.
 
+**Known warnings — triaged 2026-07-16, no action. Gate stays green; don't re-diagnose.**
+
+| Warning | Source | Why not fixed |
+|---|---|---|
+| Kotlin plugin version (2.0.21 vs 2.2.20) | Flutter SDK's own `:gradle` build | Upstream. Debug and release alike. |
+| Gradle space-assignment x16 | pub-cache `jni`, `jni_flutter`, `file_picker` | Upstream. Hard error at Gradle 10. |
+| JVM restricted-method (`System::load`) | Gradle 8.14 `native-platform` jar | Needs a wrapper bump — a full-gate change, do deliberately. |
+| `cargo deny` no-license-field: `allo-isolate` | `flutter_rust_bridge` dep | Fixed on their master; await release. `[[licenses.clarify]]` is inert — don't retry. |
+| `cargo deny` duplicates x7 | `argon2`->`digest`, `jni`->`libloading`, `bindgen`->`shlex` | Upstream pins. `hybrid-array` dies with RT-3. |
+| KGP via `buildscript` classpath | `file_picker`, `url_launcher_android` | Upstream. Future Flutter hard error. |
+
 ---
 
 ## Current Focus
@@ -130,16 +141,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   above is welcome-not-blocking). Optional: a read-only Codeberg mirror for redundancy.
 
 ### Code Quality
-- Kotlin-version warning (Android gate leg): `WARNING: Unsupported Kotlin plugin version. The
-  embedded-kotlin and kotlin-dsl plugins rely on features of Kotlin 2.0.21 that might work
-  differently than in the requested version 2.2.20`. Emitted under `> Configure project :gradle` —
-  that project is the Flutter SDK's own included build `flutter_tools/gradle/build.gradle.kts`
-  (pulled in by `android/settings.gradle.kts:11`), which applies `kotlin-dsl` + `kotlin("jvm")
-  version "2.2.20"` (lines 10-11). Gradle 8.14 embeds Kotlin 2.0.21; Flutter's build requests
-  2.2.20 on top. Both versions live outside our tree (Flutter SDK install + Gradle wrapper) — we
-  set neither; upstream-owned. Cosmetic. Verified 2026-07-16: it appears in release builds too
-  (`./gradlew :app:assembleRelease`) — it is a configure-phase warning, so build type is
-  irrelevant. `flutter build apk` hides it (the tool suppresses Gradle's configure output).
 - **RT-3 + dual-lock cleanup (merged, floor → v11)** — once no ≤v10 vault remains: delete the
   legacy `StdRng` X25519, the legacy ML-KEM + dual-lock derivations, and the frozen-golden
   tripwire; **drop the `ml-kem` + `x25519-dalek` crates** (supply-chain surface → zero); min
@@ -157,32 +158,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   translations (and the `resizeColumns` label added the same way).
 - **Native-review `aboutTagline` translations** (all locales, 2026-07-09 rename): `eu` Basque
   and `yo` Yoruba lowest confidence, `kk`/`lt` medium.
-- Gradle space-assignment deprecations (16 remaining, Android leg): `Properties should be assigned
-  using the 'propName = value' syntax ... deprecated ... removed in Gradle 10.0`. All 16 are in
-  pub-cache plugins we don't control (`jni-1.0.0` x6, `jni_flutter-1.0.1` x5, `file_picker-11.0.2`
-  x5) — upstream-owned; wait for releases. (The 4 that were ours, in
-  `rust_builder/android/build.gradle`, are fixed — and verified to survive
-  `flutter_rust_bridge_codegen generate`, which does not own that file: the frb config scopes to
-  `rust/` -> `lib/src/rust` only.) Cosmetic until Gradle 10; gate stays green.
-- Android gate leg: `WARNING: java.lang.System::load has been called ... restricted method`. The
-  caller is `net.rubygrapefruit.platform.NativeLibraryLoader` inside Gradle 8.14's own
-  `native-platform-0.22-milestone-28.jar` (`gradle-8.14/lib/`), not our code or a plugin. Newer
-  JDKs require modules to declare native access; Gradle 8.14 doesn't, so the JVM warns — and the
-  warning says it becomes a hard error in a future JDK. Fix is ours to time, not upstream's to
-  ship: bump the Gradle wrapper (`android/gradle/wrapper/gradle-wrapper.properties`, currently
-  `gradle-8.14-all`) to a version whose bundled `native-platform` declares native access. A
-  wrapper bump is a full-gate change (AGP 8.11.1 / Kotlin 2.2.20 compat), not a warning tweak — do
-  it deliberately. Cosmetic until then; gate stays green.
-- `cargo deny` `no-license-field` warning on `allo-isolate` (via `flutter_rust_bridge`): the
-  published 0.1.27 manifest declares only `license-file`, no SPDX `license` field, so deny infers
-  Apache-2.0 from the file text and passes. Already fixed on their master — wait for a release.
-  Cosmetic; gate stays green. A `[[licenses.clarify]]` entry does NOT suppress it (tested
-  2026-07-16: inert, silently ignores a wrong hash and a disallowed expression) — don't retry it.
-- `cargo deny` duplicate warnings, 6 of 8 (`block-buffer`, `crypto-common`, `digest`,
-  `cpufeatures`, `libloading`, `shlex`): two deps pin incompatible versions of a shared crate.
-  Upstream-owned (`argon2` -> `digest` 0.11, `jni` -> `libloading`, `bindgen` -> `shlex`);
-  warn-only, gate stays green. Diagnosed 2026-07-16 — don't re-diagnose.
-- KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
 
 ### V2+ / Defer
 - **Linux biometric unlock** (laptop fingerprint readers, e.g. libfido2/PAM or `fprintd`). Fits the current per-device model unchanged: Linux would just get its own local per-vault secret store; the vault file carries no biometric state, so nothing else changes.
