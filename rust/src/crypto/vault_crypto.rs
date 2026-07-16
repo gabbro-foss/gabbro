@@ -1024,6 +1024,24 @@ mod tests {
         ]
     }
 
+    /// N5 (RT-3 net): the v11 slice of the re-seal cap, standalone. The
+    /// multi-era test below dies with the legacy derivations; this survives it and
+    /// pins the only behaviour left at floor v11 — a body-only re-seal of v11
+    /// material stays at v11 and never invents a version.
+    #[test]
+    fn capped_reseal_version_holds_v11_material_at_v11() {
+        assert_eq!(
+            capped_reseal_version_for(11, 11),
+            11,
+            "v11 material re-seals as v11"
+        );
+        assert_eq!(
+            capped_reseal_version_for(12, 11),
+            11,
+            "material ahead of the build pins to the build's version"
+        );
+    }
+
     /// S15 (belt): a body-only re-seal must never advance a vault across the v10
     /// X25519 boundary. Pure/version-independent so the boundary is pinned now.
     #[test]

@@ -2557,6 +2557,13 @@ mod field_merge_tests {
             .expect("seal");
             crate::vault::io::write_vault(&sealed, &dir.join(format!("sync_test_{name}.gabbro")))
                 .expect("write");
+            // write_vault rotates a .bak alongside the vault — correct for a real
+            // vault, just an untracked stray for the committed corpus. Drop it.
+            // Absent on a first-ever mint, so a missing file is not an error.
+            let bak = dir.join(format!("sync_test_{name}.gabbro.bak"));
+            if bak.exists() {
+                std::fs::remove_file(&bak).expect("remove stray .bak");
+            }
         }
     }
 

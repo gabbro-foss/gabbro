@@ -624,6 +624,84 @@ mod tests {
         assert_eq!(v10.header_aad().len() - v11.header_aad().len(), 1600);
     }
 
+    // ── N4 (RT-3 net): absolute pin of the VERSION 11 layout ──────────────────
+    // The v11 tests above measure v11 RELATIVE to the v10 (KEM-bearing) layout.
+    // RT-3 deletes v10 and takes that reference with it, so the two tests below
+    // pin v11 on its own terms. The expected streams are rebuilt field by field
+    // from the format spec at the top of this file rather than copied from
+    // `to_bytes` output — so a change to `to_bytes` cannot quietly redefine v11.
+    // Self-contained on purpose: they must not inherit from `test_vault()`, which
+    // RT-3 re-pins to v11.
+
+    fn pinned_v11_vault() -> SealedVault {
+        SealedVault {
+            version: 11,
+            params: Argon2idParams {
+                m_cost: 65536,
+                t_cost: 25,
+                p_cost: 4,
+            },
+            argon2_salt: [1u8; 32],
+            hkdf_salt: [2u8; 32],
+            nonce: [3u8; 12],
+            ml_kem_ciphertext: vec![],
+            x25519_ephemeral_public: [0u8; 32],
+            ciphertext: vec![6u8; 64],
+            yubikey_records: vec![],
+            alias: None,
+            passphrase_blob: vec![],
+        }
+    }
+
+    #[test]
+    fn v11_on_disk_layout_is_pinned_absolutely() {
+        let mut expected = Vec::new();
+        expected.extend_from_slice(MAGIC); // 6
+        expected.push(11); // version 1
+        expected.extend_from_slice(&65536u32.to_be_bytes()); // m_cost 4
+        expected.extend_from_slice(&25u32.to_be_bytes()); // t_cost 4
+        expected.extend_from_slice(&4u32.to_be_bytes()); // p_cost 4
+        expected.extend_from_slice(&[1u8; 32]); // argon2_salt 32
+        expected.extend_from_slice(&[2u8; 32]); // hkdf_salt 32
+        expected.extend_from_slice(&[3u8; 12]); // nonce 12
+                                                // v11 carries NO ML-KEM ciphertext and NO X25519 ephemeral pubkey
+        expected.push(0); // yubikey record count 1
+        expected.extend_from_slice(&0u16.to_be_bytes()); // alias_len 2
+        expected.extend_from_slice(&0u16.to_be_bytes()); // passphrase_blob_len 2
+        expected.extend_from_slice(&64u64.to_be_bytes()); // body_len 8
+        expected.extend_from_slice(&[6u8; 64]); // body 64
+
+        assert_eq!(
+            pinned_v11_vault().to_bytes(),
+            expected,
+            "the v11 on-disk layout is frozen — changing it makes every v11 vault unopenable"
+        );
+        assert_eq!(expected.len(), 172, "6+1+12+32+32+12+1+2+2+8+64 = 172");
+    }
+
+    #[test]
+    fn v11_header_aad_is_pinned_absolutely() {
+        let mut expected = Vec::new();
+        expected.extend_from_slice(MAGIC);
+        expected.push(11);
+        expected.extend_from_slice(&65536u32.to_be_bytes());
+        expected.extend_from_slice(&25u32.to_be_bytes());
+        expected.extend_from_slice(&4u32.to_be_bytes());
+        expected.extend_from_slice(&[1u8; 32]); // argon2_salt
+        expected.extend_from_slice(&[2u8; 32]); // hkdf_salt
+                                                // nonce excluded (AES-GCM authenticates it implicitly); no KEM fields at v11
+        expected.push(0); // yubikey record count
+        expected.extend_from_slice(&0u16.to_be_bytes()); // alias_len
+        expected.extend_from_slice(&0u16.to_be_bytes()); // passphrase_blob_len
+
+        assert_eq!(
+            pinned_v11_vault().header_aad(),
+            expected,
+            "the v11 AAD recipe is frozen — changing it makes every v11 vault unopenable"
+        );
+        assert_eq!(expected.len(), 88, "6+1+12+32+32+1+2+2 = 88");
+    }
+
     #[test]
     fn version_2_records_readable_without_key_blob() {
         // Craft a raw VERSION 2 vault with one YubiKey record (no key_blob fields).
