@@ -70,7 +70,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 664 | 17 |
+| Rust (`cargo test -q`) | 668 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 18 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -157,12 +157,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   translations (and the `resizeColumns` label added the same way).
 - **Native-review `aboutTagline` translations** (all locales, 2026-07-09 rename): `eu` Basque
   and `yo` Yoruba lowest confidence, `kk`/`lt` medium.
-- **Drop `uuid`'s `v4` feature — kills the `getrandom` 0.2/0.4 duplicate.** `v4 = ["rng"]` is the
-  only thing pulling `getrandom` 0.4.2, and `uuid` is its sole parent. Replace `Uuid::new_v4()`
-  (5 call sites: `api/vault.rs`, `api/vault_bridge.rs`, `api/import.rs`, `import/google_pm.rs`,
-  `import/dashlane.rs`) with an `OsRng` + `Builder::from_random_bytes` helper (not feature-gated;
-  sets version/variant bits). Same entropy source as today, one fewer dep edge, IDs minted in one
-  place. Net-first, then canon-TDD.
 - Gradle space-assignment deprecations (20 total, Android leg): `Properties should be assigned
   using the 'propName = value' syntax ... deprecated ... removed in Gradle 10.0`. Split by source:
   16 are in pub-cache plugins we don't control (`jni-1.0.0` x6, `jni_flutter-1.0.1` x5,
