@@ -836,6 +836,8 @@
   "passphraseNoWordlist": "Kielelläsi ei ole vielä sanalistaa. Käytetään englantia.",
   "manageFoldersDefaultNote": "Oletuskansioita voi nimetä uudelleen tai poistaa.",
 
+  "vaultFormatTooOld": "Tämä holvi käyttää vanhempaa muotoa, jota tämä Gabbron versio ei voi avata. Holvitiedostoasi ei ole muutettu.",
+  "vaultFormatUpgradeLink": "Näin päivität tämän holvin",
   "vaultCorruptBackupAvailable": "Tätä holvitiedostoa ei voi lukea. Saatavilla on automaattinen varakopio viimeisimmästä onnistuneesta tallennuksesta.",
   "restoreBackupButton": "Palauta varakopiosta",
   "restoreBackupConfirmTitle": "Palautetaanko holvi varakopiosta?",

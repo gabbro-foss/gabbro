@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/widgets/gabbro_logo.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:gabbro/widgets/url_link.dart';
 
 /// Injected at build time from `pubspec.yaml` (build metadata stripped) via
 /// `--dart-define=APP_VERSION=...` — see BUILD_AND_RELEASE.md. No dependency,
@@ -187,41 +187,8 @@ class _LinkTile extends StatelessWidget {
     required this.url,
   });
 
-  Future<void> _showUrl(BuildContext context) async {
-    await showDialog<void>(
-      context: context,
-      builder: (context) {
-        final l = AppLocalizations.of(context);
-        return AlertDialog(
-          title: Text(label),
-          content: SelectableText(url),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(l.close),
-            ),
-            FilledButton.icon(
-              icon: const Icon(Icons.open_in_new, size: 16),
-              label: Text(l.openInBrowser),
-              onPressed: () async {
-                final uri = Uri.parse(url);
-                final launched = await launchUrl(
-                  uri,
-                  mode: LaunchMode.externalApplication,
-                );
-                if (!launched && context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(AppLocalizations.of(context).couldNotOpen(url))),
-                  );
-                }
-                if (context.mounted) Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+  Future<void> _showUrl(BuildContext context) =>
+      showUrlDialog(context, title: label, url: url);
 
   @override
   Widget build(BuildContext context) {
@@ -264,39 +231,7 @@ class _ComponentTile extends StatelessWidget {
         size: 16,
         color: Theme.of(context).colorScheme.outline,
       ),
-      onTap: () => showDialog<void>(
-        context: context,
-        builder: (context) {
-          final l = AppLocalizations.of(context);
-          return AlertDialog(
-            title: Text(name),
-            content: SelectableText(url),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(l.close),
-              ),
-              FilledButton.icon(
-                icon: const Icon(Icons.open_in_new, size: 16),
-                label: Text(l.openInBrowser),
-                onPressed: () async {
-                  final uri = Uri.parse(url);
-                  final launched = await launchUrl(
-                    uri,
-                    mode: LaunchMode.externalApplication,
-                  );
-                  if (!launched && context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(AppLocalizations.of(context).couldNotOpen(url))),
-                    );
-                  }
-                  if (context.mounted) Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      ),
+      onTap: () => showUrlDialog(context, title: name, url: url),
     );
   }
 }

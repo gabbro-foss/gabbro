@@ -836,6 +836,8 @@
   "passphraseNoWordlist": "Ingen ordlista för ditt språk ännu. Engelska används.",
   "manageFoldersDefaultNote": "Standardmappar kan döpas om eller tas bort.",
 
+  "vaultFormatTooOld": "Det här valvet använder ett äldre format som den här versionen av Gabbro inte kan öppna. Din valvfil har inte ändrats.",
+  "vaultFormatUpgradeLink": "Så uppgraderar du det här valvet",
   "vaultCorruptBackupAvailable": "Den här valvfilen kan inte läsas. En automatisk reservkopia från den senaste lyckade sparningen finns tillgänglig.",
   "restoreBackupButton": "Återställ från reservkopia",
   "restoreBackupConfirmTitle": "Återställa valvet från reservkopian?",

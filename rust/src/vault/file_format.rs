@@ -88,7 +88,17 @@ pub const MAGIC: &[u8; 6] = b"GABBRO";
 pub const VERSION: u8 = 11;
 
 /// Oldest version this build can still read.
-const VERSION_MIN_READABLE: u8 = 2;
+///
+/// RT-3 raised this 2 -> 11: the X25519 + ML-KEM derivation that opened v2–v10 is
+/// gone, so those vaults are refused (never damaged) and the user is pointed at the
+/// upgrade path — install alpha.14, open each vault once to migrate it to v11, then
+/// return. See docs/VAULT_UPGRADE_PATH.md.
+const VERSION_MIN_READABLE: u8 = 11;
+
+/// Where a user with a pre-v11 vault is sent to recover it. Carried in the refusal
+/// error itself: the file is intact, and this documents the way back.
+const UPGRADE_PATH_URL: &str =
+    "https://github.com/gabbro-foss/gabbro/blob/master/docs/VAULT_UPGRADE_PATH.md";
 
 /// Size of the ML-KEM-1024 ciphertext in bytes.
 const ML_KEM_CIPHERTEXT_LEN: usize = 1568;
@@ -98,6 +108,34 @@ const ML_KEM_CIPHERTEXT_LEN: usize = 1568;
 /// (ADR-018) and omits both fields from the header (`to_bytes`/`from_bytes`/
 /// `header_aad` all version-branch on this).
 const KEM_HEADER_MAX_VERSION: u8 = 10;
+
+/// Read the format version from a vault file's first bytes, with **no floor check**.
+///
+/// [`SealedVault::from_bytes`] refuses anything below [`VERSION_MIN_READABLE`] before
+/// it returns a header, so a caller cannot learn a pre-v11 vault's version from it.
+/// Without this, the app treats "too old to open" as "corrupt" and offers to delete a
+/// perfectly intact vault. Reads magic + the version byte only; decrypts nothing.
+///
+/// `Err` means the file is not a Gabbro vault (bad magic) or is too short to have a
+/// version — i.e. genuinely unreadable rather than merely old.
+pub fn peek_version(data: &[u8]) -> Result<u8, String> {
+    if data.len() < 7 {
+        return Err("File too short to be a Gabbro vault".to_string());
+    }
+    if &data[..6] != MAGIC {
+        return Err("Not a Gabbro vault file".to_string());
+    }
+    Ok(data[6])
+}
+
+/// Whether the vault file at `data` is readable by this build, or predates the floor.
+///
+/// `Ok(true)` = intact Gabbro vault, too old to open (the user must migrate it with an
+/// older release first — see [`UPGRADE_PATH_URL`]). `Ok(false)` = current enough to try.
+/// `Err` = not a Gabbro vault at all.
+pub fn is_format_too_old(data: &[u8]) -> Result<bool, String> {
+    Ok(peek_version(data)? < VERSION_MIN_READABLE)
+}
 
 /// The complete contents of a sealed vault file.
 #[derive(Debug, Clone, PartialEq)]
@@ -261,7 +299,12 @@ impl SealedVault {
             ));
         }
         if version < VERSION_MIN_READABLE {
-            return Err(format!("Unsupported version: {version}"));
+            // Refuse, never touch: the file stays intact so the user can migrate it
+            // with an older release and come back. Names no other cause (a passphrase,
+            // corruption) so the message can't send them chasing the wrong thing.
+            return Err(format!(
+                "file version not supported: v{version} (this build opens v{VERSION_MIN_READABLE} and later) - {UPGRADE_PATH_URL}"
+            ));
         }
         let is_v3 = version >= 3;
         let is_v4 = version >= 4;
@@ -651,6 +694,49 @@ mod tests {
             alias: None,
             passphrase_blob: vec![],
         }
+    }
+
+    // ── peek_version: tell "too old" apart from "corrupt" ────────────────────
+    // `from_bytes` refuses a pre-v11 vault before it returns anything, so the app
+    // cannot learn the version from it and would report an old vault as corrupt —
+    // then offer to delete it. `peek_version` reads magic + the version byte only,
+    // with no floor check, so the refusal can be explained instead.
+
+    #[test]
+    fn peek_version_reads_a_version_from_bytes_refuses() {
+        // The exact case that matters: from_bytes says no, peek_version says v10.
+        let mut bytes = test_vault().to_bytes(); // v10, KEM-bearing
+        assert!(
+            SealedVault::from_bytes(&bytes).is_err(),
+            "v10 must be refused at floor v11"
+        );
+        assert_eq!(peek_version(&bytes).unwrap(), 10);
+
+        // ...and a current vault reports its own version just the same.
+        bytes = test_vault_v11().to_bytes();
+        assert_eq!(peek_version(&bytes).unwrap(), 11);
+    }
+
+    #[test]
+    fn peek_version_rejects_a_non_gabbro_file() {
+        let mut bytes = test_vault().to_bytes();
+        bytes[0] = b'X';
+        assert!(
+            peek_version(&bytes).is_err(),
+            "a file that is not a Gabbro vault has no version to report"
+        );
+    }
+
+    #[test]
+    fn peek_version_rejects_a_truncated_file() {
+        assert!(
+            peek_version(b"GABBR").is_err(),
+            "too short to hold magic + version"
+        );
+        assert!(
+            peek_version(MAGIC).is_err(),
+            "magic present but the version byte is missing"
+        );
     }
 
     #[test]

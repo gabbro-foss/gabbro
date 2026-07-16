@@ -836,6 +836,8 @@
   "passphraseNoWordlist": "Brak listy słów dla Twojego języka. Używa się angielskiego.",
   "manageFoldersDefaultNote": "Domyślne foldery można zmienić lub usunąć.",
 
+  "vaultFormatTooOld": "Ten sejf używa starszego formatu, którego ta wersja Gabbro nie może otworzyć. Plik sejfu nie został zmieniony.",
+  "vaultFormatUpgradeLink": "Jak zaktualizować ten sejf",
   "vaultCorruptBackupAvailable": "Nie można odczytać tego pliku sejfu. Dostępna jest automatyczna kopia awaryjna z ostatniego udanego zapisu.",
   "restoreBackupButton": "Przywróć z kopii awaryjnej",
   "restoreBackupConfirmTitle": "Przywrócić sejf z kopii awaryjnej?",

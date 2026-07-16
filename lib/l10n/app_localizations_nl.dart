@@ -1947,6 +1947,13 @@ class AppLocalizationsNl extends AppLocalizations {
       'Standaardmappen kunnen worden hernoemd of verwijderd.';
 
   @override
+  String get vaultFormatTooOld =>
+      'Deze kluis gebruikt een ouder formaat dat deze versie van Gabbro niet kan openen. Uw kluisbestand is niet gewijzigd.';
+
+  @override
+  String get vaultFormatUpgradeLink => 'Deze kluis bijwerken';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Dit kluisbestand kan niet worden gelezen. Er is een automatische reservekopie van de laatste geslaagde opslag beschikbaar.';
 

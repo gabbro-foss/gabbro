@@ -836,6 +836,8 @@
   "passphraseNoWordlist": "Teie keele jaoks pole veel sõnaloendit. Kasutatakse inglise keelt.",
   "manageFoldersDefaultNote": "Vaikekaustu saab ümber nimetada või kustutada.",
 
+  "vaultFormatTooOld": "See hoidla kasutab vanemat vormingut, mida see Gabbro versioon ei suuda avada. Teie hoidlafaili ei ole muudetud.",
+  "vaultFormatUpgradeLink": "Kuidas seda hoidlat uuendada",
   "vaultCorruptBackupAvailable": "Seda hoidlafaili ei saa lugeda. Saadaval on automaatne kaitsekoopia viimasest õnnestunud salvestusest.",
   "restoreBackupButton": "Taasta kaitsekoopiast",
   "restoreBackupConfirmTitle": "Kas taastada hoidla kaitsekoopiast?",

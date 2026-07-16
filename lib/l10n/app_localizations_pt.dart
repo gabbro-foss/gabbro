@@ -1943,6 +1943,13 @@ class AppLocalizationsPt extends AppLocalizations {
       'As pastas padrão podem ser renomeadas ou excluídas.';
 
   @override
+  String get vaultFormatTooOld =>
+      'Este cofre usa um formato mais antigo que esta versão do Gabbro não consegue abrir. O seu ficheiro de cofre não foi alterado.';
+
+  @override
+  String get vaultFormatUpgradeLink => 'Como atualizar este cofre';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Este ficheiro de cofre não pode ser lido. Está disponível uma cópia de recuperação automática da última gravação bem-sucedida.';
 
@@ -3958,6 +3965,13 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   @override
   String get manageFoldersDefaultNote =>
       'As pastas padrão podem ser renomeadas ou excluídas.';
+
+  @override
+  String get vaultFormatTooOld =>
+      'Este cofre usa um formato mais antigo que esta versão do Gabbro não consegue abrir. O seu arquivo de cofre não foi alterado.';
+
+  @override
+  String get vaultFormatUpgradeLink => 'Como atualizar este cofre';
 
   @override
   String get vaultCorruptBackupAvailable =>
@@ -5977,6 +5991,13 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   @override
   String get manageFoldersDefaultNote =>
       'As pastas predefinidas podem ser renomeadas ou eliminadas.';
+
+  @override
+  String get vaultFormatTooOld =>
+      'Este cofre usa um formato mais antigo que esta versão do Gabbro não consegue abrir. O seu ficheiro de cofre não foi alterado.';
+
+  @override
+  String get vaultFormatUpgradeLink => 'Como atualizar este cofre';
 
   @override
   String get vaultCorruptBackupAvailable =>

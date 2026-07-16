@@ -1925,6 +1925,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Default folders can be renamed or deleted.';
 
   @override
+  String get vaultFormatTooOld =>
+      'This vault uses an older format that this version of Gabbro cannot open. Your vault file has not been changed.';
+
+  @override
+  String get vaultFormatUpgradeLink => 'How to upgrade this vault';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'This vault file cannot be read. A usable safety copy from your last save is available.';
 

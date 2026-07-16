@@ -1954,6 +1954,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Standardordner können umbenannt oder gelöscht werden.';
 
   @override
+  String get vaultFormatTooOld =>
+      'Dieser Tresor verwendet ein älteres Format, das diese Version von Gabbro nicht öffnen kann. Ihre Tresordatei wurde nicht verändert.';
+
+  @override
+  String get vaultFormatUpgradeLink => 'So aktualisieren Sie diesen Tresor';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Diese Tresordatei kann nicht gelesen werden. Eine automatische Sicherheitskopie vom letzten erfolgreichen Speichern ist verfügbar.';
 

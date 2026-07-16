@@ -1941,6 +1941,13 @@ class AppLocalizationsSr extends AppLocalizations {
       'Подразумеване фасцикле могу се преименовати или избрисати.';
 
   @override
+  String get vaultFormatTooOld =>
+      'Овај сеф користи старији формат који ова верзија Gabbro-а не може да отвори. Датотека вашег сефа није промењена.';
+
+  @override
+  String get vaultFormatUpgradeLink => 'Како надоградити овај сеф';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Ова датотека сефа не може да се прочита. Доступна је аутоматска помоћна копија последњег успешног чувања.';
 
@@ -3952,6 +3959,13 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   @override
   String get manageFoldersDefaultNote =>
       'Podrazumevane fascikle mogu se preimenovati ili izbrisati.';
+
+  @override
+  String get vaultFormatTooOld =>
+      'Ovaj sef koristi stariji format koji ova verzija Gabbro-a ne može da otvori. Datoteka vašeg sefa nije promenjena.';
+
+  @override
+  String get vaultFormatUpgradeLink => 'Kako nadograditi ovaj sef';
 
   @override
   String get vaultCorruptBackupAvailable =>

@@ -1963,6 +1963,13 @@ class AppLocalizationsFr extends AppLocalizations {
       'Les dossiers par défaut peuvent être renommés ou supprimés.';
 
   @override
+  String get vaultFormatTooOld =>
+      'Ce coffre utilise un format plus ancien que cette version de Gabbro ne peut pas ouvrir. Votre fichier de coffre n\'a pas été modifié.';
+
+  @override
+  String get vaultFormatUpgradeLink => 'Comment mettre à niveau ce coffre';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Ce fichier de coffre est illisible. Une copie de secours automatique du dernier enregistrement réussi est disponible.';
 

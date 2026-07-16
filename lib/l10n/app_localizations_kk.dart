@@ -1938,6 +1938,13 @@ class AppLocalizationsKk extends AppLocalizations {
       'Әдепкі қалталарды өзгертуге немесе жоюға болады.';
 
   @override
+  String get vaultFormatTooOld =>
+      'Бұл қойма Gabbro-ның осы нұсқасы аша алмайтын ескі пішімді пайдаланады. Қойма файлыңыз өзгертілген жоқ.';
+
+  @override
+  String get vaultFormatUpgradeLink => 'Бұл қойманы қалай жаңартуға болады';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Бұл қойма файлын оқу мүмкін емес. Соңғы сәтті сақтаудың автоматты қосалқы көшірмесі қолжетімді.';
 

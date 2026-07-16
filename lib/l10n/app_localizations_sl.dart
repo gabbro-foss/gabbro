@@ -1943,6 +1943,13 @@ class AppLocalizationsSl extends AppLocalizations {
       'Privzete mape je mogoče preimenovati ali izbrisati.';
 
   @override
+  String get vaultFormatTooOld =>
+      'Ta trezor uporablja starejšo obliko, ki je ta različica Gabbra ne more odpreti. Vaša datoteka trezorja ni bila spremenjena.';
+
+  @override
+  String get vaultFormatUpgradeLink => 'Kako nadgraditi ta trezor';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Te datoteke trezorja ni mogoče prebrati. Na voljo je samodejna rešilna kopija zadnjega uspešnega shranjevanja.';
 

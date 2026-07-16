@@ -836,6 +836,8 @@
   "passphraseNoWordlist": "Ingen ordliste for ditt språk ennå. Bruker engelsk.",
   "manageFoldersDefaultNote": "Standardmapper kan gis nytt navn eller slettes.",
 
+  "vaultFormatTooOld": "Dette hvelvet bruker et eldre format som denne versjonen av Gabbro ikke kan åpne. Hvelvfilen din er ikke endret.",
+  "vaultFormatUpgradeLink": "Slik oppgraderer du dette hvelvet",
   "vaultCorruptBackupAvailable": "Denne hvelvfilen kan ikke leses. En automatisk reservekopi fra siste vellykkede lagring er tilgjengelig.",
   "restoreBackupButton": "Gjenopprett fra reservekopi",
   "restoreBackupConfirmTitle": "Gjenopprette hvelvet fra reservekopien?",

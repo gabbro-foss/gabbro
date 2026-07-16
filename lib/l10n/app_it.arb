@@ -835,6 +835,8 @@
   "passphraseNoWordlist": "Nessuna lista di parole per la tua lingua ancora. Si usa l'inglese.",
   "manageFoldersDefaultNote": "Le cartelle predefinite possono essere rinominate o eliminate.",
 
+  "vaultFormatTooOld": "Questa cassaforte usa un formato più vecchio che questa versione di Gabbro non può aprire. Il file della cassaforte non è stato modificato.",
+  "vaultFormatUpgradeLink": "Come aggiornare questa cassaforte",
   "vaultCorruptBackupAvailable": "Questo file della cassaforte non può essere letto. È disponibile una copia di sicurezza automatica dell'ultimo salvataggio riuscito.",
   "restoreBackupButton": "Ripristina dalla copia di sicurezza",
   "restoreBackupConfirmTitle": "Ripristinare la cassaforte dalla copia di sicurezza?",

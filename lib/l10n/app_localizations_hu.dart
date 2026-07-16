@@ -1943,6 +1943,13 @@ class AppLocalizationsHu extends AppLocalizations {
       'Az alapértelmezett mappák átnevezhetők vagy törölhetők.';
 
   @override
+  String get vaultFormatTooOld =>
+      'Ez a széf régebbi formátumot használ, amelyet a Gabbro ezen verziója nem tud megnyitni. A széffájlja nem változott.';
+
+  @override
+  String get vaultFormatUpgradeLink => 'A széf frissítésének módja';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Ez a széffájl nem olvasható. Elérhető egy automatikus vészmásolat az utolsó sikeres mentésből.';
 

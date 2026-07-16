@@ -672,6 +672,18 @@ pub fn read_vault_header(path: String) -> Result<VaultHeaderData, String> {
     })
 }
 
+/// Whether the vault at `path` is an intact Gabbro vault that is too old for this
+/// build to open (format below the readable floor).
+///
+/// The unlock screen calls this when the header fails to parse, to tell "too old"
+/// apart from "corrupt": an old vault is intact and recoverable by migrating it with
+/// an older release, so it must never surface the corruption banner's restore/delete
+/// offers. Returns `Err` if the file is not a Gabbro vault at all.
+/// Sync — reads the first bytes, no crypto.
+pub fn vault_format_too_old(path: String) -> Result<bool, String> {
+    crate::vault::io::vault_format_too_old(&PathBuf::from(path))
+}
+
 /// Rename the active vault: updates the alias in the file header and re-seals
 /// the body so the new alias is bound to the ciphertext via AES-GCM AAD.
 ///

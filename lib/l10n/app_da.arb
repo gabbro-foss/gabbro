@@ -836,6 +836,8 @@
   "passphraseNoWordlist": "Ingen ordliste til dit sprog endnu. Bruger engelsk.",
   "manageFoldersDefaultNote": "Standardmapper kan omdøbes eller slettes.",
 
+  "vaultFormatTooOld": "Denne boks bruger et ældre format, som denne version af Gabbro ikke kan åbne. Din boksfil er ikke blevet ændret.",
+  "vaultFormatUpgradeLink": "Sådan opgraderer du denne boks",
   "vaultCorruptBackupAvailable": "Denne boksfil kan ikke læses. En automatisk reservekopi fra den seneste vellykkede gemning er tilgængelig.",
   "restoreBackupButton": "Gendan fra reservekopi",
   "restoreBackupConfirmTitle": "Gendan boksen fra reservekopien?",

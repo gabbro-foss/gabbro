@@ -237,6 +237,18 @@ pub fn read_vault(path: &Path) -> Result<SealedVault, String> {
     SealedVault::from_bytes(&bytes)
 }
 
+/// Whether the vault file at `path` predates the readable floor (see
+/// [`crate::vault::file_format::is_format_too_old`]).
+///
+/// Lets the unlock screen tell "intact but too old to open" apart from "corrupt",
+/// so an old vault is explained rather than reported as damaged with an offer to
+/// delete it. Reads the first bytes only; decrypts nothing.
+pub fn vault_format_too_old(path: &Path) -> Result<bool, String> {
+    check_not_symlink(path)?;
+    let bytes = fs::read(path).map_err(|e| format!("Failed to read vault: {e}"))?;
+    crate::vault::file_format::is_format_too_old(&bytes)
+}
+
 /// Lightweight vault header: alias and YubiKey records only, no body decryption.
 pub struct VaultHeader {
     pub alias: Option<String>,

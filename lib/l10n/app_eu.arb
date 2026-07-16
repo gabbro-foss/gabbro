@@ -835,6 +835,8 @@
   "passphraseNoWordlist": "Zure hizkuntzarako oraindik ez dago hitz-zerrendasik. Ingelesa erabiltzen da.",
   "manageFoldersDefaultNote": "Karpeta lehenetsiak berrizendatu edo ezabatu daitezke.",
 
+  "vaultFormatTooOld": "Kutxa gotor honek Gabbroren bertsio honek ireki ezin duen formatu zaharrago bat erabiltzen du. Zure kutxa gotorraren fitxategia ez da aldatu.",
+  "vaultFormatUpgradeLink": "Nola eguneratu kutxa gotor hau",
   "vaultCorruptBackupAvailable": "Kutxa gotorraren fitxategi hau ezin da irakurri. Azken gordetze arrakastatsuaren segurtasun-kopia automatiko bat dago erabilgarri.",
   "restoreBackupButton": "Berreskuratu segurtasun-kopiatik",
   "restoreBackupConfirmTitle": "Kutxa gotorra segurtasun-kopiatik berreskuratu?",

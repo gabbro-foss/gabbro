@@ -1860,6 +1860,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get manageFoldersDefaultNote => '默认文件夹可以重命名或删除。';
 
   @override
+  String get vaultFormatTooOld => '此保险库使用的格式较旧，此版本的 Gabbro 无法打开。您的保险库文件未被更改。';
+
+  @override
+  String get vaultFormatUpgradeLink => '如何升级此保险库';
+
+  @override
   String get vaultCorruptBackupAvailable => '无法读取此保险库文件。可使用上次成功保存的自动安全副本。';
 
   @override
@@ -3783,6 +3789,12 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get manageFoldersDefaultNote => '默认文件夹可以重命名或删除。';
 
   @override
+  String get vaultFormatTooOld => '此保险库使用的格式较旧，此版本的 Gabbro 无法打开。您的保险库文件未被更改。';
+
+  @override
+  String get vaultFormatUpgradeLink => '如何升级此保险库';
+
+  @override
   String get vaultCorruptBackupAvailable => '无法读取此保险库文件。可使用上次成功保存的自动安全副本。';
 
   @override
@@ -5704,6 +5716,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get manageFoldersDefaultNote => '預設資料夾可以重新命名或刪除。';
+
+  @override
+  String get vaultFormatTooOld => '此保險庫使用的格式較舊，此版本的 Gabbro 無法開啟。您的保險庫檔案未被變更。';
+
+  @override
+  String get vaultFormatUpgradeLink => '如何升級此保險庫';
 
   @override
   String get vaultCorruptBackupAvailable => '無法讀取此保險庫檔案。可使用上次成功儲存的自動安全副本。';

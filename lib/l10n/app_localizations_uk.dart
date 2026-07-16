@@ -1947,6 +1947,13 @@ class AppLocalizationsUk extends AppLocalizations {
       'Типові теки можна перейменовувати або видаляти.';
 
   @override
+  String get vaultFormatTooOld =>
+      'Це сховище використовує старіший формат, який ця версія Gabbro не може відкрити. Файл вашого сховища не було змінено.';
+
+  @override
+  String get vaultFormatUpgradeLink => 'Як оновити це сховище';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Цей файл сховища не читається. Доступна автоматична аварійна копія останнього успішного збереження.';
 

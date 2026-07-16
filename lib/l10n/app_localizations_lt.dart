@@ -1946,6 +1946,13 @@ class AppLocalizationsLt extends AppLocalizations {
       'Numatytuosius aplankus galima pervadinti arba ištrinti.';
 
   @override
+  String get vaultFormatTooOld =>
+      'Ši saugykla naudoja senesnį formatą, kurio ši Gabbro versija negali atidaryti. Jūsų saugyklos failas nebuvo pakeistas.';
+
+  @override
+  String get vaultFormatUpgradeLink => 'Kaip atnaujinti šią saugyklą';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Šio saugyklos failo nepavyksta perskaityti. Galima automatinė paskutinio sėkmingo išsaugojimo apsauginė kopija.';
 

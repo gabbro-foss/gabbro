@@ -1935,6 +1935,13 @@ class AppLocalizationsSv extends AppLocalizations {
       'Standardmappar kan döpas om eller tas bort.';
 
   @override
+  String get vaultFormatTooOld =>
+      'Det här valvet använder ett äldre format som den här versionen av Gabbro inte kan öppna. Din valvfil har inte ändrats.';
+
+  @override
+  String get vaultFormatUpgradeLink => 'Så uppgraderar du det här valvet';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Den här valvfilen kan inte läsas. En automatisk reservkopia från den senaste lyckade sparningen finns tillgänglig.';
 

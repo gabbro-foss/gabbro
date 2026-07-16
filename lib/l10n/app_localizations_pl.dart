@@ -1950,6 +1950,13 @@ class AppLocalizationsPl extends AppLocalizations {
       'Domyślne foldery można zmienić lub usunąć.';
 
   @override
+  String get vaultFormatTooOld =>
+      'Ten sejf używa starszego formatu, którego ta wersja Gabbro nie może otworzyć. Plik sejfu nie został zmieniony.';
+
+  @override
+  String get vaultFormatUpgradeLink => 'Jak zaktualizować ten sejf';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Nie można odczytać tego pliku sejfu. Dostępna jest automatyczna kopia awaryjna z ostatniego udanego zapisu.';
 

@@ -1936,6 +1936,13 @@ class AppLocalizationsNb extends AppLocalizations {
       'Standardmapper kan gis nytt navn eller slettes.';
 
   @override
+  String get vaultFormatTooOld =>
+      'Dette hvelvet bruker et eldre format som denne versjonen av Gabbro ikke kan åpne. Hvelvfilen din er ikke endret.';
+
+  @override
+  String get vaultFormatUpgradeLink => 'Slik oppgraderer du dette hvelvet';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Denne hvelvfilen kan ikke leses. En automatisk reservekopi fra siste vellykkede lagring er tilgjengelig.';
 

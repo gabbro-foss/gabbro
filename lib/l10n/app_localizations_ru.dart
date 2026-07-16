@@ -1946,6 +1946,13 @@ class AppLocalizationsRu extends AppLocalizations {
       'Папки по умолчанию можно переименовать или удалить.';
 
   @override
+  String get vaultFormatTooOld =>
+      'Это хранилище использует более старый формат, который эта версия Gabbro не может открыть. Файл хранилища не был изменён.';
+
+  @override
+  String get vaultFormatUpgradeLink => 'Как обновить это хранилище';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Этот файл хранилища не читается. Доступна автоматическая аварийная копия последнего успешного сохранения.';
 

@@ -1937,6 +1937,13 @@ class AppLocalizationsEt extends AppLocalizations {
       'Vaikekaustu saab ümber nimetada või kustutada.';
 
   @override
+  String get vaultFormatTooOld =>
+      'See hoidla kasutab vanemat vormingut, mida see Gabbro versioon ei suuda avada. Teie hoidlafaili ei ole muudetud.';
+
+  @override
+  String get vaultFormatUpgradeLink => 'Kuidas seda hoidlat uuendada';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Seda hoidlafaili ei saa lugeda. Saadaval on automaatne kaitsekoopia viimasest õnnestunud salvestusest.';
 

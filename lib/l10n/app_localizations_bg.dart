@@ -1941,6 +1941,13 @@ class AppLocalizationsBg extends AppLocalizations {
       'Папките по подразбиране могат да се преименуват или изтрият.';
 
   @override
+  String get vaultFormatTooOld =>
+      'Този сейф използва по-стар формат, който тази версия на Gabbro не може да отвори. Файлът на сейфа ви не е променян.';
+
+  @override
+  String get vaultFormatUpgradeLink => 'Как да обновите този сейф';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Този файл на сейфа не може да бъде прочетен. Налично е автоматично аварийно копие от последното успешно запазване.';
 

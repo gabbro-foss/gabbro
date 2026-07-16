@@ -836,6 +836,8 @@
   "passphraseNoWordlist": "Jūsu valodai vēl nav vārdu saraksta. Tiek izmantota angļu valoda.",
   "manageFoldersDefaultNote": "Noklusējuma mapes var pārdēvēt vai dzēst.",
 
+  "vaultFormatTooOld": "Šis seifs izmanto vecāku formātu, ko šī Gabbro versija nevar atvērt. Jūsu seifa fails nav mainīts.",
+  "vaultFormatUpgradeLink": "Kā jaunināt šo seifu",
   "vaultCorruptBackupAvailable": "Šo seifa failu nevar nolasīt. Ir pieejama automātiska pēdējās veiksmīgās saglabāšanas rezerves kopija.",
   "restoreBackupButton": "Atjaunot no rezerves kopijas",
   "restoreBackupConfirmTitle": "Atjaunot seifu no rezerves kopijas?",

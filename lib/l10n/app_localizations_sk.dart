@@ -1941,6 +1941,13 @@ class AppLocalizationsSk extends AppLocalizations {
       'Predvolené priečinky možno premenovať alebo odstrániť.';
 
   @override
+  String get vaultFormatTooOld =>
+      'Tento trezor používa starší formát, ktorý táto verzia Gabbra nedokáže otvoriť. Súbor trezoru nebol zmenený.';
+
+  @override
+  String get vaultFormatUpgradeLink => 'Ako aktualizovať tento trezor';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Tento súbor trezoru sa nedá prečítať. K dispozícii je automatická záchranná kópia z posledného úspešného uloženia.';
 

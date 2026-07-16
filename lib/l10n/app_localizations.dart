@@ -3625,6 +3625,18 @@ abstract class AppLocalizations {
   /// **'Default folders can be renamed or deleted.'**
   String get manageFoldersDefaultNote;
 
+  /// Shown on the unlock screen when the vault file predates the oldest format this build can read. It is intact, not damaged: the user must open it once with an older Gabbro release to upgrade it. Must never sound like corruption or data loss.
+  ///
+  /// In en, this message translates to:
+  /// **'This vault uses an older format that this version of Gabbro cannot open. Your vault file has not been changed.'**
+  String get vaultFormatTooOld;
+
+  /// Tappable link label on the unlock screen, next to vaultFormatTooOld. Opens the documented upgrade steps.
+  ///
+  /// In en, this message translates to:
+  /// **'How to upgrade this vault'**
+  String get vaultFormatUpgradeLink;
+
   /// No description provided for @vaultCorruptBackupAvailable.
   ///
   /// In en, this message translates to:

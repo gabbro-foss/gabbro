@@ -1882,6 +1882,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get manageFoldersDefaultNote => 'デフォルトフォルダは名前の変更や削除ができます。';
 
   @override
+  String get vaultFormatTooOld =>
+      'このボールトは、このバージョンの Gabbro では開けない古い形式を使用しています。ボールトファイルは変更されていません。';
+
+  @override
+  String get vaultFormatUpgradeLink => 'このボールトをアップグレードする方法';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'このボールトファイルは読み取れません。最後に成功した保存の自動セーフティコピーが利用できます。';
 

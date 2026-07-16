@@ -1940,6 +1940,13 @@ class AppLocalizationsCs extends AppLocalizations {
       'Výchozí složky lze přejmenovat nebo odstranit.';
 
   @override
+  String get vaultFormatTooOld =>
+      'Tento trezor používá starší formát, který tato verze Gabbra nedokáže otevřít. Soubor trezoru nebyl změněn.';
+
+  @override
+  String get vaultFormatUpgradeLink => 'Jak tento trezor aktualizovat';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Tento soubor trezoru nelze přečíst. Je k dispozici automatická záchranná kopie z posledního úspěšného uložení.';
 

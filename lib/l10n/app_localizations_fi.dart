@@ -1940,6 +1940,13 @@ class AppLocalizationsFi extends AppLocalizations {
       'Oletuskansioita voi nimetä uudelleen tai poistaa.';
 
   @override
+  String get vaultFormatTooOld =>
+      'Tämä holvi käyttää vanhempaa muotoa, jota tämä Gabbron versio ei voi avata. Holvitiedostoasi ei ole muutettu.';
+
+  @override
+  String get vaultFormatUpgradeLink => 'Näin päivität tämän holvin';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Tätä holvitiedostoa ei voi lukea. Saatavilla on automaattinen varakopio viimeisimmästä onnistuneesta tallennuksesta.';
 

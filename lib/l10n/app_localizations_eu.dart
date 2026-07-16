@@ -1938,6 +1938,13 @@ class AppLocalizationsEu extends AppLocalizations {
       'Karpeta lehenetsiak berrizendatu edo ezabatu daitezke.';
 
   @override
+  String get vaultFormatTooOld =>
+      'Kutxa gotor honek Gabbroren bertsio honek ireki ezin duen formatu zaharrago bat erabiltzen du. Zure kutxa gotorraren fitxategia ez da aldatu.';
+
+  @override
+  String get vaultFormatUpgradeLink => 'Nola eguneratu kutxa gotor hau';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Kutxa gotorraren fitxategi hau ezin da irakurri. Azken gordetze arrakastatsuaren segurtasun-kopia automatiko bat dago erabilgarri.';
 

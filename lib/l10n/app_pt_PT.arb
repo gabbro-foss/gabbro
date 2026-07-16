@@ -836,6 +836,8 @@
   "passphraseNoWordlist": "Ainda não existe uma lista de palavras para o seu idioma. A usar inglês.",
   "manageFoldersDefaultNote": "As pastas predefinidas podem ser renomeadas ou eliminadas.",
 
+  "vaultFormatTooOld": "Este cofre usa um formato mais antigo que esta versão do Gabbro não consegue abrir. O seu ficheiro de cofre não foi alterado.",
+  "vaultFormatUpgradeLink": "Como atualizar este cofre",
   "vaultCorruptBackupAvailable": "Este ficheiro de cofre não pode ser lido. Está disponível uma cópia de recuperação automática da última gravação bem-sucedida.",
   "restoreBackupButton": "Restaurar a partir da cópia de recuperação",
   "restoreBackupConfirmTitle": "Restaurar o cofre a partir da cópia de recuperação?",

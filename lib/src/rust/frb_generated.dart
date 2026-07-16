@@ -75,7 +75,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.12.0';
 
   @override
-  int get rustContentHash => -1597788319;
+  int get rustContentHash => 1574391907;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -357,6 +357,8 @@ abstract class RustLibApi extends BaseApi {
   });
 
   Future<bool> crateApiVaultBridgeVaultBackupUsable({required String path});
+
+  Future<bool> crateApiVaultBridgeVaultFormatTooOld({required String path});
 }
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
@@ -2545,6 +2547,37 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   TaskConstMeta get kCrateApiVaultBridgeVaultBackupUsableConstMeta =>
       const TaskConstMeta(debugName: "vault_backup_usable", argNames: ["path"]);
+
+  @override
+  Future<bool> crateApiVaultBridgeVaultFormatTooOld({required String path}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(path, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 69,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_bool,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiVaultBridgeVaultFormatTooOldConstMeta,
+        argValues: [path],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiVaultBridgeVaultFormatTooOldConstMeta =>
+      const TaskConstMeta(
+        debugName: "vault_format_too_old",
+        argNames: ["path"],
+      );
 
   @protected
   String dco_decode_String(dynamic raw) {

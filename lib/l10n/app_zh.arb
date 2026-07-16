@@ -835,6 +835,8 @@
   "passphraseNoWordlist": "您的语言暂无词汇列表。使用英语。",
   "manageFoldersDefaultNote": "默认文件夹可以重命名或删除。",
 
+  "vaultFormatTooOld": "此保险库使用的格式较旧，此版本的 Gabbro 无法打开。您的保险库文件未被更改。",
+  "vaultFormatUpgradeLink": "如何升级此保险库",
   "vaultCorruptBackupAvailable": "无法读取此保险库文件。可使用上次成功保存的自动安全副本。",
   "restoreBackupButton": "从安全副本恢复",
   "restoreBackupConfirmTitle": "从安全副本恢复保险库？",

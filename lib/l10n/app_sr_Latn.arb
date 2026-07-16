@@ -835,6 +835,8 @@
   "passphraseNoWordlist": "Nema liste reči za vaš jezik. Koristi se engleski.",
   "manageFoldersDefaultNote": "Podrazumevane fascikle mogu se preimenovati ili izbrisati.",
 
+  "vaultFormatTooOld": "Ovaj sef koristi stariji format koji ova verzija Gabbro-a ne može da otvori. Datoteka vašeg sefa nije promenjena.",
+  "vaultFormatUpgradeLink": "Kako nadograditi ovaj sef",
   "vaultCorruptBackupAvailable": "Ova datoteka sefa ne može da se pročita. Dostupna je automatska pomoćna kopija poslednjeg uspešnog čuvanja.",
   "restoreBackupButton": "Vrati iz pomoćne kopije",
   "restoreBackupConfirmTitle": "Vratiti sef iz pomoćne kopije?",

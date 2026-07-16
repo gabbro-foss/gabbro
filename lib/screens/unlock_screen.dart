@@ -14,6 +14,7 @@ import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/vault_registry.dart';
 import 'package:gabbro/widgets/gabbro_logo.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
+import 'package:gabbro/widgets/url_link.dart';
 import 'package:gabbro/widgets/yubikey_tap.dart';
 
 // ── Bridge defaults ───────────────────────────────────────────────────────────
@@ -21,6 +22,13 @@ import 'package:gabbro/widgets/yubikey_tap.dart';
 // Public so the autofill unlock shell can reuse it as its injectable default.
 Future<void> defaultUnlock(List<int> passphrase, String path) =>
     unlockVault(passphrase: passphrase, path: path);
+
+/// Where a user whose vault predates the readable format floor is sent to
+/// recover it. Mirrors the URL the Rust refusal carries
+/// (`vault/file_format.rs`) — the vault is intact and this documents the way
+/// back: install alpha.14, open each vault once, then return.
+const vaultUpgradePathUrl =
+    'https://github.com/gabbro-foss/gabbro/blob/master/docs/VAULT_UPGRADE_PATH.md';
 
 // R-03: probe whether the vault file parses at all. Only a parse failure may
 // surface the restore offer — authentication failures never do.
@@ -34,6 +42,20 @@ Future<bool> _defaultVaultIsReadable(String path) async {
     // report healthy so the restore banner cannot appear by accident.
     return true;
   } catch (_) {
+    return false;
+  }
+}
+
+// RT-3: an intact vault whose format predates the readable floor. Asked only
+// after the parse probe fails, so a pre-v11 vault is explained rather than
+// reported as corrupt (which would offer to delete a perfectly good file).
+Future<bool> _defaultVaultFormatTooOld(String path) async {
+  try {
+    return await vaultFormatTooOld(path: path);
+  } catch (_) {
+    // Not a Gabbro vault, unreadable on disk, or the bridge is unavailable
+    // (widget-test context). "Cannot tell" must never claim the file is merely
+    // old — fall through to the existing corruption handling.
     return false;
   }
 }
@@ -212,6 +234,13 @@ class UnlockScreen extends StatefulWidget {
   /// offer.
   final Future<bool> Function(String path) onVaultIsReadable;
 
+  /// RT-3: returns true when the file is an intact Gabbro vault whose format
+  /// predates the oldest this build reads. Consulted only when
+  /// [onVaultIsReadable] says the file does not parse, to tell "too old" apart
+  /// from "corrupt" — an old vault is undamaged and must be explained, never
+  /// offered a restore (its `.bak` is equally old) or a delete.
+  final Future<bool> Function(String path) onVaultFormatTooOld;
+
   /// R-03 P3: whether a *usable* (present and parseable) `.bak` safety copy
   /// exists next to the vault. A `.bak` that does not parse reports false, so
   /// the restore offer can never advertise a backup a restore would refuse.
@@ -252,6 +281,7 @@ class UnlockScreen extends StatefulWidget {
     this.onCancelTap = _defaultCancelTap,
     this.isAndroid,
     this.onVaultIsReadable = _defaultVaultIsReadable,
+    this.onVaultFormatTooOld = _defaultVaultFormatTooOld,
     this.onBackupUsable = _defaultBackupUsable,
     this.onRestoreBackup = _defaultRestoreBackup,
     this.onRestoreFromFile = _defaultRestoreFromFile,
@@ -279,6 +309,10 @@ class _UnlockScreenState extends State<UnlockScreen>
   bool _biometricEnrolled = false;
   // R-03 restore flow: set only by the parse probe, never by auth failures.
   bool _vaultCorrupt = false;
+  /// RT-3: the file is an intact vault in a format older than this build reads.
+  /// Distinct from [_vaultCorrupt]: nothing is damaged and nothing needs
+  /// restoring — it needs migrating with an older release first.
+  bool _vaultFormatTooOld = false;
   bool _backupAvailable = false;
   bool _backupRestored = false;
   bool _vaultRestoredFromFile = false;
@@ -316,6 +350,14 @@ class _UnlockScreenState extends State<UnlockScreen>
   Future<void> _probeVault() async {
     final readable = await widget.onVaultIsReadable(widget.vaultPath);
     if (readable) return;
+    // RT-3: it does not parse — but an intact pre-v11 vault does not parse
+    // either, and it is not damaged. Say so instead of offering a restore
+    // (the .bak is the same old format) or a delete.
+    if (await widget.onVaultFormatTooOld(widget.vaultPath)) {
+      if (!mounted) return;
+      setState(() => _vaultFormatTooOld = true);
+      return;
+    }
     final usable = await widget.onBackupUsable(widget.vaultPath);
     if (!mounted) return;
     setState(() {
@@ -580,6 +622,16 @@ class _UnlockScreenState extends State<UnlockScreen>
       final stillReadable = await widget.onVaultIsReadable(widget.vaultPath);
       if (!mounted) return;
       if (!stillReadable) {
+        // RT-3: an intact but pre-v11 vault also fails to parse. It is not
+        // corrupt, so explain the format rather than offering restore/delete.
+        if (await widget.onVaultFormatTooOld(widget.vaultPath)) {
+          if (!mounted) return;
+          setState(() {
+            _vaultFormatTooOld = true;
+            _errorMessage = null;
+          });
+          return;
+        }
         final usable = await widget.onBackupUsable(widget.vaultPath);
         if (!mounted) return;
         setState(() {
@@ -687,7 +739,7 @@ class _UnlockScreenState extends State<UnlockScreen>
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 48),
-                    if (_biometricEnrolled && !_vaultCorrupt) ...[
+                    if (_biometricEnrolled && !_vaultCorrupt && !_vaultFormatTooOld) ...[
                       if (_isYubikeyMode)
                         Padding(
                           padding: const EdgeInsets.only(bottom: 6),
@@ -729,6 +781,37 @@ class _UnlockScreenState extends State<UnlockScreen>
                     // this device; offer remove-from-list / delete-file so the
                     // user is never stranded (responsive buttons that stack on
                     // narrow Android screens rather than overflowing).
+                    // RT-3: intact vault, format older than this build reads.
+                    // Deliberately NOT the errorContainer red of the corruption
+                    // card and deliberately offering no restore/delete: nothing
+                    // is damaged, and the one destructive action available would
+                    // be the only way to actually lose the vault.
+                    if (_vaultFormatTooOld) ...[
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            children: [
+                              Text(
+                                l.vaultFormatTooOld,
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 8),
+                              TextButton.icon(
+                                icon: const Icon(Icons.open_in_new, size: 16),
+                                label: Text(l.vaultFormatUpgradeLink),
+                                onPressed: () => showUrlDialog(
+                                  context,
+                                  title: l.vaultFormatUpgradeLink,
+                                  url: vaultUpgradePathUrl,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
                     if (_vaultCorrupt) ...[
                       Card(
                         color: Theme.of(context).colorScheme.errorContainer,
@@ -876,7 +959,7 @@ class _UnlockScreenState extends State<UnlockScreen>
                     // R-03: the vault cannot be opened — hide the unlock
                     // controls until it is restored. The vault dropdown above
                     // stays visible so the user can switch to another vault.
-                    if (!_vaultCorrupt) ...[
+                    if (!_vaultCorrupt && !_vaultFormatTooOld) ...[
                     TextField(
                       controller: _passphraseController,
                       autofocus: true,

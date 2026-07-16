@@ -1949,6 +1949,13 @@ class AppLocalizationsIt extends AppLocalizations {
       'Le cartelle predefinite possono essere rinominate o eliminate.';
 
   @override
+  String get vaultFormatTooOld =>
+      'Questa cassaforte usa un formato più vecchio che questa versione di Gabbro non può aprire. Il file della cassaforte non è stato modificato.';
+
+  @override
+  String get vaultFormatUpgradeLink => 'Come aggiornare questa cassaforte';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Questo file della cassaforte non può essere letto. È disponibile una copia di sicurezza automatica dell\'ultimo salvataggio riuscito.';
 

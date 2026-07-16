@@ -835,6 +835,8 @@
   "passphraseNoWordlist": "Pre váš jazyk zatiaľ nie je zoznam slov. Používa sa angličtina.",
   "manageFoldersDefaultNote": "Predvolené priečinky možno premenovať alebo odstrániť.",
 
+  "vaultFormatTooOld": "Tento trezor používa starší formát, ktorý táto verzia Gabbra nedokáže otvoriť. Súbor trezoru nebol zmenený.",
+  "vaultFormatUpgradeLink": "Ako aktualizovať tento trezor",
   "vaultCorruptBackupAvailable": "Tento súbor trezoru sa nedá prečítať. K dispozícii je automatická záchranná kópia z posledného úspešného uloženia.",
   "restoreBackupButton": "Obnoviť zo záchrannej kópie",
   "restoreBackupConfirmTitle": "Obnoviť trezor zo záchrannej kópie?",

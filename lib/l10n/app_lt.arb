@@ -836,6 +836,8 @@
   "passphraseNoWordlist": "Jūsų kalbai dar nėra žodžių sąrašo. Naudojama anglų kalba.",
   "manageFoldersDefaultNote": "Numatytuosius aplankus galima pervadinti arba ištrinti.",
 
+  "vaultFormatTooOld": "Ši saugykla naudoja senesnį formatą, kurio ši Gabbro versija negali atidaryti. Jūsų saugyklos failas nebuvo pakeistas.",
+  "vaultFormatUpgradeLink": "Kaip atnaujinti šią saugyklą",
   "vaultCorruptBackupAvailable": "Šio saugyklos failo nepavyksta perskaityti. Galima automatinė paskutinio sėkmingo išsaugojimo apsauginė kopija.",
   "restoreBackupButton": "Atkurti iš apsauginės kopijos",
   "restoreBackupConfirmTitle": "Atkurti saugyklą iš apsauginės kopijos?",

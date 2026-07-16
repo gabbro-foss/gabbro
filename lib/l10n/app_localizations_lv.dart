@@ -1943,6 +1943,13 @@ class AppLocalizationsLv extends AppLocalizations {
       'Noklusējuma mapes var pārdēvēt vai dzēst.';
 
   @override
+  String get vaultFormatTooOld =>
+      'Šis seifs izmanto vecāku formātu, ko šī Gabbro versija nevar atvērt. Jūsu seifa fails nav mainīts.';
+
+  @override
+  String get vaultFormatUpgradeLink => 'Kā jaunināt šo seifu';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Šo seifa failu nevar nolasīt. Ir pieejama automātiska pēdējās veiksmīgās saglabāšanas rezerves kopija.';
 

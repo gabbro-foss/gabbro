@@ -1956,6 +1956,13 @@ class AppLocalizationsEs extends AppLocalizations {
       'Las carpetas predeterminadas se pueden renombrar o eliminar.';
 
   @override
+  String get vaultFormatTooOld =>
+      'Esta caja fuerte usa un formato más antiguo que esta versión de Gabbro no puede abrir. Su archivo de caja fuerte no se ha modificado.';
+
+  @override
+  String get vaultFormatUpgradeLink => 'Cómo actualizar esta caja fuerte';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Este archivo de caja fuerte no se puede leer. Hay disponible una copia de respaldo automática del último guardado correcto.';
 

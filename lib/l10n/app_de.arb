@@ -835,6 +835,8 @@
   "passphraseNoWordlist": "Noch keine Wortliste für deine Sprache. Englisch wird verwendet.",
   "manageFoldersDefaultNote": "Standardordner können umbenannt oder gelöscht werden.",
 
+  "vaultFormatTooOld": "Dieser Tresor verwendet ein älteres Format, das diese Version von Gabbro nicht öffnen kann. Ihre Tresordatei wurde nicht verändert.",
+  "vaultFormatUpgradeLink": "So aktualisieren Sie diesen Tresor",
   "vaultCorruptBackupAvailable": "Diese Tresordatei kann nicht gelesen werden. Eine automatische Sicherheitskopie vom letzten erfolgreichen Speichern ist verfügbar.",
   "restoreBackupButton": "Aus Sicherheitskopie wiederherstellen",
   "restoreBackupConfirmTitle": "Tresor aus Sicherheitskopie wiederherstellen?",

@@ -1887,6 +1887,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get manageFoldersDefaultNote => '기본 폴더는 이름을 바꾸거나 삭제할 수 있습니다.';
 
   @override
+  String get vaultFormatTooOld =>
+      '이 보관함은 이 버전의 Gabbro에서 열 수 없는 이전 형식을 사용합니다. 보관함 파일은 변경되지 않았습니다.';
+
+  @override
+  String get vaultFormatUpgradeLink => '이 보관함을 업그레이드하는 방법';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       '이 보관함 파일을 읽을 수 없습니다. 마지막으로 성공한 저장의 자동 안전 사본을 사용할 수 있습니다.';
 

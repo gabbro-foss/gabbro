@@ -1940,6 +1940,13 @@ class AppLocalizationsDa extends AppLocalizations {
       'Standardmapper kan omdøbes eller slettes.';
 
   @override
+  String get vaultFormatTooOld =>
+      'Denne boks bruger et ældre format, som denne version af Gabbro ikke kan åbne. Din boksfil er ikke blevet ændret.';
+
+  @override
+  String get vaultFormatUpgradeLink => 'Sådan opgraderer du denne boks';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Denne boksfil kan ikke læses. En automatisk reservekopi fra den seneste vellykkede gemning er tilgængelig.';
 

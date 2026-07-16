@@ -62,6 +62,7 @@ Widget _buildScreen({
   bool? isAndroid,
   Future<void> Function()? onCancelTap,
   Future<bool> Function(String)? onVaultIsReadable,
+  Future<bool> Function(String)? onVaultFormatTooOld,
   Future<bool> Function(String)? onBackupUsable,
   Future<void> Function(String)? onRestoreBackup,
   Future<bool> Function(String)? onRestoreFromFile,
@@ -85,6 +86,7 @@ Widget _buildScreen({
       isAndroid: isAndroid,
       onCancelTap: onCancelTap ?? () async {},
       onVaultIsReadable: onVaultIsReadable ?? (_) async => true,
+      onVaultFormatTooOld: onVaultFormatTooOld ?? (_) async => false,
       onBackupUsable: onBackupUsable ?? (_) async => false,
       onRestoreBackup: onRestoreBackup ?? (_) async {},
       onRestoreFromFile: onRestoreFromFile ?? (_) async => false,
@@ -125,6 +127,20 @@ UnlockScreen _bareUnlock({List<YubikeyRecordData> yubikeyRecords = const []}) =>
       onEstimateEntropy: _fakeEntropy,
       yubikeyRecords: yubikeyRecords,
       onVaultIsReadable: (_) async => true,
+      onBackupUsable: (_) async => false,
+      onBiometricIsEnrolled: (_) async => false,
+    );
+
+// RT-3: a bare UnlockScreen showing the pre-v11 format banner. The Net A/B/C
+// sweeps below use this so the banner is exercised for overflow, contrast, tap
+// targets and long-string locales — _bareUnlock has a readable vault, so it
+// never renders the banner at all.
+Widget _bareFormatTooOld() => UnlockScreen(
+      vaultPath: '/tmp/test.gabbro',
+      onEstimateEntropy: _fakeEntropy,
+      yubikeyRecords: const [],
+      onVaultIsReadable: (_) async => false,
+      onVaultFormatTooOld: (_) async => true,
       onBackupUsable: (_) async => false,
       onBiometricIsEnrolled: (_) async => false,
     );
@@ -514,6 +530,91 @@ void main() {
       expect(find.byType(FilledButton), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
+
+    // RT-3 banner: two sentences plus a link button, so it is the longest text
+    // block on the screen and the likeliest to bleed.
+    testWidgets('format-too-old banner survives a narrow phone at 8x text',
+        (tester) async {
+      // 360x800 phone, the app's text-scale ceiling (ADR-016).
+      tester.view.physicalSize = const Size(360, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() => tester.view.reset());
+
+      await tester.pumpWidget(_appShell(
+        _bareFormatTooOld(),
+        textScaler: const TextScaler.linear(8.0),
+      ));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull,
+          reason: 'the banner must scroll at 8x text, never overflow');
+    });
+
+    // A user who needs large text must not get a broken screen in their own
+    // language: the worst case is the LONGEST translation at the LARGEST scale
+    // on the NARROWEST screen, and testing scale and locale separately never
+    // meets it. Sweep every supported locale at the 8x ceiling rather than
+    // guessing which translation is longest.
+    testWidgets('format-too-old banner survives every locale at 8x text',
+        (tester) async {
+      tester.view.physicalSize = const Size(360, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() => tester.view.reset());
+
+      for (final locale in AppLocalizations.supportedLocales) {
+        await tester.pumpWidget(_appShell(
+          _bareFormatTooOld(),
+          locale: locale,
+          textScaler: const TextScaler.linear(8.0),
+        ));
+        await tester.pumpAndSettle();
+
+        final thrown = tester.takeException();
+        if (thrown == null) continue;
+        // nn and yo are not shipped by Flutter's own Material/Cupertino/Widgets
+        // delegates, so rendering them warns. That is app-wide and predates this
+        // banner (see ARCHITECTURE known warnings) — tolerate exactly that text
+        // and nothing else, so a real overflow here still fails.
+        expect(
+          thrown.toString(),
+          contains('is not supported by all of its localization delegates'),
+          reason: '$locale at 8x must scroll, never overflow',
+        );
+      }
+    });
+
+    testWidgets('format-too-old banner scrolls in a short viewport',
+        (tester) async {
+      tester.view.physicalSize = const Size(400, 340);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() => tester.view.reset());
+
+      await tester.pumpWidget(_appShell(_bareFormatTooOld()));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull,
+          reason: 'short viewport must scroll, never overflow');
+    });
+
+    testWidgets('format-too-old banner renders in every theme and in de',
+        (tester) async {
+      for (final mode in [ThemeMode.light, ThemeMode.dark]) {
+        for (final hc in [false, true]) {
+          await tester.pumpWidget(
+            _appShell(_bareFormatTooOld(), mode: mode, highContrast: hc),
+          );
+          await tester.pumpAndSettle();
+          expect(tester.takeException(), isNull,
+              reason: 'mode=$mode highContrast=$hc must render cleanly');
+        }
+      }
+      await tester.pumpWidget(
+        _appShell(_bareFormatTooOld(), locale: const Locale('de')),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull,
+          reason: 'the long-string locale must not overflow the banner');
+    });
   });
 
   // ── Net C: accessibility (broad sweep) ──────────────────────────────────────
@@ -549,6 +650,22 @@ void main() {
       for (final mode in [ThemeMode.light, ThemeMode.dark]) {
         await tester.pumpWidget(_appShell(_bareUnlock(), mode: mode));
         await tester.pumpAndSettle();
+        await expectLater(tester, meetsGuideline(textContrastGuideline));
+      }
+      handle.dispose();
+    });
+
+    // RT-3 banner: it is what the user sees INSTEAD of the unlock controls, so
+    // it must clear the same bars — the upgrade link must be reachable and
+    // announced, not a bare unlabelled button.
+    testWidgets('format-too-old banner meets tap-target, label and contrast '
+        'guidelines', (tester) async {
+      final handle = tester.ensureSemantics();
+      for (final mode in [ThemeMode.light, ThemeMode.dark]) {
+        await tester.pumpWidget(_appShell(_bareFormatTooOld(), mode: mode));
+        await tester.pumpAndSettle();
+        await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+        await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
         await expectLater(tester, meetsGuideline(textContrastGuideline));
       }
       handle.dispose();
@@ -1132,6 +1249,70 @@ void main() {
     expect(find.text('Restore from safety copy'), findsNothing);
     expect(find.text('Remove from list'), findsOneWidget);
     expect(find.text('Delete file'), findsOneWidget);
+  });
+
+  // ── RT-3: a pre-v11 vault is refused, NOT reported as corrupt ──────────────
+  //
+  // The floor moved to v11, so an older vault no longer parses. Without these,
+  // the parse probe reports it unreadable and the user is told their vault is
+  // corrupt and invited to delete it — the file is fine, it just needs
+  // migrating with alpha.14 first. Refuse, explain, and offer no destructive
+  // action.
+
+  const oldFormatMessage =
+      'This vault uses an older format that this version of Gabbro cannot '
+      'open. Your vault file has not been changed.';
+  const upgradeUrl =
+      'https://github.com/gabbro-foss/gabbro/blob/master/docs/VAULT_UPGRADE_PATH.md';
+
+  testWidgets('a pre-v11 vault explains the format, never the corruption banner',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      onVaultIsReadable: (_) async => false, // does not parse at floor v11
+      onVaultFormatTooOld: (_) async => true, // ...because it is an old format
+      onBackupUsable: (_) async => true, // a .bak exists, and is equally old
+    ));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining(oldFormatMessage), findsOneWidget);
+    // None of the corruption vocabulary or destructive offers may appear: the
+    // .bak is the same old format, so restoring it would fix nothing, and
+    // deleting is the one thing that would actually lose the vault.
+    expect(find.text('Restore from safety copy'), findsNothing);
+    expect(find.text('Delete file'), findsNothing);
+    expect(find.text('Remove from list'), findsNothing);
+  });
+
+  testWidgets('a pre-v11 vault offers a tappable link to the upgrade steps',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      onVaultIsReadable: (_) async => false,
+      onVaultFormatTooOld: (_) async => true,
+    ));
+    await tester.pumpAndSettle();
+
+    // Same convention as the About screen: tapping shows the URL first, so the
+    // user sees where they are going before any browser opens.
+    await tester.tap(find.textContaining('upgrade'));
+    await tester.pumpAndSettle();
+
+    expect(find.text(upgradeUrl), findsOneWidget);
+    expect(find.text('Open in browser'), findsOneWidget);
+  });
+
+  testWidgets('an unreadable vault that is NOT old still reports corruption',
+      (tester) async {
+    // Guards the regression the two tests above could cause: a genuinely
+    // corrupt file must keep its restore path.
+    await tester.pumpWidget(_buildScreen(
+      onVaultIsReadable: (_) async => false,
+      onVaultFormatTooOld: (_) async => false,
+      onBackupUsable: (_) async => true,
+    ));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Restore from safety copy'), findsOneWidget);
+    expect(find.textContaining(oldFormatMessage), findsNothing);
   });
 
   testWidgets('wrong passphrase on a healthy vault never offers restore',
