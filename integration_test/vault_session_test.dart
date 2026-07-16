@@ -1,37 +1,36 @@
 // Phase 1 - Linux desktop, no hardware.
 //
 // Run with:
-//   flutter drive --driver=test_driver/integration_test.dart \
-//     --target=integration_test/vault_session_test.dart -d linux --profile
+//   cd rust && cargo build --release --lib && cd ..
+//   dart test integration_test/ -j 1
 //
-// Profile (not debug) is required: `flutter test -d linux` builds the Rust lib
-// in debug, where Argon2id is so slow that init+create blow the 30s timeout;
-// `flutter drive --release` is rejected for non-web, so --profile is the path.
-// RustLib.init() then loads the actual compiled Rust library and every bridge
-// call goes through real FFI -> crypto -> disk. That is the whole point: plain
-// `flutter test` (host VM) cannot load the native lib, so the direct bridge calls
-// inside the screens (e.g. getEntry at entry_detail_screen.dart:355) are
-// unreachable there.
+// Plain `dart test`: no Flutter, no window, no GL. The suite loads the compiled
+// Rust cdylib directly (see rust_lib_setup.dart), so every bridge call goes
+// through real FFI -> crypto -> disk. That is the whole point: `flutter test`
+// (host VM) cannot load the native lib, so the direct bridge calls inside the
+// screens (e.g. getEntry at entry_detail_screen.dart:355) are unreachable there.
+// Nothing here touches the UI, so nothing here needs a window - see ADR on the
+// drive-harness removal in ARCHITECTURE.md.
 //
 // Scope is the passphrase-only vault path (initVault / unlockVault), which needs
-// no YubiKey. Multi-key/YubiKey unlock, autofillUnlockMain (Android), and native
-// FilePicker flows are gated to later phases - see ARCHITECTURE.md Current Focus.
+// no YubiKey. Multi-key/YubiKey unlock, autofillUnlockMain (Android) and native
+// FilePicker flows are deliberately out of scope here: they are covered by the Rust
+// suites (yubikey_session_tests / yubikey_mgmt_tests / autofill_tests), the Kotlin
+// unit tests, the Flutter widget tests, and the hardware matrix.
 
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test/integration_test.dart';
+import 'package:test/test.dart';
 
-import 'package:gabbro/src/rust/frb_generated.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
-void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+import 'rust_lib_setup.dart';
 
+void main() {
   setUpAll(() async {
-    await RustLib.init();
+    await initRustLib();
   });
 
   late Directory tmp;
@@ -48,10 +47,10 @@ void main() {
     if (tmp.existsSync()) tmp.deleteSync(recursive: true);
   });
 
-  testWidgets('passphrase vault: init -> createEntry -> getEntry round-trips through real FFI',
-      (_) async {
+  test('passphrase vault: init -> createEntry -> getEntry round-trips through real FFI',
+      () async {
     // Real production Argon2id runs twice here (initVault + the createEntry save);
-    // hence the raised per-test timeout and the profile-mode run (see file header).
+    // hence the raised per-test timeout and the release-built cdylib (see file header).
     // initVault seals a new passphrase-only vault and unlocks it into session.
     await initVault(passphrase: passphrase, path: vaultPath, alias: 'IT');
     expect(File(vaultPath).existsSync(), isTrue,
@@ -78,7 +77,7 @@ void main() {
     expect(got.url, 'https://example.com');
   }, timeout: const Timeout(Duration(minutes: 3)));
 
-  testWidgets('lock -> unlock with passphrase restores the persisted entry', (_) async {
+  test('lock -> unlock with passphrase restores the persisted entry', () async {
     await initVault(passphrase: passphrase, path: vaultPath, alias: 'IT');
     final login = await createLoginEntry(
       folder: '',
@@ -103,8 +102,8 @@ void main() {
     expect((reopened as VaultEntryData_Login).field0.username, 'bob');
   }, timeout: const Timeout(Duration(minutes: 3)));
 
-  testWidgets('changePassphrase re-seals; vault re-opens under the new passphrase only',
-      (_) async {
+  test('changePassphrase re-seals; vault re-opens under the new passphrase only',
+      () async {
     // Proves the Flutter FFI marshals changePassphrase's two byte-vector
     // arguments and that the real re-seal round-trips on a device. The vault-level
     // backward-compat of this path (from frozen v6/v7 bytes, multi-key) is the

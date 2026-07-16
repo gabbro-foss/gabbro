@@ -1,12 +1,12 @@
 // Phase 1 - Linux desktop, no hardware.
 //
 // Run with:
-//   flutter drive --driver=test_driver/integration_test.dart \
-//     --target=integration_test/entry_edit_test.dart -d linux --profile
+//   cd rust && cargo build --release --lib && cd ..
+//   dart test integration_test/ -j 1
 //
-// Profile (not debug) is required for the same reason as vault_session_test.dart:
-// `flutter test -d linux` builds the Rust lib in debug, where Argon2id is too slow,
-// and `flutter drive --release` is rejected for non-web. See that file's header.
+// Plain `dart test` against the release cdylib, for the same reasons as
+// vault_session_test.dart: real FFI needs the native lib, and release matters
+// because debug Argon2id is too slow. See that file's header.
 //
 // These tests cover the un-injectable real-bridge calls embedded in the edit/detail
 // screens that `flutter test` widget tests mock past:
@@ -20,18 +20,16 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test/integration_test.dart';
+import 'package:test/test.dart';
 
-import 'package:gabbro/src/rust/frb_generated.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
-void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+import 'rust_lib_setup.dart';
 
+void main() {
   setUpAll(() async {
-    await RustLib.init();
+    await initRustLib();
   });
 
   late Directory tmp;
@@ -84,8 +82,8 @@ void main() {
     );
   }
 
-  testWidgets('edit -> updateEntry records the prior password in unified history',
-      (_) async {
+  test('edit -> updateEntry records the prior password in unified history',
+      () async {
     final id = await seedLogin(password: 'first-pass');
 
     // Edit mode: change the password and persist through the real bridge.
@@ -102,7 +100,7 @@ void main() {
         reason: 'changing the password records the prior one in meta.history');
   }, timeout: const Timeout(Duration(minutes: 3)));
 
-  testWidgets('delete history record -> real getEntry refresh shows it gone', (_) async {
+  test('delete history record -> real getEntry refresh shows it gone', () async {
     final id = await seedLogin(password: 'first-pass');
     await updateEntry(
       entry: VaultEntryData_Login(editedPassword(id, 'second-pass')),
@@ -122,7 +120,7 @@ void main() {
         reason: 'deleting history must not touch the current password');
   }, timeout: const Timeout(Duration(minutes: 3)));
 
-  testWidgets('restore history record -> restores the prior password', (_) async {
+  test('restore history record -> restores the prior password', () async {
     final id = await seedLogin(password: 'first-pass');
     await updateEntry(
       entry: VaultEntryData_Login(editedPassword(id, 'second-pass')),
@@ -141,8 +139,8 @@ void main() {
         reason: 'restore consumes the record');
   }, timeout: const Timeout(Duration(minutes: 3)));
 
-  testWidgets('recorded history survives a real lock -> unlock disk round-trip',
-      (_) async {
+  test('recorded history survives a real lock -> unlock disk round-trip',
+      () async {
     final id = await seedLogin(password: 'first-pass');
     await updateEntry(
       entry: VaultEntryData_Login(editedPassword(id, 'second-pass')),
