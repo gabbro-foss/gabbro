@@ -10,9 +10,8 @@ use crate::import::csv::{import_csv, sniff_csv as csv_sniff, CsvImportConfig};
 use crate::import::dashlane;
 use crate::import::enpass;
 use crate::import::google_pm;
-use crate::vault::entry::{CustomField, EntryMeta, LoginEntry, VaultEntry};
+use crate::vault::entry::{new_entry_id, CustomField, EntryMeta, LoginEntry, VaultEntry};
 use crate::vault::session;
-use uuid::Uuid;
 
 // ── CSV preview ───────────────────────────────────────────────────────────────
 
@@ -105,7 +104,7 @@ pub async fn import_from_csv(
             meta: EntryMeta {
                 field_times: Default::default(),
                 history: Vec::new(),
-                id: Uuid::new_v4().to_string(),
+                id: new_entry_id(),
                 created_at: now.clone(),
                 updated_at: now,
                 folder: String::new(),

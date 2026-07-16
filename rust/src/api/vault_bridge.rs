@@ -419,10 +419,10 @@ pub fn get_entry(id: String) -> Result<VaultEntryData, String> {
 /// Async — triggers a full vault save (Argon2id + encryption).
 pub async fn create_entry(entry: VaultEntryData) -> Result<EntrySummaryData, String> {
     use crate::api::vault::chrono_now;
-    use uuid::Uuid;
+    use crate::vault::entry::new_entry_id;
     let mut internal = vault_entry_from_data(entry)?;
     let now = chrono_now();
-    let id = Uuid::new_v4().to_string();
+    let id = new_entry_id();
     // `ref mut e` borrows the inner value rather than moving it — required
     // because VaultEntry now implements Drop via ZeroizeOnDrop.
     match &mut internal {

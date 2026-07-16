@@ -15,8 +15,7 @@
 //!   to `"MISSING TITLE"` rather than being dropped)
 
 use crate::import::csv::parse_csv_line;
-use crate::vault::entry::{CustomField, EntryMeta, LoginEntry, VaultEntry};
-use uuid::Uuid;
+use crate::vault::entry::{new_entry_id, CustomField, EntryMeta, LoginEntry, VaultEntry};
 
 // ── Public API ────────────────────────────────────────────────────────────────
 
@@ -120,7 +119,7 @@ pub(crate) fn parse(data: &[u8]) -> Result<(Vec<VaultEntry>, Vec<ParseFailure>),
             meta: EntryMeta {
                 field_times: Default::default(),
                 history: Vec::new(),
-                id: Uuid::new_v4().to_string(),
+                id: new_entry_id(),
                 created_at: String::new(),
                 updated_at: String::new(),
                 folder: String::new(),
@@ -168,6 +167,31 @@ Sample,https://example.net,user@example.com,s3cr3t,";
         let (entries, failures) = parse(SAMPLE_CSV.as_bytes()).unwrap();
         assert_eq!(entries.len(), 2);
         assert!(failures.is_empty());
+    }
+
+    #[test]
+    fn imported_entries_get_a_valid_v4_uuid() {
+        let (entries, _) = parse(SAMPLE_CSV.as_bytes()).unwrap();
+        for entry in &entries {
+            let VaultEntry::Login(ref e) = entry else {
+                panic!("expected Login")
+            };
+            let id = uuid::Uuid::parse_str(&e.meta.id).expect("entry id must be a valid UUID");
+            assert_eq!(id.get_version_num(), 4, "entry ids must be UUID v4");
+            assert_eq!(id.get_variant(), uuid::Variant::RFC4122);
+        }
+    }
+
+    #[test]
+    fn imported_entries_get_distinct_ids() {
+        let (entries, _) = parse(SAMPLE_CSV.as_bytes()).unwrap();
+        let VaultEntry::Login(ref first) = entries[0] else {
+            panic!("expected Login")
+        };
+        let VaultEntry::Login(ref second) = entries[1] else {
+            panic!("expected Login")
+        };
+        assert_ne!(first.meta.id, second.meta.id);
     }
 
     #[test]

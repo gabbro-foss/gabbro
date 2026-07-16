@@ -4,9 +4,25 @@
 //! these types directly — it calls API functions that build them.
 
 use indexmap::IndexMap;
+use rand::rngs::OsRng;
+use rand::RngCore;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use zeroize::{Zeroize, ZeroizeOnDrop};
+
+/// Mint a fresh entry id: a random UUID v4, drawn from `OsRng`.
+///
+/// Every entry id in the vault comes from here. Built on `Builder::from_random_bytes`
+/// (which sets the version and variant bits) rather than `Uuid::new_v4`, so the crate
+/// does not need uuid's `v4` feature — the only edge pulling a second major version of
+/// `getrandom` into the tree. Same entropy source either way.
+pub(crate) fn new_entry_id() -> String {
+    let mut bytes = [0u8; 16];
+    OsRng.fill_bytes(&mut bytes);
+    uuid::Builder::from_random_bytes(bytes)
+        .into_uuid()
+        .to_string()
+}
 
 /// Common metadata shared by every entry, regardless of type.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
@@ -321,6 +337,18 @@ pub enum VaultEntry {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn new_entry_id_is_a_valid_v4_uuid() {
+        let id = uuid::Uuid::parse_str(&new_entry_id()).expect("must be a valid UUID");
+        assert_eq!(id.get_version_num(), 4, "entry ids must be UUID v4");
+        assert_eq!(id.get_variant(), uuid::Variant::RFC4122);
+    }
+
+    #[test]
+    fn new_entry_id_differs_across_calls() {
+        assert_ne!(new_entry_id(), new_entry_id());
+    }
 
     fn default_meta() -> EntryMeta {
         EntryMeta {

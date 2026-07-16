@@ -18,8 +18,7 @@
 //! - `username2` and `username3` when non-empty (alternate credentials)
 
 use crate::import::csv::parse_csv_line;
-use crate::vault::entry::{CustomField, EntryMeta, LoginEntry, VaultEntry};
-use uuid::Uuid;
+use crate::vault::entry::{new_entry_id, CustomField, EntryMeta, LoginEntry, VaultEntry};
 
 // ── Public API ────────────────────────────────────────────────────────────────
 
@@ -123,7 +122,7 @@ pub(crate) fn parse(data: &[u8]) -> Result<(Vec<VaultEntry>, Vec<ParseFailure>),
             meta: EntryMeta {
                 field_times: Default::default(),
                 history: Vec::new(),
-                id: Uuid::new_v4().to_string(),
+                id: new_entry_id(),
                 created_at: String::new(),
                 updated_at: String::new(),
                 folder: String::new(),

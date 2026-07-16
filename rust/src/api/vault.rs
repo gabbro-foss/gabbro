@@ -9,11 +9,10 @@ use sha2::{Digest, Sha256};
 
 use crate::crypto::vault_crypto::{open_vault, seal_vault};
 use crate::vault::entry::{
-    CardEntry, CustomField, EntryMeta, FileEntry, LoginEntry, NoteEntry, VaultEntry,
+    new_entry_id, CardEntry, CustomField, EntryMeta, FileEntry, LoginEntry, NoteEntry, VaultEntry,
 };
 use crate::vault::io::{atomic_write_0600, read_vault, write_vault};
 use crate::vault::serialization::{deserialize_vault_body, serialize_vault_body, VaultBody};
-use uuid::Uuid;
 
 // ── Bridge-facing DTOs ────────────────────────────────────────────────────────
 
@@ -300,7 +299,7 @@ pub fn create_login_entry(
     let meta = EntryMeta {
         field_times: Default::default(),
         history: Vec::new(),
-        id: Uuid::new_v4().to_string(),
+        id: new_entry_id(),
         created_at: now.clone(),
         updated_at: now,
         folder,
