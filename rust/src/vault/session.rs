@@ -6096,48 +6096,42 @@ mod merge_tests {
         teardown(&path);
     }
 
-    // Merging an incoming entry that carries NO per-field times must not lose data:
-    // the entry is added, the local one survives. `field_times` arrived at v9, so
-    // entries written before it have none — a v11 vault migrated up from a pre-v9
-    // format still holds such entries until each is next edited.
-    //
-    // This test used to load a real v8 file through `load_vault` to source that shape.
-    // RT-3 raised the floor to v11, so no build can open a v8 file and that premise is
-    // unreachable; the incoming body is now built in memory instead (`note()` already
-    // leaves `field_times` empty). The merge invariant under test is unchanged — only
-    // the now-impossible old-file load is gone.
+    // A never-edited entry must survive a sync. `create_login_entry` starts every entry
+    // with empty `field_times` (api/vault.rs) — only `update_entry` fills them in — so an
+    // entry created and synced before it is ever edited arrives carrying none. Merging it
+    // must not lose data: it is added, and the local entry survives.
     #[test]
     #[serial]
     #[ignore = "production-Argon saves; run via the gate"]
-    fn sync_merges_an_incoming_entry_without_field_times() {
-        let canary_id = "00000000-0000-0000-0000-000000000001";
+    fn sync_merges_a_never_edited_entry() {
+        let incoming_id = "00000000-0000-0000-0000-000000000001";
         let incoming = VaultBody {
             folders: vec![],
-            entries: vec![note(canary_id, "Incoming", "2026-06-01T00:00:00Z")],
+            entries: vec![note(incoming_id, "Incoming", "2026-06-01T00:00:00Z")],
             ..Default::default()
         };
-        let canary = incoming
+        let fresh = incoming
             .entries
             .iter()
-            .find(|e| entry_id(e) == canary_id)
-            .expect("the incoming body has the canary entry");
+            .find(|e| entry_id(e) == incoming_id)
+            .expect("the incoming body has the entry");
         assert!(
-            meta_of(canary).field_times.is_empty(),
-            "precondition: the incoming entry carries no field times"
+            meta_of(fresh).field_times.is_empty(),
+            "precondition: a never-edited entry carries no field times"
         );
 
-        // Current-format local session with a distinct entry.
-        let pass = b"xversion-local-pass";
+        // Local session with a distinct entry.
+        let pass = b"never-edited-local-pass";
         let path = setup(
             pass,
-            "xversion",
+            "never_edited",
             vec![note("local-only", "Local", "2026-01-01T00:00:00Z")],
         );
         unlock_vault(pass, path.clone()).unwrap();
 
         let summary = session_merge_vault_from_body(incoming).unwrap();
 
-        assert_eq!(summary.added, 1, "the canary is the one added entry");
+        assert_eq!(summary.added, 1, "the incoming entry is the one added");
         {
             let s = VAULT_SESSION.lock().unwrap();
             let ents = &s.as_ref().unwrap().entries;
@@ -6146,8 +6140,8 @@ mod merge_tests {
                 "local entry preserved across the merge"
             );
             assert!(
-                ents.iter().any(|e| entry_id(e) == canary_id),
-                "the field-times-less entry is added without loss"
+                ents.iter().any(|e| entry_id(e) == incoming_id),
+                "the never-edited entry is added without loss"
             );
         }
         teardown(&path);
