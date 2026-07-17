@@ -5,7 +5,7 @@
 //!
 //! The gate proves two *hand-picked* journeys (vault A passphrase change, vault B
 //! interleaved change + rotation). This fuzzer instead applies a *random* order of
-//! `{change_passphrase, add_key, remove_key}` to a frozen golden vault and, after
+//! `{change_passphrase, add_key, remove_key}` to a frozen golden v11 vault and, after
 //! every single step, asserts the brick-prevention invariants hold. It is the
 //! Hypothesis-style "find the interleaving I didn't think of" net for the multi-key
 //! state machine.
@@ -176,48 +176,18 @@ fn assert_unlockable(path: &Path, model: &Model, pool: &[KeyMat; 4], log: &[Stri
 }
 
 /// After every mutation: the vault is never bricked (opens with every registered
-/// key, canary intact) and its on-disk version is consistent with the RT-3 rules.
-/// A passphrase change rebuilds the whole passphrase path, so it migrates the vault
-/// to the current VERSION. A passphrase-less add/remove cannot rebuild the passphrase
-/// material, so the belt keeps the vault WITHIN its starting era: a pre-v11 fixture
-/// stays below the derivation boundary (< current, migrating to current on unlock),
-/// while a v11 fixture is already HKDF-direct and stays AT current VERSION.
-/// change_passphrase always uses a fresh passphrase, so `passphrase != FIXTURE`
-/// reliably marks "a migrating op has run". `start_version` is the fixture's on-disk
-/// version before any mutation.
-fn assert_invariants(
-    path: &Path,
-    model: &Model,
-    pool: &[KeyMat; 4],
-    start_version: u8,
-    log: &[String],
-) {
+/// key, canary intact) and stays at the current VERSION. Every openable vault is
+/// v11+, a single key-derivation era, so every re-seal — with or without a
+/// passphrase rebuild — tags the current VERSION.
+fn assert_invariants(path: &Path, model: &Model, pool: &[KeyMat; 4], log: &[String]) {
     let on_disk = read_vault(path)
         .unwrap_or_else(|e| panic!("read_vault failed after [{}]: {e}", log.join(" -> ")));
-    if model.passphrase != FIXTURE_PASSPHRASE {
-        assert_eq!(
-            on_disk.version,
-            VERSION,
-            "a passphrase change must migrate the vault to the current VERSION; history: [{}]",
-            log.join(" -> ")
-        );
-    } else if start_version >= VERSION {
-        // A v11 fixture is already at the HKDF-direct boundary: a passphrase-less
-        // mutation re-seals within the same era and stays AT current VERSION.
-        assert_eq!(
-            on_disk.version,
-            VERSION,
-            "belt (v11): passphrase-less add/remove stays AT current VERSION; history: [{}]",
-            log.join(" -> ")
-        );
-    } else {
-        assert!(
-            on_disk.version < VERSION,
-            "belt: passphrase-less add/remove must NOT force a pre-v11 vault across the \
-             derivation boundary (stays < current until unlock migrates it); history: [{}]",
-            log.join(" -> ")
-        );
-    }
+    assert_eq!(
+        on_disk.version,
+        VERSION,
+        "every mutation must re-seal at the current VERSION; history: [{}]",
+        log.join(" -> ")
+    );
     assert_unlockable(path, model, pool, log);
 }
 
@@ -258,16 +228,10 @@ fn random_op_sequences_preserve_unlockability() {
     let pool = key_pool();
     let mut rng = StdRng::seed_from_u64(FIXED_SEED);
 
-    // Rotate the starting fixture across versions so random op-orders also exercise
-    // the v6/v7 -> v8 migration paths (v8 has the transcript-bound passphrase combiner)
-    // and the v11 HKDF-direct era (already at the boundary — stays AT current VERSION
-    // across passphrase-less mutations).
-    const FIXTURES: [&str; 4] = [
-        "v6_multikey_2keys.gabbro",
-        "v7_multikey_2keys.gabbro",
-        "v8_multikey_2keys.gabbro",
-        "v11_multikey_2keys.gabbro",
-    ];
+    // v11 is the oldest openable format, so it is the only fixture the fuzzer can
+    // start from. Append the older format here if a future VERSION changes key
+    // derivation and re-introduces a migration path worth fuzzing.
+    const FIXTURES: [&str; 1] = ["v11_multikey_2keys.gabbro"];
 
     for case in 0..cases {
         let fixture_name = FIXTURES[case % FIXTURES.len()];
@@ -276,13 +240,16 @@ fn random_op_sequences_preserve_unlockability() {
         let mut model = Model::fresh();
         let mut log: Vec<String> = vec![format!("case#{case} start({fixture_name}: YK1,YK2)")];
 
-        // Baseline: the freshly-copied fixture opens with every key. Its on-disk
-        // VERSION may be pre-current (v6/v7) until the first mutation migrates it,
-        // so check unlockability only here, not the version.
+        // Baseline: the freshly-copied fixture opens with every key, at the current
+        // VERSION (it is the current format, not an older one being migrated).
         assert_unlockable(path, &model, &pool, &log);
         let start_version = read_vault(path)
             .unwrap_or_else(|e| panic!("baseline read_vault failed ({fixture_name}): {e}"))
             .version;
+        assert_eq!(
+            start_version, VERSION,
+            "fixture {fixture_name} must be at the current VERSION"
+        );
 
         let steps = rng.gen_range(1..=MAX_STEPS);
         for _ in 0..steps {
@@ -366,7 +333,7 @@ fn random_op_sequences_preserve_unlockability() {
                 _ => unreachable!(),
             }
 
-            assert_invariants(path, &model, &pool, start_version, &log);
+            assert_invariants(path, &model, &pool, &log);
         }
 
         // Final lock-out checks once the sequence is complete.
