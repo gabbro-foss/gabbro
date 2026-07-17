@@ -12,13 +12,13 @@ Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
 
 **Tech stack:** Flutter (Dart) frontend, Rust backend/crypto, flutter_rust_bridge v2 (FFI).
 
-**Encryption (at rest):** Argon2id KDF → HKDF-SHA256 → AES-256-GCM. Quantum resistance from Argon2id + AES-256-GCM (ADR-018). New vaults (VERSION 11+) derive the vault key straight from the Argon2id output; the removed X25519 + ML-KEM-1024 hybrid layer survives read-only to open/migrate ≤v10 vaults (dropped entirely at RT-3).
+**Encryption (at rest):** Argon2id KDF → HKDF-SHA256 → AES-256-GCM. Quantum resistance from Argon2id + AES-256-GCM (ADR-018). The vault key derives straight from the Argon2id output. The X25519 + ML-KEM-1024 hybrid layer was non-load-bearing and is gone: RT-3 deleted it with the `ml-kem` + `x25519-dalek` crates, and v11 is now the oldest readable format (≤v10 refused intact — see [VAULT_UPGRADE_PATH.md](VAULT_UPGRADE_PATH.md)).
 
 **Authentication (app access):** Passphrase always; a FIDO2/WebAuthn hardware key (YubiKey) is strongly recommended but **not enforced** — a passphrase-only vault is the default. When keys are used: v1 Ed25519 (hardware constraint), target ML-DSA-44 once Yubico ships PQ-capable hardware (ADR-005), min 2 keys (primary + backup), max 4. Auto-lock: 30s default, configurable.
 
 **YubiKey NFC / NDEF OTP:** a YubiKey's OTP slot 1 (an NDEF URI) would open a browser when tapped on Android. Gabbro suppresses this via `NfcConfiguration().skipNdefCheck(true)` and by re-arming foreground dispatch after `stopNfcDiscovery`; OTP slot 1 can stay enabled (no `ykman` workaround).
 
-**Vault file format:** `.gabbro` binary. Plaintext header (magic, version, Argon2id params + salt, HKDF salt, nonce; ≤v10 also carry an ML-KEM ciphertext + X25519 ephemeral pubkey, dropped at v11) + AES-256-GCM encrypted body (JSON-serialised entries). Self-contained; auth tag detects tampering.
+**Vault file format:** `.gabbro` binary. Plaintext header (magic, version, Argon2id params + salt, HKDF salt, nonce) + AES-256-GCM encrypted body (JSON-serialised entries). Self-contained; auth tag detects tampering.
 
 **Vault entries:** 6 types — Login (displayed as "Password" in UI), Note, Identity, Card, File, Custom. Common fields: UUID, created, modified, folder, tags, favourite. No TOTP — YubiKey covers 2FA; keeping them separate is more secure.
 
@@ -70,12 +70,12 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 668 | 17 |
+| Rust (`cargo test -q`) | 634 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 11 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust sync-walk batched apply (`cargo test --release --lib sync_walk_batched_apply_matches_checker -- --ignored`) | 1 | 1 (opt-in by default) |
-| Rust cross-version sync, v8 file (`cargo test --release --lib cross_version_sync_loads_and_merges_a_v8_file -- --ignored`) | 1 | 1 (opt-in by default) |
+| Rust sync merges entry without field_times (`cargo test --release --lib sync_merges_an_incoming_entry_without_field_times -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
 | Flutter (`flutter test`) | 1265 | 0 |
@@ -101,7 +101,7 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 | Gradle space-assignment x16 | pub-cache `jni`, `jni_flutter`, `file_picker` | Upstream. Hard error at Gradle 10. |
 | JVM restricted-method (`System::load`) | Gradle 8.14 `native-platform` jar | Needs a wrapper bump — a full-gate change, do deliberately. |
 | `cargo deny` no-license-field: `allo-isolate` | `flutter_rust_bridge` dep | Fixed on their master; await release. `[[licenses.clarify]]` is inert — don't retry. |
-| `cargo deny` duplicates x7 | `argon2`->`digest`, `jni`->`libloading`, `bindgen`->`shlex` | Upstream pins. `hybrid-array` dies with RT-3. |
+| `cargo deny` duplicates x6 | `argon2`->`digest`, `jni`->`libloading`, `bindgen`->`shlex` | Upstream pins. Was x7; RT-3 took the `hybrid-array` duplicate with `ml-kem`. The crate itself stays (`sha2`/`hkdf` -> `digest` need it). |
 | KGP via `buildscript` classpath | `file_picker`, `url_launcher_android` | Upstream. Future Flutter hard error. |
 
 ---
@@ -112,20 +112,12 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**RT-3 is IN PROGRESS — read the HANDOFF block at the top of
-[RT3_CLEANUP.md](RT3_CLEANUP.md) first.** Floor is raised to v11, the backward-compat gate is
-rewritten and green, the unlock UI refuses old vaults non-destructively (37 locales), and the
-state-machine fuzzer now runs v11-only. Next up: the §1–§7 deletions.
-
-- **RT-3 + dual-lock cleanup (merged, floor → v11)** — once no ≤v10 vault remains: delete the
-  legacy `StdRng` X25519, the legacy ML-KEM + dual-lock derivations, and the frozen-golden
-  tripwire; **drop the `ml-kem` + `x25519-dalek` crates** (supply-chain surface → zero); min
-  supported version → v11 (≤v10 rejected gracefully, never bricked); convert the v2–v10 gate
-  fixtures to a graceful-rejection test; migration-vault + gate corpus floor → v11. The v11
-  auto-migrate release (alpha.14) has shipped; gated now only on field vaults migrating off ≤v10
-  — see VAULT_UPGRADE_PATH.md. Also silences the `hybrid-array` 0.2.3/0.4.12 `cargo deny` duplicate
-  warning for free: `ml-kem` is its only source. **Exhaustive deletion checklist:
-  [RT3_CLEANUP.md](RT3_CLEANUP.md).**
+**RT-3 code is COMPLETE; the gate is not run.** The hybrid layer and both crates are deleted,
+the floor is v11, and every suite the agent can run is green (see the verification table in
+[RT3_CLEANUP.md](RT3_CLEANUP.md)). Outstanding: the full `gabbro_test` gate (~2h, maintainer),
+the hardware matrix, and the CHANGELOG `[Unreleased]` entry. Whether it warrants a release is
+the maintainer's call. Remaining doc sweep and the delete-this-file step are tracked in
+RT3_CLEANUP §9.
 
 ---
 

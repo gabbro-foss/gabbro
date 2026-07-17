@@ -73,7 +73,8 @@ Unlocking your vault involves these steps:
    derive the intermediate key. This step is the same in both modes. *(Vaults
    created before VERSION 11 instead combined two key-exchange shared secrets — one
    X25519, one ML-KEM-1024 — via HKDF; that layer was removed as non-load-bearing
-   per ADR-018, and is retained read-only to open and migrate older vaults.)*
+   per ADR-018 and deleted outright at RT-3, so VERSION 11 is the oldest format this
+   build opens.)*
 
 3. **YubiKey factor (YubiKey mode only).** The intermediate key is combined with
    the YubiKey's HMAC-secret in a second HKDF pass to produce the final vault key.
@@ -97,7 +98,7 @@ Both modes share the same first phase. The second phase differs.
 | KDF | Argon2id (RFC 9106) | m = 64 MiB, t = 25, p = 4. Exceeds RFC 9106 second-recommended profile (m=64 MiB, t=3, p=4) and OWASP minimum. Tuned to ~667 ms on the reference hardware. Produces 96 bytes of key material. |
 | Vault-key HKDF | HKDF-SHA256 (RFC 5869) | `HKDF(hkdf_salt, argon2id_output, "gabbro-vault-key-from-argon2id-v1") → 32-byte intermediate_key`. `hkdf_salt` is a fresh 32-byte random value per seal, stored in the vault header. |
 
-*Vaults ≤ VERSION 10 instead derived `intermediate_key` from a hybrid X25519 (RFC 7748) + ML-KEM-1024 (FIPS 203) key exchange, combined via HKDF (`"gabbro-hybrid-kex-v1"`, transcript-bound `"…-v2"` from VERSION 8). That layer was removed as non-load-bearing (ADR-018); its keypair-derivation and combiner code is retained read-only to open and migrate older vaults, and is dropped entirely at RT-3.*
+*Vaults ≤ VERSION 10 instead derived `intermediate_key` from a hybrid X25519 (RFC 7748) + ML-KEM-1024 (FIPS 203) key exchange, combined via HKDF (`"gabbro-hybrid-kex-v1"`, transcript-bound `"…-v2"` from VERSION 8). That layer was removed as non-load-bearing (ADR-018), and RT-3 deleted the code and both crates. Such a vault is now refused — intact, never modified — with a pointer to [VAULT_UPGRADE_PATH.md](VAULT_UPGRADE_PATH.md).*
 
 **Phase 2 — differs by mode**
 
@@ -115,7 +116,7 @@ Any single registered key can decrypt the body. Passphrase changes only re-encry
 | Step | Algorithm | Notes |
 |------|-----------|-------|
 | Symmetric encryption | AES-256-GCM (FIPS 197 / NIST SP 800-38D) | 96-bit nonce generated via OS CSPRNG (`getrandom`). GCM authentication tag detects any tampering of the ciphertext. |
-| File format | `.gabbro` binary | Plaintext header (params, salts, nonces, YubiKey records, alias; vaults ≤ VERSION 10 also carry the ML-KEM ciphertext + X25519 ephemeral pubkey, dropped at v11) + AES-GCM encrypted body. Self-contained. |
+| File format | `.gabbro` binary | Plaintext header (params, salts, nonces, YubiKey records, alias) + AES-GCM encrypted body. Self-contained. |
 
 The vault file is written with `0600` permissions (user-read/write only) via an
 atomic temp-file-then-rename. Symlinks at the vault path are rejected on both
@@ -170,13 +171,13 @@ The parameters (m=64 MiB, t=25, p=4) were measured with `rust/src/bin/bench_kdf.
 on the development hardware. They exceed the RFC 9106 second-recommended profile
 and the OWASP minimum by a factor of ~8× on time cost.
 
-**ML-KEM keypair derivation follows FIPS 203 §7.1 (VERSION 6–10, read path).**
-In vaults VERSION 6–10, the ML-KEM-1024 keypair is derived by calling
+**ML-KEM keypair derivation followed FIPS 203 §7.1 (VERSION 6–10) — historical.**
+In vaults VERSION 6–10, the ML-KEM-1024 keypair was derived by calling
 `ML-KEM.KeyGen(d, z)` directly with `d = kdf[32..64]`, `z = kdf[64..96]` — the
-FIPS 203-conformant construction. VERSION 11 removes the hybrid KEM (ADR-018); this
-derivation is retained read-only to open and migrate older vaults. The implementation
-is tested for determinism, full consumption of both seed bytes, and divergence from the
-legacy derivation path. Legacy vaults (VERSION ≤ 5) remain readable.
+FIPS 203-conformant construction. VERSION 11 removed the hybrid KEM (ADR-018) and RT-3
+deleted the derivation, so no ML-KEM code ships. Recorded here because the Argon2id
+output is still 96 bytes: the length is frozen (changing it would change every derived
+key), and this is where the three ranges came from.
 
 **Secrets are absent from memory after lock.**
 A reproducible memory-forensics self-test (`rust/scripts/mem_forensics.sh`) seals
@@ -245,10 +246,9 @@ Bounded further by auto-lock and clipboard auto-clear.
 
 Since VERSION 7, every byte of the `.gabbro` plaintext header — Argon2id
 parameters, salts, YubiKey records (including credential IDs, salts, and key blobs),
-alias, and passphrase_blob (plus, in vaults ≤ VERSION 10, the ML-KEM ciphertext and
-X25519 public key) — is committed to the AES-256-GCM authentication tag as additional
-authenticated data (AAD). Any modification to the header without possessing the vault
-key causes body decryption to fail immediately.
+alias, and passphrase_blob — is committed to the AES-256-GCM authentication tag as
+additional authenticated data (AAD). Any modification to the header without possessing
+the vault key causes body decryption to fail immediately.
 
 **What this protects:**
 - **Alias**: renaming the vault without an active unlocked session is now detectable.
@@ -269,9 +269,10 @@ CRUD operation, or key management action.
 
 ### F-03 — Hybrid KEM combiner transcript binding (addressed for passphrase-only, VERSION 8)
 
-*Historical: applies to vaults ≤ VERSION 10. VERSION 11 removes the hybrid KEM layer
-entirely (ADR-018) — the vault key is derived straight from the Argon2id output, so
-there is no KEM transcript to bind.*
+*Historical: applied to vaults ≤ VERSION 10. VERSION 11 removed the hybrid KEM layer
+entirely (ADR-018) and RT-3 deleted the code — the vault key is derived straight from
+the Argon2id output, so there is no KEM transcript to bind. Kept as the record of why
+F-03 was raised and how it was answered.*
 
 The Phase 1 combiner was `HKDF(hkdf_salt, ml_kem_ss ∥ x25519_ss, "gabbro-hybrid-kex-v1")`,
 binding the KEM transcript only via the AES-GCM AAD. As of vault format **VERSION 8** the
@@ -282,19 +283,17 @@ X25519 public key — which the AAD cannot bind, as it is not stored in the file
 substantive gain. This is defence-in-depth, not a fix for a known attack; post-quantum
 security at rest still comes from AES-256-GCM + Argon2id, not the KEM layer.
 
-**YubiKey-protected vaults are intentionally unchanged.** Their body uses an independent
-random master key plus the hardware `hmac-secret` factor, so the combiner only wraps the
-passphrase key-slot there — KDF-level binding would add no security and would risk a
-migration brick. The combiner is version-gated: older vaults open unchanged and migrate on
-next save.
+**YubiKey-protected vaults were intentionally unchanged.** Their body uses an independent
+random master key plus the hardware `hmac-secret` factor, so the combiner only wrapped the
+passphrase key-slot there — KDF-level binding would have added no security and would have
+risked a migration brick.
 
 ### What a future expert reviewer could still look at
 
 - The v11 key derivation in `rust/src/crypto/` — `HKDF(argon2id_output)` for the
   passphrase key-slot, the YubiKey combiner phase, and the multi-key vault state
-  machine (plus the ≤v10 hybrid-KEM read/migrate path retained until RT-3).
-- Side-channel behaviour of the Argon2id / HKDF (and, on the ≤v10 read path,
-  X25519 / ML-KEM) call sites at the compiled-code level.
+  machine.
+- Side-channel behaviour of the Argon2id / HKDF call sites at the compiled-code level.
 - The formal correctness of `add_key_to_sealed` / `remove_key_from_sealed` /
   `change_vault_passphrase_with_keys` (invariant: any registered key can always
   unlock; passphrase change does not invalidate existing keys).

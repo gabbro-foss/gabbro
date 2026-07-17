@@ -7,8 +7,8 @@
 //   ML-KEM-1024 hybrid key-exchange layer was removed as non-load-bearing.
 //   The plaintext header is bound as AES-GCM AAD (v7+); the YubiKey multi-key
 //   keyslot layer is unchanged (wrapping_key / vault_key_master / passphrase_blob
-//   / per-key key_blob). v2-v10 vaults keep the legacy hybrid derivation, read-only,
-//   to open and migrate them (dropped entirely at RT-3).
+//   / per-key key_blob). RT-3 deleted the hybrid derivation: v11 is the oldest
+//   readable format, and a v2-v10 vault is refused intact (VAULT_UPGRADE_PATH.md).
 //   Arrows read top-down as the UNLOCK / key-derivation path; sealing is the
 //   inverse (see notes).
 
@@ -73,11 +73,11 @@ digraph gabbro_crypto_stack {
 
   // ───────── Notes ─────────
   note_aad [shape=note, fillcolor="#FFF7D6", color="#B08900",
-    label="VERSION 7+ header integrity: the entire plaintext header\n— Argon2 params, salts, YubiKey records, alias, passphrase_blob —\nis the AES-GCM AAD. (Vaults ≤ v10 also bind the ML-KEM\nciphertext + X25519 pubkey they carry.) Any header tamper\nmakes body decryption fail."];
+    label="VERSION 7+ header integrity: the entire plaintext header\n— Argon2 params, salts, YubiKey records, alias, passphrase_blob —\nis the AES-GCM AAD. Any header tamper\nmakes body decryption fail."];
   note_v11 [shape=note, fillcolor="#FFF7D6", color="#B08900",
-    label="VERSION 11 (ADR-018): the vault key is derived straight from\nthe Argon2id output via HKDF, removing the X25519 + ML-KEM-1024\nhybrid key exchange (it was non-load-bearing — both keypairs\nderived from the passphrase). v2–v10 keep the legacy hybrid\nderivation, read-only, to open and migrate them; derivation is\nversion-dispatched on the parsed file version. Dropped at RT-3."];
+    label="VERSION 11 (ADR-018): the vault key is derived straight from\nthe Argon2id output via HKDF, removing the X25519 + ML-KEM-1024\nhybrid key exchange (it was non-load-bearing — both keypairs\nderived from the passphrase). RT-3 deleted that layer and both\ncrates: v11 is the oldest readable format, and a v2–v10 vault is\nrefused intact (see VAULT_UPGRADE_PATH.md)."];
   note_pp [shape=note, fillcolor="#FFF7D6", color="#B08900",
-    label="Passphrase change re-runs Argon2id + HKDF and re-wraps\nwrapping_key into a new passphrase_blob; key_blobs and\nthe vault body are unchanged (any one key still opens).\nYubiKey slots keep the \"…-v1\" combiner at every version."];
+    label="Passphrase change re-runs Argon2id + HKDF and re-wraps\nwrapping_key into a new passphrase_blob; key_blobs and\nthe vault body are unchanged (any one key still opens).\nYubiKey slots keep the \"…-v1\" combiner."];
   body -> note_aad  [style=invis];
   body -> note_v11  [style=invis];
   body -> note_pp   [style=invis];

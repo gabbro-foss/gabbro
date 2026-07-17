@@ -10,23 +10,23 @@ that let the 2026-06-08 brick through).
 
 ## What each fixture is
 
-| File | VERSION | Sealed by | Shape |
-|------|---------|-----------|-------|
-| `v6_passphrase.gabbro` | 6 | `v0.1.0-alpha.4` | passphrase only |
-| `v6_multikey_2keys.gabbro` | 6 | `v0.1.0-alpha.4` | passphrase + YK1 + YK2 |
-| `v7_passphrase.gabbro` | 7 | `master` (pre-v8) | passphrase only |
-| `v7_multikey_2keys.gabbro` | 7 | `master` (pre-v8) | passphrase + YK1 + YK2 |
-| `v8_passphrase.gabbro` | 8 | `master` (pre-v9, transcript-bound combiner) | passphrase only |
-| `v8_multikey_2keys.gabbro` | 8 | `master` (pre-v9) | passphrase + YK1 + YK2 |
-| `v9_passphrase.gabbro` | 9 | current `master` (granular sync; crypto == v8) | passphrase only |
-| `v9_multikey_2keys.gabbro` | 9 | current `master` | passphrase + YK1 + YK2 |
-| `v10_passphrase.gabbro` | 10 | current `master` (RT-3: X25519 direct from KDF, no StdRng) | passphrase only |
-| `v10_multikey_2keys.gabbro` | 10 | current `master` | passphrase + YK1 + YK2 |
-| `v11_passphrase.gabbro` | 11 | `drop-dual-lock-hybrid-kem` (ADR-018: vault key from Argon2id via HKDF, no KEM) | passphrase only |
-| `v11_multikey_2keys.gabbro` | 11 | same branch | passphrase + YK1 + YK2 |
+| File | VERSION | Sealed by | Shape | Role |
+|------|---------|-----------|-------|------|
+| `v10_passphrase.gabbro` | 10 | `master` (X25519 direct from KDF, no StdRng) | passphrase only | refusal input |
+| `v10_multikey_2keys.gabbro` | 10 | `master` | passphrase + YK1 + YK2 | refusal input |
+| `v11_passphrase.gabbro` | 11 | ADR-018 (vault key from Argon2id via HKDF, no KEM) | passphrase only | open/migrate |
+| `v11_multikey_2keys.gabbro` | 11 | same | passphrase + YK1 + YK2 | open/migrate |
 
 (Table grows as the harness grows — see the test list at the top of
 `../vault_backward_compat.rs`.)
+
+**The v10 pair is kept deliberately.** RT-3 raised the readable floor to v11 and
+deleted the hybrid derivation that opened v2–v10, so these two no longer open —
+that is their job. They are a *real* old vault (not a synthetic one) proving the
+refusal is graceful and leaves the file byte-identical. Do not delete them, and do
+not "fix" the tests that expect them to fail. The v6–v9 fixtures were deleted at
+RT-3: below the floor and redundant once v10 covers the refusal. Git history has
+them if a future archaeology needs one.
 
 All fixtures seal the same canary body and use the same passphrase / YubiKey
 material, defined in `fixture_spec.rs` (shared with the generator so seal-time
@@ -56,16 +56,16 @@ git checkout src/crypto/kdf.rs
 git status
 ```
 
-## Recipe — generating an older-VERSION fixture (e.g. v6 from a tag)
+## Recipe — generating an older-VERSION fixture from a tag
 
 ```bash
-# v6 shipped in v0.1.0-alpha.4. Generate in an isolated worktree at that tag:
-git worktree add /tmp/gabbro-v6 v0.1.0-alpha.4
-cd /tmp/gabbro-v6/rust
+# Generate in an isolated worktree at the tag that shipped the VERSION:
+git worktree add /tmp/gabbro-old <tag>
+cd /tmp/gabbro-old/rust
 # Drop in a generator adapted to that tag's public API (older save_* signatures)
 # and the same low-params edit, run it, then copy the produced .gabbro file(s)
 # back into this repo's tests/fixtures/vaults/. Remove the worktree when done:
-git worktree remove /tmp/gabbro-v6
+git worktree remove /tmp/gabbro-old
 ```
 
 ## Adding a fixture when a NEW VERSION ships

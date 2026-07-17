@@ -93,6 +93,13 @@ the legacy derivation code stay for that read/migrate path; both are dropped at 
 (decision item 2). Living docs (ARCHITECTURE, SECURITY, README, diagrams) corrected to
 attribute quantum resistance to Argon2id + AES-256-GCM (decision item 1).
 
+**Decision item 2 completed (RT-3).** The readable floor is now v11: the hybrid
+derivation, the version dispatchers, and both crates are deleted, taking 11 crates out of
+the dependency tree (195 -> 184 lock entries). A ≤v10 vault is refused intact and pointed
+at `VAULT_UPGRADE_PATH.md` rather than migrated in place — auto-migrate-on-unlock is gone
+with the era it bridged. `hkdf.rs::v11_vault_key_known_answer` remains as the frozen
+tripwire proving the deletion did not alter the v11 derivation.
+
 ## References
 
 - https://crypto.stackexchange.com/questions/119762/

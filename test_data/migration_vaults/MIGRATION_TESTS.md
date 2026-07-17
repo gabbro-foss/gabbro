@@ -2,7 +2,16 @@
 
 One passphrase-only vault per shipped format VERSION. The automated gate
 (`rust/tests/`) proves format backward-compat in software; this proves the
-**migrate-on-unlock** behaviour (RT-3) on real devices.
+**migrate-on-unlock** behaviour on real devices.
+
+> **Read this before running anything below (RT-3, 2026-07-17).** The readable floor is
+> now **v11**, and migrate-on-unlock is gone with the hybrid layer it carried vaults
+> across. On the current build `v6`–`v10` **will not open — that is correct, not a
+> failure**: the expected result is a refusal naming the upgrade path, with the file left
+> byte-identical. Every migrate-on-unlock procedure below is therefore **historical** and
+> applies only to the alpha.14-and-earlier builds it names; the migration route for a real
+> ≤v10 vault is now alpha.14 as a stepping stone (see `docs/VAULT_UPGRADE_PATH.md`).
+> The corpus is kept per the never-delete rule — it is now the refusal corpus.
 
 ## Corpus
 

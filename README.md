@@ -19,7 +19,7 @@ Named after the intrusive igneous rock — hard, stable, enduring.
 ### Key properties
 
 - **Quantum-resistant by design** — vault security rests on Argon2id +
-  AES-256-GCM, both quantum-resistant. New vaults derive the vault key
+  AES-256-GCM, both quantum-resistant. Vaults derive the vault key
   straight from Argon2id (VERSION 11); an earlier X25519 + ML-KEM-1024
   layer was removed as non-load-bearing (ADR-018)
 - **Hardware key (optional, recommended)** — FIDO2/YubiKey authentication; passphrase-only
@@ -75,10 +75,12 @@ passphrase + random_salt
 → encrypted vault body + auth tag
 ```
 
-Quantum resistance comes from Argon2id + AES-256-GCM. New vaults
-(VERSION 11) derive the vault key directly from Argon2id; an earlier
-hybrid X25519 + ML-KEM-1024 key-exchange layer was removed as
-non-load-bearing (ADR-018), and survives read-only to migrate older vaults.
+Quantum resistance comes from Argon2id + AES-256-GCM. Vaults (VERSION 11)
+derive the vault key directly from Argon2id; an earlier hybrid X25519 +
+ML-KEM-1024 key-exchange layer was removed as non-load-bearing (ADR-018).
+VERSION 11 is the oldest format this build opens — an older vault is refused
+without being modified, and can be upgraded via
+[docs/VAULT_UPGRADE_PATH.md](docs/VAULT_UPGRADE_PATH.md).
 
 Vault files use the `.gabbro` extension and are self-contained —
 all parameters needed for decryption travel with the file.

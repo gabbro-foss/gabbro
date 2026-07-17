@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+- **VERSION 11 is now the minimum vault format.** The X25519 + ML-KEM hybrid layer removed as non-load-bearing at alpha.14 (ADR-018) is now deleted outright, along with the `ml-kem` and `x25519-dalek` crates — 11 fewer dependencies. Quantum resistance is unchanged (Argon2id + AES-256-GCM).
+
+### Changed
+- **A vault older than VERSION 11 is refused, not damaged.** The file is left untouched and the app explains it needs upgrading rather than reporting corruption. To upgrade: install alpha.14, open each vault once, then return. See [docs/VAULT_UPGRADE_PATH.md](docs/VAULT_UPGRADE_PATH.md).
+
 ## [0.1.0-alpha.14] – 2026-07-11
 
 ### Security
