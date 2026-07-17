@@ -1,8 +1,9 @@
-# Hardware migration tests — old-vault corpus + RT-3 migrate-on-unlock
+# Hardware refusal tests — old-vault corpus (floor v11)
 
-One passphrase-only vault per shipped format VERSION. The automated gate
-(`rust/tests/`) proves format backward-compat in software; this proves the
-**migrate-on-unlock** behaviour on real devices.
+One passphrase-only vault per shipped format VERSION, kept permanently. The automated gate
+(`rust/tests/`) proves the floor in software; this proves on real devices that a pre-v11
+vault is **refused and left intact**. The migrate-on-unlock procedures below are historical
+— see the banner.
 
 > **Read this before running anything below (RT-3, 2026-07-17).** The readable floor is
 > now **v11**, and migrate-on-unlock is gone with the hybrid layer it carried vaults
