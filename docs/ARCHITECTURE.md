@@ -45,7 +45,7 @@ gabbro/
 │   └── *.dart            # main, app_paths (GabbroPaths), settings, text_scale, control_scale, vault_registry, safe_file_picker, autotype_listener, autotype_target, clipboard_clear
 ├── rust/src/
 │   ├── api/              # Bridge surface: vault, vault_bridge, import, *_generator, fido_bridge, autofill_bridge, autotype_bridge, entropy, types
-│   ├── crypto/           # Internal (not bridge-exposed): kdf, keypair, ml_kem, hkdf, aes_gcm, vault_crypto
+│   ├── crypto/           # Internal (not bridge-exposed): kdf, hkdf, aes_gcm, vault_crypto
 │   ├── vault/            # Domain model: entry, file_format, io, serialization, session
 │   ├── fido/             # FIDO2/libfido2 FFI (Linux only)
 │   ├── import/           # enpass, bitwarden, google_pm, dashlane, csv
