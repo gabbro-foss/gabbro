@@ -15,14 +15,12 @@ argon2 = "0.5.3"
 flutter_rust_bridge = "=2.12.0"
 hkdf = "0.13.0"
 indexmap = { version = "2", features = ["serde"] }
-ml-kem = { version = "0.2.3", features = ["deterministic"] }
 rand = "0.8"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = { version = "1.0.149", features = ["preserve_order"] }
 sha2 = "0.11.0"
 thiserror = "1"
 uuid = "1.23.0"
-x25519-dalek = { version = "2.0.1", features = ["static_secrets"] }
 zeroize = { version = "1.8.2", features = ["zeroize_derive"] }
 base64 = "0.22.1"
 # Optional, only for the `forensics` feature (memory self-test harness — not in normal builds).

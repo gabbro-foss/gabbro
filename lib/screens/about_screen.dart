@@ -341,11 +341,6 @@ const _kComponents = [
     url: 'https://github.com/Yubico/libfido2',
   ),
   _Component(
-    name: 'ml-kem',
-    licence: 'Apache-2.0 / MIT',
-    url: 'https://github.com/RustCrypto/KEMs',
-  ),
-  _Component(
     name: 'path_provider',
     licence: 'BSD-3-Clause',
     url: 'https://github.com/flutter/packages',
@@ -384,11 +379,6 @@ const _kComponents = [
     name: 'uuid',
     licence: 'Apache-2.0 / MIT',
     url: 'https://github.com/uuid-rs/uuid',
-  ),
-  _Component(
-    name: 'x25519-dalek',
-    licence: 'BSD-3-Clause',
-    url: 'https://github.com/dalek-cryptography/x25519-dalek',
   ),
   _Component(
     name: 'zeroize',

@@ -41,9 +41,12 @@ const FIXED_SEED: u64 = 0x6761_6262_726f_5f70; // "gabbro_p"
 const GARBAGE_CASES: usize = 4096;
 
 /// Bytes of a committed golden vault, used as the "valid" base for truncation.
+/// Must be a readable format (v11+): the truncation test needs the full file to
+/// parse, and a pre-floor vault is refused on its version byte alone — which would
+/// pass the "is_err" assertions for the wrong reason and test nothing.
 fn golden_vault_bytes() -> Vec<u8> {
     let path = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("tests/fixtures/vaults/v7_passphrase.gabbro");
+        .join("tests/fixtures/vaults/v11_passphrase.gabbro");
     std::fs::read(&path).expect("read golden fixture")
 }
 

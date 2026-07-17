@@ -11,7 +11,6 @@ use std::sync::{LazyLock, Mutex};
 
 use crate::api::vault::{
     add_yubikey_to_vault, change_passphrase_with_keys, load_vault, load_vault_with_key_record,
-    migrate_multikey_vault_on_unlock, migrate_passphrase_vault_on_unlock,
     remove_yubikey_from_vault, reseal_vault_body, save_vault, MergeSummary,
 };
 use crate::api::vault_bridge::EntrySummaryData;
@@ -75,10 +74,6 @@ static VAULT_SESSION: LazyLock<Mutex<Option<VaultSession>>> = LazyLock::new(|| M
 pub fn unlock_vault(passphrase: &[u8], path: PathBuf) -> Result<(), String> {
     let mut body = load_vault(passphrase, &path)?;
     crate::api::vault::purge_expired_history(&mut body.entries);
-    // RT-3: best-effort migrate an older passphrase-only vault to the current
-    // format on unlock. A write failure must not block unlock (D1) — retried next
-    // unlock; the reseal cap keeps the un-migrated vault safe meanwhile.
-    let _ = migrate_passphrase_vault_on_unlock(passphrase, &body, &path);
     let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     *session = Some(VaultSession {
         folders: body.folders,
@@ -106,12 +101,6 @@ pub fn unlock_vault_with_key_record(
     let (mut body, master, wrapping_key) =
         load_vault_with_key_record(passphrase, hmac_secret, &credential_id, &path)?;
     crate::api::vault::purge_expired_history(&mut body.entries);
-    // RT-3: best-effort migrate an older p+YK vault to the current format on unlock,
-    // reusing the cached wrapping_key/master (no re-tap). Best-effort per D1; only
-    // when a wrapping_key exists (v4+ multi-key). Borrow before the session takes them.
-    if let Some(ref wrapping) = wrapping_key {
-        let _ = migrate_multikey_vault_on_unlock(passphrase, wrapping, &master, &body, &path);
-    }
     let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     *session = Some(VaultSession {
         folders: body.folders,
@@ -6107,30 +6096,34 @@ mod merge_tests {
         teardown(&path);
     }
 
-    // Cross-version sync end to end: load a real pre-v9 (v8) vault file as the
-    // incoming body - through the same load_vault -> deserialize path the app uses
-    // - and merge it into a current-format session. Proves the whole flow loads an
-    // older format, upgrades it (empty field_times), and merges without loss or
-    // panic: the v8 entry is added, the local entry survives.
+    // Merging an incoming entry that carries NO per-field times must not lose data:
+    // the entry is added, the local one survives. `field_times` arrived at v9, so
+    // entries written before it have none — a v11 vault migrated up from a pre-v9
+    // format still holds such entries until each is next edited.
+    //
+    // This test used to load a real v8 file through `load_vault` to source that shape.
+    // RT-3 raised the floor to v11, so no build can open a v8 file and that premise is
+    // unreachable; the incoming body is now built in memory instead (`note()` already
+    // leaves `field_times` empty). The merge invariant under test is unchanged — only
+    // the now-impossible old-file load is gone.
     #[test]
     #[serial]
-    #[ignore = "loads a production-Argon golden fixture + saves; run via the gate"]
-    fn cross_version_sync_loads_and_merges_a_v8_file() {
-        let fixture = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .join("tests/fixtures/vaults/v8_passphrase.gabbro");
-        let fixture_pass = b"correct horse battery staple -- gabbro fixture";
-        let incoming =
-            crate::api::vault::load_vault(fixture_pass, &fixture).expect("load v8 fixture");
-        // The v8 canary deserializes with no per-field marks (pre-v9).
+    #[ignore = "production-Argon saves; run via the gate"]
+    fn sync_merges_an_incoming_entry_without_field_times() {
         let canary_id = "00000000-0000-0000-0000-000000000001";
+        let incoming = VaultBody {
+            folders: vec![],
+            entries: vec![note(canary_id, "Incoming", "2026-06-01T00:00:00Z")],
+            ..Default::default()
+        };
         let canary = incoming
             .entries
             .iter()
             .find(|e| entry_id(e) == canary_id)
-            .expect("v8 fixture has the canary entry");
+            .expect("the incoming body has the canary entry");
         assert!(
             meta_of(canary).field_times.is_empty(),
-            "a pre-v9 entry carries no field times"
+            "precondition: the incoming entry carries no field times"
         );
 
         // Current-format local session with a distinct entry.
@@ -6144,17 +6137,17 @@ mod merge_tests {
 
         let summary = session_merge_vault_from_body(incoming).unwrap();
 
-        assert_eq!(summary.added, 1, "the v8 canary is the one added entry");
+        assert_eq!(summary.added, 1, "the canary is the one added entry");
         {
             let s = VAULT_SESSION.lock().unwrap();
             let ents = &s.as_ref().unwrap().entries;
             assert!(
                 ents.iter().any(|e| entry_id(e) == "local-only"),
-                "local entry preserved across the cross-version merge"
+                "local entry preserved across the merge"
             );
             assert!(
                 ents.iter().any(|e| entry_id(e) == canary_id),
-                "v8 entry added without loss"
+                "the field-times-less entry is added without loss"
             );
         }
         teardown(&path);
@@ -8336,92 +8329,6 @@ mod read_only_unlock_tests {
             before, after,
             "unlock+lock must not modify an already-current vault file"
         );
-
-        let _ = std::fs::remove_file(&path);
-        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
-    }
-}
-
-#[cfg(test)]
-mod migrate_on_unlock_tests {
-    use super::*;
-    use crate::crypto::vault_crypto::{
-        migrate_multikey_to_version, open_vault_with_key_record, seal_vault_with_keys,
-        YubiKeyRegistration,
-    };
-    use crate::vault::io::{read_vault, write_vault};
-    use crate::vault::serialization::{serialize_vault_body, VaultBody};
-    use serial_test::serial;
-    use std::env::temp_dir;
-
-    /// S10/S11/S12 at the session level: unlocking an OLD (v9) p+YK vault migrates
-    /// it in place to the current VERSION, preserving data, with no re-tap. This is
-    /// the only test exercising the migrate-on-unlock *wiring* (the gate drives the
-    /// crypto primitives directly, bypassing the session).
-    #[test]
-    #[serial]
-    fn unlock_migrates_an_old_multikey_vault_to_current_version() {
-        let pass = b"migrate-on-unlock-multikey-pass";
-        let keys = [
-            YubiKeyRegistration {
-                credential_id: vec![0x01u8; 64],
-                hmac_secret: [0x11u8; 32],
-                salt: [0x22u8; 32],
-            },
-            YubiKeyRegistration {
-                credential_id: vec![0x02u8; 48],
-                hmac_secret: [0x33u8; 32],
-                salt: [0x44u8; 32],
-            },
-        ];
-        let body = VaultBody {
-            folders: vec![String::from("Work")],
-            entries: vec![],
-            ..Default::default()
-        };
-        let plaintext = serialize_vault_body(&body).unwrap();
-
-        // Mint a genuine v9 (legacy StdRng X25519) multi-key vault on disk.
-        let sealed = seal_vault_with_keys(pass, &keys, &plaintext, None).unwrap();
-        let (_, master, wrapping) =
-            open_vault_with_key_record(pass, &keys[0].hmac_secret, &keys[0].credential_id, &sealed)
-                .unwrap();
-        let wrapping = wrapping.unwrap();
-        let v9 =
-            migrate_multikey_to_version(&sealed, pass, &wrapping, &master, &plaintext, 9).unwrap();
-        assert_eq!(v9.version, 9, "precondition: an on-disk v9 vault");
-
-        let mut path = temp_dir();
-        path.push("gabbro_migrate_on_unlock_multikey.gabbro");
-        write_vault(&v9, &path).unwrap();
-
-        // Unlock with one key -> should migrate the file to the current VERSION.
-        unlock_vault_with_key_record(
-            pass,
-            &keys[0].hmac_secret,
-            keys[0].credential_id.clone(),
-            path.clone(),
-        )
-        .unwrap();
-
-        assert_eq!(
-            read_vault(&path).unwrap().version,
-            crate::vault::file_format::VERSION,
-            "unlock must migrate the old vault to the current VERSION"
-        );
-        assert_eq!(
-            session_list_folders().unwrap(),
-            vec![String::from("Work")],
-            "data must survive migration"
-        );
-        lock_vault().unwrap();
-
-        // The migrated file still opens with EACH registered key.
-        let migrated = read_vault(&path).unwrap();
-        for k in &keys {
-            open_vault_with_key_record(pass, &k.hmac_secret, &k.credential_id, &migrated)
-                .unwrap_or_else(|e| panic!("migrated vault must open with each key: {e}"));
-        }
 
         let _ = std::fs::remove_file(&path);
         let _ = std::fs::remove_file(format!("{}.bak", path.display()));

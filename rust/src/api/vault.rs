@@ -1080,52 +1080,6 @@ pub fn save_vault(body: &VaultBody, passphrase: &[u8], path: &Path) -> Result<()
     write_vault(&sealed, path)
 }
 
-/// RT-3: migrate a passphrase-only vault to the current format on unlock (full
-/// re-seal at [`VERSION`]). Returns `Ok(false)` if already current (no write —
-/// steady-state S14). The session caller is best-effort per D1: a write failure
-/// must not block unlock; it is retried on the next unlock.
-#[flutter_rust_bridge::frb(ignore)]
-pub fn migrate_passphrase_vault_on_unlock(
-    passphrase: &[u8],
-    body: &VaultBody,
-    path: &Path,
-) -> Result<bool, String> {
-    if read_vault(path)?.version >= crate::vault::file_format::VERSION {
-        return Ok(false);
-    }
-    save_vault(body, passphrase, path)?;
-    Ok(true)
-}
-
-/// RT-3: migrate a multi-key (p+YK) vault to the current format on unlock, reusing
-/// the `wrapping_key`/`vault_key_master` recovered during unlock — no re-tap.
-/// `key_blob`s are preserved. Returns `Ok(false)` if already current (S14).
-/// Best-effort per D1.
-#[flutter_rust_bridge::frb(ignore)]
-pub fn migrate_multikey_vault_on_unlock(
-    passphrase: &[u8],
-    wrapping_key: &[u8; 32],
-    vault_key_master: &[u8; 32],
-    body: &VaultBody,
-    path: &Path,
-) -> Result<bool, String> {
-    let sealed = read_vault(path)?;
-    if sealed.version >= crate::vault::file_format::VERSION {
-        return Ok(false);
-    }
-    let plaintext = zeroize::Zeroizing::new(serialize_vault_body(body)?);
-    let migrated = crate::crypto::vault_crypto::migrate_multikey_to_version(
-        &sealed,
-        passphrase,
-        wrapping_key,
-        vault_key_master,
-        &plaintext,
-        crate::vault::file_format::VERSION,
-    )?;
-    write_vault(&migrated, path)?;
-    Ok(true)
-}
-
 /// Read, decrypt, and deserialize a vault from disk in one operation.
 ///
 /// This is the top-level load operation Flutter will call.
@@ -1251,13 +1205,12 @@ pub fn reseal_vault_body(
     write_vault(&sealed, path)
 }
 
-/// Change the passphrase on a VERSION 4 multi-key vault.
+/// Change the passphrase on a multi-key vault.
 ///
 /// Reads the vault from disk, verifies the old passphrase via `passphrase_blob`,
-/// generates fresh PQ material for the new passphrase, re-encrypts `wrapping_key`
-/// as the new `passphrase_blob`, then re-seals the body so the updated header
-/// (new argon2_salt, hkdf_salt, ml_kem_ciphertext, passphrase_blob) is committed
-/// as AES-GCM AAD for VERSION 7+ vaults.
+/// generates fresh passphrase material, re-encrypts `wrapping_key` as the new
+/// `passphrase_blob`, then re-seals the body so the updated header (new
+/// argon2_salt, hkdf_salt, passphrase_blob) is committed as AES-GCM AAD.
 #[flutter_rust_bridge::frb(ignore)]
 pub fn change_passphrase_with_keys(
     old_passphrase: &[u8],

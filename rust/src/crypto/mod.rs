@@ -6,6 +6,4 @@
 pub mod aes_gcm;
 pub mod hkdf;
 pub mod kdf;
-pub mod keypair;
-pub mod ml_kem;
 pub mod vault_crypto;
