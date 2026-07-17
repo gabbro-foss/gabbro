@@ -112,12 +112,11 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**RT-3 code is COMPLETE; the gate is not run.** The hybrid layer and both crates are deleted,
-the floor is v11, and every suite the agent can run is green (see the verification table in
-[RT3_CLEANUP.md](RT3_CLEANUP.md)). Outstanding: the full `gabbro_test` gate (~2h, maintainer),
-the hardware matrix, and the CHANGELOG `[Unreleased]` entry. Whether it warrants a release is
-the maintainer's call. Remaining doc sweep and the delete-this-file step are tracked in
-RT3_CLEANUP §9.
+**RT-3 code is COMPLETE and the gate is GREEN** (maintainer, 2026-07-17 — every leg,
+Android included). The hybrid layer and both crates are deleted, the floor is v11, and the
+CHANGELOG `[Unreleased]` entry is written. Outstanding: the hardware matrix, then whether it
+warrants a release (maintainer's call). Verification table and the delete-this-file step are
+in [RT3_CLEANUP.md](RT3_CLEANUP.md).
 
 ---
 
@@ -136,6 +135,14 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - See if vault `syncing` can do without a second `passphrase + yubikey` if and only if the current vault and the incoming vault share the same `alias`, `passphrase`, `yubikey(s)`
 - in `sync` path, we currently have `auto-merge` and `review all changes`, the `auto-merge` is additive only (check and verify) and therefore never deletes items in the receiving vault: (1) add a message that explains this (or the correct) behaviour to the user, (2) add a third `sync` mechanism that simply takes the incoming vault and clobbers the existing one - discuss this
 - Autotype in linux often has typos in the login/email. and it often fails perhaps due to a typo in the passphrase. investigate.
+- **Version-not-supported card has no tappable link.** The card is meant to link to
+  `docs/VAULT_UPGRADE_PATH.md`. No link renders. Found on hardware 2026-07-17 (matrix 4.3).
+- **Version-not-supported card is English-only.** Card text stays English with the UI set to
+  Spanish. Found on hardware 2026-07-17 (matrix 4.5). Check whether other Rust-originated
+  error strings share this — the card may not be the only one.
+- **Vault format version is meaningless to the user.** "v10"/"v11" is the file format and
+  tracks neither the app version nor the alpha number, so the refusal message cites a number
+  the user cannot find anywhere in the app. Rework the wording.
 
 ### Features and UI/UX (continued)
 - **`nn` and `yo` are only half-localised.** Both are offered in the picker, but Flutter's own

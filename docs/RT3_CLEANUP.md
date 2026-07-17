@@ -14,8 +14,8 @@ and warned again before the next. Cleared to proceed.
 
 ## HANDOFF — state at 2026-07-17 (read this first)
 
-**The code is COMPLETE. Every §1–§9 deletion has landed; what remains is the gate, the
-hardware matrix, and deleting this file.** All committed on `master`, nothing on a branch.
+**The code is COMPLETE and the gate is GREEN. What remains is the hardware matrix and
+deleting this file.** All committed on `master`, nothing on a branch.
 
 **Done and green:**
 1. Net pins for v11 — absolute layout pin, reseal-cap pin, sync corpus re-minted at v11.
@@ -31,13 +31,13 @@ hardware matrix, and deleting this file.** All committed on `master`, nothing on
 7. §8 fixtures: v6–v9 deleted, v10 pair kept as the refusal input. §9 docs swept.
 
 **NOT done:**
-- [ ] **Full gate (~2h) — maintainer runs it, not the agent.** Everything the agent can run is
-  green (table below), but the gate is the authority — in particular the Android leg, which no
-  agent-run suite covers.
 - [ ] Hardware matrix.
 - [ ] Decide whether this warrants a release (maintainer's call). CHANGELOG `[Unreleased]` is
   written: Security (v11 minimum, crates gone) + Changed (≤v10 refused, not damaged).
-- [ ] Delete this file (§9) once the gate is green and it has shipped.
+- [ ] Delete this file (§9) once it has shipped.
+
+**Gate: GREEN, run by the maintainer 2026-07-17** (~105 min, offline). Every leg passed,
+including Android (148 pass / 15 ignored). Counts match the agent-run table below.
 
 **Two checklist claims turned out to be WRONG — do not re-trust them:**
 - §1/ARCHITECTURE said `ml-kem` was `hybrid-array`'s only source and the crate "dies with RT-3".
@@ -74,7 +74,7 @@ hardware matrix, and deleting this file.** All committed on `master`, nothing on
 | `dart test integration_test/ -j 1` (real FFI) | 12 pass | against the new release cdylib |
 | `cargo clippy --release --all-targets -- -D warnings` | clean | **after** the final `cargo fmt` |
 | `cargo fmt --check` | clean | final |
-| Full `gabbro_test` gate (~2h) incl. **Android** | **NOT RUN** | — |
+| Full `gabbro_test` gate incl. **Android** (148 pass / 15 ignored) | **ALL GREEN** | maintainer, 2026-07-17 |
 | Hardware matrix | **NOT RUN** | — |
 
 The Rust unit count is **634** (measured, not arithmetic — was 668). ARCHITECTURE updated; the
