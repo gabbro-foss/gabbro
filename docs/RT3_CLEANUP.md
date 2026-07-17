@@ -12,11 +12,11 @@ and warned again before the next. Cleared to proceed.
 
 ---
 
-## HANDOFF — state at 2026-07-16 (read this first)
+## HANDOFF — state at 2026-07-17 (read this first)
 
-**The work is PART DONE and UNCOMMITTED. Nothing below is on a branch; it is all in the
-working tree.** Committed so far (3 commits, **not pushed**): `4da04dc` (v11 pins + v11 sync
-corpus), `a0e1865` (decisions/plan), `86ce8c9` (upgrade-path docs).
+**The work is PART DONE. Everything below is COMMITTED AND PUSHED on `master`** — the
+2026-07-16 handoff said "uncommitted / 3 unpushed", which is stale: `master` and
+`origin/master` both sit at the fuzzer commit. Nothing is on a branch.
 
 **Done and green** (see the ticks in §8a and §10):
 1. Net pins for v11 — absolute layout pin, reseal-cap pin, sync corpus re-minted at v11.
@@ -26,11 +26,12 @@ corpus), `a0e1865` (decisions/plan), `86ce8c9` (upgrade-path docs).
 4. The UI hole (§8a) closed: `peek_version`/`is_format_too_old` -> bridge `vault_format_too_old`
    -> `onVaultFormatTooOld` seam -> a non-destructive banner with a tappable link; 37 locales;
    Net A/B/C sweeps incl. every locale at 8x text.
+5. The fuzzer (§8, R8): `FIXTURES` -> v11 only; the three-way version check collapsed to one
+   (the pre-v11 branch was a hybrid-era check and went with it); `start_version` param dropped;
+   baseline now pins the fixture at the current VERSION. Green in release, fmt + clippy clean.
 
 **NOT done — pick up here, in this order:**
-- [ ] **The fuzzer** (`tests/vault_state_machine_fuzz.rs`). Untouched. `FIXTURES` still lists
-  v6/v7/v8 (+v11) — those fixtures are being deleted, so it WILL break. See §8.
-- [ ] Then the actual deletions: §1–§7 (crates, modules, hkdf legacy combiners, the 6 derivation
+- [ ] The deletions: §1–§7 (crates, modules, hkdf legacy combiners, the 6 derivation
   sites, constants, header fields, the migrate-on-unlock hooks).
 - [ ] Then §8 fixtures (delete v6–v9, KEEP the v10 pair), §9 docs.
 - [ ] `gabbro_test` gate leg list: check it needs no edit once tests are added/removed.
@@ -174,9 +175,10 @@ Rust tests were **not re-run after the fmt**. Re-run them before trusting the gr
   fixtures** (a real old vault, not a synthetic one).
 - [ ] Delete `rust/tests/fixtures/vaults/v{6,7,8,9}_*.gabbro` (8 files) + their FIXTURES.md rows.
   **Keep the `v10_*` pair** — the most recent old format, now the rejection-test input.
-- [ ] `rust/tests/vault_state_machine_fuzz.rs`: drop v6/v7/v8 from `FIXTURES` (keep v11); the
-  `start_version < VERSION` belt branch in `assert_invariants` becomes unreachable — simplify.
-  **IN PROGRESS — not yet done.**
+- [x] `rust/tests/vault_state_machine_fuzz.rs`: `FIXTURES` -> v11 only; the `start_version <
+  VERSION` belt branch in `assert_invariants` deleted (it guarded the hybrid-era boundary) and
+  the two remaining branches merged — one era, one expected version. `start_version` is now
+  asserted at baseline instead of threaded through. Done 2026-07-17, green in release.
 
 ## 8a. UI: the refusal must not read as corruption (sweep 2026-07-16)
 
@@ -259,5 +261,5 @@ Pins land and go green against the CURRENT code before anything is deleted.
   survive the floor move).
 - [ ] R7 rejection is distinguishable from "wrong passphrase" — a ≤v10 user must not think
   they mistyped.
-- [ ] R8 fuzzer `FIXTURES` → v11 only; the unreachable `start_version < VERSION` branch
-  simplified.
+- [x] R8 fuzzer `FIXTURES` → v11 only; the unreachable `start_version < VERSION` branch
+  simplified. Re-expand both only if a future VERSION changes key derivation.

@@ -112,11 +112,10 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**RT-3 is IN PROGRESS and UNCOMMITTED in the working tree — read the HANDOFF block at the top
-of [RT3_CLEANUP.md](RT3_CLEANUP.md) first.** Floor is raised to v11, the backward-compat gate is
-rewritten and green, and the unlock UI now refuses old vaults non-destructively (37 locales).
-Next up: the state-machine fuzzer (still on v6/v7/v8 fixtures), then the §1–§7 deletions.
-3 unpushed commits.
+**RT-3 is IN PROGRESS — read the HANDOFF block at the top of
+[RT3_CLEANUP.md](RT3_CLEANUP.md) first.** Floor is raised to v11, the backward-compat gate is
+rewritten and green, the unlock UI refuses old vaults non-destructively (37 locales), and the
+state-machine fuzzer now runs v11-only. Next up: the §1–§7 deletions.
 
 - **RT-3 + dual-lock cleanup (merged, floor → v11)** — once no ≤v10 vault remains: delete the
   legacy `StdRng` X25519, the legacy ML-KEM + dual-lock derivations, and the frozen-golden
