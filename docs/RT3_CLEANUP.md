@@ -46,11 +46,17 @@ hardware matrix, and deleting this file.** All committed on `master`, nothing on
 - §8's fixture list missed two live consumers of the deleted fixtures, both found by grep, not by
   the checklist: `tests/vault_parse_fuzz.rs` (seeded off `v7_passphrase.gabbro`; its truncation
   test needs a file that *parses*, so it moved to v11) and the **gate leg**
-  `cross_version_sync_loads_and_merges_a_v8_file`, which loaded `v8_passphrase.gabbro`. The
-  latter's premise (load an older format) is unreachable at floor v11; it is rewritten as
-  `sync_merges_an_incoming_entry_without_field_times`, building the incoming body in memory —
-  same merge invariant, no dead file. `gabbro_test` line 79 and the ARCHITECTURE row follow it.
+  `cross_version_sync_loads_and_merges_a_v8_file`, which loaded `v8_passphrase.gabbro`.
   **Both were `#[ignore]`d or gate-only, so no routine suite would have caught either.**
+
+  The gate leg is now `sync_merges_a_never_edited_entry`, building the body in memory
+  (`gabbro_test` line 79 + the ARCHITECTURE row follow it). Its old name and comment were
+  actively misleading and nearly got it deleted: they framed "an entry with no `field_times`"
+  as a pre-v9 artifact, when in fact `create_login_entry` (`api/vault.rs:289`) starts EVERY
+  entry with `field_times` empty — only `update_entry` fills them in. So the shape under test is
+  the everyday one (create an entry, sync it before ever editing it), and has nothing to do with
+  v8; the v8 file was just where the original author found that shape lying around. The test
+  stays, and the v8 archaeology is gone from its name and comment.
 
 **Verification state — what was actually run, and what was NOT:**
 
@@ -60,7 +66,7 @@ hardware matrix, and deleting this file.** All committed on `master`, nothing on
 | `cargo test --release --test vault_backward_compat` | 11 pass, 0 fail | after all deletions |
 | `cargo test --release --test vault_state_machine_fuzz -- --ignored` | 1 pass | after all deletions |
 | `cargo test --release --test vault_parse_fuzz` | 4 pass | after the v11 re-seed |
-| `cargo test --release --lib sync_merges_an_incoming_entry_without_field_times -- --ignored` | 1 pass (count checked, not 0-filtered) | after the rewrite |
+| `cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored` | 1 pass (count checked, not 0-filtered) | after the rewrite |
 | `cargo deny --offline check` | advisories/bans/licences/sources **ok**; duplicates 7 -> 6 | after crate removal |
 | `cargo audit -n` | no vulnerabilities (184 crates) | after crate removal |
 | `flutter test` (whole suite) | 1265 pass, 0 fail | after the About-screen edit |

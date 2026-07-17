@@ -102,10 +102,17 @@ for extra on-device confidence.
   changes** → **Cancel** → **Merge automatically**. Export to `/tmp/fast_sync_walk.json`
   and run Walk 2's command — expect the **same** green result.
 
-- **Cross-version source** (`cross_version_sync_loads_and_merges_a_v8_file`). New vault
-  with one Login **`Local Only`** → **Sync from file** → `migration_vaults/v8.gabbro`
-  → passphrase `0123456789a` → **Review all changes** → keep **Migration Test Login**.
+- **Never-edited source** (`sync_merges_a_never_edited_entry`). An entry carries no
+  per-field times until it is first edited, so a freshly created one is the shape most
+  likely to be synced un-edited. On device A: new vault, add one Login **`Fresh Entry`**,
+  do **not** edit it, export. On device B: new vault with one Login **`Local Only`** →
+  **Sync from file** → A's export → **Review all changes** → keep **Fresh Entry**.
   Expect both entries present, nothing lost.
+
+  (Was "Cross-version source", syncing from `migration_vaults/v8.gabbro`. RT-3 raised the
+  floor to v11, so that file no longer opens and the step was impossible as written. It was
+  never really about v8 — it needed an entry with no per-field times, which a never-edited
+  entry gives you directly.)
 
 ---
 
