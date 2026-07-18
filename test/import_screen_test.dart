@@ -10,6 +10,7 @@ import 'package:gabbro/screens/import_screen.dart';
 import 'package:gabbro/screens/import_skipped_dialog.dart';
 import 'package:gabbro/src/rust/api/import.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
+import 'package:gabbro/widgets/path_field.dart';
 import 'package:gabbro/widgets/yubikey_tap.dart';
 
 /// Scrolls to [sectionTitle], then taps the FilledButton in that section.
@@ -380,6 +381,81 @@ void main() {
       await tester.pump();
       await tester.pump();
       expect(tapPin, '1234');
+    });
+
+    // ── Import failure (net pins) ────────────────────────────────────────────
+    // The catch at import_screen.dart:379 had no coverage at all, which is how
+    // the raw-Rust-error defect (matrix 4.2 / 4.4) shipped. These pin what the
+    // failure path does TODAY, before it is changed.
+
+    // The refusal a pre-v11 vault produces, as the bridge surfaces it.
+    const versionRefusal =
+        'file version not supported: v10 (this build opens v11 and later) - '
+        'https://github.com/gabbro-foss/gabbro/blob/master/docs/VAULT_UPGRADE_PATH.md';
+
+    Widget failingGabbroImport(Object error) => testApp(ImportScreen(
+          isAndroid: false,
+          initialGabbroPath: tempGabbroFile().path,
+          onDetectSourceRecords: (_) => [],
+          onImportGabbro: (_, _) async => throw error,
+        ));
+
+    Future<void> runFailingImport(WidgetTester tester, Object error) async {
+      await tester.pumpWidget(failingGabbroImport(error));
+      await tester.enterText(
+          find.widgetWithText(TextField, 'Vault passphrase'), 'pw');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+      await tester.pump();
+    }
+
+    testWidgets('N1 a failed Gabbro import shows the error and stays on screen',
+        (tester) async {
+      await runFailingImport(tester, Exception(versionRefusal));
+
+      expect(find.textContaining('file version not supported'), findsOneWidget);
+      // Still on the import screen: a failure must not pop as a success does.
+      expect(find.text('Sync from vault'), findsOneWidget);
+    });
+
+    testWidgets('N2 the spinner clears after a failed Gabbro import',
+        (tester) async {
+      await runFailingImport(tester, Exception(versionRefusal));
+
+      // The finally block must re-enable the button, or the user is stranded
+      // with a dead screen after one bad file.
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+      final btn = tester.widget<FilledButton>(
+          find.widgetWithText(FilledButton, 'Sync from vault'));
+      expect(btn.onPressed, isNotNull);
+    });
+
+    testWidgets('N3 choosing another file clears the previous import error',
+        (tester) async {
+      await runFailingImport(tester, Exception(versionRefusal));
+      expect(find.textContaining('file version not supported'), findsOneWidget);
+
+      // PathField's onChanged is what clears it (import_screen.dart:567); the
+      // Gabbro one is identified by its hint, several importers have a field.
+      final other = tempGabbroFile();
+      final gabbroPathField = find.descendant(
+        of: find.byWidgetPredicate(
+            (w) => w is PathField && w.hint == '/home/user/vault.gabbro'),
+        matching: find.byType(TextFormField),
+      );
+      await tester.enterText(gabbroPathField, other.path);
+      await tester.pump();
+
+      expect(find.textContaining('file version not supported'), findsNothing);
+    });
+
+    testWidgets('N4 the passphrase survives a failed import so retry works',
+        (tester) async {
+      await runFailingImport(tester, Exception(versionRefusal));
+
+      final field = tester.widget<TextField>(
+          find.widgetWithText(TextField, 'Vault passphrase'));
+      expect(field.controller?.text, 'pw');
     });
 
     // ── No-file validation for each importer ─────────────────────────────────
