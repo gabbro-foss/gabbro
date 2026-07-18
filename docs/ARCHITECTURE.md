@@ -155,10 +155,16 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   16/32/48/64/128/256/512 plus a scalable SVG from `ic_launcher_*.svg` and add a `.desktop`
   entry. Blocked on the new logo. Same render covers the Windows `.ico`, still the stock
   Flutter template.
+- **Ship `gabbro-autotype` in the Linux bundle.** The binary exists
+  (`rust/src/bin/gabbro-autotype.rs`) but the tarball carries the Flutter bundle only, so a
+  tester who installs from a release has nothing to bind a key to. Build it `--release`,
+  add it to the tarball, and update BUILD_AND_RELEASE. Add key-binding examples to the
+  README for qtile (config line) and Cinnamon/Mint (Keyboard -> Shortcuts -> Custom
+  Shortcuts). Note: `## Project Structure` already calls it "shipped trigger client" — it
+  is not shipped; fix that line at the same time. Independent of Phase 4 below.
 - **Auto-type: unlock-then-type + cold start (ADR-017 Phase 4).** A trigger while the
-  vault is locked or Gabbro is closed does nothing today. Add: prompt-unlock-then-type,
-  an opt-in setting, README key-binding examples, and package `gabbro-autotype` into the
-  release bundle (update BUILD_AND_RELEASE). Secret stays in Rust; auto-lock preserved.
+  vault is locked or Gabbro is closed does nothing today. Add: prompt-unlock-then-type
+  and an opt-in setting. Secret stays in Rust; auto-lock preserved.
 
 ### V2+ / Defer
 - **Linux biometric unlock** (laptop fingerprint readers, e.g. libfido2/PAM or `fprintd`). Fits the current per-device model unchanged: Linux would just get its own local per-vault secret store; the vault file carries no biometric state, so nothing else changes.
