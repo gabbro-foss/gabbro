@@ -31,7 +31,8 @@ deleting this file.** All committed on `master`, nothing on a branch.
 7. §8 fixtures: v6–v9 deleted, v10 pair kept as the refusal input. §9 docs swept.
 
 **NOT done:**
-- [ ] Hardware matrix.
+- [ ] Hardware matrix. Run 2026-07-17 on Linux + S23; GrapheneOS `held` throughout. Two
+  failures (4.2, 4.4), both fixed 2026-07-18 — see below — and awaiting a re-run.
 - [ ] Decide whether this warrants a release (maintainer's call). CHANGELOG `[Unreleased]` is
   written: Security (v11 minimum, crates gone) + Changed (≤v10 refused, not damaged).
 - [ ] Delete this file (§9) once it has shipped.
@@ -79,6 +80,18 @@ including Android (148 pass / 15 ignored). Counts match the agent-run table belo
 
 The Rust unit count is **634** (measured, not arithmetic — was 668). ARCHITECTURE updated; the
 gate remains the authority.
+
+**Hardware matrix findings (2026-07-18):**
+- The §8a UI work covered the **unlock** screen only. A `.gabbro` file actually enters the app
+  through **Import** — there is no add-a-vault-file flow — so the refusal a user meets came from
+  `import_screen.dart`, which passed the raw Rust error to the screen: URL as dead text,
+  English-only. The matrix had been written against a flow that does not exist, which is why
+  the failures were misattributed to the unlock card.
+- Fixed by mirroring the unlock screen: an `onSourceFormatTooOld` seam defaulting to the
+  existing `vaultFormatTooOld` bridge call, reusing `vaultFormatTooOld` /
+  `vaultFormatUpgradeLink` (already in 37 locales, and naming no format version).
+- The `catch` at `import_screen.dart` had **no test at all** before this. Net pins landed
+  first, then the red tests. The other five importers still show raw errors — Bikeshed.
 
 **Traps found the hard way — do not re-learn these:**
 - `cargo test --exact <bare_name>` silently runs **0 tests** and prints `ok`. Always use the full

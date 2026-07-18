@@ -114,9 +114,19 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 **RT-3 code is COMPLETE and the gate is GREEN** (maintainer, 2026-07-17 — every leg,
 Android included). The hybrid layer and both crates are deleted, the floor is v11, and the
-CHANGELOG `[Unreleased]` entry is written. Outstanding: the hardware matrix, then whether it
-warrants a release (maintainer's call). Verification table and the delete-this-file step are
-in [RT3_CLEANUP.md](RT3_CLEANUP.md).
+CHANGELOG `[Unreleased]` entry is written. Verification table and the delete-this-file step
+are in [RT3_CLEANUP.md](RT3_CLEANUP.md).
+
+Hardware matrix run 2026-07-17 on Linux + S23 (GrapheneOS still `held`). Two failures, both
+the same defect on the **import** screen — not the unlock screen, which was correct all
+along. Fixed 2026-07-18: a too-old source is now explained with the unlock screen's own
+translated strings and a tappable link.
+
+**Outstanding, in order:**
+1. Maintainer to re-run matrix Step 5 (4.2 and 4.4) on Linux + S23 and update
+   `test_data/migration_vaults/test_matrix.md` — held back from git until it is all green.
+2. GrapheneOS legs, still `held` throughout the matrix.
+3. Whether this warrants a release (maintainer's call). It is a user-visible bugfix.
 
 ---
 
@@ -148,9 +158,10 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   Flutter's built-ins (text-selection menu, pickers, system dialog buttons) fall back to English.
   Silent in release; debug warns. Found 2026-07-16 by the all-locale unlock sweep — pre-existing
   and app-wide, not caused by it. Options: accept, ship custom delegates, or drop the two locales.
-  Worse than first recorded: any screen with a `TextField` throws `No MaterialLocalizations
-  found` in these two, before layout. So all-locale sweeps cannot cover them and must skip
-  them by name (see `import_screen_test.dart`). Raises the case for dropping both.
+  Note for sweeps: an all-locale test must use `gabbroLocalizationsDelegates` (`main.dart`),
+  not the generated `AppLocalizations.localizationsDelegates`. The former wraps
+  Material/Cupertino to fall back to English; on the raw list any screen with a `TextField`
+  throws in nn/yo — a harness artefact, not app behaviour.
 
 ### Security (pre-v1)
 - Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
