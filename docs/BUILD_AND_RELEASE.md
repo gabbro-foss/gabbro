@@ -171,7 +171,21 @@ real fix.
 > ```
 > Omitting it (e.g. `flutter run` during dev) makes About show `dev` — harmless.
 
-- **Linux:** `flutter build linux --release --dart-define=APP_VERSION="$(sed -n 's/^version: *//p' pubspec.yaml | cut -d+ -f1)"` → self-contained bundle in `build/linux/x64/release/bundle/`; package with `tar -czf gabbro-<ver>-linux-x86_64.tar.gz -C build/linux/x64/release bundle`. (The Arch-built bundle runs on Debian trixie / Mint — glibc ≤ 2.34, verified; only build in a `debian:trixie` container if a future release raises that above 2.41.) Then sign the tarball: `gpg --detach-sign --armor gabbro-<ver>-linux-x86_64.tar.gz` → `.tar.gz.asc` (asks for the key passphrase). Signing key fingerprint `369B E2CE CFD0 A528 7155 895A 4775 4EEE 7F9A ABFC`; public key + verify steps are in README.
+- **Linux:** `flutter build linux --release --dart-define=APP_VERSION="$(sed -n 's/^version: *//p' pubspec.yaml | cut -d+ -f1)"` → self-contained bundle in `build/linux/x64/release/bundle/`.
+
+  Then build the auto-type trigger client and copy it **into the bundle** — without it a
+  tester who installs from a release has no binary to bind a key to (see
+  [AUTOTYPE_AND_AUTOFILL.md](AUTOTYPE_AND_AUTOFILL.md)):
+
+  ```bash
+  (cd rust && cargo build --release --bin gabbro-autotype)
+  cp rust/target/release/gabbro-autotype build/linux/x64/release/bundle/
+  ```
+
+  It links only libc/libgcc, so it adds no runtime dependency to the list above.
+
+  Package with `tar -czf gabbro-<ver>-linux-x86_64.tar.gz -C build/linux/x64/release bundle`;
+  confirm the binary made it in: `tar -tzf gabbro-<ver>-linux-x86_64.tar.gz | grep gabbro-autotype`. (The Arch-built bundle runs on Debian trixie / Mint — glibc ≤ 2.34, verified; only build in a `debian:trixie` container if a future release raises that above 2.41.) Then sign the tarball: `gpg --detach-sign --armor gabbro-<ver>-linux-x86_64.tar.gz` → `.tar.gz.asc` (asks for the key passphrase). Signing key fingerprint `369B E2CE CFD0 A528 7155 895A 4775 4EEE 7F9A ABFC`; public key + verify steps are in README.
 - **Android:** `flutter build apk --split-per-abi --release --dart-define=APP_VERSION="$(sed -n 's/^version: *//p' pubspec.yaml | cut -d+ -f1)"` → three per-ABI APKs in `build/app/outputs/flutter-apk/`: `app-arm64-v8a-release.apk` (~29 MB, modern phones), `app-armeabi-v7a-release.apk` (old 32-bit phones), `app-x86_64-release.apk` (emulators / Chromebooks). Splitting replaces the ~76 MB universal APK (which bundled all three ABIs) — each file carries only its own native libs. Rename each to `gabbro-<ver>-android-<abi>.apk`. All three are signed by the same key, so they share one certificate fingerprint (see README). The signing keystore (`android/app/gabbro-upload.jks`) and `android/key.properties` are already configured and gitignored.
   - **Dependency lock:** the release runtime dependency graph is locked in `android/app/gradle.lockfile` (osv-scannable, reproducible). After any change to Android dependencies (incl. a plugin/Flutter bump), regenerate it: `cd android && ./gradlew :app:dependencies --write-locks --configuration releaseRuntimeClasspath`, then re-scan: `osv-scanner scan --lockfile android/app/gradle.lockfile`. A stale lock fails the release build (by design).
 

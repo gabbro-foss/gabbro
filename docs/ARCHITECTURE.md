@@ -54,7 +54,7 @@ gabbro/
 │   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics, crash_writer, autotype_{spike,window,trigger} (diagnostics), gabbro-autotype (shipped trigger client); wordlist gen; gen_fixtures
 ├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + crash-safety (kill mid-write) + frozen golden fixtures (FIXTURES.md)
 ├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, BiometricHelper + BiometricStore (per-vault; + Robolectric tests)
-├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, VAULT_SYNC, RT3_CLEANUP, AI_*; decisions/ (ADRs); artefacts/
+├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, VAULT_SYNC, AUTOTYPE_AND_AUTOFILL, RT3_CLEANUP, AI_*; decisions/ (ADRs); artefacts/
 ├── test/  integration_test/          # Flutter widget/unit + Linux real-FFI suites (dart test)
 ├── test_data/            # Sample import files + migration_vaults/ (refusal corpus at floor v11, one vault per VERSION + MIGRATION_TESTS.md + test_matrix.md)
 ├── assets/               # fonts, images, help/; public_suffix_list.dat (autofill eTLD+1)
@@ -155,13 +155,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   16/32/48/64/128/256/512 plus a scalable SVG from `ic_launcher_*.svg` and add a `.desktop`
   entry. Blocked on the new logo. Same render covers the Windows `.ico`, still the stock
   Flutter template.
-- **Ship `gabbro-autotype` in the Linux bundle.** The binary exists
-  (`rust/src/bin/gabbro-autotype.rs`) but the tarball carries the Flutter bundle only, so a
-  tester who installs from a release has nothing to bind a key to. Build it `--release`,
-  add it to the tarball, and update BUILD_AND_RELEASE. Add key-binding examples to the
-  README for qtile (config line) and Cinnamon/Mint (Keyboard -> Shortcuts -> Custom
-  Shortcuts). Note: `## Project Structure` already calls it "shipped trigger client" — it
-  is not shipped; fix that line at the same time. Independent of Phase 4 below.
 - **Auto-type: unlock-then-type + cold start (ADR-017 Phase 4).** A trigger while the
   vault is locked or Gabbro is closed does nothing today. Add: prompt-unlock-then-type
   and an opt-in setting. Secret stays in Rust; auto-lock preserved.

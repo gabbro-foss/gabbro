@@ -144,6 +144,25 @@ tar -xzf gabbro-<version>-linux-x86_64.tar.gz
 
 You can place the `bundle/` directory anywhere; the app is self-contained.
 
+#### Set up auto-type (optional)
+
+The bundle also contains `gabbro-autotype`. Bind it to a keyboard shortcut and
+Gabbro types the login you have open into whatever window you are in — no
+copy-paste.
+
+qtile (`~/.config/qtile/config.py`):
+
+```python
+Key([mod, "control"], "g", lazy.spawn("/full/path/to/bundle/gabbro-autotype")),
+```
+
+Cinnamon / Linux Mint: Menu → **Keyboard** → **Shortcuts** → **Custom
+Shortcuts** → **Add custom shortcut**, with the full path as the command.
+
+Requires an X11 session (not Wayland) and Gabbro running and unlocked with a
+login open. Full instructions, other desktops, and troubleshooting:
+[`docs/AUTOTYPE_AND_AUTOFILL.md`](docs/AUTOTYPE_AND_AUTOFILL.md).
+
 #### Verify the Linux build is genuine
 
 The Linux tarball is signed with the project's OpenPGP (GPG) key — the same way
@@ -294,12 +313,28 @@ dart test integration_test/ -j 1
 
 ## Documentation
 
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — full architecture reference
+**Using Gabbro**
+
+- [`docs/AUTOTYPE_AND_AUTOFILL.md`](docs/AUTOTYPE_AND_AUTOFILL.md) — setting up auto-type on Linux and autofill on Android
 - [`docs/VAULT_SYNC.md`](docs/VAULT_SYNC.md) — syncing one vault across devices; worked example with Syncthing (Linux) and Syncthing-Fork (Android)
+- [`docs/VAULT_UPGRADE_PATH.md`](docs/VAULT_UPGRADE_PATH.md) — vault file format versions and what happens to an older vault
+
+**Project**
+
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — full architecture reference
+- [`docs/SECURITY.md`](docs/SECURITY.md) — security overview: what Gabbro protects against and what it does not
+- [`docs/BUILD_AND_RELEASE.md`](docs/BUILD_AND_RELEASE.md) — build environment, runtime dependencies, and the release process
+- [`docs/MAINTENANCE.md`](docs/MAINTENANCE.md) — vendored data and pins that need periodic refresh
+- [`docs/RT3_CLEANUP.md`](docs/RT3_CLEANUP.md) — record of deleting the unused hybrid key-exchange layer (readable floor raised to v11)
+- [`docs/decisions/`](docs/decisions/) — architectural decision records (ADRs)
+
+**AI development and review**
+
+- [`docs/AI_DEVELOPMENT_PROCESS.md`](docs/AI_DEVELOPMENT_PROCESS.md) — is Gabbro "vibe-coded"? notes on how it is actually built
+- [`docs/AI_AUTHORSHIP_AND_IP.md`](docs/AI_AUTHORSHIP_AND_IP.md) — who owns AI-written code: authorship and IP notes
 - [`docs/AI_SECURITY_AUDIT.md`](docs/AI_SECURITY_AUDIT.md) — AI-assisted security review of the crypto and vault modules (Claude Opus 4.7, 2026-05-31)
 - [`docs/AI_SECURITY_AUDIT_REVIEW.md`](docs/AI_SECURITY_AUDIT_REVIEW.md) — second-pass review of that audit (Claude Fable 5, 2026-06-11)
 - [`docs/AI_SECURITY_AUDIT_3.md`](docs/AI_SECURITY_AUDIT_3.md) — third pass: import parsers, FFI/JNI bridge, Kotlin, Dart leak channels (Claude Opus 4.8, 2026-06-25)
-- [`docs/decisions/`](docs/decisions/) — architectural decision records (ADRs)
 
 ---
 
