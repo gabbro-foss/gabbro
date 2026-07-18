@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'test_helpers.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
+import 'package:gabbro/main.dart';
 import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/screens/import_screen.dart';
 import 'package:gabbro/screens/import_skipped_dialog.dart';
@@ -556,7 +557,10 @@ void main() {
       bool highContrast = false,
     }) =>
         MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          // The app's own delegate list, not the raw generated one: it wraps
+          // Material/Cupertino so nn and yo fall back to English instead of
+          // throwing. A sweep on the raw list tests a shell the app never uses.
+          localizationsDelegates: gabbroLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           locale: locale,
           themeMode: mode,
@@ -597,16 +601,7 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() => tester.view.reset());
 
-      // nn and yo ship no Material/Cupertino delegate, so any screen with a
-      // TextField throws "No MaterialLocalizations found" before layout is even
-      // reached — this sweep cannot say anything about them. App-wide and
-      // pre-existing (Bikeshed: "nn and yo are only half-localised"), not
-      // caused by this refusal. Named, not blanket-ignored.
-      const noMaterialDelegate = {'nn', 'yo'};
-
       for (final locale in AppLocalizations.supportedLocales) {
-        if (noMaterialDelegate.contains(locale.languageCode)) continue;
-
         await showRefusal(
           tester,
           importShell(
