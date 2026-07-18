@@ -71,9 +71,9 @@ open it, then Import `v10.gabbro` from inside it. On Android `adb push` the file
 | # | Step | Expect | Linux | S23 | GrapheneOS |
 |---|------|--------|-------|-----|------------|
 | 4.1 | Import `v10.gabbro` with correct passphrase `0123456789a` | version-not-supported message; no "corrupt"; no Delete; no Restore. Error-red is correct here — the import did fail — and the text carries the meaning on its own (ADR-003) | pass | pass | held |
-| 4.2 | The message shows a tappable link | link present | **fail** | **fail** | held |
-| 4.3 | Tap link | opens `docs/VAULT_UPGRADE_PATH.md` | blocked by 4.2 | blocked by 4.2 | held |
-| 4.4 | Set app language to Spanish, repeat 4.1 | message is in Spanish | **fail** | **fail** | held |
+| 4.2 | The message shows a tappable link | link present | pass | pass | held |
+| 4.3 | Tap link | opens `docs/VAULT_UPGRADE_PATH.md` | pass | pass | held |
+| 4.4 | Set app language to Spanish, repeat 4.1 | message is in Spanish | pass | pass | held |
 | 4.5 | Dismiss the message | app usable; other vaults open | pass | pass | held |
 | 4.6 | Import with a WRONG passphrase | same version message, **not** "wrong passphrase" | pass | pass | held |
 
@@ -130,11 +130,15 @@ No edits. No saves. It is v11 (created by alpha.14 or later) — Step 4 is the p
 
 ## Open failures
 
-| Ref | Failure |
-|-----|---------|
-| 4.2 | No tappable link on the import screen's version-not-supported message |
-| 4.4 | That message stays English under a non-English UI locale |
+None. Linux and S23 are green throughout; GrapheneOS legs remain `held`.
 
-Both are the same defect: `import_screen.dart:379` renders the raw Rust error
-(`e.toString()`) as plain text, so the URL is not tappable and the string never
-reaches the ARB. The unlock screen's card is correctly built and localised.
+4.2 and 4.4 failed on the 2026-07-17 run — `import_screen.dart` rendered the raw Rust
+error as plain text, so the URL was not tappable and the string never reached the ARB.
+Fixed 2026-07-18 by reusing the unlock screen's own translated strings and link; re-run
+2026-07-18 passes on both devices.
+
+## Noted, not a failure
+
+3.1, S23 passphrase+YubiKey: `gethmacsecret failed: tag was lost` several times before
+the unlock succeeded. Retrying worked, so the step passes, but the NFC tap is unreliable
+enough to be user-visible.
