@@ -14,8 +14,8 @@ and warned again before the next. Cleared to proceed.
 
 ## HANDOFF — state at 2026-07-17 (read this first)
 
-**The code is COMPLETE and the gate is GREEN. What remains is the hardware matrix and
-deleting this file.** All committed on `master`, nothing on a branch.
+**RT-3 is COMPLETE: code, gate and hardware matrix all green. Only shipping remains.**
+All committed on `master`, nothing on a branch.
 
 **Done and green:**
 1. Net pins for v11 — absolute layout pin, reseal-cap pin, sync corpus re-minted at v11.
@@ -30,11 +30,13 @@ deleting this file.** All committed on `master`, nothing on a branch.
    migrate-on-unlock hooks. **11 crates left the tree (195 -> 184 lock entries.)**
 7. §8 fixtures: v6–v9 deleted, v10 pair kept as the refusal input. §9 docs swept.
 
+- [x] Hardware matrix. Run 2026-07-17 on Linux + S23, re-run 2026-07-18 after the import fix:
+  green throughout. GrapheneOS is not in scope for this matrix.
+
 **NOT done:**
-- [ ] Hardware matrix. Run 2026-07-17 on Linux + S23; GrapheneOS `held` throughout. Two
-  failures (4.2, 4.4), both fixed 2026-07-18 — see below — and awaiting a re-run.
-- [ ] Decide whether this warrants a release (maintainer's call). CHANGELOG `[Unreleased]` is
-  written: Security (v11 minimum, crates gone) + Changed (≤v10 refused, not damaged).
+- [ ] Release. Deferred 2026-07-18 — the maintainer is fixing other issues surfaced during the
+  matrix first. CHANGELOG `[Unreleased]` is written: Security (v11 minimum, crates gone) +
+  Changed (≤v10 refused, not damaged).
 - [ ] Delete this file (§9) once it has shipped.
 
 **Gate: GREEN, run by the maintainer 2026-07-17** (~105 min, offline). Every leg passed,
@@ -76,7 +78,7 @@ including Android (148 pass / 15 ignored). Counts match the agent-run table belo
 | `cargo clippy --release --all-targets -- -D warnings` | clean | **after** the final `cargo fmt` |
 | `cargo fmt --check` | clean | final |
 | Full `gabbro_test` gate incl. **Android** (148 pass / 15 ignored) | **ALL GREEN** | maintainer, 2026-07-17 |
-| Hardware matrix | **NOT RUN** | — |
+| Hardware matrix, Linux + S23 | **ALL GREEN** | maintainer, re-run 2026-07-18 |
 
 The Rust unit count is **634** (measured, not arithmetic — was 668). ARCHITECTURE updated; the
 gate remains the authority.

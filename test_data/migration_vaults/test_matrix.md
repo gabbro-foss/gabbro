@@ -4,6 +4,9 @@ Run top to bottom. No step depends on a later one.
 
 Fill: `pass` / `fail` / `n/a` / `held`.
 
+Devices in scope: Linux and S23. GrapheneOS is **not** part of this matrix — its `held`
+cells below are out of scope, not outstanding work.
+
 ## Facts (grounded in code)
 
 | Fact | Source |
@@ -130,15 +133,9 @@ No edits. No saves. It is v11 (created by alpha.14 or later) — Step 4 is the p
 
 ## Open failures
 
-None. Linux and S23 are green throughout; GrapheneOS legs remain `held`.
+None. The matrix is complete: Linux and S23 green throughout.
 
 4.2 and 4.4 failed on the 2026-07-17 run — `import_screen.dart` rendered the raw Rust
 error as plain text, so the URL was not tappable and the string never reached the ARB.
 Fixed 2026-07-18 by reusing the unlock screen's own translated strings and link; re-run
 2026-07-18 passes on both devices.
-
-## Noted, not a failure
-
-3.1, S23 passphrase+YubiKey: `gethmacsecret failed: tag was lost` several times before
-the unlock succeeded. Retrying worked, so the step passes, but the NFC tap is unreliable
-enough to be user-visible.

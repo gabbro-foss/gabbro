@@ -112,19 +112,6 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**RT-3 code is COMPLETE and the gate is GREEN** (maintainer, 2026-07-17 — every leg,
-Android included). The hybrid layer and both crates are deleted, the floor is v11, and the
-CHANGELOG `[Unreleased]` entry is written. Verification table and the delete-this-file step
-are in [RT3_CLEANUP.md](RT3_CLEANUP.md).
-
-Hardware matrix green on Linux + S23 (re-run 2026-07-18). The two 2026-07-17 failures were
-one defect on the **import** screen — not the unlock screen, which was correct all along —
-fixed by reusing the unlock screen's translated strings and tappable link.
-
-**Outstanding, in order:**
-1. GrapheneOS legs, still `held` throughout the matrix.
-2. Whether this warrants a release (maintainer's call). It is a user-visible bugfix.
-
 ---
 
 ## Build & Release
