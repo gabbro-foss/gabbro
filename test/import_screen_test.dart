@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'test_helpers.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/screens/import_screen.dart';
 import 'package:gabbro/screens/import_skipped_dialog.dart';
@@ -540,6 +541,103 @@ void main() {
 
       expect(find.textContaining('not a Gabbro vault'), findsOneWidget);
       expect(find.textContaining(tooOldMessage), findsNothing);
+    });
+
+    // ── The too-old refusal under l10n + accessibility ───────────────────────
+    // The strings are reused and already translated, but this screen's LAYOUT
+    // with them is new. The worst case is the longest translation at the largest
+    // scale on the narrowest screen, together — testing them separately never
+    // meets it.
+
+    Widget importShell({
+      Locale? locale,
+      TextScaler? textScaler,
+      ThemeMode mode = ThemeMode.light,
+      bool highContrast = false,
+    }) =>
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: locale,
+          themeMode: mode,
+          theme: ThemeData(brightness: Brightness.light),
+          darkTheme: ThemeData(brightness: Brightness.dark),
+          home: MediaQuery(
+            data: MediaQueryData(
+              textScaler: textScaler ?? TextScaler.noScaling,
+              highContrast: highContrast,
+            ),
+            child: ImportScreen(
+              isAndroid: false,
+              initialGabbroPath: tempGabbroFile().path,
+              onDetectSourceRecords: (_) => [],
+              onSourceFormatTooOld: (_) async => true,
+              onImportGabbro: (_, _) async => throw Exception(versionRefusal),
+            ),
+          ),
+        );
+
+    Future<void> showRefusal(WidgetTester tester, Widget shell) async {
+      await tester.pumpWidget(shell);
+      // Matched by shape, not by label: the sweep runs in 37 locales, so any
+      // English finder would fail on the first translated one. With no
+      // key-protected source the vault passphrase is the only obscured field.
+      final passphrase =
+          find.byWidgetPredicate((w) => w is TextField && w.obscureText);
+      expect(passphrase, findsOneWidget);
+      await tester.enterText(passphrase, 'pw');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+      await tester.pump();
+    }
+
+    testWidgets('the too-old refusal survives every locale at 8x text',
+        (tester) async {
+      tester.view.physicalSize = const Size(360, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() => tester.view.reset());
+
+      // nn and yo ship no Material/Cupertino delegate, so any screen with a
+      // TextField throws "No MaterialLocalizations found" before layout is even
+      // reached — this sweep cannot say anything about them. App-wide and
+      // pre-existing (Bikeshed: "nn and yo are only half-localised"), not
+      // caused by this refusal. Named, not blanket-ignored.
+      const noMaterialDelegate = {'nn', 'yo'};
+
+      for (final locale in AppLocalizations.supportedLocales) {
+        if (noMaterialDelegate.contains(locale.languageCode)) continue;
+
+        await showRefusal(
+          tester,
+          importShell(
+            locale: locale,
+            textScaler: const TextScaler.linear(8.0),
+          ),
+        );
+
+        expect(tester.takeException(), isNull,
+            reason: '$locale at 8x must scroll, never overflow');
+      }
+    });
+
+    testWidgets('the too-old refusal renders in every theme and contrast',
+        (tester) async {
+      for (final mode in [ThemeMode.light, ThemeMode.dark]) {
+        for (final hc in [false, true]) {
+          await showRefusal(tester, importShell(mode: mode, highContrast: hc));
+          expect(tester.takeException(), isNull,
+              reason: 'mode=$mode highContrast=$hc must render cleanly');
+        }
+      }
+    });
+
+    testWidgets('the upgrade link meets the labelled-tap-target guideline',
+        (tester) async {
+      final handle = tester.ensureSemantics();
+      await showRefusal(tester, importShell());
+
+      await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+      handle.dispose();
     });
 
     // ── No-file validation for each importer ─────────────────────────────────
