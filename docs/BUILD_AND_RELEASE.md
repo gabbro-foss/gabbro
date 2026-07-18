@@ -142,7 +142,23 @@ real fix.
      the search with `GABBRO_FUZZ_CASES=64`.
    - The ignored Rust + Kotlin tests are hardware-only (YubiKey /
      biometric / AndroidKeyStore) and cannot run without the devices.
-4. Commit the version + CHANGELOG bump. **The tag is pushed last** — after the artifacts are built (see Tag, below).
+4. Record the build toolchain. Run these on the build box and add the output to the
+   CHANGELOG entry from step 1 (and, later, the GitHub release body):
+
+   ```bash
+   flutter --version | head -1
+   rustc --version
+   grep -oP '(com\.android\.application|org\.jetbrains\.kotlin\.android)"\) version "\K[^"]+' android/settings.gradle.kts   # AGP, Kotlin
+   grep -oP 'VERSION_\K[0-9]+' android/app/build.gradle.kts | head -1   # Java
+   ```
+
+   Format it as one line, e.g.
+   *"Built with Flutter 3.44.6, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21."*
+
+   The NDK is deliberately absent: `ndkVersion = flutter.ndkVersion`
+   (`android/app/build.gradle.kts:16`), so the Flutter version already determines it.
+   Pinning it separately would drift.
+5. Commit the version + CHANGELOG bump. **The tag is pushed last** — after the artifacts are built (see Tag, below).
 
 **Build:**
 
@@ -168,9 +184,10 @@ the release by hand on github.com:
 2. **Choose the existing tag** `v0.1.0-alpha.N` (do not create a new one).
 3. Title **Gabbro v0.1.0-alpha.N**; tick **Set as a pre-release**.
 4. Attach the artifacts: the Linux `.tar.gz` **and its `.tar.gz.asc` signature**, plus all three renamed per-ABI `.apk` files.
-5. Body: the changelog section for this version, plus the disclaimer: *"Alpha — for
-   invited testers only. The cryptographic implementation has not undergone external
-   review. Do not store passwords you cannot afford to lose."*
+5. Body: the changelog section for this version — including the build-toolchain line from
+   pre-flight step 4 — plus the disclaimer: *"Alpha — for invited testers only. The
+   cryptographic implementation has not undergone external review. Do not store passwords
+   you cannot afford to lose."*
 
 If a stale draft release already exists for this version, delete it first and create
 the release fresh from the tag.

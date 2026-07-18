@@ -136,17 +136,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   tracks neither the app version nor the alpha number, so the refusal message cites a number
   the user cannot find anywhere in the app. Rework the wording.
 
-### Features and UI/UX (continued)
-- **`nn` and `yo` are only half-localised.** Both are offered in the picker, but Flutter's own
-  Material/Cupertino/Widgets delegates do not ship either, so Gabbro's strings translate while
-  Flutter's built-ins (text-selection menu, pickers, system dialog buttons) fall back to English.
-  Silent in release; debug warns. Found 2026-07-16 by the all-locale unlock sweep — pre-existing
-  and app-wide, not caused by it. Options: accept, ship custom delegates, or drop the two locales.
-  Note for sweeps: an all-locale test must use `gabbroLocalizationsDelegates` (`main.dart`),
-  not the generated `AppLocalizations.localizationsDelegates`. The former wraps
-  Material/Cupertino to fall back to English; on the raw list any screen with a `TextField`
-  throws in nn/yo — a harness artefact, not app behaviour.
-
 ### Security (pre-v1)
 - Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
 
@@ -166,10 +155,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   16/32/48/64/128/256/512 plus a scalable SVG from `ic_launcher_*.svg` and add a `.desktop`
   entry. Blocked on the new logo. Same render covers the Windows `.ico`, still the stock
   Flutter template.
-- **Record build-tool versions in releases.** Add the Flutter version (and Rust/NDK if
-  useful) to the CHANGELOG entry and the GitHub release body, as Yubico does:
-  "Binaries compiled with Flutter 3.44.4 and Python 3.14.6 (desktop)"
-  (https://github.com/Yubico/yubioath-flutter/releases/tag/7.4.1). Update BUILD_AND_RELEASE.
 - **Auto-type: unlock-then-type + cold start (ADR-017 Phase 4).** A trigger while the
   vault is locked or Gabbro is closed does nothing today. Add: prompt-unlock-then-type,
   an opt-in setting, README key-binding examples, and package `gabbro-autotype` into the
