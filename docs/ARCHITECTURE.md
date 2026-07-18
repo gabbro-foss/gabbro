@@ -78,7 +78,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1274 | 0 |
+| Flutter (`flutter test`) | 1277 | 0 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -148,6 +148,9 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   Flutter's built-ins (text-selection menu, pickers, system dialog buttons) fall back to English.
   Silent in release; debug warns. Found 2026-07-16 by the all-locale unlock sweep — pre-existing
   and app-wide, not caused by it. Options: accept, ship custom delegates, or drop the two locales.
+  Worse than first recorded: any screen with a `TextField` throws `No MaterialLocalizations
+  found` in these two, before layout. So all-locale sweeps cannot cover them and must skip
+  them by name (see `import_screen_test.dart`). Raises the case for dropping both.
 
 ### Security (pre-v1)
 - Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
