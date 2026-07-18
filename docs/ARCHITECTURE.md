@@ -177,6 +177,11 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   reusable sweep every screen must pass: all locales, 8x text on a 360px phone, overflow,
   light/dark, high-contrast, tap targets, screen reader labels. Include Rust-originated
   strings — they bypass the ARB entirely.
+- **Linux ships no desktop icon.** No `.desktop` file and no hicolor icon tree, so an
+  installed build (AUR) shows a generic placeholder in the app menu and taskbar. Render
+  16/32/48/64/128/256/512 plus a scalable SVG from `ic_launcher_*.svg` and add a `.desktop`
+  entry. Blocked on the new logo. Same render covers the Windows `.ico`, still the stock
+  Flutter template.
 - **Record build-tool versions in releases.** Add the Flutter version (and Rust/NDK if
   useful) to the CHANGELOG entry and the GitHub release body, as Yubico does:
   "Binaries compiled with Flutter 3.44.4 and Python 3.14.6 (desktop)"
