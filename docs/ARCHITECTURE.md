@@ -135,11 +135,11 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - See if vault `syncing` can do without a second `passphrase + yubikey` if and only if the current vault and the incoming vault share the same `alias`, `passphrase`, `yubikey(s)`
 - in `sync` path, we currently have `auto-merge` and `review all changes`, the `auto-merge` is additive only (check and verify) and therefore never deletes items in the receiving vault: (1) add a message that explains this (or the correct) behaviour to the user, (2) add a third `sync` mechanism that simply takes the incoming vault and clobbers the existing one - discuss this
 - Autotype in linux often has typos in the login/email. and it often fails perhaps due to a typo in the passphrase. investigate.
-- **Version-not-supported card has no tappable link.** The card is meant to link to
-  `docs/VAULT_UPGRADE_PATH.md`. No link renders. Found on hardware 2026-07-17 (matrix 4.3).
-- **Version-not-supported card is English-only.** Card text stays English with the UI set to
-  Spanish. Found on hardware 2026-07-17 (matrix 4.5). Check whether other Rust-originated
-  error strings share this — the card may not be the only one.
+- **Import screen shows raw Rust errors.** `import_screen.dart:379` sets
+  `_gabbroError = e.toString()` and renders it as plain text, so the v10 refusal has no
+  tappable link (matrix 4.2) and stays English (matrix 4.4). The other five import
+  sources (lines 201, 241, 281, 321, 420) do the same. Found on hardware 2026-07-17.
+  The unlock screen's card is correct — it was not the surface under test.
 - **Vault format version is meaningless to the user.** "v10"/"v11" is the file format and
   tracks neither the app version nor the alpha number, so the refusal message cites a number
   the user cannot find anywhere in the app. Rework the wording.
@@ -160,6 +160,15 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   above is welcome-not-blocking). Optional: a read-only Codeberg mirror for redundancy.
 
 ### Code Quality
+- **Net for l10n + accessibility on every screen.** Matrix 4.4 shipped an English-only
+  card through a full l10n implementation, so the per-screen net is not catching it. Build a
+  reusable sweep every screen must pass: all locales, 8x text on a 360px phone, overflow,
+  light/dark, high-contrast, tap targets, screen reader labels. Include Rust-originated
+  strings — they bypass the ARB entirely.
+- **Record build-tool versions in releases.** Add the Flutter version (and Rust/NDK if
+  useful) to the CHANGELOG entry and the GitHub release body, as Yubico does:
+  "Binaries compiled with Flutter 3.44.4 and Python 3.14.6 (desktop)"
+  (https://github.com/Yubico/yubioath-flutter/releases/tag/7.4.1). Update BUILD_AND_RELEASE.
 - **Auto-type: unlock-then-type + cold start (ADR-017 Phase 4).** A trigger while the
   vault is locked or Gabbro is closed does nothing today. Add: prompt-unlock-then-type,
   an opt-in setting, README key-binding examples, and package `gabbro-autotype` into the
