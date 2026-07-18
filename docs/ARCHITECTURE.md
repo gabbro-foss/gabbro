@@ -78,7 +78,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1265 | 0 |
+| Flutter (`flutter test`) | 1274 | 0 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -135,11 +135,9 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - See if vault `syncing` can do without a second `passphrase + yubikey` if and only if the current vault and the incoming vault share the same `alias`, `passphrase`, `yubikey(s)`
 - in `sync` path, we currently have `auto-merge` and `review all changes`, the `auto-merge` is additive only (check and verify) and therefore never deletes items in the receiving vault: (1) add a message that explains this (or the correct) behaviour to the user, (2) add a third `sync` mechanism that simply takes the incoming vault and clobbers the existing one - discuss this
 - Autotype in linux often has typos in the login/email. and it often fails perhaps due to a typo in the passphrase. investigate.
-- **Import screen shows raw Rust errors.** `import_screen.dart:379` sets
-  `_gabbroError = e.toString()` and renders it as plain text, so the v10 refusal has no
-  tappable link (matrix 4.2) and stays English (matrix 4.4). The other five import
-  sources (lines 201, 241, 281, 321, 420) do the same. Found on hardware 2026-07-17.
-  The unlock screen's card is correct — it was not the surface under test.
+- **The other five importers still show raw Rust errors.** Enpass, Bitwarden, Google PM,
+  Dashlane and CSV all set their error to `e.toString()`, so any Rust failure reaches the
+  user untranslated. The Gabbro source was fixed (matrix 4.2 / 4.4); these were not.
 - **Vault format version is meaningless to the user.** "v10"/"v11" is the file format and
   tracks neither the app version nor the alpha number, so the refusal message cites a number
   the user cannot find anywhere in the app. Rework the wording.
