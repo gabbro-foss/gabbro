@@ -938,11 +938,11 @@
 
   "vaultFormatTooOld": "This vault uses an older format that this version of Gabbro cannot open. Your vault file has not been changed.",
   "@vaultFormatTooOld": {
-    "description": "Shown on the unlock screen when the vault file predates the oldest format this build can read. It is intact, not damaged: the user must open it once with an older Gabbro release to upgrade it. Must never sound like corruption or data loss."
+    "description": "Shown on the unlock screen, and on the import screen for a too-old source, when the vault file predates the oldest format this build can read. It is intact, not damaged: the user must open it once with an older Gabbro release to upgrade it. Must never sound like corruption or data loss. Names no format version - 'v10' means nothing to a user."
   },
   "vaultFormatUpgradeLink": "How to upgrade this vault",
   "@vaultFormatUpgradeLink": {
-    "description": "Tappable link label on the unlock screen, next to vaultFormatTooOld. Opens the documented upgrade steps."
+    "description": "Tappable link label next to vaultFormatTooOld, on both the unlock and import screens. Opens the documented upgrade steps."
   },
   "vaultCorruptBackupAvailable": "This vault file cannot be read. A usable safety copy from your last save is available.",
   "restoreBackupButton": "Restore from safety copy",

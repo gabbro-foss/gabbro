@@ -8,9 +8,11 @@ import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/screens/csv_mapping_screen.dart';
 import 'package:gabbro/screens/import_failures_dialog.dart';
 import 'package:gabbro/screens/import_skipped_dialog.dart';
+import 'package:gabbro/screens/unlock_screen.dart' show vaultUpgradePathUrl;
 import 'package:gabbro/src/rust/api/import.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/widgets/path_field.dart';
+import 'package:gabbro/widgets/url_link.dart';
 import 'package:gabbro/widgets/yubikey_tap.dart';
 
 /// Import size caps, mirrored from `rust/src/import/mod.rs` — keep in sync. A
@@ -59,6 +61,16 @@ Future<YubikeyHmacMatch> _defaultGetYubikeyHmac(
         List<YubikeyRecordData> records, String pin, String transport) =>
     getAnyYubikeyHmacSecret(records: records, pin: pin, transport: transport);
 
+// Same shape as the unlock screen's probe: "cannot tell" must never claim the
+// file is merely old, or a genuinely corrupt source would be mis-explained.
+Future<bool> _defaultSourceFormatTooOld(String path) async {
+  try {
+    return await vaultFormatTooOld(path: path);
+  } catch (_) {
+    return false;
+  }
+}
+
 class ImportScreen extends StatefulWidget {
   final Future<ImportResult> Function(List<int> data) onImportEnpass;
   final Future<ImportResult> Function(List<int> data) onImportBitwarden;
@@ -81,6 +93,13 @@ class ImportScreen extends StatefulWidget {
       List<YubikeyRecordData> records, String pin, String transport)
   onGetYubikeyHmac;
 
+  /// Whether the chosen `.gabbro` source is intact but predates the readable
+  /// floor. Asked only after an import fails, to tell "too old" apart from a
+  /// wrong passphrase or a damaged file — an old vault is undamaged and needs
+  /// explaining, never a raw error string. Mirrors the unlock screen's
+  /// `onVaultFormatTooOld` so both refusals behave the same.
+  final Future<bool> Function(String path) onSourceFormatTooOld;
+
   final bool isAndroid;
 
   /// Pre-selected Gabbro source path. Mainly a test seam (the path is otherwise
@@ -99,6 +118,7 @@ class ImportScreen extends StatefulWidget {
     this.onImportGabbroWithKey = _defaultImportGabbroWithKey,
     this.onDetectSourceRecords = _defaultDetectSourceRecords,
     this.onGetYubikeyHmac = _defaultGetYubikeyHmac,
+    this.onSourceFormatTooOld = _defaultSourceFormatTooOld,
     this.initialGabbroPath,
     bool? isAndroid,
   }) : isAndroid = isAndroid ?? Platform.isAndroid;
@@ -128,6 +148,10 @@ class _ImportScreenState extends State<ImportScreen> {
   String? _dashlaneError;
   String? _csvError;
   String? _gabbroError;
+
+  /// Distinct from [_gabbroError]: the source is intact, just older than this
+  /// build reads. Explained with a link, never shown as a raw failure.
+  bool _gabbroFormatTooOld = false;
 
   final _passphraseController = TextEditingController();
   bool _showPassphrase = false;
@@ -351,6 +375,7 @@ class _ImportScreenState extends State<ImportScreen> {
     setState(() {
       _isImportingGabbro = true;
       _gabbroError = null;
+      _gabbroFormatTooOld = false;
     });
     try {
       final passphraseBytes = utf8.encode(passphrase);
@@ -376,7 +401,16 @@ class _ImportScreenState extends State<ImportScreen> {
       }
       if (mounted) Navigator.of(context).pop(result.imported.toInt());
     } catch (e) {
-      if (mounted) setState(() => _gabbroError = e.toString());
+      if (!mounted) return;
+      // An intact pre-v11 source fails here too. It is not corrupt and the user
+      // did not mistype, so explain the format instead of dumping the Rust text
+      // (which is English-only and renders its URL as dead plain text).
+      final tooOld = await widget.onSourceFormatTooOld(path);
+      if (!mounted) return;
+      setState(() {
+        _gabbroFormatTooOld = tooOld;
+        _gabbroError = tooOld ? null : e.toString();
+      });
     } finally {
       if (mounted) setState(() => _isImportingGabbro = false);
     }
@@ -565,6 +599,7 @@ class _ImportScreenState extends State<ImportScreen> {
           onPathSelected: (p) => setState(() {
             _gabbroPath = p;
             _gabbroError = null;
+      _gabbroFormatTooOld = false;
             try {
               _gabbroSourceRecords = widget.onDetectSourceRecords(p);
             } catch (_) {
@@ -660,6 +695,32 @@ class _ImportScreenState extends State<ImportScreen> {
             style: TextStyle(
               color: Theme.of(context).colorScheme.error,
               fontSize: 12,
+            ),
+          ),
+        ],
+        // The source is intact, just too old: same words and link as the unlock
+        // screen, so one refusal is not two different experiences. Error-red is
+        // right — the import did fail — but the text carries the meaning on its
+        // own (ADR-003), and names no format version (meaningless to the user).
+        if (_gabbroFormatTooOld) ...[
+          const SizedBox(height: 4),
+          Text(
+            l.vaultFormatTooOld,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.error,
+              fontSize: 12,
+            ),
+          ),
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: TextButton.icon(
+              icon: const Icon(Icons.open_in_new, size: 16),
+              label: Text(l.vaultFormatUpgradeLink),
+              onPressed: () => showUrlDialog(
+                context,
+                title: l.vaultFormatUpgradeLink,
+                url: vaultUpgradePathUrl,
+              ),
             ),
           ),
         ],

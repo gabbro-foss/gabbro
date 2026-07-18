@@ -458,6 +458,90 @@ void main() {
       expect(field.controller?.text, 'pw');
     });
 
+    // ── A pre-v11 source is explained, not dumped as a raw error ─────────────
+    // Matrix 4.2 / 4.4. Reuses the unlock screen's strings so both refusals read
+    // the same and are already translated. Neither carries a format version
+    // number: "v10" means nothing to a user (Bikeshed), so the assertions below
+    // must never depend on one.
+
+    const tooOldMessage =
+        'This vault uses an older format that this version of Gabbro cannot '
+        'open. Your vault file has not been changed.';
+    const upgradeLinkLabel = 'How to upgrade this vault';
+    const upgradeUrl =
+        'https://github.com/gabbro-foss/gabbro/blob/master/docs/VAULT_UPGRADE_PATH.md';
+
+    Future<void> runImportOfOldSource(
+      WidgetTester tester, {
+      required bool tooOld,
+      Object? error,
+    }) async {
+      await tester.pumpWidget(testApp(ImportScreen(
+        isAndroid: false,
+        initialGabbroPath: tempGabbroFile().path,
+        onDetectSourceRecords: (_) => [],
+        onSourceFormatTooOld: (_) async => tooOld,
+        onImportGabbro: (_, _) async =>
+            throw error ?? Exception(versionRefusal),
+      )));
+      await tester.enterText(
+          find.widgetWithText(TextField, 'Vault passphrase'), 'pw');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+      await tester.pump();
+    }
+
+    testWidgets('a pre-v11 source explains the format, not the raw Rust error',
+        (tester) async {
+      await runImportOfOldSource(tester, tooOld: true);
+
+      expect(find.textContaining(tooOldMessage), findsOneWidget);
+      expect(find.textContaining('file version not supported'), findsNothing);
+    });
+
+    testWidgets('a pre-v11 source offers a tappable link to the upgrade steps',
+        (tester) async {
+      await runImportOfOldSource(tester, tooOld: true);
+
+      expect(find.text(upgradeLinkLabel), findsOneWidget);
+    });
+
+    testWidgets('tapping the upgrade link shows the URL before the browser',
+        (tester) async {
+      await runImportOfOldSource(tester, tooOld: true);
+
+      await tester.tap(find.text(upgradeLinkLabel));
+      await tester.pumpAndSettle();
+
+      // Same convention as url_link.dart: the user sees where they are going.
+      expect(find.text(upgradeUrl), findsOneWidget);
+      expect(find.text('Open in browser'), findsOneWidget);
+    });
+
+    testWidgets('a wrong passphrase on a current source keeps its own error',
+        (tester) async {
+      await runImportOfOldSource(
+        tester,
+        tooOld: false,
+        error: Exception('wrong passphrase'),
+      );
+
+      expect(find.textContaining('wrong passphrase'), findsOneWidget);
+      expect(find.textContaining(tooOldMessage), findsNothing);
+    });
+
+    testWidgets('a corrupt source keeps its own error, never the format one',
+        (tester) async {
+      await runImportOfOldSource(
+        tester,
+        tooOld: false,
+        error: Exception('not a Gabbro vault'),
+      );
+
+      expect(find.textContaining('not a Gabbro vault'), findsOneWidget);
+      expect(find.textContaining(tooOldMessage), findsNothing);
+    });
+
     // ── No-file validation for each importer ─────────────────────────────────
 
     testWidgets('shows error when Enpass import attempted with no file',
