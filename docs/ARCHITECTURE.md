@@ -112,6 +112,84 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
+**Net for l10n + accessibility on every screen.**
+
+Scope: all locales, 8x text on a 360px phone, overflow, light/dark, high-contrast,
+tap targets, screen reader labels. Rust-originated strings bypass the ARB and must
+be included.
+
+First attempt (2026-07-19, Claude Opus 4.8) was reverted — nothing committed. What it
+established, so it need not be redone:
+
+**Verified**
+- `test/overflow_probe_test.dart` already sweeps 14 screens x 2 surfaces at max text
+  scale, English only. Extend it; do not rebuild.
+- The locale axis is cheap: 34 locales x 17 screens x 2 surfaces ran in ~29 s. Cost
+  was never the obstacle (an earlier "too slow" claim was made without measuring).
+- ARB key sets and placeholder tokens are identical across all 37 locales today
+  (jq-verified) but nothing asserts either — both are cheap tests to add.
+- Placeholder tokens stay ASCII in every script, so `\{(\w+)\}` matches inside
+  Greek/Cyrillic/CJK messages.
+
+**Defects found**
+- `lib/screens/recovery_history_screen.dart:96` — the `ListTile` `trailing` Row
+  overflows at 360dp/2.0x in 24 of 34 locales; en, ja, ko, zh*, da, et, hr, sl, sr*
+  pass, which is why it was invisible. `trailing` is intrinsically sized, so the fix
+  is moving the actions out of it, not an `Expanded`. The comment at
+  `overflow_probe_test.dart:149` calling this fixed is true for English only.
+- `lib/widgets/sync_review.dart` — the password field cannot be scrolled and
+  overflows even at small text (seen in device use). The probe **cannot** catch this:
+  a child clipped inside a fixed box throws no exception.
+
+**Traps**
+- Sweeping locales inside one `testWidgets` needs the tree torn down between pumps
+  (`pumpWidget(SizedBox())` first), or a stale overflow is blamed on the next locale
+  — including `en`, which passes standalone. This produced a false defect report.
+- A screen-coverage guard must enumerate `lib/widgets/` as well as `lib/screens/`.
+  sync_review, generator_widget, password_breakdown_sheet and yubikey_tap live there;
+  an attempt that checked only `lib/screens/` missed the sync_review bug entirely.
+- `overflow_probe_test.dart:29` cites `docs/PHASE2_OVERFLOW_COVERAGE.md`, which does
+  not exist.
+
+**Not attempted:** light/dark, high-contrast, tap targets, screen reader labels,
+Rust-originated strings. The first attempt built the locale and overflow axes only
+and treated that as the whole task — it is roughly a third of the scope above.
+
+**How the first attempt went wrong** — the method failures that produced the above,
+recorded so the next attempt does not repeat them:
+- *Never checked the work against the requirement.* A scenario list was invented at
+  the start and then treated as the definition of done. The Bikeshed text was not
+  re-read once. That is the single reason two thirds of the scope went missing.
+- *Asserted instead of measuring.* "Too slow for `flutter test`" was stated with no
+  timing run; the real figure was ~12 s. A "real defect found" was announced while
+  `en` sat in the failure list, having passed minutes earlier — it was a harness bug.
+  Both were caught by the maintainer, not by the work.
+- *Built the guard without testing the guard.* The screen-coverage test existed
+  solely to fail when a screen is unswept, and was pointed at `lib/screens/` without
+  ever listing `lib/widgets/`. It reported green while missing nine widgets.
+- *Overstated coverage.* Nine screens were waived as "covered by" other tests; that
+  coverage is English-only overflow, and in two cases only logic tests. The word
+  claimed far more than the tests do — see the waiver reasons before trusting them.
+- *Constraints were not propagated to subagents.* Repo rules (no interpreters, no
+  absolute host paths) do not reach spawned agents automatically and must be written
+  into each agent prompt.
+
+CLAUDE.md was read at session start and then not followed. Every rule under
+`## Messages to the [user]` was broken, repeatedly:
+- *Terse, no walls of text.* Nearly every message was long: tables, multi-section
+  status reports, and restated context the maintainer already had. Correcting this
+  took three separate interventions and it still recurred.
+- *Never ask a question and continue without waiting.* Questions were asked and work
+  continued in the same turn; decisions were also presented as settled while asking
+  about one narrow point, which anchors the answer.
+- *Name the consequence, not the artifact.* Findings were reported as `RenderFlex`,
+  `ListTile trailing`, probe and registry internals. The maintainer had to ask
+  outright what the defect meant for a user before that was stated.
+
+Also broken from the Session Start Checklist: absolute host paths (`/home/<user>/...`)
+were written into agent prompts and shell commands, which the checklist forbids
+because the repo goes public.
+
 ---
 
 ## Build & Release
@@ -153,11 +231,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   above is welcome-not-blocking). Optional: a read-only Codeberg mirror for redundancy.
 
 ### Code Quality
-- **Net for l10n + accessibility on every screen.** Matrix 4.4 shipped an English-only
-  card through a full l10n implementation, so the per-screen net is not catching it. Build a
-  reusable sweep every screen must pass: all locales, 8x text on a 360px phone, overflow,
-  light/dark, high-contrast, tap targets, screen reader labels. Include Rust-originated
-  strings — they bypass the ARB entirely.
 - **Linux ships no desktop icon.** No `.desktop` file and no hicolor icon tree, so an
   installed build (AUR) shows a generic placeholder in the app menu and taskbar. Render
   16/32/48/64/128/256/512 plus a scalable SVG from `ic_launcher_*.svg` and add a `.desktop`
