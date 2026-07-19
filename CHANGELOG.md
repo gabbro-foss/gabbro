@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Recovery history: the Revert, Delete and reveal controls ran off the right edge at larger text in most languages, leaving no way to restore or discard a value sync had replaced. They now wrap onto their own line.
+- Sync review: a long password, URL or folder name was cut off in the choice buttons, so you picked between two values you could not read. Value choices are now full-width rows that wrap onto as many lines as needed, at every text size.
 
 ### Changed
 - **A vault older than VERSION 11 is refused, not damaged.** The file is left untouched and the app explains it needs upgrading rather than reporting corruption. To upgrade: install alpha.14, open each vault once, then return. See [docs/VAULT_UPGRADE_PATH.md](docs/VAULT_UPGRADE_PATH.md).

@@ -78,7 +78,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1280 | 0 |
+| Flutter (`flutter test`) | 1283 | 0 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -114,28 +114,28 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 **Net for l10n + accessibility on every screen.**
 
-**STATE 2026-07-19 (session interrupted, nothing committed).** Working tree carries:
-`lib/screens/recovery_history_screen.dart` (fix), `test/recovery_history_overflow_test.dart`
-(new), `CHANGELOG.md`, this file. `flutter test` = 1280 pass, 0 fail; `flutter analyze`
-clean on both touched files. Commit this before starting anything new.
+**STATE 2026-07-19.** Both known defects are fixed: recovery-history (`bcec8da`)
+and sync_review value choices (uncommitted). Flutter 1280 -> 1283. **Neither was
+found by a net, and the net still does not exist** — the first attempt's locale
+sweep, screen-coverage guard and ARB assertions were all reverted. Both defects
+came from hardware use.
 
-**NEXT STEP: the sync_review defect (screen 2 of 2).** Nothing written for it yet.
-The maintainer described it precisely: in a choice chip there is no room for
-`this vault: <value>` and `other vault: <value>`; once revealed, the passphrase is
-stuck and cannot be scrolled. Fix = make the value inside the chip horizontally
-scrollable. Agreed scenario list, still to write:
-- Net: chips at normal text / wrapping rows past 1.5x (already pinned by
-  `sync_review_large_text_test.dart:133` and `:138`); reveal, toggle, bail-out and
-  decision-building unchanged (existing sync_review_*_test.dart files).
-- Red: at 1.0x on 360dp a long revealed passphrase is readable end to end; same at
-  2.0x across all locales.
-- Watch: the red case may force the chip branch of `_choiceRow`
-  (`sync_review.dart:309`) to change, which `sync_review_large_text_test.dart:133`
-  pins. If so, change that test deliberately and say why — do not quietly retarget it.
+The sync_review fix departed from the plan below. A `ChoiceChip` is one 48px line
+with no way to scroll it, so a long password, URL or folder name was clipped and
+the user picked between two values they could not read. Scrolling the value inside
+the chip was dropped on discovery: chevrons inside a chip are tappables nested in
+the chip's own tap target, so a chevron press would also flip the selection, and
+drag-only would exclude mouse, keyboard and screen-reader users. Instead
+`_choiceRow` takes `showsValues`: labels interpolating user data (brought-over,
+clash, folder) render as the existing wrapping radio row at every text size; bare
+Keep/Delete/Skip labels stay compact chips below 1.5x (ADR-016).
+`sync_review_large_text_test.dart:133` pinned value choices as chips at 1.0x —
+that is the removed behaviour, so it was retargeted onto bare labels, with the
+reason recorded in the test.
 
-After screen 2, four of the six failure modes remain untouched: dark mode, the
-high-contrast setting, tap-target size, and screen-reader labels — plus
-Rust-originated strings, which bypass the ARB entirely.
+Four of the six failure modes remain untouched: dark mode, the high-contrast
+setting, tap-target size, and screen-reader labels — plus Rust-originated strings,
+which bypass the ARB entirely.
 
 Scope: all locales, 8x text on a 360px phone, overflow, light/dark, high-contrast,
 tap targets, screen reader labels. Rust-originated strings bypass the ARB and must
@@ -154,18 +154,9 @@ established, so it need not be redone:
 - Placeholder tokens stay ASCII in every script, so `\{(\w+)\}` matches inside
   Greek/Cyrillic/CJK messages.
 
-**Defects found**
-- ~~`recovery_history_screen.dart` `trailing` overflow~~ — **FIXED 2026-07-19.** Actions
-  moved out of the intrinsically-sized `trailing` slot into a `Wrap` under the value.
-  Net + red in `test/recovery_history_overflow_test.dart` (all locales, 2.0x, 360dp);
-  verified red against the unfixed code (24 locales) and green after.
-- `lib/widgets/sync_review.dart` — the password field cannot be scrolled and
-  overflows even at small text (seen in device use). The probe **cannot** catch this:
-  a child clipped inside a fixed box throws no exception. The fix is a horizontally
-  scrollable value inside the chip, so a long revealed passphrase can be read end to
-  end at normal text.
-
 **Traps**
+- A child clipped inside a fixed-size box throws no exception, so the probe cannot
+  see it. This is why both defects so far were found on hardware, not by a test.
 - Sweeping locales inside one `testWidgets` needs the tree torn down between pumps
   (`pumpWidget(SizedBox())` first), or a stale overflow is blamed on the next locale
   — including `en`, which passes standalone. This produced a false defect report.
