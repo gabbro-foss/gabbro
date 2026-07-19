@@ -16,6 +16,33 @@ Widget _buildWithLocale(LanguageChoice lang, Widget screen) => GabbroApp(
   initialScreen: screen,
 );
 
+/// String entries of an ARB file, dropping `@`-prefixed metadata (`@@locale`,
+/// per-key `@description`/`@placeholders`), which are not user-facing strings.
+Map<String, String> _readArb(File f) {
+  final json = jsonDecode(f.readAsStringSync()) as Map<String, dynamic>;
+  return {
+    for (final e in json.entries)
+      if (e.value is String && !e.key.startsWith('@')) e.key: e.value as String,
+  };
+}
+
+/// A key names a language endonym: `langFrench`, `langDutch`, … but not
+/// `langSystem` (which IS localised — "System default" / "Système par défaut").
+bool _isEndonymKey(String key) =>
+    key.startsWith('lang') &&
+    key.length > 4 &&
+    key[4] == key[4].toUpperCase() &&
+    key[4] != key[4].toLowerCase() &&
+    key != 'langSystem';
+
+/// Every `app_*.arb` under lib/l10n, sorted for stable test order.
+List<File> _arbFiles() => (Directory('lib/l10n')
+    .listSync()
+    .whereType<File>()
+    .where((f) => f.path.endsWith('.arb'))
+    .toList()
+  ..sort((a, b) => a.path.compareTo(b.path)));
+
 void main() {
   group('AppLocalizations', () {
     testWidgets('delegate resolves appName for all supported locales',
@@ -68,24 +95,8 @@ void main() {
   // and languageNote start with lowercase "langu" and never match `lang[A-Z]`.
 
   group('language-label endonym convention', () {
-    bool isEndonymKey(String key) =>
-        key.startsWith('lang') &&
-        key.length > 4 &&
-        key[4] == key[4].toUpperCase() &&
-        key[4] != key[4].toLowerCase() && // 4th char is an A-Z style letter
-        key != 'langSystem';
-
-    Map<String, String> readArb(File f) {
-      final json = jsonDecode(f.readAsStringSync()) as Map<String, dynamic>;
-      return {
-        for (final e in json.entries)
-          if (e.value is String) e.key: e.value as String,
-      };
-    }
-
-    final l10nDir = Directory('lib/l10n');
-    final base = readArb(File('lib/l10n/app_en.arb'));
-    final endonymKeys = base.keys.where(isEndonymKey).toList()..sort();
+    final base = _readArb(File('lib/l10n/app_en.arb'));
+    final endonymKeys = base.keys.where(_isEndonymKey).toList()..sort();
 
     test('base ARB exposes language labels to check', () {
       // Sanity: if this ever hits zero the matcher above has silently broken and
@@ -95,17 +106,10 @@ void main() {
       expect(endonymKeys, isNot(contains('langSystem')));
     });
 
-    final arbFiles = l10nDir
-        .listSync()
-        .whereType<File>()
-        .where((f) => f.path.endsWith('.arb'))
-        .toList()
-      ..sort((a, b) => a.path.compareTo(b.path));
-
-    for (final f in arbFiles) {
+    for (final f in _arbFiles()) {
       final name = f.uri.pathSegments.last;
       test('$name uses endonyms for all language labels', () {
-        final values = readArb(f);
+        final values = _readArb(f);
         for (final key in endonymKeys) {
           // A locale may omit an endonym key entirely — gen-l10n then falls back
           // to the (correct) English endonym. Only a present value can be wrong.
@@ -117,6 +121,100 @@ void main() {
                 'convention requires "${base[key]}" (same in every locale).',
           );
         }
+      });
+    }
+  });
+
+  group('ARB completeness across locales', () {
+    // Behaviour 1: a key missing from one locale means that user silently reads
+    // English for that string. Behaviour 2: a key whose message renames or drops
+    // a placeholder renders broken. Neither is caught by rendering — these read
+    // the ARB files directly.
+    final base = _readArb(File('lib/l10n/app_en.arb'));
+    final files = _arbFiles();
+
+    // Distinct placeholder names in a message. DISTINCT, not occurrences: a
+    // plural repeats its token once per arm, and Slavic locales carry arms
+    // English lacks (`few`), so counting occurrences reports false mismatches.
+    Set<String> placeholders(String message) => RegExp(r'\{(\w+)\}')
+        .allMatches(message)
+        .map((m) => m.group(1)!)
+        .toSet();
+
+    test('the ARB listing is complete, so the checks are not vacuous', () {
+      // A wrong path would return an empty list and pass every per-file loop
+      // below while checking nothing (the probe had this exact hole). Adding or
+      // removing a language fails HERE first — update the count deliberately.
+      expect(
+        files.length,
+        37,
+        reason: 'expected 37 app_*.arb files under lib/l10n; found '
+            '${files.length}. Added or removed a locale? Update this count.',
+      );
+      expect(base.length, greaterThan(500), reason: 'base ARB looks truncated');
+    });
+
+    for (final f in files) {
+      final name = f.uri.pathSegments.last;
+      test('$name has exactly the base key set', () {
+        final keys = _readArb(f).keys.toSet();
+        expect(
+          keys.difference(base.keys.toSet()),
+          isEmpty,
+          reason: '$name has keys absent from app_en.arb (stale after a rename?)',
+        );
+        expect(
+          base.keys.toSet().difference(keys),
+          isEmpty,
+          reason: '$name is MISSING keys — that string falls back to English for '
+              'this locale.',
+        );
+      });
+
+      test('$name matches base placeholders on every shared key', () {
+        final values = _readArb(f);
+        for (final key in base.keys) {
+          if (!values.containsKey(key)) continue; // absence is the test above
+          expect(
+            placeholders(values[key]!),
+            placeholders(base[key]!),
+            reason: '$name key "$key" changes placeholders from '
+                '${placeholders(base[key]!)} — the message will render broken.',
+          );
+        }
+      });
+    }
+  });
+
+  group('every listed language is present in every locale', () {
+    // The in-app language menu lists N languages; each must have its endonym in
+    // every ARB file, or a user in locale X sees a blank / English name for
+    // language Y in the picker. Pins the COUNT too, so adding a language without
+    // its endonym fails here.
+    final base = _readArb(File('lib/l10n/app_en.arb'));
+    final endonymKeys = base.keys.where(_isEndonymKey).toSet();
+
+    test('the base lists the expected number of languages', () {
+      // 34 selectable languages (LanguageChoice minus `system`). langSystem is
+      // excluded by _isEndonymKey because it is itself localised.
+      expect(
+        endonymKeys.length,
+        34,
+        reason: 'expected 34 language endonyms; found ${endonymKeys.length}. '
+            'Added or removed a language? Update this count and the ARB files.',
+      );
+    });
+
+    for (final f in _arbFiles()) {
+      final name = f.uri.pathSegments.last;
+      test('$name lists every language', () {
+        final keys = _readArb(f).keys.toSet();
+        expect(
+          endonymKeys.difference(keys),
+          isEmpty,
+          reason: '$name is missing language endonyms — those languages show '
+              'blank or English in the picker for this locale.',
+        );
       });
     }
   });
