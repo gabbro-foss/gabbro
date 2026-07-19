@@ -78,7 +78,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1283 | 0 |
+| Flutter (`flutter test`) | 1324 | 1 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -114,41 +114,34 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 **Net for l10n + accessibility on every screen.**
 
-**STATE 2026-07-19.** Both known defects are fixed: recovery-history (`bcec8da`)
-and sync_review value choices (uncommitted). Flutter 1280 -> 1283. **Neither was
-found by a net, and the net still does not exist** — the first attempt's locale
-sweep, screen-coverage guard and ARB assertions were all reverted. Both defects
-came from hardware use.
+**STATE 2026-07-19.** The overflow axis is built and covers every UI file:
+`test/overflow_probe_test.dart` sweeps 33 of 35 screens+widgets on a phone and a
+tablet surface at max text (2 waived — `yubikey_tap` and `section_index` render
+nothing). Three guards protect it, each verified able to fail: pinned file counts,
+a `_covers` cross-check so a declaration cannot stand in for a real probe entry,
+and probe-or-waive over both `lib/screens/` and `lib/widgets/`. Flutter 1280 ->
+1324 (+1 skipped).
 
-The sync_review fix departed from the plan below. A `ChoiceChip` is one 48px line
-with no way to scroll it, so a long password, URL or folder name was clipped and
-the user picked between two values they could not read. Scrolling the value inside
-the chip was dropped on discovery: chevrons inside a chip are tappables nested in
-the chip's own tap target, so a chevron press would also flip the selection, and
-drag-only would exclude mouse, keyboard and screen-reader users. Instead
-`_choiceRow` takes `showsValues`: labels interpolating user data (brought-over,
-clash, folder) render as the existing wrapping radio row at every text size; bare
-Keep/Delete/Skip labels stay compact chips below 1.5x (ADR-016).
-`sync_review_large_text_test.dart:133` pinned value choices as chips at 1.0x —
-that is the removed behaviour, so it was retargeted onto bare labels, with the
-reason recorded in the test.
+That whole sweep found **one** overflow (tablet detail-pane placeholder, fixed).
+Both earlier defects were clipping inside fixed boxes, which throws nothing — so
+the probe is worth having as a regression net but is not where the remaining
+defects live.
 
-Four of the six failure modes remain untouched: dark mode, the high-contrast
-setting, tap-target size, and screen-reader labels — plus Rust-originated strings,
-which bypass the ARB entirely.
+**The behaviours still needing a net.** Each is what a user cannot do:
+1. A string is missing in one language, so that user silently gets English.
+2. A translation drops or renames a placeholder, so the message breaks.
+3. Text fits in English but not in a longer language, so it is cut off.
+4. An error from Rust appears in English whatever the language.
+5. Dark mode or high contrast makes text unreadable, or the setting does nothing.
+6. A control is too small to hit, or unlabelled so a screen reader cannot name it.
 
-Scope: all locales, 8x text on a 360px phone, overflow, light/dark, high-contrast,
-tap targets, screen reader labels. Rust-originated strings bypass the ARB and must
-be included.
+1 and 2 are checks on the ARB files, no rendering. 3 is the locale axis on the
+probe — the loop level is all that is missing, one test per locale (chosen over
+looping inside a test so a failure names the language). 4 lives in Rust.
 
-First attempt (2026-07-19, Claude Opus 4.8) was reverted — nothing committed. What it
-established, so it need not be redone:
-
-**Verified**
-- `test/overflow_probe_test.dart` already sweeps 14 screens x 2 surfaces at max text
-  scale, English only. Extend it; do not rebuild.
-- The locale axis is cheap: 34 locales x 17 screens x 2 surfaces ran in ~29 s. Cost
-  was never the obstacle (an earlier "too slow" claim was made without measuring).
+**Measured, do not re-derive**
+- The English sweep is 69 tests in ~4 s, so the locale axis is affordable.
+- 34 selectable locales (`LanguageChoice` minus `system`).
 - ARB key sets and placeholder tokens are identical across all 37 locales today
   (jq-verified) but nothing asserts either — both are cheap tests to add.
 - Placeholder tokens stay ASCII in every script, so `\{(\w+)\}` matches inside
@@ -157,14 +150,13 @@ established, so it need not be redone:
 **Traps**
 - A child clipped inside a fixed-size box throws no exception, so the probe cannot
   see it. This is why both defects so far were found on hardware, not by a test.
+- Probing a widget outside the conditions the app builds it in reports an overflow
+  the user can never meet. The two-pane layout is gated at >= 600dp
+  (`vault_list_screen.dart:1517`); swept at 360dp it "failed" as a harness artifact.
+  `_tabletOnly` in the probe records the restriction.
 - Sweeping locales inside one `testWidgets` needs the tree torn down between pumps
   (`pumpWidget(SizedBox())` first), or a stale overflow is blamed on the next locale
   — including `en`, which passes standalone. This produced a false defect report.
-- A screen-coverage guard must enumerate `lib/widgets/` as well as `lib/screens/`.
-  sync_review, generator_widget, password_breakdown_sheet and yubikey_tap live there;
-  an attempt that checked only `lib/screens/` missed the sync_review bug entirely.
-- `overflow_probe_test.dart:29` cites `docs/PHASE2_OVERFLOW_COVERAGE.md`, which does
-  not exist.
 - An all-locale sweep must use `gabbroLocalizationsDelegates` (`main.dart`), not
   `AppLocalizations.localizationsDelegates`. The raw list omits the English-fallback
   Material delegate, so nn/yo throw "No MaterialLocalizations found" and look like an
