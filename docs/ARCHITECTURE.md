@@ -78,7 +78,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1324 | 1 |
+| Flutter (`flutter test`) | 1437 | 1 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -114,28 +114,31 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 **Net for l10n + accessibility on every screen.**
 
-**STATE 2026-07-19.** The overflow axis is built and covers every UI file:
-`test/overflow_probe_test.dart` sweeps 33 of 35 screens+widgets on a phone and a
-tablet surface at max text (2 waived — `yubikey_tap` and `section_index` render
-nothing). Three guards protect it, each verified able to fail: pinned file counts,
-a `_covers` cross-check so a declaration cannot stand in for a real probe entry,
-and probe-or-waive over both `lib/screens/` and `lib/widgets/`. Flutter 1280 ->
-1324 (+1 skipped).
+**STATE 2026-07-19.** Two nets built:
+- **Overflow axis** — `test/overflow_probe_test.dart` sweeps 33 of 35
+  screens+widgets on a phone and a tablet surface at max text (2 waived —
+  `yubikey_tap`, `section_index` render nothing). Three guards, each verified able
+  to fail: pinned file counts, a `_covers` cross-check, probe-or-waive over both
+  `lib/screens/` and `lib/widgets/`.
+- **ARB parity** (behaviours 1+2) — `test/l10n_test.dart`: every locale has the
+  base key set, matches base placeholders on shared keys, and lists all 34 language
+  endonyms. Guarded by a 37-file count and a 34-endonym count, both verified able
+  to fail. English-only strings and renamed placeholders now fail a test, not ship.
+
+Flutter 1280 -> 1437 (+1 skipped).
 
 **The behaviours still needing a net.** Each is what a user cannot do:
-1. A string is missing in one language, so that user silently gets English.
-2. A translation drops or renames a placeholder, so the message breaks.
 3. Text fits in English but not in a longer language, so it is cut off.
 4. An error from Rust appears in English whatever the language.
 5. Dark mode or high contrast makes text unreadable, or the setting does nothing.
 6. A control is too small to hit, or unlabelled so a screen reader cannot name it.
 
-1 and 2 are checks on the ARB files, no rendering. 3 is the locale axis on the
-probe — the loop level is all that is missing, one test per locale (chosen over
-looping inside a test so a failure names the language). 4 lives in Rust.
+3 is the locale axis on the overflow probe — the loop level is all that is missing,
+one test per locale (chosen over looping inside a test so a failure names the
+language). 4 lives in Rust.
 
 **Measured, do not re-derive**
-- The English sweep is 69 tests in ~4 s, so the locale axis is affordable.
+- The English overflow sweep is 69 tests in ~4 s, so the locale axis is affordable.
 - **The locale axis is 37, not 34.** Three counts differ by design and all three
   need pinning, or adding a language silently half-lands:
   ARB files 37 = `supportedLocales` 37 > `LanguageChoice` 34 (+`system`).
@@ -143,14 +146,12 @@ looping inside a test so a failure names the language). 4 lives in Rust.
   in-app language menu, kept so `pt_BR`/`sr_Latn`/`zh_CN` etc. have a fallback.
   A device set to plain Portuguese with language on "System default" is shown
   `app_pt.arb`, so they are reachable and must be swept.
-- ARB key sets are identical across all 37 locales (600 keys each, jq-verified
-  2026-07-19) but nothing asserts it — a cheap test to add.
 - Placeholder tokens stay ASCII in every script, so `\{(\w+)\}` matches inside
   Greek/Cyrillic/CJK messages.
 - **Compare DISTINCT placeholder names, not occurrences.** A plural message
   repeats its token once per arm, and Slavic locales have arms English lacks
   (`few`), so a naive count reports 9 locales "differing" when nothing is wrong.
-  On distinct names all 37 match.
+  The ARB parity test already does this.
 
 **Traps**
 - A child clipped inside a fixed-size box throws no exception, so the probe cannot
