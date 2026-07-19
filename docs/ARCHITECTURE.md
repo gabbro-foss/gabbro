@@ -133,19 +133,50 @@ Flutter 1280 -> 1437 (+1 skipped).
 5. Dark mode or high contrast makes text unreadable, or the setting does nothing.
 6. A control is too small to hit, or unlabelled so a screen reader cannot name it.
 
-3 is the locale axis on the overflow probe — the loop level is all that is missing,
-one test per locale (chosen over looping inside a test so a failure names the
-language). 4 lives in Rust.
+**3 — DECISION (2026-07-19): one synthetic long-string locale, NOT a 37-locale
+sweep.** A layout overflows on rendered width, and width does not care which
+language produced it — "le renard..." and "the fox..." stress the same box. So
+rendering all 37 real locales is 37x the cost to prove one thing: some string is
+too long. Instead render each screen/widget/dialog ONCE against a synthetic
+"pseudo" locale whose every string is deliberately long. One pass catches what any
+real language could. It may over-report (flag an overflow no real language hits),
+which is the safe direction — you harden the layout.
+
+Rejected on the way here (do not revisit without new reason):
+- **37 real locales.** Measured ~140 s added to `flutter test` (2442 renders at
+  ~0.056 s each; fixed ~11 s). Cost is the render count, not the loop shape.
+- **The dialog-locale fork.** Dialogs are root-navigator routes, so a
+  `Localizations.override` in the screen body cannot reach them; they take the
+  MaterialApp locale from `settings.language`, which reaches only 34 of 37 (no
+  `LanguageChoice` for base `pt`/`sr`/`zh`). Three fixes were weighed — a
+  `Locale?` seam on GabbroApp (touches production for tests), a mixed 37-screens/
+  34-dialogs sweep (leaves sync_review, a past bug site, untested in 3 locales),
+  and a test-built MaterialApp (duplicates app setup, drifts). The synthetic
+  locale sidesteps all three: it is one delegate, applied the same way everywhere.
+
+**What is already covered, so the synthetic locale only needs to add labels.**
+Injected VALUES (folder names, passwords, URLs, titles) are already stressed with
+long English strings in the probe's test data — locale adds nothing there. The gap
+is FIXED LABELS (button text, titles like "Appearance"), which are not variables
+and can only be lengthened by a longer translation. The synthetic locale must
+therefore lengthen the ARB-sourced labels.
+
+**NEXT STEP (was mid-investigation): build the synthetic AppLocalizations.** Open
+question being checked when stopped: `lib/l10n/app_localizations.dart` has ~600
+getters/methods, so hand-overriding a subclass is out. Was reading it for a seam —
+a `lookupAppLocalizations`-style factory or map-based lookup to wrap, so one
+wrapper can pad every returned string without 600 overrides. If no such seam
+exists, fall back to a generated synthetic ARB consumed only by the test (must NOT
+add a locale to the shipped `supportedLocales` or the picker). Width caveat: pad
+generously (German ~1.35x, but allow >=2x margin); a Latin pad under-models CJK
+glyph width, which is wider per character.
 
 **Measured, do not re-derive**
-- The English overflow sweep is 69 tests in ~4 s, so the locale axis is affordable.
-- **The locale axis is 37, not 34.** Three counts differ by design and all three
-  need pinning, or adding a language silently half-lands:
-  ARB files 37 = `supportedLocales` 37 > `LanguageChoice` 34 (+`system`).
-  The 3 extra are `pt`, `sr`, `zh` — bare base locales with no entry in the
-  in-app language menu, kept so `pt_BR`/`sr_Latn`/`zh_CN` etc. have a fallback.
-  A device set to plain Portuguese with language on "System default" is shown
-  `app_pt.arb`, so they are reachable and must be swept.
+- 37 real locales = ~140 s added; rejected (above).
+- **The locale count is 37, not 34.** ARB files 37 = `supportedLocales` 37 >
+  `LanguageChoice` 34 (+`system`). Extra 3 = base `pt`/`sr`/`zh`, no picker entry,
+  kept as fallback for `pt_BR`/`sr_Latn`/`zh_CN`. (Retained: the synthetic-locale
+  approach does not need this, but the ARB parity guards do.)
 - Placeholder tokens stay ASCII in every script, so `\{(\w+)\}` matches inside
   Greek/Cyrillic/CJK messages.
 - **Compare DISTINCT placeholder names, not occurrences.** A plural message
