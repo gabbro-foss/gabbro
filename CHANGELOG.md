@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Linux auto-type now works from a release download.** The `gabbro-autotype` trigger client ships in the tarball, so binding a keyboard shortcut no longer requires building from source. Setup for auto-type (Linux) and autofill (Android): [docs/AUTOTYPE_AND_AUTOFILL.md](docs/AUTOTYPE_AND_AUTOFILL.md).
 
+### Fixed
+- Recovery history: the Revert, Delete and reveal controls ran off the right edge at larger text in most languages, leaving no way to restore or discard a value sync had replaced. They now wrap onto their own line.
+
 ### Changed
 - **A vault older than VERSION 11 is refused, not damaged.** The file is left untouched and the app explains it needs upgrading rather than reporting corruption. To upgrade: install alpha.14, open each vault once, then return. See [docs/VAULT_UPGRADE_PATH.md](docs/VAULT_UPGRADE_PATH.md).
 - Importing a too-old vault now explains it in your own language with a tappable link to the upgrade steps, instead of showing an untranslated error. Matches the unlock screen.
