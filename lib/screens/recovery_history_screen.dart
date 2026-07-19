@@ -75,6 +75,11 @@ class _RecoveryHistoryScreenState extends State<RecoveryHistoryScreen> {
           final display = binary
               ? '<binary>'
               : (secret && !revealed ? '••••' : r.value);
+          // The actions sit under the value, not in `trailing`. `trailing` is
+          // intrinsically sized: a longer Revert label (most locales) or larger
+          // text made the row demand the whole tile width, and the controls ran
+          // off the right edge where they could not be tapped. A Wrap reflows
+          // them onto another line instead.
           return ListTile(
             title: Text(_fieldLabel(r.field)),
             subtitle: Column(
@@ -91,34 +96,35 @@ class _RecoveryHistoryScreenState extends State<RecoveryHistoryScreen> {
                   ),
                   style: const TextStyle(fontSize: 12),
                 ),
-              ],
-            ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (secret)
-                  IconButton(
-                    iconSize: scaledIconSize(context),
-                    icon: Icon(
-                      revealed ? Icons.visibility : Icons.visibility_off,
+                Wrap(
+                  alignment: WrapAlignment.end,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    if (secret)
+                      IconButton(
+                        iconSize: scaledIconSize(context),
+                        icon: Icon(
+                          revealed ? Icons.visibility : Icons.visibility_off,
+                        ),
+                        tooltip: revealed ? l.tooltipHide : l.tooltipShow,
+                        onPressed: () => setState(() {
+                          if (revealed) {
+                            _revealed.remove(index);
+                          } else {
+                            _revealed.add(index);
+                          }
+                        }),
+                      ),
+                    TextButton(
+                      onPressed: () => _act(index, widget.onRestore),
+                      child: Text(l.revert),
                     ),
-                    tooltip: revealed ? l.tooltipHide : l.tooltipShow,
-                    onPressed: () => setState(() {
-                      if (revealed) {
-                        _revealed.remove(index);
-                      } else {
-                        _revealed.add(index);
-                      }
-                    }),
-                  ),
-                TextButton(
-                  onPressed: () => _act(index, widget.onRestore),
-                  child: Text(l.revert),
-                ),
-                IconButton(
-                  tooltip: l.delete,
-                  icon: const Icon(Icons.delete_outline),
-                  onPressed: () => _act(index, widget.onDelete),
+                    IconButton(
+                      tooltip: l.delete,
+                      icon: const Icon(Icons.delete_outline),
+                      onPressed: () => _act(index, widget.onDelete),
+                    ),
+                  ],
                 ),
               ],
             ),
