@@ -48,8 +48,10 @@ import 'package:gabbro/src/rust/api/vault_bridge.dart';
 // MAX text scale on a phone and a tablet surface and asserts no RenderFlex /
 // layout overflow (an overflow reports a FlutterError -> takeException()).
 //
-// Blind spot (tracked in docs/PHASE2_OVERFLOW_COVERAGE.md): a child clipped
-// inside a FIXED width/height throws nothing, so this probe cannot see it.
+// Blind spot: a child clipped inside a FIXED width/height throws nothing, so
+// this probe cannot see it. Both defects found in the l10n/a11y sweep so far
+// (recovery-history actions, sync_review chip values) were of exactly that kind
+// and came from hardware use, not from here.
 
 class _Surface {
   final String name;
