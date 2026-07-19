@@ -122,11 +122,6 @@ a `_covers` cross-check so a declaration cannot stand in for a real probe entry,
 and probe-or-waive over both `lib/screens/` and `lib/widgets/`. Flutter 1280 ->
 1324 (+1 skipped).
 
-That whole sweep found **one** overflow (tablet detail-pane placeholder, fixed).
-Both earlier defects were clipping inside fixed boxes, which throws nothing — so
-the probe is worth having as a regression net but is not where the remaining
-defects live.
-
 **The behaviours still needing a net.** Each is what a user cannot do:
 1. A string is missing in one language, so that user silently gets English.
 2. A translation drops or renames a placeholder, so the message breaks.
@@ -149,7 +144,9 @@ looping inside a test so a failure names the language). 4 lives in Rust.
 
 **Traps**
 - A child clipped inside a fixed-size box throws no exception, so the probe cannot
-  see it. This is why both defects so far were found on hardware, not by a test.
+  see it. Of the three defects so far the probe found one (the tablet placeholder);
+  the two clipping ones (recovery-history actions, sync_review chip values) came
+  from hardware use and no test would have caught them.
 - Probing a widget outside the conditions the app builds it in reports an overflow
   the user can never meet. The two-pane layout is gated at >= 600dp
   (`vault_list_screen.dart:1517`); swept at 360dp it "failed" as a harness artifact.
@@ -165,44 +162,10 @@ looping inside a test so a failure names the language). 4 lives in Rust.
 - Collecting `tester.takeException()` filtered to `FlutterError` silently drops the
   "Multiple exceptions (N)" wrapper and reports a false green. Take any non-null.
 
-**Not attempted:** light/dark, high-contrast, tap targets, screen reader labels,
-Rust-originated strings. The first attempt built the locale and overflow axes only
-and treated that as the whole task — it is roughly a third of the scope above.
-
-**How the first attempt went wrong** — the method failures that produced the above,
-recorded so the next attempt does not repeat them:
-- *Never checked the work against the requirement.* A scenario list was invented at
-  the start and then treated as the definition of done. The Bikeshed text was not
-  re-read once. That is the single reason two thirds of the scope went missing.
-- *Asserted instead of measuring.* "Too slow for `flutter test`" was stated with no
-  timing run; the real figure was ~12 s. A "real defect found" was announced while
-  `en` sat in the failure list, having passed minutes earlier — it was a harness bug.
-  Both were caught by the maintainer, not by the work.
-- *Built the guard without testing the guard.* The screen-coverage test existed
-  solely to fail when a screen is unswept, and was pointed at `lib/screens/` without
-  ever listing `lib/widgets/`. It reported green while missing nine widgets.
-- *Overstated coverage.* Nine screens were waived as "covered by" other tests; that
-  coverage is English-only overflow, and in two cases only logic tests. The word
-  claimed far more than the tests do — see the waiver reasons before trusting them.
-- *Constraints were not propagated to subagents.* Repo rules (no interpreters, no
-  absolute host paths) do not reach spawned agents automatically and must be written
-  into each agent prompt.
-
-CLAUDE.md was read at session start and then not followed. Every rule under
-`## Messages to the [user]` was broken, repeatedly:
-- *Terse, no walls of text.* Nearly every message was long: tables, multi-section
-  status reports, and restated context the maintainer already had. Correcting this
-  took three separate interventions and it still recurred.
-- *Never ask a question and continue without waiting.* Questions were asked and work
-  continued in the same turn; decisions were also presented as settled while asking
-  about one narrow point, which anchors the answer.
-- *Name the consequence, not the artifact.* Findings were reported as `RenderFlex`,
-  `ListTile trailing`, probe and registry internals. The maintainer had to ask
-  outright what the defect meant for a user before that was stated.
-
-Also broken from the Session Start Checklist: absolute host paths (`/home/<user>/...`)
-were written into agent prompts and shell commands, which the checklist forbids
-because the repo goes public.
+**Not attempted:** the locale axis (item 3), the ARB checks (1 and 2), light/dark,
+high-contrast, tap targets, screen reader labels, Rust-originated strings. Only the
+English overflow axis exists. An earlier attempt built the locale axis and was
+reverted — nothing of it is in the tree, so item 3 starts from the loop level.
 
 ---
 
