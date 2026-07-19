@@ -297,16 +297,22 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
 
   /// A two-choice keep-vs-other picker (keep / delete or keep / skip), matching
   /// the clash picker so every keep/remove decision is explicitly labelled.
-  // A ChoiceChip is locked to a single 48px line, so at large text it silently
-  // clips a long field value (a URL, a password) and it can't be read or
-  // compared (hardware: phone portrait, review-all). Past 1.5x render each
-  // choice as a full-width row — a radio marker + the value as wrapping Text
-  // (Flutter char-wraps even an unbroken password) — instead of a chip. Compact
-  // chips stay at normal text (ADR-016).
+  //
+  // A ChoiceChip is locked to a single 48px line with no way to scroll it, so
+  // it silently clips a long field value (a URL, a password, a folder name) and
+  // the user picks between two values they cannot read (hardware: sync review,
+  // phone portrait). Set [showsValues] for any choice whose label interpolates
+  // user data: it then renders as a full-width row — a radio marker + the value
+  // as wrapping Text (Flutter char-wraps even an unbroken password) — at EVERY
+  // text size, because a value clips at normal text too.
+  //
+  // Bare labels (Keep / Delete / Skip) can never clip, so they stay compact
+  // chips at normal text and only become rows past 1.5x (ADR-016).
   Widget _choiceRow(
-    List<({String label, bool selected, VoidCallback onSelect})> choices,
-  ) {
-    if (MediaQuery.textScalerOf(context).scale(1) <= 1.5) {
+    List<({String label, bool selected, VoidCallback onSelect})> choices, {
+    bool showsValues = false,
+  }) {
+    if (!showsValues && MediaQuery.textScalerOf(context).scale(1) <= 1.5) {
       return Wrap(
         spacing: 8,
         children: [
@@ -351,12 +357,13 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
     required String otherLabel,
     required VoidCallback onKeep,
     required VoidCallback onOther,
+    bool showsValues = false,
   }) => Padding(
     padding: const EdgeInsets.symmetric(horizontal: 16),
     child: _choiceRow([
       (label: keepLabel, selected: keepSelected, onSelect: onKeep),
       (label: otherLabel, selected: !keepSelected, onSelect: onOther),
-    ]),
+    ], showsValues: showsValues),
   );
 
   /// Eye toggle for a secret field, mirroring the entry-detail reveal idiom.
@@ -617,6 +624,7 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
                   '${l.syncThisVault}: ${_disp(b.field, b.oldValue, l, revealed: revealed)}',
               onKeep: () => setState(() => _keepBrought[key] = true),
               onOther: () => setState(() => _keepBrought[key] = false),
+              showsValues: true,
             ),
           );
         }
@@ -657,7 +665,7 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
                   onSelect: () =>
                       setState(() => _conflictUseTheirs[key] = true),
                 ),
-              ]),
+              ], showsValues: true),
             ),
           );
         }
@@ -713,7 +721,7 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
                     () => _folderChoice[step.id] = fc.incomingFolder,
                   ),
                 ),
-              ]),
+              ], showsValues: true),
             ),
           );
         }
