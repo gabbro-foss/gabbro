@@ -136,11 +136,21 @@ looping inside a test so a failure names the language). 4 lives in Rust.
 
 **Measured, do not re-derive**
 - The English sweep is 69 tests in ~4 s, so the locale axis is affordable.
-- 34 selectable locales (`LanguageChoice` minus `system`).
-- ARB key sets and placeholder tokens are identical across all 37 locales today
-  (jq-verified) but nothing asserts either — both are cheap tests to add.
+- **The locale axis is 37, not 34.** Three counts differ by design and all three
+  need pinning, or adding a language silently half-lands:
+  ARB files 37 = `supportedLocales` 37 > `LanguageChoice` 34 (+`system`).
+  The 3 extra are `pt`, `sr`, `zh` — bare base locales with no entry in the
+  in-app language menu, kept so `pt_BR`/`sr_Latn`/`zh_CN` etc. have a fallback.
+  A device set to plain Portuguese with language on "System default" is shown
+  `app_pt.arb`, so they are reachable and must be swept.
+- ARB key sets are identical across all 37 locales (600 keys each, jq-verified
+  2026-07-19) but nothing asserts it — a cheap test to add.
 - Placeholder tokens stay ASCII in every script, so `\{(\w+)\}` matches inside
   Greek/Cyrillic/CJK messages.
+- **Compare DISTINCT placeholder names, not occurrences.** A plural message
+  repeats its token once per arm, and Slavic locales have arms English lacks
+  (`few`), so a naive count reports 9 locales "differing" when nothing is wrong.
+  On distinct names all 37 match.
 
 **Traps**
 - A child clipped inside a fixed-size box throws no exception, so the probe cannot
