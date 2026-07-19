@@ -192,14 +192,22 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
 
   Widget _buildEmptyState(BuildContext context) {
     final l = AppLocalizations.of(context);
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.lock_outline, size: 48),
-          const SizedBox(height: 12),
-          Text(l.selectEntry),
-        ],
+    // At large text `selectEntry` wraps into enough lines to outgrow the detail
+    // pane, and a Column cannot shrink to fit — it overflows and the message is
+    // clipped. Scrolling keeps the whole placeholder readable (ADR-016).
+    return SingleChildScrollView(
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.lock_outline, size: 48),
+              const SizedBox(height: 12),
+              Text(l.selectEntry, textAlign: TextAlign.center),
+            ],
+          ),
+        ),
       ),
     );
   }
