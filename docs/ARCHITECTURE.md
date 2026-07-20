@@ -148,7 +148,7 @@ project_error_l10n_by_log_level). Too-old vault path pinned in
 `unlock_screen_test.dart`. The classifier is statement-scoped, so a template
 wrapping split across lines by the formatter is not a false leak.
 
-The leak backlog now stands at **8 sites / 8 files** (plus 2 reviewed non-leaks —
+The leak backlog now stands at **4 sites / 4 files** (plus 2 reviewed non-leaks —
 see below) and shrinks via Canon-TDD, one red->fix->green each. Done so far:
 - `vaultFormatTooNew` — localized message + link on unlock and import, all 37
   locales (added a probe branch, not a raw site, so no count change).
@@ -157,16 +157,18 @@ see below) and shrinks via Canon-TDD, one red->fix->green each. Done so far:
   -> new `folderActionFailed` (15 -> 11).
 - `vault_list` x3 -> `vaultLoadFailed` (load, wrapped at build since `_loadEntries`
   runs in initState) + `syncFailed` (sync tap + sync dialog fallback) (11 -> 8).
+- `create_entry` + `review_changes` -> `saveEntryFailed`; `change_passphrase` ->
+  `changePassphraseFailed`; `recovery_history` -> `recoveryActionFailed` (8 -> 4).
 
-`_notADisplayLeak` (new map in the net): sites where `e.toString()` appears but is
-NOT shown raw — control-flow-only, or a field wrapped by a template at the build
-site. Two so far, both in `vault_list`. The net's classifier is statement-scoped,
-so these are reviewed claims, not false greens.
+`_notADisplayLeak` (map in the net): sites where `e.toString()` appears but is NOT
+shown raw — control-flow-only, or a field wrapped by a template at the build site.
+Two so far, both in `vault_list`. The net's classifier is statement-scoped, so
+these are reviewed claims, not false greens.
 
-Still todo (8): `review_changes`, `onboarding`, `security`, `manage_yubikeys`,
-`change_passphrase`, `unlock`, `recovery_history`, `create_entry`. Note:
+Still todo (4): `onboarding`, `security`, `manage_yubikeys`, `unlock`. Notes:
 `onboarding`'s `_ =>` arm also catches vault-creation errors, so it needs a generic
-"couldn't create/enroll" message, not a YubiKey-specific one.
+"couldn't create/enroll" message; `manage_yubikeys` load may run in initState (check
+before wrapping at assignment, like `vault_list`); `unlock` is a niche .bak-rot race.
 
 **The behaviours still needing a net.** Each is what a user cannot do:
 5. Dark mode or high contrast makes text unreadable, or the setting does nothing.
