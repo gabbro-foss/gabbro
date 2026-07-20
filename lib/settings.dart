@@ -15,7 +15,7 @@ class AppSettings {
   /// later phases, control/target sizing (ADR-016). Stored range [0.8, 8.0];
   /// clamped to the device's screen-derived max on load (see text_scale.dart).
   final double textScale;
-  final bool highContrast; // placeholder — not yet implemented
+  final bool highContrast; // pure black/white theme; disables UI dimming
   final ForegroundLockTimeout foregroundLockTimeout;
   final BackgroundLockTimeout backgroundLockTimeout;
   final ClipboardClearTimeout clipboardClearTimeout;
@@ -204,7 +204,8 @@ class AppSettings {
   // and controls. Stored range 0.8 - 8.0; capped to your device's screen on load.
   "text_scale": $textScale,
 
-  // High-contrast mode (not yet implemented — reserved for future use).
+  // High-contrast mode: maximum-contrast black/white theme; stops dimming of
+  // inactive UI (e.g. the alphabet index bar).
   // Options: true | false
   "high_contrast": $highContrast,
 

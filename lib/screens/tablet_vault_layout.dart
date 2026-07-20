@@ -270,6 +270,9 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
                         child: AlphabetIndexBar(
                           letters: widget.barLetters ?? canonicalAlphabet(null),
                           presentLetters: widget.letterIndex.keys.toSet(),
+                          highContrast:
+                              GabbroApp.maybeOf(context)?.settings.highContrast ??
+                              false,
                           scrollUpLabel:
                               AppLocalizations.of(context).tooltipPreviousPage,
                           scrollDownLabel:

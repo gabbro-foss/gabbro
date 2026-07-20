@@ -8,6 +8,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:gabbro/app_paths.dart';
 import 'package:gabbro/autotype_listener.dart';
 import 'package:gabbro/autotype_target.dart';
+import 'package:gabbro/gabbro_contrast.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/screens/manage_vaults_screen.dart';
@@ -508,25 +509,74 @@ abstract class GabbroAppState {
   Future<void> deleteVaultFromManager(String path);
 }
 
+// A maximum-contrast scheme: every container / variant / outline role collapses
+// to the surface / onSurface pair, so text is always onSurface on surface. Only
+// `error` keeps its own high-contrast hue. Left at Material's defaults these
+// roles are mid-tones that fail contrast in HC (review_changes rendered 1.74:1).
+ColorScheme _highContrastScheme({
+  required Brightness brightness,
+  required Color surface,
+  required Color onSurface,
+  required Color error,
+}) {
+  final onError = brightness == Brightness.dark
+      ? const Color(0xFF000000)
+      : const Color(0xFFFFFFFF);
+  final base = ColorScheme(
+    brightness: brightness,
+    primary: onSurface,
+    onPrimary: surface,
+    secondary: onSurface,
+    onSecondary: surface,
+    error: error,
+    onError: onError,
+    surface: surface,
+    onSurface: onSurface,
+  );
+  return base.copyWith(
+    tertiary: onSurface,
+    onTertiary: surface,
+    primaryContainer: surface,
+    onPrimaryContainer: onSurface,
+    secondaryContainer: surface,
+    onSecondaryContainer: onSurface,
+    tertiaryContainer: surface,
+    onTertiaryContainer: onSurface,
+    errorContainer: surface,
+    onErrorContainer: onSurface,
+    surfaceContainerLowest: surface,
+    surfaceContainerLow: surface,
+    surfaceContainer: surface,
+    surfaceContainerHigh: surface,
+    surfaceContainerHighest: surface,
+    surfaceBright: surface,
+    surfaceDim: surface,
+    onSurfaceVariant: onSurface,
+    outline: onSurface,
+    outlineVariant: onSurface,
+    inverseSurface: onSurface,
+    onInverseSurface: surface,
+    inversePrimary: surface,
+    surfaceTint: surface,
+  );
+}
+
 ThemeData gabbroLightTheme({required bool highContrast}) {
   if (highContrast) {
     return ThemeData(
-      colorScheme: const ColorScheme.light(
+      colorScheme: _highContrastScheme(
         brightness: Brightness.light,
-        primary: Color(0xFF000000),
-        onPrimary: Color(0xFFFFFFFF),
-        secondary: Color(0xFF000000),
-        onSecondary: Color(0xFFFFFFFF),
-        surface: Color(0xFFFFFFFF),
-        onSurface: Color(0xFF000000),
-        error: Color(0xFF7A0000),
-        onError: Color(0xFFFFFFFF),
+        surface: const Color(0xFFFFFFFF),
+        onSurface: const Color(0xFF000000),
+        error: const Color(0xFF7A0000),
       ),
+      extensions: const [GabbroContrast(highContrast: true)],
       useMaterial3: true,
     );
   }
   return ThemeData(
     colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF5C7A3E)),
+    extensions: const [GabbroContrast(highContrast: false)],
     useMaterial3: true,
   );
 }
@@ -534,17 +584,13 @@ ThemeData gabbroLightTheme({required bool highContrast}) {
 ThemeData gabbroDarkTheme({required bool highContrast}) {
   if (highContrast) {
     return ThemeData(
-      colorScheme: const ColorScheme.dark(
+      colorScheme: _highContrastScheme(
         brightness: Brightness.dark,
-        primary: Color(0xFFFFFFFF),
-        onPrimary: Color(0xFF000000),
-        secondary: Color(0xFFFFFFFF),
-        onSecondary: Color(0xFF000000),
-        surface: Color(0xFF000000),
-        onSurface: Color(0xFFFFFFFF),
-        error: Color(0xFFFF9999),
-        onError: Color(0xFF000000),
+        surface: const Color(0xFF000000),
+        onSurface: const Color(0xFFFFFFFF),
+        error: const Color(0xFFFF9999),
       ),
+      extensions: const [GabbroContrast(highContrast: true)],
       useMaterial3: true,
     );
   }
@@ -553,6 +599,7 @@ ThemeData gabbroDarkTheme({required bool highContrast}) {
       seedColor: const Color(0xFF5C7A3E),
       brightness: Brightness.dark,
     ),
+    extensions: const [GabbroContrast(highContrast: false)],
     useMaterial3: true,
   );
 }

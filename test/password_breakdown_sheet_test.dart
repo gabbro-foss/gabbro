@@ -1,10 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'test_helpers.dart';
+import 'package:gabbro/main.dart';
 import 'package:gabbro/widgets/password_breakdown_sheet.dart';
 
 void main() {
   group('PasswordBreakdownSheet', () {
+    testWidgets('high contrast: character markers use full-contrast onSurface',
+        (tester) async {
+      final theme = gabbroLightTheme(highContrast: true);
+      await tester.pumpWidget(
+        testApp(
+          const Scaffold(body: PasswordBreakdownSheet(password: 'aA1#')),
+          theme: theme,
+        ),
+      );
+      // The digit marker '●' is coloured via the type palette in normal mode;
+      // in high contrast it must collapse to onSurface so it stays readable.
+      final marker = tester.widget<Text>(find.text('●').first);
+      expect(marker.style!.color, theme.colorScheme.onSurface);
+    });
+
     testWidgets('renders one column per character', (tester) async {
       const password = 'Zx9#';
 

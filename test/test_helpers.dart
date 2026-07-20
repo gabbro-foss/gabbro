@@ -5,9 +5,10 @@ import 'package:gabbro/l10n/app_localizations.dart';
 
 /// Wraps [home] in a MaterialApp configured with the app's localizations.
 /// Use this in place of a bare MaterialApp in widget tests.
-Widget testApp(Widget home) => MaterialApp(
+Widget testApp(Widget home, {ThemeData? theme}) => MaterialApp(
   localizationsDelegates: AppLocalizations.localizationsDelegates,
   supportedLocales: AppLocalizations.supportedLocales,
+  theme: theme,
   home: home,
 );
 

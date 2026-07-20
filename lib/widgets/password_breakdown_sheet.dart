@@ -2,6 +2,7 @@ import 'dart:ui' show PointerDeviceKind;
 
 import 'package:flutter/material.dart';
 import 'package:gabbro/control_scale.dart';
+import 'package:gabbro/gabbro_contrast.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 
 enum _CharType { uppercase, lowercase, digit, letter, symbol }
@@ -291,7 +292,11 @@ class _CharColumn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = _classify(char);
-    final color = _colorFor(t, brightness);
+    // High contrast drops the per-type colour so every glyph stays at full
+    // onSurface contrast; the shape marker + legend still convey the type.
+    final color = GabbroContrast.of(context)
+        ? Theme.of(context).colorScheme.onSurface
+        : _colorFor(t, brightness);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -318,7 +323,9 @@ class _LegendItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final color = _colorFor(type, brightness);
+    final color = GabbroContrast.of(context)
+        ? Theme.of(context).colorScheme.onSurface
+        : _colorFor(type, brightness);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [

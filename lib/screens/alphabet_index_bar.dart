@@ -50,6 +50,10 @@ class AlphabetIndexBar extends StatefulWidget {
   // localized strings; the English defaults are for the widget in isolation.
   final String scrollUpLabel;
   final String scrollDownLabel;
+  // When true (high-contrast mode) the bar never dims absent letters, the gap
+  // ellipsis or disabled chevrons: hiding items from low-vision users defeats
+  // the mode. Normal mode keeps the dimming. Defaults to false.
+  final bool highContrast;
 
   const AlphabetIndexBar({
     super.key,
@@ -59,6 +63,7 @@ class AlphabetIndexBar extends StatefulWidget {
     this.initialLetter,
     this.scrollUpLabel = 'Scroll up',
     this.scrollDownLabel = 'Scroll down',
+    this.highContrast = false,
   });
 
   @override
@@ -177,7 +182,7 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
                   fontWeight: FontWeight.w500,
                   color: isActive
                       ? Theme.of(context).colorScheme.onPrimary
-                      : isPresent
+                      : isPresent || widget.highContrast
                       ? primary
                       : primary.withValues(alpha: 0.25),
                 ),
@@ -227,7 +232,9 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
                 width: 28 * scale,
                 height: 28 * scale,
                 decoration: BoxDecoration(
-                  color: enabled ? primary : primary.withValues(alpha: 0.25),
+                  color: enabled || widget.highContrast
+                      ? primary
+                      : primary.withValues(alpha: 0.25),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -243,15 +250,22 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
     );
   }
 
-  Widget _ellipsis(Color primary, double slotHeight) => SizedBox(
-    height: slotHeight,
-    child: Center(
-      child: Text(
-        '…',
-        style: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-          color: primary.withValues(alpha: 0.4),
+  // Decorative gap hint: drawn but excluded from semantics so a screen reader
+  // does not announce "ellipsis" (matching how absent letters are excluded),
+  // and so the contrast net does not flag a dim, non-informational glyph.
+  Widget _ellipsis(Color primary, double slotHeight) => ExcludeSemantics(
+    child: SizedBox(
+      height: slotHeight,
+      child: Center(
+        child: Text(
+          '…',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: widget.highContrast
+                ? primary
+                : primary.withValues(alpha: 0.4),
+          ),
         ),
       ),
     ),

@@ -1726,6 +1726,11 @@ class _VaultListScreenState extends State<VaultListScreen>
                                   scrollUpLabel: l.tooltipPreviousPage,
                                   scrollDownLabel: l.tooltipNextPage,
                                   onLetterSelected: _scrollToLetter,
+                                  highContrast:
+                                      GabbroApp.maybeOf(context)
+                                          ?.settings
+                                          .highContrast ??
+                                      false,
                                 ),
                               ),
                             // List takes all remaining width.
@@ -1839,6 +1844,11 @@ class _VaultListScreenState extends State<VaultListScreen>
                                     scrollUpLabel: l.tooltipPreviousPage,
                                     scrollDownLabel: l.tooltipNextPage,
                                     onLetterSelected: _scrollToLetter,
+                                    highContrast:
+                                        GabbroApp.maybeOf(context)
+                                            ?.settings
+                                            .highContrast ??
+                                        false,
                                   ),
                                 ),
                               ),

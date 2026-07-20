@@ -68,12 +68,18 @@ const tablet = Surface('tablet 866dp->3x', Size(1732, 2400), 2.0);
 Widget appShell(
   Widget screen, {
   double textScale = 8.0,
+  ThemeChoice theme = ThemeChoice.system,
+  bool highContrast = false,
   Iterable<LocalizationsDelegate<dynamic>> localizationsDelegates =
       gabbroLocalizationsDelegates,
 }) => GabbroApp(
   registry: VaultRegistry([]),
   vaultPath: null,
-  settings: AppSettings(textScale: textScale),
+  settings: AppSettings(
+    textScale: textScale,
+    theme: theme,
+    highContrast: highContrast,
+  ),
   initialScreen: screen,
   localizationsDelegates: localizationsDelegates,
 );

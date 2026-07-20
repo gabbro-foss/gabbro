@@ -15,6 +15,7 @@ Future<void> pumpBar(
   String? scrollUpLabel,
   String? scrollDownLabel,
   void Function(String)? onLetterSelected,
+  bool highContrast = false,
 }) async {
   tester.view.physicalSize = Size(400, height);
   tester.view.devicePixelRatio = 1.0;
@@ -29,6 +30,7 @@ Future<void> pumpBar(
           scrollUpLabel: scrollUpLabel ?? 'Scroll up',
           scrollDownLabel: scrollDownLabel ?? 'Scroll down',
           onLetterSelected: onLetterSelected ?? (_) {},
+          highContrast: highContrast,
         )
       : AlphabetIndexBar(
           letters: letters,
@@ -37,6 +39,7 @@ Future<void> pumpBar(
           scrollUpLabel: scrollUpLabel ?? 'Scroll up',
           scrollDownLabel: scrollDownLabel ?? 'Scroll down',
           onLetterSelected: onLetterSelected ?? (_) {},
+          highContrast: highContrast,
         );
 
   await tester.pumpWidget(MaterialApp(home: bar));
@@ -109,6 +112,83 @@ void main() {
     expect(colorOf('A').a, greaterThan(colorOf('B').a));
   });
 
+  // ── High-contrast: never dim (hiding items defeats the mode) ──────────────
+
+  testWidgets('normal mode: gap ellipsis stays dimmed', (tester) async {
+    await pumpBar(
+      tester,
+      height: 400,
+      presentLetters: {'A', 'M', 'Z'},
+      initialLetter: 'M',
+    );
+    // Guard the fix does not leak into normal mode: dimming is intentional here.
+    final ellipsis = tester.widget<Text>(find.text('…').first);
+    expect(ellipsis.style!.color!.a, lessThan(1.0));
+  });
+
+  testWidgets('high contrast: ellipsis renders at full strength', (
+    tester,
+  ) async {
+    await pumpBar(
+      tester,
+      height: 400,
+      presentLetters: {'A', 'M', 'Z'},
+      initialLetter: 'M',
+      highContrast: true,
+    );
+    final ellipsis = tester.widget<Text>(find.text('…').first);
+    expect(
+      ellipsis.style!.color!.a,
+      1.0,
+      reason: 'high contrast must not dim the gap ellipsis',
+    );
+  });
+
+  testWidgets('high contrast: absent letters render at full strength', (
+    tester,
+  ) async {
+    await pumpBar(
+      tester,
+      height: 756,
+      presentLetters: {'A'},
+      highContrast: true,
+    );
+    final absent = tester.widget<Text>(find.text('B'));
+    expect(
+      absent.style!.color!.a,
+      1.0,
+      reason: 'high contrast must not dim absent letters',
+    );
+  });
+
+  testWidgets('high contrast: disabled chevron renders at full strength', (
+    tester,
+  ) async {
+    await pumpBar(
+      tester,
+      height: 400,
+      presentLetters: {'A', 'M', 'Z'},
+      initialLetter: 'A',
+      highContrast: true,
+    );
+    // Window starts at 'A', so the up-chevron is disabled; its circle must not
+    // be dimmed away in high contrast.
+    final circle = tester.widget<Container>(
+      find
+          .ancestor(
+            of: find.byIcon(Icons.keyboard_arrow_up),
+            matching: find.byType(Container),
+          )
+          .first,
+    );
+    final color = (circle.decoration as BoxDecoration).color!;
+    expect(
+      color.a,
+      1.0,
+      reason: 'high contrast must not dim a disabled chevron',
+    );
+  });
+
   // ── A11y semantics ────────────────────────────────────────────────────────
 
   testWidgets('present letter slot is a button labelled with its letter',
@@ -119,6 +199,21 @@ void main() {
     expect(find.bySemanticsLabel('A'), findsOneWidget);
     final node = tester.getSemantics(find.bySemanticsLabel('A'));
     expect(node.flagsCollection.isButton, isTrue);
+    handle.dispose();
+  });
+
+  testWidgets('the gap ellipsis is excluded from semantics', (tester) async {
+    final handle = tester.ensureSemantics();
+    await pumpBar(
+      tester,
+      height: 400,
+      presentLetters: {'A', 'M', 'Z'},
+      initialLetter: 'M',
+    );
+    // The ellipsis is a decorative gap hint: drawn, but not a node a screen
+    // reader announces (and so not a text node the contrast net flags).
+    expect(find.text('…'), findsWidgets);
+    expect(find.bySemanticsLabel('…'), findsNothing);
     handle.dispose();
   });
 
