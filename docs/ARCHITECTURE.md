@@ -78,7 +78,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1539 | 9 |
+| Flutter (`flutter test`) | 1545 | 4 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -186,15 +186,27 @@ tablet-only skips left). Fixes:
   `selectedItemBuilder` items wrapped in `minHeight: 48`, so the collapsed button
   is a 48dp tap target (open menu items still grow, ADR-016).
 
-**Pending: hardware a11y verification** — TalkBack announces each control; the
-enlarged dropdowns tap cleanly and look right at normal + large text.
+**First hardware pass (S23 + TalkBack) — 3/5 passed** (both dropdowns tap cleanly
++ look right; appearance toggle announced). It found what the net structurally
+can't (label *quality* + operability), now fixed:
+- Generator option toggles read as glyphs ("0-9" -> "zero minus nine"). Now
+  `Semantics(label:)` with the char-type name + `ExcludeSemantics` on the glyph
+  (`MergeSemantics` so label + tap are one node).
+- Length / word-count / **text-size** sliders were unnamed and unadjustable under
+  TalkBack. Now `MergeSemantics(Semantics(label:, Slider(semanticFormatterCallback:)))`
+  — named + value announced; a net guard asserts they keep increase/decrease
+  actions. `TextSizeSlider` takes the label as a param (stays l10n-free).
+
+**Pending: a SECOND hardware pass** to confirm TalkBack now announces + adjusts
+the toggles and sliders. The net cannot verify label quality or TalkBack
+operability — that is hardware-only.
 
 **The behaviour still needing a net.** What a user cannot do:
 5. Dark mode or high contrast makes text unreadable, or the setting does nothing.
 
-**NEXT STEP: hardware-verify the item-6 a11y fixes (TalkBack + tap), then item 5
-(dark/high-contrast) with [maintainer]. Items 1-4 done; item 6 net + backlog
-done (hardware-verify pending).**
+**NEXT STEP: re-run the S23/TalkBack pass on the toggle + slider fixes, then item
+5 (dark/high-contrast) with [maintainer]. Items 1-4 done; item 6 net + backlog +
+TalkBack-quality fixes done (2nd hardware pass pending).**
 
 **Still-relevant traps (items 4-6)**
 - A child clipped inside a fixed-size box throws no exception, so the probe cannot
