@@ -1963,6 +1963,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get vaultFormatUpgradeLink => 'Cómo actualizar esta caja fuerte';
 
   @override
+  String get vaultFormatTooNew =>
+      'Esta caja fuerte se creó con una versión más reciente de Gabbro. Actualice Gabbro para abrirla. Su archivo de caja fuerte no se ha modificado.';
+
+  @override
+  String get vaultFormatTooNewLink => 'Cómo actualizar Gabbro';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Este archivo de caja fuerte no se puede leer. Hay disponible una copia de respaldo automática del último guardado correcto.';
 

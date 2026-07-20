@@ -7,7 +7,7 @@ import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `add_days_to_timestamp`, `changed_field_keys`, `custom_field_to_data`, `days_from_ymd`, `days_to_ymd`, `entry_custom_fields_mut`, `entry_id`, `entry_meta_mut`, `entry_meta`, `is_expired`, `is_leap`, `item_keys`, `login_entry_to_data`, `mask_entry`, `purge_expired_history`, `remove_entry_item_by_key`, `set_entry_field_by_key`, `set_entry_scalar`, `write_sha256_companion`
-// These functions are ignored (category: IgnoreBecauseExplicitAttribute): `add_yubikey_to_vault`, `build_passphrase_only_bytes`, `change_passphrase_with_keys`, `change_passphrase`, `delete_entry`, `delete_whole_vault`, `export_vault_preserving`, `export_vault`, `list_entries`, `load_vault_with_key_record`, `load_vault`, `migrate_multikey_vault_on_unlock`, `migrate_passphrase_vault_on_unlock`, `remove_yubikey_from_vault`, `reseal_vault_body`, `save_vault_with_keys`, `save_vault`, `sha256_line`, `update_entry`
+// These functions are ignored (category: IgnoreBecauseExplicitAttribute): `add_yubikey_to_vault`, `build_passphrase_only_bytes`, `change_passphrase_with_keys`, `change_passphrase`, `delete_entry`, `delete_whole_vault`, `export_vault_preserving`, `export_vault`, `list_entries`, `load_vault_with_key_record`, `load_vault`, `remove_yubikey_from_vault`, `reseal_vault_body`, `save_vault_with_keys`, `save_vault`, `sha256_line`, `update_entry`
 
 /// Creates a new login entry with a generated UUID and current timestamp.
 ///

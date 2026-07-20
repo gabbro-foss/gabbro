@@ -1957,6 +1957,13 @@ class AppLocalizationsPl extends AppLocalizations {
   String get vaultFormatUpgradeLink => 'Jak zaktualizować ten sejf';
 
   @override
+  String get vaultFormatTooNew =>
+      'Ten sejf został utworzony przez nowszą wersję Gabbro. Zaktualizuj Gabbro, aby go otworzyć. Plik sejfu nie został zmieniony.';
+
+  @override
+  String get vaultFormatTooNewLink => 'Jak zaktualizować Gabbro';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Nie można odczytać tego pliku sejfu. Dostępna jest automatyczna kopia awaryjna z ostatniego udanego zapisu.';
 

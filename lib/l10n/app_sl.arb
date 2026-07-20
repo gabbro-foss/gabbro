@@ -837,6 +837,8 @@
 
   "vaultFormatTooOld": "Ta trezor uporablja starejšo obliko, ki je ta različica Gabbra ne more odpreti. Vaša datoteka trezorja ni bila spremenjena.",
   "vaultFormatUpgradeLink": "Kako nadgraditi ta trezor",
+  "vaultFormatTooNew": "Ta trezor je ustvarila novejša različica Gabbra. Posodobite Gabbro, da ga odprete. Vaša datoteka trezorja ni bila spremenjena.",
+  "vaultFormatTooNewLink": "Kako posodobiti Gabbro",
   "vaultCorruptBackupAvailable": "Te datoteke trezorja ni mogoče prebrati. Na voljo je samodejna rešilna kopija zadnjega uspešnega shranjevanja.",
   "restoreBackupButton": "Obnovi iz rešilne kopije",
   "restoreBackupConfirmTitle": "Obnovim trezor iz rešilne kopije?",

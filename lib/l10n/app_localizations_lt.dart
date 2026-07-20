@@ -1953,6 +1953,13 @@ class AppLocalizationsLt extends AppLocalizations {
   String get vaultFormatUpgradeLink => 'Kaip atnaujinti šią saugyklą';
 
   @override
+  String get vaultFormatTooNew =>
+      'Ši saugykla sukurta naudojant naujesnę Gabbro versiją. Norėdami ją atidaryti, atnaujinkite Gabbro. Jūsų saugyklos failas nebuvo pakeistas.';
+
+  @override
+  String get vaultFormatTooNewLink => 'Kaip atnaujinti Gabbro';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Šio saugyklos failo nepavyksta perskaityti. Galima automatinė paskutinio sėkmingo išsaugojimo apsauginė kopija.';
 

@@ -1942,6 +1942,13 @@ class AppLocalizationsSv extends AppLocalizations {
   String get vaultFormatUpgradeLink => 'Så uppgraderar du det här valvet';
 
   @override
+  String get vaultFormatTooNew =>
+      'Det här valvet skapades av en nyare version av Gabbro. Uppdatera Gabbro för att öppna det. Din valvfil har inte ändrats.';
+
+  @override
+  String get vaultFormatTooNewLink => 'Så uppdaterar du Gabbro';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Den här valvfilen kan inte läsas. En automatisk reservkopia från den senaste lyckade sparningen finns tillgänglig.';
 

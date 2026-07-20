@@ -837,6 +837,8 @@
 
   "vaultFormatTooOld": "此保险库使用的格式较旧，此版本的 Gabbro 无法打开。您的保险库文件未被更改。",
   "vaultFormatUpgradeLink": "如何升级此保险库",
+  "vaultFormatTooNew": "此保险库由较新版本的 Gabbro 创建。请更新 Gabbro 以打开它。您的保险库文件未被更改。",
+  "vaultFormatTooNewLink": "如何更新 Gabbro",
   "vaultCorruptBackupAvailable": "无法读取此保险库文件。可使用上次成功保存的自动安全副本。",
   "restoreBackupButton": "从安全副本恢复",
   "restoreBackupConfirmTitle": "从安全副本恢复保险库？",

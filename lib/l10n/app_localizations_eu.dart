@@ -1945,6 +1945,13 @@ class AppLocalizationsEu extends AppLocalizations {
   String get vaultFormatUpgradeLink => 'Nola eguneratu kutxa gotor hau';
 
   @override
+  String get vaultFormatTooNew =>
+      'Kutxa gotor hau Gabbroren bertsio berriago batek sortu du. Ireki ahal izateko, eguneratu Gabbro. Zure kutxa gotorraren fitxategia ez da aldatu.';
+
+  @override
+  String get vaultFormatTooNewLink => 'Nola eguneratu Gabbro';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Kutxa gotorraren fitxategi hau ezin da irakurri. Azken gordetze arrakastatsuaren segurtasun-kopia automatiko bat dago erabilgarri.';
 

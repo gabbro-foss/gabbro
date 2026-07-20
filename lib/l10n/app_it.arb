@@ -837,6 +837,8 @@
 
   "vaultFormatTooOld": "Questa cassaforte usa un formato più vecchio che questa versione di Gabbro non può aprire. Il file della cassaforte non è stato modificato.",
   "vaultFormatUpgradeLink": "Come aggiornare questa cassaforte",
+  "vaultFormatTooNew": "Questa cassaforte è stata creata da una versione più recente di Gabbro. Aggiorna Gabbro per aprirla. Il file della cassaforte non è stato modificato.",
+  "vaultFormatTooNewLink": "Come aggiornare Gabbro",
   "vaultCorruptBackupAvailable": "Questo file della cassaforte non può essere letto. È disponibile una copia di sicurezza automatica dell'ultimo salvataggio riuscito.",
   "restoreBackupButton": "Ripristina dalla copia di sicurezza",
   "restoreBackupConfirmTitle": "Ripristinare la cassaforte dalla copia di sicurezza?",

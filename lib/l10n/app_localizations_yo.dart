@@ -1944,6 +1944,13 @@ class AppLocalizationsYo extends AppLocalizations {
       'Bí a ṣe ń ṣe ìmúdójúìwọ̀n àpótí ìṣúra yìí';
 
   @override
+  String get vaultFormatTooNew =>
+      'Àpótí ìṣúra yìí ni a dá pẹ̀lú ẹ̀yà Gabbro tuntun. Ṣe ìmúdójúìwọ̀n Gabbro láti ṣí i. A kò yí fáìlì àpótí ìṣúra rẹ padà.';
+
+  @override
+  String get vaultFormatTooNewLink => 'Bí a ṣe ń ṣe ìmúdójúìwọ̀n Gabbro';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Kò ṣeé ka fáìlì àpótí ìṣúra yìí. Àdàkọ ààbò aládàáṣiṣẹ́ láti ìfipamọ́ àṣeyọrí tó kẹ́yìn wà ní àrọ́wọ́tó.';
 

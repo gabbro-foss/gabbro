@@ -1950,6 +1950,13 @@ class AppLocalizationsHu extends AppLocalizations {
   String get vaultFormatUpgradeLink => 'A széf frissítésének módja';
 
   @override
+  String get vaultFormatTooNew =>
+      'Ezt a széfet a Gabbro egy újabb verziója hozta létre. A megnyitásához frissítse a Gabbrót. A széffájlja nem változott.';
+
+  @override
+  String get vaultFormatTooNewLink => 'A Gabbro frissítésének módja';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Ez a széffájl nem olvasható. Elérhető egy automatikus vészmásolat az utolsó sikeres mentésből.';
 

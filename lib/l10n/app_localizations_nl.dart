@@ -1954,6 +1954,13 @@ class AppLocalizationsNl extends AppLocalizations {
   String get vaultFormatUpgradeLink => 'Deze kluis bijwerken';
 
   @override
+  String get vaultFormatTooNew =>
+      'Deze kluis is gemaakt door een nieuwere versie van Gabbro. Werk Gabbro bij om deze te openen. Uw kluisbestand is niet gewijzigd.';
+
+  @override
+  String get vaultFormatTooNewLink => 'Gabbro bijwerken';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Dit kluisbestand kan niet worden gelezen. Er is een automatische reservekopie van de laatste geslaagde opslag beschikbaar.';
 

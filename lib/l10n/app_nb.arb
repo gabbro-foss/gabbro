@@ -838,6 +838,8 @@
 
   "vaultFormatTooOld": "Dette hvelvet bruker et eldre format som denne versjonen av Gabbro ikke kan åpne. Hvelvfilen din er ikke endret.",
   "vaultFormatUpgradeLink": "Slik oppgraderer du dette hvelvet",
+  "vaultFormatTooNew": "Dette hvelvet ble opprettet av en nyere versjon av Gabbro. Oppdater Gabbro for å åpne det. Hvelvfilen din er ikke endret.",
+  "vaultFormatTooNewLink": "Slik oppdaterer du Gabbro",
   "vaultCorruptBackupAvailable": "Denne hvelvfilen kan ikke leses. En automatisk reservekopi fra siste vellykkede lagring er tilgjengelig.",
   "restoreBackupButton": "Gjenopprett fra reservekopi",
   "restoreBackupConfirmTitle": "Gjenopprette hvelvet fra reservekopien?",

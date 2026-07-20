@@ -63,6 +63,7 @@ Widget _buildScreen({
   Future<void> Function()? onCancelTap,
   Future<bool> Function(String)? onVaultIsReadable,
   Future<bool> Function(String)? onVaultFormatTooOld,
+  Future<bool> Function(String)? onVaultFormatTooNew,
   Future<bool> Function(String)? onBackupUsable,
   Future<void> Function(String)? onRestoreBackup,
   Future<bool> Function(String)? onRestoreFromFile,
@@ -87,6 +88,7 @@ Widget _buildScreen({
       onCancelTap: onCancelTap ?? () async {},
       onVaultIsReadable: onVaultIsReadable ?? (_) async => true,
       onVaultFormatTooOld: onVaultFormatTooOld ?? (_) async => false,
+      onVaultFormatTooNew: onVaultFormatTooNew ?? (_) async => false,
       onBackupUsable: onBackupUsable ?? (_) async => false,
       onRestoreBackup: onRestoreBackup ?? (_) async {},
       onRestoreFromFile: onRestoreFromFile ?? (_) async => false,
@@ -1313,6 +1315,43 @@ void main() {
 
     expect(find.text('Restore from safety copy'), findsOneWidget);
     expect(find.textContaining(oldFormatMessage), findsNothing);
+  });
+
+  // A vault written by a NEWER build also fails to parse, but it is intact: the
+  // fix is to update Gabbro, so it must never surface the corruption banner.
+  const newFormatMessage =
+      'This vault was created by a newer version of Gabbro. Update Gabbro to '
+      'open it. Your vault file has not been changed.';
+
+  testWidgets('a too-new vault explains "update Gabbro", never corruption',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      onVaultIsReadable: (_) async => false, // does not parse
+      onVaultFormatTooOld: (_) async => false, // ...and it is not too old
+      onVaultFormatTooNew: (_) async => true, // ...it is too new
+      onBackupUsable: (_) async => true,
+    ));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining(newFormatMessage), findsOneWidget);
+    expect(find.text('Restore from safety copy'), findsNothing);
+    expect(find.text('Delete file'), findsNothing);
+    expect(find.text('Remove from list'), findsNothing);
+  });
+
+  testWidgets('a too-new vault offers a tappable link to update Gabbro',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      onVaultIsReadable: (_) async => false,
+      onVaultFormatTooNew: (_) async => true,
+    ));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.textContaining('update Gabbro'));
+    await tester.pumpAndSettle();
+
+    expect(find.text(upgradeUrl), findsOneWidget);
+    expect(find.text('Open in browser'), findsOneWidget);
   });
 
   testWidgets('wrong passphrase on a healthy vault never offers restore',

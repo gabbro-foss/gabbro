@@ -837,6 +837,8 @@
 
   "vaultFormatTooOld": "このボールトは、このバージョンの Gabbro では開けない古い形式を使用しています。ボールトファイルは変更されていません。",
   "vaultFormatUpgradeLink": "このボールトをアップグレードする方法",
+  "vaultFormatTooNew": "このボールトは、より新しいバージョンの Gabbro で作成されました。開くには Gabbro を更新してください。ボールトファイルは変更されていません。",
+  "vaultFormatTooNewLink": "Gabbro を更新する方法",
   "vaultCorruptBackupAvailable": "このボールトファイルは読み取れません。最後に成功した保存の自動セーフティコピーが利用できます。",
   "restoreBackupButton": "セーフティコピーから復元",
   "restoreBackupConfirmTitle": "セーフティコピーからボールトを復元しますか？",

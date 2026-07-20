@@ -1947,6 +1947,13 @@ class AppLocalizationsCs extends AppLocalizations {
   String get vaultFormatUpgradeLink => 'Jak tento trezor aktualizovat';
 
   @override
+  String get vaultFormatTooNew =>
+      'Tento trezor byl vytvořen novější verzí Gabbra. Aktualizujte Gabbro, abyste jej otevřeli. Soubor trezoru nebyl změněn.';
+
+  @override
+  String get vaultFormatTooNewLink => 'Jak aktualizovat Gabbro';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Tento soubor trezoru nelze přečíst. Je k dispozici automatická záchranná kopie z posledního úspěšného uložení.';
 

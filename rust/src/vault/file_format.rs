@@ -106,6 +106,15 @@ pub fn is_format_too_old(data: &[u8]) -> Result<bool, String> {
     Ok(peek_version(data)? < VERSION_MIN_READABLE)
 }
 
+/// Whether the vault file at `data` was written by a newer build than this one.
+///
+/// `Ok(true)` = intact Gabbro vault, too new to open (the user must update Gabbro;
+/// this build fails closed rather than silently downgrade — see `from_bytes`).
+/// `Ok(false)` = this build's version or older. `Err` = not a Gabbro vault at all.
+pub fn is_format_too_new(data: &[u8]) -> Result<bool, String> {
+    Ok(peek_version(data)? > VERSION)
+}
+
 /// The complete contents of a sealed vault file.
 #[derive(Debug, Clone, PartialEq)]
 pub struct SealedVault {
@@ -446,6 +455,21 @@ mod tests {
         let mut bytes = test_vault().to_bytes();
         bytes[6] = version; // version byte: immediately after the 6 magic bytes
         bytes
+    }
+
+    #[test]
+    fn is_format_too_new_flags_a_newer_version() {
+        // A vault byte-stamped above this build's version is "too new".
+        let mut newer = test_vault().to_bytes();
+        newer[6] = VERSION + 1;
+        assert!(is_format_too_new(&newer).unwrap());
+        // This build's own version, and an older one, are not too new.
+        assert!(!is_format_too_new(&test_vault().to_bytes()).unwrap());
+        assert!(!is_format_too_new(&too_old_vault_bytes(10)).unwrap());
+        // Not a Gabbro vault at all -> Err, not a bool.
+        let mut junk = test_vault().to_bytes();
+        junk[0] = b'X';
+        assert!(is_format_too_new(&junk).is_err());
     }
 
     #[test]

@@ -1866,6 +1866,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get vaultFormatUpgradeLink => '如何升级此保险库';
 
   @override
+  String get vaultFormatTooNew =>
+      '此保险库由较新版本的 Gabbro 创建。请更新 Gabbro 以打开它。您的保险库文件未被更改。';
+
+  @override
+  String get vaultFormatTooNewLink => '如何更新 Gabbro';
+
+  @override
   String get vaultCorruptBackupAvailable => '无法读取此保险库文件。可使用上次成功保存的自动安全副本。';
 
   @override
@@ -3795,6 +3802,13 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get vaultFormatUpgradeLink => '如何升级此保险库';
 
   @override
+  String get vaultFormatTooNew =>
+      '此保险库由较新版本的 Gabbro 创建。请更新 Gabbro 以打开它。您的保险库文件未被更改。';
+
+  @override
+  String get vaultFormatTooNewLink => '如何更新 Gabbro';
+
+  @override
   String get vaultCorruptBackupAvailable => '无法读取此保险库文件。可使用上次成功保存的自动安全副本。';
 
   @override
@@ -5722,6 +5736,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get vaultFormatUpgradeLink => '如何升級此保險庫';
+
+  @override
+  String get vaultFormatTooNew =>
+      '此保險庫由較新版本的 Gabbro 建立。請更新 Gabbro 以開啟它。您的保險庫檔案未被變更。';
+
+  @override
+  String get vaultFormatTooNewLink => '如何更新 Gabbro';
 
   @override
   String get vaultCorruptBackupAvailable => '無法讀取此保險庫檔案。可使用上次成功儲存的自動安全副本。';

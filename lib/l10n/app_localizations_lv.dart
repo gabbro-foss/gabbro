@@ -1950,6 +1950,13 @@ class AppLocalizationsLv extends AppLocalizations {
   String get vaultFormatUpgradeLink => 'Kā jaunināt šo seifu';
 
   @override
+  String get vaultFormatTooNew =>
+      'Šis seifs tika izveidots ar jaunāku Gabbro versiju. Lai to atvērtu, atjauniniet Gabbro. Jūsu seifa fails nav mainīts.';
+
+  @override
+  String get vaultFormatTooNewLink => 'Kā atjaunināt Gabbro';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Šo seifa failu nevar nolasīt. Ir pieejama automātiska pēdējās veiksmīgās saglabāšanas rezerves kopija.';
 

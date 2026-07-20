@@ -1954,6 +1954,13 @@ class AppLocalizationsUk extends AppLocalizations {
   String get vaultFormatUpgradeLink => 'Як оновити це сховище';
 
   @override
+  String get vaultFormatTooNew =>
+      'Це сховище було створено новішою версією Gabbro. Оновіть Gabbro, щоб його відкрити. Файл вашого сховища не було змінено.';
+
+  @override
+  String get vaultFormatTooNewLink => 'Як оновити Gabbro';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Цей файл сховища не читається. Доступна автоматична аварійна копія останнього успішного збереження.';
 

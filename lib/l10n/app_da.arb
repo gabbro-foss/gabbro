@@ -838,6 +838,8 @@
 
   "vaultFormatTooOld": "Denne boks bruger et ældre format, som denne version af Gabbro ikke kan åbne. Din boksfil er ikke blevet ændret.",
   "vaultFormatUpgradeLink": "Sådan opgraderer du denne boks",
+  "vaultFormatTooNew": "Denne boks blev oprettet af en nyere version af Gabbro. Opdater Gabbro for at åbne den. Din boksfil er ikke blevet ændret.",
+  "vaultFormatTooNewLink": "Sådan opdaterer du Gabbro",
   "vaultCorruptBackupAvailable": "Denne boksfil kan ikke læses. En automatisk reservekopi fra den seneste vellykkede gemning er tilgængelig.",
   "restoreBackupButton": "Gendan fra reservekopi",
   "restoreBackupConfirmTitle": "Gendan boksen fra reservekopien?",

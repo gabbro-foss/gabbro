@@ -1944,6 +1944,13 @@ class AppLocalizationsEt extends AppLocalizations {
   String get vaultFormatUpgradeLink => 'Kuidas seda hoidlat uuendada';
 
   @override
+  String get vaultFormatTooNew =>
+      'See hoidla loodi Gabbro uuema versiooniga. Selle avamiseks uuendage Gabbrot. Teie hoidlafaili ei ole muudetud.';
+
+  @override
+  String get vaultFormatTooNewLink => 'Kuidas Gabbrot uuendada';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Seda hoidlafaili ei saa lugeda. Saadaval on automaatne kaitsekoopia viimasest õnnestunud salvestusest.';
 

@@ -1948,6 +1948,13 @@ class AppLocalizationsSr extends AppLocalizations {
   String get vaultFormatUpgradeLink => 'Како надоградити овај сеф';
 
   @override
+  String get vaultFormatTooNew =>
+      'Овај сеф је направила новија верзија Gabbro-а. Ажурирајте Gabbro да бисте га отворили. Датотека вашег сефа није промењена.';
+
+  @override
+  String get vaultFormatTooNewLink => 'Како ажурирати Gabbro';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Ова датотека сефа не може да се прочита. Доступна је аутоматска помоћна копија последњег успешног чувања.';
 
@@ -3966,6 +3973,13 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get vaultFormatUpgradeLink => 'Kako nadograditi ovaj sef';
+
+  @override
+  String get vaultFormatTooNew =>
+      'Ovaj sef je napravila novija verzija Gabbro-a. Ažurirajte Gabbro da biste ga otvorili. Datoteka vašeg sefa nije promenjena.';
+
+  @override
+  String get vaultFormatTooNewLink => 'Kako ažurirati Gabbro';
 
   @override
   String get vaultCorruptBackupAvailable =>

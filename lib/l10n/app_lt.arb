@@ -838,6 +838,8 @@
 
   "vaultFormatTooOld": "Ši saugykla naudoja senesnį formatą, kurio ši Gabbro versija negali atidaryti. Jūsų saugyklos failas nebuvo pakeistas.",
   "vaultFormatUpgradeLink": "Kaip atnaujinti šią saugyklą",
+  "vaultFormatTooNew": "Ši saugykla sukurta naudojant naujesnę Gabbro versiją. Norėdami ją atidaryti, atnaujinkite Gabbro. Jūsų saugyklos failas nebuvo pakeistas.",
+  "vaultFormatTooNewLink": "Kaip atnaujinti Gabbro",
   "vaultCorruptBackupAvailable": "Šio saugyklos failo nepavyksta perskaityti. Galima automatinė paskutinio sėkmingo išsaugojimo apsauginė kopija.",
   "restoreBackupButton": "Atkurti iš apsauginės kopijos",
   "restoreBackupConfirmTitle": "Atkurti saugyklą iš apsauginės kopijos?",

@@ -1953,6 +1953,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get vaultFormatUpgradeLink => 'Как обновить это хранилище';
 
   @override
+  String get vaultFormatTooNew =>
+      'Это хранилище создано более новой версией Gabbro. Обновите Gabbro, чтобы открыть его. Файл хранилища не был изменён.';
+
+  @override
+  String get vaultFormatTooNewLink => 'Как обновить Gabbro';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Этот файл хранилища не читается. Доступна автоматическая аварийная копия последнего успешного сохранения.';
 

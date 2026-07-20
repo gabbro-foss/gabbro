@@ -472,6 +472,10 @@ void main() {
     const upgradeLinkLabel = 'How to upgrade this vault';
     const upgradeUrl =
         'https://github.com/gabbro-foss/gabbro/blob/master/docs/VAULT_UPGRADE_PATH.md';
+    const tooNewMessage =
+        'This vault was created by a newer version of Gabbro. Update Gabbro to '
+        'open it. Your vault file has not been changed.';
+    const updateLinkLabel = 'How to update Gabbro';
 
     Future<void> runImportOfOldSource(
       WidgetTester tester, {
@@ -506,6 +510,29 @@ void main() {
       await runImportOfOldSource(tester, tooOld: true);
 
       expect(find.text(upgradeLinkLabel), findsOneWidget);
+    });
+
+    testWidgets('a too-new source explains "update Gabbro", not the raw error',
+        (tester) async {
+      // A source from a newer build refuses here too; it is intact, so explain
+      // the format and offer the update link instead of dumping the Rust text.
+      await tester.pumpWidget(testApp(ImportScreen(
+        isAndroid: false,
+        initialGabbroPath: tempGabbroFile().path,
+        onDetectSourceRecords: (_) => [],
+        onSourceFormatTooOld: (_) async => false,
+        onSourceFormatTooNew: (_) async => true,
+        onImportGabbro: (_, _) async => throw Exception(versionRefusal),
+      )));
+      await tester.enterText(
+          find.widgetWithText(TextField, 'Vault passphrase'), 'pw');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+      await tester.pump();
+
+      expect(find.textContaining(tooNewMessage), findsOneWidget);
+      expect(find.textContaining('file version not supported'), findsNothing);
+      expect(find.text(updateLinkLabel), findsOneWidget);
     });
 
     testWidgets('tapping the upgrade link shows the URL before the browser',

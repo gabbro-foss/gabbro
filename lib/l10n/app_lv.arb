@@ -838,6 +838,8 @@
 
   "vaultFormatTooOld": "Šis seifs izmanto vecāku formātu, ko šī Gabbro versija nevar atvērt. Jūsu seifa fails nav mainīts.",
   "vaultFormatUpgradeLink": "Kā jaunināt šo seifu",
+  "vaultFormatTooNew": "Šis seifs tika izveidots ar jaunāku Gabbro versiju. Lai to atvērtu, atjauniniet Gabbro. Jūsu seifa fails nav mainīts.",
+  "vaultFormatTooNewLink": "Kā atjaunināt Gabbro",
   "vaultCorruptBackupAvailable": "Šo seifa failu nevar nolasīt. Ir pieejama automātiska pēdējās veiksmīgās saglabāšanas rezerves kopija.",
   "restoreBackupButton": "Atjaunot no rezerves kopijas",
   "restoreBackupConfirmTitle": "Atjaunot seifu no rezerves kopijas?",

@@ -838,6 +838,8 @@
 
   "vaultFormatTooOld": "Ten sejf używa starszego formatu, którego ta wersja Gabbro nie może otworzyć. Plik sejfu nie został zmieniony.",
   "vaultFormatUpgradeLink": "Jak zaktualizować ten sejf",
+  "vaultFormatTooNew": "Ten sejf został utworzony przez nowszą wersję Gabbro. Zaktualizuj Gabbro, aby go otworzyć. Plik sejfu nie został zmieniony.",
+  "vaultFormatTooNewLink": "Jak zaktualizować Gabbro",
   "vaultCorruptBackupAvailable": "Nie można odczytać tego pliku sejfu. Dostępna jest automatyczna kopia awaryjna z ostatniego udanego zapisu.",
   "restoreBackupButton": "Przywróć z kopii awaryjnej",
   "restoreBackupConfirmTitle": "Przywrócić sejf z kopii awaryjnej?",

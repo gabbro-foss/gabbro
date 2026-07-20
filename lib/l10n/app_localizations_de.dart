@@ -1961,6 +1961,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get vaultFormatUpgradeLink => 'So aktualisieren Sie diesen Tresor';
 
   @override
+  String get vaultFormatTooNew =>
+      'Dieser Tresor wurde von einer neueren Version von Gabbro erstellt. Aktualisieren Sie Gabbro, um ihn zu öffnen. Ihre Tresordatei wurde nicht verändert.';
+
+  @override
+  String get vaultFormatTooNewLink => 'So aktualisieren Sie Gabbro';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Diese Tresordatei kann nicht gelesen werden. Eine automatische Sicherheitskopie vom letzten erfolgreichen Speichern ist verfügbar.';
 

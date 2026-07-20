@@ -838,6 +838,8 @@
 
   "vaultFormatTooOld": "Det här valvet använder ett äldre format som den här versionen av Gabbro inte kan öppna. Din valvfil har inte ändrats.",
   "vaultFormatUpgradeLink": "Så uppgraderar du det här valvet",
+  "vaultFormatTooNew": "Det här valvet skapades av en nyare version av Gabbro. Uppdatera Gabbro för att öppna det. Din valvfil har inte ändrats.",
+  "vaultFormatTooNewLink": "Så uppdaterar du Gabbro",
   "vaultCorruptBackupAvailable": "Den här valvfilen kan inte läsas. En automatisk reservkopia från den senaste lyckade sparningen finns tillgänglig.",
   "restoreBackupButton": "Återställ från reservkopia",
   "restoreBackupConfirmTitle": "Återställa valvet från reservkopian?",

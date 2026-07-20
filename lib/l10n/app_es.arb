@@ -837,6 +837,8 @@
 
   "vaultFormatTooOld": "Esta caja fuerte usa un formato más antiguo que esta versión de Gabbro no puede abrir. Su archivo de caja fuerte no se ha modificado.",
   "vaultFormatUpgradeLink": "Cómo actualizar esta caja fuerte",
+  "vaultFormatTooNew": "Esta caja fuerte se creó con una versión más reciente de Gabbro. Actualice Gabbro para abrirla. Su archivo de caja fuerte no se ha modificado.",
+  "vaultFormatTooNewLink": "Cómo actualizar Gabbro",
   "vaultCorruptBackupAvailable": "Este archivo de caja fuerte no se puede leer. Hay disponible una copia de respaldo automática del último guardado correcto.",
   "restoreBackupButton": "Restaurar desde la copia de respaldo",
   "restoreBackupConfirmTitle": "¿Restaurar la caja fuerte desde la copia de respaldo?",

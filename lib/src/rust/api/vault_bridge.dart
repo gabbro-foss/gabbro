@@ -240,6 +240,13 @@ VaultHeaderData readVaultHeader({required String path}) =>
 Future<bool> vaultFormatTooOld({required String path}) =>
     RustLib.instance.api.crateApiVaultBridgeVaultFormatTooOld(path: path);
 
+/// The unlock and import screens call this to tell "too new" apart from a generic
+/// failure: a vault written by a newer Gabbro build is intact, and the fix is to
+/// update the app, not to retry the passphrase or delete the file. Returns `Err`
+/// if the file is not a Gabbro vault at all. Sync — reads the first bytes, no crypto.
+Future<bool> vaultFormatTooNew({required String path}) =>
+    RustLib.instance.api.crateApiVaultBridgeVaultFormatTooNew(path: path);
+
 /// Rename the active vault: updates the alias in the file header and re-seals
 /// the body so the new alias is bound to the ciphertext via AES-GCM AAD.
 ///

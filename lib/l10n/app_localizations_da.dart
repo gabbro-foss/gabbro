@@ -1947,6 +1947,13 @@ class AppLocalizationsDa extends AppLocalizations {
   String get vaultFormatUpgradeLink => 'Sådan opgraderer du denne boks';
 
   @override
+  String get vaultFormatTooNew =>
+      'Denne boks blev oprettet af en nyere version af Gabbro. Opdater Gabbro for at åbne den. Din boksfil er ikke blevet ændret.';
+
+  @override
+  String get vaultFormatTooNewLink => 'Sådan opdaterer du Gabbro';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Denne boksfil kan ikke læses. En automatisk reservekopi fra den seneste vellykkede gemning er tilgængelig.';
 

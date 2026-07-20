@@ -1932,6 +1932,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get vaultFormatUpgradeLink => 'How to upgrade this vault';
 
   @override
+  String get vaultFormatTooNew =>
+      'This vault was created by a newer version of Gabbro. Update Gabbro to open it. Your vault file has not been changed.';
+
+  @override
+  String get vaultFormatTooNewLink => 'How to update Gabbro';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'This vault file cannot be read. A usable safety copy from your last save is available.';
 

@@ -1945,6 +1945,13 @@ class AppLocalizationsKk extends AppLocalizations {
   String get vaultFormatUpgradeLink => 'Бұл қойманы қалай жаңартуға болады';
 
   @override
+  String get vaultFormatTooNew =>
+      'Бұл қойма Gabbro-ның жаңарақ нұсқасында жасалған. Оны ашу үшін Gabbro-ны жаңартыңыз. Қойма файлыңыз өзгертілген жоқ.';
+
+  @override
+  String get vaultFormatTooNewLink => 'Gabbro-ны қалай жаңартуға болады';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Бұл қойма файлын оқу мүмкін емес. Соңғы сәтті сақтаудың автоматты қосалқы көшірмесі қолжетімді.';
 

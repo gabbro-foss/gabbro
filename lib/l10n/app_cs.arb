@@ -838,6 +838,8 @@
 
   "vaultFormatTooOld": "Tento trezor používá starší formát, který tato verze Gabbra nedokáže otevřít. Soubor trezoru nebyl změněn.",
   "vaultFormatUpgradeLink": "Jak tento trezor aktualizovat",
+  "vaultFormatTooNew": "Tento trezor byl vytvořen novější verzí Gabbra. Aktualizujte Gabbro, abyste jej otevřeli. Soubor trezoru nebyl změněn.",
+  "vaultFormatTooNewLink": "Jak aktualizovat Gabbro",
   "vaultCorruptBackupAvailable": "Tento soubor trezoru nelze přečíst. Je k dispozici automatická záchranná kopie z posledního úspěšného uložení.",
   "restoreBackupButton": "Obnovit ze záchranné kopie",
   "restoreBackupConfirmTitle": "Obnovit trezor ze záchranné kopie?",

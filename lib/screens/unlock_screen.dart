@@ -60,6 +60,17 @@ Future<bool> _defaultVaultFormatTooOld(String path) async {
   }
 }
 
+// An intact vault written by a newer build than this one. Like the too-old
+// probe, asked only after the parse probe fails, so a too-new vault is explained
+// (update Gabbro) rather than reported as corrupt.
+Future<bool> _defaultVaultFormatTooNew(String path) async {
+  try {
+    return await vaultFormatTooNew(path: path);
+  } catch (_) {
+    return false;
+  }
+}
+
 Future<bool> _defaultBackupUsable(String path) async {
   try {
     return await vaultBackupUsable(path: path);
@@ -241,6 +252,11 @@ class UnlockScreen extends StatefulWidget {
   /// offered a restore (its `.bak` is equally old) or a delete.
   final Future<bool> Function(String path) onVaultFormatTooOld;
 
+  /// Returns true when the file is an intact Gabbro vault written by a newer
+  /// build than this one. Consulted, like [onVaultFormatTooOld], only when the
+  /// file does not parse — the fix is to update Gabbro, not to retry or delete.
+  final Future<bool> Function(String path) onVaultFormatTooNew;
+
   /// R-03 P3: whether a *usable* (present and parseable) `.bak` safety copy
   /// exists next to the vault. A `.bak` that does not parse reports false, so
   /// the restore offer can never advertise a backup a restore would refuse.
@@ -282,6 +298,7 @@ class UnlockScreen extends StatefulWidget {
     this.isAndroid,
     this.onVaultIsReadable = _defaultVaultIsReadable,
     this.onVaultFormatTooOld = _defaultVaultFormatTooOld,
+    this.onVaultFormatTooNew = _defaultVaultFormatTooNew,
     this.onBackupUsable = _defaultBackupUsable,
     this.onRestoreBackup = _defaultRestoreBackup,
     this.onRestoreFromFile = _defaultRestoreFromFile,
@@ -313,6 +330,8 @@ class _UnlockScreenState extends State<UnlockScreen>
   /// Distinct from [_vaultCorrupt]: nothing is damaged and nothing needs
   /// restoring — it needs migrating with an older release first.
   bool _vaultFormatTooOld = false;
+  // Intact vault from a newer build: explain "update Gabbro", never restore/delete.
+  bool _vaultFormatTooNew = false;
   bool _backupAvailable = false;
   bool _backupRestored = false;
   bool _vaultRestoredFromFile = false;
@@ -356,6 +375,11 @@ class _UnlockScreenState extends State<UnlockScreen>
     if (await widget.onVaultFormatTooOld(widget.vaultPath)) {
       if (!mounted) return;
       setState(() => _vaultFormatTooOld = true);
+      return;
+    }
+    if (await widget.onVaultFormatTooNew(widget.vaultPath)) {
+      if (!mounted) return;
+      setState(() => _vaultFormatTooNew = true);
       return;
     }
     final usable = await widget.onBackupUsable(widget.vaultPath);
@@ -632,6 +656,14 @@ class _UnlockScreenState extends State<UnlockScreen>
           });
           return;
         }
+        if (await widget.onVaultFormatTooNew(widget.vaultPath)) {
+          if (!mounted) return;
+          setState(() {
+            _vaultFormatTooNew = true;
+            _errorMessage = null;
+          });
+          return;
+        }
         final usable = await widget.onBackupUsable(widget.vaultPath);
         if (!mounted) return;
         setState(() {
@@ -739,7 +771,10 @@ class _UnlockScreenState extends State<UnlockScreen>
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 48),
-                    if (_biometricEnrolled && !_vaultCorrupt && !_vaultFormatTooOld) ...[
+                    if (_biometricEnrolled &&
+                        !_vaultCorrupt &&
+                        !_vaultFormatTooOld &&
+                        !_vaultFormatTooNew) ...[
                       if (_isYubikeyMode)
                         Padding(
                           padding: const EdgeInsets.only(bottom: 6),
@@ -803,6 +838,33 @@ class _UnlockScreenState extends State<UnlockScreen>
                                 onPressed: () => showUrlDialog(
                                   context,
                                   title: l.vaultFormatUpgradeLink,
+                                  url: vaultUpgradePathUrl,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                    // A vault from a newer build: nothing is damaged, so no
+                    // restore/delete — the fix is to update Gabbro.
+                    if (_vaultFormatTooNew) ...[
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            children: [
+                              Text(
+                                l.vaultFormatTooNew,
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 8),
+                              TextButton.icon(
+                                icon: const Icon(Icons.open_in_new, size: 16),
+                                label: Text(l.vaultFormatTooNewLink),
+                                onPressed: () => showUrlDialog(
+                                  context,
+                                  title: l.vaultFormatTooNewLink,
                                   url: vaultUpgradePathUrl,
                                 ),
                               ),
@@ -959,7 +1021,9 @@ class _UnlockScreenState extends State<UnlockScreen>
                     // R-03: the vault cannot be opened — hide the unlock
                     // controls until it is restored. The vault dropdown above
                     // stays visible so the user can switch to another vault.
-                    if (!_vaultCorrupt && !_vaultFormatTooOld) ...[
+                    if (!_vaultCorrupt &&
+                        !_vaultFormatTooOld &&
+                        !_vaultFormatTooNew) ...[
                     TextField(
                       controller: _passphraseController,
                       autofocus: true,

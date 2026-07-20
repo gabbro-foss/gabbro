@@ -1946,6 +1946,13 @@ class AppLocalizationsHr extends AppLocalizations {
   String get vaultFormatUpgradeLink => 'Kako nadograditi ovaj trezor';
 
   @override
+  String get vaultFormatTooNew =>
+      'Ovaj trezor stvorila je novija verzija Gabbra. Ažurirajte Gabbro da biste ga otvorili. Vaša datoteka trezora nije promijenjena.';
+
+  @override
+  String get vaultFormatTooNewLink => 'Kako ažurirati Gabbro';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Ova datoteka trezora ne može se pročitati. Dostupna je automatska pričuvna kopija posljednjeg uspješnog spremanja.';
 

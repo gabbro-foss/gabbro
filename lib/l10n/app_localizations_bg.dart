@@ -1948,6 +1948,13 @@ class AppLocalizationsBg extends AppLocalizations {
   String get vaultFormatUpgradeLink => 'Как да обновите този сейф';
 
   @override
+  String get vaultFormatTooNew =>
+      'Този сейф е създаден от по-нова версия на Gabbro. Обновете Gabbro, за да го отворите. Файлът на сейфа ви не е променян.';
+
+  @override
+  String get vaultFormatTooNewLink => 'Как да обновите Gabbro';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Този файл на сейфа не може да бъде прочетен. Налично е автоматично аварийно копие от последното успешно запазване.';
 

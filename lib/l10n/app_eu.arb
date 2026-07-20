@@ -837,6 +837,8 @@
 
   "vaultFormatTooOld": "Kutxa gotor honek Gabbroren bertsio honek ireki ezin duen formatu zaharrago bat erabiltzen du. Zure kutxa gotorraren fitxategia ez da aldatu.",
   "vaultFormatUpgradeLink": "Nola eguneratu kutxa gotor hau",
+  "vaultFormatTooNew": "Kutxa gotor hau Gabbroren bertsio berriago batek sortu du. Ireki ahal izateko, eguneratu Gabbro. Zure kutxa gotorraren fitxategia ez da aldatu.",
+  "vaultFormatTooNewLink": "Nola eguneratu Gabbro",
   "vaultCorruptBackupAvailable": "Kutxa gotorraren fitxategi hau ezin da irakurri. Azken gordetze arrakastatsuaren segurtasun-kopia automatiko bat dago erabilgarri.",
   "restoreBackupButton": "Berreskuratu segurtasun-kopiatik",
   "restoreBackupConfirmTitle": "Kutxa gotorra segurtasun-kopiatik berreskuratu?",

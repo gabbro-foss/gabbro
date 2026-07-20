@@ -71,6 +71,16 @@ Future<bool> _defaultSourceFormatTooOld(String path) async {
   }
 }
 
+// A source written by a newer Gabbro build. Explained (update Gabbro) rather
+// than dumping the English-only Rust text.
+Future<bool> _defaultSourceFormatTooNew(String path) async {
+  try {
+    return await vaultFormatTooNew(path: path);
+  } catch (_) {
+    return false;
+  }
+}
+
 class ImportScreen extends StatefulWidget {
   final Future<ImportResult> Function(List<int> data) onImportEnpass;
   final Future<ImportResult> Function(List<int> data) onImportBitwarden;
@@ -100,6 +110,10 @@ class ImportScreen extends StatefulWidget {
   /// `onVaultFormatTooOld` so both refusals behave the same.
   final Future<bool> Function(String path) onSourceFormatTooOld;
 
+  /// Whether the chosen `.gabbro` source was written by a newer Gabbro build.
+  /// Mirrors [onSourceFormatTooOld]; the fix is to update Gabbro.
+  final Future<bool> Function(String path) onSourceFormatTooNew;
+
   final bool isAndroid;
 
   /// Pre-selected Gabbro source path. Mainly a test seam (the path is otherwise
@@ -119,6 +133,7 @@ class ImportScreen extends StatefulWidget {
     this.onDetectSourceRecords = _defaultDetectSourceRecords,
     this.onGetYubikeyHmac = _defaultGetYubikeyHmac,
     this.onSourceFormatTooOld = _defaultSourceFormatTooOld,
+    this.onSourceFormatTooNew = _defaultSourceFormatTooNew,
     this.initialGabbroPath,
     bool? isAndroid,
   }) : isAndroid = isAndroid ?? Platform.isAndroid;
@@ -148,6 +163,9 @@ class _ImportScreenState extends State<ImportScreen> {
   String? _dashlaneError;
   String? _csvError;
   String? _gabbroError;
+
+  // Source intact but written by a newer build: explain "update Gabbro".
+  bool _gabbroFormatTooNew = false;
 
   /// Distinct from [_gabbroError]: the source is intact, just older than this
   /// build reads. Explained with a link, never shown as a raw failure.
@@ -376,6 +394,7 @@ class _ImportScreenState extends State<ImportScreen> {
       _isImportingGabbro = true;
       _gabbroError = null;
       _gabbroFormatTooOld = false;
+      _gabbroFormatTooNew = false;
     });
     try {
       final passphraseBytes = utf8.encode(passphrase);
@@ -406,10 +425,12 @@ class _ImportScreenState extends State<ImportScreen> {
       // did not mistype, so explain the format instead of dumping the Rust text
       // (which is English-only and renders its URL as dead plain text).
       final tooOld = await widget.onSourceFormatTooOld(path);
+      final tooNew = tooOld ? false : await widget.onSourceFormatTooNew(path);
       if (!mounted) return;
       setState(() {
         _gabbroFormatTooOld = tooOld;
-        _gabbroError = tooOld ? null : e.toString();
+        _gabbroFormatTooNew = tooNew;
+        _gabbroError = (tooOld || tooNew) ? null : e.toString();
       });
     } finally {
       if (mounted) setState(() => _isImportingGabbro = false);
@@ -600,6 +621,7 @@ class _ImportScreenState extends State<ImportScreen> {
             _gabbroPath = p;
             _gabbroError = null;
       _gabbroFormatTooOld = false;
+      _gabbroFormatTooNew = false;
             try {
               _gabbroSourceRecords = widget.onDetectSourceRecords(p);
             } catch (_) {
@@ -719,6 +741,29 @@ class _ImportScreenState extends State<ImportScreen> {
               onPressed: () => showUrlDialog(
                 context,
                 title: l.vaultFormatUpgradeLink,
+                url: vaultUpgradePathUrl,
+              ),
+            ),
+          ),
+        ],
+        // Same shape for a source from a newer build: explain "update Gabbro".
+        if (_gabbroFormatTooNew) ...[
+          const SizedBox(height: 4),
+          Text(
+            l.vaultFormatTooNew,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.error,
+              fontSize: 12,
+            ),
+          ),
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: TextButton.icon(
+              icon: const Icon(Icons.open_in_new, size: 16),
+              label: Text(l.vaultFormatTooNewLink),
+              onPressed: () => showUrlDialog(
+                context,
+                title: l.vaultFormatTooNewLink,
                 url: vaultUpgradePathUrl,
               ),
             ),

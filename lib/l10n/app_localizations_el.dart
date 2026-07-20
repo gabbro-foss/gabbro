@@ -1967,6 +1967,13 @@ class AppLocalizationsEl extends AppLocalizations {
       'Πώς να αναβαθμίσετε αυτό το θησαυροφυλάκιο';
 
   @override
+  String get vaultFormatTooNew =>
+      'Αυτό το θησαυροφυλάκιο δημιουργήθηκε από νεότερη έκδοση του Gabbro. Ενημερώστε το Gabbro για να το ανοίξετε. Το αρχείο του θησαυροφυλακίου σας δεν έχει τροποποιηθεί.';
+
+  @override
+  String get vaultFormatTooNewLink => 'Πώς να ενημερώσετε το Gabbro';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Αυτό το αρχείο θησαυροφυλακίου δεν μπορεί να διαβαστεί. Διατίθεται ένα αυτόματο εφεδρικό αντίγραφο από την τελευταία επιτυχή αποθήκευση.';
 

@@ -838,6 +838,8 @@
 
   "vaultFormatTooOld": "See hoidla kasutab vanemat vormingut, mida see Gabbro versioon ei suuda avada. Teie hoidlafaili ei ole muudetud.",
   "vaultFormatUpgradeLink": "Kuidas seda hoidlat uuendada",
+  "vaultFormatTooNew": "See hoidla loodi Gabbro uuema versiooniga. Selle avamiseks uuendage Gabbrot. Teie hoidlafaili ei ole muudetud.",
+  "vaultFormatTooNewLink": "Kuidas Gabbrot uuendada",
   "vaultCorruptBackupAvailable": "Seda hoidlafaili ei saa lugeda. Saadaval on automaatne kaitsekoopia viimasest õnnestunud salvestusest.",
   "restoreBackupButton": "Taasta kaitsekoopiast",
   "restoreBackupConfirmTitle": "Kas taastada hoidla kaitsekoopiast?",

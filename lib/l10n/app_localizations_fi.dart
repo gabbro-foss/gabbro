@@ -1947,6 +1947,13 @@ class AppLocalizationsFi extends AppLocalizations {
   String get vaultFormatUpgradeLink => 'Näin päivität tämän holvin';
 
   @override
+  String get vaultFormatTooNew =>
+      'Tämä holvi luotiin uudemmalla Gabbron versiolla. Päivitä Gabbro avataksesi sen. Holvitiedostoasi ei ole muutettu.';
+
+  @override
+  String get vaultFormatTooNewLink => 'Näin päivität Gabbron';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Tätä holvitiedostoa ei voi lukea. Saatavilla on automaattinen varakopio viimeisimmästä onnistuneesta tallennuksesta.';
 

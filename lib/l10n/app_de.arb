@@ -837,6 +837,8 @@
 
   "vaultFormatTooOld": "Dieser Tresor verwendet ein älteres Format, das diese Version von Gabbro nicht öffnen kann. Ihre Tresordatei wurde nicht verändert.",
   "vaultFormatUpgradeLink": "So aktualisieren Sie diesen Tresor",
+  "vaultFormatTooNew": "Dieser Tresor wurde von einer neueren Version von Gabbro erstellt. Aktualisieren Sie Gabbro, um ihn zu öffnen. Ihre Tresordatei wurde nicht verändert.",
+  "vaultFormatTooNewLink": "So aktualisieren Sie Gabbro",
   "vaultCorruptBackupAvailable": "Diese Tresordatei kann nicht gelesen werden. Eine automatische Sicherheitskopie vom letzten erfolgreichen Speichern ist verfügbar.",
   "restoreBackupButton": "Aus Sicherheitskopie wiederherstellen",
   "restoreBackupConfirmTitle": "Tresor aus Sicherheitskopie wiederherstellen?",

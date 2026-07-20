@@ -1889,6 +1889,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get vaultFormatUpgradeLink => 'このボールトをアップグレードする方法';
 
   @override
+  String get vaultFormatTooNew =>
+      'このボールトは、より新しいバージョンの Gabbro で作成されました。開くには Gabbro を更新してください。ボールトファイルは変更されていません。';
+
+  @override
+  String get vaultFormatTooNewLink => 'Gabbro を更新する方法';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'このボールトファイルは読み取れません。最後に成功した保存の自動セーフティコピーが利用できます。';
 

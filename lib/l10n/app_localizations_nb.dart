@@ -1943,6 +1943,13 @@ class AppLocalizationsNb extends AppLocalizations {
   String get vaultFormatUpgradeLink => 'Slik oppgraderer du dette hvelvet';
 
   @override
+  String get vaultFormatTooNew =>
+      'Dette hvelvet ble opprettet av en nyere versjon av Gabbro. Oppdater Gabbro for å åpne det. Hvelvfilen din er ikke endret.';
+
+  @override
+  String get vaultFormatTooNewLink => 'Slik oppdaterer du Gabbro';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Denne hvelvfilen kan ikke leses. En automatisk reservekopi fra siste vellykkede lagring er tilgjengelig.';
 

@@ -249,6 +249,15 @@ pub fn vault_format_too_old(path: &Path) -> Result<bool, String> {
     crate::vault::file_format::is_format_too_old(&bytes)
 }
 
+/// Whether the vault file at `path` was written by a newer build than this one.
+/// Reads magic + version byte only; no body decryption. See
+/// [`crate::vault::file_format::is_format_too_new`].
+pub fn vault_format_too_new(path: &Path) -> Result<bool, String> {
+    check_not_symlink(path)?;
+    let bytes = fs::read(path).map_err(|e| format!("Failed to read vault: {e}"))?;
+    crate::vault::file_format::is_format_too_new(&bytes)
+}
+
 /// Lightweight vault header: alias and YubiKey records only, no body decryption.
 pub struct VaultHeader {
     pub alias: Option<String>,

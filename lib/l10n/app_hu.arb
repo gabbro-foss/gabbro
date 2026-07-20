@@ -838,6 +838,8 @@
 
   "vaultFormatTooOld": "Ez a széf régebbi formátumot használ, amelyet a Gabbro ezen verziója nem tud megnyitni. A széffájlja nem változott.",
   "vaultFormatUpgradeLink": "A széf frissítésének módja",
+  "vaultFormatTooNew": "Ezt a széfet a Gabbro egy újabb verziója hozta létre. A megnyitásához frissítse a Gabbrót. A széffájlja nem változott.",
+  "vaultFormatTooNewLink": "A Gabbro frissítésének módja",
   "vaultCorruptBackupAvailable": "Ez a széffájl nem olvasható. Elérhető egy automatikus vészmásolat az utolsó sikeres mentésből.",
   "restoreBackupButton": "Helyreállítás vészmásolatból",
   "restoreBackupConfirmTitle": "Helyreállítja a széfet a vészmásolatból?",

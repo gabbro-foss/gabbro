@@ -75,7 +75,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.12.0';
 
   @override
-  int get rustContentHash => 1574391907;
+  int get rustContentHash => 906954885;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -357,6 +357,8 @@ abstract class RustLibApi extends BaseApi {
   });
 
   Future<bool> crateApiVaultBridgeVaultBackupUsable({required String path});
+
+  Future<bool> crateApiVaultBridgeVaultFormatTooNew({required String path});
 
   Future<bool> crateApiVaultBridgeVaultFormatTooOld({required String path});
 }
@@ -2549,7 +2551,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "vault_backup_usable", argNames: ["path"]);
 
   @override
-  Future<bool> crateApiVaultBridgeVaultFormatTooOld({required String path}) {
+  Future<bool> crateApiVaultBridgeVaultFormatTooNew({required String path}) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -2559,6 +2561,37 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             generalizedFrbRustBinding,
             serializer,
             funcId: 69,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_bool,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiVaultBridgeVaultFormatTooNewConstMeta,
+        argValues: [path],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiVaultBridgeVaultFormatTooNewConstMeta =>
+      const TaskConstMeta(
+        debugName: "vault_format_too_new",
+        argNames: ["path"],
+      );
+
+  @override
+  Future<bool> crateApiVaultBridgeVaultFormatTooOld({required String path}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(path, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 70,
             port: port_,
           );
         },

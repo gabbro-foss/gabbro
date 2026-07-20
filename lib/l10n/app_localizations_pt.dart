@@ -1950,6 +1950,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get vaultFormatUpgradeLink => 'Como atualizar este cofre';
 
   @override
+  String get vaultFormatTooNew =>
+      'Este cofre foi criado por uma versão mais recente do Gabbro. Atualize o Gabbro para o abrir. O seu ficheiro de cofre não foi alterado.';
+
+  @override
+  String get vaultFormatTooNewLink => 'Como atualizar o Gabbro';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Este ficheiro de cofre não pode ser lido. Está disponível uma cópia de recuperação automática da última gravação bem-sucedida.';
 
@@ -3972,6 +3979,13 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get vaultFormatUpgradeLink => 'Como atualizar este cofre';
+
+  @override
+  String get vaultFormatTooNew =>
+      'Este cofre foi criado por uma versão mais recente do Gabbro. Atualize o Gabbro para abri-lo. O seu arquivo de cofre não foi alterado.';
+
+  @override
+  String get vaultFormatTooNewLink => 'Como atualizar o Gabbro';
 
   @override
   String get vaultCorruptBackupAvailable =>
@@ -5998,6 +6012,13 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get vaultFormatUpgradeLink => 'Como atualizar este cofre';
+
+  @override
+  String get vaultFormatTooNew =>
+      'Este cofre foi criado por uma versão mais recente do Gabbro. Atualize o Gabbro para o abrir. O seu ficheiro de cofre não foi alterado.';
+
+  @override
+  String get vaultFormatTooNewLink => 'Como atualizar o Gabbro';
 
   @override
   String get vaultCorruptBackupAvailable =>

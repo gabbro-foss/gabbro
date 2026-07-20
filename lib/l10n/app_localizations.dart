@@ -3637,6 +3637,18 @@ abstract class AppLocalizations {
   /// **'How to upgrade this vault'**
   String get vaultFormatUpgradeLink;
 
+  /// Shown on the unlock screen, and on the import screen for a too-new source, when the vault file was written by a newer Gabbro build than this one. The file is intact: the fix is to update the app, not to retry the passphrase or delete it. Must never sound like corruption. Names no format version - a number means nothing to a user.
+  ///
+  /// In en, this message translates to:
+  /// **'This vault was created by a newer version of Gabbro. Update Gabbro to open it. Your vault file has not been changed.'**
+  String get vaultFormatTooNew;
+
+  /// Tappable link label next to vaultFormatTooNew, on both the unlock and import screens. Opens the documented upgrade/version steps.
+  ///
+  /// In en, this message translates to:
+  /// **'How to update Gabbro'**
+  String get vaultFormatTooNewLink;
+
   /// No description provided for @vaultCorruptBackupAvailable.
   ///
   /// In en, this message translates to:

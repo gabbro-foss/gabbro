@@ -838,6 +838,8 @@
 
   "vaultFormatTooOld": "Dette kvelvet brukar eit eldre format som denne versjonen av Gabbro ikkje kan opna. Kvelvfila di er ikkje endra.",
   "vaultFormatUpgradeLink": "Slik oppgraderer du dette kvelvet",
+  "vaultFormatTooNew": "Dette kvelvet vart oppretta av ein nyare versjon av Gabbro. Oppdater Gabbro for å opna det. Kvelvfila di er ikkje endra.",
+  "vaultFormatTooNewLink": "Slik oppdaterer du Gabbro",
   "vaultCorruptBackupAvailable": "Denne kvelvfila kan ikkje lesast. Ein automatisk reservekopi frå siste vellukka lagring er tilgjengeleg.",
   "restoreBackupButton": "Gjenopprett frå reservekopi",
   "restoreBackupConfirmTitle": "Gjenopprette kvelvet frå reservekopien?",

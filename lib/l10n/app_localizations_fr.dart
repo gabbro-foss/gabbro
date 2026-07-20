@@ -1970,6 +1970,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get vaultFormatUpgradeLink => 'Comment mettre à niveau ce coffre';
 
   @override
+  String get vaultFormatTooNew =>
+      'Ce coffre a été créé par une version plus récente de Gabbro. Mettez Gabbro à jour pour l\'ouvrir. Votre fichier de coffre n\'a pas été modifié.';
+
+  @override
+  String get vaultFormatTooNewLink => 'Comment mettre Gabbro à jour';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Ce fichier de coffre est illisible. Une copie de secours automatique du dernier enregistrement réussi est disponible.';
 

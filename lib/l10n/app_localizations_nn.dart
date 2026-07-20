@@ -1945,6 +1945,13 @@ class AppLocalizationsNn extends AppLocalizations {
   String get vaultFormatUpgradeLink => 'Slik oppgraderer du dette kvelvet';
 
   @override
+  String get vaultFormatTooNew =>
+      'Dette kvelvet vart oppretta av ein nyare versjon av Gabbro. Oppdater Gabbro for å opna det. Kvelvfila di er ikkje endra.';
+
+  @override
+  String get vaultFormatTooNewLink => 'Slik oppdaterer du Gabbro';
+
+  @override
   String get vaultCorruptBackupAvailable =>
       'Denne kvelvfila kan ikkje lesast. Ein automatisk reservekopi frå siste vellukka lagring er tilgjengeleg.';
 
