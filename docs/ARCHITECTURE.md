@@ -112,7 +112,7 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-- Autotype in linux often has typos in the login/email. and it often fails perhaps due to a typo in the passphrase. investigate.
+Empty — pick the next task with the maintainer from Bikeshed / Backlog below.
 
 ---
 
