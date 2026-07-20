@@ -754,12 +754,16 @@ class _GeneratorWidgetState extends State<GeneratorWidget>
     required bool value,
     required void Function(bool)? onChanged,
   }) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Flexible(child: Text(label)),
-        Switch(key: key, value: value, onChanged: onChanged),
-      ],
+    // MergeSemantics so the toggle node carries the row's text as its
+    // screen-reader label (a11y net: labeledTapTargetGuideline).
+    return MergeSemantics(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Flexible(child: Text(label)),
+          Switch(key: key, value: value, onChanged: onChanged),
+        ],
+      ),
     );
   }
 }

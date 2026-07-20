@@ -23,10 +23,7 @@ const Map<String, String> _knownTapTargetTooSmall = <String, String>{
 };
 
 // Screens/dialogs with a KNOWN unfixed unlabelled tappable node. Same rules.
-const Map<String, String> _knownUnlabelled = <String, String>{
-  'generator': 'an icon-only control (60x48) has no label',
-  'generator_widget': 'same control as generator (shared GeneratorWidget)',
-};
+const Map<String, String> _knownUnlabelled = <String, String>{};
 
 /// Set the phone surface + a semantics handle, pump [app] at natural text scale,
 /// and settle. Caller disposes the returned handle.
