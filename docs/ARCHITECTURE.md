@@ -78,7 +78,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1476 | 2 |
+| Flutter (`flutter test`) | 1477 | 2 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -144,15 +144,22 @@ result: a site is OK only when the error is trailing detail inside an approved
 meaning-carrying template; otherwise it is a raw leak listed in `_todoRawErrors`.
 A new unlisted leak fails the test. Principle: the localized part must carry the
 MEANING, English allowed only as trailing detail (see memory
-project_error_l10n_by_log_level). Green now, pinning the current 22-site backlog.
-Too-old vault path pinned in `unlock_screen_test.dart`.
+project_error_l10n_by_log_level). Too-old vault path pinned in
+`unlock_screen_test.dart`. The classifier is statement-scoped, so a template
+wrapping split across lines by the formatter is not a false leak.
 
-The `_todoRawErrors` backlog (22 sites / 13 files) shrinks via Canon-TDD, one
-red->fix->green each: all Class A raw sites + `errorPrefix(...)` (`manage_folders`
-x3, `vault_list` dialogs, meaning-empty). `vaultFormatTooNew` is done (localized
-message + link on unlock and import, mirroring too-old, all 37 locales); it added
-a probe branch not a new raw site, so the count is unchanged. Next: the five
-importers.
+The `_todoRawErrors` backlog now stands at **15 sites / 11 files** and shrinks via
+Canon-TDD, one red->fix->green each. Done so far:
+- `vaultFormatTooNew` — localized message + link on unlock and import, all 37
+  locales (added a probe branch, not a raw site, so no count change).
+- The five importers + Gabbro-source + csv-mapping (7 sites) now use the
+  meaning-carrying `importFailed` template ("Import failed: {error}", 37 locales) —
+  22 -> 15.
+
+Still todo: `errorPrefix(...)` (`manage_folders` x3, `vault_list` dialogs,
+meaning-empty) + the remaining Class A raw sites (review_changes, onboarding,
+export, security, manage_yubikeys, change_passphrase, unlock, recovery_history,
+create_entry).
 
 **The behaviours still needing a net.** Each is what a user cannot do:
 5. Dark mode or high contrast makes text unreadable, or the setting does nothing.
@@ -188,9 +195,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - See if vault `syncing` can do without a second `passphrase + yubikey` if and only if the current vault and the incoming vault share the same `alias`, `passphrase`, `yubikey(s)`
 - in `sync` path, we currently have `auto-merge` and `review all changes`, the `auto-merge` is additive only (check and verify) and therefore never deletes items in the receiving vault: (1) add a message that explains this (or the correct) behaviour to the user, (2) add a third `sync` mechanism that simply takes the incoming vault and clobbers the existing one - discuss this
 - Autotype in linux often has typos in the login/email. and it often fails perhaps due to a typo in the passphrase. investigate.
-- **The other five importers still show raw Rust errors.** Enpass, Bitwarden, Google PM,
-  Dashlane and CSV all set their error to `e.toString()`, so any Rust failure reaches the
-  user untranslated. The Gabbro source was fixed (matrix 4.2 / 4.4); these were not.
 - **Vault format version is meaningless to the user.** "v10"/"v11" is the file format and
   tracks neither the app version nor the alpha number. Both too-old and too-new paths are
   now handled: unlock and Gabbro-source import probe `vaultFormatTooOld()` /
