@@ -197,16 +197,16 @@ can't (label *quality* + operability), now fixed:
   — named + value announced; a net guard asserts they keep increase/decrease
   actions. `TextSizeSlider` takes the label as a param (stays l10n-free).
 
-**Pending: a SECOND hardware pass** to confirm TalkBack now announces + adjusts
-the toggles and sliders. The net cannot verify label quality or TalkBack
-operability — that is hardware-only.
+**Second hardware pass (S23 + TalkBack) — PASS.** Toggles announce their
+char-type name + state; sliders announce name + value and adjust via swipe
+(slow — one step per division — but functional). **Item 6 is DONE,
+hardware-verified.**
 
 **The behaviour still needing a net.** What a user cannot do:
 5. Dark mode or high contrast makes text unreadable, or the setting does nothing.
 
-**NEXT STEP: re-run the S23/TalkBack pass on the toggle + slider fixes, then item
-5 (dark/high-contrast) with [maintainer]. Items 1-4 done; item 6 net + backlog +
-TalkBack-quality fixes done (2nd hardware pass pending).**
+**NEXT STEP: item 5 (dark mode / high contrast) with [maintainer]. Items 1-4 and
+6 all DONE (item 6 hardware-verified). Item 5 is the last behaviour.**
 
 **Still-relevant traps (items 4-6)**
 - A child clipped inside a fixed-size box throws no exception, so the probe cannot
