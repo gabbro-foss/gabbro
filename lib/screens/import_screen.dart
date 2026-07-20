@@ -259,8 +259,9 @@ class _ImportScreenState extends State<ImportScreen> {
       if (result.skipped.isNotEmpty && mounted) {
         await showSkippedEntriesDialog(context, result.skipped);
       }
-      if (mounted)
+      if (mounted) {
         Navigator.of(context).pop(result.imported.toInt() + editedCount);
+      }
     } catch (e) {
       if (mounted) {
         setState(
@@ -313,8 +314,9 @@ class _ImportScreenState extends State<ImportScreen> {
       if (result.skipped.isNotEmpty && mounted) {
         await showSkippedEntriesDialog(context, result.skipped);
       }
-      if (mounted)
+      if (mounted) {
         Navigator.of(context).pop(result.imported.toInt() + editedCount);
+      }
     } catch (e) {
       if (mounted) {
         setState(
@@ -367,8 +369,9 @@ class _ImportScreenState extends State<ImportScreen> {
       if (result.skipped.isNotEmpty && mounted) {
         await showSkippedEntriesDialog(context, result.skipped);
       }
-      if (mounted)
+      if (mounted) {
         Navigator.of(context).pop(result.imported.toInt() + editedCount);
+      }
     } catch (e) {
       if (mounted) {
         setState(
@@ -421,8 +424,9 @@ class _ImportScreenState extends State<ImportScreen> {
       if (result.skipped.isNotEmpty && mounted) {
         await showSkippedEntriesDialog(context, result.skipped);
       }
-      if (mounted)
+      if (mounted) {
         Navigator.of(context).pop(result.imported.toInt() + editedCount);
+      }
     } catch (e) {
       if (mounted) {
         setState(
