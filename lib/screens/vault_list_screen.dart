@@ -1676,20 +1676,25 @@ class _VaultListScreenState extends State<VaultListScreen>
                       // Ellipsize the button's one-line selection so a long
                       // folder truncates cleanly instead of hard-clipping at
                       // large text (ADR-016).
-                      selectedItemBuilder: (context) => [
-                        Text(
-                          l.allFolders,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        ..._folders.map(
-                          (f) => Text(
-                            f,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
+                      selectedItemBuilder: (context) =>
+                          [l.allFolders, ..._folders]
+                              .map(
+                                // minHeight 48 so the collapsed button is a
+                                // 48dp tap target (a11y net); open menu items
+                                // still grow via itemHeight: null (ADR-016).
+                                (label) => Container(
+                                  alignment: AlignmentDirectional.centerStart,
+                                  constraints: const BoxConstraints(
+                                    minHeight: 48,
+                                  ),
+                                  child: Text(
+                                    label,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              )
+                              .toList(),
                       onChanged: (value) =>
                           setState(() => _selectedFolder = value ?? ''),
                       items: [

@@ -16,11 +16,7 @@ import 'screen_catalog.dart';
 
 // Screens/dialogs with a KNOWN unfixed control smaller than 48dp, each skipped
 // (not silently passing) with a reason. Remove the entry once fixed.
-const Map<String, String> _knownTapTargetTooSmall = <String, String>{
-  'vault_list': '"All folders" folder-filter chip renders 344x24 — 24dp high, needs 48',
-  'generator': '"English" wordlist-language selector renders 296x24 — 24dp high',
-  'generator_widget': 'same selector as generator (shared GeneratorWidget)',
-};
+const Map<String, String> _knownTapTargetTooSmall = <String, String>{};
 
 // Screens/dialogs with a KNOWN unfixed unlabelled tappable node. Same rules.
 const Map<String, String> _knownUnlabelled = <String, String>{};

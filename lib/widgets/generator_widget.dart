@@ -437,10 +437,17 @@ class _GeneratorWidgetState extends State<GeneratorWidget>
                           ).compareTo(_languageLabel(b, l)),
                         ))
                         .map(
-                          (lang) => Text(
-                            _languageLabel(lang, l),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                          // minHeight 48 so the collapsed button is a 48dp tap
+                          // target (a11y net); open menu items still grow via
+                          // itemHeight: null.
+                          (lang) => Container(
+                            alignment: AlignmentDirectional.centerStart,
+                            constraints: const BoxConstraints(minHeight: 48),
+                            child: Text(
+                              _languageLabel(lang, l),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         )
                         .toList(),
