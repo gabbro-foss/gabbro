@@ -128,7 +128,7 @@ is detailed in its own section below; the other three:
   or dialog overflows a ~2x locale. Two meta-guards prove it can fail (padded delegate
   reaches the tree; detection still fires).
 
-Flutter 1478 (+2 skipped); count of record lives in the Testing table above.
+(Flutter test count of record lives in the Testing table above.)
 
 **How item 3 works (so it is not re-litigated).** A test-only `noSuchMethod` wrapper
 implements `AppLocalizations`, returning each label's English value (read from
@@ -189,8 +189,10 @@ Done: `appearance` high-contrast toggle (`ListTile` + trailing `Switch` ->
 **The behaviour still needing a net.** What a user cannot do:
 5. Dark mode or high contrast makes text unreadable, or the setting does nothing.
 
-**NEXT STEP: fix the item-6 a11y backlog (3 clusters) Canon-TDD, then item 5
-(dark/high-contrast) with [maintainer]. Items 1-4 done; item 6 net built.**
+**NEXT STEP: fix the 2 remaining item-6 a11y clusters (generator size+label,
+vault_list chip) Canon-TDD — layout-sensitive, hardware-verify — then item 5
+(dark/high-contrast) with [maintainer]. Items 1-4 done; item 6 net built,
+appearance toggle fixed.**
 
 **Still-relevant traps (items 4-6)**
 - A child clipped inside a fixed-size box throws no exception, so the probe cannot
