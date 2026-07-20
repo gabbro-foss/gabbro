@@ -24,7 +24,6 @@ const Map<String, String> _knownTapTargetTooSmall = <String, String>{
 
 // Screens/dialogs with a KNOWN unfixed unlabelled tappable node. Same rules.
 const Map<String, String> _knownUnlabelled = <String, String>{
-  'appearance': 'a toggle (60x48) has no semantic label a screen reader can read',
   'generator': 'an icon-only control (60x48) has no label',
   'generator_widget': 'same control as generator (shared GeneratorWidget)',
 };

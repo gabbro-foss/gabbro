@@ -100,15 +100,14 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
               // ── High contrast ──────────────────────────────────────────
               SectionHeader(label: l.sectionAccessibility),
               const SizedBox(height: 8),
-              ListTile(
+              // SwitchListTile (not ListTile + trailing Switch) so the toggle
+              // node carries the title as its screen-reader label (a11y net).
+              SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: Text(l.highContrastTitle),
                 subtitle: Text(l.highContrastSubtitle),
-                trailing: Switch(
-                  value: _settings.highContrast,
-                  onChanged: (v) =>
-                      _update(_settings.copyWith(highContrast: v)),
-                ),
+                value: _settings.highContrast,
+                onChanged: (v) => _update(_settings.copyWith(highContrast: v)),
               ),
             ],
           ),
