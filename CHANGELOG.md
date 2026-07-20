@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Linux auto-type now works from a release download.** The `gabbro-autotype` trigger client ships in the tarball, so binding a keyboard shortcut no longer requires building from source. Setup for auto-type (Linux) and autofill (Android): [docs/AUTOTYPE_AND_AUTOFILL.md](docs/AUTOTYPE_AND_AUTOFILL.md).
 
 ### Fixed
+- High contrast is now genuinely high-contrast on every screen: the alphabet index bar (absent letters, gap marker, greyed chevrons), the sync-review changed-field rows, and the password breakdown no longer render dimmed or low-contrast text. The alphabet-bar gap marker is also no longer announced by screen readers.
 - Recovery history: the Revert, Delete and reveal controls ran off the right edge at larger text in most languages, leaving no way to restore or discard a value sync had replaced. They now wrap onto their own line.
 - Sync review: a long password, URL or folder name was cut off in the choice buttons, so you picked between two values you could not read. Value choices are now full-width rows that wrap onto as many lines as needed, at every text size.
 - Tablet, largest text: the "select an entry" placeholder in the detail pane ran off the bottom of the pane. It now scrolls.

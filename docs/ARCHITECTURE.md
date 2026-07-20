@@ -42,7 +42,7 @@ gabbro/
 │   ├── screens/          # unlock, vault list, export, import, generator, settings, manage vaults/folders, …
 │   ├── widgets/          # path_field, generator_widget, yubikey_tap, password_breakdown_sheet, sync_review, text_size_slider, url_link, …
 │   ├── src/rust/         # Auto-generated bridge (do not edit)
-│   └── *.dart            # main, app_paths (GabbroPaths), settings, text_scale, control_scale, vault_registry, safe_file_picker, autotype_listener, autotype_target, clipboard_clear
+│   └── *.dart            # main, app_paths (GabbroPaths), settings, text_scale, control_scale, gabbro_contrast (high-contrast theme flag), vault_registry, safe_file_picker, autotype_listener, autotype_target, clipboard_clear
 ├── rust/src/
 │   ├── api/              # Bridge surface: vault, vault_bridge, import, *_generator, fido_bridge, autofill_bridge, autotype_bridge, entropy, types
 │   ├── crypto/           # Internal (not bridge-exposed): kdf, hkdf, aes_gcm, vault_crypto
@@ -78,7 +78,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1545 | 4 |
+| Flutter (`flutter test`) | 1656 | 7 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -112,51 +112,13 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Net for l10n + accessibility on every screen** — one behaviour left (item 5).
-
-**STATE 2026-07-20. Behaviours 1-4 and 6 are DONE; item 5 is all that remains.**
-Five green "every screen" nets (details in git history / CHANGELOG; the tests
-themselves encode the invariants):
-- `test/l10n_test.dart` — ARB parity (1+2): every locale has the base key set,
-  matches base placeholders, lists all 34 endonyms (37-file + 34-endonym guards).
-- `test/overflow_probe_test.dart` — overflow (English) + longer-language (3) axes:
-  sweeps every screen/dialog/widget at max text on phone + tablet, plus one pass
-  under a synthetic ~2x-length locale (a `noSuchMethod` `AppLocalizations` wrapper
-  installed via a `localizationsDelegates` seam on `GabbroApp`; no shipped locale).
-- `test/error_l10n_net_test.dart` — error-l10n (4): scans `lib/` for raw
-  `e/err.toString()` reaching the user; backlog EMPTY — every Rust error now sits
-  behind a meaning-carrying localized template. Rule: the localized part carries
-  the MEANING (memory project_error_l10n_by_log_level). `_notADisplayLeak` = 3
-  reviewed non-leaks (logic-only / field wrapped at build).
-- `test/a11y_net_test.dart` — accessibility (6): every screen passes
-  `androidTapTargetGuideline` (>=48dp) + `labeledTapTargetGuideline`; a guard
-  asserts sliders keep their adjust actions. Hardware-verified (S23/TalkBack).
-- `test/screen_catalog.dart` — the shared 33-entry screen/dialog catalog that the
-  overflow and a11y nets both sweep. **Item 5's net should reuse it.**
-
-Memory gotchas: [[reference_async_matcher_no_isnot]] (`isNot(meetsGuideline)` hangs
-forever — catch `TestFailure`), [[project_error_l10n_by_log_level]],
-[[reference_flutter_run_release_lockfile]].
-
-**NEXT STEP — item 5: dark mode / high contrast.** What a user cannot do: dark
-mode or high contrast makes text unreadable, or the setting does nothing. Headless,
-like item 3. Likely starting point (verify first): reuse `screen_catalog.dart`;
-`AppSettings` carries the theme choice + high-contrast flag, and `GabbroApp` wires
-`gabbroLightTheme` / `gabbroDarkTheme(highContrast:)` + `themeMode`. Render each
-screen in dark and in high-contrast and assert `meetsGuideline(textContrastGuideline)`
-(the "unreadable" half), plus that flipping the setting actually changes the
-rendered output (the "setting does nothing" half). Canon-TDD: present the
-scenario list and STOP for review before writing test code.
-
-**Still-relevant traps (items 4-6)**
-- A child clipped inside a fixed-size box throws no exception, so the probe cannot
-  see it — clipping defects need hardware, not this net. Two of three past defects
-  were clipping (recovery-history actions, sync_review chip values).
-- Probing a widget outside the conditions the app builds it in reports an overflow
-  the user can never meet. The two-pane layout is gated >= 600dp
-  (`vault_list_screen.dart:1517`); `_tabletOnly` records the restriction.
-- Collecting `tester.takeException()` filtered to `FlutterError` drops the "Multiple
-  exceptions (N)" wrapper and reports a false green. Take any non-null.
+Empty — the "Net for l10n + accessibility on every screen" task is complete: all
+six behaviours shipped and hardware-verified. The invariants live in their nets,
+all sweeping the shared `test/screen_catalog.dart`: `l10n_test.dart` (ARB parity),
+`overflow_probe_test.dart` (overflow + longer-language), `error_l10n_net_test.dart`
+(no raw error strings), `a11y_net_test.dart` (tap-target + label + text-contrast in
+dark and high-contrast, plus theme/high-contrast wiring proofs). Pick the next task
+with the maintainer from Bikeshed / Backlog below.
 
 ---
 
