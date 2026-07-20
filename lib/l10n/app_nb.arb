@@ -298,6 +298,8 @@
   "exportFailed": "Eksport mislyktes: {error}",
   "importFailed": "Import mislyktes: {error}",
   "folderActionFailed": "Mappehandling mislyktes: {error}",
+  "vaultLoadFailed": "Kunne ikke laste hvelvet: {error}",
+  "syncFailed": "Synkronisering mislyktes: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

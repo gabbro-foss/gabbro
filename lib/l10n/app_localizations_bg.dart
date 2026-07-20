@@ -760,6 +760,16 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'Зареждането на сейфа не успя: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Синхронизацията не успя: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Отвори в браузър?';
 
   @override

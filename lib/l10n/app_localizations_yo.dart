@@ -757,6 +757,16 @@ class AppLocalizationsYo extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'Ko le kojọpọ vọọliti: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Iṣọkan kuna: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Ṣii ninu aṣawakiri?';
 
   @override

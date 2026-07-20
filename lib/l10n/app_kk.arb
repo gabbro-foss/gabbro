@@ -298,6 +298,8 @@
   "exportFailed": "Экспорт сәтсіз болды: {error}",
   "importFailed": "Импорт сәтсіз болды: {error}",
   "folderActionFailed": "Қалта әрекеті сәтсіз болды: {error}",
+  "vaultLoadFailed": "Қойманы жүктеу мүмкін болмады: {error}",
+  "syncFailed": "Синхрондау сәтсіз болды: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

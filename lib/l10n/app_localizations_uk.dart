@@ -762,6 +762,16 @@ class AppLocalizationsUk extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'Не вдалося завантажити сховище: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Синхронізація не вдалася: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Відкрити в браузері?';
 
   @override

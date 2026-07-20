@@ -758,6 +758,16 @@ class AppLocalizationsDa extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'Indlæsning af boksen mislykkedes: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Synkronisering mislykkedes: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Åbn i browser?';
 
   @override

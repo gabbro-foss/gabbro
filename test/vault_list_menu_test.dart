@@ -369,5 +369,10 @@ void main() {
         reason: 'a locked load must not render the vault-list AppBar/menu');
     expect(find.byIcon(Icons.lock_outline), findsNothing,
         reason: 'no AppBar lock button (and no Login entry rows) when locked');
+
+    // The failure is shown via a meaning-carrying message, not the old
+    // meaning-empty "Error: ..." wrapper; the raw detail is appended.
+    expect(find.textContaining("Couldn't load the vault:"), findsOneWidget);
+    expect(find.textContaining('vault is locked'), findsOneWidget);
   });
 }

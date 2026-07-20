@@ -760,6 +760,16 @@ class AppLocalizationsFi extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'Holvin lataaminen epäonnistui: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Synkronointi epäonnistui: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Avataan selaimessa?';
 
   @override

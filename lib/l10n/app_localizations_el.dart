@@ -763,6 +763,16 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'Αποτυχία φόρτωσης θησαυροφυλακίου: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Αποτυχία συγχρονισμού: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Άνοιγμα στο πρόγραμμα περιήγησης;';
 
   @override

@@ -759,6 +759,16 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'Error al cargar la caja fuerte: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Error de sincronización: $error';
+  }
+
+  @override
   String get openInBrowserTitle => '¿Abrir en el navegador?';
 
   @override

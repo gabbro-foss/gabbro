@@ -762,6 +762,16 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'Nie udało się wczytać skarbca: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Synchronizacja nie powiodła się: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Otworzyć w przeglądarce?';
 
   @override

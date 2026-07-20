@@ -758,6 +758,16 @@ class AppLocalizationsLv extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'Nevarēja ielādēt seifu: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Sinhronizācija neizdevās: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Atvērt pārlūkā?';
 
   @override

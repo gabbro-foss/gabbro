@@ -298,6 +298,8 @@
   "exportFailed": "Export selhal: {error}",
   "importFailed": "Import selhal: {error}",
   "folderActionFailed": "Akce se složkou selhala: {error}",
+  "vaultLoadFailed": "Načtení trezoru selhalo: {error}",
+  "syncFailed": "Synchronizace selhala: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

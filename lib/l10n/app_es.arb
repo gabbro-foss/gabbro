@@ -298,6 +298,8 @@
   "exportFailed": "Error al exportar: {error}",
   "importFailed": "Error al importar: {error}",
   "folderActionFailed": "Error en la acción de carpeta: {error}",
+  "vaultLoadFailed": "Error al cargar la caja fuerte: {error}",
+  "syncFailed": "Error de sincronización: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

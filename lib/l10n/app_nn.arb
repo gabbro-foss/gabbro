@@ -298,6 +298,8 @@
   "exportFailed": "Eksport mislukkast: {error}",
   "importFailed": "Import mislukkast: {error}",
   "folderActionFailed": "Mappehandling mislukkast: {error}",
+  "vaultLoadFailed": "Klarte ikkje laste kvelvet: {error}",
+  "syncFailed": "Synkronisering mislukkast: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

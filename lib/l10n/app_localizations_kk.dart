@@ -756,6 +756,16 @@ class AppLocalizationsKk extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'Қойманы жүктеу мүмкін болмады: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Синхрондау сәтсіз болды: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Браузерде ашу керек пе?';
 
   @override

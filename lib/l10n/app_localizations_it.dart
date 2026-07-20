@@ -759,6 +759,16 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'Impossibile caricare la cassaforte: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Sincronizzazione fallita: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Aprire nel browser?';
 
   @override

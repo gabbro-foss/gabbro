@@ -1004,7 +1004,7 @@ class _VaultListScreenState extends State<VaultListScreen>
           return AlertDialog(
             title: Text(l.syncFailedTitle),
             content: Text(
-              isPassphraseMismatch ? l.syncPassphraseMismatch : msg,
+              isPassphraseMismatch ? l.syncPassphraseMismatch : l.syncFailed(msg),
             ),
             actions: [
               TextButton(
@@ -1266,7 +1266,7 @@ class _VaultListScreenState extends State<VaultListScreen>
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     if (_error != null) {
-      return Scaffold(body: Center(child: Text(l.errorPrefix(_error!))));
+      return Scaffold(body: Center(child: Text(l.vaultLoadFailed(_error!))));
     }
 
     return Scaffold(
@@ -1957,9 +1957,10 @@ class SyncPassphraseDialogState extends State<SyncPassphraseDialog> {
       );
     } catch (e) {
       if (!mounted) return;
+      final l = AppLocalizations.of(context);
       setState(() {
         _tapping = false;
-        _error = e.toString();
+        _error = l.syncFailed(e.toString());
       });
     }
   }

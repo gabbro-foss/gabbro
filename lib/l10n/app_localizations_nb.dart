@@ -759,6 +759,16 @@ class AppLocalizationsNb extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'Kunne ikke laste hvelvet: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Synkronisering mislyktes: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Åpne i nettleser?';
 
   @override

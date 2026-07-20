@@ -761,6 +761,16 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'Načtení trezoru selhalo: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Synchronizace selhala: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Otevřít v prohlížeči?';
 
   @override

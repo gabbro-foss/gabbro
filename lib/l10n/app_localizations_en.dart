@@ -757,6 +757,16 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'Couldn\'t load the vault: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Sync failed: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Open in browser?';
 
   @override

@@ -759,6 +759,16 @@ class AppLocalizationsEt extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'Hoidla laadimine ebaõnnestus: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Sünkroonimine ebaõnnestus: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Ava brauseris?';
 
   @override

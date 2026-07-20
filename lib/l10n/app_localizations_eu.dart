@@ -759,6 +759,16 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'Ezin izan da kutxa gotorra kargatu: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Sinkronizazioak huts egin du: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Nabigatzailean ireki?';
 
   @override

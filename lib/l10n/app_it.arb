@@ -298,6 +298,8 @@
   "exportFailed": "Esportazione fallita: {error}",
   "importFailed": "Importazione fallita: {error}",
   "folderActionFailed": "Azione cartella fallita: {error}",
+  "vaultLoadFailed": "Impossibile caricare la cassaforte: {error}",
+  "syncFailed": "Sincronizzazione fallita: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

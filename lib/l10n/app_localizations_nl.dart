@@ -760,6 +760,16 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'Kon de kluis niet laden: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Synchronisatie mislukt: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Openen in browser?';
 
   @override

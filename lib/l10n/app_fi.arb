@@ -298,6 +298,8 @@
   "exportFailed": "Vienti epäonnistui: {error}",
   "importFailed": "Tuonti epäonnistui: {error}",
   "folderActionFailed": "Kansiotoiminto epäonnistui: {error}",
+  "vaultLoadFailed": "Holvin lataaminen epäonnistui: {error}",
+  "syncFailed": "Synkronointi epäonnistui: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

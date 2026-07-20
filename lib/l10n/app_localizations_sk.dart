@@ -761,6 +761,16 @@ class AppLocalizationsSk extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'Trezor sa nepodarilo načítať: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Synchronizácia zlyhala: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Otvoriť v prehliadači?';
 
   @override

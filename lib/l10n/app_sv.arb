@@ -298,6 +298,8 @@
   "exportFailed": "Export misslyckades: {error}",
   "importFailed": "Import misslyckades: {error}",
   "folderActionFailed": "Mappåtgärd misslyckades: {error}",
+  "vaultLoadFailed": "Kunde inte läsa in valvet: {error}",
+  "syncFailed": "Synkronisering misslyckades: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

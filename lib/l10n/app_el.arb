@@ -298,6 +298,8 @@
   "exportFailed": "Αποτυχία εξαγωγής: {error}",
   "importFailed": "Αποτυχία εισαγωγής: {error}",
   "folderActionFailed": "Αποτυχία ενέργειας φακέλου: {error}",
+  "vaultLoadFailed": "Αποτυχία φόρτωσης θησαυροφυλακίου: {error}",
+  "syncFailed": "Αποτυχία συγχρονισμού: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

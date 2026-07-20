@@ -759,6 +759,16 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'Não foi possível carregar o cofre: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Sincronização falhou: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Abrir no navegador?';
 
   @override
@@ -2801,6 +2811,16 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'Não foi possível carregar o cofre: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Sincronização falhou: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Abrir no navegador?';
 
   @override
@@ -4837,6 +4857,16 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   @override
   String folderActionFailed(String error) {
     return 'Ação de pasta falhou: $error';
+  }
+
+  @override
+  String vaultLoadFailed(String error) {
+    return 'Não foi possível carregar o cofre: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Sincronização falhou: $error';
   }
 
   @override

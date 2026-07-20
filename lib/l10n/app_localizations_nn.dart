@@ -759,6 +759,16 @@ class AppLocalizationsNn extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'Klarte ikkje laste kvelvet: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Synkronisering mislukkast: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Opne i nettlesar?';
 
   @override

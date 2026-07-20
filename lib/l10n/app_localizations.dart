@@ -1567,6 +1567,18 @@ abstract class AppLocalizations {
   /// **'Folder action failed: {error}'**
   String folderActionFailed(String error);
 
+  /// Shown on the vault list when loading entries fails (e.g. the vault is locked). The localized frame carries the meaning; {error} is the raw technical detail (kept English on purpose, for bug reports).
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load the vault: {error}'**
+  String vaultLoadFailed(String error);
+
+  /// Shown when a sync fails for a reason other than a wrong passphrase (which has its own message). The localized frame carries the meaning; {error} is the raw technical detail (kept English on purpose, for bug reports).
+  ///
+  /// In en, this message translates to:
+  /// **'Sync failed: {error}'**
+  String syncFailed(String error);
+
   /// No description provided for @openInBrowserTitle.
   ///
   /// In en, this message translates to:

@@ -759,6 +759,16 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'A széf betöltése sikertelen: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Szinkronizálás sikertelen: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Megnyitás böngészőben?';
 
   @override

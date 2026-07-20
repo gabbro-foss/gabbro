@@ -761,6 +761,16 @@ class AppLocalizationsSr extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'Učitavanje trezora nije uspelo: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Sinhronizacija nije uspela: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Otvori u pregledaču?';
 
   @override
@@ -2795,6 +2805,16 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   @override
   String folderActionFailed(String error) {
     return 'Radnja sa mapom nije uspela: $error';
+  }
+
+  @override
+  String vaultLoadFailed(String error) {
+    return 'Učitavanje trezora nije uspelo: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Sinhronizacija nije uspela: $error';
   }
 
   @override

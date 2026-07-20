@@ -298,6 +298,8 @@
   "exportFailed": "Eksportimine ebaõnnestus: {error}",
   "importFailed": "Importimine ebaõnnestus: {error}",
   "folderActionFailed": "Kaustatoiming ebaõnnestus: {error}",
+  "vaultLoadFailed": "Hoidla laadimine ebaõnnestus: {error}",
+  "syncFailed": "Sünkroonimine ebaõnnestus: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

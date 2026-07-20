@@ -762,6 +762,16 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'Tresor konnte nicht geladen werden: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Synchronisierung fehlgeschlagen: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Im Browser öffnen?';
 
   @override

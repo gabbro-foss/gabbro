@@ -760,6 +760,16 @@ class AppLocalizationsLt extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'Nepavyko įkelti saugyklos: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Sinchronizavimas nepavyko: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Atidaryti naršyklėje?';
 
   @override

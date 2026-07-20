@@ -761,6 +761,16 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'Impossible de charger le coffre : $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Échec de la synchronisation : $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Ouvrir dans le navigateur ?';
 
   @override

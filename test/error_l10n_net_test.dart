@@ -30,6 +30,8 @@ const Set<String> _approvedTemplates = {
   'exportFailed',
   'importFailed',
   'folderActionFailed',
+  'syncFailed',
+  'vaultLoadFailed',
 };
 
 // `e.toString()` / `err.toString()` — a caught error rendered to a string. `\b`
@@ -97,13 +99,27 @@ List<_Site> _scanRawErrorSites() {
 const Map<String, int> _todoRawErrors = {
   'lib/screens/review_changes_screen.dart': 1,
   'lib/screens/onboarding_screen.dart': 1,
-  'lib/screens/vault_list_screen.dart': 3,
   'lib/screens/security_screen.dart': 1,
   'lib/screens/manage_yubikeys_screen.dart': 1,
   'lib/screens/change_passphrase_screen.dart': 1,
   'lib/screens/unlock_screen.dart': 1,
   'lib/screens/recovery_history_screen.dart': 1,
   'lib/screens/create_entry_screen.dart': 1,
+};
+
+// Sites where `e.toString()` appears but does NOT reach the user as a raw
+// message — so they are resolved, not leaks, and kept out of the backlog above.
+// Each is a reviewed claim. Two reasons occur:
+//   - control flow only: the string feeds a `contains(...)` branch, never shown.
+//   - field wrapped at render: the raw detail is stored in a field that a
+//     meaning-carrying template wraps at the build site (the assignment can't
+//     wrap inline because its method runs in initState, before AppLocalizations
+//     is available).
+const Map<String, int> _notADisplayLeak = {
+  // vault_list: 408 `_error` set in _loadEntries (initState) is shown via
+  // `vaultLoadFailed(_error!)` at build; 994 `msg` feeds a
+  // `contains('decryption failed')` branch and the dialog shows `syncFailed(msg)`.
+  'lib/screens/vault_list_screen.dart': 2,
 };
 
 void main() {
@@ -126,17 +142,25 @@ void main() {
     );
   });
 
-  // Enumerate + freeze. The set of raw-error sites in source must equal the
-  // documented backlog exactly — no new untranslated leak, no stale entry.
+  // Enumerate + freeze. Every raw `e.toString()` in source must be accounted
+  // for — either in the leak backlog or as a reviewed non-leak. No new
+  // untranslated leak, no stale entry.
   test('every raw-error site is accounted for', () {
     final sites = _scanRawErrorSites();
     final actual = <String, int>{};
     for (final s in sites) {
       actual[s.file] = (actual[s.file] ?? 0) + 1;
     }
+    final expected = <String, int>{};
+    for (final e in _todoRawErrors.entries) {
+      expected[e.key] = (expected[e.key] ?? 0) + e.value;
+    }
+    for (final e in _notADisplayLeak.entries) {
+      expected[e.key] = (expected[e.key] ?? 0) + e.value;
+    }
     expect(
       actual,
-      _todoRawErrors,
+      expected,
       reason: 'raw-error sites drifted from the backlog. Found:\n'
           '${sites.join('\n')}',
     );

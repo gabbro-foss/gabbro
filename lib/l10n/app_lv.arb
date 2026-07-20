@@ -298,6 +298,8 @@
   "exportFailed": "Eksportēšana neizdevās: {error}",
   "importFailed": "Importēšana neizdevās: {error}",
   "folderActionFailed": "Mapes darbība neizdevās: {error}",
+  "vaultLoadFailed": "Nevarēja ielādēt seifu: {error}",
+  "syncFailed": "Sinhronizācija neizdevās: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

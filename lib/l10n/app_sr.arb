@@ -298,6 +298,8 @@
   "exportFailed": "Izvoz nije uspeo: {error}",
   "importFailed": "Uvoz nije uspeo: {error}",
   "folderActionFailed": "Radnja sa mapom nije uspela: {error}",
+  "vaultLoadFailed": "Učitavanje trezora nije uspelo: {error}",
+  "syncFailed": "Sinhronizacija nije uspela: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

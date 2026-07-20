@@ -298,6 +298,8 @@
   "exportFailed": "Export zlyhal: {error}",
   "importFailed": "Import zlyhal: {error}",
   "folderActionFailed": "Akcia priečinka zlyhala: {error}",
+  "vaultLoadFailed": "Trezor sa nepodarilo načítať: {error}",
+  "syncFailed": "Synchronizácia zlyhala: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

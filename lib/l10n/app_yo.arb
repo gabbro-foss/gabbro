@@ -298,6 +298,8 @@
   "exportFailed": "Ifijiṣẹ okeere kuna: {error}",
   "importFailed": "Gbigbe wọle kuna: {error}",
   "folderActionFailed": "Iṣe folda kuna: {error}",
+  "vaultLoadFailed": "Ko le kojọpọ vọọliti: {error}",
+  "syncFailed": "Iṣọkan kuna: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

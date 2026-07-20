@@ -383,6 +383,20 @@
       "error": {"type": "String"}
     }
   },
+  "vaultLoadFailed": "Couldn't load the vault: {error}",
+  "@vaultLoadFailed": {
+    "description": "Shown on the vault list when loading entries fails (e.g. the vault is locked). The localized frame carries the meaning; {error} is the raw technical detail (kept English on purpose, for bug reports).",
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "syncFailed": "Sync failed: {error}",
+  "@syncFailed": {
+    "description": "Shown when a sync fails for a reason other than a wrong passphrase (which has its own message). The localized frame carries the meaning; {error} is the raw technical detail (kept English on purpose, for bug reports).",
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
 
   "openInBrowserTitle": "Open in browser?",
   "couldNotOpen": "Could not open {url}",

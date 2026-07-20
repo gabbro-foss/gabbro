@@ -749,6 +749,16 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'ボールトを読み込めませんでした: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return '同期に失敗しました: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'ブラウザで開きますか?';
 
   @override

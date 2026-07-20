@@ -759,6 +759,16 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'Učitavanje trezora nije uspjelo: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Sinkronizacija nije uspjela: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Otvori u pregledniku?';
 
   @override

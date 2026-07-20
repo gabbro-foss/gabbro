@@ -298,6 +298,8 @@
   "exportFailed": "Eksport mislykkedes: {error}",
   "importFailed": "Import mislykkedes: {error}",
   "folderActionFailed": "Mappehandling mislykkedes: {error}",
+  "vaultLoadFailed": "Indlæsning af boksen mislykkedes: {error}",
+  "syncFailed": "Synkronisering mislykkedes: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

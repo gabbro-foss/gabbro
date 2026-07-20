@@ -758,6 +758,16 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'Kunde inte läsa in valvet: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Synkronisering misslyckades: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Öppna i webbläsare?';
 
   @override

@@ -298,6 +298,8 @@
   "exportFailed": "Esportazioak huts egin du: {error}",
   "importFailed": "Inportazioak huts egin du: {error}",
   "folderActionFailed": "Karpeta-ekintzak huts egin du: {error}",
+  "vaultLoadFailed": "Ezin izan da kutxa gotorra kargatu: {error}",
+  "syncFailed": "Sinkronizazioak huts egin du: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

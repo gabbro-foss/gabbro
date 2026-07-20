@@ -763,6 +763,16 @@ class AppLocalizationsSl extends AppLocalizations {
   }
 
   @override
+  String vaultLoadFailed(String error) {
+    return 'Trezorja ni mogoče naložiti: $error';
+  }
+
+  @override
+  String syncFailed(String error) {
+    return 'Sinhronizacija ni uspela: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Odpri v brskalniku?';
 
   @override

@@ -298,6 +298,8 @@
   "exportFailed": "Exportação falhou: {error}",
   "importFailed": "Importação falhou: {error}",
   "folderActionFailed": "Ação da pasta falhou: {error}",
+  "vaultLoadFailed": "Não foi possível carregar o cofre: {error}",
+  "syncFailed": "Sincronização falhou: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

@@ -298,6 +298,8 @@
   "exportFailed": "Export mislukt: {error}",
   "importFailed": "Import mislukt: {error}",
   "folderActionFailed": "Mapactie mislukt: {error}",
+  "vaultLoadFailed": "Kon de kluis niet laden: {error}",
+  "syncFailed": "Synchronisatie mislukt: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

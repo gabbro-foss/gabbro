@@ -298,6 +298,8 @@
   "exportFailed": "Izvoz ni uspel: {error}",
   "importFailed": "Uvoz ni uspel: {error}",
   "folderActionFailed": "Dejanje mape ni uspelo: {error}",
+  "vaultLoadFailed": "Trezorja ni mogoče naložiti: {error}",
+  "syncFailed": "Sinhronizacija ni uspela: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
