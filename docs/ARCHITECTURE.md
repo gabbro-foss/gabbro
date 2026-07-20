@@ -78,7 +78,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1471 | 2 |
+| Flutter (`flutter test`) | 1473 | 2 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -138,12 +138,26 @@ override on `GabbroApp` (defaults to the real list; mirrors the existing `clock`
 test-seam). The padded list swaps only `AppLocalizations.delegate`, keeping the
 fallback Material/Cupertino delegates verbatim.
 
+**Error-l10n net (item 4) — built, backlog open.** `test/error_l10n_net_test.dart`
+scans `lib/` for `e/err.toString()` fed into user-visible text and freezes the
+result: a site is OK only when the error is trailing detail inside an approved
+meaning-carrying template; otherwise it is a raw leak listed in `_todoRawErrors`.
+A new unlisted leak fails the test. Principle: the localized part must carry the
+MEANING, English allowed only as trailing detail (see memory
+project_error_l10n_by_log_level). Green now, pinning the current 22-site backlog.
+Too-old vault path pinned in `unlock_screen_test.dart`.
+
+The `_todoRawErrors` backlog (22 sites / 13 files) shrinks via Canon-TDD, one
+red->fix->green each: all Class A raw sites + `errorPrefix(...)` (`manage_folders`
+x3, `vault_list` dialogs, meaning-empty) + `vaultFormatTooNew` (new ARB string +
+probe, mirroring too-old).
+
 **The behaviours still needing a net.** Each is what a user cannot do:
-4. An error from Rust appears in English whatever the language.
 5. Dark mode or high contrast makes text unreadable, or the setting does nothing.
 6. A control is too small to hit, or unlabelled so a screen reader cannot name it.
 
-**NEXT STEP: pick 4, 5, or 6 with [maintainer].**
+**NEXT STEP: shrink the item-4 backlog (Canon-TDD), then pick 5 or 6 with
+[maintainer].**
 
 **Still-relevant traps (items 4-6)**
 - A child clipped inside a fixed-size box throws no exception, so the probe cannot
