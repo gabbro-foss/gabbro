@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A vault written by a newer Gabbro build is now explained in your own language ("update Gabbro") with a tappable link, on both unlock and import, instead of an untranslated error citing a meaningless format number. Fail-closed behaviour unchanged.
 - Import failures (Enpass, Bitwarden, Google PM, Dashlane, CSV, and Gabbro-source) now show a localized "Import failed" message with the technical detail appended, instead of a bare untranslated error.
 - Export failures and folder create/rename/delete failures are now shown in your own language, with the technical detail appended, instead of an untranslated error.
+- A vault that fails to load, and a sync that fails for a reason other than a wrong passphrase, are now explained in your own language with the technical detail appended, instead of an untranslated error.
 
 ## [0.1.0-alpha.14] – 2026-07-11
 
