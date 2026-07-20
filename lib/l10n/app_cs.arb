@@ -300,6 +300,9 @@
   "folderActionFailed": "Akce se složkou selhala: {error}",
   "vaultLoadFailed": "Načtení trezoru selhalo: {error}",
   "syncFailed": "Synchronizace selhala: {error}",
+  "saveEntryFailed": "Uložení záznamu selhalo: {error}",
+  "changePassphraseFailed": "Změna přístupové fráze selhala: {error}",
+  "recoveryActionFailed": "Akce obnovení selhala: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

@@ -771,6 +771,21 @@ class AppLocalizationsSr extends AppLocalizations {
   }
 
   @override
+  String saveEntryFailed(String error) {
+    return 'Čuvanje unosa nije uspelo: $error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return 'Promena pristupne fraze nije uspela: $error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return 'Radnja oporavka nije uspela: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Otvori u pregledaču?';
 
   @override
@@ -2815,6 +2830,21 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   @override
   String syncFailed(String error) {
     return 'Sinhronizacija nije uspela: $error';
+  }
+
+  @override
+  String saveEntryFailed(String error) {
+    return 'Čuvanje unosa nije uspelo: $error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return 'Promena pristupne fraze nije uspela: $error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return 'Radnja oporavka nije uspela: $error';
   }
 
   @override

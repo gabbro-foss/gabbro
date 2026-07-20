@@ -397,6 +397,27 @@
       "error": {"type": "String"}
     }
   },
+  "saveEntryFailed": "Couldn't save the entry: {error}",
+  "@saveEntryFailed": {
+    "description": "Shown when saving a vault entry fails (on the create/edit screen and when saving a field change during sync review). The localized frame carries the meaning; {error} is the raw technical detail (kept English on purpose, for bug reports).",
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "changePassphraseFailed": "Couldn't change the passphrase: {error}",
+  "@changePassphraseFailed": {
+    "description": "Shown when changing the vault passphrase fails. The localized frame carries the meaning; {error} is the raw technical detail (kept English on purpose, for bug reports).",
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "recoveryActionFailed": "Recovery action failed: {error}",
+  "@recoveryActionFailed": {
+    "description": "Shown when a recovery-history action (revert or delete a recovered value) fails. The localized frame carries the meaning; {error} is the raw technical detail (kept English on purpose, for bug reports).",
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
 
   "openInBrowserTitle": "Open in browser?",
   "couldNotOpen": "Could not open {url}",

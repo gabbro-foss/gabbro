@@ -768,6 +768,21 @@ class AppLocalizationsLv extends AppLocalizations {
   }
 
   @override
+  String saveEntryFailed(String error) {
+    return 'Neizdevās saglabāt ierakstu: $error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return 'Neizdevās nomainīt ieejas frāzi: $error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return 'Atjaunošanas darbība neizdevās: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Atvērt pārlūkā?';
 
   @override

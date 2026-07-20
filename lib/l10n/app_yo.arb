@@ -300,6 +300,9 @@
   "folderActionFailed": "Iṣe folda kuna: {error}",
   "vaultLoadFailed": "Ko le kojọpọ vọọliti: {error}",
   "syncFailed": "Iṣọkan kuna: {error}",
+  "saveEntryFailed": "Fifipamọ titẹ sii kuna: {error}",
+  "changePassphraseFailed": "Yiyipada gbolohun ọrọ igbaniwọle kuna: {error}",
+  "recoveryActionFailed": "Iṣe imularada kuna: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

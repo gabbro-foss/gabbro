@@ -300,6 +300,9 @@
   "folderActionFailed": "Kansiotoiminto epäonnistui: {error}",
   "vaultLoadFailed": "Holvin lataaminen epäonnistui: {error}",
   "syncFailed": "Synkronointi epäonnistui: {error}",
+  "saveEntryFailed": "Merkinnän tallentaminen epäonnistui: {error}",
+  "changePassphraseFailed": "Salauslauseen vaihtaminen epäonnistui: {error}",
+  "recoveryActionFailed": "Palautustoiminto epäonnistui: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

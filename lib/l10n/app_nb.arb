@@ -300,6 +300,9 @@
   "folderActionFailed": "Mappehandling mislyktes: {error}",
   "vaultLoadFailed": "Kunne ikke laste hvelvet: {error}",
   "syncFailed": "Synkronisering mislyktes: {error}",
+  "saveEntryFailed": "Kunne ikke lagre oppføringen: {error}",
+  "changePassphraseFailed": "Kunne ikke bytte passfrasen: {error}",
+  "recoveryActionFailed": "Gjenopprettingshandling mislyktes: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

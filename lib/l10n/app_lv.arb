@@ -300,6 +300,9 @@
   "folderActionFailed": "Mapes darbība neizdevās: {error}",
   "vaultLoadFailed": "Nevarēja ielādēt seifu: {error}",
   "syncFailed": "Sinhronizācija neizdevās: {error}",
+  "saveEntryFailed": "Neizdevās saglabāt ierakstu: {error}",
+  "changePassphraseFailed": "Neizdevās nomainīt ieejas frāzi: {error}",
+  "recoveryActionFailed": "Atjaunošanas darbība neizdevās: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

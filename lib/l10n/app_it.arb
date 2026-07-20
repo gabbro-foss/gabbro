@@ -300,6 +300,9 @@
   "folderActionFailed": "Azione cartella fallita: {error}",
   "vaultLoadFailed": "Impossibile caricare la cassaforte: {error}",
   "syncFailed": "Sincronizzazione fallita: {error}",
+  "saveEntryFailed": "Impossibile salvare la voce: {error}",
+  "changePassphraseFailed": "Impossibile cambiare la passphrase: {error}",
+  "recoveryActionFailed": "Azione di ripristino fallita: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

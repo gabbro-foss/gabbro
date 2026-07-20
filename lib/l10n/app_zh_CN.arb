@@ -300,6 +300,9 @@
   "folderActionFailed": "文件夹操作失败：{error}",
   "vaultLoadFailed": "无法加载保险库：{error}",
   "syncFailed": "同步失败：{error}",
+  "saveEntryFailed": "无法保存条目：{error}",
+  "changePassphraseFailed": "无法更改密码短语：{error}",
+  "recoveryActionFailed": "恢复操作失败：{error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

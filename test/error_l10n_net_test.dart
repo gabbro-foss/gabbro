@@ -32,6 +32,9 @@ const Set<String> _approvedTemplates = {
   'folderActionFailed',
   'syncFailed',
   'vaultLoadFailed',
+  'saveEntryFailed',
+  'changePassphraseFailed',
+  'recoveryActionFailed',
 };
 
 // `e.toString()` / `err.toString()` — a caught error rendered to a string. `\b`
@@ -97,14 +100,10 @@ List<_Site> _scanRawErrorSites() {
 // each is localized. A count change here is the point: a new leak must be added
 // deliberately, and a fix must decrement the count.
 const Map<String, int> _todoRawErrors = {
-  'lib/screens/review_changes_screen.dart': 1,
   'lib/screens/onboarding_screen.dart': 1,
   'lib/screens/security_screen.dart': 1,
   'lib/screens/manage_yubikeys_screen.dart': 1,
-  'lib/screens/change_passphrase_screen.dart': 1,
   'lib/screens/unlock_screen.dart': 1,
-  'lib/screens/recovery_history_screen.dart': 1,
-  'lib/screens/create_entry_screen.dart': 1,
 };
 
 // Sites where `e.toString()` appears but does NOT reach the user as a raw

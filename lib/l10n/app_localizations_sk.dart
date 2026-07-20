@@ -771,6 +771,21 @@ class AppLocalizationsSk extends AppLocalizations {
   }
 
   @override
+  String saveEntryFailed(String error) {
+    return 'Záznam sa nepodarilo uložiť: $error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return 'Prístupovú frázu sa nepodarilo zmeniť: $error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return 'Akcia obnovy zlyhala: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Otvoriť v prehliadači?';
 
   @override

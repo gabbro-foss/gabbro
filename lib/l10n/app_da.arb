@@ -300,6 +300,9 @@
   "folderActionFailed": "Mappehandling mislykkedes: {error}",
   "vaultLoadFailed": "Indlæsning af boksen mislykkedes: {error}",
   "syncFailed": "Synkronisering mislykkedes: {error}",
+  "saveEntryFailed": "Kunne ikke gemme posten: {error}",
+  "changePassphraseFailed": "Kunne ikke skifte adgangssætning: {error}",
+  "recoveryActionFailed": "Gendannelseshandling mislykkedes: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

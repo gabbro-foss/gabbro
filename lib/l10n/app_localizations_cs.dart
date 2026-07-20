@@ -771,6 +771,21 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
+  String saveEntryFailed(String error) {
+    return 'Uložení záznamu selhalo: $error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return 'Změna přístupové fráze selhala: $error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return 'Akce obnovení selhala: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Otevřít v prohlížeči?';
 
   @override

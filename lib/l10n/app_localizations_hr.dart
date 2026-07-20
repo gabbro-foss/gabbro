@@ -769,6 +769,21 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
+  String saveEntryFailed(String error) {
+    return 'Spremanje unosa nije uspjelo: $error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return 'Promjena pristupne fraze nije uspjela: $error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return 'Radnja oporavka nije uspjela: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Otvori u pregledniku?';
 
   @override

@@ -770,6 +770,21 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String saveEntryFailed(String error) {
+    return 'Kon het item niet opslaan: $error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return 'Kon de wachtwoordzin niet wijzigen: $error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return 'Herstelactie mislukt: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Openen in browser?';
 
   @override

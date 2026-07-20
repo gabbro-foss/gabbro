@@ -770,6 +770,21 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
+  String saveEntryFailed(String error) {
+    return 'Запазването на записа не успя: $error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return 'Промяната на паролната фраза не успя: $error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return 'Действието за възстановяване не успя: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Отвори в браузър?';
 
   @override

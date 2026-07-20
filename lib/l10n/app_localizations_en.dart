@@ -767,6 +767,21 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String saveEntryFailed(String error) {
+    return 'Couldn\'t save the entry: $error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return 'Couldn\'t change the passphrase: $error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return 'Recovery action failed: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Open in browser?';
 
   @override

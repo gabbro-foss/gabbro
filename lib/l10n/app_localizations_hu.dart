@@ -769,6 +769,21 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String saveEntryFailed(String error) {
+    return 'A bejegyzés mentése sikertelen: $error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return 'A jelmondat módosítása sikertelen: $error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return 'A helyreállítási művelet sikertelen: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Megnyitás böngészőben?';
 
   @override

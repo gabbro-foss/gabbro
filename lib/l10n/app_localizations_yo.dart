@@ -767,6 +767,21 @@ class AppLocalizationsYo extends AppLocalizations {
   }
 
   @override
+  String saveEntryFailed(String error) {
+    return 'Fifipamọ titẹ sii kuna: $error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return 'Yiyipada gbolohun ọrọ igbaniwọle kuna: $error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return 'Iṣe imularada kuna: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Ṣii ninu aṣawakiri?';
 
   @override

@@ -300,6 +300,9 @@
   "folderActionFailed": "폴더 작업에 실패했습니다: {error}",
   "vaultLoadFailed": "보관함을 불러올 수 없습니다: {error}",
   "syncFailed": "동기화에 실패했습니다: {error}",
+  "saveEntryFailed": "항목 저장에 실패했습니다: {error}",
+  "changePassphraseFailed": "암호 문구 변경에 실패했습니다: {error}",
+  "recoveryActionFailed": "복구 작업에 실패했습니다: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

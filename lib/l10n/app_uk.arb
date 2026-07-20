@@ -300,6 +300,9 @@
   "folderActionFailed": "Дія з папкою не вдалася: {error}",
   "vaultLoadFailed": "Не вдалося завантажити сховище: {error}",
   "syncFailed": "Синхронізація не вдалася: {error}",
+  "saveEntryFailed": "Не вдалося зберегти запис: {error}",
+  "changePassphraseFailed": "Не вдалося змінити кодову фразу: {error}",
+  "recoveryActionFailed": "Дія відновлення не вдалася: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

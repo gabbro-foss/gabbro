@@ -300,6 +300,9 @@
   "folderActionFailed": "フォルダ操作に失敗しました: {error}",
   "vaultLoadFailed": "ボールトを読み込めませんでした: {error}",
   "syncFailed": "同期に失敗しました: {error}",
+  "saveEntryFailed": "エントリの保存に失敗しました: {error}",
+  "changePassphraseFailed": "パスフレーズの変更に失敗しました: {error}",
+  "recoveryActionFailed": "復元操作に失敗しました: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

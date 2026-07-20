@@ -769,6 +769,21 @@ class AppLocalizationsEt extends AppLocalizations {
   }
 
   @override
+  String saveEntryFailed(String error) {
+    return 'Kirje salvestamine ebaõnnestus: $error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return 'Pääslause muutmine ebaõnnestus: $error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return 'Taastetoiming ebaõnnestus: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Ava brauseris?';
 
   @override

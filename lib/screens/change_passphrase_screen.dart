@@ -293,7 +293,11 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
         }
       }
     } catch (e) {
-      setState(() => _error = e.toString());
+      setState(
+        () => _error = AppLocalizations.of(
+          context,
+        ).changePassphraseFailed(e.toString()),
+      );
     } finally {
       setState(() => _isChanging = false);
     }

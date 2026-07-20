@@ -300,6 +300,9 @@
   "folderActionFailed": "資料夾操作失敗：{error}",
   "vaultLoadFailed": "無法載入保險庫：{error}",
   "syncFailed": "同步失敗：{error}",
+  "saveEntryFailed": "無法儲存項目：{error}",
+  "changePassphraseFailed": "無法變更密碼片語：{error}",
+  "recoveryActionFailed": "復原操作失敗：{error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

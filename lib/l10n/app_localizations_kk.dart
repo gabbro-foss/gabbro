@@ -766,6 +766,21 @@ class AppLocalizationsKk extends AppLocalizations {
   }
 
   @override
+  String saveEntryFailed(String error) {
+    return 'Жазбаны сақтау сәтсіз болды: $error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return 'Кілт фразасын өзгерту сәтсіз болды: $error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return 'Қалпына келтіру әрекеті сәтсіз болды: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Браузерде ашу керек пе?';
 
   @override

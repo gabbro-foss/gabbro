@@ -773,6 +773,21 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
+  String saveEntryFailed(String error) {
+    return 'Αποτυχία αποθήκευσης καταχώρισης: $error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return 'Αποτυχία αλλαγής φράσης πρόσβασης: $error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return 'Αποτυχία ενέργειας ανάκτησης: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Άνοιγμα στο πρόγραμμα περιήγησης;';
 
   @override

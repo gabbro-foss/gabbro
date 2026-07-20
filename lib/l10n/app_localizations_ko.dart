@@ -759,6 +759,21 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String saveEntryFailed(String error) {
+    return '항목 저장에 실패했습니다: $error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return '암호 문구 변경에 실패했습니다: $error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return '복구 작업에 실패했습니다: $error';
+  }
+
+  @override
   String get openInBrowserTitle => '브라우저에서 열기?';
 
   @override

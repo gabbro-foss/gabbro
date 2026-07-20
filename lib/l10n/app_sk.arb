@@ -300,6 +300,9 @@
   "folderActionFailed": "Akcia priečinka zlyhala: {error}",
   "vaultLoadFailed": "Trezor sa nepodarilo načítať: {error}",
   "syncFailed": "Synchronizácia zlyhala: {error}",
+  "saveEntryFailed": "Záznam sa nepodarilo uložiť: {error}",
+  "changePassphraseFailed": "Prístupovú frázu sa nepodarilo zmeniť: {error}",
+  "recoveryActionFailed": "Akcia obnovy zlyhala: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

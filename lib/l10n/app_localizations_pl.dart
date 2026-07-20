@@ -772,6 +772,21 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
+  String saveEntryFailed(String error) {
+    return 'Nie udało się zapisać wpisu: $error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return 'Nie udało się zmienić hasła głównego: $error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return 'Operacja odzyskiwania nie powiodła się: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Otworzyć w przeglądarce?';
 
   @override

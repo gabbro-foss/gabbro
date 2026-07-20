@@ -300,6 +300,9 @@
   "folderActionFailed": "Mapactie mislukt: {error}",
   "vaultLoadFailed": "Kon de kluis niet laden: {error}",
   "syncFailed": "Synchronisatie mislukt: {error}",
+  "saveEntryFailed": "Kon het item niet opslaan: {error}",
+  "changePassphraseFailed": "Kon de wachtwoordzin niet wijzigen: {error}",
+  "recoveryActionFailed": "Herstelactie mislukt: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

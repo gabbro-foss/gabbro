@@ -300,6 +300,9 @@
   "folderActionFailed": "Operacja na folderze nie powiodła się: {error}",
   "vaultLoadFailed": "Nie udało się wczytać skarbca: {error}",
   "syncFailed": "Synchronizacja nie powiodła się: {error}",
+  "saveEntryFailed": "Nie udało się zapisać wpisu: {error}",
+  "changePassphraseFailed": "Nie udało się zmienić hasła głównego: {error}",
+  "recoveryActionFailed": "Operacja odzyskiwania nie powiodła się: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

@@ -300,6 +300,9 @@
   "folderActionFailed": "Mappaművelet sikertelen: {error}",
   "vaultLoadFailed": "A széf betöltése sikertelen: {error}",
   "syncFailed": "Szinkronizálás sikertelen: {error}",
+  "saveEntryFailed": "A bejegyzés mentése sikertelen: {error}",
+  "changePassphraseFailed": "A jelmondat módosítása sikertelen: {error}",
+  "recoveryActionFailed": "A helyreállítási művelet sikertelen: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

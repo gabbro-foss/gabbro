@@ -769,6 +769,21 @@ class AppLocalizationsNn extends AppLocalizations {
   }
 
   @override
+  String saveEntryFailed(String error) {
+    return 'Klarte ikkje lagre oppføringa: $error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return 'Klarte ikkje byte passfrasen: $error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return 'Gjenopprettingshandling mislukkast: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Opne i nettlesar?';
 
   @override

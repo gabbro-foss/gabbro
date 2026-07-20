@@ -300,6 +300,9 @@
   "folderActionFailed": "Kaustatoiming ebaõnnestus: {error}",
   "vaultLoadFailed": "Hoidla laadimine ebaõnnestus: {error}",
   "syncFailed": "Sünkroonimine ebaõnnestus: {error}",
+  "saveEntryFailed": "Kirje salvestamine ebaõnnestus: {error}",
+  "changePassphraseFailed": "Pääslause muutmine ebaõnnestus: {error}",
+  "recoveryActionFailed": "Taastetoiming ebaõnnestus: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

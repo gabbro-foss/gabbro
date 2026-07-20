@@ -770,6 +770,21 @@ class AppLocalizationsFi extends AppLocalizations {
   }
 
   @override
+  String saveEntryFailed(String error) {
+    return 'Merkinnän tallentaminen epäonnistui: $error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return 'Salauslauseen vaihtaminen epäonnistui: $error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return 'Palautustoiminto epäonnistui: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Avataan selaimessa?';
 
   @override

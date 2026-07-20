@@ -49,7 +49,13 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
       final refreshed = getEntry(id: id);
       if (mounted) Navigator.of(context).pop(refreshed);
     } catch (e) {
-      if (mounted) setState(() => _error = e.toString());
+      if (mounted) {
+        setState(
+          () => _error = AppLocalizations.of(context).saveEntryFailed(
+            e.toString(),
+          ),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }

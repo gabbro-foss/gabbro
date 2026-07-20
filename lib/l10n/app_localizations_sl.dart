@@ -773,6 +773,21 @@ class AppLocalizationsSl extends AppLocalizations {
   }
 
   @override
+  String saveEntryFailed(String error) {
+    return 'Vnosa ni mogoče shraniti: $error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return 'Gesla za dostop ni mogoče spremeniti: $error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return 'Dejanje obnovitve ni uspelo: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Odpri v brskalniku?';
 
   @override

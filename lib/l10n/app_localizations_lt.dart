@@ -770,6 +770,21 @@ class AppLocalizationsLt extends AppLocalizations {
   }
 
   @override
+  String saveEntryFailed(String error) {
+    return 'Nepavyko išsaugoti įrašo: $error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return 'Nepavyko pakeisti slaptafrazės: $error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return 'Atkūrimo veiksmas nepavyko: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Atidaryti naršyklėje?';
 
   @override

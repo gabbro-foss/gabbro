@@ -300,6 +300,9 @@
   "folderActionFailed": "Échec de l'action sur le dossier : {error}",
   "vaultLoadFailed": "Impossible de charger le coffre : {error}",
   "syncFailed": "Échec de la synchronisation : {error}",
+  "saveEntryFailed": "Échec de l'enregistrement de l'entrée : {error}",
+  "changePassphraseFailed": "Échec du changement du mot de passe principal : {error}",
+  "recoveryActionFailed": "Échec de l'action de récupération : {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

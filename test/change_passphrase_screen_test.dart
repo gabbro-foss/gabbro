@@ -370,6 +370,9 @@ void main() {
 
     expect(disableCalled, isFalse);
     expect(find.text('Passphrase changed successfully'), findsNothing);
+    // The failure is localized (meaning-carrying), with the raw detail appended.
+    expect(find.textContaining("Couldn't change the passphrase:"), findsOneWidget);
+    expect(find.textContaining('change failed'), findsOneWidget);
   });
 
   testWidgets(

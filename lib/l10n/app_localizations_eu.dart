@@ -769,6 +769,21 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
+  String saveEntryFailed(String error) {
+    return 'Ezin izan da sarrera gorde: $error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return 'Ezin izan da pasaesaldia aldatu: $error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return 'Berreskuratze-ekintzak huts egin du: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Nabigatzailean ireki?';
 
   @override

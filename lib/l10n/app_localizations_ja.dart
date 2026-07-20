@@ -759,6 +759,21 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String saveEntryFailed(String error) {
+    return 'エントリの保存に失敗しました: $error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return 'パスフレーズの変更に失敗しました: $error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return '復元操作に失敗しました: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'ブラウザで開きますか?';
 
   @override

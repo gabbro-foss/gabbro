@@ -769,6 +769,21 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String saveEntryFailed(String error) {
+    return 'Não foi possível guardar a entrada: $error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return 'Não foi possível alterar a frase secreta: $error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return 'Ação de recuperação falhou: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Abrir no navegador?';
 
   @override
@@ -2821,6 +2836,21 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   }
 
   @override
+  String saveEntryFailed(String error) {
+    return 'Não foi possível salvar a entrada: $error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return 'Não foi possível alterar a frase secreta: $error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return 'Ação de recuperação falhou: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Abrir no navegador?';
 
   @override
@@ -4867,6 +4897,21 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   @override
   String syncFailed(String error) {
     return 'Sincronização falhou: $error';
+  }
+
+  @override
+  String saveEntryFailed(String error) {
+    return 'Não foi possível guardar a entrada: $error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return 'Não foi possível alterar a frase-passe: $error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return 'Ação de recuperação falhou: $error';
   }
 
   @override

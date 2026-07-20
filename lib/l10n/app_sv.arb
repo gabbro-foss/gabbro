@@ -300,6 +300,9 @@
   "folderActionFailed": "Mappåtgärd misslyckades: {error}",
   "vaultLoadFailed": "Kunde inte läsa in valvet: {error}",
   "syncFailed": "Synkronisering misslyckades: {error}",
+  "saveEntryFailed": "Kunde inte spara posten: {error}",
+  "changePassphraseFailed": "Kunde inte byta lösenfrasen: {error}",
+  "recoveryActionFailed": "Återställningsåtgärd misslyckades: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

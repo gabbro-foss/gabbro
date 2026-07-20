@@ -300,6 +300,9 @@
   "folderActionFailed": "Действието с папката не успя: {error}",
   "vaultLoadFailed": "Зареждането на сейфа не успя: {error}",
   "syncFailed": "Синхронизацията не успя: {error}",
+  "saveEntryFailed": "Запазването на записа не успя: {error}",
+  "changePassphraseFailed": "Промяната на паролната фраза не успя: {error}",
+  "recoveryActionFailed": "Действието за възстановяване не успя: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

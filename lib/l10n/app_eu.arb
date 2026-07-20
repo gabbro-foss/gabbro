@@ -300,6 +300,9 @@
   "folderActionFailed": "Karpeta-ekintzak huts egin du: {error}",
   "vaultLoadFailed": "Ezin izan da kutxa gotorra kargatu: {error}",
   "syncFailed": "Sinkronizazioak huts egin du: {error}",
+  "saveEntryFailed": "Ezin izan da sarrera gorde: {error}",
+  "changePassphraseFailed": "Ezin izan da pasaesaldia aldatu: {error}",
+  "recoveryActionFailed": "Berreskuratze-ekintzak huts egin du: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

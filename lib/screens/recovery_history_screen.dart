@@ -52,7 +52,9 @@ class _RecoveryHistoryScreenState extends State<RecoveryHistoryScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(err.toString()),
+          content: Text(
+            AppLocalizations.of(context).recoveryActionFailed(err.toString()),
+          ),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );

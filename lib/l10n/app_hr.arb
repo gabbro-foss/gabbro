@@ -300,6 +300,9 @@
   "folderActionFailed": "Radnja s mapom nije uspjela: {error}",
   "vaultLoadFailed": "Učitavanje trezora nije uspjelo: {error}",
   "syncFailed": "Sinkronizacija nije uspjela: {error}",
+  "saveEntryFailed": "Spremanje unosa nije uspjelo: {error}",
+  "changePassphraseFailed": "Promjena pristupne fraze nije uspjela: {error}",
+  "recoveryActionFailed": "Radnja oporavka nije uspjela: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

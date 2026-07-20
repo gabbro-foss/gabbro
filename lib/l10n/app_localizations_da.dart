@@ -768,6 +768,21 @@ class AppLocalizationsDa extends AppLocalizations {
   }
 
   @override
+  String saveEntryFailed(String error) {
+    return 'Kunne ikke gemme posten: $error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return 'Kunne ikke skifte adgangssætning: $error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return 'Gendannelseshandling mislykkedes: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Åbn i browser?';
 
   @override

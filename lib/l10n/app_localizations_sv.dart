@@ -768,6 +768,21 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
+  String saveEntryFailed(String error) {
+    return 'Kunde inte spara posten: $error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return 'Kunde inte byta lösenfrasen: $error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return 'Återställningsåtgärd misslyckades: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Öppna i webbläsare?';
 
   @override

@@ -448,7 +448,13 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       await _saveCreate();
       if (mounted) Navigator.of(context).pop(true);
     } catch (e) {
-      if (mounted) setState(() => _error = e.toString());
+      if (mounted) {
+        setState(
+          () => _error = AppLocalizations.of(context).saveEntryFailed(
+            e.toString(),
+          ),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }

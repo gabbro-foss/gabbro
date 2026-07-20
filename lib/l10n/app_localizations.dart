@@ -1579,6 +1579,24 @@ abstract class AppLocalizations {
   /// **'Sync failed: {error}'**
   String syncFailed(String error);
 
+  /// Shown when saving a vault entry fails (on the create/edit screen and when saving a field change during sync review). The localized frame carries the meaning; {error} is the raw technical detail (kept English on purpose, for bug reports).
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save the entry: {error}'**
+  String saveEntryFailed(String error);
+
+  /// Shown when changing the vault passphrase fails. The localized frame carries the meaning; {error} is the raw technical detail (kept English on purpose, for bug reports).
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t change the passphrase: {error}'**
+  String changePassphraseFailed(String error);
+
+  /// Shown when a recovery-history action (revert or delete a recovered value) fails. The localized frame carries the meaning; {error} is the raw technical detail (kept English on purpose, for bug reports).
+  ///
+  /// In en, this message translates to:
+  /// **'Recovery action failed: {error}'**
+  String recoveryActionFailed(String error);
+
   /// No description provided for @openInBrowserTitle.
   ///
   /// In en, this message translates to:

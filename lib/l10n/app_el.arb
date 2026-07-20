@@ -300,6 +300,9 @@
   "folderActionFailed": "Αποτυχία ενέργειας φακέλου: {error}",
   "vaultLoadFailed": "Αποτυχία φόρτωσης θησαυροφυλακίου: {error}",
   "syncFailed": "Αποτυχία συγχρονισμού: {error}",
+  "saveEntryFailed": "Αποτυχία αποθήκευσης καταχώρισης: {error}",
+  "changePassphraseFailed": "Αποτυχία αλλαγής φράσης πρόσβασης: {error}",
+  "recoveryActionFailed": "Αποτυχία ενέργειας ανάκτησης: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

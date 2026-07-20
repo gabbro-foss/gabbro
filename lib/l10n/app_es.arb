@@ -300,6 +300,9 @@
   "folderActionFailed": "Error en la acción de carpeta: {error}",
   "vaultLoadFailed": "Error al cargar la caja fuerte: {error}",
   "syncFailed": "Error de sincronización: {error}",
+  "saveEntryFailed": "Error al guardar la entrada: {error}",
+  "changePassphraseFailed": "Error al cambiar la contraseña maestra: {error}",
+  "recoveryActionFailed": "Error en la acción de recuperación: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

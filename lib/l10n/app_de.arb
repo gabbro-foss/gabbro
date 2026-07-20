@@ -300,6 +300,9 @@
   "folderActionFailed": "Ordneraktion fehlgeschlagen: {error}",
   "vaultLoadFailed": "Tresor konnte nicht geladen werden: {error}",
   "syncFailed": "Synchronisierung fehlgeschlagen: {error}",
+  "saveEntryFailed": "Eintrag konnte nicht gespeichert werden: {error}",
+  "changePassphraseFailed": "Passphrase konnte nicht geändert werden: {error}",
+  "recoveryActionFailed": "Wiederherstellungsaktion fehlgeschlagen: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

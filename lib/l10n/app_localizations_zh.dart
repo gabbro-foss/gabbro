@@ -757,6 +757,21 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String saveEntryFailed(String error) {
+    return '无法保存条目：$error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return '无法更改密码短语：$error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return '恢复操作失败：$error';
+  }
+
+  @override
   String get openInBrowserTitle => '在浏览器中打开？';
 
   @override
@@ -2713,6 +2728,21 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   }
 
   @override
+  String saveEntryFailed(String error) {
+    return '无法保存条目：$error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return '无法更改密码短语：$error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return '恢复操作失败：$error';
+  }
+
+  @override
   String get openInBrowserTitle => '在浏览器中打开？';
 
   @override
@@ -4666,6 +4696,21 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String syncFailed(String error) {
     return '同步失敗：$error';
+  }
+
+  @override
+  String saveEntryFailed(String error) {
+    return '無法儲存項目：$error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return '無法變更密碼片語：$error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return '復原操作失敗：$error';
   }
 
   @override

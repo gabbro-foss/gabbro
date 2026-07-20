@@ -300,6 +300,9 @@
   "folderActionFailed": "Действие с папкой не удалось: {error}",
   "vaultLoadFailed": "Не удалось загрузить хранилище: {error}",
   "syncFailed": "Синхронизация не удалась: {error}",
+  "saveEntryFailed": "Не удалось сохранить запись: {error}",
+  "changePassphraseFailed": "Не удалось изменить кодовую фразу: {error}",
+  "recoveryActionFailed": "Действие восстановления не удалось: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

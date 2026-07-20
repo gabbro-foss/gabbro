@@ -300,6 +300,9 @@
   "folderActionFailed": "Ação da pasta falhou: {error}",
   "vaultLoadFailed": "Não foi possível carregar o cofre: {error}",
   "syncFailed": "Sincronização falhou: {error}",
+  "saveEntryFailed": "Não foi possível salvar a entrada: {error}",
+  "changePassphraseFailed": "Não foi possível alterar a frase secreta: {error}",
+  "recoveryActionFailed": "Ação de recuperação falhou: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

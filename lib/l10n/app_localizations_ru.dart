@@ -771,6 +771,21 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String saveEntryFailed(String error) {
+    return 'Не удалось сохранить запись: $error';
+  }
+
+  @override
+  String changePassphraseFailed(String error) {
+    return 'Не удалось изменить кодовую фразу: $error';
+  }
+
+  @override
+  String recoveryActionFailed(String error) {
+    return 'Действие восстановления не удалось: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Открыть в браузере?';
 
   @override

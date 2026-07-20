@@ -300,6 +300,9 @@
   "folderActionFailed": "Aplanko veiksmas nepavyko: {error}",
   "vaultLoadFailed": "Nepavyko įkelti saugyklos: {error}",
   "syncFailed": "Sinchronizavimas nepavyko: {error}",
+  "saveEntryFailed": "Nepavyko išsaugoti įrašo: {error}",
+  "changePassphraseFailed": "Nepavyko pakeisti slaptafrazės: {error}",
+  "recoveryActionFailed": "Atkūrimo veiksmas nepavyko: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
