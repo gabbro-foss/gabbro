@@ -19,6 +19,7 @@ void main() {
         onChanged: onChanged ?? (_) {},
         onChangeEnd: onChangeEnd,
         previewText: 'Sample',
+        semanticLabel: 'Text size',
       );
 
   // ── D1 end glyphs ──────────────────────────────────────────────────────────

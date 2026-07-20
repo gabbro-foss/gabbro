@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'screen_catalog.dart';
@@ -99,6 +100,26 @@ void main() {
       await failsGuideline(tester, meetsGuideline(labeledTapTargetGuideline)),
       isTrue,
       reason: 'an icon-only button with no label must fail the label guideline',
+    );
+    handle.dispose();
+  });
+
+  // Sliders must keep the increase/decrease actions a screen reader uses to
+  // adjust them — a Semantics/MergeSemantics label wrapper must not strip them
+  // (hardware found the text-size slider unadjustable under TalkBack).
+  testWidgets('the text-size slider stays screen-reader adjustable', (
+    tester,
+  ) async {
+    final handle = await _pump(
+      tester,
+      appShell(screens['appearance']!(), textScale: 1.0),
+    );
+    final data = tester.getSemantics(find.byType(Slider)).getSemanticsData();
+    expect(
+      data.hasAction(SemanticsAction.increase) &&
+          data.hasAction(SemanticsAction.decrease),
+      isTrue,
+      reason: 'the text-size slider lost its adjust actions',
     );
     handle.dispose();
   });

@@ -837,6 +837,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               // proper noun, same in every locale) — the full
                               // sample sentence lives on the appearance screen.
                               previewText: 'Gabbro',
+                              semanticLabel: l.sectionTextSize,
                               onChanged: (s) => setState(() => _dragScale = s),
                               onChangeEnd: (s) {
                                 app.updateSettings(

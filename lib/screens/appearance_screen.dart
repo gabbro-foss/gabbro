@@ -67,6 +67,7 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                 deviceMax:
                     deviceMaxScale(MediaQuery.of(context).size.shortestSide),
                 previewText: l.textSizePreview,
+                semanticLabel: l.sectionTextSize,
                 onChanged: (s) => setState(() => _dragScale = s),
                 onChangeEnd: (s) {
                   _update(_settings.copyWith(textScale: s));

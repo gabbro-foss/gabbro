@@ -604,17 +604,23 @@ class _GeneratorWidgetState extends State<GeneratorWidget>
         Text('${_length.round()}'),
       ],
     ),
-    Slider(
-      key: const Key('length_slider'),
-      value: _length,
-      min: 12,
-      max: 256,
-      divisions: 244,
-      label: _length.round().toString(),
-      onChanged: (v) {
-        setState(() => _length = v);
-        _generateClassic();
-      },
+    MergeSemantics(
+      child: Semantics(
+        label: l.lengthLabel,
+        child: Slider(
+          key: const Key('length_slider'),
+          value: _length,
+          min: 12,
+          max: 256,
+          divisions: 244,
+          label: _length.round().toString(),
+          semanticFormatterCallback: (v) => v.round().toString(),
+          onChanged: (v) {
+            setState(() => _length = v);
+            _generateClassic();
+          },
+        ),
+      ),
     ),
     const SizedBox(height: 8),
     SectionHeader(label: l.charSetsHeader),
@@ -626,6 +632,7 @@ class _GeneratorWidgetState extends State<GeneratorWidget>
         _toggleChip(
           key: const Key('toggle_uppercase'),
           label: 'A–Z',
+          semanticLabel: l.charTypeUppercase,
           value: _useUppercase,
           onChanged: (v) {
             setState(() => _useUppercase = v);
@@ -635,6 +642,7 @@ class _GeneratorWidgetState extends State<GeneratorWidget>
         _toggleChip(
           key: const Key('toggle_lowercase'),
           label: 'a–z',
+          semanticLabel: l.charTypeLowercase,
           value: _useLowercase,
           onChanged: (v) {
             setState(() => _useLowercase = v);
@@ -644,6 +652,7 @@ class _GeneratorWidgetState extends State<GeneratorWidget>
         _toggleChip(
           key: const Key('toggle_digits'),
           label: '0–9',
+          semanticLabel: l.charTypeDigit,
           value: _useDigits,
           onChanged: (v) {
             setState(() => _useDigits = v);
@@ -653,6 +662,7 @@ class _GeneratorWidgetState extends State<GeneratorWidget>
         _toggleChip(
           key: const Key('toggle_symbols'),
           label: '!@#…',
+          semanticLabel: l.charTypeSymbol,
           value: _useSymbols,
           onChanged: (v) {
             setState(() => _useSymbols = v);
@@ -683,17 +693,23 @@ class _GeneratorWidgetState extends State<GeneratorWidget>
         Text('${_wordCount.round()}'),
       ],
     ),
-    Slider(
-      key: const Key('word_count_slider'),
-      value: _wordCount,
-      min: 4,
-      max: 20,
-      divisions: 16,
-      label: _wordCount.round().toString(),
-      onChanged: (v) {
-        setState(() => _wordCount = v);
-        _generatePassphrase();
-      },
+    MergeSemantics(
+      child: Semantics(
+        label: l.wordsLabel,
+        child: Slider(
+          key: const Key('word_count_slider'),
+          value: _wordCount,
+          min: 4,
+          max: 20,
+          divisions: 16,
+          label: _wordCount.round().toString(),
+          semanticFormatterCallback: (v) => v.round().toString(),
+          onChanged: (v) {
+            setState(() => _wordCount = v);
+            _generatePassphrase();
+          },
+        ),
+      ),
     ),
     const SizedBox(height: 8),
     TextFormField(
@@ -738,20 +754,33 @@ class _GeneratorWidgetState extends State<GeneratorWidget>
   Widget _toggleChip({
     required Key key,
     required String label,
+    required String semanticLabel,
     required bool value,
     required void Function(bool) onChanged,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
-    return FilledButton.tonal(
-      key: key,
-      style: FilledButton.styleFrom(
-        backgroundColor: value
-            ? colorScheme.primary
-            : colorScheme.surfaceContainerHighest,
-        foregroundColor: value ? colorScheme.onPrimary : colorScheme.onSurface,
+    // The visible label is a terse glyph set ("A-Z", "0-9") that a screen reader
+    // would read letter by letter ("zero minus nine"). Hide it from semantics
+    // and announce the char-type name + on/off state instead. MergeSemantics so
+    // the label and the button's tap node are one node, not two.
+    return MergeSemantics(
+      child: Semantics(
+        label: semanticLabel,
+        toggled: value,
+        child: FilledButton.tonal(
+          key: key,
+          style: FilledButton.styleFrom(
+            backgroundColor: value
+                ? colorScheme.primary
+                : colorScheme.surfaceContainerHighest,
+            foregroundColor: value
+                ? colorScheme.onPrimary
+                : colorScheme.onSurface,
+          ),
+          onPressed: () => onChanged(!value),
+          child: ExcludeSemantics(child: Text(label)),
+        ),
       ),
-      onPressed: () => onChanged(!value),
-      child: Text(label),
     );
   }
 

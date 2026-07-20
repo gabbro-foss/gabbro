@@ -208,6 +208,7 @@ final Map<String, Widget Function()> screens = {
       deviceMax: 3.0,
       onChanged: (_) {},
       previewText: 'A preview line long enough to stress the row at max text',
+      semanticLabel: 'Text size',
     ),
   ),
   'path_field': () => Scaffold(

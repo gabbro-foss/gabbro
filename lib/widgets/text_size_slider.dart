@@ -27,12 +27,17 @@ class TextSizeSlider extends StatelessWidget {
   /// Localized sample text shown scaled to [scale].
   final String previewText;
 
+  /// Localized screen-reader label for the slider (e.g. "Text size"). Passed in
+  /// so this widget stays free of a localization-context dependency.
+  final String semanticLabel;
+
   const TextSizeSlider({
     super.key,
     required this.scale,
     required this.deviceMax,
     required this.onChanged,
     required this.previewText,
+    required this.semanticLabel,
     this.onChangeEnd,
   });
 
@@ -50,12 +55,22 @@ class TextSizeSlider extends StatelessWidget {
           children: [
             const Icon(Icons.zoom_out),
             Expanded(
-              child: Slider(
-                value: posForScale(clamped, deviceMax),
-                onChanged: (pos) => onChanged(scaleForPos(pos, deviceMax)),
-                onChangeEnd: onChangeEnd == null
-                    ? null
-                    : (pos) => onChangeEnd!(scaleForPos(pos, deviceMax)),
+              // Name the slider ("Text size") and announce the real scale as a
+              // percentage, so a screen-reader user can find and adjust it —
+              // the icons alone are silent to TalkBack.
+              child: MergeSemantics(
+                child: Semantics(
+                  label: semanticLabel,
+                  child: Slider(
+                    value: posForScale(clamped, deviceMax),
+                    semanticFormatterCallback: (pos) =>
+                        '${(scaleForPos(pos, deviceMax) * 100).round()}%',
+                    onChanged: (pos) => onChanged(scaleForPos(pos, deviceMax)),
+                    onChangeEnd: onChangeEnd == null
+                        ? null
+                        : (pos) => onChangeEnd!(scaleForPos(pos, deviceMax)),
+                  ),
+                ),
               ),
             ),
             const Icon(Icons.zoom_in),
