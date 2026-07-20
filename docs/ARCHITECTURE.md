@@ -112,13 +112,7 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-Empty — the "Net for l10n + accessibility on every screen" task is complete: all
-six behaviours shipped and hardware-verified. The invariants live in their nets,
-all sweeping the shared `test/screen_catalog.dart`: `l10n_test.dart` (ARB parity),
-`overflow_probe_test.dart` (overflow + longer-language), `error_l10n_net_test.dart`
-(no raw error strings), `a11y_net_test.dart` (tap-target + label + text-contrast in
-dark and high-contrast, plus theme/high-contrast wiring proofs). Pick the next task
-with the maintainer from Bikeshed / Backlog below.
+- Autotype in linux often has typos in the login/email. and it often fails perhaps due to a typo in the passphrase. investigate.
 
 ---
 
@@ -136,7 +130,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 ### Features and UI/UX
 - See if vault `syncing` can do without a second `passphrase + yubikey` if and only if the current vault and the incoming vault share the same `alias`, `passphrase`, `yubikey(s)`
 - in `sync` path, we currently have `auto-merge` and `review all changes`, the `auto-merge` is additive only (check and verify) and therefore never deletes items in the receiving vault: (1) add a message that explains this (or the correct) behaviour to the user, (2) add a third `sync` mechanism that simply takes the incoming vault and clobbers the existing one - discuss this
-- Autotype in linux often has typos in the login/email. and it often fails perhaps due to a typo in the passphrase. investigate.
 
 ### Security (pre-v1)
 - Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
@@ -147,14 +140,15 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   above is welcome-not-blocking). Optional: a read-only Codeberg mirror for redundancy.
 
 ### Code Quality
-- **Linux ships no desktop icon.** No `.desktop` file and no hicolor icon tree, so an
-  installed build (AUR) shows a generic placeholder in the app menu and taskbar. Render
-  16/32/48/64/128/256/512 plus a scalable SVG from `ic_launcher_*.svg` and add a `.desktop`
-  entry. Blocked on the new logo. Same render covers the Windows `.ico`, still the stock
-  Flutter template.
-- **Auto-type: unlock-then-type + cold start (ADR-017 Phase 4).** A trigger while the
-  vault is locked or Gabbro is closed does nothing today. Add: prompt-unlock-then-type
-  and an opt-in setting. Secret stays in Rust; auto-lock preserved.
+- **Linux install doesn't register in the app launcher (and ships no icon) — one root cause.**
+  No `.desktop` entry in an XDG applications dir (`~/.local/share/applications` or
+  `/usr/share/applications`), so qtile's launcher and Mint's menu never list gabbro — you run the
+  binary from the build folder; an AUR/installed build likewise shows a generic placeholder in
+  menu + taskbar. Fixable in two parts that DON'T block each other: (1) write + install the
+  `.desktop` entry NOW — launcher registration works immediately with a placeholder/existing icon;
+  (2) render the hicolor icon tree (16/32/48/64/128/256/512 + scalable SVG from `ic_launcher_*.svg`)
+  and point the entry at it — this half is logo-blocked. Same render covers the Windows `.ico`,
+  still the stock Flutter template.
 
 ### V2+ / Defer
 - **Linux biometric unlock** (laptop fingerprint readers, e.g. libfido2/PAM or `fprintd`). Fits the current per-device model unchanged: Linux would just get its own local per-vault secret store; the vault file carries no biometric state, so nothing else changes.
