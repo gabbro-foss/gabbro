@@ -137,13 +137,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - See if vault `syncing` can do without a second `passphrase + yubikey` if and only if the current vault and the incoming vault share the same `alias`, `passphrase`, `yubikey(s)`
 - in `sync` path, we currently have `auto-merge` and `review all changes`, the `auto-merge` is additive only (check and verify) and therefore never deletes items in the receiving vault: (1) add a message that explains this (or the correct) behaviour to the user, (2) add a third `sync` mechanism that simply takes the incoming vault and clobbers the existing one - discuss this
 - Autotype in linux often has typos in the login/email. and it often fails perhaps due to a typo in the passphrase. investigate.
-- **Vault format version is meaningless to the user.** "v10"/"v11" is the file format and
-  tracks neither the app version nor the alpha number. Both too-old and too-new paths are
-  now handled: unlock and Gabbro-source import probe `vaultFormatTooOld()` /
-  `vaultFormatTooNew()` and show a localized message + link, naming no number, in all 37
-  locales. The only remaining leak of `file_format.rs:264` (too old) is the five importers
-  below, which show the raw Rust string instead of probing — covered by fixing those (the
-  error-l10n net's importer backlog).
 
 ### Security (pre-v1)
 - Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
