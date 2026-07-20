@@ -751,6 +751,11 @@ class AppLocalizationsSr extends AppLocalizations {
   }
 
   @override
+  String importFailed(String error) {
+    return 'Uvoz nije uspeo: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Otvori u pregledaču?';
 
   @override
@@ -2775,6 +2780,11 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   @override
   String exportFailed(String error) {
     return 'Izvoz nije uspeo: $error';
+  }
+
+  @override
+  String importFailed(String error) {
+    return 'Uvoz nije uspeo: $error';
   }
 
   @override

@@ -751,6 +751,11 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
+  String importFailed(String error) {
+    return 'Import selhal: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Otevřít v prohlížeči?';
 
   @override

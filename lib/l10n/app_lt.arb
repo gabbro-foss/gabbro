@@ -296,6 +296,7 @@
     }
   },
   "exportFailed": "Eksportavimas nepavyko: {error}",
+  "importFailed": "Importavimas nepavyko: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

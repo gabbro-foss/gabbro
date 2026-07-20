@@ -747,6 +747,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String importFailed(String error) {
+    return 'Import failed: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Open in browser?';
 
   @override

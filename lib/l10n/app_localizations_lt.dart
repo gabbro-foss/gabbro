@@ -750,6 +750,11 @@ class AppLocalizationsLt extends AppLocalizations {
   }
 
   @override
+  String importFailed(String error) {
+    return 'Importavimas nepavyko: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Atidaryti naršyklėje?';
 
   @override

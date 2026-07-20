@@ -749,6 +749,11 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
+  String importFailed(String error) {
+    return 'Inportazioak huts egin du: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Nabigatzailean ireki?';
 
   @override

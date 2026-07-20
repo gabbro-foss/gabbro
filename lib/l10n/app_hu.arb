@@ -296,6 +296,7 @@
     }
   },
   "exportFailed": "Exportálás sikertelen: {error}",
+  "importFailed": "Importálás sikertelen: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

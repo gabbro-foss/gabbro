@@ -750,6 +750,11 @@ class AppLocalizationsFi extends AppLocalizations {
   }
 
   @override
+  String importFailed(String error) {
+    return 'Tuonti epäonnistui: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Avataan selaimessa?';
 
   @override

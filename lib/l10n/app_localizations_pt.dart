@@ -749,6 +749,11 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String importFailed(String error) {
+    return 'Importação falhou: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Abrir no navegador?';
 
   @override
@@ -2781,6 +2786,11 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   }
 
   @override
+  String importFailed(String error) {
+    return 'Importação falhou: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Abrir no navegador?';
 
   @override
@@ -4807,6 +4817,11 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   @override
   String exportFailed(String error) {
     return 'Exportação falhou: $error';
+  }
+
+  @override
+  String importFailed(String error) {
+    return 'Importação falhou: $error';
   }
 
   @override

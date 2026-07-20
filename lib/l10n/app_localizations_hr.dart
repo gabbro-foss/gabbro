@@ -749,6 +749,11 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
+  String importFailed(String error) {
+    return 'Uvoz nije uspio: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Otvori u pregledniku?';
 
   @override

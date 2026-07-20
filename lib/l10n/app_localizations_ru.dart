@@ -751,6 +751,11 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String importFailed(String error) {
+    return 'Импорт не удался: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Открыть в браузере?';
 
   @override

@@ -369,6 +369,13 @@
       "error": {"type": "String"}
     }
   },
+  "importFailed": "Import failed: {error}",
+  "@importFailed": {
+    "description": "Generic import failure shown when an importer (Enpass, Bitwarden, Google PM, Dashlane, CSV, or a Gabbro source that is not too-old/too-new) throws. The localized frame carries the meaning; {error} is the raw technical detail (kept English on purpose, for bug reports).",
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
 
   "openInBrowserTitle": "Open in browser?",
   "couldNotOpen": "Could not open {url}",

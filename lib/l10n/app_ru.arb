@@ -296,6 +296,7 @@
     }
   },
   "exportFailed": "Экспорт не удался: {error}",
+  "importFailed": "Импорт не удался: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

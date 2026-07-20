@@ -753,6 +753,11 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
+  String importFailed(String error) {
+    return 'Αποτυχία εισαγωγής: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Άνοιγμα στο πρόγραμμα περιήγησης;';
 
   @override

@@ -296,6 +296,7 @@
     }
   },
   "exportFailed": "Ifijiṣẹ okeere kuna: {error}",
+  "importFailed": "Gbigbe wọle kuna: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

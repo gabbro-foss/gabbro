@@ -751,6 +751,11 @@ class AppLocalizationsSk extends AppLocalizations {
   }
 
   @override
+  String importFailed(String error) {
+    return 'Import zlyhal: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Otvoriť v prehliadači?';
 
   @override

@@ -535,6 +535,29 @@ void main() {
       expect(find.text(updateLinkLabel), findsOneWidget);
     });
 
+    testWidgets('a generic import failure shows a localized "Import failed:"',
+        (tester) async {
+      // Not too-old/too-new: a wrong passphrase or damaged source. The localized
+      // frame carries the meaning; the raw Rust detail is kept as trailing text
+      // (English on purpose, for bug reports) instead of standing alone.
+      await tester.pumpWidget(testApp(ImportScreen(
+        isAndroid: false,
+        initialGabbroPath: tempGabbroFile().path,
+        onDetectSourceRecords: (_) => [],
+        onSourceFormatTooOld: (_) async => false,
+        onSourceFormatTooNew: (_) async => false,
+        onImportGabbro: (_, _) async => throw Exception('decryption failed'),
+      )));
+      await tester.enterText(
+          find.widgetWithText(TextField, 'Vault passphrase'), 'pw');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+      await tester.pump();
+
+      expect(find.textContaining('Import failed:'), findsOneWidget);
+      expect(find.textContaining('decryption failed'), findsOneWidget);
+    });
+
     testWidgets('tapping the upgrade link shows the URL before the browser',
         (tester) async {
       await runImportOfOldSource(tester, tooOld: true);

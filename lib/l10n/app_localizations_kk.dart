@@ -746,6 +746,11 @@ class AppLocalizationsKk extends AppLocalizations {
   }
 
   @override
+  String importFailed(String error) {
+    return 'Импорт сәтсіз болды: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Браузерде ашу керек пе?';
 
   @override

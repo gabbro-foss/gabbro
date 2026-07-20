@@ -748,6 +748,11 @@ class AppLocalizationsLv extends AppLocalizations {
   }
 
   @override
+  String importFailed(String error) {
+    return 'Importēšana neizdevās: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Atvērt pārlūkā?';
 
   @override

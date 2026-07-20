@@ -749,6 +749,11 @@ class AppLocalizationsNn extends AppLocalizations {
   }
 
   @override
+  String importFailed(String error) {
+    return 'Import mislukkast: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Opne i nettlesar?';
 
   @override

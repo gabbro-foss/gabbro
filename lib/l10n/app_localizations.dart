@@ -1555,6 +1555,12 @@ abstract class AppLocalizations {
   /// **'Export failed: {error}'**
   String exportFailed(String error);
 
+  /// Generic import failure shown when an importer (Enpass, Bitwarden, Google PM, Dashlane, CSV, or a Gabbro source that is not too-old/too-new) throws. The localized frame carries the meaning; {error} is the raw technical detail (kept English on purpose, for bug reports).
+  ///
+  /// In en, this message translates to:
+  /// **'Import failed: {error}'**
+  String importFailed(String error);
+
   /// No description provided for @openInBrowserTitle.
   ///
   /// In en, this message translates to:

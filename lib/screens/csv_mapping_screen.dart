@@ -75,7 +75,12 @@ class _CsvMappingScreenState extends State<CsvMappingScreen> {
       final result = await widget.onImport(widget.csvContent, config);
       if (mounted) Navigator.of(context).pop(result.imported.toInt());
     } catch (e) {
-      if (mounted) setState(() => _error = e.toString());
+      if (mounted) {
+        setState(
+          () =>
+              _error = AppLocalizations.of(context).importFailed(e.toString()),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isImporting = false);
     }

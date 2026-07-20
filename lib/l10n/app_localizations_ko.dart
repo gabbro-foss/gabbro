@@ -739,6 +739,11 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String importFailed(String error) {
+    return '가져오기에 실패했습니다: $error';
+  }
+
+  @override
   String get openInBrowserTitle => '브라우저에서 열기?';
 
   @override

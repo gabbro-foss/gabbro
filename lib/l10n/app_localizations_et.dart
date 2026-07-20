@@ -749,6 +749,11 @@ class AppLocalizationsEt extends AppLocalizations {
   }
 
   @override
+  String importFailed(String error) {
+    return 'Importimine ebaõnnestus: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Ava brauseris?';
 
   @override

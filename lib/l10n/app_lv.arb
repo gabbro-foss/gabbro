@@ -296,6 +296,7 @@
     }
   },
   "exportFailed": "Eksportēšana neizdevās: {error}",
+  "importFailed": "Importēšana neizdevās: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

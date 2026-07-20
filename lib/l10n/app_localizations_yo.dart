@@ -747,6 +747,11 @@ class AppLocalizationsYo extends AppLocalizations {
   }
 
   @override
+  String importFailed(String error) {
+    return 'Gbigbe wọle kuna: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Ṣii ninu aṣawakiri?';
 
   @override

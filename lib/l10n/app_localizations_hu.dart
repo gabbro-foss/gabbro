@@ -749,6 +749,11 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String importFailed(String error) {
+    return 'Importálás sikertelen: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Megnyitás böngészőben?';
 
   @override

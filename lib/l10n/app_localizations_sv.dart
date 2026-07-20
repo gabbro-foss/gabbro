@@ -748,6 +748,11 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
+  String importFailed(String error) {
+    return 'Import misslyckades: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Öppna i webbläsare?';
 
   @override

@@ -296,6 +296,7 @@
     }
   },
   "exportFailed": "Export selhal: {error}",
+  "importFailed": "Import selhal: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

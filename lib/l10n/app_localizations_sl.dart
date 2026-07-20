@@ -753,6 +753,11 @@ class AppLocalizationsSl extends AppLocalizations {
   }
 
   @override
+  String importFailed(String error) {
+    return 'Uvoz ni uspel: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Odpri v brskalniku?';
 
   @override

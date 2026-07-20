@@ -749,6 +749,11 @@ class AppLocalizationsNb extends AppLocalizations {
   }
 
   @override
+  String importFailed(String error) {
+    return 'Import mislyktes: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Åpne i nettleser?';
 
   @override

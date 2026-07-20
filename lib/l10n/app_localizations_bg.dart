@@ -750,6 +750,11 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
+  String importFailed(String error) {
+    return 'Импортирането не успя: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Отвори в браузър?';
 
   @override

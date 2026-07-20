@@ -28,17 +28,33 @@ const Set<String> _approvedTemplates = {
   'failedToRegisterKey',
   'failedToActivateKey',
   'exportFailed',
+  'importFailed',
 };
 
 // `e.toString()` / `err.toString()` — a caught error rendered to a string. `\b`
 // keeps `locale.toString()` / `buffer.toString()` from matching.
 final RegExp _rawErrorToString = RegExp(r'\b(?:e|err)\.toString\(\)');
 
-/// True when [line] surfaces a raw error string that is NOT wrapped in an
-/// approved meaning-carrying template.
-bool isRawErrorLine(String line) =>
-    _rawErrorToString.hasMatch(line) &&
-    !_approvedTemplates.any((t) => line.contains('$t('));
+/// The statement text around [index] in [src] — from the previous `;`/`{`/`}` to
+/// the next. So a template call and its `e.toString()` argument are seen together
+/// even when a formatter wraps them onto separate lines.
+String _enclosingStatement(String src, int index) {
+  var start = index;
+  while (start > 0 && !';{}'.contains(src[start - 1])) {
+    start--;
+  }
+  var end = index;
+  while (end < src.length && !';{}'.contains(src[end])) {
+    end++;
+  }
+  return src.substring(start, end);
+}
+
+/// True when [statement] surfaces a raw error string that is NOT an argument to
+/// an approved meaning-carrying template.
+bool _isRawError(String statement) =>
+    _rawErrorToString.hasMatch(statement) &&
+    !_approvedTemplates.any((t) => statement.contains('$t('));
 
 class _Site {
   final String file;
@@ -60,10 +76,13 @@ List<_Site> _scanRawErrorSites() {
     final path = f.path;
     if (!path.endsWith('.dart')) continue;
     if (path.contains('/src/rust/') || path.contains('/l10n/')) continue;
-    final lines = f.readAsLinesSync();
-    for (var i = 0; i < lines.length; i++) {
-      if (isRawErrorLine(lines[i])) {
-        sites.add(_Site(path, i + 1, lines[i].trim()));
+    final src = f.readAsStringSync();
+    for (final m in _rawErrorToString.allMatches(src)) {
+      if (_isRawError(_enclosingStatement(src, m.start))) {
+        final line = '\n'.allMatches(src.substring(0, m.start)).length + 1;
+        final lineText =
+            src.substring(m.start).split('\n').first.trim();
+        sites.add(_Site(path, line, lineText));
       }
     }
   }
@@ -79,10 +98,8 @@ const Map<String, int> _todoRawErrors = {
   'lib/screens/manage_folders_screen.dart': 3,
   'lib/screens/onboarding_screen.dart': 1,
   'lib/screens/export_screen.dart': 1,
-  'lib/screens/import_screen.dart': 6,
   'lib/screens/vault_list_screen.dart': 3,
   'lib/screens/security_screen.dart': 1,
-  'lib/screens/csv_mapping_screen.dart': 1,
   'lib/screens/manage_yubikeys_screen.dart': 1,
   'lib/screens/change_passphrase_screen.dart': 1,
   'lib/screens/unlock_screen.dart': 1,
@@ -94,14 +111,20 @@ void main() {
   // Guard on the guard: the classifier must flag a raw leak and clear an
   // approved template, or the scan below proves nothing.
   test('the classifier distinguishes a raw leak from an approved template', () {
-    expect(isRawErrorLine('_error = e.toString();'), isTrue);
-    expect(isRawErrorLine('setState(() => _error = err.toString());'), isTrue);
-    expect(isRawErrorLine('Text(l.errorPrefix(e.toString()))'), isTrue,
+    expect(_isRawError('_error = e.toString();'), isTrue);
+    expect(_isRawError('setState(() => _error = err.toString());'), isTrue);
+    expect(_isRawError('Text(l.errorPrefix(e.toString()))'), isTrue,
         reason: 'errorPrefix is meaning-empty — must count as a leak');
-    expect(isRawErrorLine('al.failedToAddKey(e.toString())'), isFalse);
-    expect(isRawErrorLine('exportFailed(err.toString())'), isFalse);
-    expect(isRawErrorLine('final text = buffer.toString();'), isFalse);
-    expect(isRawErrorLine('locale.toString()'), isFalse);
+    expect(_isRawError('al.failedToAddKey(e.toString())'), isFalse);
+    expect(_isRawError('l.importFailed(e.toString())'), isFalse);
+    expect(_isRawError('exportFailed(err.toString())'), isFalse);
+    expect(_isRawError('final text = buffer.toString();'), isFalse);
+    expect(_isRawError('locale.toString()'), isFalse);
+    // Statement-scoped: a template wrapping split across lines is still OK.
+    expect(
+      _isRawError('_enpassError = context.importFailed(\n  e.toString(),\n)'),
+      isFalse,
+    );
   });
 
   // Enumerate + freeze. The set of raw-error sites in source must equal the

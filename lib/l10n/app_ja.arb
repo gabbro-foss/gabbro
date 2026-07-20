@@ -296,6 +296,7 @@
     }
   },
   "exportFailed": "エクスポートに失敗しました: {error}",
+  "importFailed": "インポートに失敗しました: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

@@ -737,6 +737,11 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String importFailed(String error) {
+    return '导入失败：$error';
+  }
+
+  @override
   String get openInBrowserTitle => '在浏览器中打开？';
 
   @override
@@ -2673,6 +2678,11 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   }
 
   @override
+  String importFailed(String error) {
+    return '导入失败：$error';
+  }
+
+  @override
   String get openInBrowserTitle => '在浏览器中打开？';
 
   @override
@@ -4606,6 +4616,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String exportFailed(String error) {
     return '匯出失敗：$error';
+  }
+
+  @override
+  String importFailed(String error) {
+    return '匯入失敗：$error';
   }
 
   @override

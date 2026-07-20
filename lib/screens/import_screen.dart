@@ -39,18 +39,23 @@ Future<ImportResult> _defaultImportDashlane(List<int> data) =>
     importFromDashlane(data: data);
 CsvPreviewData _defaultSniffCsv(String input) => sniffCsvFile(input: input);
 Future<GabbroImportResult> _defaultImportGabbro(
-        String path, List<int> passphrase) =>
-    importFromGabbro(path: path, passphrase: passphrase);
+  String path,
+  List<int> passphrase,
+) => importFromGabbro(path: path, passphrase: passphrase);
 
 /// Sync from a key-protected source: passphrase + a tapped registered YubiKey
 /// (ADR-013).
 Future<GabbroImportResult> _defaultImportGabbroWithKey(
-        String path, List<int> passphrase, List<int> hmac, List<int> credentialId) =>
-    importFromGabbroWithKey(
-        path: path,
-        passphrase: passphrase,
-        hmacSecret: hmac,
-        credentialId: credentialId);
+  String path,
+  List<int> passphrase,
+  List<int> hmac,
+  List<int> credentialId,
+) => importFromGabbroWithKey(
+  path: path,
+  passphrase: passphrase,
+  hmacSecret: hmac,
+  credentialId: credentialId,
+);
 
 /// Reads the source vault's YubiKey records to decide whether a key is required.
 /// Non-empty ⇒ key-protected. Sync — header read only.
@@ -58,8 +63,10 @@ List<YubikeyRecordData> _defaultDetectSourceRecords(String path) =>
     listVaultYubikeyRecords(path: path);
 
 Future<YubikeyHmacMatch> _defaultGetYubikeyHmac(
-        List<YubikeyRecordData> records, String pin, String transport) =>
-    getAnyYubikeyHmacSecret(records: records, pin: pin, transport: transport);
+  List<YubikeyRecordData> records,
+  String pin,
+  String transport,
+) => getAnyYubikeyHmacSecret(records: records, pin: pin, transport: transport);
 
 // Same shape as the unlock screen's probe: "cannot tell" must never claim the
 // file is merely old, or a genuinely corrupt source would be mis-explained.
@@ -88,11 +95,15 @@ class ImportScreen extends StatefulWidget {
   final Future<ImportResult> Function(List<int> data) onImportDashlane;
   final CsvPreviewData Function(String input) onSniffCsv;
   final Future<GabbroImportResult> Function(String path, List<int> passphrase)
-      onImportGabbro;
+  onImportGabbro;
 
   /// Sync from a key-protected source: passphrase + tapped YubiKey (ADR-013).
   final Future<GabbroImportResult> Function(
-      String path, List<int> passphrase, List<int> hmac, List<int> credentialId)
+    String path,
+    List<int> passphrase,
+    List<int> hmac,
+    List<int> credentialId,
+  )
   onImportGabbroWithKey;
 
   /// Detects whether the chosen `.gabbro` source is key-protected.
@@ -100,7 +111,10 @@ class ImportScreen extends StatefulWidget {
 
   /// Prompts for a YubiKey tap and returns the hmac + matched credential.
   final Future<YubikeyHmacMatch> Function(
-      List<YubikeyRecordData> records, String pin, String transport)
+    List<YubikeyRecordData> records,
+    String pin,
+    String transport,
+  )
   onGetYubikeyHmac;
 
   /// Whether the chosen `.gabbro` source is intact but predates the readable
@@ -211,17 +225,24 @@ class _ImportScreenState extends State<ImportScreen> {
   Future<void> _importEnpass() async {
     final path = _enpassPath;
     if (path == null || path.isEmpty) {
-      setState(() => _enpassError = AppLocalizations.of(context).importSelectFile);
+      setState(
+        () => _enpassError = AppLocalizations.of(context).importSelectFile,
+      );
       return;
     }
     final file = File(path);
     if (!file.existsSync()) {
-      setState(() => _enpassError = AppLocalizations.of(context).importFileNotFound);
+      setState(
+        () => _enpassError = AppLocalizations.of(context).importFileNotFound,
+      );
       return;
     }
     if (importSizeExceeded(file.lengthSync(), isEnpass: true)) {
-      setState(() => _enpassError = AppLocalizations.of(context)
-          .importFileTooLarge(importLimitLabel(kEnpassImportMaxBytes)));
+      setState(
+        () => _enpassError = AppLocalizations.of(
+          context,
+        ).importFileTooLarge(importLimitLabel(kEnpassImportMaxBytes)),
+      );
       return;
     }
     setState(() {
@@ -238,9 +259,16 @@ class _ImportScreenState extends State<ImportScreen> {
       if (result.skipped.isNotEmpty && mounted) {
         await showSkippedEntriesDialog(context, result.skipped);
       }
-      if (mounted) Navigator.of(context).pop(result.imported.toInt() + editedCount);
+      if (mounted)
+        Navigator.of(context).pop(result.imported.toInt() + editedCount);
     } catch (e) {
-      if (mounted) setState(() => _enpassError = e.toString());
+      if (mounted) {
+        setState(
+          () => _enpassError = AppLocalizations.of(
+            context,
+          ).importFailed(e.toString()),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isImportingEnpass = false);
     }
@@ -251,17 +279,24 @@ class _ImportScreenState extends State<ImportScreen> {
   Future<void> _importBitwarden() async {
     final path = _bitwardenPath;
     if (path == null || path.isEmpty) {
-      setState(() => _bitwardenError = AppLocalizations.of(context).importSelectFile);
+      setState(
+        () => _bitwardenError = AppLocalizations.of(context).importSelectFile,
+      );
       return;
     }
     final file = File(path);
     if (!file.existsSync()) {
-      setState(() => _bitwardenError = AppLocalizations.of(context).importFileNotFound);
+      setState(
+        () => _bitwardenError = AppLocalizations.of(context).importFileNotFound,
+      );
       return;
     }
     if (importSizeExceeded(file.lengthSync(), isEnpass: false)) {
-      setState(() => _bitwardenError = AppLocalizations.of(context)
-          .importFileTooLarge(importLimitLabel(kTextImportMaxBytes)));
+      setState(
+        () => _bitwardenError = AppLocalizations.of(
+          context,
+        ).importFileTooLarge(importLimitLabel(kTextImportMaxBytes)),
+      );
       return;
     }
     setState(() {
@@ -278,9 +313,16 @@ class _ImportScreenState extends State<ImportScreen> {
       if (result.skipped.isNotEmpty && mounted) {
         await showSkippedEntriesDialog(context, result.skipped);
       }
-      if (mounted) Navigator.of(context).pop(result.imported.toInt() + editedCount);
+      if (mounted)
+        Navigator.of(context).pop(result.imported.toInt() + editedCount);
     } catch (e) {
-      if (mounted) setState(() => _bitwardenError = e.toString());
+      if (mounted) {
+        setState(
+          () => _bitwardenError = AppLocalizations.of(
+            context,
+          ).importFailed(e.toString()),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isImportingBitwarden = false);
     }
@@ -291,17 +333,24 @@ class _ImportScreenState extends State<ImportScreen> {
   Future<void> _importGooglePm() async {
     final path = _googlePmPath;
     if (path == null || path.isEmpty) {
-      setState(() => _googlePmError = AppLocalizations.of(context).importSelectFile);
+      setState(
+        () => _googlePmError = AppLocalizations.of(context).importSelectFile,
+      );
       return;
     }
     final file = File(path);
     if (!file.existsSync()) {
-      setState(() => _googlePmError = AppLocalizations.of(context).importFileNotFound);
+      setState(
+        () => _googlePmError = AppLocalizations.of(context).importFileNotFound,
+      );
       return;
     }
     if (importSizeExceeded(file.lengthSync(), isEnpass: false)) {
-      setState(() => _googlePmError = AppLocalizations.of(context)
-          .importFileTooLarge(importLimitLabel(kTextImportMaxBytes)));
+      setState(
+        () => _googlePmError = AppLocalizations.of(
+          context,
+        ).importFileTooLarge(importLimitLabel(kTextImportMaxBytes)),
+      );
       return;
     }
     setState(() {
@@ -318,9 +367,16 @@ class _ImportScreenState extends State<ImportScreen> {
       if (result.skipped.isNotEmpty && mounted) {
         await showSkippedEntriesDialog(context, result.skipped);
       }
-      if (mounted) Navigator.of(context).pop(result.imported.toInt() + editedCount);
+      if (mounted)
+        Navigator.of(context).pop(result.imported.toInt() + editedCount);
     } catch (e) {
-      if (mounted) setState(() => _googlePmError = e.toString());
+      if (mounted) {
+        setState(
+          () => _googlePmError = AppLocalizations.of(
+            context,
+          ).importFailed(e.toString()),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isImportingGooglePm = false);
     }
@@ -331,17 +387,24 @@ class _ImportScreenState extends State<ImportScreen> {
   Future<void> _importDashlane() async {
     final path = _dashlanePath;
     if (path == null || path.isEmpty) {
-      setState(() => _dashlaneError = AppLocalizations.of(context).importSelectFile);
+      setState(
+        () => _dashlaneError = AppLocalizations.of(context).importSelectFile,
+      );
       return;
     }
     final file = File(path);
     if (!file.existsSync()) {
-      setState(() => _dashlaneError = AppLocalizations.of(context).importFileNotFound);
+      setState(
+        () => _dashlaneError = AppLocalizations.of(context).importFileNotFound,
+      );
       return;
     }
     if (importSizeExceeded(file.lengthSync(), isEnpass: false)) {
-      setState(() => _dashlaneError = AppLocalizations.of(context)
-          .importFileTooLarge(importLimitLabel(kTextImportMaxBytes)));
+      setState(
+        () => _dashlaneError = AppLocalizations.of(
+          context,
+        ).importFileTooLarge(importLimitLabel(kTextImportMaxBytes)),
+      );
       return;
     }
     setState(() {
@@ -358,9 +421,16 @@ class _ImportScreenState extends State<ImportScreen> {
       if (result.skipped.isNotEmpty && mounted) {
         await showSkippedEntriesDialog(context, result.skipped);
       }
-      if (mounted) Navigator.of(context).pop(result.imported.toInt() + editedCount);
+      if (mounted)
+        Navigator.of(context).pop(result.imported.toInt() + editedCount);
     } catch (e) {
-      if (mounted) setState(() => _dashlaneError = e.toString());
+      if (mounted) {
+        setState(
+          () => _dashlaneError = AppLocalizations.of(
+            context,
+          ).importFailed(e.toString()),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isImportingDashlane = false);
     }
@@ -430,7 +500,9 @@ class _ImportScreenState extends State<ImportScreen> {
       setState(() {
         _gabbroFormatTooOld = tooOld;
         _gabbroFormatTooNew = tooNew;
-        _gabbroError = (tooOld || tooNew) ? null : e.toString();
+        _gabbroError = (tooOld || tooNew)
+            ? null
+            : AppLocalizations.of(context).importFailed(e.toString());
       });
     } finally {
       if (mounted) setState(() => _isImportingGabbro = false);
@@ -452,8 +524,11 @@ class _ImportScreenState extends State<ImportScreen> {
       return;
     }
     if (importSizeExceeded(file.lengthSync(), isEnpass: false)) {
-      setState(() =>
-          _csvError = l.importFileTooLarge(importLimitLabel(kTextImportMaxBytes)));
+      setState(
+        () => _csvError = l.importFileTooLarge(
+          importLimitLabel(kTextImportMaxBytes),
+        ),
+      );
       return;
     }
     setState(() {
@@ -472,7 +547,13 @@ class _ImportScreenState extends State<ImportScreen> {
       );
       if (mounted && count != null) Navigator.of(context).pop(count);
     } catch (e) {
-      if (mounted) setState(() => _csvError = e.toString());
+      if (mounted) {
+        setState(
+          () => _csvError = AppLocalizations.of(
+            context,
+          ).importFailed(e.toString()),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isSniffingCsv = false);
     }
@@ -606,7 +687,10 @@ class _ImportScreenState extends State<ImportScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(l.gabbroVaultSection, style: Theme.of(context).textTheme.titleMedium),
+        Text(
+          l.gabbroVaultSection,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
         const SizedBox(height: 4),
         Text(
           l.importGabbroSubtitle,
@@ -620,8 +704,8 @@ class _ImportScreenState extends State<ImportScreen> {
           onPathSelected: (p) => setState(() {
             _gabbroPath = p;
             _gabbroError = null;
-      _gabbroFormatTooOld = false;
-      _gabbroFormatTooNew = false;
+            _gabbroFormatTooOld = false;
+            _gabbroFormatTooNew = false;
             try {
               _gabbroSourceRecords = widget.onDetectSourceRecords(p);
             } catch (_) {
@@ -657,8 +741,11 @@ class _ImportScreenState extends State<ImportScreen> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.usb, size: 20,
-                  color: Theme.of(context).colorScheme.primary),
+              Icon(
+                Icons.usb,
+                size: 20,
+                color: Theme.of(context).colorScheme.primary,
+              ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -685,8 +772,8 @@ class _ImportScreenState extends State<ImportScreen> {
                 tooltip: _yubikeyPinObscured
                     ? l.tooltipShowPin
                     : l.tooltipHidePin,
-                onPressed: () => setState(
-                    () => _yubikeyPinObscured = !_yubikeyPinObscured),
+                onPressed: () =>
+                    setState(() => _yubikeyPinObscured = !_yubikeyPinObscured),
               ),
             ),
           ),
@@ -694,8 +781,10 @@ class _ImportScreenState extends State<ImportScreen> {
             const SizedBox(height: 12),
             Row(
               children: [
-                Text(l.transportLabel,
-                    style: Theme.of(context).textTheme.bodyMedium),
+                Text(
+                  l.transportLabel,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
                 const SizedBox(width: 12),
                 SegmentedButton<String>(
                   segments: [
@@ -778,8 +867,11 @@ class _ImportScreenState extends State<ImportScreen> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.touch_app, size: 20,
-                  color: Theme.of(context).colorScheme.primary),
+              Icon(
+                Icons.touch_app,
+                size: 20,
+                color: Theme.of(context).colorScheme.primary,
+              ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -858,12 +950,12 @@ class _ImportScreenState extends State<ImportScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(l.genericCsvSection, style: Theme.of(context).textTheme.titleMedium),
-        const SizedBox(height: 4),
         Text(
-          l.importCsvSubtitle,
-          style: Theme.of(context).textTheme.bodySmall,
+          l.genericCsvSection,
+          style: Theme.of(context).textTheme.titleMedium,
         ),
+        const SizedBox(height: 4),
+        Text(l.importCsvSubtitle, style: Theme.of(context).textTheme.bodySmall),
         const SizedBox(height: 12),
         PathField(
           mode: PathFieldMode.open,

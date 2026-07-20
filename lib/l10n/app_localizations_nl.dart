@@ -750,6 +750,11 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String importFailed(String error) {
+    return 'Import mislukt: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Openen in browser?';
 
   @override

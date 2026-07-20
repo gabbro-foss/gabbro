@@ -748,6 +748,11 @@ class AppLocalizationsDa extends AppLocalizations {
   }
 
   @override
+  String importFailed(String error) {
+    return 'Import mislykkedes: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Åbn i browser?';
 
   @override

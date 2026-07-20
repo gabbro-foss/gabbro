@@ -296,6 +296,7 @@
     }
   },
   "exportFailed": "匯出失敗：{error}",
+  "importFailed": "匯入失敗：{error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

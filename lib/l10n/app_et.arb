@@ -296,6 +296,7 @@
     }
   },
   "exportFailed": "Eksportimine ebaõnnestus: {error}",
+  "importFailed": "Importimine ebaõnnestus: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

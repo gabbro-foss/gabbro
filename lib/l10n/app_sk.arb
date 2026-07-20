@@ -296,6 +296,7 @@
     }
   },
   "exportFailed": "Export zlyhal: {error}",
+  "importFailed": "Import zlyhal: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
