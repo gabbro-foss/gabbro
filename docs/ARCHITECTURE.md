@@ -112,101 +112,41 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Net for l10n + accessibility on every screen.**
+**Net for l10n + accessibility on every screen** — one behaviour left (item 5).
 
-**STATE 2026-07-20.** Four nets built (behaviours 1-4 done). Item 4 (error-l10n)
-is detailed in its own section below; the other three:
-- **Overflow (English) axis** — `test/overflow_probe_test.dart` sweeps 33 of 35
-  screens+widgets on phone + tablet at max text (2 waived: `yubikey_tap`,
-  `section_index` render nothing).
-- **ARB parity** (1+2) — `test/l10n_test.dart`: every locale has the base key set,
-  matches base placeholders, lists all 34 endonyms. Guarded by 37-file + 34-endonym
-  counts, both proven able to fail.
-- **Longer-language axis (3)** — same probe, one extra pass on the phone at max text
-  under a synthetic locale that doubles every ARB label (~2x). Width does not care
-  which real language produced it, so one pass stands in for all 37. Green: no screen
-  or dialog overflows a ~2x locale. Two meta-guards prove it can fail (padded delegate
-  reaches the tree; detection still fires).
+**STATE 2026-07-20. Behaviours 1-4 and 6 are DONE; item 5 is all that remains.**
+Five green "every screen" nets (details in git history / CHANGELOG; the tests
+themselves encode the invariants):
+- `test/l10n_test.dart` — ARB parity (1+2): every locale has the base key set,
+  matches base placeholders, lists all 34 endonyms (37-file + 34-endonym guards).
+- `test/overflow_probe_test.dart` — overflow (English) + longer-language (3) axes:
+  sweeps every screen/dialog/widget at max text on phone + tablet, plus one pass
+  under a synthetic ~2x-length locale (a `noSuchMethod` `AppLocalizations` wrapper
+  installed via a `localizationsDelegates` seam on `GabbroApp`; no shipped locale).
+- `test/error_l10n_net_test.dart` — error-l10n (4): scans `lib/` for raw
+  `e/err.toString()` reaching the user; backlog EMPTY — every Rust error now sits
+  behind a meaning-carrying localized template. Rule: the localized part carries
+  the MEANING (memory project_error_l10n_by_log_level). `_notADisplayLeak` = 3
+  reviewed non-leaks (logic-only / field wrapped at build).
+- `test/a11y_net_test.dart` — accessibility (6): every screen passes
+  `androidTapTargetGuideline` (>=48dp) + `labeledTapTargetGuideline`; a guard
+  asserts sliders keep their adjust actions. Hardware-verified (S23/TalkBack).
+- `test/screen_catalog.dart` — the shared 33-entry screen/dialog catalog that the
+  overflow and a11y nets both sweep. **Item 5's net should reuse it.**
 
-(Flutter test count of record lives in the Testing table above.)
+Memory gotchas: [[reference_async_matcher_no_isnot]] (`isNot(meetsGuideline)` hangs
+forever — catch `TestFailure`), [[project_error_l10n_by_log_level]],
+[[reference_flutter_run_release_lockfile]].
 
-**How item 3 works (so it is not re-litigated).** A test-only `noSuchMethod` wrapper
-implements `AppLocalizations`, returning each label's English value (read from
-`app_en.arb`) doubled — no 600 overrides, no shipped locale, auto-tracks new strings.
-It reaches dialogs (root routes an in-body `Localizations.override` cannot touch)
-because it is installed at MaterialApp level via a new `localizationsDelegates`
-override on `GabbroApp` (defaults to the real list; mirrors the existing `clock`
-test-seam). The padded list swaps only `AppLocalizations.delegate`, keeping the
-fallback Material/Cupertino delegates verbatim.
-
-**Error-l10n net (item 4) — DONE; net is now a regression guard.**
-`test/error_l10n_net_test.dart` scans `lib/` for `e/err.toString()` fed into
-user-visible text: a site is OK only when the error is trailing detail inside an
-approved meaning-carrying template; otherwise it is a raw leak in `_todoRawErrors`.
-That backlog is now **empty** — every raw Rust error reaching the user sits behind
-a localized template. A new unlisted leak fails the test. Principle: the localized
-part must carry the MEANING, English allowed only as trailing detail (see memory
-project_error_l10n_by_log_level). The classifier is statement-scoped (a formatter
-wrapping a template across lines is not a false leak).
-
-Cleared 22 sites across the session via Canon-TDD: `vaultFormatTooNew` (unlock +
-import, +link), importers -> `importFailed`, `export` -> `exportFailed`,
-`manage_folders` -> `folderActionFailed`, `vault_list` -> `vaultLoadFailed` +
-`syncFailed`, `create_entry`/`review_changes` -> `saveEntryFailed`,
-`change_passphrase` -> `changePassphraseFailed`, `recovery_history` ->
-`recoveryActionFailed`, `onboarding` -> `setupFailed`, `security` ->
-`biometricEnrollFailed`, `unlock` (.bak-rot) -> `restoreBackupFailed`, and
-`manageYubiKeysError` repurposed from meaning-empty "Error: {x}" to "Couldn't load
-YubiKeys". All new strings across 37 locales.
-
-`_notADisplayLeak` (map in the net): 3 sites where `e.toString()` appears but is
-NOT shown raw — control-flow-only, or a field wrapped by a meaning-carrying
-template at the build site (the assignment runs in initState, before
-AppLocalizations). `vault_list` x2, `manage_yubikeys` x1. Reviewed claims, not
-false greens.
-
-**Accessibility net (item 6) — built; backlog cleared (hardware-verify pending).**
-`test/a11y_net_test.dart`
-sweeps every screen and dialog on a phone at natural text scale and asserts two
-Flutter guidelines: `androidTapTargetGuideline` (tappable controls >= 48dp) and
-`labeledTapTargetGuideline` (every tappable node named for a screen reader). Two
-meta-guards prove it fires (catch the async `TestFailure` — `isNot(meetsGuideline)`
-HANGS forever, see memory reference_async_matcher_no_isnot).
-
-The screen/dialog catalog (33 builders + test data + seams) is now
-`test/screen_catalog.dart`, shared by BOTH "every screen" nets — the overflow
-probe and this one — so there is one source, no drift.
-
-Backlog: **CLEARED** — every screen passes both guidelines (net has only the 2
-tablet-only skips left). Fixes:
-- `appearance` high-contrast toggle: `ListTile`+trailing `Switch` -> `SwitchListTile`.
-- `generator` option toggles (`_switchRow`): `MergeSemantics` so the toggle
-  carries its row label.
-- `vault_list` folder dropdown + `generator` wordlist dropdown:
-  `selectedItemBuilder` items wrapped in `minHeight: 48`, so the collapsed button
-  is a 48dp tap target (open menu items still grow, ADR-016).
-
-**First hardware pass (S23 + TalkBack) — 3/5 passed** (both dropdowns tap cleanly
-+ look right; appearance toggle announced). It found what the net structurally
-can't (label *quality* + operability), now fixed:
-- Generator option toggles read as glyphs ("0-9" -> "zero minus nine"). Now
-  `Semantics(label:)` with the char-type name + `ExcludeSemantics` on the glyph
-  (`MergeSemantics` so label + tap are one node).
-- Length / word-count / **text-size** sliders were unnamed and unadjustable under
-  TalkBack. Now `MergeSemantics(Semantics(label:, Slider(semanticFormatterCallback:)))`
-  — named + value announced; a net guard asserts they keep increase/decrease
-  actions. `TextSizeSlider` takes the label as a param (stays l10n-free).
-
-**Second hardware pass (S23 + TalkBack) — PASS.** Toggles announce their
-char-type name + state; sliders announce name + value and adjust via swipe
-(slow — one step per division — but functional). **Item 6 is DONE,
-hardware-verified.**
-
-**The behaviour still needing a net.** What a user cannot do:
-5. Dark mode or high contrast makes text unreadable, or the setting does nothing.
-
-**NEXT STEP: item 5 (dark mode / high contrast) with [maintainer]. Items 1-4 and
-6 all DONE (item 6 hardware-verified). Item 5 is the last behaviour.**
+**NEXT STEP — item 5: dark mode / high contrast.** What a user cannot do: dark
+mode or high contrast makes text unreadable, or the setting does nothing. Headless,
+like item 3. Likely starting point (verify first): reuse `screen_catalog.dart`;
+`AppSettings` carries the theme choice + high-contrast flag, and `GabbroApp` wires
+`gabbroLightTheme` / `gabbroDarkTheme(highContrast:)` + `themeMode`. Render each
+screen in dark and in high-contrast and assert `meetsGuideline(textContrastGuideline)`
+(the "unreadable" half), plus that flipping the setting actually changes the
+rendered output (the "setting does nothing" half). Canon-TDD: present the
+scenario list and STOP for review before writing test code.
 
 **Still-relevant traps (items 4-6)**
 - A child clipped inside a fixed-size box throws no exception, so the probe cannot
