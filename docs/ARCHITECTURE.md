@@ -78,7 +78,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1478 | 2 |
+| Flutter (`flutter test`) | 1538 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -165,12 +165,28 @@ template at the build site (the assignment runs in initState, before
 AppLocalizations). `vault_list` x2, `manage_yubikeys` x1. Reviewed claims, not
 false greens.
 
-**The behaviours still needing a net.** Each is what a user cannot do:
-5. Dark mode or high contrast makes text unreadable, or the setting does nothing.
-6. A control is too small to hit, or unlabelled so a screen reader cannot name it.
+**Accessibility net (item 6) — built; backlog open.** `test/a11y_net_test.dart`
+sweeps every screen and dialog on a phone at natural text scale and asserts two
+Flutter guidelines: `androidTapTargetGuideline` (tappable controls >= 48dp) and
+`labeledTapTargetGuideline` (every tappable node named for a screen reader). Two
+meta-guards prove it fires (catch the async `TestFailure` — `isNot(meetsGuideline)`
+HANGS forever, see memory reference_async_matcher_no_isnot).
 
-**NEXT STEP: pick item 5 (dark/high-contrast) or 6 (tap targets / screen-reader
-labels) with [maintainer]. Items 1-4 done.**
+The screen/dialog catalog (33 builders + test data + seams) is now
+`test/screen_catalog.dart`, shared by BOTH "every screen" nets — the overflow
+probe and this one — so there is one source, no drift.
+
+Backlog (3 clusters, skipped with reasons in the net, so it stays green):
+- Too small (24dp high, needs 48): `vault_list` "All folders" filter chip;
+  `generator` "English" wordlist-language selector (also `generator_widget`).
+- Unlabelled tappable: `appearance` toggle; `generator` icon control (also
+  `generator_widget`). Shared root: `GeneratorWidget`.
+
+**The behaviour still needing a net.** What a user cannot do:
+5. Dark mode or high contrast makes text unreadable, or the setting does nothing.
+
+**NEXT STEP: fix the item-6 a11y backlog (3 clusters) Canon-TDD, then item 5
+(dark/high-contrast) with [maintainer]. Items 1-4 done; item 6 net built.**
 
 **Still-relevant traps (items 4-6)**
 - A child clipped inside a fixed-size box throws no exception, so the probe cannot
