@@ -571,6 +571,10 @@ class GabbroApp extends StatefulWidget {
   /// Overridable clock; defaults to [DateTime.now]. Pass a fake clock in tests.
   final DateTime Function() clock;
 
+  /// Localization delegates; defaults to [gabbroLocalizationsDelegates].
+  /// Override in tests to inject padded strings (see overflow_probe_test.dart).
+  final Iterable<LocalizationsDelegate<dynamic>> localizationsDelegates;
+
   const GabbroApp({
     super.key,
     required this.registry,
@@ -578,6 +582,7 @@ class GabbroApp extends StatefulWidget {
     required this.settings,
     this.initialScreen,
     this.clock = DateTime.now,
+    this.localizationsDelegates = gabbroLocalizationsDelegates,
   });
 
   @override
@@ -959,7 +964,7 @@ class _GabbroAppState extends State<GabbroApp>
           navigatorKey: _navigatorKey,
           title: 'Gabbro',
           debugShowCheckedModeBanner: false,
-          localizationsDelegates: gabbroLocalizationsDelegates,
+          localizationsDelegates: widget.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           locale: _settings.language == LanguageChoice.system
               ? null

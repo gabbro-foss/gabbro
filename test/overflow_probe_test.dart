@@ -1,8 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/app_paths.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/vault_registry.dart';
@@ -72,6 +75,74 @@ Widget _app(Widget screen) => GabbroApp(
   vaultPath: null,
   settings: const AppSettings(textScale: 8.0),
   initialScreen: screen,
+);
+
+// --- Longer-language (padded) axis (ADR-016 item 3) -----------------------
+// A layout overflows on rendered width, and width does not care which language
+// produced it: "le renard..." and "the fox..." stress the same box. So instead
+// of rendering all 37 real locales, render each screen ONCE under a synthetic
+// locale whose every ARB label is ~2x its English length. One pass catches what
+// any real language could; it may over-report (the safe direction). See
+// ARCHITECTURE.md Current Focus.
+
+// The real English strings, read from the template ARB so the padded axis tracks
+// every new UI string automatically. `@key` metadata and `@@locale` are skipped.
+final Map<String, String> _enArb = () {
+  final raw =
+      jsonDecode(File('lib/l10n/app_en.arb').readAsStringSync())
+          as Map<String, dynamic>;
+  final out = <String, String>{};
+  raw.forEach((k, v) {
+    if (!k.startsWith('@') && v is String) out[k] = v;
+  });
+  return out;
+}();
+
+// ~2x the English length. A Latin pad under-models CJK glyph width (wider per
+// character), so doubling with a space is a generous, not tight, margin.
+String _pad(String v) => '$v $v';
+
+// Every AppLocalizations member returns String and is abstract, so one
+// noSuchMethod handler pads all ~600 of them. The member name is recovered from
+// the invocation symbol (no dart:mirrors) and mapped back to its English value.
+class _PaddedLocalizations implements AppLocalizations {
+  static final _symbolName = RegExp(r'Symbol\("([^"]+)"\)');
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) {
+    final match = _symbolName.firstMatch(invocation.memberName.toString());
+    final base = match == null ? null : _enArb[match.group(1)];
+    return _pad(base ?? 'padded');
+  }
+}
+
+class _PaddingDelegate extends LocalizationsDelegate<AppLocalizations> {
+  const _PaddingDelegate();
+  @override
+  bool isSupported(Locale locale) => true;
+  @override
+  Future<AppLocalizations> load(Locale locale) =>
+      SynchronousFuture<AppLocalizations>(_PaddedLocalizations());
+  @override
+  bool shouldReload(_PaddingDelegate old) => false;
+}
+
+// The real delegate list with only AppLocalizations.delegate swapped for the
+// padding one, so the fallback Material/Cupertino delegates are kept verbatim
+// (no drift from production). Locale stays the default (en, supported), so the
+// padded strings reach dialogs — which are root routes an in-body
+// Localizations.override could not touch.
+final List<LocalizationsDelegate<dynamic>> _paddedDelegates = [
+  const _PaddingDelegate(),
+  ...gabbroLocalizationsDelegates.where((d) => d != AppLocalizations.delegate),
+];
+
+Widget _paddedApp(Widget screen) => GabbroApp(
+  registry: VaultRegistry([]),
+  vaultPath: null,
+  settings: const AppSettings(textScale: 8.0),
+  initialScreen: screen,
+  localizationsDelegates: _paddedDelegates,
 );
 
 EntropyResult _strong(String _) =>
@@ -386,6 +457,10 @@ final Map<String, Widget Function()> _screens = {
 // recovery_history's ListTile-trailing case was fixed in Phase 3 Slice C.
 const Map<String, String> _knownOverflow = <String, String>{};
 
+// Entries that overflow only under the padded (longer-language) axis, each with
+// a reason. Empty means every screen and dialog survives a ~2x-length locale.
+const Map<String, String> _paddedKnownOverflow = <String, String>{};
+
 // Entries that only exist above a width breakpoint. Probing them narrower than
 // the app ever builds them reports an overflow the user can never meet — a
 // harness artifact, not a defect. vault_list_screen.dart:1517 gates the
@@ -400,14 +475,15 @@ const Map<String, String> _tabletOnly = {
 Future<Object?> _probe(
   WidgetTester tester,
   Widget screen,
-  _Surface surface,
-) async {
+  _Surface surface, {
+  Widget Function(Widget) app = _app,
+}) async {
   tester.view.physicalSize = surface.physical;
   tester.view.devicePixelRatio = surface.dpr;
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
 
-  await tester.pumpWidget(_app(screen));
+  await tester.pumpWidget(app(screen));
   await tester.pump(const Duration(milliseconds: 300));
   return tester.takeException();
 }
@@ -464,15 +540,16 @@ final Map<String, Future<void> Function(BuildContext)> _dialogs = {
 Future<Object?> _probeDialog(
   WidgetTester tester,
   Future<void> Function(BuildContext) dialog,
-  _Surface surface,
-) async {
+  _Surface surface, {
+  Widget Function(Widget) app = _app,
+}) async {
   tester.view.physicalSize = surface.physical;
   tester.view.devicePixelRatio = surface.dpr;
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
 
   await tester.pumpWidget(
-    _app(
+    app(
       Builder(
         builder: (context) => Scaffold(
           body: Center(
@@ -654,5 +731,66 @@ void main() {
         skip: _knownOverflow.containsKey(entry.key),
       );
     }
+  }
+
+  // --- Longer-language (padded) axis --------------------------------------
+  // Guard on the guard 1: the padded delegate must actually win at MaterialApp
+  // level, or every assertion below passes vacuously against real English.
+  testWidgets('the padded delegate reaches the widget tree', (tester) async {
+    late String seen;
+    await tester.pumpWidget(
+      _paddedApp(
+        Builder(
+          builder: (ctx) {
+            seen = AppLocalizations.of(ctx).appName;
+            return const SizedBox();
+          },
+        ),
+      ),
+    );
+    // appName is "Gabbro" in en; the padded locale doubles it.
+    expect(seen, _pad('Gabbro'));
+  });
+
+  // Guard on the guard 2: overflow detection still fires under the padded app,
+  // not only under the English one.
+  testWidgets('the probe detects an overflow under the padded app', (
+    tester,
+  ) async {
+    expect(
+      await _probe(tester, _deliberateOverflow(), _phone, app: _paddedApp),
+      isNotNull,
+    );
+  });
+
+  // One pass at max text on the phone (narrowest x largest) under the padded
+  // locale. Tablet-only screens are skipped as on the English phone pass.
+  for (final entry in _screens.entries) {
+    testWidgets(
+      '${entry.key} @ padded phone: no overflow',
+      (tester) async {
+        expect(
+          await _probe(tester, entry.value(), _phone, app: _paddedApp),
+          isNull,
+          reason: '${entry.key} overflowed under a ~2x-length locale',
+        );
+      },
+      skip: _paddedKnownOverflow.containsKey(entry.key) ||
+          _tabletOnly.containsKey(entry.key),
+    );
+  }
+
+  for (final entry in _dialogs.entries) {
+    testWidgets(
+      '${entry.key} @ padded phone: no overflow',
+      (tester) async {
+        expect(
+          await _probeDialog(tester, entry.value, _phone, app: _paddedApp),
+          isNull,
+          reason: '${entry.key} overflowed under a ~2x-length locale',
+        );
+      },
+      skip: _paddedKnownOverflow.containsKey(entry.key),
+    );
   }
 }
