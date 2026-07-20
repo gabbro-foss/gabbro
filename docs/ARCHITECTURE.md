@@ -138,44 +138,38 @@ override on `GabbroApp` (defaults to the real list; mirrors the existing `clock`
 test-seam). The padded list swaps only `AppLocalizations.delegate`, keeping the
 fallback Material/Cupertino delegates verbatim.
 
-**Error-l10n net (item 4) — built, backlog open.** `test/error_l10n_net_test.dart`
-scans `lib/` for `e/err.toString()` fed into user-visible text and freezes the
-result: a site is OK only when the error is trailing detail inside an approved
-meaning-carrying template; otherwise it is a raw leak listed in `_todoRawErrors`.
-A new unlisted leak fails the test. Principle: the localized part must carry the
-MEANING, English allowed only as trailing detail (see memory
-project_error_l10n_by_log_level). Too-old vault path pinned in
-`unlock_screen_test.dart`. The classifier is statement-scoped, so a template
-wrapping split across lines by the formatter is not a false leak.
+**Error-l10n net (item 4) — DONE; net is now a regression guard.**
+`test/error_l10n_net_test.dart` scans `lib/` for `e/err.toString()` fed into
+user-visible text: a site is OK only when the error is trailing detail inside an
+approved meaning-carrying template; otherwise it is a raw leak in `_todoRawErrors`.
+That backlog is now **empty** — every raw Rust error reaching the user sits behind
+a localized template. A new unlisted leak fails the test. Principle: the localized
+part must carry the MEANING, English allowed only as trailing detail (see memory
+project_error_l10n_by_log_level). The classifier is statement-scoped (a formatter
+wrapping a template across lines is not a false leak).
 
-The leak backlog now stands at **4 sites / 4 files** (plus 2 reviewed non-leaks —
-see below) and shrinks via Canon-TDD, one red->fix->green each. Done so far:
-- `vaultFormatTooNew` — localized message + link on unlock and import, all 37
-  locales (added a probe branch, not a raw site, so no count change).
-- Importers (five + Gabbro-source + csv-mapping, 7 sites) -> `importFailed` (22 -> 15).
-- `export` -> reused `exportFailed`; `manage_folders` x3 (`errorPrefix`, meaning-empty)
-  -> new `folderActionFailed` (15 -> 11).
-- `vault_list` x3 -> `vaultLoadFailed` (load, wrapped at build since `_loadEntries`
-  runs in initState) + `syncFailed` (sync tap + sync dialog fallback) (11 -> 8).
-- `create_entry` + `review_changes` -> `saveEntryFailed`; `change_passphrase` ->
-  `changePassphraseFailed`; `recovery_history` -> `recoveryActionFailed` (8 -> 4).
+Cleared 22 sites across the session via Canon-TDD: `vaultFormatTooNew` (unlock +
+import, +link), importers -> `importFailed`, `export` -> `exportFailed`,
+`manage_folders` -> `folderActionFailed`, `vault_list` -> `vaultLoadFailed` +
+`syncFailed`, `create_entry`/`review_changes` -> `saveEntryFailed`,
+`change_passphrase` -> `changePassphraseFailed`, `recovery_history` ->
+`recoveryActionFailed`, `onboarding` -> `setupFailed`, `security` ->
+`biometricEnrollFailed`, `unlock` (.bak-rot) -> `restoreBackupFailed`, and
+`manageYubiKeysError` repurposed from meaning-empty "Error: {x}" to "Couldn't load
+YubiKeys". All new strings across 37 locales.
 
-`_notADisplayLeak` (map in the net): sites where `e.toString()` appears but is NOT
-shown raw — control-flow-only, or a field wrapped by a template at the build site.
-Two so far, both in `vault_list`. The net's classifier is statement-scoped, so
-these are reviewed claims, not false greens.
-
-Still todo (4): `onboarding`, `security`, `manage_yubikeys`, `unlock`. Notes:
-`onboarding`'s `_ =>` arm also catches vault-creation errors, so it needs a generic
-"couldn't create/enroll" message; `manage_yubikeys` load may run in initState (check
-before wrapping at assignment, like `vault_list`); `unlock` is a niche .bak-rot race.
+`_notADisplayLeak` (map in the net): 3 sites where `e.toString()` appears but is
+NOT shown raw — control-flow-only, or a field wrapped by a meaning-carrying
+template at the build site (the assignment runs in initState, before
+AppLocalizations). `vault_list` x2, `manage_yubikeys` x1. Reviewed claims, not
+false greens.
 
 **The behaviours still needing a net.** Each is what a user cannot do:
 5. Dark mode or high contrast makes text unreadable, or the setting does nothing.
 6. A control is too small to hit, or unlabelled so a screen reader cannot name it.
 
-**NEXT STEP: shrink the item-4 backlog (Canon-TDD), then pick 5 or 6 with
-[maintainer].**
+**NEXT STEP: pick item 5 (dark/high-contrast) or 6 (tap targets / screen-reader
+labels) with [maintainer]. Items 1-4 done.**
 
 **Still-relevant traps (items 4-6)**
 - A child clipped inside a fixed-size box throws no exception, so the probe cannot

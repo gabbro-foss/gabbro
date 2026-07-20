@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Export failures and folder create/rename/delete failures are now shown in your own language, with the technical detail appended, instead of an untranslated error.
 - A vault that fails to load, and a sync that fails for a reason other than a wrong passphrase, are now explained in your own language with the technical detail appended, instead of an untranslated error.
 - Failures saving an entry, changing the passphrase, and recovery-history actions are now shown in your own language, with the technical detail appended, instead of an untranslated error.
+- Onboarding, biometric-enrolment, safety-copy-restore and YubiKey-loading failures are now shown in your own language too. No error a user can trigger now reaches them in English only; a technical detail is appended for bug reports.
 
 ## [0.1.0-alpha.14] – 2026-07-11
 
