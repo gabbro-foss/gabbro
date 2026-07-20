@@ -165,7 +165,8 @@ template at the build site (the assignment runs in initState, before
 AppLocalizations). `vault_list` x2, `manage_yubikeys` x1. Reviewed claims, not
 false greens.
 
-**Accessibility net (item 6) — built; backlog open.** `test/a11y_net_test.dart`
+**Accessibility net (item 6) — built; backlog cleared (hardware-verify pending).**
+`test/a11y_net_test.dart`
 sweeps every screen and dialog on a phone at natural text scale and asserts two
 Flutter guidelines: `androidTapTargetGuideline` (tappable controls >= 48dp) and
 `labeledTapTargetGuideline` (every tappable node named for a screen reader). Two
@@ -176,23 +177,24 @@ The screen/dialog catalog (33 builders + test data + seams) is now
 `test/screen_catalog.dart`, shared by BOTH "every screen" nets — the overflow
 probe and this one — so there is one source, no drift.
 
-Backlog (skipped with reasons in the net, so it stays green):
-- Too small (24dp high, needs 48): `vault_list` "All folders" filter chip;
-  `generator` "English" wordlist selector (a `DropdownButton`; also
-  `generator_widget`). Layout-sensitive — hardware-verify.
-- Unlabelled tappable: a `generator` tap node (60x48; also `generator_widget`,
-  shared `GeneratorWidget`) — un-skip to pin the exact widget first.
+Backlog: **CLEARED** — every screen passes both guidelines (net has only the 2
+tablet-only skips left). Fixes:
+- `appearance` high-contrast toggle: `ListTile`+trailing `Switch` -> `SwitchListTile`.
+- `generator` option toggles (`_switchRow`): `MergeSemantics` so the toggle
+  carries its row label.
+- `vault_list` folder dropdown + `generator` wordlist dropdown:
+  `selectedItemBuilder` items wrapped in `minHeight: 48`, so the collapsed button
+  is a 48dp tap target (open menu items still grow, ADR-016).
 
-Done: `appearance` high-contrast toggle (`ListTile` + trailing `Switch` ->
-`SwitchListTile`, so the toggle carries its title as a screen-reader label).
+**Pending: hardware a11y verification** — TalkBack announces each control; the
+enlarged dropdowns tap cleanly and look right at normal + large text.
 
 **The behaviour still needing a net.** What a user cannot do:
 5. Dark mode or high contrast makes text unreadable, or the setting does nothing.
 
-**NEXT STEP: fix the 2 remaining item-6 a11y clusters (generator size+label,
-vault_list chip) Canon-TDD — layout-sensitive, hardware-verify — then item 5
-(dark/high-contrast) with [maintainer]. Items 1-4 done; item 6 net built,
-appearance toggle fixed.**
+**NEXT STEP: hardware-verify the item-6 a11y fixes (TalkBack + tap), then item 5
+(dark/high-contrast) with [maintainer]. Items 1-4 done; item 6 net + backlog
+done (hardware-verify pending).**
 
 **Still-relevant traps (items 4-6)**
 - A child clipped inside a fixed-size box throws no exception, so the probe cannot
