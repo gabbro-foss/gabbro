@@ -176,11 +176,15 @@ The screen/dialog catalog (33 builders + test data + seams) is now
 `test/screen_catalog.dart`, shared by BOTH "every screen" nets — the overflow
 probe and this one — so there is one source, no drift.
 
-Backlog (3 clusters, skipped with reasons in the net, so it stays green):
+Backlog (skipped with reasons in the net, so it stays green):
 - Too small (24dp high, needs 48): `vault_list` "All folders" filter chip;
-  `generator` "English" wordlist-language selector (also `generator_widget`).
-- Unlabelled tappable: `appearance` toggle; `generator` icon control (also
-  `generator_widget`). Shared root: `GeneratorWidget`.
+  `generator` "English" wordlist selector (a `DropdownButton`; also
+  `generator_widget`). Layout-sensitive — hardware-verify.
+- Unlabelled tappable: a `generator` tap node (60x48; also `generator_widget`,
+  shared `GeneratorWidget`) — un-skip to pin the exact widget first.
+
+Done: `appearance` high-contrast toggle (`ListTile` + trailing `Switch` ->
+`SwitchListTile`, so the toggle carries its title as a screen-reader label).
 
 **The behaviour still needing a net.** What a user cannot do:
 5. Dark mode or high contrast makes text unreadable, or the setting does nothing.
