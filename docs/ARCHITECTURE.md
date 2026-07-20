@@ -54,6 +54,7 @@ gabbro/
 │   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics, crash_writer, autotype_{spike,window,trigger} (diagnostics), gabbro-autotype (shipped trigger client); wordlist gen; gen_fixtures
 ├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + crash-safety (kill mid-write) + frozen golden fixtures (FIXTURES.md)
 ├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, BiometricHelper + BiometricStore (per-vault; + Robolectric tests)
+├── linux/packaging/      # Desktop integration: install.sh (.desktop + PATH launcher, per-user/--system), render_icons.sh, install_test.sh (sandbox)
 ├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, VAULT_SYNC, AUTOTYPE_AND_AUTOFILL, RT3_CLEANUP, AI_*; decisions/ (ADRs); artefacts/
 ├── test/  integration_test/          # Flutter widget/unit + Linux real-FFI suites (dart test)
 ├── test_data/            # Sample import files + migration_vaults/ (refusal corpus at floor v11, one vault per VERSION + MIGRATION_TESTS.md + test_matrix.md)
@@ -112,7 +113,15 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-Empty — pick the next task with the maintainer from Bikeshed / Backlog below.
+- **Linux install doesn't register in the app launcher (and ships no icon) — one root cause.**
+  No `.desktop` entry in an XDG applications dir (`~/.local/share/applications` or
+  `/usr/share/applications`), so qtile's launcher and Mint's menu never list gabbro — you run the
+  binary from the build folder; an AUR/installed build likewise shows a generic placeholder in
+  menu + taskbar. Fixable in two parts that DON'T block each other: (1) write + install the
+  `.desktop` entry NOW — launcher registration works immediately with a placeholder/existing icon;
+  (2) render the hicolor icon tree (16/32/48/64/128/256/512 + scalable SVG from `ic_launcher_*.svg`)
+  and point the entry at it — this half is logo-blocked. Same render covers the Windows `.ico`,
+  still the stock Flutter template.
 
 ---
 
@@ -128,6 +137,9 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Features and UI/UX
+- **No in-app Quit.** Under a tiling WM (qtile — no title-bar close button) the only way out is
+  lock + force-kill. Add an explicit Quit that locks (zeroizes secrets) then exits cleanly — a menu
+  item and/or shortcut.
 - See if vault `syncing` can do without a second `passphrase + yubikey` if and only if the current vault and the incoming vault share the same `alias`, `passphrase`, `yubikey(s)`
 - in `sync` path, we currently have `auto-merge` and `review all changes`, the `auto-merge` is additive only (check and verify) and therefore never deletes items in the receiving vault: (1) add a message that explains this (or the correct) behaviour to the user, (2) add a third `sync` mechanism that simply takes the incoming vault and clobbers the existing one - discuss this
 
@@ -138,17 +150,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - **Flip the repo to public.** Repo now lives in the `gabbro-foss` org (transferred; URLs
   migrated). Flip visibility to public once the pre-v1 gates clear (crypto-review outreach
   above is welcome-not-blocking). Optional: a read-only Codeberg mirror for redundancy.
-
-### Code Quality
-- **Linux install doesn't register in the app launcher (and ships no icon) — one root cause.**
-  No `.desktop` entry in an XDG applications dir (`~/.local/share/applications` or
-  `/usr/share/applications`), so qtile's launcher and Mint's menu never list gabbro — you run the
-  binary from the build folder; an AUR/installed build likewise shows a generic placeholder in
-  menu + taskbar. Fixable in two parts that DON'T block each other: (1) write + install the
-  `.desktop` entry NOW — launcher registration works immediately with a placeholder/existing icon;
-  (2) render the hicolor icon tree (16/32/48/64/128/256/512 + scalable SVG from `ic_launcher_*.svg`)
-  and point the entry at it — this half is logo-blocked. Same render covers the Windows `.ico`,
-  still the stock Flutter template.
 
 ### V2+ / Defer
 - **Linux biometric unlock** (laptop fingerprint readers, e.g. libfido2/PAM or `fprintd`). Fits the current per-device model unchanged: Linux would just get its own local per-vault secret store; the vault file carries no biometric state, so nothing else changes.

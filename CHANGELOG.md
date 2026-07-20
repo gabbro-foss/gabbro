@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **VERSION 11 is now the minimum vault format.** The X25519 + ML-KEM hybrid layer removed as non-load-bearing at alpha.14 (ADR-018) is now deleted outright, along with the `ml-kem` and `x25519-dalek` crates — 11 fewer dependencies. Quantum resistance is unchanged (Argon2id + AES-256-GCM).
 
 ### Added
+- **Linux release ships an installer.** `install.sh` (in the tarball) registers Gabbro with the desktop: a `.desktop` launcher entry plus a `gabbro` command on your PATH, so it appears in the app menu (Mint) or runs by name (tiling WMs) instead of being launched from the extract folder. Per-user by default (no root); `--system` and `--uninstall` supported. Ships a placeholder icon until the final logo lands.
 - **Linux auto-type now works from a release download.** The `gabbro-autotype` trigger client ships in the tarball, so binding a keyboard shortcut no longer requires building from source. Setup for auto-type (Linux) and autofill (Android): [docs/AUTOTYPE_AND_AUTOFILL.md](docs/AUTOTYPE_AND_AUTOFILL.md).
 
 ### Fixed
