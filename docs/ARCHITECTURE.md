@@ -78,7 +78,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1437 | 1 |
+| Flutter (`flutter test`) | 1471 | 2 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -114,100 +114,46 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 **Net for l10n + accessibility on every screen.**
 
-**STATE 2026-07-19.** Two nets built:
-- **Overflow axis** — `test/overflow_probe_test.dart` sweeps 33 of 35
-  screens+widgets on a phone and a tablet surface at max text (2 waived —
-  `yubikey_tap`, `section_index` render nothing). Three guards, each verified able
-  to fail: pinned file counts, a `_covers` cross-check, probe-or-waive over both
-  `lib/screens/` and `lib/widgets/`.
-- **ARB parity** (behaviours 1+2) — `test/l10n_test.dart`: every locale has the
-  base key set, matches base placeholders on shared keys, and lists all 34 language
-  endonyms. Guarded by a 37-file count and a 34-endonym count, both verified able
-  to fail. English-only strings and renamed placeholders now fail a test, not ship.
+**STATE 2026-07-20.** Three nets built (behaviours 1-3 done):
+- **Overflow (English) axis** — `test/overflow_probe_test.dart` sweeps 33 of 35
+  screens+widgets on phone + tablet at max text (2 waived: `yubikey_tap`,
+  `section_index` render nothing).
+- **ARB parity** (1+2) — `test/l10n_test.dart`: every locale has the base key set,
+  matches base placeholders, lists all 34 endonyms. Guarded by 37-file + 34-endonym
+  counts, both proven able to fail.
+- **Longer-language axis (3)** — same probe, one extra pass on the phone at max text
+  under a synthetic locale that doubles every ARB label (~2x). Width does not care
+  which real language produced it, so one pass stands in for all 37. Green: no screen
+  or dialog overflows a ~2x locale. Two meta-guards prove it can fail (padded delegate
+  reaches the tree; detection still fires).
 
-Flutter 1280 -> 1437 (+1 skipped).
+Flutter 1471 (+2 skipped).
+
+**How item 3 works (so it is not re-litigated).** A test-only `noSuchMethod` wrapper
+implements `AppLocalizations`, returning each label's English value (read from
+`app_en.arb`) doubled — no 600 overrides, no shipped locale, auto-tracks new strings.
+It reaches dialogs (root routes an in-body `Localizations.override` cannot touch)
+because it is installed at MaterialApp level via a new `localizationsDelegates`
+override on `GabbroApp` (defaults to the real list; mirrors the existing `clock`
+test-seam). The padded list swaps only `AppLocalizations.delegate`, keeping the
+fallback Material/Cupertino delegates verbatim.
 
 **The behaviours still needing a net.** Each is what a user cannot do:
-3. Text fits in English but not in a longer language, so it is cut off.
 4. An error from Rust appears in English whatever the language.
 5. Dark mode or high contrast makes text unreadable, or the setting does nothing.
 6. A control is too small to hit, or unlabelled so a screen reader cannot name it.
 
-**3 — DECISION (2026-07-19): one synthetic long-string locale, NOT a 37-locale
-sweep.** A layout overflows on rendered width, and width does not care which
-language produced it — "le renard..." and "the fox..." stress the same box. So
-rendering all 37 real locales is 37x the cost to prove one thing: some string is
-too long. Instead render each screen/widget/dialog ONCE against a synthetic
-"pseudo" locale whose every string is deliberately long. One pass catches what any
-real language could. It may over-report (flag an overflow no real language hits),
-which is the safe direction — you harden the layout.
+**NEXT STEP: pick 4, 5, or 6 with [maintainer].**
 
-Rejected on the way here (do not revisit without new reason):
-- **37 real locales.** Measured ~140 s added to `flutter test` (2442 renders at
-  ~0.056 s each; fixed ~11 s). Cost is the render count, not the loop shape.
-- **The dialog-locale fork.** Dialogs are root-navigator routes, so a
-  `Localizations.override` in the screen body cannot reach them; they take the
-  MaterialApp locale from `settings.language`, which reaches only 34 of 37 (no
-  `LanguageChoice` for base `pt`/`sr`/`zh`). Three fixes were weighed — a
-  `Locale?` seam on GabbroApp (touches production for tests), a mixed 37-screens/
-  34-dialogs sweep (leaves sync_review, a past bug site, untested in 3 locales),
-  and a test-built MaterialApp (duplicates app setup, drifts). The synthetic
-  locale sidesteps all three: it is one delegate, applied the same way everywhere.
-
-**What is already covered, so the synthetic locale only needs to add labels.**
-Injected VALUES (folder names, passwords, URLs, titles) are already stressed with
-long English strings in the probe's test data — locale adds nothing there. The gap
-is FIXED LABELS (button text, titles like "Appearance"), which are not variables
-and can only be lengthened by a longer translation. The synthetic locale must
-therefore lengthen the ARB-sourced labels.
-
-**NEXT STEP (was mid-investigation): build the synthetic AppLocalizations.** Open
-question being checked when stopped: `lib/l10n/app_localizations.dart` has ~600
-getters/methods, so hand-overriding a subclass is out. Was reading it for a seam —
-a `lookupAppLocalizations`-style factory or map-based lookup to wrap, so one
-wrapper can pad every returned string without 600 overrides. If no such seam
-exists, fall back to a generated synthetic ARB consumed only by the test (must NOT
-add a locale to the shipped `supportedLocales` or the picker). Width caveat: pad
-generously (German ~1.35x, but allow >=2x margin); a Latin pad under-models CJK
-glyph width, which is wider per character.
-
-**Measured, do not re-derive**
-- 37 real locales = ~140 s added; rejected (above).
-- **The locale count is 37, not 34.** ARB files 37 = `supportedLocales` 37 >
-  `LanguageChoice` 34 (+`system`). Extra 3 = base `pt`/`sr`/`zh`, no picker entry,
-  kept as fallback for `pt_BR`/`sr_Latn`/`zh_CN`. (Retained: the synthetic-locale
-  approach does not need this, but the ARB parity guards do.)
-- Placeholder tokens stay ASCII in every script, so `\{(\w+)\}` matches inside
-  Greek/Cyrillic/CJK messages.
-- **Compare DISTINCT placeholder names, not occurrences.** A plural message
-  repeats its token once per arm, and Slavic locales have arms English lacks
-  (`few`), so a naive count reports 9 locales "differing" when nothing is wrong.
-  The ARB parity test already does this.
-
-**Traps**
+**Still-relevant traps (items 4-6)**
 - A child clipped inside a fixed-size box throws no exception, so the probe cannot
-  see it. Of the three defects so far the probe found one (the tablet placeholder);
-  the two clipping ones (recovery-history actions, sync_review chip values) came
-  from hardware use and no test would have caught them.
+  see it — clipping defects need hardware, not this net. Two of three past defects
+  were clipping (recovery-history actions, sync_review chip values).
 - Probing a widget outside the conditions the app builds it in reports an overflow
-  the user can never meet. The two-pane layout is gated at >= 600dp
-  (`vault_list_screen.dart:1517`); swept at 360dp it "failed" as a harness artifact.
-  `_tabletOnly` in the probe records the restriction.
-- Sweeping locales inside one `testWidgets` needs the tree torn down between pumps
-  (`pumpWidget(SizedBox())` first), or a stale overflow is blamed on the next locale
-  — including `en`, which passes standalone. This produced a false defect report.
-- An all-locale sweep must use `gabbroLocalizationsDelegates` (`main.dart`), not
-  `AppLocalizations.localizationsDelegates`. The raw list omits the English-fallback
-  Material delegate, so nn/yo throw "No MaterialLocalizations found" and look like an
-  app defect — they are not (RT3_CLEANUP.md:107). `test_helpers.dart`
-  `testApp()` still uses the raw list.
-- Collecting `tester.takeException()` filtered to `FlutterError` silently drops the
-  "Multiple exceptions (N)" wrapper and reports a false green. Take any non-null.
-
-**Not attempted:** the locale axis (item 3), the ARB checks (1 and 2), light/dark,
-high-contrast, tap targets, screen reader labels, Rust-originated strings. Only the
-English overflow axis exists. An earlier attempt built the locale axis and was
-reverted — nothing of it is in the tree, so item 3 starts from the loop level.
+  the user can never meet. The two-pane layout is gated >= 600dp
+  (`vault_list_screen.dart:1517`); `_tabletOnly` records the restriction.
+- Collecting `tester.takeException()` filtered to `FlutterError` drops the "Multiple
+  exceptions (N)" wrapper and reports a false green. Take any non-null.
 
 ---
 
