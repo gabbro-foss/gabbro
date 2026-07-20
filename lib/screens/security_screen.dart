@@ -180,9 +180,13 @@ class _SecurityScreenState extends State<SecurityScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(e.toString())));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context).biometricEnrollFailed(e.toString()),
+            ),
+          ),
+        );
       }
     }
   }

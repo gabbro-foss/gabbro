@@ -772,6 +772,21 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String setupFailed(String error) {
+    return '设置失败：$error';
+  }
+
+  @override
+  String biometricEnrollFailed(String error) {
+    return '无法启用生物特征解锁：$error';
+  }
+
+  @override
+  String restoreBackupFailed(String error) {
+    return '无法从安全副本恢复：$error';
+  }
+
+  @override
   String get openInBrowserTitle => '在浏览器中打开？';
 
   @override
@@ -1601,7 +1616,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String manageYubiKeysError(String error) {
-    return '错误：$error';
+    return '无法加载 YubiKey：$error';
   }
 
   @override
@@ -2743,6 +2758,21 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   }
 
   @override
+  String setupFailed(String error) {
+    return '设置失败：$error';
+  }
+
+  @override
+  String biometricEnrollFailed(String error) {
+    return '无法启用生物特征解锁：$error';
+  }
+
+  @override
+  String restoreBackupFailed(String error) {
+    return '无法从安全副本恢复：$error';
+  }
+
+  @override
   String get openInBrowserTitle => '在浏览器中打开？';
 
   @override
@@ -3572,7 +3602,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String manageYubiKeysError(String error) {
-    return '错误：$error';
+    return '无法加载 YubiKey：$error';
   }
 
   @override
@@ -4714,6 +4744,21 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   }
 
   @override
+  String setupFailed(String error) {
+    return '設定失敗：$error';
+  }
+
+  @override
+  String biometricEnrollFailed(String error) {
+    return '無法啟用生物特徵解鎖：$error';
+  }
+
+  @override
+  String restoreBackupFailed(String error) {
+    return '無法從安全副本復原：$error';
+  }
+
+  @override
   String get openInBrowserTitle => '在瀏覽器中開啟？';
 
   @override
@@ -5543,7 +5588,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String manageYubiKeysError(String error) {
-    return '錯誤：$error';
+    return '無法載入 YubiKey：$error';
   }
 
   @override

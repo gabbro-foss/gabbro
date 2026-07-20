@@ -969,6 +969,9 @@ void main() {
     });
     await tester.pump();
 
+    // Localized frame ("Setup failed: …") carries the meaning; the raw detail
+    // ("disk full") is appended rather than shown alone.
+    expect(find.textContaining('Setup failed:'), findsOneWidget);
     expect(find.textContaining('disk full'), findsOneWidget);
   });
 

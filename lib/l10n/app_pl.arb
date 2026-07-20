@@ -303,6 +303,9 @@
   "saveEntryFailed": "Nie udało się zapisać wpisu: {error}",
   "changePassphraseFailed": "Nie udało się zmienić hasła głównego: {error}",
   "recoveryActionFailed": "Operacja odzyskiwania nie powiodła się: {error}",
+  "setupFailed": "Konfiguracja nie powiodła się: {error}",
+  "biometricEnrollFailed": "Nie udało się włączyć odblokowania biometrycznego: {error}",
+  "restoreBackupFailed": "Nie udało się przywrócić z kopii zapasowej: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
@@ -725,7 +728,7 @@
   "editAliasTooltip": "Edytuj alias",
   "cannotRemoveLastKey": "Nie można usunąć ostatniego klucza",
   "removeKeyTooltip": "Usuń klucz",
-  "manageYubiKeysError": "Błąd: {error}",
+  "manageYubiKeysError": "Nie udało się wczytać kluczy YubiKey: {error}",
   "@manageYubiKeysError": {
     "placeholders": {
       "error": {"type": "String"}

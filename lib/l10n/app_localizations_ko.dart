@@ -774,6 +774,21 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String setupFailed(String error) {
+    return '설정에 실패했습니다: $error';
+  }
+
+  @override
+  String biometricEnrollFailed(String error) {
+    return '생체 인증 잠금 해제를 활성화할 수 없습니다: $error';
+  }
+
+  @override
+  String restoreBackupFailed(String error) {
+    return '안전 사본에서 복원할 수 없습니다: $error';
+  }
+
+  @override
   String get openInBrowserTitle => '브라우저에서 열기?';
 
   @override
@@ -1617,7 +1632,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String manageYubiKeysError(String error) {
-    return '오류: $error';
+    return 'YubiKey를 불러올 수 없습니다: $error';
   }
 
   @override

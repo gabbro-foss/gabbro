@@ -303,6 +303,9 @@
   "saveEntryFailed": "Error al guardar la entrada: {error}",
   "changePassphraseFailed": "Error al cambiar la contraseña maestra: {error}",
   "recoveryActionFailed": "Error en la acción de recuperación: {error}",
+  "setupFailed": "Error en la configuración: {error}",
+  "biometricEnrollFailed": "No se pudo activar el desbloqueo biométrico: {error}",
+  "restoreBackupFailed": "Error al restaurar desde la copia de seguridad: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
@@ -724,7 +727,7 @@
   "editAliasTooltip": "Editar alias",
   "cannotRemoveLastKey": "No se puede eliminar la última clave",
   "removeKeyTooltip": "Quitar clave",
-  "manageYubiKeysError": "Error: {error}",
+  "manageYubiKeysError": "Error al cargar las YubiKey: {error}",
   "@manageYubiKeysError": {
     "placeholders": {
       "error": {"type": "String"}

@@ -303,6 +303,9 @@
   "saveEntryFailed": "Záznam sa nepodarilo uložiť: {error}",
   "changePassphraseFailed": "Prístupovú frázu sa nepodarilo zmeniť: {error}",
   "recoveryActionFailed": "Akcia obnovy zlyhala: {error}",
+  "setupFailed": "Nastavenie zlyhalo: {error}",
+  "biometricEnrollFailed": "Nepodarilo sa povoliť biometrické odomknutie: {error}",
+  "restoreBackupFailed": "Nepodarilo sa obnoviť zo záchrannej kópie: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
@@ -724,7 +727,7 @@
   "editAliasTooltip": "Upraviť alias",
   "cannotRemoveLastKey": "Posledný kľúč nie je možné odstrániť",
   "removeKeyTooltip": "Odstrániť kľúč",
-  "manageYubiKeysError": "Chyba: {error}",
+  "manageYubiKeysError": "Nepodarilo sa načítať kľúče YubiKey: {error}",
   "@manageYubiKeysError": {
     "placeholders": {
       "error": {"type": "String"}

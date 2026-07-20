@@ -781,6 +781,21 @@ class AppLocalizationsKk extends AppLocalizations {
   }
 
   @override
+  String setupFailed(String error) {
+    return 'Орнату сәтсіз болды: $error';
+  }
+
+  @override
+  String biometricEnrollFailed(String error) {
+    return 'Биометриялық бекітуді ашуды қосу мүмкін болмады: $error';
+  }
+
+  @override
+  String restoreBackupFailed(String error) {
+    return 'Қосалқы көшірмеден қалпына келтіру мүмкін болмады: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Браузерде ашу керек пе?';
 
   @override
@@ -1652,7 +1667,7 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String manageYubiKeysError(String error) {
-    return 'Қате: $error';
+    return 'YubiKey кілттерін жүктеу мүмкін болмады: $error';
   }
 
   @override

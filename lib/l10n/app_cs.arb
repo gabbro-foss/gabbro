@@ -303,6 +303,9 @@
   "saveEntryFailed": "Uložení záznamu selhalo: {error}",
   "changePassphraseFailed": "Změna přístupové fráze selhala: {error}",
   "recoveryActionFailed": "Akce obnovení selhala: {error}",
+  "setupFailed": "Nastavení selhalo: {error}",
+  "biometricEnrollFailed": "Nepodařilo se povolit biometrické odemykání: {error}",
+  "restoreBackupFailed": "Obnovení z bezpečnostní kopie se nezdařilo: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
@@ -725,7 +728,7 @@
   "editAliasTooltip": "Upravit alias",
   "cannotRemoveLastKey": "Poslední klíč nelze odebrat",
   "removeKeyTooltip": "Odebrat klíč",
-  "manageYubiKeysError": "Chyba: {error}",
+  "manageYubiKeysError": "Nepodařilo se načíst klíče YubiKey: {error}",
   "@manageYubiKeysError": {
     "placeholders": {
       "error": {"type": "String"}

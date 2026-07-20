@@ -783,6 +783,21 @@ class AppLocalizationsDa extends AppLocalizations {
   }
 
   @override
+  String setupFailed(String error) {
+    return 'Opsætning mislykkedes: $error';
+  }
+
+  @override
+  String biometricEnrollFailed(String error) {
+    return 'Biometrisk oplåsning kunne ikke aktiveres: $error';
+  }
+
+  @override
+  String restoreBackupFailed(String error) {
+    return 'Gendannelse fra sikkerhedskopien mislykkedes: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Åbn i browser?';
 
   @override
@@ -1656,7 +1671,7 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String manageYubiKeysError(String error) {
-    return 'Fejl: $error';
+    return 'YubiKeys kunne ikke indlæses: $error';
   }
 
   @override

@@ -782,6 +782,21 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String setupFailed(String error) {
+    return 'Setup failed: $error';
+  }
+
+  @override
+  String biometricEnrollFailed(String error) {
+    return 'Couldn\'t enable biometric unlock: $error';
+  }
+
+  @override
+  String restoreBackupFailed(String error) {
+    return 'Couldn\'t restore from the safety copy: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Open in browser?';
 
   @override
@@ -1642,7 +1657,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String manageYubiKeysError(String error) {
-    return 'Error: $error';
+    return 'Couldn\'t load YubiKeys: $error';
   }
 
   @override

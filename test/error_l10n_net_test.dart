@@ -35,6 +35,9 @@ const Set<String> _approvedTemplates = {
   'saveEntryFailed',
   'changePassphraseFailed',
   'recoveryActionFailed',
+  'setupFailed',
+  'biometricEnrollFailed',
+  'restoreBackupFailed',
 };
 
 // `e.toString()` / `err.toString()` — a caught error rendered to a string. `\b`
@@ -99,11 +102,9 @@ List<_Site> _scanRawErrorSites() {
 // `errorPrefix("Error: {x}")` wrappers), by file -> count. Shrinks to empty as
 // each is localized. A count change here is the point: a new leak must be added
 // deliberately, and a fix must decrement the count.
-const Map<String, int> _todoRawErrors = {
-  'lib/screens/onboarding_screen.dart': 1,
-  'lib/screens/security_screen.dart': 1,
-  'lib/screens/manage_yubikeys_screen.dart': 1,
-  'lib/screens/unlock_screen.dart': 1,
+const Map<String, int> _todoRawErrors = <String, int>{
+  // Empty: every raw Rust error reaching the user is now behind a
+  // meaning-carrying localized template. New leaks fail the test below.
 };
 
 // Sites where `e.toString()` appears but does NOT reach the user as a raw
@@ -119,6 +120,9 @@ const Map<String, int> _notADisplayLeak = {
   // `vaultLoadFailed(_error!)` at build; 994 `msg` feeds a
   // `contains('decryption failed')` branch and the dialog shows `syncFailed(msg)`.
   'lib/screens/vault_list_screen.dart': 2,
+  // manage_yubikeys: 152 `_error` set in _load (initState) is shown via
+  // `manageYubiKeysError(_error!)` = "Couldn't load YubiKeys: {error}" at build.
+  'lib/screens/manage_yubikeys_screen.dart': 1,
 };
 
 void main() {

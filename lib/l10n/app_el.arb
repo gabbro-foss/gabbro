@@ -303,6 +303,9 @@
   "saveEntryFailed": "Αποτυχία αποθήκευσης καταχώρισης: {error}",
   "changePassphraseFailed": "Αποτυχία αλλαγής φράσης πρόσβασης: {error}",
   "recoveryActionFailed": "Αποτυχία ενέργειας ανάκτησης: {error}",
+  "setupFailed": "Αποτυχία ρύθμισης: {error}",
+  "biometricEnrollFailed": "Αποτυχία ενεργοποίησης βιομετρικού ξεκλειδώματος: {error}",
+  "restoreBackupFailed": "Αποτυχία επαναφοράς από το αντίγραφο ασφαλείας: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
@@ -724,7 +727,7 @@
   "editAliasTooltip": "Επεξεργασία ψευδωνύμου",
   "cannotRemoveLastKey": "Δεν μπορεί να αφαιρεθεί το τελευταίο κλειδί",
   "removeKeyTooltip": "Αφαίρεση κλειδιού",
-  "manageYubiKeysError": "Σφάλμα: {error}",
+  "manageYubiKeysError": "Αποτυχία φόρτωσης των YubiKey: {error}",
   "@manageYubiKeysError": {
     "placeholders": {
       "error": {"type": "String"}

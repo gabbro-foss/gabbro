@@ -303,6 +303,9 @@
   "saveEntryFailed": "Eintrag konnte nicht gespeichert werden: {error}",
   "changePassphraseFailed": "Passphrase konnte nicht geändert werden: {error}",
   "recoveryActionFailed": "Wiederherstellungsaktion fehlgeschlagen: {error}",
+  "setupFailed": "Einrichtung fehlgeschlagen: {error}",
+  "biometricEnrollFailed": "Biometrisches Entsperren konnte nicht aktiviert werden: {error}",
+  "restoreBackupFailed": "Wiederherstellung aus der Sicherungskopie fehlgeschlagen: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
@@ -724,7 +727,7 @@
   "editAliasTooltip": "Alias bearbeiten",
   "cannotRemoveLastKey": "Letzter Schlüssel kann nicht entfernt werden",
   "removeKeyTooltip": "Schlüssel entfernen",
-  "manageYubiKeysError": "Fehler: {error}",
+  "manageYubiKeysError": "YubiKeys konnten nicht geladen werden: {error}",
   "@manageYubiKeysError": {
     "placeholders": {
       "error": {"type": "String"}

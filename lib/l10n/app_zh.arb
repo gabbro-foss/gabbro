@@ -303,6 +303,9 @@
   "saveEntryFailed": "无法保存条目：{error}",
   "changePassphraseFailed": "无法更改密码短语：{error}",
   "recoveryActionFailed": "恢复操作失败：{error}",
+  "setupFailed": "设置失败：{error}",
+  "biometricEnrollFailed": "无法启用生物特征解锁：{error}",
+  "restoreBackupFailed": "无法从安全副本恢复：{error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
@@ -724,7 +727,7 @@
   "editAliasTooltip": "编辑别名",
   "cannotRemoveLastKey": "无法移除最后一个密钥",
   "removeKeyTooltip": "移除密钥",
-  "manageYubiKeysError": "错误：{error}",
+  "manageYubiKeysError": "无法加载 YubiKey：{error}",
   "@manageYubiKeysError": {
     "placeholders": {
       "error": {"type": "String"}

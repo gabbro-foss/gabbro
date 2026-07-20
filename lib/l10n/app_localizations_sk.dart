@@ -786,6 +786,21 @@ class AppLocalizationsSk extends AppLocalizations {
   }
 
   @override
+  String setupFailed(String error) {
+    return 'Nastavenie zlyhalo: $error';
+  }
+
+  @override
+  String biometricEnrollFailed(String error) {
+    return 'Nepodarilo sa povoliť biometrické odomknutie: $error';
+  }
+
+  @override
+  String restoreBackupFailed(String error) {
+    return 'Nepodarilo sa obnoviť zo záchrannej kópie: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Otvoriť v prehliadači?';
 
   @override
@@ -1655,7 +1670,7 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String manageYubiKeysError(String error) {
-    return 'Chyba: $error';
+    return 'Nepodarilo sa načítať kľúče YubiKey: $error';
   }
 
   @override

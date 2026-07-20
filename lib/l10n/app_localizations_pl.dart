@@ -787,6 +787,21 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
+  String setupFailed(String error) {
+    return 'Konfiguracja nie powiodła się: $error';
+  }
+
+  @override
+  String biometricEnrollFailed(String error) {
+    return 'Nie udało się włączyć odblokowania biometrycznego: $error';
+  }
+
+  @override
+  String restoreBackupFailed(String error) {
+    return 'Nie udało się przywrócić z kopii zapasowej: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Otworzyć w przeglądarce?';
 
   @override
@@ -1662,7 +1677,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String manageYubiKeysError(String error) {
-    return 'Błąd: $error';
+    return 'Nie udało się wczytać kluczy YubiKey: $error';
   }
 
   @override

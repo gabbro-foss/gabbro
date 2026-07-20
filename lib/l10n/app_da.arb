@@ -303,6 +303,9 @@
   "saveEntryFailed": "Kunne ikke gemme posten: {error}",
   "changePassphraseFailed": "Kunne ikke skifte adgangssætning: {error}",
   "recoveryActionFailed": "Gendannelseshandling mislykkedes: {error}",
+  "setupFailed": "Opsætning mislykkedes: {error}",
+  "biometricEnrollFailed": "Biometrisk oplåsning kunne ikke aktiveres: {error}",
+  "restoreBackupFailed": "Gendannelse fra sikkerhedskopien mislykkedes: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
@@ -725,7 +728,7 @@
   "editAliasTooltip": "Rediger alias",
   "cannotRemoveLastKey": "Kan ikke fjerne den sidste nøgle",
   "removeKeyTooltip": "Fjern nøgle",
-  "manageYubiKeysError": "Fejl: {error}",
+  "manageYubiKeysError": "YubiKeys kunne ikke indlæses: {error}",
   "@manageYubiKeysError": {
     "placeholders": {
       "error": {"type": "String"}

@@ -303,6 +303,9 @@
   "saveEntryFailed": "Neizdevās saglabāt ierakstu: {error}",
   "changePassphraseFailed": "Neizdevās nomainīt ieejas frāzi: {error}",
   "recoveryActionFailed": "Atjaunošanas darbība neizdevās: {error}",
+  "setupFailed": "Iestatīšana neizdevās: {error}",
+  "biometricEnrollFailed": "Neizdevās iespējot biometrisko atbloķēšanu: {error}",
+  "restoreBackupFailed": "Neizdevās atjaunot no rezerves kopijas: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
@@ -725,7 +728,7 @@
   "editAliasTooltip": "Rediģēt aizstājvārdu",
   "cannotRemoveLastKey": "Pēdējo atslēgu nevar noņemt",
   "removeKeyTooltip": "Noņemt atslēgu",
-  "manageYubiKeysError": "Kļūda: {error}",
+  "manageYubiKeysError": "Neizdevās ielādēt YubiKey atslēgas: {error}",
   "@manageYubiKeysError": {
     "placeholders": {
       "error": {"type": "String"}

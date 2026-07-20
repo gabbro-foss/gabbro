@@ -774,6 +774,21 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String setupFailed(String error) {
+    return 'セットアップに失敗しました: $error';
+  }
+
+  @override
+  String biometricEnrollFailed(String error) {
+    return '生体認証ロック解除を有効にできませんでした: $error';
+  }
+
+  @override
+  String restoreBackupFailed(String error) {
+    return 'セーフティコピーから復元できませんでした: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'ブラウザで開きますか?';
 
   @override
@@ -1614,7 +1629,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String manageYubiKeysError(String error) {
-    return 'エラー: $error';
+    return 'YubiKeyを読み込めませんでした: $error';
   }
 
   @override

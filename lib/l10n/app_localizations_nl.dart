@@ -785,6 +785,21 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String setupFailed(String error) {
+    return 'Instellen mislukt: $error';
+  }
+
+  @override
+  String biometricEnrollFailed(String error) {
+    return 'Kon biometrische ontgrendeling niet inschakelen: $error';
+  }
+
+  @override
+  String restoreBackupFailed(String error) {
+    return 'Kon niet herstellen vanaf de veiligheidskopie: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Openen in browser?';
 
   @override
@@ -1661,7 +1676,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String manageYubiKeysError(String error) {
-    return 'Fout: $error';
+    return 'Kon YubiKeys niet laden: $error';
   }
 
   @override

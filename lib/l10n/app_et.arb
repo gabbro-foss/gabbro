@@ -303,6 +303,9 @@
   "saveEntryFailed": "Kirje salvestamine ebaõnnestus: {error}",
   "changePassphraseFailed": "Pääslause muutmine ebaõnnestus: {error}",
   "recoveryActionFailed": "Taastetoiming ebaõnnestus: {error}",
+  "setupFailed": "Seadistamine ebaõnnestus: {error}",
+  "biometricEnrollFailed": "Ei õnnestunud biomeetrilist avamist lubada: {error}",
+  "restoreBackupFailed": "Ei õnnestunud varukoopiast taastada: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
@@ -725,7 +728,7 @@
   "editAliasTooltip": "Muuda aliast",
   "cannotRemoveLastKey": "Viimast võtit ei saa eemaldada",
   "removeKeyTooltip": "Eemalda võti",
-  "manageYubiKeysError": "Viga: {error}",
+  "manageYubiKeysError": "Ei õnnestunud YubiKey-sid laadida: {error}",
   "@manageYubiKeysError": {
     "placeholders": {
       "error": {"type": "String"}

@@ -787,6 +787,21 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String setupFailed(String error) {
+    return 'Einrichtung fehlgeschlagen: $error';
+  }
+
+  @override
+  String biometricEnrollFailed(String error) {
+    return 'Biometrisches Entsperren konnte nicht aktiviert werden: $error';
+  }
+
+  @override
+  String restoreBackupFailed(String error) {
+    return 'Wiederherstellung aus der Sicherungskopie fehlgeschlagen: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Im Browser öffnen?';
 
   @override
@@ -1663,7 +1678,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String manageYubiKeysError(String error) {
-    return 'Fehler: $error';
+    return 'YubiKeys konnten nicht geladen werden: $error';
   }
 
   @override

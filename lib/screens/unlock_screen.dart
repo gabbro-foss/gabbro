@@ -419,7 +419,9 @@ class _UnlockScreenState extends State<UnlockScreen>
       // (remove-from-list / delete-file) rather than offering restore again.
       setState(() {
         _backupAvailable = false;
-        _errorMessage = e.toString().replaceFirst('Exception: ', '');
+        _errorMessage = l.restoreBackupFailed(
+          e.toString().replaceFirst('Exception: ', ''),
+        );
       });
       return;
     }

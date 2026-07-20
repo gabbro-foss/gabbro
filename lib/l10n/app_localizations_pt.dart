@@ -784,6 +784,21 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String setupFailed(String error) {
+    return 'Configuração falhou: $error';
+  }
+
+  @override
+  String biometricEnrollFailed(String error) {
+    return 'Não foi possível ativar o desbloqueio biométrico: $error';
+  }
+
+  @override
+  String restoreBackupFailed(String error) {
+    return 'Não foi possível restaurar a partir da cópia de segurança: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Abrir no navegador?';
 
   @override
@@ -1656,7 +1671,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String manageYubiKeysError(String error) {
-    return 'Erro: $error';
+    return 'Não foi possível carregar as YubiKeys: $error';
   }
 
   @override
@@ -2851,6 +2866,21 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   }
 
   @override
+  String setupFailed(String error) {
+    return 'Configuração falhou: $error';
+  }
+
+  @override
+  String biometricEnrollFailed(String error) {
+    return 'Não foi possível ativar o desbloqueio biométrico: $error';
+  }
+
+  @override
+  String restoreBackupFailed(String error) {
+    return 'Não foi possível restaurar a partir da cópia de segurança: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Abrir no navegador?';
 
   @override
@@ -3722,7 +3752,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String manageYubiKeysError(String error) {
-    return 'Erro: $error';
+    return 'Não foi possível carregar as YubiKeys: $error';
   }
 
   @override
@@ -4915,6 +4945,21 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   }
 
   @override
+  String setupFailed(String error) {
+    return 'Configuração falhou: $error';
+  }
+
+  @override
+  String biometricEnrollFailed(String error) {
+    return 'Não foi possível ativar o desbloqueio biométrico: $error';
+  }
+
+  @override
+  String restoreBackupFailed(String error) {
+    return 'Não foi possível restaurar a partir da cópia de recuperação: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Abrir no browser?';
 
   @override
@@ -5789,7 +5834,7 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String manageYubiKeysError(String error) {
-    return 'Erro: $error';
+    return 'Não foi possível carregar as YubiKeys: $error';
   }
 
   @override

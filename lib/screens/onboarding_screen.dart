@@ -505,7 +505,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             PlatformException(code: 'NO_BACKUP_FIDO2_DEVICE') =>
               l.noBackupFidoDeviceFound,
             PlatformException() => e.message ?? l.yubikeyOperationFailed,
-            _ => e.toString(),
+            _ => l.setupFailed(e.toString()),
           };
           _yubikeyStep = 0;
         });

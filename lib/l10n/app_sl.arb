@@ -303,6 +303,9 @@
   "saveEntryFailed": "Vnosa ni mogoče shraniti: {error}",
   "changePassphraseFailed": "Gesla za dostop ni mogoče spremeniti: {error}",
   "recoveryActionFailed": "Dejanje obnovitve ni uspelo: {error}",
+  "setupFailed": "Nastavitev ni uspela: {error}",
+  "biometricEnrollFailed": "Biometričnega odklepanja ni mogoče omogočiti: {error}",
+  "restoreBackupFailed": "Iz rešilne kopije ni mogoče obnoviti: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
@@ -724,7 +727,7 @@
   "editAliasTooltip": "Uredi vzdevek",
   "cannotRemoveLastKey": "Zadnjega ključa ni mogoče odstraniti",
   "removeKeyTooltip": "Odstrani ključ",
-  "manageYubiKeysError": "Napaka: {error}",
+  "manageYubiKeysError": "Ključev YubiKey ni mogoče naložiti: {error}",
   "@manageYubiKeysError": {
     "placeholders": {
       "error": {"type": "String"}

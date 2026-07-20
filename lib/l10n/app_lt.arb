@@ -303,6 +303,9 @@
   "saveEntryFailed": "Nepavyko išsaugoti įrašo: {error}",
   "changePassphraseFailed": "Nepavyko pakeisti slaptafrazės: {error}",
   "recoveryActionFailed": "Atkūrimo veiksmas nepavyko: {error}",
+  "setupFailed": "Sąranka nepavyko: {error}",
+  "biometricEnrollFailed": "Nepavyko įjungti biometrinio atrakinimo: {error}",
+  "restoreBackupFailed": "Nepavyko atkurti iš apsauginės kopijos: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
@@ -725,7 +728,7 @@
   "editAliasTooltip": "Redaguoti slapyvardį",
   "cannotRemoveLastKey": "Negalima pašalinti paskutinio rakto",
   "removeKeyTooltip": "Pašalinti raktą",
-  "manageYubiKeysError": "Klaida: {error}",
+  "manageYubiKeysError": "Nepavyko įkelti YubiKey raktų: {error}",
   "@manageYubiKeysError": {
     "placeholders": {
       "error": {"type": "String"}

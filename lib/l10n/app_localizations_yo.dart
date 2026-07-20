@@ -782,6 +782,21 @@ class AppLocalizationsYo extends AppLocalizations {
   }
 
   @override
+  String setupFailed(String error) {
+    return 'Ìṣètò kuna: $error';
+  }
+
+  @override
+  String biometricEnrollFailed(String error) {
+    return 'Ko le mu ṣiṣi ẹya ara ṣiṣẹ: $error';
+  }
+
+  @override
+  String restoreBackupFailed(String error) {
+    return 'Ko le dá padà láti àdàkọ ààbò: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Ṣii ninu aṣawakiri?';
 
   @override
@@ -1650,7 +1665,7 @@ class AppLocalizationsYo extends AppLocalizations {
 
   @override
   String manageYubiKeysError(String error) {
-    return 'Aṣiṣe: $error';
+    return 'Ko le kojọpọ YubiKey: $error';
   }
 
   @override

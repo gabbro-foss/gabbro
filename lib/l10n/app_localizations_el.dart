@@ -788,6 +788,21 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
+  String setupFailed(String error) {
+    return 'Αποτυχία ρύθμισης: $error';
+  }
+
+  @override
+  String biometricEnrollFailed(String error) {
+    return 'Αποτυχία ενεργοποίησης βιομετρικού ξεκλειδώματος: $error';
+  }
+
+  @override
+  String restoreBackupFailed(String error) {
+    return 'Αποτυχία επαναφοράς από το αντίγραφο ασφαλείας: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Άνοιγμα στο πρόγραμμα περιήγησης;';
 
   @override
@@ -1666,7 +1681,7 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String manageYubiKeysError(String error) {
-    return 'Σφάλμα: $error';
+    return 'Αποτυχία φόρτωσης των YubiKey: $error';
   }
 
   @override

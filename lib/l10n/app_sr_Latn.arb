@@ -303,6 +303,9 @@
   "saveEntryFailed": "Čuvanje unosa nije uspelo: {error}",
   "changePassphraseFailed": "Promena pristupne fraze nije uspela: {error}",
   "recoveryActionFailed": "Radnja oporavka nije uspela: {error}",
+  "setupFailed": "Podešavanje nije uspelo: {error}",
+  "biometricEnrollFailed": "Omogućavanje biometrijskog otključavanja nije uspelo: {error}",
+  "restoreBackupFailed": "Vraćanje iz pomoćne kopije nije uspelo: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
@@ -724,7 +727,7 @@
   "editAliasTooltip": "Uredi alias",
   "cannotRemoveLastKey": "Poslednji ključ se ne može ukloniti",
   "removeKeyTooltip": "Ukloni ključ",
-  "manageYubiKeysError": "Greška: {error}",
+  "manageYubiKeysError": "Učitavanje YubiKey ključeva nije uspelo: {error}",
   "@manageYubiKeysError": {
     "placeholders": {
       "error": {"type": "String"}

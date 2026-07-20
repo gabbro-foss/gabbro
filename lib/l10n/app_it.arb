@@ -303,6 +303,9 @@
   "saveEntryFailed": "Impossibile salvare la voce: {error}",
   "changePassphraseFailed": "Impossibile cambiare la passphrase: {error}",
   "recoveryActionFailed": "Azione di ripristino fallita: {error}",
+  "setupFailed": "Configurazione non riuscita: {error}",
+  "biometricEnrollFailed": "Impossibile attivare lo sblocco biometrico: {error}",
+  "restoreBackupFailed": "Impossibile ripristinare dalla copia di sicurezza: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
@@ -724,7 +727,7 @@
   "editAliasTooltip": "Modifica alias",
   "cannotRemoveLastKey": "Impossibile rimuovere l'ultima chiave",
   "removeKeyTooltip": "Rimuovi chiave",
-  "manageYubiKeysError": "Errore: {error}",
+  "manageYubiKeysError": "Impossibile caricare le YubiKey: {error}",
   "@manageYubiKeysError": {
     "placeholders": {
       "error": {"type": "String"}

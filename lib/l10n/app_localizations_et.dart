@@ -784,6 +784,21 @@ class AppLocalizationsEt extends AppLocalizations {
   }
 
   @override
+  String setupFailed(String error) {
+    return 'Seadistamine ebaõnnestus: $error';
+  }
+
+  @override
+  String biometricEnrollFailed(String error) {
+    return 'Ei õnnestunud biomeetrilist avamist lubada: $error';
+  }
+
+  @override
+  String restoreBackupFailed(String error) {
+    return 'Ei õnnestunud varukoopiast taastada: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Ava brauseris?';
 
   @override
@@ -1654,7 +1669,7 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String manageYubiKeysError(String error) {
-    return 'Viga: $error';
+    return 'Ei õnnestunud YubiKey-sid laadida: $error';
   }
 
   @override

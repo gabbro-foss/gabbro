@@ -303,6 +303,9 @@
   "saveEntryFailed": "Ezin izan da sarrera gorde: {error}",
   "changePassphraseFailed": "Ezin izan da pasaesaldia aldatu: {error}",
   "recoveryActionFailed": "Berreskuratze-ekintzak huts egin du: {error}",
+  "setupFailed": "Konfigurazioak huts egin du: {error}",
+  "biometricEnrollFailed": "Ezin izan da desblokeo biometrikoa gaitu: {error}",
+  "restoreBackupFailed": "Ezin izan da segurtasun-kopiatik berreskuratu: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
@@ -724,7 +727,7 @@
   "editAliasTooltip": "Ezizena editatu",
   "cannotRemoveLastKey": "Azken gakoa ezin da kendu",
   "removeKeyTooltip": "Gakoa kendu",
-  "manageYubiKeysError": "Errorea: {error}",
+  "manageYubiKeysError": "Ezin izan dira YubiKey-ak kargatu: {error}",
   "@manageYubiKeysError": {
     "placeholders": {
       "error": {"type": "String"}

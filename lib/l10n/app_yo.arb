@@ -303,6 +303,9 @@
   "saveEntryFailed": "Fifipamọ titẹ sii kuna: {error}",
   "changePassphraseFailed": "Yiyipada gbolohun ọrọ igbaniwọle kuna: {error}",
   "recoveryActionFailed": "Iṣe imularada kuna: {error}",
+  "setupFailed": "Ìṣètò kuna: {error}",
+  "biometricEnrollFailed": "Ko le mu ṣiṣi ẹya ara ṣiṣẹ: {error}",
+  "restoreBackupFailed": "Ko le dá padà láti àdàkọ ààbò: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
@@ -724,7 +727,7 @@
   "editAliasTooltip": "Ṣatunkọ orukọ apejuwe",
   "cannotRemoveLastKey": "A ko le yọ bọtini ti o kẹhin kuro",
   "removeKeyTooltip": "Yọ bọtini kuro",
-  "manageYubiKeysError": "Aṣiṣe: {error}",
+  "manageYubiKeysError": "Ko le kojọpọ YubiKey: {error}",
   "@manageYubiKeysError": {
     "placeholders": {
       "error": {"type": "String"}

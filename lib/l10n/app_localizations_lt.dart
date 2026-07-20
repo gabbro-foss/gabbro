@@ -785,6 +785,21 @@ class AppLocalizationsLt extends AppLocalizations {
   }
 
   @override
+  String setupFailed(String error) {
+    return 'Sąranka nepavyko: $error';
+  }
+
+  @override
+  String biometricEnrollFailed(String error) {
+    return 'Nepavyko įjungti biometrinio atrakinimo: $error';
+  }
+
+  @override
+  String restoreBackupFailed(String error) {
+    return 'Nepavyko atkurti iš apsauginės kopijos: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Atidaryti naršyklėje?';
 
   @override
@@ -1656,7 +1671,7 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String manageYubiKeysError(String error) {
-    return 'Klaida: $error';
+    return 'Nepavyko įkelti YubiKey raktų: $error';
   }
 
   @override

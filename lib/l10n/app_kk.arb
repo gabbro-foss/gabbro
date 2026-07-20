@@ -303,6 +303,9 @@
   "saveEntryFailed": "Жазбаны сақтау сәтсіз болды: {error}",
   "changePassphraseFailed": "Кілт фразасын өзгерту сәтсіз болды: {error}",
   "recoveryActionFailed": "Қалпына келтіру әрекеті сәтсіз болды: {error}",
+  "setupFailed": "Орнату сәтсіз болды: {error}",
+  "biometricEnrollFailed": "Биометриялық бекітуді ашуды қосу мүмкін болмады: {error}",
+  "restoreBackupFailed": "Қосалқы көшірмеден қалпына келтіру мүмкін болмады: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
@@ -724,7 +727,7 @@
   "editAliasTooltip": "Бүркеншік атын өңдеу",
   "cannotRemoveLastKey": "Соңғы кілтті алып тастауға болмайды",
   "removeKeyTooltip": "Кілтті алып тастау",
-  "manageYubiKeysError": "Қате: {error}",
+  "manageYubiKeysError": "YubiKey кілттерін жүктеу мүмкін болмады: {error}",
   "@manageYubiKeysError": {
     "placeholders": {
       "error": {"type": "String"}

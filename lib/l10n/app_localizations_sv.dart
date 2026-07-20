@@ -783,6 +783,21 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
+  String setupFailed(String error) {
+    return 'Konfigurationen misslyckades: $error';
+  }
+
+  @override
+  String biometricEnrollFailed(String error) {
+    return 'Kunde inte aktivera biometrisk upplåsning: $error';
+  }
+
+  @override
+  String restoreBackupFailed(String error) {
+    return 'Kunde inte återställa från reservkopian: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Öppna i webbläsare?';
 
   @override
@@ -1651,7 +1666,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String manageYubiKeysError(String error) {
-    return 'Fel: $error';
+    return 'Kunde inte läsa in YubiKeys: $error';
   }
 
   @override

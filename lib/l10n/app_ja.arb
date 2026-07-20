@@ -303,6 +303,9 @@
   "saveEntryFailed": "エントリの保存に失敗しました: {error}",
   "changePassphraseFailed": "パスフレーズの変更に失敗しました: {error}",
   "recoveryActionFailed": "復元操作に失敗しました: {error}",
+  "setupFailed": "セットアップに失敗しました: {error}",
+  "biometricEnrollFailed": "生体認証ロック解除を有効にできませんでした: {error}",
+  "restoreBackupFailed": "セーフティコピーから復元できませんでした: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
@@ -724,7 +727,7 @@
   "editAliasTooltip": "エイリアスを編集",
   "cannotRemoveLastKey": "最後のキーは削除できません",
   "removeKeyTooltip": "キーを削除",
-  "manageYubiKeysError": "エラー: {error}",
+  "manageYubiKeysError": "YubiKeyを読み込めませんでした: {error}",
   "@manageYubiKeysError": {
     "placeholders": {
       "error": {"type": "String"}

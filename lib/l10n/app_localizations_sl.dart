@@ -788,6 +788,21 @@ class AppLocalizationsSl extends AppLocalizations {
   }
 
   @override
+  String setupFailed(String error) {
+    return 'Nastavitev ni uspela: $error';
+  }
+
+  @override
+  String biometricEnrollFailed(String error) {
+    return 'Biometričnega odklepanja ni mogoče omogočiti: $error';
+  }
+
+  @override
+  String restoreBackupFailed(String error) {
+    return 'Iz rešilne kopije ni mogoče obnoviti: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Odpri v brskalniku?';
 
   @override
@@ -1658,7 +1673,7 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String manageYubiKeysError(String error) {
-    return 'Napaka: $error';
+    return 'Ključev YubiKey ni mogoče naložiti: $error';
   }
 
   @override

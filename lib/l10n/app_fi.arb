@@ -303,6 +303,9 @@
   "saveEntryFailed": "Merkinnän tallentaminen epäonnistui: {error}",
   "changePassphraseFailed": "Salauslauseen vaihtaminen epäonnistui: {error}",
   "recoveryActionFailed": "Palautustoiminto epäonnistui: {error}",
+  "setupFailed": "Määritys epäonnistui: {error}",
+  "biometricEnrollFailed": "Biometrisen avaamisen käyttöönotto epäonnistui: {error}",
+  "restoreBackupFailed": "Varmuuskopiosta palauttaminen epäonnistui: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
@@ -725,7 +728,7 @@
   "editAliasTooltip": "Muokkaa aliasta",
   "cannotRemoveLastKey": "Viimeistä avainta ei voi poistaa",
   "removeKeyTooltip": "Poista avain",
-  "manageYubiKeysError": "Virhe: {error}",
+  "manageYubiKeysError": "YubiKey-avainten lataaminen epäonnistui: {error}",
   "@manageYubiKeysError": {
     "placeholders": {
       "error": {"type": "String"}

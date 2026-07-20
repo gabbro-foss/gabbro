@@ -784,6 +784,21 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
+  String setupFailed(String error) {
+    return 'Konfigurazioak huts egin du: $error';
+  }
+
+  @override
+  String biometricEnrollFailed(String error) {
+    return 'Ezin izan da desblokeo biometrikoa gaitu: $error';
+  }
+
+  @override
+  String restoreBackupFailed(String error) {
+    return 'Ezin izan da segurtasun-kopiatik berreskuratu: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Nabigatzailean ireki?';
 
   @override
@@ -1651,7 +1666,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String manageYubiKeysError(String error) {
-    return 'Errorea: $error';
+    return 'Ezin izan dira YubiKey-ak kargatu: $error';
   }
 
   @override

@@ -303,6 +303,9 @@
   "saveEntryFailed": "Klarte ikkje lagre oppføringa: {error}",
   "changePassphraseFailed": "Klarte ikkje byte passfrasen: {error}",
   "recoveryActionFailed": "Gjenopprettingshandling mislukkast: {error}",
+  "setupFailed": "Oppsett mislukkast: {error}",
+  "biometricEnrollFailed": "Klarte ikkje aktivere biometrisk opplåsing: {error}",
+  "restoreBackupFailed": "Klarte ikkje gjenopprette frå sikkerheitskopien: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
@@ -725,7 +728,7 @@
   "editAliasTooltip": "Rediger alias",
   "cannotRemoveLastKey": "Kan ikkje fjerne den siste nøkkelen",
   "removeKeyTooltip": "Fjern nøkkel",
-  "manageYubiKeysError": "Feil: {error}",
+  "manageYubiKeysError": "Klarte ikkje laste YubiKey-ar: {error}",
   "@manageYubiKeysError": {
     "placeholders": {
       "error": {"type": "String"}

@@ -785,6 +785,21 @@ class AppLocalizationsFi extends AppLocalizations {
   }
 
   @override
+  String setupFailed(String error) {
+    return 'Määritys epäonnistui: $error';
+  }
+
+  @override
+  String biometricEnrollFailed(String error) {
+    return 'Biometrisen avaamisen käyttöönotto epäonnistui: $error';
+  }
+
+  @override
+  String restoreBackupFailed(String error) {
+    return 'Varmuuskopiosta palauttaminen epäonnistui: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Avataan selaimessa?';
 
   @override
@@ -1655,7 +1670,7 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String manageYubiKeysError(String error) {
-    return 'Virhe: $error';
+    return 'YubiKey-avainten lataaminen epäonnistui: $error';
   }
 
   @override

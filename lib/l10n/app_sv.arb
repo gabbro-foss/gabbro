@@ -303,6 +303,9 @@
   "saveEntryFailed": "Kunde inte spara posten: {error}",
   "changePassphraseFailed": "Kunde inte byta lösenfrasen: {error}",
   "recoveryActionFailed": "Återställningsåtgärd misslyckades: {error}",
+  "setupFailed": "Konfigurationen misslyckades: {error}",
+  "biometricEnrollFailed": "Kunde inte aktivera biometrisk upplåsning: {error}",
+  "restoreBackupFailed": "Kunde inte återställa från reservkopian: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
@@ -725,7 +728,7 @@
   "editAliasTooltip": "Redigera alias",
   "cannotRemoveLastKey": "Kan inte ta bort den sista nyckeln",
   "removeKeyTooltip": "Ta bort nyckel",
-  "manageYubiKeysError": "Fel: {error}",
+  "manageYubiKeysError": "Kunde inte läsa in YubiKeys: {error}",
   "@manageYubiKeysError": {
     "placeholders": {
       "error": {"type": "String"}

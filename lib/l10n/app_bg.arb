@@ -303,6 +303,9 @@
   "saveEntryFailed": "Запазването на записа не успя: {error}",
   "changePassphraseFailed": "Промяната на паролната фраза не успя: {error}",
   "recoveryActionFailed": "Действието за възстановяване не успя: {error}",
+  "setupFailed": "Настройката не успя: {error}",
+  "biometricEnrollFailed": "Биометричното отключване не можа да бъде активирано: {error}",
+  "restoreBackupFailed": "Възстановяването от резервното копие не успя: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
@@ -725,7 +728,7 @@
   "editAliasTooltip": "Редактирай псевдоним",
   "cannotRemoveLastKey": "Последният ключ не може да бъде премахнат",
   "removeKeyTooltip": "Премахни ключ",
-  "manageYubiKeysError": "Грешка: {error}",
+  "manageYubiKeysError": "YubiKey ключовете не можаха да бъдат заредени: {error}",
   "@manageYubiKeysError": {
     "placeholders": {
       "error": {"type": "String"}

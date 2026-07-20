@@ -784,6 +784,21 @@ class AppLocalizationsNn extends AppLocalizations {
   }
 
   @override
+  String setupFailed(String error) {
+    return 'Oppsett mislukkast: $error';
+  }
+
+  @override
+  String biometricEnrollFailed(String error) {
+    return 'Klarte ikkje aktivere biometrisk opplåsing: $error';
+  }
+
+  @override
+  String restoreBackupFailed(String error) {
+    return 'Klarte ikkje gjenopprette frå sikkerheitskopien: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Opne i nettlesar?';
 
   @override
@@ -1653,7 +1668,7 @@ class AppLocalizationsNn extends AppLocalizations {
 
   @override
   String manageYubiKeysError(String error) {
-    return 'Feil: $error';
+    return 'Klarte ikkje laste YubiKey-ar: $error';
   }
 
   @override

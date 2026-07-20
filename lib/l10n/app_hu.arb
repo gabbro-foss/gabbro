@@ -303,6 +303,9 @@
   "saveEntryFailed": "A bejegyzés mentése sikertelen: {error}",
   "changePassphraseFailed": "A jelmondat módosítása sikertelen: {error}",
   "recoveryActionFailed": "A helyreállítási művelet sikertelen: {error}",
+  "setupFailed": "A beállítás sikertelen: {error}",
+  "biometricEnrollFailed": "A biometrikus feloldás engedélyezése sikertelen: {error}",
+  "restoreBackupFailed": "A biztonsági másolatból való visszaállítás sikertelen: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
@@ -725,7 +728,7 @@
   "editAliasTooltip": "Alias szerkesztése",
   "cannotRemoveLastKey": "Az utolsó kulcs nem távolítható el",
   "removeKeyTooltip": "Kulcs eltávolítása",
-  "manageYubiKeysError": "Hiba: {error}",
+  "manageYubiKeysError": "A YubiKey-k betöltése sikertelen: {error}",
   "@manageYubiKeysError": {
     "placeholders": {
       "error": {"type": "String"}

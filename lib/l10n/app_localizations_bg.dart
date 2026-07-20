@@ -785,6 +785,21 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
+  String setupFailed(String error) {
+    return 'Настройката не успя: $error';
+  }
+
+  @override
+  String biometricEnrollFailed(String error) {
+    return 'Биометричното отключване не можа да бъде активирано: $error';
+  }
+
+  @override
+  String restoreBackupFailed(String error) {
+    return 'Възстановяването от резервното копие не успя: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Отвори в браузър?';
 
   @override
@@ -1653,7 +1668,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String manageYubiKeysError(String error) {
-    return 'Грешка: $error';
+    return 'YubiKey ключовете не можаха да бъдат заредени: $error';
   }
 
   @override

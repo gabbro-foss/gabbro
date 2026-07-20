@@ -784,6 +784,21 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
+  String setupFailed(String error) {
+    return 'Postavljanje nije uspjelo: $error';
+  }
+
+  @override
+  String biometricEnrollFailed(String error) {
+    return 'Omogućavanje biometrijskog otključavanja nije uspjelo: $error';
+  }
+
+  @override
+  String restoreBackupFailed(String error) {
+    return 'Vraćanje iz sigurnosne kopije nije uspjelo: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Otvori u pregledniku?';
 
   @override
@@ -1653,7 +1668,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String manageYubiKeysError(String error) {
-    return 'Greška: $error';
+    return 'Učitavanje YubiKey ključeva nije uspjelo: $error';
   }
 
   @override

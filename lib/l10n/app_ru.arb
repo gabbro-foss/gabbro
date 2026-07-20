@@ -303,6 +303,9 @@
   "saveEntryFailed": "Не удалось сохранить запись: {error}",
   "changePassphraseFailed": "Не удалось изменить кодовую фразу: {error}",
   "recoveryActionFailed": "Действие восстановления не удалось: {error}",
+  "setupFailed": "Настройка не удалась: {error}",
+  "biometricEnrollFailed": "Не удалось включить биометрическую разблокировку: {error}",
+  "restoreBackupFailed": "Не удалось восстановить из аварийной копии: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
@@ -725,7 +728,7 @@
   "editAliasTooltip": "Изменить псевдоним",
   "cannotRemoveLastKey": "Нельзя удалить последний ключ",
   "removeKeyTooltip": "Удалить ключ",
-  "manageYubiKeysError": "Ошибка: {error}",
+  "manageYubiKeysError": "Не удалось загрузить ключи YubiKey: {error}",
   "@manageYubiKeysError": {
     "placeholders": {
       "error": {"type": "String"}

@@ -1597,6 +1597,24 @@ abstract class AppLocalizations {
   /// **'Recovery action failed: {error}'**
   String recoveryActionFailed(String error);
 
+  /// Shown during onboarding when creating the vault or enrolling a YubiKey fails with an unexpected error (the known FIDO cases have their own messages). The localized frame carries the meaning; {error} is the raw technical detail (kept English on purpose, for bug reports).
+  ///
+  /// In en, this message translates to:
+  /// **'Setup failed: {error}'**
+  String setupFailed(String error);
+
+  /// Shown when enabling biometric unlock fails. The localized frame carries the meaning; {error} is the raw technical detail (kept English on purpose, for bug reports).
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t enable biometric unlock: {error}'**
+  String biometricEnrollFailed(String error);
+
+  /// Shown on unlock when restoring the vault from its .bak safety copy fails (e.g. the copy rotted between the check and the restore). The localized frame carries the meaning; {error} is the raw technical detail (kept English on purpose, for bug reports).
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t restore from the safety copy: {error}'**
+  String restoreBackupFailed(String error);
+
   /// No description provided for @openInBrowserTitle.
   ///
   /// In en, this message translates to:
@@ -3106,7 +3124,7 @@ abstract class AppLocalizations {
   /// No description provided for @manageYubiKeysError.
   ///
   /// In en, this message translates to:
-  /// **'Error: {error}'**
+  /// **'Couldn\'t load YubiKeys: {error}'**
   String manageYubiKeysError(String error);
 
   /// No description provided for @generatorModeClassic.

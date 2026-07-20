@@ -303,6 +303,9 @@
   "saveEntryFailed": "Kon het item niet opslaan: {error}",
   "changePassphraseFailed": "Kon de wachtwoordzin niet wijzigen: {error}",
   "recoveryActionFailed": "Herstelactie mislukt: {error}",
+  "setupFailed": "Instellen mislukt: {error}",
+  "biometricEnrollFailed": "Kon biometrische ontgrendeling niet inschakelen: {error}",
+  "restoreBackupFailed": "Kon niet herstellen vanaf de veiligheidskopie: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
@@ -725,7 +728,7 @@
   "editAliasTooltip": "Alias bewerken",
   "cannotRemoveLastKey": "Laatste sleutel kan niet worden verwijderd",
   "removeKeyTooltip": "Sleutel verwijderen",
-  "manageYubiKeysError": "Fout: {error}",
+  "manageYubiKeysError": "Kon YubiKeys niet laden: {error}",
   "@manageYubiKeysError": {
     "placeholders": {
       "error": {"type": "String"}

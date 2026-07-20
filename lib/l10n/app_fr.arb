@@ -303,6 +303,9 @@
   "saveEntryFailed": "Échec de l'enregistrement de l'entrée : {error}",
   "changePassphraseFailed": "Échec du changement du mot de passe principal : {error}",
   "recoveryActionFailed": "Échec de l'action de récupération : {error}",
+  "setupFailed": "Échec de la configuration : {error}",
+  "biometricEnrollFailed": "Impossible d'activer le déverrouillage biométrique : {error}",
+  "restoreBackupFailed": "Impossible de restaurer depuis la copie de sauvegarde : {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}
@@ -724,7 +727,7 @@
   "editAliasTooltip": "Modifier l'alias",
   "cannotRemoveLastKey": "Impossible de retirer la dernière clé",
   "removeKeyTooltip": "Retirer la clé",
-  "manageYubiKeysError": "Erreur : {error}",
+  "manageYubiKeysError": "Impossible de charger les YubiKeys : {error}",
   "@manageYubiKeysError": {
     "placeholders": {
       "error": {"type": "String"}

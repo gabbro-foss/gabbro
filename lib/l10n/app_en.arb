@@ -418,6 +418,27 @@
       "error": {"type": "String"}
     }
   },
+  "setupFailed": "Setup failed: {error}",
+  "@setupFailed": {
+    "description": "Shown during onboarding when creating the vault or enrolling a YubiKey fails with an unexpected error (the known FIDO cases have their own messages). The localized frame carries the meaning; {error} is the raw technical detail (kept English on purpose, for bug reports).",
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "biometricEnrollFailed": "Couldn't enable biometric unlock: {error}",
+  "@biometricEnrollFailed": {
+    "description": "Shown when enabling biometric unlock fails. The localized frame carries the meaning; {error} is the raw technical detail (kept English on purpose, for bug reports).",
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "restoreBackupFailed": "Couldn't restore from the safety copy: {error}",
+  "@restoreBackupFailed": {
+    "description": "Shown on unlock when restoring the vault from its .bak safety copy fails (e.g. the copy rotted between the check and the restore). The localized frame carries the meaning; {error} is the raw technical detail (kept English on purpose, for bug reports).",
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
 
   "openInBrowserTitle": "Open in browser?",
   "couldNotOpen": "Could not open {url}",
@@ -864,7 +885,7 @@
   "editAliasTooltip": "Edit alias",
   "cannotRemoveLastKey": "Cannot remove the last key",
   "removeKeyTooltip": "Remove key",
-  "manageYubiKeysError": "Error: {error}",
+  "manageYubiKeysError": "Couldn't load YubiKeys: {error}",
   "@manageYubiKeysError": {
     "placeholders": {
       "error": {"type": "String"}

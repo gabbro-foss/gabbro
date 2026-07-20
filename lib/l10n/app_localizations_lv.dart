@@ -783,6 +783,21 @@ class AppLocalizationsLv extends AppLocalizations {
   }
 
   @override
+  String setupFailed(String error) {
+    return 'Iestatīšana neizdevās: $error';
+  }
+
+  @override
+  String biometricEnrollFailed(String error) {
+    return 'Neizdevās iespējot biometrisko atbloķēšanu: $error';
+  }
+
+  @override
+  String restoreBackupFailed(String error) {
+    return 'Neizdevās atjaunot no rezerves kopijas: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Atvērt pārlūkā?';
 
   @override
@@ -1655,7 +1670,7 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String manageYubiKeysError(String error) {
-    return 'Kļūda: $error';
+    return 'Neizdevās ielādēt YubiKey atslēgas: $error';
   }
 
   @override

@@ -784,6 +784,21 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String setupFailed(String error) {
+    return 'A beállítás sikertelen: $error';
+  }
+
+  @override
+  String biometricEnrollFailed(String error) {
+    return 'A biometrikus feloldás engedélyezése sikertelen: $error';
+  }
+
+  @override
+  String restoreBackupFailed(String error) {
+    return 'A biztonsági másolatból való visszaállítás sikertelen: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Megnyitás böngészőben?';
 
   @override
@@ -1655,7 +1670,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String manageYubiKeysError(String error) {
-    return 'Hiba: $error';
+    return 'A YubiKey-k betöltése sikertelen: $error';
   }
 
   @override
