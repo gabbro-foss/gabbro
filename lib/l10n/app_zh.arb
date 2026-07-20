@@ -297,6 +297,7 @@
   },
   "exportFailed": "导出失败：{error}",
   "importFailed": "导入失败：{error}",
+  "folderActionFailed": "文件夹操作失败：{error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

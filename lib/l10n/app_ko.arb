@@ -297,6 +297,7 @@
   },
   "exportFailed": "내보내기에 실패했습니다: {error}",
   "importFailed": "가져오기에 실패했습니다: {error}",
+  "folderActionFailed": "폴더 작업에 실패했습니다: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

@@ -754,6 +754,11 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
+  String folderActionFailed(String error) {
+    return 'Karpeta-ekintzak huts egin du: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Nabigatzailean ireki?';
 
   @override

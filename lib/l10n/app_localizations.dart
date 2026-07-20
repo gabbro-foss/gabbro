@@ -1561,6 +1561,12 @@ abstract class AppLocalizations {
   /// **'Import failed: {error}'**
   String importFailed(String error);
 
+  /// Shown on the manage-folders screen when creating, renaming or deleting a folder throws. The localized frame carries the meaning; {error} is the raw technical detail (kept English on purpose, for bug reports).
+  ///
+  /// In en, this message translates to:
+  /// **'Folder action failed: {error}'**
+  String folderActionFailed(String error);
+
   /// No description provided for @openInBrowserTitle.
   ///
   /// In en, this message translates to:

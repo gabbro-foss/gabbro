@@ -203,6 +203,23 @@ void main() {
       expect(created, 'Finance');
     });
 
+    testWidgets('a folder action failure shows a localized message', (tester) async {
+      // The localized frame carries the meaning; the raw detail is appended,
+      // instead of the old meaning-empty "Error: ..." wrapper.
+      await tester.pumpWidget(_buildScreen(
+        createFolder: (_) async => throw Exception('duplicate'),
+      ));
+      await tester.pump();
+      await tester.tap(find.byIcon(Icons.add));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextFormField), 'Finance');
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('Folder action failed:'), findsOneWidget);
+      expect(find.textContaining('duplicate'), findsOneWidget);
+    });
+
     testWidgets('add folder cancel does not call createFolder', (tester) async {
       var called = false;
       await tester.pumpWidget(_buildScreen(

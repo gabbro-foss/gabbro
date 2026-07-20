@@ -756,6 +756,11 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
+  String folderActionFailed(String error) {
+    return 'Akce se složkou selhala: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Otevřít v prohlížeči?';
 
   @override

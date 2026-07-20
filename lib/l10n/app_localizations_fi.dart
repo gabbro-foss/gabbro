@@ -755,6 +755,11 @@ class AppLocalizationsFi extends AppLocalizations {
   }
 
   @override
+  String folderActionFailed(String error) {
+    return 'Kansiotoiminto epäonnistui: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Avataan selaimessa?';
 
   @override

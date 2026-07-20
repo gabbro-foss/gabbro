@@ -297,6 +297,7 @@
   },
   "exportFailed": "Экспорт сәтсіз болды: {error}",
   "importFailed": "Импорт сәтсіз болды: {error}",
+  "folderActionFailed": "Қалта әрекеті сәтсіз болды: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

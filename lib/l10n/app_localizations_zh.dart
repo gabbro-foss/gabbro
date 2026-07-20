@@ -742,6 +742,11 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String folderActionFailed(String error) {
+    return '文件夹操作失败：$error';
+  }
+
+  @override
   String get openInBrowserTitle => '在浏览器中打开？';
 
   @override
@@ -2683,6 +2688,11 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   }
 
   @override
+  String folderActionFailed(String error) {
+    return '文件夹操作失败：$error';
+  }
+
+  @override
   String get openInBrowserTitle => '在浏览器中打开？';
 
   @override
@@ -4621,6 +4631,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String importFailed(String error) {
     return '匯入失敗：$error';
+  }
+
+  @override
+  String folderActionFailed(String error) {
+    return '資料夾操作失敗：$error';
   }
 
   @override

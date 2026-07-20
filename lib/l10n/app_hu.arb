@@ -297,6 +297,7 @@
   },
   "exportFailed": "Exportálás sikertelen: {error}",
   "importFailed": "Importálás sikertelen: {error}",
+  "folderActionFailed": "Mappaművelet sikertelen: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

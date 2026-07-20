@@ -297,6 +297,7 @@
   },
   "exportFailed": "Export mislukt: {error}",
   "importFailed": "Import mislukt: {error}",
+  "folderActionFailed": "Mapactie mislukt: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

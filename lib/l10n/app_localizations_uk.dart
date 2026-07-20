@@ -757,6 +757,11 @@ class AppLocalizationsUk extends AppLocalizations {
   }
 
   @override
+  String folderActionFailed(String error) {
+    return 'Дія з папкою не вдалася: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Відкрити в браузері?';
 
   @override

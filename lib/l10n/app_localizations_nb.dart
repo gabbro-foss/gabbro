@@ -754,6 +754,11 @@ class AppLocalizationsNb extends AppLocalizations {
   }
 
   @override
+  String folderActionFailed(String error) {
+    return 'Mappehandling mislyktes: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Åpne i nettleser?';
 
   @override

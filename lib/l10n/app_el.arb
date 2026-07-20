@@ -297,6 +297,7 @@
   },
   "exportFailed": "Αποτυχία εξαγωγής: {error}",
   "importFailed": "Αποτυχία εισαγωγής: {error}",
+  "folderActionFailed": "Αποτυχία ενέργειας φακέλου: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

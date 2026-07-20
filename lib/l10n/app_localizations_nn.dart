@@ -754,6 +754,11 @@ class AppLocalizationsNn extends AppLocalizations {
   }
 
   @override
+  String folderActionFailed(String error) {
+    return 'Mappehandling mislukkast: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Opne i nettlesar?';
 
   @override

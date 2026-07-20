@@ -297,6 +297,7 @@
   },
   "exportFailed": "Export selhal: {error}",
   "importFailed": "Import selhal: {error}",
+  "folderActionFailed": "Akce se složkou selhala: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

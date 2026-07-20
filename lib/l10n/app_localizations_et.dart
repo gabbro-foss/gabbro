@@ -754,6 +754,11 @@ class AppLocalizationsEt extends AppLocalizations {
   }
 
   @override
+  String folderActionFailed(String error) {
+    return 'Kaustatoiming ebaõnnestus: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Ava brauseris?';
 
   @override

@@ -744,6 +744,11 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String folderActionFailed(String error) {
+    return '폴더 작업에 실패했습니다: $error';
+  }
+
+  @override
   String get openInBrowserTitle => '브라우저에서 열기?';
 
   @override

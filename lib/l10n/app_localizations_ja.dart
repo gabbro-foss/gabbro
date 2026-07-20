@@ -744,6 +744,11 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String folderActionFailed(String error) {
+    return 'フォルダ操作に失敗しました: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'ブラウザで開きますか?';
 
   @override

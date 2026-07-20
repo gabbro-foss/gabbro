@@ -297,6 +297,7 @@
   },
   "exportFailed": "Izvoz nije uspio: {error}",
   "importFailed": "Uvoz nije uspio: {error}",
+  "folderActionFailed": "Radnja s mapom nije uspjela: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

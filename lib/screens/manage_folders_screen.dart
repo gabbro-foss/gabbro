@@ -128,7 +128,7 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
         if (mounted) await _load();
       } catch (e) {
         messenger.showSnackBar(
-          SnackBar(content: Text(l.errorPrefix(e.toString()))),
+          SnackBar(content: Text(l.folderActionFailed(e.toString()))),
         );
       }
     }
@@ -175,7 +175,7 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
         if (mounted) await _load();
       } catch (e) {
         messenger.showSnackBar(
-          SnackBar(content: Text(l.errorPrefix(e.toString()))),
+          SnackBar(content: Text(l.folderActionFailed(e.toString()))),
         );
       }
     }
@@ -216,7 +216,7 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
         if (mounted) await _load();
       } catch (e) {
         messenger.showSnackBar(
-          SnackBar(content: Text(l.errorPrefix(e.toString()))),
+          SnackBar(content: Text(l.folderActionFailed(e.toString()))),
         );
       }
     }

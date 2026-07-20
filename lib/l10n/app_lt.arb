@@ -297,6 +297,7 @@
   },
   "exportFailed": "Eksportavimas nepavyko: {error}",
   "importFailed": "Importavimas nepavyko: {error}",
+  "folderActionFailed": "Aplanko veiksmas nepavyko: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

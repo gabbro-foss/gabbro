@@ -755,6 +755,11 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String folderActionFailed(String error) {
+    return 'Mapactie mislukt: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Openen in browser?';
 
   @override

@@ -297,6 +297,7 @@
   },
   "exportFailed": "Exportação falhou: {error}",
   "importFailed": "Importação falhou: {error}",
+  "folderActionFailed": "Ação da pasta falhou: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

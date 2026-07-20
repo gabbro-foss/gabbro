@@ -754,6 +754,11 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String folderActionFailed(String error) {
+    return 'Ação da pasta falhou: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Abrir no navegador?';
 
   @override
@@ -2791,6 +2796,11 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   }
 
   @override
+  String folderActionFailed(String error) {
+    return 'Ação da pasta falhou: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Abrir no navegador?';
 
   @override
@@ -4822,6 +4832,11 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   @override
   String importFailed(String error) {
     return 'Importação falhou: $error';
+  }
+
+  @override
+  String folderActionFailed(String error) {
+    return 'Ação de pasta falhou: $error';
   }
 
   @override

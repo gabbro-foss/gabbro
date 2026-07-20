@@ -753,6 +753,11 @@ class AppLocalizationsDa extends AppLocalizations {
   }
 
   @override
+  String folderActionFailed(String error) {
+    return 'Mappehandling mislykkedes: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Åbn i browser?';
 
   @override

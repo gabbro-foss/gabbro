@@ -756,6 +756,11 @@ class AppLocalizationsSk extends AppLocalizations {
   }
 
   @override
+  String folderActionFailed(String error) {
+    return 'Akcia priečinka zlyhala: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Otvoriť v prehliadači?';
 
   @override

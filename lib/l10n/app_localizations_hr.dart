@@ -754,6 +754,11 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
+  String folderActionFailed(String error) {
+    return 'Radnja s mapom nije uspjela: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Otvori u pregledniku?';
 
   @override

@@ -753,6 +753,11 @@ class AppLocalizationsLv extends AppLocalizations {
   }
 
   @override
+  String folderActionFailed(String error) {
+    return 'Mapes darbība neizdevās: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Atvērt pārlūkā?';
 
   @override

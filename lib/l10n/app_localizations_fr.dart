@@ -756,6 +756,11 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String folderActionFailed(String error) {
+    return 'Échec de l\'action sur le dossier : $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Ouvrir dans le navigateur ?';
 
   @override

@@ -297,6 +297,7 @@
   },
   "exportFailed": "Eksport nie powiódł się: {error}",
   "importFailed": "Import nie powiódł się: {error}",
+  "folderActionFailed": "Operacja na folderze nie powiodła się: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

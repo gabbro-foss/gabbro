@@ -376,6 +376,13 @@
       "error": {"type": "String"}
     }
   },
+  "folderActionFailed": "Folder action failed: {error}",
+  "@folderActionFailed": {
+    "description": "Shown on the manage-folders screen when creating, renaming or deleting a folder throws. The localized frame carries the meaning; {error} is the raw technical detail (kept English on purpose, for bug reports).",
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
 
   "openInBrowserTitle": "Open in browser?",
   "couldNotOpen": "Could not open {url}",

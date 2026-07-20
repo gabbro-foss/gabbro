@@ -297,6 +297,7 @@
   },
   "exportFailed": "Export zlyhal: {error}",
   "importFailed": "Import zlyhal: {error}",
+  "folderActionFailed": "Akcia priečinka zlyhala: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

@@ -296,7 +296,13 @@ class _ExportScreenState extends State<ExportScreen> {
       }
       if (mounted) Navigator.of(context).pop(true);
     } catch (e) {
-      if (mounted) setState(() => _error = e.toString());
+      if (mounted) {
+        setState(
+          () => _error = AppLocalizations.of(context).exportFailed(
+            e.toString(),
+          ),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isExporting = false);
     }

@@ -757,6 +757,11 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String folderActionFailed(String error) {
+    return 'Ordneraktion fehlgeschlagen: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Im Browser öffnen?';
 
   @override

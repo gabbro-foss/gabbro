@@ -755,6 +755,11 @@ class AppLocalizationsLt extends AppLocalizations {
   }
 
   @override
+  String folderActionFailed(String error) {
+    return 'Aplanko veiksmas nepavyko: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Atidaryti naršyklėje?';
 
   @override

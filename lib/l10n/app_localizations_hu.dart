@@ -754,6 +754,11 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String folderActionFailed(String error) {
+    return 'Mappaművelet sikertelen: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Megnyitás böngészőben?';
 
   @override

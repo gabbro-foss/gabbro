@@ -297,6 +297,7 @@
   },
   "exportFailed": "Izvoz ni uspel: {error}",
   "importFailed": "Uvoz ni uspel: {error}",
+  "folderActionFailed": "Dejanje mape ni uspelo: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

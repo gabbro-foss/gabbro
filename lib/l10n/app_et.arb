@@ -297,6 +297,7 @@
   },
   "exportFailed": "Eksportimine ebaõnnestus: {error}",
   "importFailed": "Importimine ebaõnnestus: {error}",
+  "folderActionFailed": "Kaustatoiming ebaõnnestus: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

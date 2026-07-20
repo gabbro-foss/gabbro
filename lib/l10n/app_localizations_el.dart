@@ -758,6 +758,11 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
+  String folderActionFailed(String error) {
+    return 'Αποτυχία ενέργειας φακέλου: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Άνοιγμα στο πρόγραμμα περιήγησης;';
 
   @override

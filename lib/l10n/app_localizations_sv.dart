@@ -753,6 +753,11 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
+  String folderActionFailed(String error) {
+    return 'Mappåtgärd misslyckades: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Öppna i webbläsare?';
 
   @override

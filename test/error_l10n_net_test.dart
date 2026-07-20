@@ -29,6 +29,7 @@ const Set<String> _approvedTemplates = {
   'failedToActivateKey',
   'exportFailed',
   'importFailed',
+  'folderActionFailed',
 };
 
 // `e.toString()` / `err.toString()` — a caught error rendered to a string. `\b`
@@ -95,9 +96,7 @@ List<_Site> _scanRawErrorSites() {
 // deliberately, and a fix must decrement the count.
 const Map<String, int> _todoRawErrors = {
   'lib/screens/review_changes_screen.dart': 1,
-  'lib/screens/manage_folders_screen.dart': 3,
   'lib/screens/onboarding_screen.dart': 1,
-  'lib/screens/export_screen.dart': 1,
   'lib/screens/vault_list_screen.dart': 3,
   'lib/screens/security_screen.dart': 1,
   'lib/screens/manage_yubikeys_screen.dart': 1,

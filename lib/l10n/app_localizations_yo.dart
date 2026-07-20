@@ -752,6 +752,11 @@ class AppLocalizationsYo extends AppLocalizations {
   }
 
   @override
+  String folderActionFailed(String error) {
+    return 'Iṣe folda kuna: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Ṣii ninu aṣawakiri?';
 
   @override

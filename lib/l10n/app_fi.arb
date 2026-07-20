@@ -297,6 +297,7 @@
   },
   "exportFailed": "Vienti epäonnistui: {error}",
   "importFailed": "Tuonti epäonnistui: {error}",
+  "folderActionFailed": "Kansiotoiminto epäonnistui: {error}",
   "@exportFailed": {
     "placeholders": {
       "error": {"type": "String"}

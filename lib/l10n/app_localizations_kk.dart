@@ -751,6 +751,11 @@ class AppLocalizationsKk extends AppLocalizations {
   }
 
   @override
+  String folderActionFailed(String error) {
+    return 'Қалта әрекеті сәтсіз болды: $error';
+  }
+
+  @override
   String get openInBrowserTitle => 'Браузерде ашу керек пе?';
 
   @override
