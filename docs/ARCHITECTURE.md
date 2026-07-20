@@ -113,15 +113,13 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-- **Linux install doesn't register in the app launcher (and ships no icon) — one root cause.**
-  No `.desktop` entry in an XDG applications dir (`~/.local/share/applications` or
-  `/usr/share/applications`), so qtile's launcher and Mint's menu never list gabbro — you run the
-  binary from the build folder; an AUR/installed build likewise shows a generic placeholder in
-  menu + taskbar. Fixable in two parts that DON'T block each other: (1) write + install the
-  `.desktop` entry NOW — launcher registration works immediately with a placeholder/existing icon;
-  (2) render the hicolor icon tree (16/32/48/64/128/256/512 + scalable SVG from `ic_launcher_*.svg`)
-  and point the entry at it — this half is logo-blocked. Same render covers the Windows `.ico`,
-  still the stock Flutter template.
+- **Distro packaging (replaces `install.sh`).** The tarball + `install.sh` is a
+  stopgap: it can't put the `gabbro` command on PATH for bare-WM / `spawncmd`
+  users without editing their shell rc, and `spawncmd` never reads the `.desktop`
+  entry. Real fix is native packages — AUR `PKGBUILD` (Arch; never core repos) +
+  `.deb` (Debian/Mint) — where the package manager handles user/system, PATH,
+  `.desktop` and icons the way brave-bin/enpass-bin do. Retire `install.sh` once
+  both land.
 
 ---
 
@@ -137,6 +135,9 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Features and UI/UX
+- **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
+  SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
+  and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
 - **No in-app Quit.** Under a tiling WM (qtile — no title-bar close button) the only way out is
   lock + force-kill. Add an explicit Quit that locks (zeroizes secrets) then exits cleanly — a menu
   item and/or shortcut.
