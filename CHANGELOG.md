@@ -22,11 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **A vault older than VERSION 11 is refused, not damaged.** The file is left untouched and the app explains it needs upgrading rather than reporting corruption. To upgrade: install alpha.14, open each vault once, then return. See [docs/VAULT_UPGRADE_PATH.md](docs/VAULT_UPGRADE_PATH.md).
 - Importing a too-old vault now explains it in your own language with a tappable link to the upgrade steps, instead of showing an untranslated error. Matches the unlock screen.
 - A vault written by a newer Gabbro build is now explained in your own language ("update Gabbro") with a tappable link, on both unlock and import, instead of an untranslated error citing a meaningless format number. Fail-closed behaviour unchanged.
-- Import failures (Enpass, Bitwarden, Google PM, Dashlane, CSV, and Gabbro-source) now show a localized "Import failed" message with the technical detail appended, instead of a bare untranslated error.
-- Export failures and folder create/rename/delete failures are now shown in your own language, with the technical detail appended, instead of an untranslated error.
-- A vault that fails to load, and a sync that fails for a reason other than a wrong passphrase, are now explained in your own language with the technical detail appended, instead of an untranslated error.
-- Failures saving an entry, changing the passphrase, and recovery-history actions are now shown in your own language, with the technical detail appended, instead of an untranslated error.
-- Onboarding, biometric-enrolment, safety-copy-restore and YubiKey-loading failures are now shown in your own language too. No error a user can trigger now reaches them in English only; a technical detail is appended for bug reports.
+- Every error a user can trigger — import, export, folder actions, vault load, sync, entry save, passphrase change, recovery history, onboarding, biometric enrolment, backup restore, YubiKey loading — is now shown in your own language, with the technical detail appended for bug reports, instead of an untranslated English error.
 
 ## [0.1.0-alpha.14] – 2026-07-11
 

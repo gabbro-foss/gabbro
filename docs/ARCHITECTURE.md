@@ -114,7 +114,8 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 **Net for l10n + accessibility on every screen.**
 
-**STATE 2026-07-20.** Three nets built (behaviours 1-3 done):
+**STATE 2026-07-20.** Four nets built (behaviours 1-4 done). Item 4 (error-l10n)
+is detailed in its own section below; the other three:
 - **Overflow (English) axis** — `test/overflow_probe_test.dart` sweeps 33 of 35
   screens+widgets on phone + tablet at max text (2 waived: `yubikey_tap`,
   `section_index` render nothing).
@@ -127,7 +128,7 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
   or dialog overflows a ~2x locale. Two meta-guards prove it can fail (padded delegate
   reaches the tree; detection still fires).
 
-Flutter 1471 (+2 skipped).
+Flutter 1478 (+2 skipped); count of record lives in the Testing table above.
 
 **How item 3 works (so it is not re-litigated).** A test-only `noSuchMethod` wrapper
 implements `AppLocalizations`, returning each label's English value (read from
