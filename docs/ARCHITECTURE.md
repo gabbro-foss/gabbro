@@ -78,7 +78,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1473 | 2 |
+| Flutter (`flutter test`) | 1476 | 2 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -149,8 +149,10 @@ Too-old vault path pinned in `unlock_screen_test.dart`.
 
 The `_todoRawErrors` backlog (22 sites / 13 files) shrinks via Canon-TDD, one
 red->fix->green each: all Class A raw sites + `errorPrefix(...)` (`manage_folders`
-x3, `vault_list` dialogs, meaning-empty) + `vaultFormatTooNew` (new ARB string +
-probe, mirroring too-old).
+x3, `vault_list` dialogs, meaning-empty). `vaultFormatTooNew` is done (localized
+message + link on unlock and import, mirroring too-old, all 37 locales); it added
+a probe branch not a new raw site, so the count is unchanged. Next: the five
+importers.
 
 **The behaviours still needing a net.** Each is what a user cannot do:
 5. Dark mode or high contrast makes text unreadable, or the setting does nothing.
@@ -190,16 +192,12 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   Dashlane and CSV all set their error to `e.toString()`, so any Rust failure reaches the
   user untranslated. The Gabbro source was fixed (matrix 4.2 / 4.4); these were not.
 - **Vault format version is meaningless to the user.** "v10"/"v11" is the file format and
-  tracks neither the app version nor the alpha number. Checked 2026-07-18 — the too-OLD
-  path is already fixed: unlock and Gabbro-source import probe `vaultFormatTooOld()` and
-  show `vaultFormatTooOld` + the upgrade link, naming no number, clean in all locales.
-  Two raw Rust strings still leak it, both English-only:
-  - `file_format.rs:264` (too old) — surfaces only where the raw error is shown instead of
-    the probe, i.e. the five importers above; fixing those covers it.
-  - `file_format.rs:255` (too NEW) — **the real gap.** No `vaultFormatTooNew` ARB string
-    exists at all, so a vault written by a newer build gives an untranslated message citing
-    a meaningless number. Reachable by syncing between devices on different versions.
-    Needs a new localized string + a probe, mirroring the too-old path.
+  tracks neither the app version nor the alpha number. Both too-old and too-new paths are
+  now handled: unlock and Gabbro-source import probe `vaultFormatTooOld()` /
+  `vaultFormatTooNew()` and show a localized message + link, naming no number, in all 37
+  locales. The only remaining leak of `file_format.rs:264` (too old) is the five importers
+  below, which show the raw Rust string instead of probing — covered by fixing those (the
+  error-l10n net's importer backlog).
 
 ### Security (pre-v1)
 - Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).

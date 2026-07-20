@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **A vault older than VERSION 11 is refused, not damaged.** The file is left untouched and the app explains it needs upgrading rather than reporting corruption. To upgrade: install alpha.14, open each vault once, then return. See [docs/VAULT_UPGRADE_PATH.md](docs/VAULT_UPGRADE_PATH.md).
 - Importing a too-old vault now explains it in your own language with a tappable link to the upgrade steps, instead of showing an untranslated error. Matches the unlock screen.
+- A vault written by a newer Gabbro build is now explained in your own language ("update Gabbro") with a tappable link, on both unlock and import, instead of an untranslated error citing a meaningless format number. Fail-closed behaviour unchanged.
 
 ## [0.1.0-alpha.14] – 2026-07-11
 
