@@ -78,7 +78,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1477 | 2 |
+| Flutter (`flutter test`) | 1478 | 2 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -148,18 +148,18 @@ project_error_l10n_by_log_level). Too-old vault path pinned in
 `unlock_screen_test.dart`. The classifier is statement-scoped, so a template
 wrapping split across lines by the formatter is not a false leak.
 
-The `_todoRawErrors` backlog now stands at **15 sites / 11 files** and shrinks via
+The `_todoRawErrors` backlog now stands at **11 sites / 9 files** and shrinks via
 Canon-TDD, one red->fix->green each. Done so far:
 - `vaultFormatTooNew` — localized message + link on unlock and import, all 37
   locales (added a probe branch, not a raw site, so no count change).
-- The five importers + Gabbro-source + csv-mapping (7 sites) now use the
-  meaning-carrying `importFailed` template ("Import failed: {error}", 37 locales) —
-  22 -> 15.
+- Importers (five + Gabbro-source + csv-mapping, 7 sites) -> `importFailed` (22 -> 15).
+- `export` -> reused `exportFailed`; `manage_folders` x3 (`errorPrefix`, meaning-empty)
+  -> new `folderActionFailed` (15 -> 11).
 
-Still todo: `errorPrefix(...)` (`manage_folders` x3, `vault_list` dialogs,
-meaning-empty) + the remaining Class A raw sites (review_changes, onboarding,
-export, security, manage_yubikeys, change_passphrase, unlock, recovery_history,
-create_entry).
+Still todo (11): `vault_list` x3, `review_changes`, `onboarding`, `security`,
+`manage_yubikeys`, `change_passphrase`, `unlock`, `recovery_history`,
+`create_entry`. Note: `onboarding`'s `_ =>` arm also catches vault-creation errors,
+so it needs a generic "couldn't create/enroll" message, not a YubiKey-specific one.
 
 **The behaviours still needing a net.** Each is what a user cannot do:
 5. Dark mode or high contrast makes text unreadable, or the setting does nothing.
