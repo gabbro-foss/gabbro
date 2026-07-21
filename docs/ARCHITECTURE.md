@@ -71,7 +71,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 635 | 17 |
+| Rust (`cargo test -q`) | 641 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 11 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -113,7 +113,7 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-_Empty — the in-app Quit task shipped 2026-07-21 (hardware-verified). Pick the next item from the Bikeshed._
+Prepare the **v0.1.0-alpha.15** release: follow BUILD_AND_RELEASE.md pre-flight -> build -> sign -> tag last. Gate green 2026-07-21; CHANGELOG `[Unreleased]` ready. Refresh `cargo audit`/`cargo deny` online before publishing.
 
 ---
 
