@@ -1219,6 +1219,7 @@ class _VaultListScreenState extends State<VaultListScreen>
           vaultAlias: widget.vaultAlias,
           blockPassphraseCopyPaste: settings.blockPassphraseCopyPaste,
           registry: appState.registry,
+          onQuit: widget.onQuit,
         ),
       ),
       (_) => false,

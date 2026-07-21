@@ -44,6 +44,11 @@ Locale localeFor(LanguageChoice choice) {
   };
 }
 
+/// Quit is offered only on Linux: a tiling WM (e.g. qtile) may have no
+/// title-bar close, and there is no other way out of the locked/first-run
+/// screens. Elsewhere this is null, so the Quit controls are absent.
+VoidCallback? get _quitApp => Platform.isLinux ? () => exit(0) : null;
+
 /// Material localizations delegate that falls back to English for locales not
 /// covered by [GlobalMaterialLocalizations] (e.g. yo, nn).
 class _FallbackMaterialLocalizationsDelegate
@@ -206,6 +211,7 @@ class _AutofillUnlockAppState extends State<_AutofillUnlockApp> {
           onUnlock: widget.onUnlock,
           onUnlocked: _onUnlocked,
           blockPassphraseCopyPaste: widget.settings.blockPassphraseCopyPaste,
+          onQuit: _quitApp,
         ),
       ),
     );
@@ -387,6 +393,7 @@ class _AutofillSaveAppState extends State<_AutofillSaveApp> {
           await _loadContext();
         },
         blockPassphraseCopyPaste: widget.settings.blockPassphraseCopyPaste,
+        onQuit: _quitApp,
       );
     }
     final ctx = _context;
@@ -826,6 +833,7 @@ class _GabbroAppState extends State<GabbroApp>
     vaultAlias: alias,
     blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
     registry: _registry,
+    onQuit: _quitApp,
   );
 
   Widget _buildHome() {
@@ -834,6 +842,7 @@ class _GabbroAppState extends State<GabbroApp>
       return OnboardingScreen(
         blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
         onVaultCreated: _onVaultCreated,
+        onQuit: _quitApp,
       );
     }
     return _buildUnlockScreen(lastUsed.path, lastUsed.alias);
@@ -899,6 +908,7 @@ class _GabbroAppState extends State<GabbroApp>
                     'The unreadable vault was removed. Create or add a vault to continue.',
                 blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
                 onVaultCreated: _onVaultCreated,
+                onQuit: _quitApp,
               )
             : _buildUnlockScreen(remaining.path, remaining.alias),
       ),
@@ -937,6 +947,7 @@ class _GabbroAppState extends State<GabbroApp>
                   'Your vault has been deleted. Create a new one to continue.',
               blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
               onVaultCreated: _onVaultCreated,
+              onQuit: _quitApp,
             ),
           ),
           (_) => false,
@@ -977,6 +988,7 @@ class _GabbroAppState extends State<GabbroApp>
             blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
             onVaultCreated: _onVaultCreated,
             existingAliases: _registry.records.map((r) => r.alias).toSet(),
+            onQuit: _quitApp,
           ),
         ),
       );

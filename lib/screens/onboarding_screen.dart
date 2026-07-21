@@ -498,6 +498,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             builder: (context) => VaultListScreen(
               vaultPath: _vaultPath,
               vaultAlias: _aliasController.text.trim(),
+              onQuit: widget.onQuit,
             ),
           ),
         );

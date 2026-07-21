@@ -717,6 +717,7 @@ class _UnlockScreenState extends State<UnlockScreen>
           builder: (context) => VaultListScreen(
             vaultPath: widget.vaultPath,
             vaultAlias: widget.vaultAlias,
+            onQuit: widget.onQuit,
           ),
         ),
       );
