@@ -243,6 +243,9 @@ void main() {
       expect(find.text('Help'), findsOneWidget);
       expect(find.text('About'), findsOneWidget);
       expect(find.text('Manage folders'), findsOneWidget);
+      // Net (2026-07-21): pin the exact count so a silently added or removed item
+      // is caught. Bump this when the menu gains an item (e.g. Quit).
+      expect(find.byType(PopupMenuItem<String>), findsNWidgets(13));
     });
     testWidgets('menu items do not overflow at large text', (tester) async {
       // ADR-016: hardware walk #4 found the bare-Text menu items (e.g. Manage

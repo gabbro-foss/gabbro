@@ -279,6 +279,10 @@ void main() {
   testWidgets('language button shown on first launch (cannot pop)', (tester) async {
     await tester.pumpWidget(_buildScreen());
     expect(find.byIcon(Icons.language), findsOneWidget);
+    // Net (2026-07-21): the first-run top row is language (left) + accessibility
+    // (right). Pin both, so a later change to the row (e.g. adding Quit) is a
+    // deliberate, caught edit rather than a silent shift.
+    expect(find.byIcon(Icons.accessibility_new), findsOneWidget);
   });
 
   testWidgets('path field is pre-populated from initialPath', (tester) async {
