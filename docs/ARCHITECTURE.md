@@ -79,7 +79,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1656 | 7 |
+| Flutter (`flutter test`) | 1673 | 7 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -113,37 +113,7 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-- **In-app Quit.** Under a tiling WM (qtile — no title-bar close) the only way out is
-  lock + force-kill; add an explicit Quit. Design agreed 2026-07-21; net-first done.
-  - **Behaviour:**
-    - Locked screens (unlock, first-run onboarding) — **exit immediately, no confirm**
-      (no secrets in memory).
-    - Unlocked — **confirm dialog -> lock -> exit**. Reuse the existing lock
-      (`_lockAndExit`/`lockVault()` in `vault_list_screen.dart`, which zeroizes the Rust
-      session via `session::lock_vault()`); do not reinvent zeroize.
-  - **Exit mechanism:** `exit(0)` (dart:io) **after** the lock `await` completes — wipe
-    keys first, exit second. Flutter's `SystemNavigator.pop()` is a no-op on Linux desktop.
-  - **Placement (net-first findings):**
-    - Convention today: **top-left = leave this screen**, top-right = accessibility.
-    - Unlock screen has **no top buttons** currently -> add Quit **top-left**.
-    - Icon `Icons.power_settings_new` (power symbol), tooltip/label "Quit". **Not** the X
-      (`Icons.close`) — that already means "cancel this screen" (onboarding, help).
-    - First-run onboarding: left corner becomes `[Quit] [Language]`, accessibility stays
-      right; only when root (`!Navigator.canPop`) — nested onboarding keeps its X-cancel.
-    - Unlocked: new "Quit" item at the bottom of the `Icons.menu` PopupMenu in
-      `vault_list_screen.dart` — one wiring point, tablet inherits it.
-  - **Confirm dialog:** default focus **Cancel**; Tab moves, Enter submits, Esc cancels;
-    localized title/body/Cancel/Quit; screen-reader announced.
-  - **Accessibility (all new controls):** keyboard-operable (focus + Enter/Space, visible
-    focus ring); min 48dp hit target even as the icon scales down; localized semantic label
-    + button role; ≥3:1 non-text contrast in high-contrast + light/dark; meaning by shape
-    not colour; follow the existing icon-only-above-1.5x + tooltip idiom in
-    `unlock_screen.dart`. Tooltip is its own overflow surface — clear all 37 locales at 8x
-    on 360px.
-  - **Overflow watch:** onboarding first-run row = three fixed icon buttons across a 360px
-    phone at 8x — verify no overflow.
-  - **Out of scope:** keyboard shortcut (Ctrl+Q) — no shortcut infra exists yet; moved to
-    Bikeshed.
+_Empty — the in-app Quit task shipped 2026-07-21 (hardware-verified). Pick the next item from the Bikeshed._
 
 ---
 
