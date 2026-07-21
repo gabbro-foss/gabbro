@@ -17,6 +17,7 @@
 
   "cancel": "Annulla",
   "quit": "Esci",
+  "quitConfirmTitle": "Bloccare e uscire da Gabbro?",
   "delete": "Elimina",
   "save": "Salva",
   "close": "Chiudi",

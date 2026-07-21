@@ -26,6 +26,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get quit => '退出';
 
   @override
+  String get quitConfirmTitle => '锁定并退出 Gabbro？';
+
+  @override
   String get delete => '删除';
 
   @override
@@ -2015,6 +2018,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get quit => '退出';
 
   @override
+  String get quitConfirmTitle => '锁定并退出 Gabbro？';
+
+  @override
   String get delete => '删除';
 
   @override
@@ -4002,6 +4008,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get quit => '結束';
+
+  @override
+  String get quitConfirmTitle => '鎖定並結束 Gabbro？';
 
   @override
   String get delete => '刪除';

@@ -17,6 +17,7 @@
 
   "cancel": "Abbrechen",
   "quit": "Beenden",
+  "quitConfirmTitle": "Gabbro sperren und beenden?",
   "delete": "Löschen",
   "save": "Speichern",
   "close": "Schließen",

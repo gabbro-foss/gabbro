@@ -17,6 +17,7 @@
 
   "cancel": "Zrušiť",
   "quit": "Ukončiť",
+  "quitConfirmTitle": "Uzamknúť a ukončiť Gabbro?",
   "delete": "Vymazať",
   "save": "Uložiť",
   "close": "Zavrieť",

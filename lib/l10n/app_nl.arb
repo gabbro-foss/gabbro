@@ -17,6 +17,7 @@
 
   "cancel": "Annuleren",
   "quit": "Afsluiten",
+  "quitConfirmTitle": "Gabbro vergrendelen en afsluiten?",
   "delete": "Verwijderen",
   "save": "Opslaan",
   "close": "Sluiten",

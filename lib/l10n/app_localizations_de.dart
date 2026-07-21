@@ -26,6 +26,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get quit => 'Beenden';
 
   @override
+  String get quitConfirmTitle => 'Gabbro sperren und beenden?';
+
+  @override
   String get delete => 'Löschen';
 
   @override

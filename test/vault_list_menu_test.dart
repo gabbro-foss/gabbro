@@ -5,9 +5,12 @@ import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/screens/about_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
-Widget _buildScreen() => testApp(VaultListScreen(
+Widget _buildScreen({VoidCallback? onQuit, void Function()? onLock}) =>
+    testApp(VaultListScreen(
       vaultPath: '/tmp/test.gabbro',
       listEntries: () => <EntrySummaryData>[],
+      onQuit: onQuit,
+      onLock: onLock ?? lockVault,
     ));
 
 Widget _buildScreenWithLoginEntry() => testApp(VaultListScreen(
@@ -243,9 +246,80 @@ void main() {
       expect(find.text('Help'), findsOneWidget);
       expect(find.text('About'), findsOneWidget);
       expect(find.text('Manage folders'), findsOneWidget);
+      expect(find.text('Quit'), findsOneWidget);
       // Net (2026-07-21): pin the exact count so a silently added or removed item
-      // is caught. Bump this when the menu gains an item (e.g. Quit).
-      expect(find.byType(PopupMenuItem<String>), findsNWidgets(13));
+      // is caught. Bump this when the menu gains an item.
+      expect(find.byType(PopupMenuItem<String>), findsNWidgets(14));
+    });
+
+    // Quit from an unlocked vault confirms first (an accidental menu tap must
+    // not nuke the session), so it opens a dialog rather than exiting at once.
+    testWidgets('tapping Quit opens a confirm dialog, does not exit yet',
+        (tester) async {
+      var quitCalls = 0;
+      await tester.pumpWidget(_buildScreen(onQuit: () => quitCalls++));
+      await _setNarrow(tester);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.menu));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Quit'));
+      await tester.pumpAndSettle();
+      expect(find.byType(AlertDialog), findsOneWidget);
+      expect(quitCalls, 0);
+    });
+
+    testWidgets('confirming Quit locks then exits (wipe before exit)',
+        (tester) async {
+      final calls = <String>[];
+      await tester.pumpWidget(_buildScreen(
+        onLock: () => calls.add('lock'),
+        onQuit: () => calls.add('quit'),
+      ));
+      await _setNarrow(tester);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.menu));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Quit'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, 'Quit'));
+      await tester.pumpAndSettle();
+      // Order is the security property: keys wiped BEFORE the process exits.
+      expect(calls, ['lock', 'quit']);
+    });
+
+    testWidgets('cancelling the Quit dialog neither locks nor exits',
+        (tester) async {
+      final calls = <String>[];
+      await tester.pumpWidget(_buildScreen(
+        onLock: () => calls.add('lock'),
+        onQuit: () => calls.add('quit'),
+      ));
+      await _setNarrow(tester);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.menu));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Quit'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
+      await tester.pumpAndSettle();
+      expect(calls, isEmpty);
+      expect(find.byType(AlertDialog), findsNothing);
+    });
+
+    testWidgets('the Quit dialog defaults focus to Cancel (safe default)',
+        (tester) async {
+      await tester.pumpWidget(_buildScreen(onQuit: () {}));
+      await _setNarrow(tester);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.menu));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Quit'));
+      await tester.pumpAndSettle();
+      final cancel = tester.widget<TextButton>(
+        find.widgetWithText(TextButton, 'Cancel'),
+      );
+      expect(cancel.autofocus, isTrue,
+          reason: 'a stray Enter must hit Cancel, not Quit');
     });
     testWidgets('menu items do not overflow at large text', (tester) async {
       // ADR-016: hardware walk #4 found the bare-Text menu items (e.g. Manage

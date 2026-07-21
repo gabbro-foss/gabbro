@@ -26,6 +26,9 @@ class AppLocalizationsSk extends AppLocalizations {
   String get quit => 'Ukončiť';
 
   @override
+  String get quitConfirmTitle => 'Uzamknúť a ukončiť Gabbro?';
+
+  @override
   String get delete => 'Vymazať';
 
   @override

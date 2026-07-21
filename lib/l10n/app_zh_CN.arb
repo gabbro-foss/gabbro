@@ -17,6 +17,7 @@
 
   "cancel": "取消",
   "quit": "退出",
+  "quitConfirmTitle": "锁定并退出 Gabbro？",
   "delete": "删除",
   "save": "保存",
   "close": "关闭",

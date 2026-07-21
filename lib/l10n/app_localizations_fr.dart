@@ -26,6 +26,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get quit => 'Quitter';
 
   @override
+  String get quitConfirmTitle => 'Verrouiller et quitter Gabbro ?';
+
+  @override
   String get delete => 'Supprimer';
 
   @override

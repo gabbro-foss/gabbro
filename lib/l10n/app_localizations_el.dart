@@ -26,6 +26,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get quit => 'Έξοδος';
 
   @override
+  String get quitConfirmTitle => 'Κλείδωμα και έξοδος από το Gabbro;';
+
+  @override
   String get delete => 'Διαγραφή';
 
   @override

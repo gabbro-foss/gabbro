@@ -17,6 +17,7 @@
 
   "cancel": "Annuler",
   "quit": "Quitter",
+  "quitConfirmTitle": "Verrouiller et quitter Gabbro ?",
   "delete": "Supprimer",
   "save": "Enregistrer",
   "close": "Fermer",

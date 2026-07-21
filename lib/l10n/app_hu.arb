@@ -17,6 +17,7 @@
 
   "cancel": "Mégse",
   "quit": "Kilépés",
+  "quitConfirmTitle": "Gabbro zárolása és bezárása?",
   "delete": "Törlés",
   "save": "Mentés",
   "close": "Bezárás",

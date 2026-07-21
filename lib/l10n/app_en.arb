@@ -15,6 +15,7 @@
 
   "cancel": "Cancel",
   "quit": "Quit",
+  "quitConfirmTitle": "Lock and quit Gabbro?",
   "delete": "Delete",
   "save": "Save",
   "close": "Close",

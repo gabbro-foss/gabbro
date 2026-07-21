@@ -193,6 +193,12 @@ abstract class AppLocalizations {
   /// **'Quit'**
   String get quit;
 
+  /// No description provided for @quitConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Lock and quit Gabbro?'**
+  String get quitConfirmTitle;
+
   /// No description provided for @delete.
   ///
   /// In en, this message translates to:

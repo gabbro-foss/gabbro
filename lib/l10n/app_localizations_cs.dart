@@ -26,6 +26,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get quit => 'Ukončit';
 
   @override
+  String get quitConfirmTitle => 'Zamknout a ukončit Gabbro?';
+
+  @override
   String get delete => 'Smazat';
 
   @override

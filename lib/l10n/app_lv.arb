@@ -17,6 +17,7 @@
 
   "cancel": "Atcelt",
   "quit": "Iziet",
+  "quitConfirmTitle": "Bloķēt un iziet no Gabbro?",
   "delete": "Dzēst",
   "save": "Saglabāt",
   "close": "Aizvērt",

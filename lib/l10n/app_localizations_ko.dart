@@ -26,6 +26,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get quit => '종료';
 
   @override
+  String get quitConfirmTitle => 'Gabbro를 잠그고 종료하시겠습니까?';
+
+  @override
   String get delete => '삭제';
 
   @override

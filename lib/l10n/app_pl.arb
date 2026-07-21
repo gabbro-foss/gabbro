@@ -17,6 +17,7 @@
 
   "cancel": "Anuluj",
   "quit": "Zakończ",
+  "quitConfirmTitle": "Zablokować i zamknąć Gabbro?",
   "delete": "Usuń",
   "save": "Zapisz",
   "close": "Zamknij",

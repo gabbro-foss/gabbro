@@ -26,6 +26,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get quit => 'Salir';
 
   @override
+  String get quitConfirmTitle => '¿Bloquear y salir de Gabbro?';
+
+  @override
   String get delete => 'Eliminar';
 
   @override

@@ -17,6 +17,7 @@
 
   "cancel": "Utzi",
   "quit": "Irten",
+  "quitConfirmTitle": "Blokeatu eta Gabbrotik irten?",
   "delete": "Ezabatu",
   "save": "Gorde",
   "close": "Itxi",

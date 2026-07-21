@@ -26,6 +26,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get quit => 'Kilépés';
 
   @override
+  String get quitConfirmTitle => 'Gabbro zárolása és bezárása?';
+
+  @override
   String get delete => 'Törlés';
 
   @override

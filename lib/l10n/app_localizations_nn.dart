@@ -26,6 +26,9 @@ class AppLocalizationsNn extends AppLocalizations {
   String get quit => 'Avslutt';
 
   @override
+  String get quitConfirmTitle => 'Lås og avslutt Gabbro?';
+
+  @override
   String get delete => 'Slett';
 
   @override

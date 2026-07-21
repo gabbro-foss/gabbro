@@ -17,6 +17,7 @@
 
   "cancel": "Отмена",
   "quit": "Выход",
+  "quitConfirmTitle": "Заблокировать и выйти из Gabbro?",
   "delete": "Удалить",
   "save": "Сохранить",
   "close": "Закрыть",

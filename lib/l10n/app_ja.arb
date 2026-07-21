@@ -17,6 +17,7 @@
 
   "cancel": "キャンセル",
   "quit": "終了",
+  "quitConfirmTitle": "Gabbroをロックして終了しますか？",
   "delete": "削除",
   "save": "保存",
   "close": "閉じる",

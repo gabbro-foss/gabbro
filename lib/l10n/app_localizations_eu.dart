@@ -26,6 +26,9 @@ class AppLocalizationsEu extends AppLocalizations {
   String get quit => 'Irten';
 
   @override
+  String get quitConfirmTitle => 'Blokeatu eta Gabbrotik irten?';
+
+  @override
   String get delete => 'Ezabatu';
 
   @override

@@ -17,6 +17,7 @@
 
   "cancel": "취소",
   "quit": "종료",
+  "quitConfirmTitle": "Gabbro를 잠그고 종료하시겠습니까?",
   "delete": "삭제",
   "save": "저장",
   "close": "닫기",

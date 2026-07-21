@@ -17,6 +17,7 @@
 
   "cancel": "Odustani",
   "quit": "Izađi",
+  "quitConfirmTitle": "Zaključati i izaći iz Gabbra?",
   "delete": "Izbriši",
   "save": "Spremi",
   "close": "Zatvori",

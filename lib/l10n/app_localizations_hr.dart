@@ -26,6 +26,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get quit => 'Izađi';
 
   @override
+  String get quitConfirmTitle => 'Zaključati i izaći iz Gabbra?';
+
+  @override
   String get delete => 'Izbriši';
 
   @override

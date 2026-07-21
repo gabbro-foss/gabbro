@@ -26,6 +26,9 @@ class AppLocalizationsKk extends AppLocalizations {
   String get quit => 'Шығу';
 
   @override
+  String get quitConfirmTitle => 'Gabbro бағдарламасын құлыптап жабасыз ба?';
+
+  @override
   String get delete => 'Жою';
 
   @override

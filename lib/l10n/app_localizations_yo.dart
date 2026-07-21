@@ -26,6 +26,9 @@ class AppLocalizationsYo extends AppLocalizations {
   String get quit => 'Jáde';
 
   @override
+  String get quitConfirmTitle => 'Tì kí o sì jáde Gabbro?';
+
+  @override
   String get delete => 'Parẹ';
 
   @override

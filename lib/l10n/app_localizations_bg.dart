@@ -26,6 +26,9 @@ class AppLocalizationsBg extends AppLocalizations {
   String get quit => 'Изход';
 
   @override
+  String get quitConfirmTitle => 'Заключване и изход от Gabbro?';
+
+  @override
   String get delete => 'Изтрий';
 
   @override

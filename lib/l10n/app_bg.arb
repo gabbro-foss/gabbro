@@ -17,6 +17,7 @@
 
   "cancel": "Откажи",
   "quit": "Изход",
+  "quitConfirmTitle": "Заключване и изход от Gabbro?",
   "delete": "Изтрий",
   "save": "Запази",
   "close": "Затвори",

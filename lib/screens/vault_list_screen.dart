@@ -245,6 +245,15 @@ class VaultListScreen extends StatefulWidget {
   /// construction time. Pass `[]` to force passphrase-only mode (tests).
   final List<YubikeyRecordData>? yubikeyRecords;
 
+  /// Quit the app from the menu — the item confirms first, then locks (wipes
+  /// keys) and exits. Null → the confirm's Quit action does nothing (tests that
+  /// don't drive Quit); production wires it to exit after the lock.
+  final VoidCallback? onQuit;
+
+  /// Locks the vault (wipes keys in Rust). Seam for tests; defaults to the real
+  /// [lockVault] bridge call. Quit calls this before exiting.
+  final void Function() onLock;
+
   VaultListScreen({
     super.key,
     required this.vaultPath,
@@ -266,6 +275,8 @@ class VaultListScreen extends StatefulWidget {
     this.applySyncDecisions = _defaultApplySyncDecisions,
     this.cancelSync = _defaultCancelSync,
     this.yubikeyRecords,
+    this.onQuit,
+    this.onLock = lockVault,
     bool? isAndroid,
   }) : isAndroid = isAndroid ?? Platform.isAndroid;
 
@@ -1162,7 +1173,36 @@ class _VaultListScreenState extends State<VaultListScreen>
         Navigator.of(
           context,
         ).push(MaterialPageRoute(builder: (context) => const AboutScreen()));
+      case 'quit':
+        await _confirmQuit();
     }
+  }
+
+  // An accidental menu tap must not nuke a live session, so Quit from an
+  // unlocked vault confirms first; on confirm it locks (wiping keys in Rust)
+  // then exits. Cancel is the default focus, so a stray Enter is harmless.
+  Future<void> _confirmQuit() async {
+    final l = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l.quitConfirmTitle),
+        actions: [
+          TextButton(
+            autofocus: true,
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(l.quit),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    widget.onLock();
+    widget.onQuit?.call();
   }
 
   void _lockAndExit() {
@@ -1445,6 +1485,17 @@ class _VaultListScreenState extends State<VaultListScreen>
                         Icon(Icons.info_outline, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
                         Expanded(child: Text(ml.menuAbout)),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuDivider(),
+                  PopupMenuItem(
+                    value: 'quit',
+                    child: Row(
+                      children: [
+                        Icon(Icons.power_settings_new, size: scaledIconSize(context, 20)),
+                        const SizedBox(width: 12),
+                        Expanded(child: Text(ml.quit)),
                       ],
                     ),
                   ),

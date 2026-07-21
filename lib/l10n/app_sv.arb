@@ -17,6 +17,7 @@
 
   "cancel": "Avbryt",
   "quit": "Avsluta",
+  "quitConfirmTitle": "Lås och avsluta Gabbro?",
   "delete": "Ta bort",
   "save": "Spara",
   "close": "Stäng",

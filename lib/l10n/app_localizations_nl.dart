@@ -26,6 +26,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get quit => 'Afsluiten';
 
   @override
+  String get quitConfirmTitle => 'Gabbro vergrendelen en afsluiten?';
+
+  @override
   String get delete => 'Verwijderen';
 
   @override

@@ -17,6 +17,7 @@
 
   "cancel": "Annuller",
   "quit": "Afslut",
+  "quitConfirmTitle": "Lås og afslut Gabbro?",
   "delete": "Slet",
   "save": "Gem",
   "close": "Luk",

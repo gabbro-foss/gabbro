@@ -26,6 +26,9 @@ class AppLocalizationsDa extends AppLocalizations {
   String get quit => 'Afslut';
 
   @override
+  String get quitConfirmTitle => 'Lås og afslut Gabbro?';
+
+  @override
   String get delete => 'Slet';
 
   @override

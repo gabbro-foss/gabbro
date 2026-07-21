@@ -17,6 +17,7 @@
 
   "cancel": "Atšaukti",
   "quit": "Išeiti",
+  "quitConfirmTitle": "Užrakinti ir išeiti iš Gabbro?",
   "delete": "Ištrinti",
   "save": "Išsaugoti",
   "close": "Uždaryti",

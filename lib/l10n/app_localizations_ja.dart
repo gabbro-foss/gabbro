@@ -26,6 +26,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get quit => '終了';
 
   @override
+  String get quitConfirmTitle => 'Gabbroをロックして終了しますか？';
+
+  @override
   String get delete => '削除';
 
   @override

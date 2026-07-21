@@ -17,6 +17,7 @@
 
   "cancel": "Otkaži",
   "quit": "Изађи",
+  "quitConfirmTitle": "Закључати и изаћи из Gabbro-а?",
   "delete": "Obriši",
   "save": "Sačuvaj",
   "close": "Zatvori",

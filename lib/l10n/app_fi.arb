@@ -17,6 +17,7 @@
 
   "cancel": "Peruuta",
   "quit": "Lopeta",
+  "quitConfirmTitle": "Lukitaanko ja suljetaanko Gabbro?",
   "delete": "Poista",
   "save": "Tallenna",
   "close": "Sulje",

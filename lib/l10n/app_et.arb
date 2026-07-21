@@ -17,6 +17,7 @@
 
   "cancel": "Tühista",
   "quit": "Välju",
+  "quitConfirmTitle": "Kas lukustada ja Gabbrost väljuda?",
   "delete": "Kustuta",
   "save": "Salvesta",
   "close": "Sulge",

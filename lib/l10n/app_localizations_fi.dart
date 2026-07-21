@@ -26,6 +26,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get quit => 'Lopeta';
 
   @override
+  String get quitConfirmTitle => 'Lukitaanko ja suljetaanko Gabbro?';
+
+  @override
   String get delete => 'Poista';
 
   @override

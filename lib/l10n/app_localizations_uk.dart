@@ -26,6 +26,9 @@ class AppLocalizationsUk extends AppLocalizations {
   String get quit => 'Вийти';
 
   @override
+  String get quitConfirmTitle => 'Заблокувати та вийти з Gabbro?';
+
+  @override
   String get delete => 'Видалити';
 
   @override
