@@ -69,6 +69,7 @@ Widget _buildScreen({
   Future<bool> Function(String)? onRestoreFromFile,
   Future<void> Function(String)? onRemoveVaultFromList,
   Future<void> Function(String)? onDeleteVaultFile,
+  VoidCallback? onQuit,
 }) =>
     testApp(UnlockScreen(
       vaultPath: vaultPath,
@@ -94,6 +95,7 @@ Widget _buildScreen({
       onRestoreFromFile: onRestoreFromFile ?? (_) async => false,
       onRemoveVaultFromList: onRemoveVaultFromList ?? (_) async {},
       onDeleteVaultFile: onDeleteVaultFile ?? (_) async {},
+      onQuit: onQuit,
     ));
 
 // ── Net B appearance shell (top-level per test-helper convention) ──────────────
@@ -123,7 +125,10 @@ Widget _appShell(
 
 // A bare UnlockScreen with only the mount-safe seams overridden (no real FFI on
 // mount); appearance tests render it, they never tap unlock.
-UnlockScreen _bareUnlock({List<YubikeyRecordData> yubikeyRecords = const []}) =>
+UnlockScreen _bareUnlock({
+  List<YubikeyRecordData> yubikeyRecords = const [],
+  VoidCallback? onQuit,
+}) =>
     UnlockScreen(
       vaultPath: '/tmp/test.gabbro',
       onEstimateEntropy: _fakeEntropy,
@@ -131,6 +136,7 @@ UnlockScreen _bareUnlock({List<YubikeyRecordData> yubikeyRecords = const []}) =>
       onVaultIsReadable: (_) async => true,
       onBackupUsable: (_) async => false,
       onBiometricIsEnrolled: (_) async => false,
+      onQuit: onQuit,
     );
 
 // RT-3: a bare UnlockScreen showing the pre-v11 format banner. The Net A/B/C
@@ -197,6 +203,21 @@ void main() {
     await tester.pumpWidget(_buildScreen());
 
     expect(find.byTooltip('Quit'), findsOneWidget);
+  });
+
+  // Quit (canon-TDD #3): the locked screen holds no secrets, so Quit exits at
+  // once — it fires onQuit and never raises a confirm dialog (that beat is only
+  // for the unlocked vault, where an accidental quit costs a re-unlock).
+  testWidgets('tapping Quit on the locked screen fires onQuit, no confirm',
+      (tester) async {
+    var quitCalls = 0;
+    await tester.pumpWidget(_buildScreen(onQuit: () => quitCalls++));
+
+    await tester.tap(find.byIcon(Icons.power_settings_new));
+    await tester.pumpAndSettle();
+
+    expect(quitCalls, 1);
+    expect(find.byType(AlertDialog), findsNothing);
   });
 
   testWidgets('error message shown when unlock throws', (tester) async {
@@ -662,6 +683,19 @@ void main() {
         await tester.pumpAndSettle();
         await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
       }
+      handle.dispose();
+    });
+
+    // Quit (canon-TDD #4): the Quit button is enabled only when onQuit is wired,
+    // so the sweeps above (button disabled) skip it. Pin its 48dp target and its
+    // localized label directly, with Quit active.
+    testWidgets('enabled Quit button meets tap-target and label guidelines',
+        (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(_appShell(_bareUnlock(onQuit: () {})));
+      await tester.pumpAndSettle();
+      await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+      await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
       handle.dispose();
     });
 
