@@ -1178,14 +1178,17 @@ class _UnlockScreenState extends State<UnlockScreen>
           ),
         ),
       ),
-      Align(
-        alignment: Alignment.topLeft,
-        child: IconButton(
-          icon: const Icon(Icons.power_settings_new),
-          tooltip: l.quit,
-          onPressed: widget.onQuit,
+      // Quit is wired only on Linux (a tiling WM may have no title-bar close);
+      // elsewhere onQuit is null and the button is absent, not just disabled.
+      if (widget.onQuit != null)
+        Align(
+          alignment: Alignment.topLeft,
+          child: IconButton(
+            icon: const Icon(Icons.power_settings_new),
+            tooltip: l.quit,
+            onPressed: widget.onQuit,
+          ),
         ),
-      ),
       ]),
       ),
     );

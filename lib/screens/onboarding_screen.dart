@@ -769,11 +769,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        IconButton(
-                          icon: const Icon(Icons.power_settings_new),
-                          tooltip: l.quit,
-                          onPressed: widget.onQuit,
-                        ),
+                        // Quit is wired only on Linux; elsewhere onQuit is null
+                        // and only the language button remains on the left.
+                        if (widget.onQuit != null)
+                          IconButton(
+                            icon: const Icon(Icons.power_settings_new),
+                            tooltip: l.quit,
+                            onPressed: widget.onQuit,
+                          ),
                         IconButton(
                           icon: const Icon(Icons.language),
                           tooltip: AppLocalizations.of(context).sectionLanguage,

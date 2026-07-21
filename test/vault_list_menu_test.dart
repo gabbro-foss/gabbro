@@ -226,7 +226,7 @@ void main() {
 
   group('VaultListScreen menu items', () {
     testWidgets('all expected menu items are present', (tester) async {
-      await tester.pumpWidget(_buildScreen());
+      await tester.pumpWidget(_buildScreen(onQuit: () {}));
       await _setNarrow(tester);
       await tester.pumpAndSettle();
 
@@ -250,6 +250,18 @@ void main() {
       // Net (2026-07-21): pin the exact count so a silently added or removed item
       // is caught. Bump this when the menu gains an item.
       expect(find.byType(PopupMenuItem<String>), findsNWidgets(14));
+    });
+
+    // Linux-only: off-Linux onQuit is null, so the menu has no Quit item.
+    testWidgets('no Quit item when onQuit is not wired (non-Linux)',
+        (tester) async {
+      await tester.pumpWidget(_buildScreen());
+      await _setNarrow(tester);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.menu));
+      await tester.pumpAndSettle();
+      expect(find.text('Quit'), findsNothing);
+      expect(find.byType(PopupMenuItem<String>), findsNWidgets(13));
     });
 
     // Quit from an unlocked vault confirms first (an accidental menu tap must

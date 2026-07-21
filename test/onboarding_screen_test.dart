@@ -292,14 +292,22 @@ void main() {
   // beside the language button.
   testWidgets('first-run onboarding shows a Quit button (power icon)',
       (tester) async {
-    await tester.pumpWidget(_buildScreen());
+    await tester.pumpWidget(_buildScreen(onQuit: () {}));
     expect(find.byIcon(Icons.power_settings_new), findsOneWidget);
     // Language stays put beside it (left corner = [Quit] [Language]).
     expect(find.byIcon(Icons.language), findsOneWidget);
   });
 
-  testWidgets('first-run Quit carries a localized tooltip', (tester) async {
+  // Linux-only: off-Linux onQuit is null, so only the language button remains.
+  testWidgets('no first-run Quit when onQuit is not wired (non-Linux)',
+      (tester) async {
     await tester.pumpWidget(_buildScreen());
+    expect(find.byIcon(Icons.power_settings_new), findsNothing);
+    expect(find.byIcon(Icons.language), findsOneWidget);
+  });
+
+  testWidgets('first-run Quit carries a localized tooltip', (tester) async {
+    await tester.pumpWidget(_buildScreen(onQuit: () {}));
     expect(find.byTooltip('Quit'), findsOneWidget);
   });
 
@@ -322,7 +330,7 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
     tester.platformDispatcher.textScaleFactorTestValue = 8.0;
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
-    await tester.pumpWidget(_buildScreen());
+    await tester.pumpWidget(_buildScreen(onQuit: () {}));
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
   });

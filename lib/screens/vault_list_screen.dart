@@ -1488,17 +1488,22 @@ class _VaultListScreenState extends State<VaultListScreen>
                       ],
                     ),
                   ),
-                  const PopupMenuDivider(),
-                  PopupMenuItem(
-                    value: 'quit',
-                    child: Row(
-                      children: [
-                        Icon(Icons.power_settings_new, size: scaledIconSize(context, 20)),
-                        const SizedBox(width: 12),
-                        Expanded(child: Text(ml.quit)),
-                      ],
+                  // Quit is wired only on Linux; elsewhere onQuit is null and
+                  // the item is absent.
+                  if (widget.onQuit != null) ...[
+                    const PopupMenuDivider(),
+                    PopupMenuItem(
+                      value: 'quit',
+                      child: Row(
+                        children: [
+                          Icon(Icons.power_settings_new,
+                              size: scaledIconSize(context, 20)),
+                          const SizedBox(width: 12),
+                          Expanded(child: Text(ml.quit)),
+                        ],
+                      ),
                     ),
-                  ),
+                  ],
                 ];
               },
             ),

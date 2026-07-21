@@ -190,9 +190,18 @@ void main() {
   // needs a way out of the locked screen. First scenario: the button exists.
   testWidgets('shows a Quit button (power icon) on the locked screen',
       (tester) async {
-    await tester.pumpWidget(_buildScreen());
+    await tester.pumpWidget(_buildScreen(onQuit: () {}));
 
     expect(find.byIcon(Icons.power_settings_new), findsOneWidget);
+  });
+
+  // Linux-only: production wires onQuit only on Linux, so elsewhere the button
+  // is absent (not a greyed-out dead control).
+  testWidgets('no Quit button when onQuit is not wired (non-Linux)',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen());
+
+    expect(find.byIcon(Icons.power_settings_new), findsNothing);
   });
 
   // Quit (canon-TDD #2): the button needs a localized name so a screen-reader
@@ -200,7 +209,7 @@ void main() {
   // guideline. English base string checked here; all 37 locales via l10n_test.
   testWidgets('the Quit button carries a localized tooltip/label',
       (tester) async {
-    await tester.pumpWidget(_buildScreen());
+    await tester.pumpWidget(_buildScreen(onQuit: () {}));
 
     expect(find.byTooltip('Quit'), findsOneWidget);
   });
