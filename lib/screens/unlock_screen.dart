@@ -279,6 +279,11 @@ class UnlockScreen extends StatefulWidget {
   /// Null → routes through GabbroApp.removeVault(deleteFiles: true).
   final Future<void> Function(String path)? onDeleteVaultFile;
 
+  /// Quit the app from the locked screen — a tiling-WM user has no title-bar
+  /// close, so this is their only way out. Null → the button renders disabled
+  /// (tests that don't drive Quit); production wires it to exit the app.
+  final VoidCallback? onQuit;
+
   const UnlockScreen({
     super.key,
     required this.vaultPath,
@@ -304,6 +309,7 @@ class UnlockScreen extends StatefulWidget {
     this.onRestoreFromFile = _defaultRestoreFromFile,
     this.onRemoveVaultFromList,
     this.onDeleteVaultFile,
+    this.onQuit,
   });
 
   @override
@@ -741,7 +747,8 @@ class _UnlockScreenState extends State<UnlockScreen>
     final onAndroid = widget.isAndroid ?? Platform.isAndroid;
     return Scaffold(
       body: SafeArea(
-        child: LayoutBuilder(
+        // Quit overlay (top-left): a tiling-WM user has no title-bar close.
+        child: Stack(children: [LayoutBuilder(
           builder: (context, constraints) => SingleChildScrollView(
           child: ConstrainedBox(
             constraints: BoxConstraints(minHeight: constraints.maxHeight),
@@ -1171,6 +1178,14 @@ class _UnlockScreenState extends State<UnlockScreen>
           ),
         ),
       ),
+      Align(
+        alignment: Alignment.topLeft,
+        child: IconButton(
+          icon: const Icon(Icons.power_settings_new),
+          onPressed: widget.onQuit,
+        ),
+      ),
+      ]),
       ),
     );
   }

@@ -180,6 +180,15 @@ void main() {
     expect(find.byType(TextField), findsOneWidget);
   });
 
+  // Quit (2026-07-21, canon-TDD #1): a tiling-WM user with no title-bar close
+  // needs a way out of the locked screen. First scenario: the button exists.
+  testWidgets('shows a Quit button (power icon) on the locked screen',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen());
+
+    expect(find.byIcon(Icons.power_settings_new), findsOneWidget);
+  });
+
   testWidgets('error message shown when unlock throws', (tester) async {
     await tester.pumpWidget(
       _buildScreen(
