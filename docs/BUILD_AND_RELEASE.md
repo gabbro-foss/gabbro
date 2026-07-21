@@ -221,3 +221,7 @@ the release fresh from the tag.
 release is published, its tag and attached assets are locked — you cannot replace an
 asset or move the tag afterwards. So verify every artifact (signature, APK certs, About
 version) *before* publishing; any fix after publish means cutting a new `alpha.N+1`.
+The build log only echoes the shell var, not the baked value — confirm the embedded
+version with `strings build/linux/x64/release/bundle/lib/libapp.so | grep alpha` (and
+`unzip -p <apk> lib/<abi>/libapp.so | strings | grep alpha`), and smoke-test the
+freshly-built bundle, **not** an installed copy still on your PATH from a prior release.

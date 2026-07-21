@@ -55,7 +55,7 @@ gabbro/
 ├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + crash-safety (kill mid-write) + frozen golden fixtures (FIXTURES.md)
 ├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, BiometricHelper + BiometricStore (per-vault; + Robolectric tests)
 ├── linux/packaging/      # Desktop integration: install.sh (.desktop + PATH launcher, per-user/--system), render_icons.sh, install_test.sh (sandbox)
-├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, VAULT_SYNC, AUTOTYPE_AND_AUTOFILL, RT3_CLEANUP, AI_*; decisions/ (ADRs); artefacts/
+├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, VAULT_SYNC, AUTOTYPE_AND_AUTOFILL, AI_*; decisions/ (ADRs); artefacts/
 ├── test/  integration_test/          # Flutter widget/unit + Linux real-FFI suites (dart test)
 ├── test_data/            # Sample import files + migration_vaults/ (refusal corpus at floor v11, one vault per VERSION + MIGRATION_TESTS.md + test_matrix.md)
 ├── assets/               # fonts, images, help/; public_suffix_list.dat (autofill eTLD+1)
@@ -113,7 +113,7 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-Prepare the **v0.1.0-alpha.15** release: follow BUILD_AND_RELEASE.md pre-flight -> build -> sign -> tag last. Gate green 2026-07-21; CHANGELOG `[Unreleased]` ready. Refresh `cargo audit`/`cargo deny` online before publishing.
+_Empty — v0.1.0-alpha.15 shipped 2026-07-21. Pick the next item from the Bikeshed._
 
 ---
 

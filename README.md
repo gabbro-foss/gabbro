@@ -325,7 +325,6 @@ dart test integration_test/ -j 1
 - [`docs/SECURITY.md`](docs/SECURITY.md) — security overview: what Gabbro protects against and what it does not
 - [`docs/BUILD_AND_RELEASE.md`](docs/BUILD_AND_RELEASE.md) — build environment, runtime dependencies, and the release process
 - [`docs/MAINTENANCE.md`](docs/MAINTENANCE.md) — vendored data and pins that need periodic refresh
-- [`docs/RT3_CLEANUP.md`](docs/RT3_CLEANUP.md) — record of deleting the unused hybrid key-exchange layer (readable floor raised to v11)
 - [`docs/decisions/`](docs/decisions/) — architectural decision records (ADRs)
 
 **AI development and review**
