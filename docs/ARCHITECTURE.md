@@ -113,7 +113,10 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-_Empty — v0.1.0-alpha.15 shipped 2026-07-21. Pick the next item from the Bikeshed._
+**Flip the repo to public.** Repo lives in the `gabbro-foss` org. Pre-publish audit cleared
+2026-07-21: secrets/keys clean across full history, real name + project emails kept by
+informed choice — no history rewrite, so existing immutable releases/tags stay valid.
+Remaining step: the GitHub visibility toggle. Optional: read-only Codeberg mirror.
 
 ---
 
@@ -154,29 +157,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 
 ### Security (pre-v1)
 - Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
-
-### Going public (pre-v1)
-- **Flip the repo to public.** Repo now lives in the `gabbro-foss` org (transferred; URLs
-  migrated). Crypto-review outreach (above) is welcome-not-blocking. Optional: a read-only
-  Codeberg mirror for redundancy.
-  - **Pre-publish audit (required before flipping).** A green `gabbro_test` proves the code,
-    not that the repo is safe to expose; going public exposes all history permanently
-    (forks/caches survive a later re-hide). Before the flip:
-    - Secret/PII sweep of tracked files **and git history** — real names, personal emails,
-      absolute host paths; no passphrase/proof committed beside a challenge vault.
-    - Confirm CLAUDE.md + LEARNINGS.md are gitignored **and untracked**.
-  - **Known finding (2026-07-21):** the LICENSE copyright line and commit author/committer
-    metadata across history carry the maintainer's real name + personal emails — must be
-    removed before flipping. GPL-3 requires source + notices, **not** VCS history, and does
-    **not** require a legal name; LICENSE may use a pseudonym/org (`The Gabbro Authors` /
-    `gabbro-foss`). Options:
-    - **(1) Clean squash** to a single public root commit — safest, nothing old to leak, but
-      destroys the intentional crack-me vaults in history.
-    - **(2) `git filter-repo`** identity/mailmap rewrite + LICENSE scrub — keeps history incl.
-      the challenge vaults; all hashes change (fine, no public clones yet).
-    - **(3) Fresh public repo** from a snapshot; keep the private one private.
-    - Deciding factor between them: whether the crack-me challenge needs its historical
-      vaults public.
 
 ### V2+ / Defer
 - **Linux biometric unlock** (laptop fingerprint readers, e.g. libfido2/PAM or `fprintd`). Fits the current per-device model unchanged: Linux would just get its own local per-vault secret store; the vault file carries no biometric state, so nothing else changes.
