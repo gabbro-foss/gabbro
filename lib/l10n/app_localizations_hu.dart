@@ -23,6 +23,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get cancel => 'Mégse';
 
   @override
+  String get quit => 'Kilépés';
+
+  @override
   String get delete => 'Törlés';
 
   @override

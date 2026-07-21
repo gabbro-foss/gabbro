@@ -23,6 +23,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get cancel => 'Tühista';
 
   @override
+  String get quit => 'Välju';
+
+  @override
   String get delete => 'Kustuta';
 
   @override

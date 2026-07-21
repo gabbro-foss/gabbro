@@ -23,6 +23,9 @@ class AppLocalizationsEu extends AppLocalizations {
   String get cancel => 'Utzi';
 
   @override
+  String get quit => 'Irten';
+
+  @override
   String get delete => 'Ezabatu';
 
   @override

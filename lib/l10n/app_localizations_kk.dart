@@ -23,6 +23,9 @@ class AppLocalizationsKk extends AppLocalizations {
   String get cancel => 'Бас тарту';
 
   @override
+  String get quit => 'Шығу';
+
+  @override
   String get delete => 'Жою';
 
   @override

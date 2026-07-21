@@ -23,6 +23,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get cancel => 'Peruuta';
 
   @override
+  String get quit => 'Lopeta';
+
+  @override
   String get delete => 'Poista';
 
   @override

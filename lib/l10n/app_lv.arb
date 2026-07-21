@@ -16,6 +16,7 @@
   "filePickerNoPortal": "File dialog unavailable here. The system file portal isn't reachable.",
 
   "cancel": "Atcelt",
+  "quit": "Iziet",
   "delete": "Dzēst",
   "save": "Saglabāt",
   "close": "Aizvērt",

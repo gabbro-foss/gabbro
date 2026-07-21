@@ -23,6 +23,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get cancel => 'Atcelt';
 
   @override
+  String get quit => 'Iziet';
+
+  @override
   String get delete => 'Dzēst';
 
   @override

@@ -23,6 +23,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get cancel => 'Cancelar';
 
   @override
+  String get quit => 'Sair';
+
+  @override
   String get delete => 'Excluir';
 
   @override
@@ -2105,6 +2108,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get cancel => 'Cancelar';
 
   @override
+  String get quit => 'Sair';
+
+  @override
   String get delete => 'Excluir';
 
   @override
@@ -4182,6 +4188,9 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get cancel => 'Cancelar';
+
+  @override
+  String get quit => 'Sair';
 
   @override
   String get delete => 'Eliminar';

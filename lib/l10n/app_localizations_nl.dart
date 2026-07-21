@@ -23,6 +23,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get cancel => 'Annuleren';
 
   @override
+  String get quit => 'Afsluiten';
+
+  @override
   String get delete => 'Verwijderen';
 
   @override

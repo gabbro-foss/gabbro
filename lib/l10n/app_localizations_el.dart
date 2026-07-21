@@ -23,6 +23,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get cancel => 'Άκυρο';
 
   @override
+  String get quit => 'Έξοδος';
+
+  @override
   String get delete => 'Διαγραφή';
 
   @override

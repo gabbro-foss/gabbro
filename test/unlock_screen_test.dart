@@ -189,6 +189,16 @@ void main() {
     expect(find.byIcon(Icons.power_settings_new), findsOneWidget);
   });
 
+  // Quit (canon-TDD #2): the button needs a localized name so a screen-reader
+  // user and a hover both get "Quit", and it satisfies the labelled-tap-target
+  // guideline. English base string checked here; all 37 locales via l10n_test.
+  testWidgets('the Quit button carries a localized tooltip/label',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen());
+
+    expect(find.byTooltip('Quit'), findsOneWidget);
+  });
+
   testWidgets('error message shown when unlock throws', (tester) async {
     await tester.pumpWidget(
       _buildScreen(

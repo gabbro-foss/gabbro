@@ -23,6 +23,9 @@ class AppLocalizationsSk extends AppLocalizations {
   String get cancel => 'Zrušiť';
 
   @override
+  String get quit => 'Ukončiť';
+
+  @override
   String get delete => 'Vymazať';
 
   @override

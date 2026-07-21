@@ -23,6 +23,9 @@ class AppLocalizationsDa extends AppLocalizations {
   String get cancel => 'Annuller';
 
   @override
+  String get quit => 'Afslut';
+
+  @override
   String get delete => 'Slet';
 
   @override

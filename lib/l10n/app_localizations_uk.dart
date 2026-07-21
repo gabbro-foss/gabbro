@@ -23,6 +23,9 @@ class AppLocalizationsUk extends AppLocalizations {
   String get cancel => 'Скасувати';
 
   @override
+  String get quit => 'Вийти';
+
+  @override
   String get delete => 'Видалити';
 
   @override

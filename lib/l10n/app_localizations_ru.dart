@@ -23,6 +23,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get cancel => 'Отмена';
 
   @override
+  String get quit => 'Выход';
+
+  @override
   String get delete => 'Удалить';
 
   @override

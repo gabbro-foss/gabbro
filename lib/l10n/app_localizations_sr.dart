@@ -23,6 +23,9 @@ class AppLocalizationsSr extends AppLocalizations {
   String get cancel => 'Otkaži';
 
   @override
+  String get quit => 'Изађи';
+
+  @override
   String get delete => 'Obriši';
 
   @override
@@ -2098,6 +2101,9 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get cancel => 'Otkaži';
+
+  @override
+  String get quit => 'Izađi';
 
   @override
   String get delete => 'Obriši';

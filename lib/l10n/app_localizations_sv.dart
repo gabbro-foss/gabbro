@@ -23,6 +23,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get cancel => 'Avbryt';
 
   @override
+  String get quit => 'Avsluta';
+
+  @override
   String get delete => 'Ta bort';
 
   @override

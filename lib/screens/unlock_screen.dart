@@ -1182,6 +1182,7 @@ class _UnlockScreenState extends State<UnlockScreen>
         alignment: Alignment.topLeft,
         child: IconButton(
           icon: const Icon(Icons.power_settings_new),
+          tooltip: l.quit,
           onPressed: widget.onQuit,
         ),
       ),

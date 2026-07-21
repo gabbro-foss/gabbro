@@ -23,6 +23,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get cancel => 'Cancelar';
 
   @override
+  String get quit => 'Salir';
+
+  @override
   String get delete => 'Eliminar';
 
   @override

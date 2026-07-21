@@ -23,6 +23,9 @@ class AppLocalizationsSl extends AppLocalizations {
   String get cancel => 'Prekliči';
 
   @override
+  String get quit => 'Izhod';
+
+  @override
   String get delete => 'Izbriši';
 
   @override

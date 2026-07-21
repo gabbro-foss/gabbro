@@ -23,6 +23,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get cancel => '取消';
 
   @override
+  String get quit => '退出';
+
+  @override
   String get delete => '删除';
 
   @override
@@ -2009,6 +2012,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get cancel => '取消';
 
   @override
+  String get quit => '退出';
+
+  @override
   String get delete => '删除';
 
   @override
@@ -3993,6 +3999,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get cancel => '取消';
+
+  @override
+  String get quit => '結束';
 
   @override
   String get delete => '刪除';

@@ -23,6 +23,9 @@ class AppLocalizationsBg extends AppLocalizations {
   String get cancel => 'Откажи';
 
   @override
+  String get quit => 'Изход';
+
+  @override
   String get delete => 'Изтрий';
 
   @override
