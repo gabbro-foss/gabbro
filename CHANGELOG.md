@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.15] – 2026-07-21
+
 ### Security
 - **VERSION 11 is now the minimum vault format.** The X25519 + ML-KEM hybrid layer removed as non-load-bearing at alpha.14 (ADR-018) is now deleted outright, along with the `ml-kem` and `x25519-dalek` crates — 11 fewer dependencies. Quantum resistance is unchanged (Argon2id + AES-256-GCM).
 
@@ -27,6 +29,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Importing a too-old vault now explains it in your own language with a tappable link to the upgrade steps, instead of showing an untranslated error. Matches the unlock screen.
 - A vault written by a newer Gabbro build is now explained in your own language ("update Gabbro") with a tappable link, on both unlock and import, instead of an untranslated error citing a meaningless format number. Fail-closed behaviour unchanged.
 - Every error a user can trigger — import, export, folder actions, vault load, sync, entry save, passphrase change, recovery history, onboarding, biometric enrolment, backup restore, YubiKey loading — is now shown in your own language, with the technical detail appended for bug reports, instead of an untranslated English error.
+
+_Built with Flutter 3.44.6, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21._
 
 ## [0.1.0-alpha.14] – 2026-07-11
 

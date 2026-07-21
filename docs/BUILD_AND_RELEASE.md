@@ -142,8 +142,9 @@ real fix.
      the search with `GABBRO_FUZZ_CASES=64`.
    - The ignored Rust + Kotlin tests are hardware-only (YubiKey /
      biometric / AndroidKeyStore) and cannot run without the devices.
-4. Record the build toolchain. Run these on the build box and add the output to the
-   CHANGELOG entry from step 1 (and, later, the GitHub release body):
+4. Record the build toolchain. Run these on the build box and add the output as an
+   italic footer line at the end of the version's CHANGELOG block from step 1 (copied
+   verbatim into the GitHub release body):
 
    ```bash
    flutter --version | head -1
