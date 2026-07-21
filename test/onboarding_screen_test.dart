@@ -44,6 +44,7 @@ Widget _buildScreen({
   String? initialPath = '/tmp/test.gabbro',
   Future<String> Function()? resolveDataDir,
   EntropyResult Function(String)? onEstimateEntropy,
+  VoidCallback? onQuit,
 }) =>
     testApp(OnboardingScreen(
       initialPath: initialPath,
@@ -56,6 +57,7 @@ Widget _buildScreen({
           (a, b, c, onStep2, onStep3, onAwaitBackupKey, onStep4, t, alias) async {},
       onVaultCreated: onVaultCreated,
       resolveDataDir: resolveDataDir ?? GabbroPaths.dataDir,
+      onQuit: onQuit,
     ));
 
 // Wraps OnboardingScreen in a GabbroApp so the accessibility toggle's
@@ -294,6 +296,45 @@ void main() {
     expect(find.byIcon(Icons.power_settings_new), findsOneWidget);
     // Language stays put beside it (left corner = [Quit] [Language]).
     expect(find.byIcon(Icons.language), findsOneWidget);
+  });
+
+  testWidgets('first-run Quit carries a localized tooltip', (tester) async {
+    await tester.pumpWidget(_buildScreen());
+    expect(find.byTooltip('Quit'), findsOneWidget);
+  });
+
+  testWidgets('tapping first-run Quit fires onQuit, no confirm', (tester) async {
+    var quitCalls = 0;
+    await tester.pumpWidget(_buildScreen(onQuit: () => quitCalls++));
+    await tester.tap(find.byIcon(Icons.power_settings_new));
+    await tester.pumpAndSettle();
+    expect(quitCalls, 1);
+    expect(find.byType(AlertDialog), findsNothing);
+  });
+
+  // The flagged risk: first-run now has three fixed buttons across the top
+  // (Quit + language + accessibility). Longest-narrowest-largest must not clip.
+  testWidgets('first-run top row does not overflow at 8x on a 360px phone',
+      (tester) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    tester.platformDispatcher.textScaleFactorTestValue = 8.0;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpWidget(_buildScreen());
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('enabled first-run Quit meets tap-target and label guidelines',
+      (tester) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpWidget(_buildScreen(onQuit: () {}));
+    await tester.pumpAndSettle();
+    await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+    await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+    handle.dispose();
   });
 
   testWidgets('path field is pre-populated from initialPath', (tester) async {
@@ -877,6 +918,33 @@ void main() {
       await tester.tap(find.text('Push'));
       await tester.pumpAndSettle();
       expect(find.byIcon(Icons.close), findsOneWidget);
+    });
+
+    // Nested onboarding (creating an extra vault) is not a trap — cancel pops
+    // back to the unlocked app — so Quit belongs only on the first-run root.
+    testWidgets('no Quit button shown when pushed onto a navigation stack',
+        (tester) async {
+      await tester.pumpWidget(
+        testApp(Builder(
+          builder: (ctx) => ElevatedButton(
+            onPressed: () => Navigator.of(ctx).push(
+              MaterialPageRoute(
+                builder: (_) => OnboardingScreen(
+                  initialPath: '/tmp/test.gabbro',
+                  onInitVault: (_, _, _) async {},
+                  onEstimateEntropy: _fakeStrongEntropy,
+                  blockPassphraseCopyPaste: false,
+                  showYubikey: false,
+                ),
+              ),
+            ),
+            child: const Text('Push'),
+          ),
+        )),
+      );
+      await tester.tap(find.text('Push'));
+      await tester.pumpAndSettle();
+      expect(find.byIcon(Icons.power_settings_new), findsNothing);
     });
 
     testWidgets('tapping cancel button pops the screen', (tester) async {
