@@ -285,6 +285,17 @@ void main() {
     expect(find.byIcon(Icons.accessibility_new), findsOneWidget);
   });
 
+  // Quit (canon-TDD): first-run onboarding (cannot pop) traps a tiling-WM user
+  // just like the locked screen, so it needs its own Quit at the left corner,
+  // beside the language button.
+  testWidgets('first-run onboarding shows a Quit button (power icon)',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen());
+    expect(find.byIcon(Icons.power_settings_new), findsOneWidget);
+    // Language stays put beside it (left corner = [Quit] [Language]).
+    expect(find.byIcon(Icons.language), findsOneWidget);
+  });
+
   testWidgets('path field is pre-populated from initialPath', (tester) async {
     await tester.pumpWidget(_buildScreen());
 

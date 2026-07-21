@@ -277,6 +277,11 @@ class OnboardingScreen extends StatefulWidget {
   /// `~/.local/share`). On failure the path field is left empty and editable.
   final Future<String> Function() resolveDataDir;
 
+  /// Quit the app from first-run onboarding — a tiling-WM user has no title-bar
+  /// close, and first-run has no other way out. Null → the button renders
+  /// disabled (tests that don't drive Quit); production wires it to exit.
+  final VoidCallback? onQuit;
+
   OnboardingScreen({
     super.key,
     this.initialPath,
@@ -290,6 +295,7 @@ class OnboardingScreen extends StatefulWidget {
     this.onVaultCreated,
     this.existingAliases = const {},
     this.resolveDataDir = GabbroPaths.dataDir,
+    this.onQuit,
   }) : showYubikey = showYubikey ?? (Platform.isAndroid || Platform.isLinux),
        isAndroid = isAndroid ?? Platform.isAndroid;
 
@@ -760,10 +766,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       onPressed: () => Navigator.of(context).pop(),
                     )
                   else
-                    IconButton(
-                      icon: const Icon(Icons.language),
-                      tooltip: AppLocalizations.of(context).sectionLanguage,
-                      onPressed: _showLanguagePicker,
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.power_settings_new),
+                          tooltip: l.quit,
+                          onPressed: widget.onQuit,
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.language),
+                          tooltip: AppLocalizations.of(context).sectionLanguage,
+                          onPressed: _showLanguagePicker,
+                        ),
+                      ],
                     ),
                   Flexible(
                     child: AnimatedOpacity(
