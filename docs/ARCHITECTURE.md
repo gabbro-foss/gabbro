@@ -113,13 +113,37 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-- **Distro packaging (replaces `install.sh`).** The tarball + `install.sh` is a
-  stopgap: it can't put the `gabbro` command on PATH for bare-WM / `spawncmd`
-  users without editing their shell rc, and `spawncmd` never reads the `.desktop`
-  entry. Real fix is native packages — AUR `PKGBUILD` (Arch; never core repos) +
-  `.deb` (Debian/Mint) — where the package manager handles user/system, PATH,
-  `.desktop` and icons the way brave-bin/enpass-bin do. Retire `install.sh` once
-  both land.
+- **In-app Quit.** Under a tiling WM (qtile — no title-bar close) the only way out is
+  lock + force-kill; add an explicit Quit. Design agreed 2026-07-21; net-first done.
+  - **Behaviour:**
+    - Locked screens (unlock, first-run onboarding) — **exit immediately, no confirm**
+      (no secrets in memory).
+    - Unlocked — **confirm dialog -> lock -> exit**. Reuse the existing lock
+      (`_lockAndExit`/`lockVault()` in `vault_list_screen.dart`, which zeroizes the Rust
+      session via `session::lock_vault()`); do not reinvent zeroize.
+  - **Exit mechanism:** `exit(0)` (dart:io) **after** the lock `await` completes — wipe
+    keys first, exit second. Flutter's `SystemNavigator.pop()` is a no-op on Linux desktop.
+  - **Placement (net-first findings):**
+    - Convention today: **top-left = leave this screen**, top-right = accessibility.
+    - Unlock screen has **no top buttons** currently -> add Quit **top-left**.
+    - Icon `Icons.power_settings_new` (power symbol), tooltip/label "Quit". **Not** the X
+      (`Icons.close`) — that already means "cancel this screen" (onboarding, help).
+    - First-run onboarding: left corner becomes `[Quit] [Language]`, accessibility stays
+      right; only when root (`!Navigator.canPop`) — nested onboarding keeps its X-cancel.
+    - Unlocked: new "Quit" item at the bottom of the `Icons.menu` PopupMenu in
+      `vault_list_screen.dart` — one wiring point, tablet inherits it.
+  - **Confirm dialog:** default focus **Cancel**; Tab moves, Enter submits, Esc cancels;
+    localized title/body/Cancel/Quit; screen-reader announced.
+  - **Accessibility (all new controls):** keyboard-operable (focus + Enter/Space, visible
+    focus ring); min 48dp hit target even as the icon scales down; localized semantic label
+    + button role; ≥3:1 non-text contrast in high-contrast + light/dark; meaning by shape
+    not colour; follow the existing icon-only-above-1.5x + tooltip idiom in
+    `unlock_screen.dart`. Tooltip is its own overflow surface — clear all 37 locales at 8x
+    on 360px.
+  - **Overflow watch:** onboarding first-run row = three fixed icon buttons across a 360px
+    phone at 8x — verify no overflow.
+  - **Out of scope:** keyboard shortcut (Ctrl+Q) — no shortcut infra exists yet; moved to
+    Bikeshed.
 
 ---
 
@@ -138,19 +162,51 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
-- **No in-app Quit.** Under a tiling WM (qtile — no title-bar close button) the only way out is
-  lock + force-kill. Add an explicit Quit that locks (zeroizes secrets) then exits cleanly — a menu
-  item and/or shortcut.
+- **Distro packaging (replaces `install.sh`).** Parked behind the public-repo flip: a clean
+  AUR `source=` needs the release tarball publicly fetchable (private-repo release assets
+  need auth). Why: `install.sh --user` drops the launcher in `~/.local/bin`, which a bare-WM
+  session PATH (qtile `spawncmd`) never sees, so the app is unfindable by name; `--system`
+  leaves two copies on disk. Native packages install to `/usr/bin` (always on PATH) and let
+  the package manager own PATH, upgrade and removal.
+  - **AUR `PKGBUILD`** (Arch; never core repos) — in `linux/packaging/aur/`, downloads the
+    release tarball; optionally pushed to the AUR for `yay -S gabbro`. Pre-flip, `source=`
+    can point at the local tarball for `makepkg -si` validation on the Arch box.
+  - **`.deb`** (Debian/Mint) — control files in `linux/packaging/deb/`, attached to the
+    GitHub Release for `sudo apt install ./gabbro_<ver>.deb`.
+  - Both stage bundle -> `/usr/lib/gabbro`, launcher -> `/usr/bin/gabbro`, `.desktop` + icons
+    -> `/usr/share` (icons via `render_icons.sh`). Deps: `gtk3 libfido2 libcbor pcsclite`;
+    portal as optdepend.
+  - **When both land:** delete `install.sh` + `install_test.sh`, strip their steps from
+    BUILD_AND_RELEASE.md and the `linux/packaging/` structure line here.
 - See if vault `syncing` can do without a second `passphrase + yubikey` if and only if the current vault and the incoming vault share the same `alias`, `passphrase`, `yubikey(s)`
 - in `sync` path, we currently have `auto-merge` and `review all changes`, the `auto-merge` is additive only (check and verify) and therefore never deletes items in the receiving vault: (1) add a message that explains this (or the correct) behaviour to the user, (2) add a third `sync` mechanism that simply takes the incoming vault and clobbers the existing one - discuss this
+- Investigate the idea of adding keyboard shortcuts
 
 ### Security (pre-v1)
 - Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
 
 ### Going public (pre-v1)
 - **Flip the repo to public.** Repo now lives in the `gabbro-foss` org (transferred; URLs
-  migrated). Flip visibility to public once the pre-v1 gates clear (crypto-review outreach
-  above is welcome-not-blocking). Optional: a read-only Codeberg mirror for redundancy.
+  migrated). Crypto-review outreach (above) is welcome-not-blocking. Optional: a read-only
+  Codeberg mirror for redundancy.
+  - **Pre-publish audit (required before flipping).** A green `gabbro_test` proves the code,
+    not that the repo is safe to expose; going public exposes all history permanently
+    (forks/caches survive a later re-hide). Before the flip:
+    - Secret/PII sweep of tracked files **and git history** — real names, personal emails,
+      absolute host paths; no passphrase/proof committed beside a challenge vault.
+    - Confirm CLAUDE.md + LEARNINGS.md are gitignored **and untracked**.
+  - **Known finding (2026-07-21):** the LICENSE copyright line and commit author/committer
+    metadata across history carry the maintainer's real name + personal emails — must be
+    removed before flipping. GPL-3 requires source + notices, **not** VCS history, and does
+    **not** require a legal name; LICENSE may use a pseudonym/org (`The Gabbro Authors` /
+    `gabbro-foss`). Options:
+    - **(1) Clean squash** to a single public root commit — safest, nothing old to leak, but
+      destroys the intentional crack-me vaults in history.
+    - **(2) `git filter-repo`** identity/mailmap rewrite + LICENSE scrub — keeps history incl.
+      the challenge vaults; all hashes change (fine, no public clones yet).
+    - **(3) Fresh public repo** from a snapshot; keep the private one private.
+    - Deciding factor between them: whether the crack-me challenge needs its historical
+      vaults public.
 
 ### V2+ / Defer
 - **Linux biometric unlock** (laptop fingerprint readers, e.g. libfido2/PAM or `fprintd`). Fits the current per-device model unchanged: Linux would just get its own local per-vault secret store; the vault file carries no biometric state, so nothing else changes.
