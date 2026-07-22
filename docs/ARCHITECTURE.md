@@ -113,16 +113,11 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Scrub build-host paths from released binaries.** The shipped Linux bundle's compiled
-binaries embed this box's `/home/gamer/...` paths: `librust_lib_gabbro.so` ~109 Rust crate
-source paths (`/home/gamer/.cargo/registry/...`), `gabbro-autotype` a rustup std path,
-`liburl_launcher_linux_plugin.so` a build-dir RUNPATH, `libapp.so` a `.dart_tool` path.
-Leaks the machine username + dir layout (not secrets, not the maintainer's real name) in
-public binaries; present since the first Linux release, surfaced by `lintian` during deb
-packaging. The **Android APK ships the same Rust code — check it too.** Fix at BUILD time:
-Rust `[profile.release] trim-paths` (or `--remap-path-prefix`); `patchelf` to strip the
-RUNPATH; investigate the Dart path; then rebuild + re-scan (`patchelf --print-rpath`,
-`strings | grep /home/`). alpha.15 already shipped it (immutable) — fix lands next build.
+_(empty — pick the next item from the Bikeshed with [maintainer].)_
+
+Release builds now remap the build-host `$HOME` out of the compiled binaries (see
+BUILD_AND_RELEASE.md build commands); the remaining minor build-path breadcrumbs in
+Flutter-generated files are known and accepted (details kept out of tracked docs).
 
 ---
 
