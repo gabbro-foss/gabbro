@@ -118,7 +118,7 @@ Ships the `.deb`, the host-path-scrubbed binaries, and the new install docs; goe
 alongside the AUR publish. Closes both packaging bikeshed items (finalize/publish + install
 docs). Order — the Mint `.deb` test is the go/no-go for retiring `install.sh`:
 
-**Progress (2026-07-22): steps 1-3 DONE + pushed; resume at step 4 (version + CHANGELOG).**
+**Progress (2026-07-22): steps 1-4 DONE + pushed; step 5 gate (`gabbro_test`) RUNNING on [maintainer]'s box. Resume by reading its result in `.scratchpad`: green -> step 6 (build with remap + sign); a `cargo audit` hit (DB was just refreshed to 1167) or any failure -> fix, then re-gate.**
 
 1. **[DONE, GO] Pre-flight — Mint `.deb` test.** Built a remap'd `.deb` in a `debian:trixie`
    container via `build-deb.sh`; installed + launched clean on the Mint box, deps resolved on
@@ -130,7 +130,7 @@ docs). Order — the Mint `.deb` test is the go/no-go for retiring `install.sh`:
 3. **[DONE] README install/uninstall docs**, accurate per method: Arch (`yay -S gabbro-bin` + run-from-folder
    tarball), Debian/Mint (`.deb` from Releases), uninstall data-retention (config/vaults stay —
    contrast Android), `gabbro-autotype` at `/usr/lib/gabbro/gabbro-autotype`.
-4. **Version + CHANGELOG**: pubspec -> `0.1.0-alpha.16`; move `[Unreleased]` -> dated block (entries:
+4. **[DONE] Version + CHANGELOG**: pubspec -> `0.1.0-alpha.16`; move `[Unreleased]` -> dated block (entries:
    AUR + `.deb` install methods; public-repo + alpha-disclaimer doc changes; host-path scrub;
    `install.sh` retired). Keep an empty `[Unreleased]` above. Commit code-first, docs-second.
 5. **Full gate** `gabbro_test` green (~100 min, [maintainer]).
