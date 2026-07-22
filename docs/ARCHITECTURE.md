@@ -152,6 +152,21 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - in `sync` path, we currently have `auto-merge` and `review all changes`, the `auto-merge` is additive only (check and verify) and therefore never deletes items in the receiving vault: (1) add a message that explains this (or the correct) behaviour to the user, (2) add a third `sync` mechanism that simply takes the incoming vault and clobbers the existing one - discuss this
 - Investigate the idea of adding keyboard shortcuts
 - **Publish on F-Droid.** Find the documented procedure to publish a package on F-Droid and see if we can publish Gabbro there.
+- **Packaging: accurate install/uninstall docs (AUR + `.deb`), README-first.** Root
+  `README.md` (not just internal docs) must carry 100%-accurate install AND uninstall
+  steps per method — fresh install on any Linux, and existing tester installs on Arch /
+  Debian / Mint. Two specifics to confirm + document:
+  - **`gabbro-autotype` path** for the keyboard-shortcut binding: AUR/`.deb` land it at
+    `/usr/lib/gabbro/gabbro-autotype`; the release tarball ships it at `bundle/gabbro-autotype`.
+    Verify per method and document the exact path.
+  - **Uninstall data retention:** `pacman -Rns gabbro-bin` (and the `.deb` purge) removes
+    only `/usr` package files — user config (`~/.config/gabbro/`) and vaults
+    (`~/.local/share/app.gabbro.gabbro/`) STAY behind. Contrast Android, where uninstalling
+    the app deletes the vaults. State this plainly so users aren't surprised either way.
+- **Track `gabbro_test` in the repo without the host path.** Extract its `ROOT=<abs path>/gabbro`
+  line so the tracked script reads ROOT from an untracked file (e.g. `.gabbro_test_root`) or
+  env — no machine/user path in the public repo — then `git add gabbro_test`.
+- **Add Liberapay to `.github/FUNDING.yml`.** (Near-term slice of the deferred donation/sustainability item.)
 
 ### Security (pre-v1)
 - Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
