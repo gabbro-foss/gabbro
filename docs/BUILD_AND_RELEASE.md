@@ -197,6 +197,23 @@ real fix.
 
   Package the bundle, installer and icons together: `tar -czf gabbro-<ver>-linux-x86_64.tar.gz -C build/linux/x64/release bundle install.sh icons`;
   confirm both binaries + the installer made it in: `tar -tzf gabbro-<ver>-linux-x86_64.tar.gz | grep -E 'gabbro-autotype|install.sh'`. (The Arch-built bundle runs on Debian trixie / Mint — glibc ≤ 2.34, verified; only build in a `debian:trixie` container if a future release raises that above 2.41.) Then sign the tarball: `gpg --detach-sign --armor gabbro-<ver>-linux-x86_64.tar.gz` → `.tar.gz.asc` (asks for the key passphrase). Signing key fingerprint `369B E2CE CFD0 A528 7155 895A 4775 4EEE 7F9A ABFC`; public key + verify steps are in README.
+- **Debian `.deb`:** `dpkg-deb` isn't on Arch — build it in a throwaway `debian:trixie`
+  container from the Linux tarball just made (repackages the same bundle, no compile). With
+  `ver` = the version (e.g. `0.1.0-alpha.15`):
+
+  ```bash
+  docker run --rm -v "$PWD":/work -w /work debian:trixie \
+    bash linux/packaging/deb/build-deb.sh --version "$ver" \
+      --tarball "gabbro-$ver-linux-x86_64.tar.gz" --out /work
+  ```
+
+  -> `gabbro_<debver>_amd64.deb` in the repo root (Debian version `0.1.0~alpha.N-1`; `~` sorts
+  the pre-release before the final `0.1.0`). Attach it to the Release; users run
+  `sudo apt install ./gabbro_<debver>_amd64.deb` -> installs to `/usr` (system-wide). Runtime
+  deps auto-resolve (trixie: `libgtk-3-0t64 libfido2-1 libcbor0.10 libpcsclite1`; recommends
+  `xdg-desktop-portal-gtk`, suggests `pcscd`). To validate a build, add `apt-get install -y
+  lintian` + `lintian ./*.deb` and `apt-get install -y ./*.deb` inside the container (see the
+  `build-deb.sh` header).
 - **Android:** `flutter build apk --split-per-abi --release --dart-define=APP_VERSION="$(sed -n 's/^version: *//p' pubspec.yaml | cut -d+ -f1)"` → three per-ABI APKs in `build/app/outputs/flutter-apk/`: `app-arm64-v8a-release.apk` (~29 MB, modern phones), `app-armeabi-v7a-release.apk` (old 32-bit phones), `app-x86_64-release.apk` (emulators / Chromebooks). Splitting replaces the ~76 MB universal APK (which bundled all three ABIs) — each file carries only its own native libs. Rename each to `gabbro-<ver>-android-<abi>.apk`. All three are signed by the same key, so they share one certificate fingerprint (see README). The signing keystore (`android/app/gabbro-upload.jks`) and `android/key.properties` are already configured and gitignored.
   - **Dependency lock:** the release runtime dependency graph is locked in `android/app/gradle.lockfile` (osv-scannable, reproducible). After any change to Android dependencies (incl. a plugin/Flutter bump), regenerate it: `cd android && ./gradlew :app:dependencies --write-locks --configuration releaseRuntimeClasspath`, then re-scan: `osv-scanner scan --lockfile android/app/gradle.lockfile`. A stale lock fails the release build (by design).
 

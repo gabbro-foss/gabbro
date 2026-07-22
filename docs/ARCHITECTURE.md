@@ -54,7 +54,7 @@ gabbro/
 │   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics, crash_writer, autotype_{spike,window,trigger} (diagnostics), gabbro-autotype (shipped trigger client); wordlist gen; gen_fixtures
 ├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + crash-safety (kill mid-write) + frozen golden fixtures (FIXTURES.md)
 ├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, BiometricHelper + BiometricStore (per-vault; + Robolectric tests)
-├── linux/packaging/      # Desktop integration: install.sh (.desktop + PATH launcher, per-user/--system), render_icons.sh, install_test.sh (sandbox); aur/ (AUR gabbro-bin PKGBUILD + .SRCINFO)
+├── linux/packaging/      # Desktop integration: install.sh (.desktop + PATH launcher, per-user/--system), render_icons.sh, install_test.sh (sandbox); aur/ (AUR gabbro-bin PKGBUILD + .SRCINFO), deb/ (build-deb.sh -> binary .deb)
 ├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, VAULT_SYNC, AUTOTYPE_AND_AUTOFILL, AI_*; decisions/ (ADRs); artefacts/
 ├── test/  integration_test/          # Flutter widget/unit + Linux real-FFI suites (dart test)
 ├── test_data/            # Sample import files + migration_vaults/ (refusal corpus at floor v11, one vault per VERSION + MIGRATION_TESTS.md + test_matrix.md)
@@ -123,8 +123,11 @@ manager own PATH, upgrade and removal.
   (`PKGBUILD` + `.SRCINFO`): a `-bin` repack of the release tarball + `LICENSE`. Hardware-
   validated on Arch (builds, pacman-installs, launches via qtile `spawncmd`, opens existing
   vaults). Not yet pushed to the AUR — publishing enables `yay -S gabbro-bin`.
-- **`.deb`** (Debian/Mint) — control files in `linux/packaging/deb/`, attached to the
-  GitHub Release for `sudo apt install ./gabbro_<ver>.deb`.
+- **`.deb`** (Debian/Mint) — DONE (tooling), in `linux/packaging/deb/build-deb.sh`: repackages
+  the release tarball into a binary `.deb`, built in a `debian:trixie` container. Container-
+  validated on trixie (builds, apt-installs, deps + libs resolve, lintian copyright/changelog
+  clean). PENDING: real install+launch test on the Mint box (uninstall the install.sh copy
+  first). Attach to the Release; `sudo apt install ./gabbro_<debver>_amd64.deb`.
 - Both stage bundle -> `/usr/lib/gabbro`, launcher -> `/usr/bin/gabbro`, `.desktop` + icons
   -> `/usr/share` (icons via `render_icons.sh`). Deps: `gtk3 libfido2 libcbor pcsclite`;
   portal as optdepend.
@@ -163,12 +166,25 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
     only `/usr` package files — user config (`~/.config/gabbro/`) and vaults
     (`~/.local/share/app.gabbro.gabbro/`) STAY behind. Contrast Android, where uninstalling
     the app deletes the vaults. State this plainly so users aren't surprised either way.
+  - **Arch install paths (once `install.sh` is gone):** README must contrast the two — raw
+    tarball (extract + run `./bundle/gabbro`, zero system integration) vs AUR `gabbro-bin`
+    (menu entry, `gabbro` on PATH, deps pulled in, `pacman -Rns` removal, `yay` updates).
 - **Track `gabbro_test` in the repo without the host path.** Extract its `ROOT=<abs path>/gabbro`
   line so the tracked script reads ROOT from an untracked file (e.g. `.gabbro_test_root`) or
   env — no machine/user path in the public repo — then `git add gabbro_test`.
 - **Add Liberapay to `.github/FUNDING.yml`.** (Near-term slice of the deferred donation/sustainability item.)
 
 ### Security (pre-v1)
+- **Scrub build-host paths from released binaries.** The shipped Linux bundle's compiled
+  binaries embed this box's `/home/gamer/...` paths: `librust_lib_gabbro.so` ~109 Rust crate
+  source paths (`/home/gamer/.cargo/registry/...`), `gabbro-autotype` a rustup std path,
+  `liburl_launcher_linux_plugin.so` a build-dir RUNPATH, `libapp.so` a `.dart_tool` path.
+  Leaks the machine username + dir layout (not secrets, not the maintainer's real name) in
+  public binaries; present since the first Linux release, surfaced by `lintian` during deb
+  packaging. The **Android APK ships the same Rust code — check it too.** Fix at BUILD time:
+  Rust `[profile.release] trim-paths` (or `--remap-path-prefix`); `patchelf` to strip the
+  RUNPATH; investigate the Dart path; then rebuild + re-scan (`patchelf --print-rpath`,
+  `strings | grep /home/`). alpha.15 already shipped it (immutable) — fix lands next build.
 - Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
 
 ### V2+ / Defer
