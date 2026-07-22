@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Render the launcher icon tree for the Linux desktop entry from the source SVG.
 # Placeholder for now; when the final logo lands, replace the source SVG (or
-# point GABBRO_ICON_SVG at it) and re-run -- install.sh and the .desktop are
-# unchanged, they just reference the `gabbro` icon name.
+# point GABBRO_ICON_SVG at it) and re-run -- the packaging recipes and their .desktop
+# entries are unchanged, they just reference the `gabbro` icon name.
 #
 #   render_icons.sh <hicolor-output-dir>
 #

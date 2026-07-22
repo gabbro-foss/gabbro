@@ -55,7 +55,6 @@ offline() {  # run a command inside the no-network namespace (loopback only)
 
 echo ">>> ===== FLUTTER ====="
 flutter test --no-pub; report $? "flutter unit/widget tests"
-bash "$ROOT/linux/packaging/install_test.sh" >/dev/null; report $? "linux install.sh (desktop integration)"
 # Real-FFI suites (integration_test/): plain `dart test` against the release cdylib -
 # no Flutter, no window, no GL. They test Dart -> FFI -> crypto -> disk and never touch
 # the UI, so they never needed an app. Under the old `flutter drive` harness they were
