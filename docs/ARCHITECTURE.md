@@ -113,36 +113,7 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Release v0.1.0-alpha.16 — packaging + host-path hygiene (no code/behaviour change).**
-Ships the `.deb`, the host-path-scrubbed binaries, and the new install docs; goes live
-alongside the AUR publish. Closes both packaging bikeshed items (finalize/publish + install
-docs). Order — the Mint `.deb` test is the go/no-go for retiring `install.sh`:
-
-**Progress (2026-07-22): steps 1-8 DONE — v0.1.0-alpha.16 PUBLISHED (tag + GitHub release, all 7 artifacts, sigs verified). Step 9 repo-side DONE: `PKGBUILD`/`.SRCINFO` bumped to `0.1.0_alpha.16`, tarball sha256 matches the published file, `makepkg -f` green. Remaining: [maintainer] pushes the two AUR files to aur.archlinux.org -> `yay -S gabbro-bin`; then step 10 (delete the 2 packaging bikeshed items + clear this Current Focus).**
-
-1. **[DONE, GO] Pre-flight — Mint `.deb` test.** Built a remap'd `.deb` in a `debian:trixie`
-   container via `build-deb.sh`; installed + launched clean on the Mint box, deps resolved on
-   Mint's Ubuntu base, vaults unlocked. GO. (The test `.deb` — `alpha.15`-versioned — stays
-   installed on Mint; the real `alpha.16` `.deb` upgrades it in place.)
-2. **[DONE] Retire `install.sh`** (on GO): delete `install.sh` + `install_test.sh`; strip from the
-   BUILD_AND_RELEASE tarball step (tar becomes `bundle icons`), the `linux/packaging/` structure
-   line, and the `gabbro_test` install_test leg.
-3. **[DONE] README install/uninstall docs**, accurate per method: Arch (`yay -S gabbro-bin` + run-from-folder
-   tarball), Debian/Mint (`.deb` from Releases), uninstall data-retention (config/vaults stay —
-   contrast Android), `gabbro-autotype` at `/usr/lib/gabbro/gabbro-autotype`.
-4. **[DONE] Version + CHANGELOG**: pubspec -> `0.1.0-alpha.16`; move `[Unreleased]` -> dated block (entries:
-   AUR + `.deb` install methods; public-repo + alpha-disclaimer doc changes; host-path scrub;
-   `install.sh` retired). Keep an empty `[Unreleased]` above. Commit code-first, docs-second.
-5. **Full gate** `gabbro_test` green (~100 min, [maintainer]).
-6. **Build with remap** (see BUILD_AND_RELEASE / `gabbro_build_install`): Linux `RUSTFLAGS`, Android
-   `CARGO_ENCODED_RUSTFLAGS` + `./gradlew --stop`. Tarball (install.sh-free) + sign; 3 APKs; `.deb` + sign.
-7. **Verify before publish** (immutable): scrub (`strings|grep /home/` -> only the 2 accepted Flutter
-   stragglers), embedded `APP_VERSION`, tarball `.asc`, APK certs.
-8. **Tag + publish** `v0.1.0-alpha.16` (tag last): tarball+`.asc`, `.deb`+`.asc`, 3 renamed APKs, changelog +
-   toolchain line + alpha disclaimer.
-9. **Publish AUR** `gabbro-bin` (name confirmed free 2026-07-22): bump `PKGBUILD`/`.SRCINFO` pkgver,
-   `makepkg -g` for new sums, push to aur.archlinux.org -> `yay -S gabbro-bin`.
-10. Delete both packaging bikeshed items.
+_(empty — v0.1.0-alpha.16 shipped; pick the next item from the Bikeshed with [maintainer].)_
 
 ---
 
@@ -165,27 +136,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - in `sync` path, we currently have `auto-merge` and `review all changes`, the `auto-merge` is additive only (check and verify) and therefore never deletes items in the receiving vault: (1) add a message that explains this (or the correct) behaviour to the user, (2) add a third `sync` mechanism that simply takes the incoming vault and clobbers the existing one - discuss this
 - Investigate the idea of adding keyboard shortcuts
 - **Publish on F-Droid.** Find the documented procedure to publish a package on F-Droid and see if we can publish Gabbro there.
-- **Finalize + publish distro packaging, then retire `install.sh`.** AUR `gabbro-bin` + `.deb`
-  tooling are done (`linux/packaging/{aur,deb}/`, container-validated). Remaining: (1) real
-  install+launch test of the `.deb` on the Mint box (uninstall the `install.sh` copy first);
-  (2) maintainer attempts AUR publish (push `PKGBUILD` + `.SRCINFO` to the AUR -> `yay -S
-  gabbro-bin`); (3) once the packages are the real install path, delete `install.sh` +
-  `install_test.sh` and strip their steps from BUILD_AND_RELEASE.md (tarball build), the
-  `linux/packaging/` structure line, and the `gabbro_test` install_test leg.
-- **Packaging: accurate install/uninstall docs (AUR + `.deb`), README-first.** Root
-  `README.md` (not just internal docs) must carry 100%-accurate install AND uninstall
-  steps per method — fresh install on any Linux, and existing tester installs on Arch /
-  Debian / Mint. Two specifics to confirm + document:
-  - **`gabbro-autotype` path** for the keyboard-shortcut binding: AUR/`.deb` land it at
-    `/usr/lib/gabbro/gabbro-autotype`; the release tarball ships it at `bundle/gabbro-autotype`.
-    Verify per method and document the exact path.
-  - **Uninstall data retention:** `pacman -Rns gabbro-bin` (and the `.deb` purge) removes
-    only `/usr` package files — user config (`~/.config/gabbro/`) and vaults
-    (`~/.local/share/app.gabbro.gabbro/`) STAY behind. Contrast Android, where uninstalling
-    the app deletes the vaults. State this plainly so users aren't surprised either way.
-  - **Arch install paths (once `install.sh` is gone):** README must contrast the two — raw
-    tarball (extract + run `./bundle/gabbro`, zero system integration) vs AUR `gabbro-bin`
-    (menu entry, `gabbro` on PATH, deps pulled in, `pacman -Rns` removal, `yay` updates).
 
 ### Security (pre-v1)
 - Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
