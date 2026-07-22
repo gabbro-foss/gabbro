@@ -1,0 +1,99 @@
+#!/bin/bash
+# gabbro test script : this test must run ALL tests for a gate to count as passed
+# this script must be updated if additional tests are added and not already included
+# gabbro_test --warm : ONLINE - warm caches (deps) AND refresh the RustSec advisory DB.
+#                      Run when pubspec/Cargo/gradle deps change - and note the offline
+#                      `cargo audit` leg is only as fresh as the last --warm.
+# gabbro_test        : full test gate. Runs EVERY section to the end - a failure is
+#                      reported red and the run continues; it never stops early.
+#   - Flutter runs NORMALLY. It cannot run inside a user namespace (the flutter SDK
+#     uses a unionfs mount that vanishes there: "unionfs failed"). Offline for
+#     flutter is enforced via --no-pub (deps are warmed).
+#   - Cargo runs inside a no-network namespace (loopback only) to prove the Rust
+#     legs need no network; --offline is belt-and-suspenders.
+#   - Android runs in the same no-network namespace. JAVA_TOOL_OPTIONS remaps the
+#     JVM home (uid-0 inside the netns would otherwise be /root, missing the warmed
+#     gradle cache). The integration_test plugin's dynamic androidx.test versions are
+#     pinned in android/build.gradle.kts so --offline resolves with no network.
+# Sections are grouped: all Flutter, then all Rust, then Android.
+echo "Start test time: $(date +%T)"
+
+# This script lives at the repo root; derive ROOT from its own location so no host
+# path is baked in (the repo is public). $GABBRO_ROOT overrides if ever needed.
+ROOT="${GABBRO_ROOT:-$(cd "$(dirname "$0")" && pwd)}"
+
+if [[ "${1:-}" == "--warm" ]]; then
+  cd "$ROOT" || exit 1
+  flutter pub get
+  (cd rust && cargo fetch)
+  # Refresh the RustSec advisory DBs while we still have network. The offline gate legs
+  # read these caches, so a stale DB = a false PASS. Exit codes ignored: warming must not
+  # fail on a finding - the gate legs judge that.
+  # NOTE: audit and deny do NOT share a cache. audit uses ~/.cargo/advisory-db;
+  # deny uses ~/.cargo/advisory-dbs/. Both need warming or their offline leg fails.
+  (cd rust && cargo audit || true)
+  (cd rust && cargo deny fetch || true)
+  (cd android && ./gradlew :app:testDebugUnitTest)
+  exit
+fi
+
+cd "$ROOT" || exit 1
+echo "pwd: ../$(basename "$(pwd)")/"
+
+FAILED=()
+report() {  # $1 = exit code, $2 = label. Green PASS / red FAIL; never stops the run.
+  if [[ "$1" -eq 0 ]]; then
+    echo -e ">>> \e[32mPASS\e[0m: $2"
+  else
+    echo -e ">>> \e[31mFAIL\e[0m: $2 (exit $1)"
+    FAILED+=("$2")
+  fi
+}
+offline() {  # run a command inside the no-network namespace (loopback only)
+  unshare -rn bash -c "ip link set lo up >/dev/null 2>&1; $1"
+}
+
+echo ">>> ===== FLUTTER ====="
+flutter test --no-pub; report $? "flutter unit/widget tests"
+bash "$ROOT/linux/packaging/install_test.sh" >/dev/null; report $? "linux install.sh (desktop integration)"
+# Real-FFI suites (integration_test/): plain `dart test` against the release cdylib -
+# no Flutter, no window, no GL. They test Dart -> FFI -> crypto -> disk and never touch
+# the UI, so they never needed an app. Under the old `flutter drive` harness they were
+# (a) blind - a failure exited 0 unless every test used testWidgets - and (b) killed by
+# an NVIDIA GL segfault whenever the WM resized the window mid-Argon2 (the engine blits
+# the new size out of the stale framebuffer). No window, neither failure mode exists.
+# The release cdylib is REQUIRED: debug Argon2id is too slow and blows the timeouts.
+# -j 1 is REQUIRED: the Rust session is process-global, so parallel suites clobber each
+# other's vault ("Vault is locked").
+(cd rust && cargo build --release --lib --offline); report $? "rust cdylib for dart test (release)"
+dart test integration_test/ -j 1; report $? "dart real-FFI suites (vault_session/entry_edit/vault_corruption)"
+
+echo ">>> ===== RUST (OFFLINE: no-network namespace) ====="
+# Supply chain first - seconds-cheap. Both read DBs warmed by --warm, never the network:
+# -n = no fetch (audit); --offline = use cached DB + index (deny).
+offline "cd '$ROOT/rust' && cargo audit -n"; report $? "rust cargo audit (RustSec advisories)"
+offline "cd '$ROOT/rust' && cargo deny --offline check"; report $? "rust cargo deny (licences/bans/sources)"
+offline "cd '$ROOT/rust' && cargo test -q --offline"; report $? "rust unit tests"
+offline "cd '$ROOT/rust' && cargo clippy --all-targets --offline -- -D warnings"; report $? "rust clippy"
+offline "cd '$ROOT/rust' && cargo test --release --offline --test vault_backward_compat"; report $? "rust backward-compat"
+offline "cd '$ROOT/rust' && cargo test --release --offline --test vault_state_machine_fuzz -- --ignored"; report $? "rust state-machine fuzz"
+offline "cd '$ROOT/rust' && cargo test --release --offline --test crash_safety -- --ignored"; report $? "rust crash-safety (kill mid-write)"
+offline "cd '$ROOT/rust' && cargo test --release --offline --lib sync_walk_batched_apply_matches_checker -- --ignored"; report $? "rust sync-walk batched apply"
+offline "cd '$ROOT/rust' && cargo test --release --offline --lib sync_merges_a_never_edited_entry -- --ignored"; report $? "rust sync merges a never-edited entry"
+offline "cd '$ROOT/rust' && cargo test --release --offline --lib cancel_sync_rolls_back_to_pre_sync_state -- --ignored"; report $? "rust cancel-sync rollback"
+offline "cd '$ROOT/rust' && cargo test --release --offline --lib apply_sync_decisions_clears_backup_so_cancel_is_noop -- --ignored"; report $? "rust cancel-sync cleared on commit"
+offline "cd '$ROOT/rust' && cargo test --release --offline --lib sync_never_writes_plaintext_secret_to_disk -- --ignored"; report $? "rust sync no-plaintext-leak"
+offline "cd '$ROOT/rust' && cargo test --release --offline --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored"; report $? "rust fast-merge walk"
+
+echo ">>> ===== ANDROID (OFFLINE: no-network namespace) ====="
+offline "cd '$ROOT/android' && JAVA_TOOL_OPTIONS=-Duser.home=$HOME ./gradlew :app:testDebugUnitTest --offline"; report $? "android unit tests"
+
+echo "End test time: $(date +%T)"
+if [[ ${#FAILED[@]} -eq 0 ]]; then
+  echo -e "\e[32m===== ALL GREEN =====\e[0m"
+else
+  echo -e "\e[31m===== FAILURES (${#FAILED[@]}): =====\e[0m"
+  for f in "${FAILED[@]}"; do echo -e "  \e[31m- $f\e[0m"; done
+fi
+
+cd "$ROOT"
