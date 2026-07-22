@@ -1,0 +1,3 @@
+# Built packages and work dirs -- regenerate with build-deb.sh
+/*.deb
+/out/
