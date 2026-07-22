@@ -54,7 +54,7 @@ gabbro/
 │   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics, crash_writer, autotype_{spike,window,trigger} (diagnostics), gabbro-autotype (shipped trigger client); wordlist gen; gen_fixtures
 ├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + crash-safety (kill mid-write) + frozen golden fixtures (FIXTURES.md)
 ├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, BiometricHelper + BiometricStore (per-vault; + Robolectric tests)
-├── linux/packaging/      # Desktop integration: install.sh (.desktop + PATH launcher, per-user/--system), render_icons.sh, install_test.sh (sandbox)
+├── linux/packaging/      # Desktop integration: install.sh (.desktop + PATH launcher, per-user/--system), render_icons.sh, install_test.sh (sandbox); aur/ (AUR gabbro-bin PKGBUILD + .SRCINFO)
 ├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, VAULT_SYNC, AUTOTYPE_AND_AUTOFILL, AI_*; decisions/ (ADRs); artefacts/
 ├── test/  integration_test/          # Flutter widget/unit + Linux real-FFI suites (dart test)
 ├── test_data/            # Sample import files + migration_vaults/ (refusal corpus at floor v11, one vault per VERSION + MIGRATION_TESTS.md + test_matrix.md)
@@ -119,9 +119,10 @@ public: the release tarball is publicly fetchable, so a clean AUR `source=` work
 (qtile `spawncmd`) never sees, so the app is unfindable by name; `--system` leaves two
 copies on disk. Native packages install to `/usr/bin` (always on PATH) and let the package
 manager own PATH, upgrade and removal.
-- **AUR `PKGBUILD`** (Arch; never core repos) — in `linux/packaging/aur/`, downloads the
-  release tarball; optionally pushed to the AUR for `yay -S gabbro`. `source=` can point at
-  the local tarball for `makepkg -si` validation on the Arch box.
+- **AUR `gabbro-bin`** (Arch; never core repos) — DONE, in `linux/packaging/aur/`
+  (`PKGBUILD` + `.SRCINFO`): a `-bin` repack of the release tarball + `LICENSE`. Hardware-
+  validated on Arch (builds, pacman-installs, launches via qtile `spawncmd`, opens existing
+  vaults). Not yet pushed to the AUR — publishing enables `yay -S gabbro-bin`.
 - **`.deb`** (Debian/Mint) — control files in `linux/packaging/deb/`, attached to the
   GitHub Release for `sudo apt install ./gabbro_<ver>.deb`.
 - Both stage bundle -> `/usr/lib/gabbro`, launcher -> `/usr/bin/gabbro`, `.desktop` + icons
@@ -150,6 +151,7 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - See if vault `syncing` can do without a second `passphrase + yubikey` if and only if the current vault and the incoming vault share the same `alias`, `passphrase`, `yubikey(s)`
 - in `sync` path, we currently have `auto-merge` and `review all changes`, the `auto-merge` is additive only (check and verify) and therefore never deletes items in the receiving vault: (1) add a message that explains this (or the correct) behaviour to the user, (2) add a third `sync` mechanism that simply takes the incoming vault and clobbers the existing one - discuss this
 - Investigate the idea of adding keyboard shortcuts
+- **Publish on F-Droid.** Find the documented procedure to publish a package on F-Droid and see if we can publish Gabbro there.
 
 ### Security (pre-v1)
 - Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
