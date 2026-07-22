@@ -113,11 +113,32 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-_(empty — pick the next item from the Bikeshed with [maintainer].)_
+**Release v0.1.0-alpha.16 — packaging + host-path hygiene (no code/behaviour change).**
+Ships the `.deb`, the host-path-scrubbed binaries, and the new install docs; goes live
+alongside the AUR publish. Closes both packaging bikeshed items (finalize/publish + install
+docs). Order — the Mint `.deb` test is the go/no-go for retiring `install.sh`:
 
-Release builds now remap the build-host `$HOME` out of the compiled binaries (see
-BUILD_AND_RELEASE.md build commands); the remaining minor build-path breadcrumbs in
-Flutter-generated files are known and accepted (details kept out of tracked docs).
+1. **Pre-flight — Mint `.deb` test.** Build a remap'd bundle -> `linux/packaging/deb/build-deb.sh`;
+   install+launch the `.deb` on the Mint box (uninstall the `install.sh` copy first). GO/NO-GO.
+2. **Retire `install.sh`** (on GO): delete `install.sh` + `install_test.sh`; strip from the
+   BUILD_AND_RELEASE tarball step (tar becomes `bundle icons`), the `linux/packaging/` structure
+   line, and the `gabbro_test` install_test leg.
+3. **README install/uninstall docs**, accurate per method: Arch (`yay -S gabbro-bin` + run-from-folder
+   tarball), Debian/Mint (`.deb` from Releases), uninstall data-retention (config/vaults stay —
+   contrast Android), `gabbro-autotype` at `/usr/lib/gabbro/gabbro-autotype`.
+4. **Version + CHANGELOG**: pubspec -> `0.1.0-alpha.16`; move `[Unreleased]` -> dated block (entries:
+   AUR + `.deb` install methods; public-repo + alpha-disclaimer doc changes; host-path scrub;
+   `install.sh` retired). Keep an empty `[Unreleased]` above. Commit code-first, docs-second.
+5. **Full gate** `gabbro_test` green (~100 min, [maintainer]).
+6. **Build with remap** (see BUILD_AND_RELEASE / `gabbro_build_install`): Linux `RUSTFLAGS`, Android
+   `CARGO_ENCODED_RUSTFLAGS` + `./gradlew --stop`. Tarball (install.sh-free) + sign; 3 APKs; `.deb`.
+7. **Verify before publish** (immutable): scrub (`strings|grep /home/` -> only the 2 accepted Flutter
+   stragglers), embedded `APP_VERSION`, tarball `.asc`, APK certs.
+8. **Tag + publish** `v0.1.0-alpha.16` (tag last): tarball+`.asc`, 3 renamed APKs, `.deb`, changelog +
+   toolchain line + alpha disclaimer.
+9. **Publish AUR** `gabbro-bin` (name confirmed free 2026-07-22): bump `PKGBUILD`/`.SRCINFO` pkgver,
+   `makepkg -g` for new sums, push to aur.archlinux.org -> `yay -S gabbro-bin`.
+10. Delete both packaging bikeshed items.
 
 ---
 
@@ -161,7 +182,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   - **Arch install paths (once `install.sh` is gone):** README must contrast the two — raw
     tarball (extract + run `./bundle/gabbro`, zero system integration) vs AUR `gabbro-bin`
     (menu entry, `gabbro` on PATH, deps pulled in, `pacman -Rns` removal, `yay` updates).
-- **Add Liberapay to `.github/FUNDING.yml`.** (Near-term slice of the deferred donation/sustainability item.)
 
 ### Security (pre-v1)
 - Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
@@ -173,7 +193,7 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - Windows support.
 - Yubico partnership.
 - Destination Linux podcast outreach (when approaching public release).
-- Donation/sustainability model (GitHub Sponsors + Liberapay + Monero — dedicated session near release).
+- Donation/sustainability model: GitHub Sponsors is live; Monero possible later (a large, dedicated effort). Liberapay ruled out (2026-07-22 — Stripe forces business-type onboarding for individuals and has suspended Liberapay-linked accounts; no PayPal). Don't re-propose Liberapay.
 - No-telemetry verification guide (ripgrep scan, Wireshark, NetGuard).
 - Support model (GitHub Issues + SUPPORT.md for v1; revisit when user base exists).
 - Import: content-hash deduplication and entry-level merge.
