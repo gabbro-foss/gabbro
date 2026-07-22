@@ -124,9 +124,9 @@ a UX complement that allows a corruption check *before* opening the vault.
 
 ## Installation
 
-> **Alpha release — for invited testers only.** The cryptographic
-> implementation has not yet undergone external review. Do not store
-> passwords you cannot afford to lose.
+> **Alpha release** — the cryptographic implementation `rust/src/crypto`
+> has not yet undergone external review. It is provided as-is, without
+> warranty, as stated in the GPL-3.0.
 
 Download the latest release from the
 [Releases](https://github.com/gabbro-foss/gabbro/releases) page,

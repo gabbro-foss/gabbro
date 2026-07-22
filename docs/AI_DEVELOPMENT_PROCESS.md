@@ -106,8 +106,9 @@ one expert's eyes*:
   remains welcome as defence-in-depth but is no longer a blocking gate. That is
   the inverse of vibe coding: the project verifies before it ships.
 - **Honest alpha labelling.** Releases ship with: *"The cryptographic
-  implementation has not undergone external review. Do not store passwords you
-  cannot afford to lose."* No false confidence is sold to users.
+  implementation `rust/src/crypto` has not yet undergone external review. It is
+  provided as-is, without warranty, as stated in the GPL-3.0."* No false confidence
+  is sold to users.
 
 So the fair statement is: Gabbro is **AI-written but not vibe-coded**, because the
 two things vibe coding discards — design direction and review — are both present.

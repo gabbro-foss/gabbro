@@ -32,7 +32,7 @@ Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
 
 **Licence:** GPL-3.0-only (ADR-004). Every dependency licence must be GPL-3.0 compatible; the allow-list is `rust/deny.toml`, enforced by the `cargo deny` gate leg.
 
-**Version control:** private GitHub repo at https://github.com/gabbro-foss/gabbro. SSH auth.
+**Version control:** public GitHub repo at https://github.com/gabbro-foss/gabbro. SSH auth.
 
 ## Project Structure
 
@@ -113,7 +113,22 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Doc review after publishing repo***. We'll discuss this at session start.
+**Distro packaging (AUR + `.deb`), replaces `install.sh`.** Unblocked now the repo is
+public: the release tarball is publicly fetchable, so a clean AUR `source=` works. Why:
+`install.sh --user` drops the launcher in `~/.local/bin`, which a bare-WM session PATH
+(qtile `spawncmd`) never sees, so the app is unfindable by name; `--system` leaves two
+copies on disk. Native packages install to `/usr/bin` (always on PATH) and let the package
+manager own PATH, upgrade and removal.
+- **AUR `PKGBUILD`** (Arch; never core repos) — in `linux/packaging/aur/`, downloads the
+  release tarball; optionally pushed to the AUR for `yay -S gabbro`. `source=` can point at
+  the local tarball for `makepkg -si` validation on the Arch box.
+- **`.deb`** (Debian/Mint) — control files in `linux/packaging/deb/`, attached to the
+  GitHub Release for `sudo apt install ./gabbro_<ver>.deb`.
+- Both stage bundle -> `/usr/lib/gabbro`, launcher -> `/usr/bin/gabbro`, `.desktop` + icons
+  -> `/usr/share` (icons via `render_icons.sh`). Deps: `gtk3 libfido2 libcbor pcsclite`;
+  portal as optdepend.
+- **When both land:** delete `install.sh` + `install_test.sh`, strip their steps from
+  BUILD_AND_RELEASE.md and the `linux/packaging/` structure line here.
 
 ---
 
@@ -132,22 +147,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
-- **Distro packaging (replaces `install.sh`).** Parked behind the public-repo flip: a clean
-  AUR `source=` needs the release tarball publicly fetchable (private-repo release assets
-  need auth). Why: `install.sh --user` drops the launcher in `~/.local/bin`, which a bare-WM
-  session PATH (qtile `spawncmd`) never sees, so the app is unfindable by name; `--system`
-  leaves two copies on disk. Native packages install to `/usr/bin` (always on PATH) and let
-  the package manager own PATH, upgrade and removal.
-  - **AUR `PKGBUILD`** (Arch; never core repos) — in `linux/packaging/aur/`, downloads the
-    release tarball; optionally pushed to the AUR for `yay -S gabbro`. Pre-flip, `source=`
-    can point at the local tarball for `makepkg -si` validation on the Arch box.
-  - **`.deb`** (Debian/Mint) — control files in `linux/packaging/deb/`, attached to the
-    GitHub Release for `sudo apt install ./gabbro_<ver>.deb`.
-  - Both stage bundle -> `/usr/lib/gabbro`, launcher -> `/usr/bin/gabbro`, `.desktop` + icons
-    -> `/usr/share` (icons via `render_icons.sh`). Deps: `gtk3 libfido2 libcbor pcsclite`;
-    portal as optdepend.
-  - **When both land:** delete `install.sh` + `install_test.sh`, strip their steps from
-    BUILD_AND_RELEASE.md and the `linux/packaging/` structure line here.
 - See if vault `syncing` can do without a second `passphrase + yubikey` if and only if the current vault and the incoming vault share the same `alias`, `passphrase`, `yubikey(s)`
 - in `sync` path, we currently have `auto-merge` and `review all changes`, the `auto-merge` is additive only (check and verify) and therefore never deletes items in the receiving vault: (1) add a message that explains this (or the correct) behaviour to the user, (2) add a third `sync` mechanism that simply takes the incoming vault and clobbers the existing one - discuss this
 - Investigate the idea of adding keyboard shortcuts

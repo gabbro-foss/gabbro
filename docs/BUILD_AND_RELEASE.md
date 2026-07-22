@@ -94,7 +94,7 @@ real fix.
 
 ## Release Process
 
-**Tag format:** `v0.1.0-alpha.N` until the pre-v1 security gates (Bikeshed) clear — honest with testers that no external crypto review has happened yet. Repo is private; the Debian collaborator pulls releases from GitHub, other testers receive artifacts directly.
+**Tag format:** `v0.1.0-alpha.N` until the pre-v1 security gates (Bikeshed) clear — honest with testers that no external crypto review has happened yet. The repo is public; testers and the Debian collaborator pull releases from the GitHub Releases page (artifacts can also be shared directly).
 
 **Pre-flight:**
 
@@ -210,9 +210,9 @@ the release by hand on github.com:
 3. Title **Gabbro v0.1.0-alpha.N**; tick **Set as a pre-release**.
 4. Attach the artifacts: the Linux `.tar.gz` **and its `.tar.gz.asc` signature**, plus all three renamed per-ABI `.apk` files.
 5. Body: the changelog section for this version — including the build-toolchain line from
-   pre-flight step 4 — plus the disclaimer: *"Alpha — for invited testers only. The
-   cryptographic implementation has not undergone external review. Do not store passwords
-   you cannot afford to lose."*
+   pre-flight step 4 — plus the disclaimer: *"Alpha release — the cryptographic
+   implementation `rust/src/crypto` has not yet undergone external review. It is provided
+   as-is, without warranty, as stated in the GPL-3.0."*
 
 If a stale draft release already exists for this version, delete it first and create
 the release fresh from the tag.
