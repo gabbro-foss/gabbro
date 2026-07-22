@@ -54,7 +54,7 @@ gabbro/
 │   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics, crash_writer, autotype_{spike,window,trigger} (diagnostics), gabbro-autotype (shipped trigger client); wordlist gen; gen_fixtures
 ├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + crash-safety (kill mid-write) + frozen golden fixtures (FIXTURES.md)
 ├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, BiometricHelper + BiometricStore (per-vault; + Robolectric tests)
-├── linux/packaging/      # Desktop integration: install.sh (.desktop + PATH launcher, per-user/--system), render_icons.sh, install_test.sh (sandbox); aur/ (AUR gabbro-bin PKGBUILD + .SRCINFO), deb/ (build-deb.sh -> binary .deb)
+├── linux/packaging/      # Desktop integration: render_icons.sh (icon tree); aur/ (AUR gabbro-bin PKGBUILD + .SRCINFO), deb/ (build-deb.sh -> binary .deb)
 ├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, VAULT_SYNC, AUTOTYPE_AND_AUTOFILL, AI_*; decisions/ (ADRs); artefacts/
 ├── test/  integration_test/          # Flutter widget/unit + Linux real-FFI suites (dart test)
 ├── test_data/            # Sample import files + migration_vaults/ (refusal corpus at floor v11, one vault per VERSION + MIGRATION_TESTS.md + test_matrix.md)

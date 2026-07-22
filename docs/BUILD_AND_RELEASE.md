@@ -185,18 +185,15 @@ real fix.
 
   It links only libc/libgcc, so it adds no runtime dependency to the list above.
 
-  Then stage the desktop-integration installer beside the bundle: `install.sh`
-  (registers a `.desktop` entry + a `gabbro` PATH command so the app appears in the
-  launcher instead of being run from the extract folder — see `linux/packaging/`)
-  and the rendered icon tree (placeholder until the logo lands; re-run to swap it):
+  Then render the icon tree beside the bundle (placeholder until the logo lands; re-run to
+  swap it) — the tarball and the AUR/`.deb` recipes all reference it:
 
   ```bash
-  cp linux/packaging/install.sh build/linux/x64/release/
   bash linux/packaging/render_icons.sh build/linux/x64/release/icons/hicolor
   ```
 
-  Package the bundle, installer and icons together: `tar -czf gabbro-<ver>-linux-x86_64.tar.gz -C build/linux/x64/release bundle install.sh icons`;
-  confirm both binaries + the installer made it in: `tar -tzf gabbro-<ver>-linux-x86_64.tar.gz | grep -E 'gabbro-autotype|install.sh'`. (The Arch-built bundle runs on Debian trixie / Mint — glibc ≤ 2.34, verified; only build in a `debian:trixie` container if a future release raises that above 2.41.) Then sign the tarball: `gpg --detach-sign --armor gabbro-<ver>-linux-x86_64.tar.gz` → `.tar.gz.asc` (asks for the key passphrase). Signing key fingerprint `369B E2CE CFD0 A528 7155 895A 4775 4EEE 7F9A ABFC`; public key + verify steps are in README.
+  Package the bundle and icons together: `tar -czf gabbro-<ver>-linux-x86_64.tar.gz -C build/linux/x64/release bundle icons`;
+  confirm the autotype binary made it in: `tar -tzf gabbro-<ver>-linux-x86_64.tar.gz | grep -E 'gabbro-autotype'`. (The Arch-built bundle runs on Debian trixie / Mint — glibc ≤ 2.34, verified; only build in a `debian:trixie` container if a future release raises that above 2.41.) Then sign the tarball: `gpg --detach-sign --armor gabbro-<ver>-linux-x86_64.tar.gz` → `.tar.gz.asc` (asks for the key passphrase). Signing key fingerprint `369B E2CE CFD0 A528 7155 895A 4775 4EEE 7F9A ABFC`; public key + verify steps are in README.
 - **Debian `.deb`:** `dpkg-deb` isn't on Arch — build it in a throwaway `debian:trixie`
   container from the Linux tarball just made (repackages the same bundle, no compile). With
   `ver` = the version (e.g. `0.1.0-alpha.15`):
