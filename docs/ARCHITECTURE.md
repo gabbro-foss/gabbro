@@ -113,10 +113,7 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Flip the repo to public.** Repo lives in the `gabbro-foss` org. Pre-publish audit cleared
-2026-07-21: secrets/keys clean across full history, real name + project emails kept by
-informed choice — no history rewrite, so existing immutable releases/tags stay valid.
-Remaining step: the GitHub visibility toggle. Optional: read-only Codeberg mirror.
+**Doc review after publishing repo***. We'll discuss this at session start.
 
 ---
 
