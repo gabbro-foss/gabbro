@@ -118,7 +118,7 @@ Ships the `.deb`, the host-path-scrubbed binaries, and the new install docs; goe
 alongside the AUR publish. Closes both packaging bikeshed items (finalize/publish + install
 docs). Order — the Mint `.deb` test is the go/no-go for retiring `install.sh`:
 
-**Progress (2026-07-22): steps 1-4 DONE + pushed; step 5 gate (`gabbro_test`) RUNNING on [maintainer]'s box. Resume by reading its result in `.scratchpad`: green -> step 6 (build with remap + sign); a `cargo audit` hit (DB was just refreshed to 1167) or any failure -> fix, then re-gate.**
+**Progress (2026-07-22): steps 1-5 DONE (gate GREEN, ~114 min, `cargo audit` clean vs 1167 DB). Step 6 builds DONE + verified: Linux tarball (autotype inside, version baked, only the 2 accepted Flutter stragglers), `.deb`, 3 APKs (version baked, cert matches README). Remaining in 6: [maintainer] runs 2 `gpg --detach-sign --armor` (tarball + `.deb`; APKs already keystore-signed). Then step 7 verify the `.asc` files, step 8 tag+publish, step 9 AUR. NOTE: stale `alpha.15` test `.deb` still in repo root (gitignored) — delete before publish.**
 
 1. **[DONE, GO] Pre-flight — Mint `.deb` test.** Built a remap'd `.deb` in a `debian:trixie`
    container via `build-deb.sh`; installed + launched clean on the Mint box, deps resolved on

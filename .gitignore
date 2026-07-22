@@ -57,6 +57,7 @@ app.*.map.json
 *.tar.gz.asc
 *.apk
 *.deb
+*.deb.asc
 
 # GPG / OpenPGP key material — NEVER commit private keys or revocation certs.
 # Live keys stay in ~/.gnupg (outside the repo); this is a belt-and-suspenders

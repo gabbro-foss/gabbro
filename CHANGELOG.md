@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **The Linux tarball no longer bundles `install.sh`.** The native packages replace it; the tarball is now extract-and-run (use the AUR or `.deb` for app-menu / PATH integration).
 - **Release binaries no longer embed the build machine's file paths** — build-path hygiene, no behaviour change.
 
+*Built with Flutter 3.44.6, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21.*
+
 ## [0.1.0-alpha.15] – 2026-07-21
 
 ### Security
