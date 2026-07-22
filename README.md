@@ -128,32 +128,79 @@ a UX complement that allows a corruption check *before* opening the vault.
 > has not yet undergone external review. It is provided as-is, without
 > warranty, as stated in the GPL-3.0.
 
-Download the latest release from the
-[Releases](https://github.com/gabbro-foss/gabbro/releases) page,
-or receive the artifact directly from the project owner.
+Release files are on the
+[Releases](https://github.com/gabbro-foss/gabbro/releases) page. Pick your
+platform below.
 
-### Linux (Arch, Debian trixie, Linux Mint)
+### Linux
 
-Requires glibc ≥ 2.34 — satisfied by all current Arch, Debian stable,
-and Mint installations.
+Two ways to install: a **native package** (recommended — it adds a menu entry and
+a `gabbro` command, pulls in the dependencies, and is removed cleanly by your
+package manager), or the **portable tarball** (any distribution, no root, run from
+a folder). All builds require glibc ≥ 2.34, satisfied by all current Arch, Debian
+stable, and Mint installations.
+
+#### Arch Linux (and derivatives) — AUR
+
+```bash
+yay -S gabbro-bin      # or: paru -S gabbro-bin
+```
+
+Installs system-wide to `/usr` with a menu entry and the `gabbro` command on your
+PATH; your AUR helper resolves the dependencies and updates it with the rest of
+your system. `gabbro-bin` repackages the official release build — it does not
+recompile from source.
+
+#### Debian / Linux Mint — `.deb`
+
+Download `gabbro_<version>_amd64.deb` from the Releases page, then:
+
+```bash
+sudo apt install ./gabbro_<version>_amd64.deb
+```
+
+Installs system-wide to `/usr` with a menu entry and the `gabbro` command; `apt`
+resolves the dependencies. There is no auto-update — install the new `.deb` when a
+release lands (it upgrades in place).
+
+#### Any distribution — portable tarball
 
 ```bash
 tar -xzf gabbro-<version>-linux-x86_64.tar.gz
 ./bundle/gabbro
 ```
 
-You can place the `bundle/` directory anywhere; the app is self-contained.
+Self-contained: place `bundle/` anywhere and run it in place. No root — but also no
+menu entry and no `gabbro` on your PATH; that system integration is what the
+packages add.
+
+#### Uninstall
+
+| Installed via | Remove with |
+|---|---|
+| AUR | `sudo pacman -Rns gabbro-bin` |
+| `.deb` | `sudo apt remove gabbro` |
+| tarball | delete the `bundle/` folder |
+
+**Your vaults and settings are not removed** — they live in
+`~/.local/share/app.gabbro.gabbro/` (vaults) and `~/.config/gabbro/` (settings),
+separate from the app files. To erase everything, delete those two directories as
+well. (Android differs: uninstalling the app *does* delete its vaults, because app
+data lives in private storage — export a `.gabbro` backup first.)
 
 #### Set up auto-type (optional)
 
-The bundle also contains `gabbro-autotype`. Bind it to a keyboard shortcut and
+Gabbro ships a small `gabbro-autotype` helper. Bind it to a keyboard shortcut and
 Gabbro types the login you have open into whatever window you are in — no
-copy-paste.
+copy-paste. Its path depends on how you installed:
+
+- **Package (AUR / `.deb`):** `/usr/lib/gabbro/gabbro-autotype`
+- **Tarball:** `<where-you-extracted>/bundle/gabbro-autotype`
 
 qtile (`~/.config/qtile/config.py`):
 
 ```python
-Key([mod, "control"], "g", lazy.spawn("/full/path/to/bundle/gabbro-autotype")),
+Key([mod, "control"], "g", lazy.spawn("/usr/lib/gabbro/gabbro-autotype")),
 ```
 
 Cinnamon / Linux Mint: Menu → **Keyboard** → **Shortcuts** → **Custom
@@ -209,6 +256,15 @@ match above is your trust anchor.
 
 A bad or missing signature means the file is **not** an official Gabbro build —
 do not run it.
+
+The Debian `.deb` is signed with the same key — verify it the same way:
+
+```bash
+gpg --verify gabbro_<version>_amd64.deb.asc gabbro_<version>_amd64.deb
+```
+
+The AUR package needs no separate check: its `PKGBUILD` pins the release tarball's
+SHA-256, so installing it verifies against the same signed tarball above.
 
 ### Android
 

@@ -118,12 +118,16 @@ Ships the `.deb`, the host-path-scrubbed binaries, and the new install docs; goe
 alongside the AUR publish. Closes both packaging bikeshed items (finalize/publish + install
 docs). Order — the Mint `.deb` test is the go/no-go for retiring `install.sh`:
 
-1. **Pre-flight — Mint `.deb` test.** Build a remap'd bundle -> `linux/packaging/deb/build-deb.sh`;
-   install+launch the `.deb` on the Mint box (uninstall the `install.sh` copy first). GO/NO-GO.
-2. **Retire `install.sh`** (on GO): delete `install.sh` + `install_test.sh`; strip from the
+**Progress (2026-07-22): steps 1-3 DONE + pushed; resume at step 4 (version + CHANGELOG).**
+
+1. **[DONE, GO] Pre-flight — Mint `.deb` test.** Built a remap'd `.deb` in a `debian:trixie`
+   container via `build-deb.sh`; installed + launched clean on the Mint box, deps resolved on
+   Mint's Ubuntu base, vaults unlocked. GO. (The test `.deb` — `alpha.15`-versioned — stays
+   installed on Mint; the real `alpha.16` `.deb` upgrades it in place.)
+2. **[DONE] Retire `install.sh`** (on GO): delete `install.sh` + `install_test.sh`; strip from the
    BUILD_AND_RELEASE tarball step (tar becomes `bundle icons`), the `linux/packaging/` structure
    line, and the `gabbro_test` install_test leg.
-3. **README install/uninstall docs**, accurate per method: Arch (`yay -S gabbro-bin` + run-from-folder
+3. **[DONE] README install/uninstall docs**, accurate per method: Arch (`yay -S gabbro-bin` + run-from-folder
    tarball), Debian/Mint (`.deb` from Releases), uninstall data-retention (config/vaults stay —
    contrast Android), `gabbro-autotype` at `/usr/lib/gabbro/gabbro-autotype`.
 4. **Version + CHANGELOG**: pubspec -> `0.1.0-alpha.16`; move `[Unreleased]` -> dated block (entries:
@@ -131,10 +135,10 @@ docs). Order — the Mint `.deb` test is the go/no-go for retiring `install.sh`:
    `install.sh` retired). Keep an empty `[Unreleased]` above. Commit code-first, docs-second.
 5. **Full gate** `gabbro_test` green (~100 min, [maintainer]).
 6. **Build with remap** (see BUILD_AND_RELEASE / `gabbro_build_install`): Linux `RUSTFLAGS`, Android
-   `CARGO_ENCODED_RUSTFLAGS` + `./gradlew --stop`. Tarball (install.sh-free) + sign; 3 APKs; `.deb`.
+   `CARGO_ENCODED_RUSTFLAGS` + `./gradlew --stop`. Tarball (install.sh-free) + sign; 3 APKs; `.deb` + sign.
 7. **Verify before publish** (immutable): scrub (`strings|grep /home/` -> only the 2 accepted Flutter
    stragglers), embedded `APP_VERSION`, tarball `.asc`, APK certs.
-8. **Tag + publish** `v0.1.0-alpha.16` (tag last): tarball+`.asc`, 3 renamed APKs, `.deb`, changelog +
+8. **Tag + publish** `v0.1.0-alpha.16` (tag last): tarball+`.asc`, `.deb`+`.asc`, 3 renamed APKs, changelog +
    toolchain line + alpha disclaimer.
 9. **Publish AUR** `gabbro-bin` (name confirmed free 2026-07-22): bump `PKGBUILD`/`.SRCINFO` pkgver,
    `makepkg -g` for new sums, push to aur.archlinux.org -> `yay -S gabbro-bin`.

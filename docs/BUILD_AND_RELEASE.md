@@ -205,7 +205,9 @@ real fix.
   ```
 
   -> `gabbro_<debver>_amd64.deb` in the repo root (Debian version `0.1.0~alpha.N-1`; `~` sorts
-  the pre-release before the final `0.1.0`). Attach it to the Release; users run
+  the pre-release before the final `0.1.0`). Then sign it **on the host** (the container has no
+  key), same key as the tarball: `gpg --detach-sign --armor gabbro_<debver>_amd64.deb` ->
+  `.deb.asc`. Attach it to the Release; users run
   `sudo apt install ./gabbro_<debver>_amd64.deb` -> installs to `/usr` (system-wide). Runtime
   deps auto-resolve (trixie: `libgtk-3-0t64 libfido2-1 libcbor0.10 libpcsclite1`; recommends
   `xdg-desktop-portal-gtk`, suggests `pcscd`). To validate a build, add `apt-get install -y
@@ -222,7 +224,7 @@ the release by hand on github.com:
 1. Repo → **Releases** → **Draft a new release**.
 2. **Choose the existing tag** `v0.1.0-alpha.N` (do not create a new one).
 3. Title **Gabbro v0.1.0-alpha.N**; tick **Set as a pre-release**.
-4. Attach the artifacts: the Linux `.tar.gz` **and its `.tar.gz.asc` signature**, plus all three renamed per-ABI `.apk` files.
+4. Attach the artifacts: the Linux `.tar.gz` **and its `.tar.gz.asc` signature**, the Debian `.deb` **and its `.deb.asc` signature**, plus all three renamed per-ABI `.apk` files.
 5. Body: the changelog section for this version — including the build-toolchain line from
    pre-flight step 4 — plus the disclaimer: *"Alpha release — the cryptographic
    implementation `rust/src/crypto` has not yet undergone external review. It is provided
