@@ -161,9 +161,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   - **Arch install paths (once `install.sh` is gone):** README must contrast the two — raw
     tarball (extract + run `./bundle/gabbro`, zero system integration) vs AUR `gabbro-bin`
     (menu entry, `gabbro` on PATH, deps pulled in, `pacman -Rns` removal, `yay` updates).
-- **Track `gabbro_test` in the repo without the host path.** Extract its `ROOT=<abs path>/gabbro`
-  line so the tracked script reads ROOT from an untracked file (e.g. `.gabbro_test_root`) or
-  env — no machine/user path in the public repo — then `git add gabbro_test`.
 - **Add Liberapay to `.github/FUNDING.yml`.** (Near-term slice of the deferred donation/sustainability item.)
 
 ### Security (pre-v1)
