@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.16] – 2026-07-22
+
+### Added
+- **Native Linux packages.** Arch via the AUR (`yay -S gabbro-bin`) and Debian/Mint via a signed `.deb` (`sudo apt install ./gabbro_<version>_amd64.deb`) — both install system-wide with a menu entry and a `gabbro` command, resolve their dependencies, and uninstall cleanly. The `.deb` carries a detached GPG signature like the tarball.
+
+### Changed
+- **The Linux tarball no longer bundles `install.sh`.** The native packages replace it; the tarball is now extract-and-run (use the AUR or `.deb` for app-menu / PATH integration).
+- **Release binaries no longer embed the build machine's file paths** — build-path hygiene, no behaviour change.
+
 ## [0.1.0-alpha.15] – 2026-07-21
 
 ### Security
