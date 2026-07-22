@@ -1,0 +1,7 @@
+# makepkg working files and downloaded sources -- regenerate with `makepkg -g`.
+# Only PKGBUILD, .SRCINFO and this file are tracked.
+/src/
+/pkg/
+*.pkg.tar.*
+/gabbro-*-linux-x86_64.tar.gz
+/LICENSE
