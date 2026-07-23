@@ -136,11 +136,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - in `sync` path, we currently have `auto-merge` and `review all changes`, the `auto-merge` is additive only (check and verify) and therefore never deletes items in the receiving vault: (1) add a message that explains this (or the correct) behaviour to the user, (2) add a third `sync` mechanism that simply takes the incoming vault and clobbers the existing one - discuss this
 - Investigate the idea of adding keyboard shortcuts
 
-### Code Quality
-- Investigate reducing Android APK size (arm64-v8a ~29 MB). Per-ABI split already
-  applied (main lever); explore R8/resource
-  shrinking, Flutter asset/font subsetting, Rust `.so` stripping.
-
 ### Security (pre-v1)
 - Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
 
