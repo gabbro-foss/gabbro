@@ -53,7 +53,7 @@ secret, it lives in Rust. Everything else lives in Flutter.
 | Platform | Target |
 |---|---|
 | Linux (Arch, Mint) | v1 |
-| Android (F-Droid) | v1 |
+| Android (incl. GrapheneOS) | v1 |
 | Windows | v2 (future) |
 
 ---
@@ -277,6 +277,21 @@ SHA-256, so installing it verifies against the same signed tarball above.
 3. Tap the APK file in your file manager to install.
 
 Tested on Android 11+ (including GrapheneOS). YubiKey authentication requires a YubiKey 5 series key (USB-A/C for all devices; NFC where supported).
+
+#### Auto-updates with Obtainium (recommended on GrapheneOS)
+
+Manual APK installs do not auto-update. [Obtainium](https://github.com/ImranR98/Obtainium)
+installs and updates Gabbro straight from its GitHub Releases, keeping the project's own
+signature. It is popular with GrapheneOS users.
+
+1. Install Obtainium.
+2. Tap **Add App** and paste the repo URL: `https://github.com/gabbro-foss/gabbro`
+3. Turn on **Include prereleases** (current builds are alpha, marked pre-release on GitHub).
+4. Set the APK filter to your device's ABI so the right file is picked: `arm64-v8a`
+   (modern phones), `armeabi-v7a` (old 32-bit), or `x86_64` (emulators / Chromebooks).
+5. Install. Obtainium then flags each new release for a one-tap update.
+
+Verify the signing fingerprint on first install (below); Obtainium pins it thereafter.
 
 #### Verify the APK is genuine
 

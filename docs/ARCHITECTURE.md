@@ -113,9 +113,7 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Publish on IzzyOnDroid** (main F-Droid rejected — reasons in
-`docs/F-Droid_publication.md`). Fastlane metadata + 9 phone screenshots done.
-Remaining: file the inclusion request on Codeberg.
+_None selected. Pick from the Bikeshed._
 
 ---
 
@@ -137,12 +135,10 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - See if vault `syncing` can do without a second `passphrase + yubikey` if and only if the current vault and the incoming vault share the same `alias`, `passphrase`, `yubikey(s)`
 - in `sync` path, we currently have `auto-merge` and `review all changes`, the `auto-merge` is additive only (check and verify) and therefore never deletes items in the receiving vault: (1) add a message that explains this (or the correct) behaviour to the user, (2) add a third `sync` mechanism that simply takes the incoming vault and clobbers the existing one - discuss this
 - Investigate the idea of adding keyboard shortcuts
-- Once Gabbro is listed on IzzyOnDroid, add the "via F-Droid client + IzzyOnDroid repo"
-  install path to the README Android section (drafted in `docs/F-Droid_publication.md`)
 
 ### Code Quality
-- Investigate reducing Android APK size (arm64-v8a ~29 MB, near IzzyOnDroid's ~30 MB
-  soft limit). Per-ABI split already applied (main lever); explore R8/resource
+- Investigate reducing Android APK size (arm64-v8a ~29 MB). Per-ABI split already
+  applied (main lever); explore R8/resource
   shrinking, Flutter asset/font subsetting, Rust `.so` stripping.
 
 ### Security (pre-v1)
