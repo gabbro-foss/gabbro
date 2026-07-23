@@ -114,21 +114,8 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 ### Next task
 
 **Publish on IzzyOnDroid** (main F-Droid rejected — reasons in
-`docs/F-Droid_publication.md`). Add a fastlane metadata folder + file the inclusion
-request on Codeberg.
-
-Store screenshots — capture on the **Android emulator** (Pixel_9a AVD). Light theme,
-generic mock data only. Drop into
-`fastlane/metadata/android/en-US/images/phoneScreenshots/`. Shots:
-1. Onboarding screen (first-run only — capture first).
-2. Entry-type picker sheet (via the create-entry FAB; shows all 6 types).
-3. Create several fake entries (generic data), then the populated vault list.
-4. A Login entry detail.
-5. Another entry-type detail.
-6. Manage vaults / manage folders.
-7. Password generator — passphrase and classic.
-
-(No YubiKey screens — hardware keys unavailable in this capture setup.)
+`docs/F-Droid_publication.md`). Fastlane metadata + 9 phone screenshots done.
+Remaining: file the inclusion request on Codeberg.
 
 ---
 
