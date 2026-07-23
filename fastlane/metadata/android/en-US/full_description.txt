@@ -1,0 +1,17 @@
+Gabbro is a free, open-source password manager for people who take security seriously. Your secrets are protected by memory-hard key derivation (Argon2id) and AES-256-GCM encryption - both resistant to classical and quantum attack.
+
+Named after the intrusive igneous rock: hard, stable, enduring.
+
+Features:
+
+* Quantum-resistant by design - vault security rests on Argon2id + AES-256-GCM.
+* Optional hardware key - FIDO2/YubiKey authentication (passphrase-only by default; two keys minimum when keys are used).
+* Rust for all secrets - every cryptographic operation lives in Rust; secrets never cross the Flutter/Rust bridge in plaintext.
+* Local-first - your vault lives on your device; sync is your choice and your responsibility.
+* No telemetry - no analytics, no accounts, no tracking; works fully offline.
+* Localised - UI available in many languages, following your system locale with an in-app override.
+* Multi-language passphrase generator - wordlists across many languages, plus a script-aware classic generator.
+* Offline in-app help - no external website or internet connection required.
+* FOSS - GPL-3.0-only.
+
+Alpha release: the cryptographic implementation has not yet undergone external review. It is provided as-is, without warranty, as stated in the GPL-3.0.
