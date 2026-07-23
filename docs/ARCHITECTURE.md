@@ -113,7 +113,8 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-_(empty — v0.1.0-alpha.16 shipped; pick the next item from the Bikeshed with [maintainer].)_
+**Publish on F-Droid.** Find the documented procedure to publish a package on
+F-Droid and see if we can publish Gabbro there.
 
 ---
 
@@ -135,18 +136,18 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - See if vault `syncing` can do without a second `passphrase + yubikey` if and only if the current vault and the incoming vault share the same `alias`, `passphrase`, `yubikey(s)`
 - in `sync` path, we currently have `auto-merge` and `review all changes`, the `auto-merge` is additive only (check and verify) and therefore never deletes items in the receiving vault: (1) add a message that explains this (or the correct) behaviour to the user, (2) add a third `sync` mechanism that simply takes the incoming vault and clobbers the existing one - discuss this
 - Investigate the idea of adding keyboard shortcuts
-- **Publish on F-Droid.** Find the documented procedure to publish a package on F-Droid and see if we can publish Gabbro there.
 
 ### Security (pre-v1)
 - Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
 
 ### V2+ / Defer
 - **Linux biometric unlock** (laptop fingerprint readers, e.g. libfido2/PAM or `fprintd`). Fits the current per-device model unchanged: Linux would just get its own local per-vault secret store; the vault file carries no biometric state, so nothing else changes.
-- Passkey (WebAuthn discoverable credential) support.
+- Passkey provider: store website passkeys (WebAuthn discoverable credentials) in
+  the vault so they sync/back up. Distinct from the YubiKey (which unlocks the app);
+  tradeoff — website private keys would live in the vault, not in hardware.
 - Custom and hideable filter chips (post-v1 user feedback gate).
 - Windows support.
 - Yubico partnership.
-- Destination Linux podcast outreach (when approaching public release).
 - Donation/sustainability model: GitHub Sponsors is live; Monero possible later (a large, dedicated effort). Liberapay ruled out (2026-07-22 — Stripe forces business-type onboarding for individuals and has suspended Liberapay-linked accounts; no PayPal). Don't re-propose Liberapay.
 - No-telemetry verification guide (ripgrep scan, Wireshark, NetGuard).
 - Support model (GitHub Issues + SUPPORT.md for v1; revisit when user base exists).
