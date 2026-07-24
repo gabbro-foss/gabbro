@@ -328,6 +328,51 @@ class _VaultListScreenState extends State<VaultListScreen>
   // the search field without either layout duplicating the node. Esc-to-blur is
   // handled globally for every text field (main.dart _onKeyEvent).
   final FocusNode _searchFocus = FocusNode();
+
+  // Phase 3: one FocusScope per Tab region. Tab jumps between regions (see
+  // _jumpRegion); arrows stay within a region (Flutter's default directional
+  // focus). Order: search -> folder -> chips -> entry list (rail/detail on the
+  // tablet layout are handled there).
+  final _searchScope = FocusScopeNode(debugLabel: 'region:search');
+  final _folderScope = FocusScopeNode(debugLabel: 'region:folder');
+  final _chipsScope = FocusScopeNode(debugLabel: 'region:chips');
+  final _listScope = FocusScopeNode(debugLabel: 'region:list');
+
+  /// Present regions in Tab order (folder only when there are folders).
+  List<FocusScopeNode> get _regions => [
+    _searchScope,
+    if (_folders.isNotEmpty) _folderScope,
+    _chipsScope,
+    _listScope,
+  ];
+
+  /// Wrap a Tab region in its FocusScope on desktop; pass the child through
+  /// UNCHANGED on Android. Keyboard navigation is Linux-desktop only and must
+  /// not alter the Android widget tree at all.
+  Widget _region(FocusScopeNode scope, Widget child) =>
+      widget.isAndroid ? child : FocusScope(node: scope, child: child);
+
+  /// Tab / Shift+Tab: move focus to the next / previous region's first control
+  /// (or the one it last had — FocusScope remembers). Arrows are untouched.
+  void _jumpRegion(bool forward) {
+    final r = _regions;
+    if (r.isEmpty) return;
+    final i = r.indexWhere((s) => s.hasFocus);
+    final next = i < 0
+        ? 0
+        : (forward ? (i + 1) % r.length : (i - 1 + r.length) % r.length);
+    final scope = r[next];
+    // The search region's entry is the text field itself (not its first
+    // focusable, which is the mode-toggle icon). Other regions: the control they
+    // last had (roving memory), else their first control.
+    final FocusNode? target = scope == _searchScope
+        ? _searchFocus
+        : (scope.focusedChild ??
+            (scope.traversalDescendants.isEmpty
+                ? null
+                : scope.traversalDescendants.first));
+    target?.requestFocus();
+  }
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ScrollController _chipScrollController = ScrollController();
   bool _showLeftChevron = false;
@@ -394,6 +439,10 @@ class _VaultListScreenState extends State<VaultListScreen>
     WidgetsBinding.instance.removeObserver(this);
     _searchController.dispose();
     _searchFocus.dispose();
+    _searchScope.dispose();
+    _folderScope.dispose();
+    _chipsScope.dispose();
+    _listScope.dispose();
     _chipScrollController.removeListener(_updateChevrons);
     _chipScrollController.dispose();
     super.dispose();
@@ -1747,12 +1796,14 @@ class _VaultListScreenState extends State<VaultListScreen>
                   ClipboardClearTimeout.sixtySeconds,
             );
           }
-          return SafeArea(
+          final Widget body = SafeArea(
             child: Column(
               children: [
-                _buildSearchField(),
+                _region(_searchScope, _buildSearchField()),
                 if (_folders.isNotEmpty)
-                  Padding(
+                  _region(
+                    _folderScope,
+                    Padding(
                     padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
                     child: DropdownButton<String>(
                       isExpanded: true,
@@ -1792,9 +1843,12 @@ class _VaultListScreenState extends State<VaultListScreen>
                       ],
                     ),
                   ),
-                _buildFilterChipRow(),
+                  ),
+                _region(_chipsScope, _buildFilterChipRow()),
                 Expanded(
-                  child: _groupedEntries.isEmpty
+                  child: _region(
+                    _listScope,
+                    _groupedEntries.isEmpty
                       ? Center(child: Text(l.noEntriesMatch))
                       : Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1941,9 +1995,28 @@ class _VaultListScreenState extends State<VaultListScreen>
                               ),
                           ],
                         ),
+                  ),
                 ),
               ],
             ),
+          );
+          if (widget.isAndroid) return body;
+          return Actions(
+            actions: <Type, Action<Intent>>{
+              NextFocusIntent: CallbackAction<NextFocusIntent>(
+                onInvoke: (_) {
+                  _jumpRegion(true);
+                  return null;
+                },
+              ),
+              PreviousFocusIntent: CallbackAction<PreviousFocusIntent>(
+                onInvoke: (_) {
+                  _jumpRegion(false);
+                  return null;
+                },
+              ),
+            },
+            child: body,
           );
         },
       ),
