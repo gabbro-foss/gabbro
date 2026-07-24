@@ -1,5 +1,17 @@
 {
   "@@locale": "nb",
+
+  "keyboardShortcutsTitle": "Hurtigtaster",
+  "kbSectionGeneral": "Generelt",
+  "kbSectionSearch": "Søk",
+  "kbSectionNavigation": "Navigasjon",
+  "kbLockVault": "Lås hvelv",
+  "kbFocusSearch": "Fokuser søk",
+  "kbSearchAllFields": "Søk i alle felt",
+  "kbMoveBetweenControls": "Flytt mellom kontroller",
+  "kbActivateControl": "Aktiver den fokuserte kontrollen",
+  "kbCloseDialog": "Lukk en dialog eller avbryt",
+  "kbNoCopyNote": "Det finnes ingen kopisnarvei: å kopiere en hemmelighet er en bevisst handling som tømmes automatisk.",
   "importSizeLimitNote": "Maksimal filstørrelse: {textLimit} (CSV, Bitwarden, Dashlane, Google) eller {enpassLimit} (Enpass).",
   "importFileTooLarge": "Denne filen overskrider grensen på {limit}.",
   "saveConfirmTitle": "Lagre i Gabbro",

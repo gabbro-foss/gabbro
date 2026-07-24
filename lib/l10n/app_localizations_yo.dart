@@ -9,6 +9,40 @@ class AppLocalizationsYo extends AppLocalizations {
   AppLocalizationsYo([String locale = 'yo']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Àwọn kọ́tuulẹ́tẹ̀ bọ́tìnì';
+
+  @override
+  String get kbSectionGeneral => 'Gbogbogbò';
+
+  @override
+  String get kbSectionSearch => 'Ìwáàṣàwárí';
+
+  @override
+  String get kbSectionNavigation => 'Ìtọ́nà';
+
+  @override
+  String get kbLockVault => 'Titi vọọliti';
+
+  @override
+  String get kbFocusSearch => 'Da ojú sí ìwáàṣàwárí';
+
+  @override
+  String get kbSearchAllFields => 'Ṣawari gbogbo awọn aaye';
+
+  @override
+  String get kbMoveBetweenControls => 'Rìn láàrin àwọn ìdarí';
+
+  @override
+  String get kbActivateControl => 'Mú ìdarí tí a dá ojú sí ṣiṣẹ́';
+
+  @override
+  String get kbCloseDialog => 'Ti onídirọ̀rọ̀ pa tàbí fagilé';
+
+  @override
+  String get kbNoCopyNote =>
+      'Kò sí kọ́tuulẹ́tẹ̀ láti daakọ: didaakọ àṣírí jẹ́ ìgbésẹ̀ onímọ̀ọ́mọ̀ tí ó ń parẹ́ fúnra rẹ̀.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override

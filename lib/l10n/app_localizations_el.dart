@@ -9,6 +9,40 @@ class AppLocalizationsEl extends AppLocalizations {
   AppLocalizationsEl([String locale = 'el']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Συντομεύσεις πληκτρολογίου';
+
+  @override
+  String get kbSectionGeneral => 'Γενικά';
+
+  @override
+  String get kbSectionSearch => 'Αναζήτηση';
+
+  @override
+  String get kbSectionNavigation => 'Πλοήγηση';
+
+  @override
+  String get kbLockVault => 'Κλείδωμα θησαυροφυλακίου';
+
+  @override
+  String get kbFocusSearch => 'Εστίαση στην αναζήτηση';
+
+  @override
+  String get kbSearchAllFields => 'Αναζήτηση σε όλα τα πεδία';
+
+  @override
+  String get kbMoveBetweenControls => 'Μετακίνηση μεταξύ στοιχείων';
+
+  @override
+  String get kbActivateControl => 'Ενεργοποίηση εστιασμένου στοιχείου';
+
+  @override
+  String get kbCloseDialog => 'Κλείσιμο διαλόγου ή ακύρωση';
+
+  @override
+  String get kbNoCopyNote =>
+      'Δεν υπάρχει συντόμευση αντιγραφής: η αντιγραφή ενός μυστικού είναι μια σκόπιμη ενέργεια με αυτόματη εκκαθάριση.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override

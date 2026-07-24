@@ -16,6 +16,7 @@ import 'package:gabbro/screens/import_screen.dart';
 import 'package:gabbro/screens/entry_detail_screen.dart';
 import 'package:gabbro/screens/about_screen.dart';
 import 'package:gabbro/screens/help_screen.dart';
+import 'package:gabbro/screens/keyboard_shortcuts_list_screen.dart';
 import 'package:gabbro/screens/export_screen.dart';
 import 'package:gabbro/screens/appearance_screen.dart';
 import 'package:gabbro/screens/language_screen.dart';
@@ -314,6 +315,9 @@ class _VaultListScreenState extends State<VaultListScreen>
   String _searchQuery = '';
   bool _fullTextSearch = false;
   final TextEditingController _searchController = TextEditingController();
+  // Shared by whichever layout (phone XOR tablet) is built, so Ctrl+F can focus
+  // the search field without either layout duplicating the node.
+  final FocusNode _searchFocus = FocusNode();
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ScrollController _chipScrollController = ScrollController();
   bool _showLeftChevron = false;
@@ -333,6 +337,12 @@ class _VaultListScreenState extends State<VaultListScreen>
     } catch (_) {
       return [];
     }
+  }
+
+  // Ctrl+Shift+F: turn on full-text (all fields) search, then focus the field.
+  void _focusSearchAllFields() {
+    setState(() => _fullTextSearch = true);
+    _searchFocus.requestFocus();
   }
 
   @override
@@ -369,6 +379,7 @@ class _VaultListScreenState extends State<VaultListScreen>
     _messenger?.clearSnackBars();
     WidgetsBinding.instance.removeObserver(this);
     _searchController.dispose();
+    _searchFocus.dispose();
     _chipScrollController.removeListener(_updateChevrons);
     _chipScrollController.dispose();
     super.dispose();
@@ -1165,6 +1176,12 @@ class _VaultListScreenState extends State<VaultListScreen>
           ),
         );
         if (mounted) _loadEntries();
+      case 'keyboard_shortcuts':
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => const KeyboardShortcutsListScreen(),
+          ),
+        );
       case 'help':
         Navigator.of(
           context,
@@ -1310,7 +1327,21 @@ class _VaultListScreenState extends State<VaultListScreen>
       return Scaffold(body: Center(child: Text(l.vaultLoadFailed(_error!))));
     }
 
-    return Scaffold(
+    // Ctrl+F focuses search; Ctrl+Shift+F also turns on full-text ("all fields")
+    // mode. The autofocus wrapper lets the shortcut fire from a cold screen
+    // (before the user has focused any control); skipTraversal keeps it out of
+    // the Tab order.
+    return CallbackShortcuts(
+      bindings: <ShortcutActivator, VoidCallback>{
+        const SingleActivator(LogicalKeyboardKey.keyF, control: true):
+            _searchFocus.requestFocus,
+        const SingleActivator(LogicalKeyboardKey.keyF, control: true, shift: true):
+            _focusSearchAllFields,
+      },
+      child: Focus(
+        autofocus: true,
+        skipTraversal: true,
+        child: Scaffold(
       // Search field sits at the top; let the keyboard overlay the scrollable
       // list rather than shrink the body (which overflowed the header). The
       // search field stays visible above the keyboard.
@@ -1469,6 +1500,19 @@ class _VaultListScreenState extends State<VaultListScreen>
                     ),
                   ),
                   const PopupMenuDivider(),
+                  // Desktop-only: a touch phone has no physical keyboard.
+                  if (!widget.isAndroid)
+                    PopupMenuItem(
+                      value: 'keyboard_shortcuts',
+                      child: Row(
+                        children: [
+                          Icon(Icons.keyboard_outlined,
+                              size: scaledIconSize(context, 20)),
+                          const SizedBox(width: 12),
+                          Expanded(child: Text(ml.keyboardShortcutsTitle)),
+                        ],
+                      ),
+                    ),
                   PopupMenuItem(
                     value: 'help',
                     child: Row(
@@ -1586,6 +1630,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                 padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                 child: TextField(
                   controller: _searchController,
+                  focusNode: _searchFocus,
                   decoration: InputDecoration(
                     hintText: _fullTextSearch
                         ? l.searchAllFieldsHint
@@ -1690,6 +1735,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                   child: TextField(
                     controller: _searchController,
+                    focusNode: _searchFocus,
                     decoration: InputDecoration(
                       hintText: _fullTextSearch
                           ? l.searchAllFieldsHint
@@ -1916,6 +1962,8 @@ class _VaultListScreenState extends State<VaultListScreen>
             ),
           );
         },
+      ),
+        ),
       ),
     );
   }

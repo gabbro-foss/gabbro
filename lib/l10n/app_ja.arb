@@ -1,5 +1,17 @@
 {
   "@@locale": "ja",
+
+  "keyboardShortcutsTitle": "キーボードショートカット",
+  "kbSectionGeneral": "一般",
+  "kbSectionSearch": "検索",
+  "kbSectionNavigation": "ナビゲーション",
+  "kbLockVault": "ボルトをロック",
+  "kbFocusSearch": "検索にフォーカス",
+  "kbSearchAllFields": "すべてのフィールドを検索",
+  "kbMoveBetweenControls": "コントロール間を移動",
+  "kbActivateControl": "フォーカス中のコントロールを実行",
+  "kbCloseDialog": "ダイアログを閉じる、またはキャンセル",
+  "kbNoCopyNote": "コピー用のショートカットはありません: 秘密のコピーは意図的な操作であり、自動的に消去されます。",
   "importSizeLimitNote": "最大ファイルサイズ：{textLimit}（CSV、Bitwarden、Dashlane、Google）または {enpassLimit}（Enpass）。",
   "importFileTooLarge": "このファイルは {limit} の上限を超えています。",
   "saveConfirmTitle": "Gabbro に保存",

@@ -9,6 +9,40 @@ class AppLocalizationsRu extends AppLocalizations {
   AppLocalizationsRu([String locale = 'ru']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Сочетания клавиш';
+
+  @override
+  String get kbSectionGeneral => 'Общие';
+
+  @override
+  String get kbSectionSearch => 'Поиск';
+
+  @override
+  String get kbSectionNavigation => 'Навигация';
+
+  @override
+  String get kbLockVault => 'Заблокировать хранилище';
+
+  @override
+  String get kbFocusSearch => 'Фокус на поиске';
+
+  @override
+  String get kbSearchAllFields => 'Поиск по всем полям';
+
+  @override
+  String get kbMoveBetweenControls => 'Перемещение между элементами';
+
+  @override
+  String get kbActivateControl => 'Активировать выбранный элемент';
+
+  @override
+  String get kbCloseDialog => 'Закрыть диалог или отменить';
+
+  @override
+  String get kbNoCopyNote =>
+      'Нет сочетания для копирования: копирование секрета — намеренное действие с автоматической очисткой.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override

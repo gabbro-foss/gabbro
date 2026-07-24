@@ -9,6 +9,40 @@ class AppLocalizationsDe extends AppLocalizations {
   AppLocalizationsDe([String locale = 'de']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Tastenkürzel';
+
+  @override
+  String get kbSectionGeneral => 'Allgemein';
+
+  @override
+  String get kbSectionSearch => 'Suche';
+
+  @override
+  String get kbSectionNavigation => 'Navigation';
+
+  @override
+  String get kbLockVault => 'Tresor sperren';
+
+  @override
+  String get kbFocusSearch => 'Suche fokussieren';
+
+  @override
+  String get kbSearchAllFields => 'In allen Feldern suchen';
+
+  @override
+  String get kbMoveBetweenControls => 'Zwischen Steuerelementen wechseln';
+
+  @override
+  String get kbActivateControl => 'Fokussiertes Element aktivieren';
+
+  @override
+  String get kbCloseDialog => 'Dialog schließen oder abbrechen';
+
+  @override
+  String get kbNoCopyNote =>
+      'Es gibt kein Kopierkürzel: Das Kopieren eines Geheimnisses ist eine bewusste Aktion, die automatisch geleert wird.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override

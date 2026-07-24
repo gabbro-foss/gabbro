@@ -1,5 +1,17 @@
 {
   "@@locale": "yo",
+
+  "keyboardShortcutsTitle": "Àwọn kọ́tuulẹ́tẹ̀ bọ́tìnì",
+  "kbSectionGeneral": "Gbogbogbò",
+  "kbSectionSearch": "Ìwáàṣàwárí",
+  "kbSectionNavigation": "Ìtọ́nà",
+  "kbLockVault": "Titi vọọliti",
+  "kbFocusSearch": "Da ojú sí ìwáàṣàwárí",
+  "kbSearchAllFields": "Ṣawari gbogbo awọn aaye",
+  "kbMoveBetweenControls": "Rìn láàrin àwọn ìdarí",
+  "kbActivateControl": "Mú ìdarí tí a dá ojú sí ṣiṣẹ́",
+  "kbCloseDialog": "Ti onídirọ̀rọ̀ pa tàbí fagilé",
+  "kbNoCopyNote": "Kò sí kọ́tuulẹ́tẹ̀ láti daakọ: didaakọ àṣírí jẹ́ ìgbésẹ̀ onímọ̀ọ́mọ̀ tí ó ń parẹ́ fúnra rẹ̀.",
   "importSizeLimitNote": "Iwọn faili to pọ̀ jù: {textLimit} (CSV, Bitwarden, Dashlane, Google) tàbí {enpassLimit} (Enpass).",
   "importFileTooLarge": "Faili yìí ré ààlà {limit} kọjá.",
   "saveConfirmTitle": "Fi pamọ́ sí Gabbro",

@@ -1,5 +1,17 @@
 {
   "@@locale": "lv",
+
+  "keyboardShortcutsTitle": "Tastatūras saīsnes",
+  "kbSectionGeneral": "Vispārīgi",
+  "kbSectionSearch": "Meklēšana",
+  "kbSectionNavigation": "Navigācija",
+  "kbLockVault": "Bloķēt seifu",
+  "kbFocusSearch": "Fokusēt meklēšanu",
+  "kbSearchAllFields": "Meklēt visos laukos",
+  "kbMoveBetweenControls": "Pārvietoties starp vadīklām",
+  "kbActivateControl": "Aktivizēt fokusēto vadīklu",
+  "kbCloseDialog": "Aizvērt dialoglodziņu vai atcelt",
+  "kbNoCopyNote": "Kopēšanas īsinājumtaustiņa nav: noslēpuma kopēšana ir apzināta, automātiski notīrāma darbība.",
   "importSizeLimitNote": "Maksimālais faila izmērs: {textLimit} (CSV, Bitwarden, Dashlane, Google) vai {enpassLimit} (Enpass).",
   "importFileTooLarge": "Šis fails pārsniedz {limit} ierobežojumu.",
   "saveConfirmTitle": "Saglabāt Gabbro",

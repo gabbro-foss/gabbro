@@ -1,5 +1,17 @@
 {
   "@@locale": "zh_CN",
+
+  "keyboardShortcutsTitle": "键盘快捷键",
+  "kbSectionGeneral": "常规",
+  "kbSectionSearch": "搜索",
+  "kbSectionNavigation": "导航",
+  "kbLockVault": "锁定保险库",
+  "kbFocusSearch": "聚焦搜索",
+  "kbSearchAllFields": "搜索所有字段",
+  "kbMoveBetweenControls": "在控件之间移动",
+  "kbActivateControl": "激活聚焦的控件",
+  "kbCloseDialog": "关闭对话框或取消",
+  "kbNoCopyNote": "没有复制快捷键：复制机密是有意的操作，并会自动清除。",
   "importSizeLimitNote": "最大文件大小：{textLimit}（CSV、Bitwarden、Dashlane、Google）或 {enpassLimit}（Enpass）。",
   "importFileTooLarge": "此文件超过 {limit} 的限制。",
   "saveConfirmTitle": "保存到 Gabbro",

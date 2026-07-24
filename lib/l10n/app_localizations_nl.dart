@@ -9,6 +9,40 @@ class AppLocalizationsNl extends AppLocalizations {
   AppLocalizationsNl([String locale = 'nl']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Sneltoetsen';
+
+  @override
+  String get kbSectionGeneral => 'Algemeen';
+
+  @override
+  String get kbSectionSearch => 'Zoeken';
+
+  @override
+  String get kbSectionNavigation => 'Navigatie';
+
+  @override
+  String get kbLockVault => 'Kluis vergrendelen';
+
+  @override
+  String get kbFocusSearch => 'Zoeken focussen';
+
+  @override
+  String get kbSearchAllFields => 'Alle velden doorzoeken';
+
+  @override
+  String get kbMoveBetweenControls => 'Tussen besturingselementen bewegen';
+
+  @override
+  String get kbActivateControl => 'Het gefocuste besturingselement activeren';
+
+  @override
+  String get kbCloseDialog => 'Een dialoogvenster sluiten of annuleren';
+
+  @override
+  String get kbNoCopyNote =>
+      'Er is geen sneltoets om te kopiëren: het kopiëren van een geheim is een bewuste actie die automatisch wordt gewist.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override

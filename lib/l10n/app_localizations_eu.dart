@@ -9,6 +9,40 @@ class AppLocalizationsEu extends AppLocalizations {
   AppLocalizationsEu([String locale = 'eu']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Teklatuko lasterbideak';
+
+  @override
+  String get kbSectionGeneral => 'Orokorra';
+
+  @override
+  String get kbSectionSearch => 'Bilaketa';
+
+  @override
+  String get kbSectionNavigation => 'Nabigazioa';
+
+  @override
+  String get kbLockVault => 'Gandegiak blokeatu';
+
+  @override
+  String get kbFocusSearch => 'Bilaketan fokatu';
+
+  @override
+  String get kbSearchAllFields => 'Eremu guztietan bilatu';
+
+  @override
+  String get kbMoveBetweenControls => 'Kontrolen artean mugitu';
+
+  @override
+  String get kbActivateControl => 'Fokatutako kontrola aktibatu';
+
+  @override
+  String get kbCloseDialog => 'Itxi elkarrizketa-koadroa edo utzi';
+
+  @override
+  String get kbNoCopyNote =>
+      'Ez dago kopiatzeko lasterbiderik: sekretu bat kopiatzea nahita egindako ekintza da, automatikoki garbitzen dena.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override

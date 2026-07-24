@@ -1,5 +1,17 @@
 {
   "@@locale": "el",
+
+  "keyboardShortcutsTitle": "Συντομεύσεις πληκτρολογίου",
+  "kbSectionGeneral": "Γενικά",
+  "kbSectionSearch": "Αναζήτηση",
+  "kbSectionNavigation": "Πλοήγηση",
+  "kbLockVault": "Κλείδωμα θησαυροφυλακίου",
+  "kbFocusSearch": "Εστίαση στην αναζήτηση",
+  "kbSearchAllFields": "Αναζήτηση σε όλα τα πεδία",
+  "kbMoveBetweenControls": "Μετακίνηση μεταξύ στοιχείων",
+  "kbActivateControl": "Ενεργοποίηση εστιασμένου στοιχείου",
+  "kbCloseDialog": "Κλείσιμο διαλόγου ή ακύρωση",
+  "kbNoCopyNote": "Δεν υπάρχει συντόμευση αντιγραφής: η αντιγραφή ενός μυστικού είναι μια σκόπιμη ενέργεια με αυτόματη εκκαθάριση.",
   "importSizeLimitNote": "Μέγιστο μέγεθος αρχείου: {textLimit} (CSV, Bitwarden, Dashlane, Google) ή {enpassLimit} (Enpass).",
   "importFileTooLarge": "Αυτό το αρχείο υπερβαίνει το όριο των {limit}.",
   "saveConfirmTitle": "Αποθήκευση στο Gabbro",

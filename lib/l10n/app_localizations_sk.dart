@@ -9,6 +9,40 @@ class AppLocalizationsSk extends AppLocalizations {
   AppLocalizationsSk([String locale = 'sk']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Klávesové skratky';
+
+  @override
+  String get kbSectionGeneral => 'Všeobecné';
+
+  @override
+  String get kbSectionSearch => 'Hľadanie';
+
+  @override
+  String get kbSectionNavigation => 'Navigácia';
+
+  @override
+  String get kbLockVault => 'Zamknúť trezor';
+
+  @override
+  String get kbFocusSearch => 'Zamerať hľadanie';
+
+  @override
+  String get kbSearchAllFields => 'Hľadať vo všetkých poliach';
+
+  @override
+  String get kbMoveBetweenControls => 'Prechádzanie medzi prvkami';
+
+  @override
+  String get kbActivateControl => 'Aktivovať zameraný prvok';
+
+  @override
+  String get kbCloseDialog => 'Zavrieť dialóg alebo zrušiť';
+
+  @override
+  String get kbNoCopyNote =>
+      'Neexistuje skratka na kopírovanie: kopírovanie tajomstva je zámerná akcia s automatickým vymazaním.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override

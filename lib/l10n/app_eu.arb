@@ -1,5 +1,17 @@
 {
   "@@locale": "eu",
+
+  "keyboardShortcutsTitle": "Teklatuko lasterbideak",
+  "kbSectionGeneral": "Orokorra",
+  "kbSectionSearch": "Bilaketa",
+  "kbSectionNavigation": "Nabigazioa",
+  "kbLockVault": "Gandegiak blokeatu",
+  "kbFocusSearch": "Bilaketan fokatu",
+  "kbSearchAllFields": "Eremu guztietan bilatu",
+  "kbMoveBetweenControls": "Kontrolen artean mugitu",
+  "kbActivateControl": "Fokatutako kontrola aktibatu",
+  "kbCloseDialog": "Itxi elkarrizketa-koadroa edo utzi",
+  "kbNoCopyNote": "Ez dago kopiatzeko lasterbiderik: sekretu bat kopiatzea nahita egindako ekintza da, automatikoki garbitzen dena.",
   "importSizeLimitNote": "Fitxategiaren gehienezko tamaina: {textLimit} (CSV, Bitwarden, Dashlane, Google) edo {enpassLimit} (Enpass).",
   "importFileTooLarge": "Fitxategi honek {limit} muga gainditzen du.",
   "saveConfirmTitle": "Gabbron gorde",

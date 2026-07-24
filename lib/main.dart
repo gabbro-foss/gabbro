@@ -690,7 +690,17 @@ class _GabbroAppState extends State<GabbroApp>
   }
 
   bool _onKeyEvent(KeyEvent event) {
-    if (event is KeyDownEvent) _resetForegroundTimer();
+    if (event is KeyDownEvent) {
+      _resetForegroundTimer();
+      // Ctrl+L locks the vault from anywhere. (No Ctrl+C binding: copying a
+      // secret stays a deliberate, auto-clearing action — see
+      // keyboard_shortcuts_list_screen.)
+      if (event.logicalKey == LogicalKeyboardKey.keyL &&
+          HardwareKeyboard.instance.isControlPressed) {
+        _lock();
+        return true;
+      }
+    }
     return false;
   }
 

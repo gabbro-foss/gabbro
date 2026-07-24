@@ -9,6 +9,40 @@ class AppLocalizationsSl extends AppLocalizations {
   AppLocalizationsSl([String locale = 'sl']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Bližnjice na tipkovnici';
+
+  @override
+  String get kbSectionGeneral => 'Splošno';
+
+  @override
+  String get kbSectionSearch => 'Iskanje';
+
+  @override
+  String get kbSectionNavigation => 'Krmarjenje';
+
+  @override
+  String get kbLockVault => 'Zakleni trezor';
+
+  @override
+  String get kbFocusSearch => 'Fokusiraj iskanje';
+
+  @override
+  String get kbSearchAllFields => 'Išči po vseh poljih';
+
+  @override
+  String get kbMoveBetweenControls => 'Premikanje med kontrolniki';
+
+  @override
+  String get kbActivateControl => 'Aktiviraj izbrani kontrolnik';
+
+  @override
+  String get kbCloseDialog => 'Zapri pogovorno okno ali prekliči';
+
+  @override
+  String get kbNoCopyNote =>
+      'Bližnjice za kopiranje ni: kopiranje skrivnosti je namerno dejanje s samodejnim brisanjem.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override

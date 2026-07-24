@@ -9,6 +9,40 @@ class AppLocalizationsHu extends AppLocalizations {
   AppLocalizationsHu([String locale = 'hu']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Billentyűparancsok';
+
+  @override
+  String get kbSectionGeneral => 'Általános';
+
+  @override
+  String get kbSectionSearch => 'Keresés';
+
+  @override
+  String get kbSectionNavigation => 'Navigáció';
+
+  @override
+  String get kbLockVault => 'Széf zárolása';
+
+  @override
+  String get kbFocusSearch => 'Keresés fókuszálása';
+
+  @override
+  String get kbSearchAllFields => 'Keresés az összes mezőben';
+
+  @override
+  String get kbMoveBetweenControls => 'Váltás a vezérlők között';
+
+  @override
+  String get kbActivateControl => 'Fókuszált vezérlő aktiválása';
+
+  @override
+  String get kbCloseDialog => 'Párbeszédpanel bezárása vagy mégse';
+
+  @override
+  String get kbNoCopyNote =>
+      'Nincs másolási billentyűparancs: egy titok másolása szándékos, automatikusan törlődő művelet.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override

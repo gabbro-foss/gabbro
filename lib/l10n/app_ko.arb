@@ -1,5 +1,17 @@
 {
   "@@locale": "ko",
+
+  "keyboardShortcutsTitle": "키보드 단축키",
+  "kbSectionGeneral": "일반",
+  "kbSectionSearch": "검색",
+  "kbSectionNavigation": "탐색",
+  "kbLockVault": "볼트 잠금",
+  "kbFocusSearch": "검색에 포커스",
+  "kbSearchAllFields": "모든 필드 검색",
+  "kbMoveBetweenControls": "컨트롤 간 이동",
+  "kbActivateControl": "포커스된 컨트롤 활성화",
+  "kbCloseDialog": "대화상자 닫기 또는 취소",
+  "kbNoCopyNote": "복사 단축키는 없습니다: 비밀 복사는 의도적이며 자동으로 지워지는 작업입니다.",
   "importSizeLimitNote": "최대 파일 크기: {textLimit}(CSV, Bitwarden, Dashlane, Google) 또는 {enpassLimit}(Enpass).",
   "importFileTooLarge": "이 파일은 {limit} 제한을 초과합니다.",
   "saveConfirmTitle": "Gabbro에 저장",

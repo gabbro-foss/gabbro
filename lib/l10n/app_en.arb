@@ -1,6 +1,18 @@
 {
   "@@locale": "en",
 
+  "keyboardShortcutsTitle": "Keyboard shortcuts",
+  "kbSectionGeneral": "General",
+  "kbSectionSearch": "Search",
+  "kbSectionNavigation": "Navigation",
+  "kbLockVault": "Lock vault",
+  "kbFocusSearch": "Focus search",
+  "kbSearchAllFields": "Search all fields",
+  "kbMoveBetweenControls": "Move between controls",
+  "kbActivateControl": "Activate the focused control",
+  "kbCloseDialog": "Close a dialog or cancel",
+  "kbNoCopyNote": "There is no copy shortcut: copying a secret is a deliberate, auto-clearing action.",
+
   "appName": "Gabbro",
 
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",

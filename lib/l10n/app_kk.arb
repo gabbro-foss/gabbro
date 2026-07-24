@@ -1,5 +1,17 @@
 {
   "@@locale": "kk",
+
+  "keyboardShortcutsTitle": "Пернетақта тіркесімдері",
+  "kbSectionGeneral": "Жалпы",
+  "kbSectionSearch": "Іздеу",
+  "kbSectionNavigation": "Навигация",
+  "kbLockVault": "Сейфті бекіту",
+  "kbFocusSearch": "Іздеуге фокус",
+  "kbSearchAllFields": "Барлық өрістерде іздеу",
+  "kbMoveBetweenControls": "Басқару элементтері арасында жылжу",
+  "kbActivateControl": "Фокустағы элементті іске қосу",
+  "kbCloseDialog": "Диалогты жабу немесе бас тарту",
+  "kbNoCopyNote": "Көшіру төте жолы жоқ: құпияны көшіру — қасақана жасалатын, автоматты түрде тазаланатын әрекет.",
   "importSizeLimitNote": "Файлдың ең үлкен өлшемі: {textLimit} (CSV, Bitwarden, Dashlane, Google) немесе {enpassLimit} (Enpass).",
   "importFileTooLarge": "Бұл файл {limit} шегінен асып кетті.",
   "saveConfirmTitle": "Gabbro-ға сақтау",

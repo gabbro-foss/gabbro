@@ -1,5 +1,17 @@
 {
   "@@locale": "cs",
+
+  "keyboardShortcutsTitle": "Klávesové zkratky",
+  "kbSectionGeneral": "Obecné",
+  "kbSectionSearch": "Hledání",
+  "kbSectionNavigation": "Navigace",
+  "kbLockVault": "Zamknout trezor",
+  "kbFocusSearch": "Zaměřit hledání",
+  "kbSearchAllFields": "Hledat ve všech polích",
+  "kbMoveBetweenControls": "Přecházení mezi prvky",
+  "kbActivateControl": "Aktivovat zaměřený prvek",
+  "kbCloseDialog": "Zavřít dialog nebo zrušit",
+  "kbNoCopyNote": "Neexistuje zkratka pro kopírování: kopírování tajemství je záměrná akce s automatickým vymazáním.",
   "importSizeLimitNote": "Maximální velikost souboru: {textLimit} (CSV, Bitwarden, Dashlane, Google) nebo {enpassLimit} (Enpass).",
   "importFileTooLarge": "Tento soubor překračuje limit {limit}.",
   "saveConfirmTitle": "Uložit do Gabbro",

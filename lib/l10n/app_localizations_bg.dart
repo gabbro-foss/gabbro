@@ -9,6 +9,40 @@ class AppLocalizationsBg extends AppLocalizations {
   AppLocalizationsBg([String locale = 'bg']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Клавишни комбинации';
+
+  @override
+  String get kbSectionGeneral => 'Общи';
+
+  @override
+  String get kbSectionSearch => 'Търсене';
+
+  @override
+  String get kbSectionNavigation => 'Навигация';
+
+  @override
+  String get kbLockVault => 'Заключи трезора';
+
+  @override
+  String get kbFocusSearch => 'Фокусиране на търсенето';
+
+  @override
+  String get kbSearchAllFields => 'Търси във всички полета';
+
+  @override
+  String get kbMoveBetweenControls => 'Преминаване между елементите';
+
+  @override
+  String get kbActivateControl => 'Активиране на фокусирания елемент';
+
+  @override
+  String get kbCloseDialog => 'Затваряне на диалог или отказ';
+
+  @override
+  String get kbNoCopyNote =>
+      'Няма комбинация за копиране: копирането на тайна е умишлено действие с автоматично изчистване.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override

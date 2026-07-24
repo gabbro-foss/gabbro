@@ -1,5 +1,17 @@
 {
   "@@locale": "de",
+
+  "keyboardShortcutsTitle": "Tastenkürzel",
+  "kbSectionGeneral": "Allgemein",
+  "kbSectionSearch": "Suche",
+  "kbSectionNavigation": "Navigation",
+  "kbLockVault": "Tresor sperren",
+  "kbFocusSearch": "Suche fokussieren",
+  "kbSearchAllFields": "In allen Feldern suchen",
+  "kbMoveBetweenControls": "Zwischen Steuerelementen wechseln",
+  "kbActivateControl": "Fokussiertes Element aktivieren",
+  "kbCloseDialog": "Dialog schließen oder abbrechen",
+  "kbNoCopyNote": "Es gibt kein Kopierkürzel: Das Kopieren eines Geheimnisses ist eine bewusste Aktion, die automatisch geleert wird.",
   "importSizeLimitNote": "Maximale Dateigröße: {textLimit} (CSV, Bitwarden, Dashlane, Google) oder {enpassLimit} (Enpass).",
   "importFileTooLarge": "Diese Datei überschreitet das Limit von {limit}.",
   "saveConfirmTitle": "In Gabbro speichern",

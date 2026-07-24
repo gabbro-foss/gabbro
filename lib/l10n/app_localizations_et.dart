@@ -9,6 +9,40 @@ class AppLocalizationsEt extends AppLocalizations {
   AppLocalizationsEt([String locale = 'et']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Klaviatuuri otseteed';
+
+  @override
+  String get kbSectionGeneral => 'Üldine';
+
+  @override
+  String get kbSectionSearch => 'Otsing';
+
+  @override
+  String get kbSectionNavigation => 'Navigeerimine';
+
+  @override
+  String get kbLockVault => 'Lukusta seif';
+
+  @override
+  String get kbFocusSearch => 'Fookus otsingule';
+
+  @override
+  String get kbSearchAllFields => 'Otsi kõigist väljadest';
+
+  @override
+  String get kbMoveBetweenControls => 'Liikumine juhtelementide vahel';
+
+  @override
+  String get kbActivateControl => 'Aktiveeri fookuses element';
+
+  @override
+  String get kbCloseDialog => 'Sulge dialoog või tühista';
+
+  @override
+  String get kbNoCopyNote =>
+      'Kopeerimise otseteed pole: saladuse kopeerimine on tahtlik, automaatselt tühjenev toiming.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override

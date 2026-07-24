@@ -9,6 +9,40 @@ class AppLocalizationsPt extends AppLocalizations {
   AppLocalizationsPt([String locale = 'pt']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Atalhos de teclado';
+
+  @override
+  String get kbSectionGeneral => 'Geral';
+
+  @override
+  String get kbSectionSearch => 'Pesquisa';
+
+  @override
+  String get kbSectionNavigation => 'Navegação';
+
+  @override
+  String get kbLockVault => 'Bloquear cofre';
+
+  @override
+  String get kbFocusSearch => 'Focar a pesquisa';
+
+  @override
+  String get kbSearchAllFields => 'Pesquisar todos os campos';
+
+  @override
+  String get kbMoveBetweenControls => 'Mover entre controlos';
+
+  @override
+  String get kbActivateControl => 'Ativar o controlo focado';
+
+  @override
+  String get kbCloseDialog => 'Fechar uma caixa de diálogo ou cancelar';
+
+  @override
+  String get kbNoCopyNote =>
+      'Não existe atalho para copiar: copiar um segredo é uma ação deliberada, com limpeza automática.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override
@@ -2097,6 +2131,40 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   AppLocalizationsPtBr() : super('pt_BR');
 
   @override
+  String get keyboardShortcutsTitle => 'Atalhos de teclado';
+
+  @override
+  String get kbSectionGeneral => 'Geral';
+
+  @override
+  String get kbSectionSearch => 'Pesquisa';
+
+  @override
+  String get kbSectionNavigation => 'Navegação';
+
+  @override
+  String get kbLockVault => 'Bloquear cofre';
+
+  @override
+  String get kbFocusSearch => 'Focar a pesquisa';
+
+  @override
+  String get kbSearchAllFields => 'Pesquisar todos os campos';
+
+  @override
+  String get kbMoveBetweenControls => 'Mover entre controles';
+
+  @override
+  String get kbActivateControl => 'Ativar o controle focado';
+
+  @override
+  String get kbCloseDialog => 'Fechar uma caixa de diálogo ou cancelar';
+
+  @override
+  String get kbNoCopyNote =>
+      'Não há atalho para copiar: copiar um segredo é uma ação deliberada, com limpeza automática.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override
@@ -4180,6 +4248,40 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 /// The translations for Portuguese, as used in Portugal (`pt_PT`).
 class AppLocalizationsPtPt extends AppLocalizationsPt {
   AppLocalizationsPtPt() : super('pt_PT');
+
+  @override
+  String get keyboardShortcutsTitle => 'Atalhos de teclado';
+
+  @override
+  String get kbSectionGeneral => 'Geral';
+
+  @override
+  String get kbSectionSearch => 'Pesquisa';
+
+  @override
+  String get kbSectionNavigation => 'Navegação';
+
+  @override
+  String get kbLockVault => 'Bloquear cofre';
+
+  @override
+  String get kbFocusSearch => 'Focar a pesquisa';
+
+  @override
+  String get kbSearchAllFields => 'Pesquisar todos os campos';
+
+  @override
+  String get kbMoveBetweenControls => 'Mover entre controlos';
+
+  @override
+  String get kbActivateControl => 'Ativar o controlo focado';
+
+  @override
+  String get kbCloseDialog => 'Fechar uma caixa de diálogo ou cancelar';
+
+  @override
+  String get kbNoCopyNote =>
+      'Não existe atalho para copiar: copiar um segredo é uma ação deliberada, com limpeza automática.';
 
   @override
   String get appName => 'Gabbro';

@@ -1,5 +1,17 @@
 {
   "@@locale": "bg",
+
+  "keyboardShortcutsTitle": "Клавишни комбинации",
+  "kbSectionGeneral": "Общи",
+  "kbSectionSearch": "Търсене",
+  "kbSectionNavigation": "Навигация",
+  "kbLockVault": "Заключи трезора",
+  "kbFocusSearch": "Фокусиране на търсенето",
+  "kbSearchAllFields": "Търси във всички полета",
+  "kbMoveBetweenControls": "Преминаване между елементите",
+  "kbActivateControl": "Активиране на фокусирания елемент",
+  "kbCloseDialog": "Затваряне на диалог или отказ",
+  "kbNoCopyNote": "Няма комбинация за копиране: копирането на тайна е умишлено действие с автоматично изчистване.",
   "importSizeLimitNote": "Максимален размер на файла: {textLimit} (CSV, Bitwarden, Dashlane, Google) или {enpassLimit} (Enpass).",
   "importFileTooLarge": "Този файл надвишава ограничението от {limit}.",
   "saveConfirmTitle": "Запазване в Gabbro",

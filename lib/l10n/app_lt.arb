@@ -1,5 +1,17 @@
 {
   "@@locale": "lt",
+
+  "keyboardShortcutsTitle": "Klaviatūros spartieji klavišai",
+  "kbSectionGeneral": "Bendra",
+  "kbSectionSearch": "Paieška",
+  "kbSectionNavigation": "Naršymas",
+  "kbLockVault": "Užrakinti saugyklą",
+  "kbFocusSearch": "Fokusuoti paiešką",
+  "kbSearchAllFields": "Ieškoti visuose laukuose",
+  "kbMoveBetweenControls": "Judėti tarp valdiklių",
+  "kbActivateControl": "Aktyvinti fokusuotą valdiklį",
+  "kbCloseDialog": "Uždaryti dialogą arba atšaukti",
+  "kbNoCopyNote": "Kopijavimo sparčiojo klavišo nėra: paslapties kopijavimas yra tyčinis, automatiškai išsivalantis veiksmas.",
   "importSizeLimitNote": "Didžiausias failo dydis: {textLimit} (CSV, Bitwarden, Dashlane, Google) arba {enpassLimit} (Enpass).",
   "importFileTooLarge": "Šis failas viršija {limit} ribą.",
   "saveConfirmTitle": "Įrašyti į Gabbro",

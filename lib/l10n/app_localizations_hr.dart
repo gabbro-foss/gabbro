@@ -9,6 +9,40 @@ class AppLocalizationsHr extends AppLocalizations {
   AppLocalizationsHr([String locale = 'hr']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Tipkovnički prečaci';
+
+  @override
+  String get kbSectionGeneral => 'Općenito';
+
+  @override
+  String get kbSectionSearch => 'Pretraživanje';
+
+  @override
+  String get kbSectionNavigation => 'Navigacija';
+
+  @override
+  String get kbLockVault => 'Zaključaj trezor';
+
+  @override
+  String get kbFocusSearch => 'Fokusiraj pretraživanje';
+
+  @override
+  String get kbSearchAllFields => 'Pretraži sva polja';
+
+  @override
+  String get kbMoveBetweenControls => 'Kretanje između kontrola';
+
+  @override
+  String get kbActivateControl => 'Aktiviraj fokusiranu kontrolu';
+
+  @override
+  String get kbCloseDialog => 'Zatvori dijalog ili odustani';
+
+  @override
+  String get kbNoCopyNote =>
+      'Ne postoji prečac za kopiranje: kopiranje tajne namjerna je radnja koja se automatski briše.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override

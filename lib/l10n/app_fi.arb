@@ -1,5 +1,17 @@
 {
   "@@locale": "fi",
+
+  "keyboardShortcutsTitle": "Pikanäppäimet",
+  "kbSectionGeneral": "Yleiset",
+  "kbSectionSearch": "Haku",
+  "kbSectionNavigation": "Navigointi",
+  "kbLockVault": "Lukitse holvi",
+  "kbFocusSearch": "Kohdista haku",
+  "kbSearchAllFields": "Hae kaikista kentistä",
+  "kbMoveBetweenControls": "Siirry hallintojen välillä",
+  "kbActivateControl": "Aktivoi kohdistettu elementti",
+  "kbCloseDialog": "Sulje valintaikkuna tai peruuta",
+  "kbNoCopyNote": "Kopiointipikanäppäintä ei ole: salaisuuden kopiointi on tarkoituksellinen, automaattisesti tyhjentyvä toiminto.",
   "importSizeLimitNote": "Tiedoston enimmäiskoko: {textLimit} (CSV, Bitwarden, Dashlane, Google) tai {enpassLimit} (Enpass).",
   "importFileTooLarge": "Tämä tiedosto ylittää {limit} rajan.",
   "saveConfirmTitle": "Tallenna Gabbroon",

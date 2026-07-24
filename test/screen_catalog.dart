@@ -20,6 +20,7 @@ import 'package:gabbro/screens/entry_detail_screen.dart';
 import 'package:gabbro/screens/export_screen.dart';
 import 'package:gabbro/screens/generator_screen.dart';
 import 'package:gabbro/screens/help_screen.dart';
+import 'package:gabbro/screens/keyboard_shortcuts_list_screen.dart';
 import 'package:gabbro/screens/language_screen.dart';
 import 'package:gabbro/screens/manage_folders_screen.dart';
 import 'package:gabbro/screens/manage_vaults_screen.dart';
@@ -117,6 +118,7 @@ VaultEntryData login(String password, String notes) => VaultEntryData.login(
 final Map<String, Widget Function()> screens = {
   'about': () => const AboutScreen(),
   'help': () => const HelpScreen(),
+  'keyboard_shortcuts': () => const KeyboardShortcutsListScreen(),
   'appearance': () => const AppearanceScreen(),
   'language': () => const LanguageScreen(),
   'generator': () => const GeneratorScreen(),
@@ -452,6 +454,7 @@ const Map<String, String> tabletOnly = {
 const Map<String, String> covers = {
   'about': 'about_screen',
   'help': 'help_screen',
+  'keyboard_shortcuts': 'keyboard_shortcuts_list_screen',
   'appearance': 'appearance_screen',
   'language': 'language_screen',
   'generator': 'generator_screen',
@@ -517,5 +520,5 @@ List<String> uiSources() =>
 // renamed folder) would otherwise leave `missing` empty and pass while checking
 // nothing. Adding a screen or widget fails here first: the new file must be
 // swept or waived deliberately.
-const screenFileCount = 26;
+const screenFileCount = 27;
 const widgetFileCount = 9;

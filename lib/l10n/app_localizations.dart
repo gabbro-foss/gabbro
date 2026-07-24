@@ -163,6 +163,72 @@ abstract class AppLocalizations {
     Locale('zh', 'TW'),
   ];
 
+  /// No description provided for @keyboardShortcutsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Keyboard shortcuts'**
+  String get keyboardShortcutsTitle;
+
+  /// No description provided for @kbSectionGeneral.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get kbSectionGeneral;
+
+  /// No description provided for @kbSectionSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get kbSectionSearch;
+
+  /// No description provided for @kbSectionNavigation.
+  ///
+  /// In en, this message translates to:
+  /// **'Navigation'**
+  String get kbSectionNavigation;
+
+  /// No description provided for @kbLockVault.
+  ///
+  /// In en, this message translates to:
+  /// **'Lock vault'**
+  String get kbLockVault;
+
+  /// No description provided for @kbFocusSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus search'**
+  String get kbFocusSearch;
+
+  /// No description provided for @kbSearchAllFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Search all fields'**
+  String get kbSearchAllFields;
+
+  /// No description provided for @kbMoveBetweenControls.
+  ///
+  /// In en, this message translates to:
+  /// **'Move between controls'**
+  String get kbMoveBetweenControls;
+
+  /// No description provided for @kbActivateControl.
+  ///
+  /// In en, this message translates to:
+  /// **'Activate the focused control'**
+  String get kbActivateControl;
+
+  /// No description provided for @kbCloseDialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Close a dialog or cancel'**
+  String get kbCloseDialog;
+
+  /// No description provided for @kbNoCopyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'There is no copy shortcut: copying a secret is a deliberate, auto-clearing action.'**
+  String get kbNoCopyNote;
+
   /// No description provided for @appName.
   ///
   /// In en, this message translates to:

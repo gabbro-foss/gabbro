@@ -9,6 +9,39 @@ class AppLocalizationsJa extends AppLocalizations {
   AppLocalizationsJa([String locale = 'ja']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'キーボードショートカット';
+
+  @override
+  String get kbSectionGeneral => '一般';
+
+  @override
+  String get kbSectionSearch => '検索';
+
+  @override
+  String get kbSectionNavigation => 'ナビゲーション';
+
+  @override
+  String get kbLockVault => 'ボルトをロック';
+
+  @override
+  String get kbFocusSearch => '検索にフォーカス';
+
+  @override
+  String get kbSearchAllFields => 'すべてのフィールドを検索';
+
+  @override
+  String get kbMoveBetweenControls => 'コントロール間を移動';
+
+  @override
+  String get kbActivateControl => 'フォーカス中のコントロールを実行';
+
+  @override
+  String get kbCloseDialog => 'ダイアログを閉じる、またはキャンセル';
+
+  @override
+  String get kbNoCopyNote => 'コピー用のショートカットはありません: 秘密のコピーは意図的な操作であり、自動的に消去されます。';
+
+  @override
   String get appName => 'Gabbro';
 
   @override

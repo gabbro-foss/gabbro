@@ -9,6 +9,40 @@ class AppLocalizationsNn extends AppLocalizations {
   AppLocalizationsNn([String locale = 'nn']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Snøggtastar';
+
+  @override
+  String get kbSectionGeneral => 'Generelt';
+
+  @override
+  String get kbSectionSearch => 'Søk';
+
+  @override
+  String get kbSectionNavigation => 'Navigasjon';
+
+  @override
+  String get kbLockVault => 'Lås kvelv';
+
+  @override
+  String get kbFocusSearch => 'Fokuser søk';
+
+  @override
+  String get kbSearchAllFields => 'Søk i alle felt';
+
+  @override
+  String get kbMoveBetweenControls => 'Flytt mellom kontrollar';
+
+  @override
+  String get kbActivateControl => 'Aktiver den fokuserte kontrollen';
+
+  @override
+  String get kbCloseDialog => 'Lukk ein dialog eller avbryt';
+
+  @override
+  String get kbNoCopyNote =>
+      'Det finst ingen kopisnarveg: å kopiere ein løyndom er ei medviten handling som vert tømd automatisk.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override

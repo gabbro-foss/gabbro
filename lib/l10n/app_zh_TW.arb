@@ -1,5 +1,17 @@
 {
   "@@locale": "zh_TW",
+
+  "keyboardShortcutsTitle": "鍵盤快速鍵",
+  "kbSectionGeneral": "一般",
+  "kbSectionSearch": "搜尋",
+  "kbSectionNavigation": "導覽",
+  "kbLockVault": "鎖定保險庫",
+  "kbFocusSearch": "聚焦搜尋",
+  "kbSearchAllFields": "搜尋所有欄位",
+  "kbMoveBetweenControls": "在控制項之間移動",
+  "kbActivateControl": "啟動聚焦的控制項",
+  "kbCloseDialog": "關閉對話方塊或取消",
+  "kbNoCopyNote": "沒有複製快速鍵：複製機密是刻意的操作，並會自動清除。",
   "importSizeLimitNote": "檔案大小上限：{textLimit}（CSV、Bitwarden、Dashlane、Google）或 {enpassLimit}（Enpass）。",
   "importFileTooLarge": "此檔案超過 {limit} 的限制。",
   "saveConfirmTitle": "儲存到 Gabbro",

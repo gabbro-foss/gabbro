@@ -1,5 +1,17 @@
 {
   "@@locale": "et",
+
+  "keyboardShortcutsTitle": "Klaviatuuri otseteed",
+  "kbSectionGeneral": "Üldine",
+  "kbSectionSearch": "Otsing",
+  "kbSectionNavigation": "Navigeerimine",
+  "kbLockVault": "Lukusta seif",
+  "kbFocusSearch": "Fookus otsingule",
+  "kbSearchAllFields": "Otsi kõigist väljadest",
+  "kbMoveBetweenControls": "Liikumine juhtelementide vahel",
+  "kbActivateControl": "Aktiveeri fookuses element",
+  "kbCloseDialog": "Sulge dialoog või tühista",
+  "kbNoCopyNote": "Kopeerimise otseteed pole: saladuse kopeerimine on tahtlik, automaatselt tühjenev toiming.",
   "importSizeLimitNote": "Faili maksimaalne suurus: {textLimit} (CSV, Bitwarden, Dashlane, Google) või {enpassLimit} (Enpass).",
   "importFileTooLarge": "See fail ületab {limit} piiri.",
   "saveConfirmTitle": "Salvesta Gabbrosse",

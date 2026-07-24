@@ -1,5 +1,17 @@
 {
   "@@locale": "pl",
+
+  "keyboardShortcutsTitle": "Skróty klawiszowe",
+  "kbSectionGeneral": "Ogólne",
+  "kbSectionSearch": "Wyszukiwanie",
+  "kbSectionNavigation": "Nawigacja",
+  "kbLockVault": "Zablokuj skarbiec",
+  "kbFocusSearch": "Fokus na wyszukiwaniu",
+  "kbSearchAllFields": "Szukaj we wszystkich polach",
+  "kbMoveBetweenControls": "Przechodzenie między kontrolkami",
+  "kbActivateControl": "Aktywuj wyróżnioną kontrolkę",
+  "kbCloseDialog": "Zamknij okno dialogowe lub anuluj",
+  "kbNoCopyNote": "Nie ma skrótu do kopiowania: skopiowanie sekretu to celowe działanie z automatycznym czyszczeniem.",
   "importSizeLimitNote": "Maksymalny rozmiar pliku: {textLimit} (CSV, Bitwarden, Dashlane, Google) lub {enpassLimit} (Enpass).",
   "importFileTooLarge": "Ten plik przekracza limit {limit}.",
   "saveConfirmTitle": "Zapisz w Gabbro",

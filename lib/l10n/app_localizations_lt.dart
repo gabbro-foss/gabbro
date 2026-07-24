@@ -9,6 +9,40 @@ class AppLocalizationsLt extends AppLocalizations {
   AppLocalizationsLt([String locale = 'lt']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Klaviatūros spartieji klavišai';
+
+  @override
+  String get kbSectionGeneral => 'Bendra';
+
+  @override
+  String get kbSectionSearch => 'Paieška';
+
+  @override
+  String get kbSectionNavigation => 'Naršymas';
+
+  @override
+  String get kbLockVault => 'Užrakinti saugyklą';
+
+  @override
+  String get kbFocusSearch => 'Fokusuoti paiešką';
+
+  @override
+  String get kbSearchAllFields => 'Ieškoti visuose laukuose';
+
+  @override
+  String get kbMoveBetweenControls => 'Judėti tarp valdiklių';
+
+  @override
+  String get kbActivateControl => 'Aktyvinti fokusuotą valdiklį';
+
+  @override
+  String get kbCloseDialog => 'Uždaryti dialogą arba atšaukti';
+
+  @override
+  String get kbNoCopyNote =>
+      'Kopijavimo sparčiojo klavišo nėra: paslapties kopijavimas yra tyčinis, automatiškai išsivalantis veiksmas.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override

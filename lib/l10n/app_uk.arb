@@ -1,5 +1,17 @@
 {
   "@@locale": "uk",
+
+  "keyboardShortcutsTitle": "Комбінації клавіш",
+  "kbSectionGeneral": "Загальні",
+  "kbSectionSearch": "Пошук",
+  "kbSectionNavigation": "Навігація",
+  "kbLockVault": "Заблокувати сховище",
+  "kbFocusSearch": "Фокус на пошуку",
+  "kbSearchAllFields": "Пошук у всіх полях",
+  "kbMoveBetweenControls": "Переміщення між елементами",
+  "kbActivateControl": "Активувати вибраний елемент",
+  "kbCloseDialog": "Закрити діалог або скасувати",
+  "kbNoCopyNote": "Немає комбінації для копіювання: копіювання секрету — навмисна дія з автоматичним очищенням.",
   "importSizeLimitNote": "Максимальний розмір файлу: {textLimit} (CSV, Bitwarden, Dashlane, Google) або {enpassLimit} (Enpass).",
   "importFileTooLarge": "Цей файл перевищує обмеження {limit}.",
   "saveConfirmTitle": "Зберегти в Gabbro",

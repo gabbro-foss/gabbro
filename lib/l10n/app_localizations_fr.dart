@@ -9,6 +9,40 @@ class AppLocalizationsFr extends AppLocalizations {
   AppLocalizationsFr([String locale = 'fr']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Raccourcis clavier';
+
+  @override
+  String get kbSectionGeneral => 'Général';
+
+  @override
+  String get kbSectionSearch => 'Recherche';
+
+  @override
+  String get kbSectionNavigation => 'Navigation';
+
+  @override
+  String get kbLockVault => 'Verrouiller le coffre';
+
+  @override
+  String get kbFocusSearch => 'Activer la recherche';
+
+  @override
+  String get kbSearchAllFields => 'Rechercher dans tous les champs';
+
+  @override
+  String get kbMoveBetweenControls => 'Se déplacer entre les contrôles';
+
+  @override
+  String get kbActivateControl => 'Activer le contrôle sélectionné';
+
+  @override
+  String get kbCloseDialog => 'Fermer une boîte de dialogue ou annuler';
+
+  @override
+  String get kbNoCopyNote =>
+      'Il n\'existe aucun raccourci de copie : copier un secret est une action délibérée qui s\'efface automatiquement.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override

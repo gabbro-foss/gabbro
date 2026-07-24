@@ -9,6 +9,40 @@ class AppLocalizationsSr extends AppLocalizations {
   AppLocalizationsSr([String locale = 'sr']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Prečice na tastaturi';
+
+  @override
+  String get kbSectionGeneral => 'Opšte';
+
+  @override
+  String get kbSectionSearch => 'Pretraga';
+
+  @override
+  String get kbSectionNavigation => 'Navigacija';
+
+  @override
+  String get kbLockVault => 'Zaključaj trezor';
+
+  @override
+  String get kbFocusSearch => 'Fokusiraj pretragu';
+
+  @override
+  String get kbSearchAllFields => 'Pretraži sva polja';
+
+  @override
+  String get kbMoveBetweenControls => 'Kretanje između kontrola';
+
+  @override
+  String get kbActivateControl => 'Aktiviraj fokusiranu kontrolu';
+
+  @override
+  String get kbCloseDialog => 'Zatvori dijalog ili otkaži';
+
+  @override
+  String get kbNoCopyNote =>
+      'Ne postoji prečica za kopiranje: kopiranje tajne je namerna radnja koja se automatski briše.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override
@@ -2090,6 +2124,40 @@ class AppLocalizationsSr extends AppLocalizations {
 /// The translations for Serbian, using the Latin script (`sr_Latn`).
 class AppLocalizationsSrLatn extends AppLocalizationsSr {
   AppLocalizationsSrLatn() : super('sr_Latn');
+
+  @override
+  String get keyboardShortcutsTitle => 'Prečice na tastaturi';
+
+  @override
+  String get kbSectionGeneral => 'Opšte';
+
+  @override
+  String get kbSectionSearch => 'Pretraga';
+
+  @override
+  String get kbSectionNavigation => 'Navigacija';
+
+  @override
+  String get kbLockVault => 'Zaključaj trezor';
+
+  @override
+  String get kbFocusSearch => 'Fokusiraj pretragu';
+
+  @override
+  String get kbSearchAllFields => 'Pretraži sva polja';
+
+  @override
+  String get kbMoveBetweenControls => 'Kretanje između kontrola';
+
+  @override
+  String get kbActivateControl => 'Aktiviraj fokusiranu kontrolu';
+
+  @override
+  String get kbCloseDialog => 'Zatvori dijalog ili otkaži';
+
+  @override
+  String get kbNoCopyNote =>
+      'Ne postoji prečica za kopiranje: kopiranje tajne je namerna radnja koja se automatski briše.';
 
   @override
   String get appName => 'Gabbro';

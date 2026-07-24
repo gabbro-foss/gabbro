@@ -1,5 +1,17 @@
 {
   "@@locale": "sl",
+
+  "keyboardShortcutsTitle": "Bližnjice na tipkovnici",
+  "kbSectionGeneral": "Splošno",
+  "kbSectionSearch": "Iskanje",
+  "kbSectionNavigation": "Krmarjenje",
+  "kbLockVault": "Zakleni trezor",
+  "kbFocusSearch": "Fokusiraj iskanje",
+  "kbSearchAllFields": "Išči po vseh poljih",
+  "kbMoveBetweenControls": "Premikanje med kontrolniki",
+  "kbActivateControl": "Aktiviraj izbrani kontrolnik",
+  "kbCloseDialog": "Zapri pogovorno okno ali prekliči",
+  "kbNoCopyNote": "Bližnjice za kopiranje ni: kopiranje skrivnosti je namerno dejanje s samodejnim brisanjem.",
   "importSizeLimitNote": "Največja velikost datoteke: {textLimit} (CSV, Bitwarden, Dashlane, Google) ali {enpassLimit} (Enpass).",
   "importFileTooLarge": "Ta datoteka presega omejitev {limit}.",
   "saveConfirmTitle": "Shrani v Gabbro",

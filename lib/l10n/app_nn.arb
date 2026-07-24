@@ -1,5 +1,17 @@
 {
   "@@locale": "nn",
+
+  "keyboardShortcutsTitle": "Snøggtastar",
+  "kbSectionGeneral": "Generelt",
+  "kbSectionSearch": "Søk",
+  "kbSectionNavigation": "Navigasjon",
+  "kbLockVault": "Lås kvelv",
+  "kbFocusSearch": "Fokuser søk",
+  "kbSearchAllFields": "Søk i alle felt",
+  "kbMoveBetweenControls": "Flytt mellom kontrollar",
+  "kbActivateControl": "Aktiver den fokuserte kontrollen",
+  "kbCloseDialog": "Lukk ein dialog eller avbryt",
+  "kbNoCopyNote": "Det finst ingen kopisnarveg: å kopiere ein løyndom er ei medviten handling som vert tømd automatisk.",
   "importSizeLimitNote": "Maksimal filstorleik: {textLimit} (CSV, Bitwarden, Dashlane, Google) eller {enpassLimit} (Enpass).",
   "importFileTooLarge": "Denne fila overskrid grensa på {limit}.",
   "saveConfirmTitle": "Lagre i Gabbro",

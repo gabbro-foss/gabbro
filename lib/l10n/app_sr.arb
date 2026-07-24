@@ -1,5 +1,17 @@
 {
   "@@locale": "sr",
+
+  "keyboardShortcutsTitle": "Prečice na tastaturi",
+  "kbSectionGeneral": "Opšte",
+  "kbSectionSearch": "Pretraga",
+  "kbSectionNavigation": "Navigacija",
+  "kbLockVault": "Zaključaj trezor",
+  "kbFocusSearch": "Fokusiraj pretragu",
+  "kbSearchAllFields": "Pretraži sva polja",
+  "kbMoveBetweenControls": "Kretanje između kontrola",
+  "kbActivateControl": "Aktiviraj fokusiranu kontrolu",
+  "kbCloseDialog": "Zatvori dijalog ili otkaži",
+  "kbNoCopyNote": "Ne postoji prečica za kopiranje: kopiranje tajne je namerna radnja koja se automatski briše.",
   "importSizeLimitNote": "Највећа величина датотеке: {textLimit} (CSV, Bitwarden, Dashlane, Google) или {enpassLimit} (Enpass).",
   "importFileTooLarge": "Ова датотека прекорачује ограничење од {limit}.",
   "saveConfirmTitle": "Sačuvaj u Gabbro",

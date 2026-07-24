@@ -1,5 +1,17 @@
 {
   "@@locale": "pt_PT",
+
+  "keyboardShortcutsTitle": "Atalhos de teclado",
+  "kbSectionGeneral": "Geral",
+  "kbSectionSearch": "Pesquisa",
+  "kbSectionNavigation": "Navegação",
+  "kbLockVault": "Bloquear cofre",
+  "kbFocusSearch": "Focar a pesquisa",
+  "kbSearchAllFields": "Pesquisar todos os campos",
+  "kbMoveBetweenControls": "Mover entre controlos",
+  "kbActivateControl": "Ativar o controlo focado",
+  "kbCloseDialog": "Fechar uma caixa de diálogo ou cancelar",
+  "kbNoCopyNote": "Não existe atalho para copiar: copiar um segredo é uma ação deliberada, com limpeza automática.",
   "importSizeLimitNote": "Tamanho máximo do ficheiro: {textLimit} (CSV, Bitwarden, Dashlane, Google) ou {enpassLimit} (Enpass).",
   "importFileTooLarge": "Este ficheiro excede o limite de {limit}.",
   "saveConfirmTitle": "Guardar no Gabbro",

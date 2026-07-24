@@ -9,6 +9,39 @@ class AppLocalizationsZh extends AppLocalizations {
   AppLocalizationsZh([String locale = 'zh']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => '键盘快捷键';
+
+  @override
+  String get kbSectionGeneral => '常规';
+
+  @override
+  String get kbSectionSearch => '搜索';
+
+  @override
+  String get kbSectionNavigation => '导航';
+
+  @override
+  String get kbLockVault => '锁定保险库';
+
+  @override
+  String get kbFocusSearch => '聚焦搜索';
+
+  @override
+  String get kbSearchAllFields => '搜索所有字段';
+
+  @override
+  String get kbMoveBetweenControls => '在控件之间移动';
+
+  @override
+  String get kbActivateControl => '激活聚焦的控件';
+
+  @override
+  String get kbCloseDialog => '关闭对话框或取消';
+
+  @override
+  String get kbNoCopyNote => '没有复制快捷键：复制机密是有意的操作，并会自动清除。';
+
+  @override
   String get appName => 'Gabbro';
 
   @override
@@ -2001,6 +2034,39 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   AppLocalizationsZhCn() : super('zh_CN');
 
   @override
+  String get keyboardShortcutsTitle => '键盘快捷键';
+
+  @override
+  String get kbSectionGeneral => '常规';
+
+  @override
+  String get kbSectionSearch => '搜索';
+
+  @override
+  String get kbSectionNavigation => '导航';
+
+  @override
+  String get kbLockVault => '锁定保险库';
+
+  @override
+  String get kbFocusSearch => '聚焦搜索';
+
+  @override
+  String get kbSearchAllFields => '搜索所有字段';
+
+  @override
+  String get kbMoveBetweenControls => '在控件之间移动';
+
+  @override
+  String get kbActivateControl => '激活聚焦的控件';
+
+  @override
+  String get kbCloseDialog => '关闭对话框或取消';
+
+  @override
+  String get kbNoCopyNote => '没有复制快捷键：复制机密是有意的操作，并会自动清除。';
+
+  @override
   String get appName => 'Gabbro';
 
   @override
@@ -3991,6 +4057,39 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
 class AppLocalizationsZhTw extends AppLocalizationsZh {
   AppLocalizationsZhTw() : super('zh_TW');
+
+  @override
+  String get keyboardShortcutsTitle => '鍵盤快速鍵';
+
+  @override
+  String get kbSectionGeneral => '一般';
+
+  @override
+  String get kbSectionSearch => '搜尋';
+
+  @override
+  String get kbSectionNavigation => '導覽';
+
+  @override
+  String get kbLockVault => '鎖定保險庫';
+
+  @override
+  String get kbFocusSearch => '聚焦搜尋';
+
+  @override
+  String get kbSearchAllFields => '搜尋所有欄位';
+
+  @override
+  String get kbMoveBetweenControls => '在控制項之間移動';
+
+  @override
+  String get kbActivateControl => '啟動聚焦的控制項';
+
+  @override
+  String get kbCloseDialog => '關閉對話方塊或取消';
+
+  @override
+  String get kbNoCopyNote => '沒有複製快速鍵：複製機密是刻意的操作，並會自動清除。';
 
   @override
   String get appName => 'Gabbro';

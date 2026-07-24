@@ -9,6 +9,40 @@ class AppLocalizationsDa extends AppLocalizations {
   AppLocalizationsDa([String locale = 'da']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Tastaturgenveje';
+
+  @override
+  String get kbSectionGeneral => 'Generelt';
+
+  @override
+  String get kbSectionSearch => 'Søgning';
+
+  @override
+  String get kbSectionNavigation => 'Navigation';
+
+  @override
+  String get kbLockVault => 'Lås hvælving';
+
+  @override
+  String get kbFocusSearch => 'Fokusér søgning';
+
+  @override
+  String get kbSearchAllFields => 'Søg i alle felter';
+
+  @override
+  String get kbMoveBetweenControls => 'Skift mellem kontroller';
+
+  @override
+  String get kbActivateControl => 'Aktivér det fokuserede element';
+
+  @override
+  String get kbCloseDialog => 'Luk en dialog eller annullér';
+
+  @override
+  String get kbNoCopyNote =>
+      'Der er ingen kopieringsgenvej: kopiering af en hemmelighed er en bevidst handling, der ryddes automatisk.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override

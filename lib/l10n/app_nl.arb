@@ -1,5 +1,17 @@
 {
   "@@locale": "nl",
+
+  "keyboardShortcutsTitle": "Sneltoetsen",
+  "kbSectionGeneral": "Algemeen",
+  "kbSectionSearch": "Zoeken",
+  "kbSectionNavigation": "Navigatie",
+  "kbLockVault": "Kluis vergrendelen",
+  "kbFocusSearch": "Zoeken focussen",
+  "kbSearchAllFields": "Alle velden doorzoeken",
+  "kbMoveBetweenControls": "Tussen besturingselementen bewegen",
+  "kbActivateControl": "Het gefocuste besturingselement activeren",
+  "kbCloseDialog": "Een dialoogvenster sluiten of annuleren",
+  "kbNoCopyNote": "Er is geen sneltoets om te kopiëren: het kopiëren van een geheim is een bewuste actie die automatisch wordt gewist.",
   "importSizeLimitNote": "Maximale bestandsgrootte: {textLimit} (CSV, Bitwarden, Dashlane, Google) of {enpassLimit} (Enpass).",
   "importFileTooLarge": "Dit bestand overschrijdt de limiet van {limit}.",
   "saveConfirmTitle": "Opslaan in Gabbro",
