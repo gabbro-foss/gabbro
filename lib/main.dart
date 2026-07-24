@@ -15,7 +15,8 @@ import 'package:gabbro/screens/manage_vaults_screen.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/screens/save_confirm_screen.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
-import 'package:gabbro/screens/vault_list_screen.dart' show confirmYubikey, confirmAnyYubikey;
+import 'package:gabbro/screens/vault_list_screen.dart'
+    show confirmYubikey, confirmAnyYubikey, focusVaultSearch;
 import 'package:gabbro/src/rust/api/autotype_bridge.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/settings.dart';
@@ -698,6 +699,15 @@ class _GabbroAppState extends State<GabbroApp>
       if (event.logicalKey == LogicalKeyboardKey.keyL &&
           HardwareKeyboard.instance.isControlPressed) {
         _lock();
+        return true;
+      }
+      // Ctrl+F focuses the vault-list search (Ctrl+Shift+F: all-fields mode).
+      // Global like Ctrl+L so it keeps working wherever focus is; a no-op on
+      // screens that haven't registered a handler.
+      if (event.logicalKey == LogicalKeyboardKey.keyF &&
+          HardwareKeyboard.instance.isControlPressed &&
+          focusVaultSearch != null) {
+        focusVaultSearch!(allFields: HardwareKeyboard.instance.isShiftPressed);
         return true;
       }
     }

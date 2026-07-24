@@ -176,6 +176,13 @@ Future<void> confirmAnyYubikey(
   );
 }
 
+/// Set by the active vault list so the GLOBAL Ctrl+F / Ctrl+Shift+F handler in
+/// main.dart can focus its search field regardless of where focus currently is.
+/// A screen-local shortcut dies once focus leaves the screen subtree (hardware:
+/// "Ctrl+F worked once then not"), so search focus rides the same global key
+/// handler as Ctrl+L. `allFields` picks normal (false) vs all-fields (true) mode.
+void Function({required bool allFields})? focusVaultSearch;
+
 class VaultListScreen extends StatefulWidget {
   final String vaultPath;
   final String? vaultAlias;
@@ -339,9 +346,11 @@ class _VaultListScreenState extends State<VaultListScreen>
     }
   }
 
-  // Ctrl+Shift+F: turn on full-text (all fields) search, then focus the field.
-  void _focusSearchAllFields() {
-    setState(() => _fullTextSearch = true);
+  // Driven by the global Ctrl+F / Ctrl+Shift+F handler (main.dart). Ctrl+F picks
+  // normal (title) mode; Ctrl+Shift+F picks all-fields. Focus-independent, so it
+  // keeps working after focus has left the search field.
+  void _handleSearchShortcut({required bool allFields}) {
+    setState(() => _fullTextSearch = allFields);
     _searchFocus.requestFocus();
   }
 
@@ -349,6 +358,7 @@ class _VaultListScreenState extends State<VaultListScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    focusVaultSearch = _handleSearchShortcut;
     _yubikeyRecords = widget.yubikeyRecords ?? _detectYubikeyRecords();
     _loadEntries();
     _chipScrollController.addListener(_updateChevrons);
@@ -377,6 +387,7 @@ class _VaultListScreenState extends State<VaultListScreen>
     // Clear any sync snackbar so it can't linger on the next screen (e.g. the
     // unlock screen after lock) and crash when its Details action is tapped.
     _messenger?.clearSnackBars();
+    if (focusVaultSearch == _handleSearchShortcut) focusVaultSearch = null;
     WidgetsBinding.instance.removeObserver(this);
     _searchController.dispose();
     _searchFocus.dispose();
@@ -1327,21 +1338,10 @@ class _VaultListScreenState extends State<VaultListScreen>
       return Scaffold(body: Center(child: Text(l.vaultLoadFailed(_error!))));
     }
 
-    // Ctrl+F focuses search; Ctrl+Shift+F also turns on full-text ("all fields")
-    // mode. The autofocus wrapper lets the shortcut fire from a cold screen
-    // (before the user has focused any control); skipTraversal keeps it out of
-    // the Tab order.
-    return CallbackShortcuts(
-      bindings: <ShortcutActivator, VoidCallback>{
-        const SingleActivator(LogicalKeyboardKey.keyF, control: true):
-            _searchFocus.requestFocus,
-        const SingleActivator(LogicalKeyboardKey.keyF, control: true, shift: true):
-            _focusSearchAllFields,
-      },
-      child: Focus(
-        autofocus: true,
-        skipTraversal: true,
-        child: Scaffold(
+    // Ctrl+F / Ctrl+Shift+F focus search via the global handler (main.dart) — see
+    // focusVaultSearch above; no screen-local shortcut wrapper (it died once
+    // focus left the screen).
+    return Scaffold(
       // Search field sits at the top; let the keyboard overlay the scrollable
       // list rather than shrink the body (which overflowed the header). The
       // search field stays visible above the keyboard.
@@ -1962,8 +1962,6 @@ class _VaultListScreenState extends State<VaultListScreen>
             ),
           );
         },
-      ),
-        ),
       ),
     );
   }

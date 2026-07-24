@@ -164,6 +164,42 @@ void main() {
       expect(focusedFields(tester), isNotEmpty,
           reason: 'Ctrl+F did not focus the search field on the tablet layout');
     });
+
+    // Hardware bug: Ctrl+F worked once, then not — a screen-local shortcut dies
+    // once focus leaves the screen subtree. Must keep working like Ctrl+L.
+    testWidgets('Ctrl+F works again after focus leaves the field', (tester) async {
+      setSurface(tester, phone);
+      await tester.pumpWidget(appShell(screens['vault_list']!(), textScale: 1.0));
+      await tester.pump(const Duration(milliseconds: 300));
+
+      await sendCtrl(tester, LogicalKeyboardKey.keyF);
+      expect(focusedFields(tester), isNotEmpty, reason: 'first Ctrl+F');
+
+      FocusManager.instance.primaryFocus?.unfocus();
+      await tester.pump();
+      expect(focusedFields(tester), isEmpty);
+
+      await sendCtrl(tester, LogicalKeyboardKey.keyF);
+      expect(focusedFields(tester), isNotEmpty,
+          reason: 'Ctrl+F must work again after focus left the field');
+    });
+
+    testWidgets('Ctrl+F forces normal mode, Ctrl+Shift+F forces all-fields',
+        (tester) async {
+      setSurface(tester, phone);
+      await tester.pumpWidget(appShell(screens['vault_list']!(), textScale: 1.0));
+      await tester.pump(const Duration(milliseconds: 300));
+
+      await sendCtrl(tester, LogicalKeyboardKey.keyF, shift: true);
+      await tester.pump();
+      expect(find.byIcon(Icons.manage_search), findsWidgets,
+          reason: 'Ctrl+Shift+F turns all-fields mode on');
+
+      await sendCtrl(tester, LogicalKeyboardKey.keyF);
+      await tester.pump();
+      expect(find.byIcon(Icons.manage_search), findsNothing,
+          reason: 'plain Ctrl+F must reset to normal (title) search mode');
+    });
   });
 
   // ── C. Escape cancels the review dialogs ─────────────────────────────────
