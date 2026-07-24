@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1734 | 12 |
+| Flutter (`flutter test`) | 1737 | 12 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -126,13 +126,20 @@ handler (`main.dart`) via `focusVaultSearch` — the screen-local version died o
 left the field. Ctrl+F forces normal search mode, Ctrl+Shift+F all-fields. Re-run the
 `.scratchpad` matrix before merging.
 
-Undecided — maintainer to rethink keep/drop/fix (do NOT start without a decision):
-- **#3 Focus indicator too low-contrast** on Linux ("can't tell what's selected"). A
-  theme-wide visible focus-ring change.
-- **#4 Tab order illogical** (two-pane list<->detail hop; FAB->list loop). Overlaps the
-  deferred arrows/traversal Bikeshed item.
+Now a full design: [KEYBOARD_NAV.md](KEYBOARD_NAV.md) (approved). Build in 3 phases,
+hardware-test between each.
+- **Phase 1 DONE (committed, green): global Esc + physical-key shortcuts.** Esc blurs the
+  search field, closes dialogs (incl. the barrierDismissible:false sync-setup), pops
+  back-arrow screens; sync review still cancels with rollback (local handler wins).
+  Ctrl+L/F now match the PHYSICAL key so they work on Cyrillic/Greek/CJK layouts. Net-first
+  baseline in `esc_baseline_test.dart`, behaviour in `keyboard_global_esc_test.dart`.
+  **Hardware test (round 3) PENDING** — watch Esc on create-entry (discard?) and dialogs
+  with a focused text field.
+- **Phase 2 (next): region `FocusTraversalGroup`s + Tab cycle + focus frame** (qtile-style
+  border per region).
+- **Phase 3: within-region arrows.** a11y (labels/tooltips/screen-reader) throughout.
 
-Merge to `master` only after the 2nd hardware pass AND the #3/#4 decision.
+Merge to `master` only after the phases land + hardware-pass.
 
 ---
 
