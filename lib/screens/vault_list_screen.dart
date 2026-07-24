@@ -178,6 +178,14 @@ Future<void> confirmAnyYubikey(
   );
 }
 
+/// Test-only: counts how many times the Tab-region override actually fired
+/// (`_jumpRegion` invoked via the Next/PreviousFocusIntent Actions). A hardware
+/// failure (round 10) showed Tab doing plain per-control traversal instead of
+/// region-jump; a net that only checks focus *moved* can't tell the two apart.
+/// This lets a net assert the override is the thing moving focus. Reset per test.
+@visibleForTesting
+int debugRegionJumpCalls = 0;
+
 /// Set by the active vault list so the GLOBAL Ctrl+F / Ctrl+Shift+F handler in
 /// main.dart can focus its search field regardless of where focus currently is.
 /// A screen-local shortcut dies once focus leaves the screen subtree (hardware:
@@ -355,6 +363,7 @@ class _VaultListScreenState extends State<VaultListScreen>
   /// Tab / Shift+Tab: move focus to the next / previous region's first control
   /// (or the one it last had — FocusScope remembers). Arrows are untouched.
   void _jumpRegion(bool forward) {
+    debugRegionJumpCalls++;
     final r = _regions;
     if (r.isEmpty) return;
     final i = r.indexWhere((s) => s.hasFocus);
