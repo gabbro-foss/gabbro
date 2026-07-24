@@ -1281,6 +1281,51 @@ class _VaultListScreenState extends State<VaultListScreen>
     );
   }
 
+  // Shared by both layouts. FocusRegion draws the focus frame (dashed in
+  // high-contrast); the native TextField focus highlight is suppressed so the
+  // frame is the single indicator (no double border).
+  Widget _buildSearchField() {
+    final l = AppLocalizations.of(context);
+    return FocusRegion(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+        child: TextField(
+          controller: _searchController,
+          focusNode: _searchFocus,
+          decoration: InputDecoration(
+            hintText:
+                _fullTextSearch ? l.searchAllFieldsHint : l.searchEntriesHint,
+            prefixIcon: IconButton(
+              icon: Icon(_fullTextSearch ? Icons.manage_search : Icons.search),
+              tooltip: _fullTextSearch
+                  ? l.searchAllFieldsTooltip
+                  : l.searchByTitleTooltip,
+              onPressed: () =>
+                  setState(() => _fullTextSearch = !_fullTextSearch),
+            ),
+            suffixIcon: _searchQuery.isNotEmpty
+                ? IconButton(
+                    icon: const Icon(Icons.clear),
+                    tooltip: l.tooltipClearSearch,
+                    onPressed: () => setState(() {
+                      _searchQuery = '';
+                      _searchController.clear();
+                    }),
+                  )
+                : null,
+            border: const OutlineInputBorder(),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+            ),
+            isDense: true,
+            contentPadding: const EdgeInsets.symmetric(vertical: 10),
+          ),
+          onChanged: (value) => setState(() => _searchQuery = value),
+        ),
+      ),
+    );
+  }
+
   Widget _buildFilterChipRow() {
     final l = AppLocalizations.of(context);
     return FocusRegion(
@@ -1630,42 +1675,7 @@ class _VaultListScreenState extends State<VaultListScreen>
               displayTitle: (e) => _localizedDisplayTitle(e, l),
               displayType: (t) => _displayType(t, l),
               entryTypeIcon: _entryTypeIcon,
-              searchBar: Padding(
-                padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                child: TextField(
-                  controller: _searchController,
-                  focusNode: _searchFocus,
-                  decoration: InputDecoration(
-                    hintText: _fullTextSearch
-                        ? l.searchAllFieldsHint
-                        : l.searchEntriesHint,
-                    prefixIcon: IconButton(
-                      icon: Icon(
-                        _fullTextSearch ? Icons.manage_search : Icons.search,
-                      ),
-                      tooltip: _fullTextSearch
-                          ? l.searchAllFieldsTooltip
-                          : l.searchByTitleTooltip,
-                      onPressed: () =>
-                          setState(() => _fullTextSearch = !_fullTextSearch),
-                    ),
-                    suffixIcon: _searchQuery.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear),
-                            tooltip: l.tooltipClearSearch,
-                            onPressed: () => setState(() {
-                              _searchQuery = '';
-                              _searchController.clear();
-                            }),
-                          )
-                        : null,
-                    border: const OutlineInputBorder(),
-                    isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                  ),
-                  onChanged: (value) => setState(() => _searchQuery = value),
-                ),
-              ),
+              searchBar: _buildSearchField(),
               filterChipRow: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -1735,42 +1745,7 @@ class _VaultListScreenState extends State<VaultListScreen>
           return SafeArea(
             child: Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                  child: TextField(
-                    controller: _searchController,
-                    focusNode: _searchFocus,
-                    decoration: InputDecoration(
-                      hintText: _fullTextSearch
-                          ? l.searchAllFieldsHint
-                          : l.searchEntriesHint,
-                      prefixIcon: IconButton(
-                        icon: Icon(
-                          _fullTextSearch ? Icons.manage_search : Icons.search,
-                        ),
-                        tooltip: _fullTextSearch
-                            ? l.searchAllFieldsTooltip
-                            : l.searchByTitleTooltip,
-                        onPressed: () =>
-                            setState(() => _fullTextSearch = !_fullTextSearch),
-                      ),
-                      suffixIcon: _searchQuery.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear),
-                              tooltip: l.tooltipClearSearch,
-                              onPressed: () => setState(() {
-                                _searchQuery = '';
-                                _searchController.clear();
-                              }),
-                            )
-                          : null,
-                      border: const OutlineInputBorder(),
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                    ),
-                    onChanged: (value) => setState(() => _searchQuery = value),
-                  ),
-                ),
+                _buildSearchField(),
                 if (_folders.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
