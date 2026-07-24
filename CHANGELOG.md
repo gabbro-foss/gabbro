@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Desktop keyboard shortcuts (Linux).** `Ctrl+L` locks the vault, `Ctrl+F` focuses search (`Ctrl+Shift+F` searches all fields), and `Esc` dismisses dialogs — including a safe cancel (rollback) of the sync review and import-failures flows. A **Keyboard shortcuts** item in the vault menu opens an in-app reference screen (desktop-only; localized across all 37 languages). No copy shortcut by design — copying a secret stays a deliberate, auto-clearing action.
+
 ## [0.1.0-alpha.16] – 2026-07-22
 
 ### Added
