@@ -17,6 +17,7 @@ import 'package:gabbro/screens/entry_detail_screen.dart';
 import 'package:gabbro/screens/about_screen.dart';
 import 'package:gabbro/screens/help_screen.dart';
 import 'package:gabbro/screens/keyboard_shortcuts_list_screen.dart';
+import 'package:gabbro/widgets/focus_region.dart';
 import 'package:gabbro/screens/export_screen.dart';
 import 'package:gabbro/screens/appearance_screen.dart';
 import 'package:gabbro/screens/language_screen.dart';
@@ -1282,7 +1283,8 @@ class _VaultListScreenState extends State<VaultListScreen>
 
   Widget _buildFilterChipRow() {
     final l = AppLocalizations.of(context);
-    return Stack(
+    return FocusRegion(
+      child: Stack(
       alignment: Alignment.centerRight,
       children: [
         NotificationListener<ScrollMetricsNotification>(
@@ -1329,6 +1331,7 @@ class _VaultListScreenState extends State<VaultListScreen>
             ),
           ),
       ],
+      ),
     );
   }
 
@@ -1627,7 +1630,8 @@ class _VaultListScreenState extends State<VaultListScreen>
               displayTitle: (e) => _localizedDisplayTitle(e, l),
               displayType: (t) => _displayType(t, l),
               entryTypeIcon: _entryTypeIcon,
-              searchBar: Padding(
+              searchBar: FocusRegion(
+                child: Padding(
                 padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                 child: TextField(
                   controller: _searchController,
@@ -1662,6 +1666,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                   ),
                   onChanged: (value) => setState(() => _searchQuery = value),
                 ),
+              ),
               ),
               filterChipRow: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -1732,7 +1737,8 @@ class _VaultListScreenState extends State<VaultListScreen>
           return SafeArea(
             child: Column(
               children: [
-                Padding(
+                FocusRegion(
+                  child: Padding(
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                   child: TextField(
                     controller: _searchController,
@@ -1767,6 +1773,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                     ),
                     onChanged: (value) => setState(() => _searchQuery = value),
                   ),
+                ),
                 ),
                 if (_folders.isNotEmpty)
                   Padding(

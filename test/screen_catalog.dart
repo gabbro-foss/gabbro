@@ -30,6 +30,7 @@ import 'package:gabbro/screens/security_screen.dart';
 import 'package:gabbro/screens/tablet_vault_layout.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
+import 'package:gabbro/widgets/focus_region.dart';
 import 'package:gabbro/widgets/gabbro_logo.dart';
 import 'package:gabbro/widgets/generator_widget.dart';
 import 'package:gabbro/widgets/password_breakdown_sheet.dart';
@@ -196,6 +197,19 @@ final Map<String, Widget Function()> screens = {
   // lib/widgets/ — nothing enumerated these before, which is how the
   // sync_review clipped-value bug reached a release. Each is wrapped in a
   // Scaffold because they are page fragments, not screens.
+  'focus_region': () => Scaffold(
+    body: Center(
+      child: FocusRegion(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: ElevatedButton(
+            onPressed: () {},
+            child: const Text('A focused region long enough to stress the row'),
+          ),
+        ),
+      ),
+    ),
+  ),
   'gabbro_logo': () => const Scaffold(body: GabbroLogo(withText: true)),
   'segmented_row': () => Scaffold(
     body: Column(
@@ -467,6 +481,7 @@ const Map<String, String> covers = {
   'recovery_history': 'recovery_history_screen',
   'create_entry (card)': 'create_entry_screen',
   'onboarding': 'onboarding_screen',
+  'focus_region': 'focus_region',
   'gabbro_logo': 'gabbro_logo',
   'segmented_row': 'segmented_row',
   'text_size_slider': 'text_size_slider',
@@ -521,4 +536,4 @@ List<String> uiSources() =>
 // nothing. Adding a screen or widget fails here first: the new file must be
 // swept or waived deliberately.
 const screenFileCount = 27;
-const widgetFileCount = 9;
+const widgetFileCount = 10;
