@@ -141,15 +141,33 @@ hardware-test between each.
   instead lights up its OWN outline (`DashedOutlineInputBorder` in high-contrast) — an
   overlay frame there gave a fade-double on Tab-in. Catalogued so all 3 nets sweep it.
 - **Phase 3 IN PROGRESS: region Tab-cycle (Linux desktop only, gated off on Android).**
-  Approach (Rob's KISS call): keep Flutter's free directional arrows, only override Tab.
-  Each region is a `FocusScope`; a vault-list `Actions` override makes Tab jump region→region
-  (search → folder → chips → entry list, wrapping); arrows untouched. **Narrow layout DONE +
-  net-green** (`_region()` helper gates it behind `!isAndroid`; a test asserts the region
-  scopes are absent on Android). **Remaining:** wide/tablet layout (rail + detail, skip
-  detail if no entry selected), hardware test. a11y (labels/tooltips/screen-reader) throughout.
-  (NB: "phone/tablet" here = layout WIDTH, not platform.)
+  Approach (maintainer's KISS call): keep Flutter's free directional arrows, only override Tab.
+  Each region is a `FocusScope`; a vault-list `Actions` override (around `body`) should make
+  Tab jump region→region (search → folder → chips → entry list, wrapping); arrows untouched.
+  Code committed, full net green. `_region()` helper gates it behind `!isAndroid`; a test
+  asserts the region scopes are absent on Android. (NB: "phone/tablet" here = layout WIDTH,
+  not platform.)
+  - **Hardware round 10 (narrow layout): FAILED — the net was green but the app runs plain
+    default per-control traversal (navbar → FAB → chip-by-chip → entry-by-entry); Tab is NOT
+    intercepted. Folder + entry-list regions also show no focus frame.** This is a BAD NET:
+    tests pass on behaviour the real app doesn't do. Two findings:
+    1. **Confirmed gap (easy):** only chips + search carry a frame. `_region()` adds a bare
+       `FocusScope`, not a `FocusRegion` — so folder + list never get an outline. Wrap them.
+    2. **Unconfirmed (the real bug):** the `Actions` override should win the `NextFocusIntent`
+       dispatch (it's the closest ancestor of the focused control) yet on hardware it does not
+       fire. Root cause not yet found. Likely why the net missed it: the catalog fixture is
+       too sparse (few chips/folders/entries), so region-jump and default-traversal don't
+       diverge — the "single Tab-stop" assertion can't tell them apart.
+  - **NEXT STEP (net-first, our method):** rebuild the net with a DENSE fixture (multiple
+    folders, chips, entries) that reproduces the hardware failure → make it go RED. Instrument
+    `_jumpRegion` (a call counter) to confirm whether the override fires at all in the real
+    tree. Then diagnose why the intent isn't reaching it, fix, re-green, re-hardware. Fix the
+    folder/list frame gap in the same pass. Only then wire the wide/rail layout.
+  - **Remaining after that:** wide/tablet layout (rail + detail, skip detail if no entry
+    selected), hardware test. a11y (labels/tooltips/screen-reader) throughout.
 
-Merge to `master` only after the phases land + hardware-pass.
+Merge to `master` only after the phases land + hardware-pass. (Untested code is broken code —
+this failing hardware result is the method working, not a setback.)
 
 ---
 
