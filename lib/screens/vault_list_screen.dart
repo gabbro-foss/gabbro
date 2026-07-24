@@ -16,6 +16,7 @@ import 'package:gabbro/screens/import_screen.dart';
 import 'package:gabbro/screens/entry_detail_screen.dart';
 import 'package:gabbro/screens/about_screen.dart';
 import 'package:gabbro/screens/help_screen.dart';
+import 'package:gabbro/gabbro_contrast.dart';
 import 'package:gabbro/screens/keyboard_shortcuts_list_screen.dart';
 import 'package:gabbro/widgets/focus_region.dart';
 import 'package:gabbro/screens/export_screen.dart';
@@ -1286,45 +1287,46 @@ class _VaultListScreenState extends State<VaultListScreen>
   // frame is the single indicator (no double border).
   Widget _buildSearchField() {
     final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final hc = theme.extension<GabbroContrast>()?.highContrast ?? false;
+    final focusSide =
+        BorderSide(color: theme.colorScheme.primary, width: hc ? 3 : 2);
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-      child: FocusRegion(
-        child: TextField(
-          controller: _searchController,
-          focusNode: _searchFocus,
-          decoration: InputDecoration(
-            hintText:
-                _fullTextSearch ? l.searchAllFieldsHint : l.searchEntriesHint,
-            prefixIcon: IconButton(
-              icon: Icon(_fullTextSearch ? Icons.manage_search : Icons.search),
-              tooltip: _fullTextSearch
-                  ? l.searchAllFieldsTooltip
-                  : l.searchByTitleTooltip,
-              onPressed: () =>
-                  setState(() => _fullTextSearch = !_fullTextSearch),
-            ),
-            suffixIcon: _searchQuery.isNotEmpty
-                ? IconButton(
-                    icon: const Icon(Icons.clear),
-                    tooltip: l.tooltipClearSearch,
-                    onPressed: () => setState(() {
-                      _searchQuery = '';
-                      _searchController.clear();
-                    }),
-                  )
-                : null,
-            border: const OutlineInputBorder(),
-            // Transparent on focus so the field's own outline vanishes and the
-            // FocusRegion frame is the SINGLE indicator. A visible border here
-            // (any colour) sits alongside the frame = the double-border bug.
-            focusedBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.transparent),
-            ),
-            isDense: true,
-            contentPadding: const EdgeInsets.symmetric(vertical: 10),
+      child: TextField(
+        controller: _searchController,
+        focusNode: _searchFocus,
+        decoration: InputDecoration(
+          hintText:
+              _fullTextSearch ? l.searchAllFieldsHint : l.searchEntriesHint,
+          prefixIcon: IconButton(
+            icon: Icon(_fullTextSearch ? Icons.manage_search : Icons.search),
+            tooltip: _fullTextSearch
+                ? l.searchAllFieldsTooltip
+                : l.searchByTitleTooltip,
+            onPressed: () => setState(() => _fullTextSearch = !_fullTextSearch),
           ),
-          onChanged: (value) => setState(() => _searchQuery = value),
+          suffixIcon: _searchQuery.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(Icons.clear),
+                  tooltip: l.tooltipClearSearch,
+                  onPressed: () => setState(() {
+                    _searchQuery = '';
+                    _searchController.clear();
+                  }),
+                )
+              : null,
+          border: const OutlineInputBorder(),
+          // The field's OWN outline is the focus indicator: it lights up solid
+          // (normal) or dashed + thicker (high-contrast). One line that changes
+          // — no overlay frame, so no fade-double on Tab-in.
+          focusedBorder: hc
+              ? DashedOutlineInputBorder(borderSide: focusSide)
+              : OutlineInputBorder(borderSide: focusSide),
+          isDense: true,
+          contentPadding: const EdgeInsets.symmetric(vertical: 10),
         ),
+        onChanged: (value) => setState(() => _searchQuery = value),
       ),
     );
   }

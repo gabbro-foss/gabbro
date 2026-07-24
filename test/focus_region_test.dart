@@ -60,10 +60,10 @@ void main() {
     expect(p!.style.dashed, isFalse, reason: 'normal mode is solid');
   });
 
-  // Regression pin (hardware round 7): the search box drew TWO borders — its
-  // always-on native outline PLUS the FocusRegion frame. The field must make its
-  // focus border transparent so the frame is the single indicator.
-  testWidgets('search box: FocusRegion frame is the single focus indicator',
+  // Regression pin (hardware rounds 5-8): the search box drew TWO lines — its
+  // own outline PLUS an overlay FocusRegion frame (and a fade-double on Tab-in).
+  // The field's OWN outline is now the single indicator; no overlay frame.
+  testWidgets('search box: its own outline is the single focus indicator',
       (tester) async {
     tester.view.physicalSize = phone.physical;
     tester.view.devicePixelRatio = phone.dpr;
@@ -73,18 +73,36 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
 
     final search = tester.widget<TextField>(find.byType(TextField).first);
-    final focused = search.decoration!.focusedBorder;
-    expect(focused, isA<OutlineInputBorder>());
-    expect((focused as OutlineInputBorder).borderSide.color, Colors.transparent,
-        reason: 'search focus border must be transparent, or it doubles the frame');
+    final focused = search.decoration!.focusedBorder! as OutlineInputBorder;
+    // Normal mode: a solid, coloured (not transparent) own border...
+    expect(focused.borderSide.color, isNot(Colors.transparent));
+    expect(focused, isNot(isA<DashedOutlineInputBorder>()));
 
-    // And the FocusRegion frame does appear when the search field is focused.
+    // ...and NO overlay FocusRegion frame around the search when it's focused.
     await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
     await tester.sendKeyEvent(LogicalKeyboardKey.keyF);
     await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
     await tester.pump();
-    expect(_framePainter(tester), isNotNull,
-        reason: 'the search region shows its FocusRegion frame when focused');
+    expect(_framePainter(tester), isNull,
+        reason: 'search uses its own outline, not an overlay frame (no double)');
+  });
+
+  testWidgets('search box: focus border is dashed in high-contrast',
+      (tester) async {
+    tester.view.physicalSize = phone.physical;
+    tester.view.devicePixelRatio = phone.dpr;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(appShell(
+      screens['vault_list']!(),
+      textScale: 1.0,
+      highContrast: true,
+    ));
+    await tester.pump(const Duration(milliseconds: 300));
+
+    final search = tester.widget<TextField>(find.byType(TextField).first);
+    expect(search.decoration!.focusedBorder, isA<DashedOutlineInputBorder>(),
+        reason: 'high-contrast search focus border must be dashed');
   });
 
   testWidgets('high-contrast focused region uses a dashed, thicker frame',

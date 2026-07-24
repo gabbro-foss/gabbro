@@ -80,6 +80,57 @@ class FocusFramePainter extends CustomPainter {
       old.style != style || old.radius != radius;
 }
 
+/// An [OutlineInputBorder] drawn with dashes — Flutter can't dash an input
+/// border out of the box. Used for the search field's focus border in
+/// high-contrast, so its own outline "lights up" dashed (matching the
+/// [FocusRegion] frame) with no second line.
+class DashedOutlineInputBorder extends OutlineInputBorder {
+  const DashedOutlineInputBorder({
+    super.borderSide,
+    super.borderRadius = const BorderRadius.all(Radius.circular(4)),
+  });
+
+  @override
+  DashedOutlineInputBorder copyWith({
+    BorderSide? borderSide,
+    BorderRadius? borderRadius,
+    double? gapPadding,
+  }) => DashedOutlineInputBorder(
+    borderSide: borderSide ?? this.borderSide,
+    borderRadius: borderRadius ?? this.borderRadius,
+  );
+
+  @override
+  DashedOutlineInputBorder scale(double t) => DashedOutlineInputBorder(
+    borderSide: borderSide.scale(t),
+    borderRadius: borderRadius * t,
+  );
+
+  @override
+  void paint(
+    Canvas canvas,
+    Rect rect, {
+    double? gapStart,
+    double gapExtent = 0.0,
+    double gapPercentage = 0.0,
+    TextDirection? textDirection,
+  }) {
+    final paint = borderSide.toPaint();
+    final rrect = borderRadius.toRRect(rect).deflate(borderSide.width / 2);
+    const dash = 6.0;
+    const gap = 4.0;
+    final path = Path()..addRRect(rrect);
+    for (final metric in path.computeMetrics()) {
+      var d = 0.0;
+      while (d < metric.length) {
+        final next = (d + dash).clamp(0.0, metric.length).toDouble();
+        canvas.drawPath(metric.extractPath(d, next), paint);
+        d = next + gap;
+      }
+    }
+  }
+}
+
 /// Wraps a traversal "region" (search box, a list, the chips row, the detail
 /// pane) and draws a focus frame around it while any control inside it holds
 /// focus. The frame is the qtile-style "which area am I in" cue; individual
