@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1758 | 12 |
+| Flutter (`flutter test`) | 1763 | 12 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -140,9 +140,14 @@ hardware-test between each.
   non-colour cue). Wired to the filter chips and the tablet navigation rail. The search box
   instead lights up its OWN outline (`DashedOutlineInputBorder` in high-contrast) — an
   overlay frame there gave a fade-double on Tab-in. Catalogued so all 3 nets sweep it.
-- **Phase 3 (next): region Tab-cycle + within-region arrows, TOGETHER** (can't split). Then
-  the entry list / index bar / detail pane become focusable and get their frames too.
-  a11y (labels / tooltips / screen-reader) throughout.
+- **Phase 3 IN PROGRESS: region Tab-cycle (Linux desktop only, gated off on Android).**
+  Approach (Rob's KISS call): keep Flutter's free directional arrows, only override Tab.
+  Each region is a `FocusScope`; a vault-list `Actions` override makes Tab jump region→region
+  (search → folder → chips → entry list, wrapping); arrows untouched. **Narrow layout DONE +
+  net-green** (`_region()` helper gates it behind `!isAndroid`; a test asserts the region
+  scopes are absent on Android). **Remaining:** wide/tablet layout (rail + detail, skip
+  detail if no entry selected), hardware test. a11y (labels/tooltips/screen-reader) throughout.
+  (NB: "phone/tablet" here = layout WIDTH, not platform.)
 
 Merge to `master` only after the phases land + hardware-pass.
 
