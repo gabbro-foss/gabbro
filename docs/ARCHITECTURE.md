@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1739 | 12 |
+| Flutter (`flutter test`) | 1753 | 12 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -134,9 +134,14 @@ hardware-test between each.
   with rollback (local handler wins). Ctrl+L/F match the PHYSICAL key (Cyrillic/Greek/CJK).
   Net-first baseline in `esc_baseline_test.dart`, behaviour in `keyboard_global_esc_test.dart`.
   (Round-3 bug found+fixed: a focused field was swallowing Esc.)
-- **Phase 2 (next): region `FocusTraversalGroup`s + Tab cycle + focus frame** (qtile-style
-  border per region).
-- **Phase 3: within-region arrows.** a11y (labels/tooltips/screen-reader) throughout.
+- **Phase 2 DONE (green): focus frame.** `FocusRegion` (`lib/widgets/focus_region.dart`)
+  draws a qtile-style border around a region while a control inside it holds focus — solid
+  (normal), dashed + thicker (high-contrast, a non-colour cue). Wired to the search box +
+  filter chips (the currently Tab-reachable regions); catalogued so all 3 nets sweep it.
+  **Hardware test PENDING** (frame visible in all 4 theme modes, incl. dashed high-contrast).
+- **Phase 3 (next): region Tab-cycle + within-region arrows, TOGETHER** (can't split). Then
+  the entry list / index bar / detail pane become focusable and get their frames too.
+  a11y (labels / tooltips / screen-reader) throughout.
 
 Merge to `master` only after the phases land + hardware-pass.
 

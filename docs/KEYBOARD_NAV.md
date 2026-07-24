@@ -113,12 +113,14 @@ for assistive tech too:
 - The **focus-frame colour passes contrast** in light, dark, and both
   high-contrast themes (the a11y net's contrast modes).
 
-## Build sequence (after approval)
+## Build sequence
 
-1. **Global Esc model + physical-key shortcut fix.** Small, high-value, testable
-   now; fixes the two round-2 Esc gaps and the non-Latin bug.
-2. **Region FocusTraversalGroups + Tab cycle + focus frame.**
-3. **Within-region arrows.**
+1. **Global Esc model + physical-key shortcut fix — DONE, hardware-passed.**
+2. **Focus frame** (qtile-style region border) on the *current* Tab behaviour.
+   Independent of the traversal model, so it ships the visible-focus win early.
+3. **Region Tab-cycle + within-region arrows — TOGETHER.** They are one unit:
+   Tab-to-region without arrows would leave items unreachable, so they can't be
+   split (revised from the original 2/3 split, 2026-07-24).
 
-Each phase: extend the keyboard net (`test/keyboard_net_test.dart`), then
-hardware-test before moving on.
+Each phase: net-first (pin current behaviour), then canon-TDD, then hardware-test
+before moving on.
