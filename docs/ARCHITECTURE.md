@@ -128,13 +128,12 @@ left the field. Ctrl+F forces normal search mode, Ctrl+Shift+F all-fields. Re-ru
 
 Now a full design: [KEYBOARD_NAV.md](KEYBOARD_NAV.md) (approved). Build in 3 phases,
 hardware-test between each.
-- **Phase 1 DONE (committed, green): global Esc + physical-key shortcuts.** Esc blurs the
-  search field, closes dialogs (incl. the barrierDismissible:false sync-setup), pops
-  back-arrow screens; sync review still cancels with rollback (local handler wins).
-  Ctrl+L/F now match the PHYSICAL key so they work on Cyrillic/Greek/CJK layouts. Net-first
-  baseline in `esc_baseline_test.dart`, behaviour in `keyboard_global_esc_test.dart`.
-  **Hardware test (round 3) PENDING** — watch Esc on create-entry (discard?) and dialogs
-  with a focused text field.
+- **Phase 1 DONE + HARDWARE-PASSED (round 4): global Esc + physical-key shortcuts.** Esc
+  blurs ANY focused text field first, then a 2nd Esc goes back (closes dialogs incl. the
+  barrierDismissible:false sync-setup, pops back-arrow screens); sync review still cancels
+  with rollback (local handler wins). Ctrl+L/F match the PHYSICAL key (Cyrillic/Greek/CJK).
+  Net-first baseline in `esc_baseline_test.dart`, behaviour in `keyboard_global_esc_test.dart`.
+  (Round-3 bug found+fixed: a focused field was swallowing Esc.)
 - **Phase 2 (next): region `FocusTraversalGroup`s + Tab cycle + focus frame** (qtile-style
   border per region).
 - **Phase 3: within-region arrows.** a11y (labels/tooltips/screen-reader) throughout.
