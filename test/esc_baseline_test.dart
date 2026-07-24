@@ -4,18 +4,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
-import 'screen_catalog.dart';
 import 'test_helpers.dart';
 
 // NET-FIRST baseline (do NOT delete): freezes the CURRENT Esc / focus behaviour
-// of inline dialogs and the search field, so the upcoming global-Esc change can
-// only IMPROVE it, never silently regress a dialog that already worked. Each
-// pin documents what is true TODAY; change a pin only when its behaviour is
-// deliberately changed (and say so in the commit).
-
-bool _searchFocused(WidgetTester t) => t
-    .widgetList<EditableText>(find.byType(EditableText))
-    .any((w) => w.focusNode.hasFocus);
+// of inline dialogs, so the global-Esc change can only IMPROVE it, never
+// silently regress a dialog that already worked. Each pin documents what is
+// true; change a pin only when its behaviour is deliberately changed (and say
+// so in the commit).
 
 void main() {
   // ── G1: dialog Esc mechanics our real dialogs rely on ────────────────────
@@ -127,25 +122,6 @@ void main() {
   );
 
   // ── G2: search field + Esc ───────────────────────────────────────────────
-  testWidgets('BASELINE: Esc does NOT blur the focused search field today',
-      (tester) async {
-    tester.view.physicalSize = phone.physical;
-    tester.view.devicePixelRatio = phone.dpr;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-    await tester.pumpWidget(appShell(screens['vault_list']!(), textScale: 1.0));
-    await tester.pump(const Duration(milliseconds: 300));
-
-    // Focus the search field via the already-shipped global Ctrl+F.
-    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
-    await tester.sendKeyEvent(LogicalKeyboardKey.keyF);
-    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
-    await tester.pump();
-    expect(_searchFocused(tester), isTrue, reason: 'Ctrl+F focuses search');
-
-    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
-    await tester.pump();
-    expect(_searchFocused(tester), isTrue,
-        reason: 'today Esc does not blur the search field (Phase 1 will change this)');
-  });
+  // The "Esc does not blur the search field" baseline flipped in Phase 1: Esc
+  // now blurs it. That behaviour is pinned in keyboard_global_esc_test.dart.
 }

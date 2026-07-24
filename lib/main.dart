@@ -612,6 +612,23 @@ ThemeData gabbroDarkTheme({required bool highContrast}) {
   );
 }
 
+/// True when [event] is a key-down of the physical [key] with Ctrl held. Matches
+/// the PHYSICAL key (not the logical one) so Ctrl+L / Ctrl+F work on any keyboard
+/// layout — on a Cyrillic/Greek layout the physical L/F position emits a non-Latin
+/// letter, which a logical match would silently miss.
+bool isCtrlShortcut(KeyEvent event, PhysicalKeyboardKey key) =>
+    event is KeyDownEvent &&
+    event.physicalKey == key &&
+    HardwareKeyboard.instance.isControlPressed;
+
+/// App-root fallback for the Escape key: peel one focus level (blur a field, or
+/// close a dialog / pop a screen). Dispatched only when nothing deeper handled
+/// Escape first, so a dialog's own Esc (e.g. the sync review's cancel-with-
+/// rollback) always wins.
+class _EscapeFallbackIntent extends Intent {
+  const _EscapeFallbackIntent();
+}
+
 class GabbroApp extends StatefulWidget {
   final VaultRegistry registry;
 
@@ -696,16 +713,14 @@ class _GabbroAppState extends State<GabbroApp>
       // Ctrl+L locks the vault from anywhere. (No Ctrl+C binding: copying a
       // secret stays a deliberate, auto-clearing action — see
       // keyboard_shortcuts_list_screen.)
-      if (event.logicalKey == LogicalKeyboardKey.keyL &&
-          HardwareKeyboard.instance.isControlPressed) {
+      if (isCtrlShortcut(event, PhysicalKeyboardKey.keyL)) {
         _lock();
         return true;
       }
       // Ctrl+F focuses the vault-list search (Ctrl+Shift+F: all-fields mode).
       // Global like Ctrl+L so it keeps working wherever focus is; a no-op on
       // screens that haven't registered a handler.
-      if (event.logicalKey == LogicalKeyboardKey.keyF &&
-          HardwareKeyboard.instance.isControlPressed &&
+      if (isCtrlShortcut(event, PhysicalKeyboardKey.keyF) &&
           focusVaultSearch != null) {
         focusVaultSearch!(allFields: HardwareKeyboard.instance.isShiftPressed);
         return true;
@@ -1039,8 +1054,23 @@ class _GabbroAppState extends State<GabbroApp>
       child: Listener(
         behavior: HitTestBehavior.translucent,
         onPointerDown: (_) => _resetForegroundTimer(),
-        child: MaterialApp(
-          navigatorKey: _navigatorKey,
+        // App-root Escape fallback. Ancestor of the navigator, so any dialog's
+        // own Esc handler wins; this only fires when nothing deeper did.
+        child: Shortcuts(
+          shortcuts: const <ShortcutActivator, Intent>{
+            SingleActivator(LogicalKeyboardKey.escape): _EscapeFallbackIntent(),
+          },
+          child: Actions(
+            actions: <Type, Action<Intent>>{
+              _EscapeFallbackIntent: CallbackAction<_EscapeFallbackIntent>(
+                onInvoke: (_) {
+                  _handleEscape();
+                  return null;
+                },
+              ),
+            },
+            child: MaterialApp(
+              navigatorKey: _navigatorKey,
           title: 'Gabbro',
           debugShowCheckedModeBanner: false,
           localizationsDelegates: widget.localizationsDelegates,
@@ -1052,8 +1082,16 @@ class _GabbroAppState extends State<GabbroApp>
           theme: gabbroLightTheme(highContrast: hc),
           darkTheme: gabbroDarkTheme(highContrast: hc),
           home: widget.initialScreen ?? _buildHome(),
+            ),
+          ),
         ),
       ),
     );
   }
+
+  /// Escape fallback: close the top dialog, or pop the current screen (its back
+  /// arrow). Fires only when nothing deeper handled Escape — a focused search
+  /// field blurs itself (vault_list), and a dialog with its own Esc (sync review)
+  /// cancels with rollback, both winning over this.
+  void _handleEscape() => _navigatorKey.currentState?.maybePop();
 }
