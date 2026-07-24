@@ -313,6 +313,24 @@ A mismatch means the file is **not** an official Gabbro build — do not install
 
 ---
 
+## Keyboard shortcuts (Linux)
+
+Desktop-only; also listed in-app under the vault menu → **Keyboard shortcuts**.
+
+| Shortcut | Action |
+|---|---|
+| `Ctrl+L` | Lock the vault |
+| `Ctrl+F` | Focus search |
+| `Ctrl+Shift+F` | Search all fields |
+| `Tab` / `Shift+Tab` | Move between controls |
+| `Enter` / `Space` | Activate the focused control |
+| `Esc` | Close a dialog or cancel |
+
+There is deliberately **no copy shortcut** — copying a secret stays an explicit,
+auto-clearing action.
+
+---
+
 ## Known hardware quirks
 
 **NumLock LED switches off when you plug in a YubiKey (Linux/X11).** On an X11
