@@ -136,10 +136,11 @@ hardware-test between each.
   (Round-3 bug found+fixed: a focused field was swallowing Esc.)
 - **Phase 2 DONE (green): focus frame.** `FocusRegion` (`lib/widgets/focus_region.dart`)
   draws a qtile-style border around a region while a control inside it holds focus — solid
-  (normal), dashed + thicker (high-contrast, a non-colour cue). Wired to the search box
-  (native TextField focus highlight suppressed so the frame is the sole indicator), the
-  filter chips, and the tablet navigation rail. Catalogued so all 3 nets sweep it.
-  **Hardware test PENDING** (frame visible in all 4 theme modes, incl. dashed high-contrast).
+  (normal), dashed + thicker (high-contrast, a non-colour cue). Wired to the filter chips
+  and the tablet navigation rail. The search box instead lights up its OWN outline
+  (`DashedOutlineInputBorder` in high-contrast) — an overlay frame there gave a fade-double
+  on Tab-in. Catalogued so all 3 nets sweep it.
+  **Hardware test PENDING** (visible in all 4 theme modes, incl. dashed high-contrast).
 - **Phase 3 (next): region Tab-cycle + within-region arrows, TOGETHER** (can't split). Then
   the entry list / index bar / detail pane become focusable and get their frames too.
   a11y (labels / tooltips / screen-reader) throughout.
