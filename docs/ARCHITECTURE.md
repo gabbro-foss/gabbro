@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1728 | 12 |
+| Flutter (`flutter test`) | 1730 | 12 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -115,7 +115,24 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-_None selected. Pick from the Bikeshed._
+**Keyboard accessibility sweep — IN PROGRESS on branch `keyboard_accessibility_sweep` (unpushed, NOT merged).**
+
+Shipped + hardware-passed: Ctrl+L lock, Esc dismiss/cancel (sync review cancels with
+rollback — safety-critical, verified), desktop-only Keyboard shortcuts reference screen
+(37 locales), Android regression clean.
+
+Just fixed, 2nd hardware test PENDING: Ctrl+F / Ctrl+Shift+F now fire from the global key
+handler (`main.dart`) via `focusVaultSearch` — the screen-local version died once focus
+left the field. Ctrl+F forces normal search mode, Ctrl+Shift+F all-fields. Re-run the
+`.scratchpad` matrix before merging.
+
+Undecided — maintainer to rethink keep/drop/fix (do NOT start without a decision):
+- **#3 Focus indicator too low-contrast** on Linux ("can't tell what's selected"). A
+  theme-wide visible focus-ring change.
+- **#4 Tab order illogical** (two-pane list<->detail hop; FAB->list loop). Overlaps the
+  deferred arrows/traversal Bikeshed item.
+
+Merge to `master` only after the 2nd hardware pass AND the #3/#4 decision.
 
 ---
 
