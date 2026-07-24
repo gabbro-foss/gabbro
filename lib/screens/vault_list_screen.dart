@@ -323,16 +323,9 @@ class _VaultListScreenState extends State<VaultListScreen>
   bool _fullTextSearch = false;
   final TextEditingController _searchController = TextEditingController();
   // Shared by whichever layout (phone XOR tablet) is built, so Ctrl+F can focus
-  // the search field without either layout duplicating the node. Esc blurs it
-  // (the app-root Esc fallback only fires once nothing deeper handled the key).
-  late final FocusNode _searchFocus = FocusNode(onKeyEvent: (node, event) {
-    if (event is KeyDownEvent &&
-        event.logicalKey == LogicalKeyboardKey.escape) {
-      node.unfocus();
-      return KeyEventResult.handled;
-    }
-    return KeyEventResult.ignored;
-  });
+  // the search field without either layout duplicating the node. Esc-to-blur is
+  // handled globally for every text field (main.dart _onKeyEvent).
+  final FocusNode _searchFocus = FocusNode();
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ScrollController _chipScrollController = ScrollController();
   bool _showLeftChevron = false;

@@ -725,6 +725,22 @@ class _GabbroAppState extends State<GabbroApp>
         focusVaultSearch!(allFields: HardwareKeyboard.instance.isShiftPressed);
         return true;
       }
+      // Esc blurs a focused text field on a SCREEN before anything else (D4:
+      // unfocus first, then a 2nd Esc goes back via the app-root fallback).
+      // Handled here — ahead of focus dispatch — because a focused text field
+      // otherwise swallows Escape. A field inside a dialog is left alone so the
+      // app-root fallback closes the whole dialog instead of just blurring.
+      if (event.logicalKey == LogicalKeyboardKey.escape) {
+        final focus = FocusManager.instance.primaryFocus;
+        final ctx = focus?.context;
+        final inField =
+            ctx != null && ctx.findAncestorStateOfType<EditableTextState>() != null;
+        final inDialog = ctx != null && ModalRoute.of(ctx) is PopupRoute;
+        if (inField && !inDialog) {
+          focus!.unfocus();
+          return true;
+        }
+      }
     }
     return false;
   }

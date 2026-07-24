@@ -97,6 +97,77 @@ void main() {
         reason: 'Esc must close the sync-setup dialog');
   });
 
+  testWidgets('Esc blurs a focused field on a sub-screen, 2nd Esc goes back',
+      (tester) async {
+    await tester.pumpWidget(appShell(
+      Builder(
+        builder: (ctx) => Scaffold(
+          body: Center(
+            child: ElevatedButton(
+              onPressed: () => Navigator.of(ctx).push(
+                MaterialPageRoute(
+                  builder: (_) => Scaffold(
+                    appBar: AppBar(title: const Text('EDIT')),
+                    body: const TextField(autofocus: true),
+                  ),
+                ),
+              ),
+              child: const Text('push'),
+            ),
+          ),
+        ),
+      ),
+      textScale: 1.0,
+    ));
+    await tester.pump();
+    await tester.tap(find.text('push'));
+    await tester.pumpAndSettle();
+    expect(searchFocused(tester), isTrue, reason: 'the sub-screen field autofocuses');
+
+    // 1st Esc blurs the field but stays on the screen (D4: unfocus first).
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pump();
+    expect(searchFocused(tester), isFalse, reason: '1st Esc blurs the field');
+    expect(find.text('EDIT'), findsOneWidget, reason: 'still on the sub-screen');
+
+    // 2nd Esc goes back.
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+    expect(find.text('EDIT'), findsNothing, reason: '2nd Esc pops the screen');
+  });
+
+  testWidgets('Esc closes a dialog even when its text field is focused',
+      (tester) async {
+    await tester.pumpWidget(appShell(
+      Builder(
+        builder: (ctx) => Scaffold(
+          body: Center(
+            child: ElevatedButton(
+              onPressed: () => showDialog<void>(
+                context: ctx,
+                builder: (_) => const AlertDialog(
+                  content: TextField(autofocus: true),
+                ),
+              ),
+              child: const Text('open'),
+            ),
+          ),
+        ),
+      ),
+      textScale: 1.0,
+    ));
+    await tester.pump();
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsOneWidget);
+    expect(searchFocused(tester), isTrue, reason: 'the dialog field autofocuses');
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsNothing,
+        reason: 'Esc closes the dialog, not merely blur the field inside it');
+  });
+
   testWidgets('Esc pops a pushed sub-screen when nothing is focused',
       (tester) async {
     await tester.pumpWidget(appShell(
