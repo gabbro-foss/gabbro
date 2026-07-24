@@ -10,6 +10,7 @@ import 'package:gabbro/screens/section_index.dart';
 import 'package:gabbro/screens/security_screen.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
+import 'package:gabbro/widgets/focus_region.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 // ---------------------------------------------------------------------------
@@ -410,7 +411,8 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
     return Row(
       children: [
         // ── Navigation rail ────────────────────────────────────────────────
-        NavigationRail(
+        FocusRegion(
+          child: NavigationRail(
           selectedIndex: _railIndex,
           onDestinationSelected: _onRailDestinationSelected,
           labelType: NavigationRailLabelType.all,
@@ -436,6 +438,7 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
               label: Text(l.navAbout),
             ),
           ],
+        ),
         ),
         const VerticalDivider(width: 1),
         // ── List pane (resizable) ──────────────────────────────────────────

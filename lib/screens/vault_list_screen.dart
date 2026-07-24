@@ -1630,8 +1630,7 @@ class _VaultListScreenState extends State<VaultListScreen>
               displayTitle: (e) => _localizedDisplayTitle(e, l),
               displayType: (t) => _displayType(t, l),
               entryTypeIcon: _entryTypeIcon,
-              searchBar: FocusRegion(
-                child: Padding(
+              searchBar: Padding(
                 padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                 child: TextField(
                   controller: _searchController,
@@ -1666,7 +1665,6 @@ class _VaultListScreenState extends State<VaultListScreen>
                   ),
                   onChanged: (value) => setState(() => _searchQuery = value),
                 ),
-              ),
               ),
               filterChipRow: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -1737,8 +1735,7 @@ class _VaultListScreenState extends State<VaultListScreen>
           return SafeArea(
             child: Column(
               children: [
-                FocusRegion(
-                  child: Padding(
+                Padding(
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                   child: TextField(
                     controller: _searchController,
@@ -1773,7 +1770,6 @@ class _VaultListScreenState extends State<VaultListScreen>
                     ),
                     onChanged: (value) => setState(() => _searchQuery = value),
                   ),
-                ),
                 ),
                 if (_folders.isNotEmpty)
                   Padding(
