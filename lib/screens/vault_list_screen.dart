@@ -1286,9 +1286,9 @@ class _VaultListScreenState extends State<VaultListScreen>
   // frame is the single indicator (no double border).
   Widget _buildSearchField() {
     final l = AppLocalizations.of(context);
-    return FocusRegion(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+      child: FocusRegion(
         child: TextField(
           controller: _searchController,
           focusNode: _searchFocus,
@@ -1314,8 +1314,11 @@ class _VaultListScreenState extends State<VaultListScreen>
                   )
                 : null,
             border: const OutlineInputBorder(),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+            // Transparent on focus so the field's own outline vanishes and the
+            // FocusRegion frame is the SINGLE indicator. A visible border here
+            // (any colour) sits alongside the frame = the double-border bug.
+            focusedBorder: const OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.transparent),
             ),
             isDense: true,
             contentPadding: const EdgeInsets.symmetric(vertical: 10),
