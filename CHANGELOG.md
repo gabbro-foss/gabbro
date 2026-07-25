@@ -10,9 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Desktop keyboard shortcuts (Linux).** `Ctrl+L` locks the vault, `Ctrl+F` focuses search (`Ctrl+Shift+F` searches all fields), and `Esc` dismisses dialogs — including a safe cancel (rollback) of the sync review and import-failures flows. A **Keyboard shortcuts** item in the vault menu opens an in-app reference screen (desktop-only; localized across all 37 languages). No copy shortcut by design — copying a secret stays a deliberate, auto-clearing action.
 
-<!-- Phase 3 (Tab region-cycle + Ctrl+N/Ctrl+M) is implemented and component-green;
-     the round-11 hardware failure is fixed but the retest is pending — NOT added
-     here until it hardware-passes. See ARCHITECTURE.md `### Next task`. -->
+<!-- The Tab region-cycle + Ctrl+N/Ctrl+M hardware-passed on Linux (round 13), but the
+     sweep is NOT finished: the focus highlight still has to be gated off Android (D5)
+     and the a11y layer is not started. Nothing is added here until the branch merges.
+     See ARCHITECTURE.md `### Next task`. -->
 
 
 ## [0.1.0-alpha.16] – 2026-07-22

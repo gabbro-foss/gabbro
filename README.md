@@ -320,11 +320,14 @@ Desktop-only; also listed in-app under the vault menu → **Keyboard shortcuts**
 | Shortcut | Action |
 |---|---|
 | `Ctrl+L` | Lock the vault |
+| `Ctrl+N` | New entry |
+| `Ctrl+M` | Open the menu |
 | `Ctrl+F` | Focus search |
 | `Ctrl+Shift+F` | Search all fields |
-| `Tab` / `Shift+Tab` | Move between controls |
+| `Tab` / `Shift+Tab` | Move between regions (search, folders, filters, list, detail) |
+| `↑` `↓` `←` `→` | Move within the focused region |
 | `Enter` / `Space` | Activate the focused control |
-| `Esc` | Close a dialog or cancel |
+| `Esc` | Leave the focused region; again to close a dialog or go back |
 
 There is deliberately **no copy shortcut** — copying a secret stays an explicit,
 auto-clearing action.

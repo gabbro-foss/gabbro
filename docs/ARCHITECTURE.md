@@ -115,7 +115,7 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Keyboard accessibility sweep — branch `keyboard_accessibility_sweep` (unpushed, NOT merged).**
+**Keyboard accessibility sweep — branch `keyboard_accessibility_sweep` (pushed, NOT merged).**
 
 Spec: [KEYBOARD_NAV.md](KEYBOARD_NAV.md) (approved) — cycle order, exclusions, Esc
 precedence, resolved decisions. **Linux desktop only**; "narrow/wide" = layout WIDTH, not
@@ -153,19 +153,14 @@ either, gestures still drive. Three changes, red-first:
 Then re-run the matrix (round 14): Android section F, plus a Linux spot-check that the
 highlight is untouched.
 
-**Phase 4 — a11y (NOT started).** The visual frame is currently the *only* region cue, which
-is precisely the cue a screen-reader user cannot see. Scope: `Semantics` label/hint per
-region so entering one is announced (`liveRegion`); extend `a11y_net_test.dart` and add a
-focus-frame contrast check; then an Orca screen-reader pass on Linux.
+**Phase 4 — a11y (NOT started).** A screen-reader user hears the app instead of seeing it,
+and the visual frame is currently the only region cue. D5 splits the work: **both
+platforms** get a `Semantics` label/hint on every control (Orca and TalkBack alike);
+**Linux only** gets region labels, the "entering Folder list" announcement (`liveRegion`)
+and the focus-frame contrast check — there are no regions on Android to announce. Extend
+`a11y_net_test.dart`, then an Orca pass on Linux.
 
 **Merge gate:** master only once the Android gate and Phase 4 land and a full matrix passes.
-- **Phase 4 a11y — NOT STARTED (after the hardware pass):** region Semantics label/hint,
-  region-entry announcement (liveRegion), extend `a11y_net_test.dart` + focus-frame contrast,
-  Orca screen-reader pass. `FocusRegion` currently has no Semantics — the visual frame is the
-  only region cue today.
-
-Merge to `master` only after the hardware pass + a11y land. (Untested code is broken code —
-the round-10 failure was the method working: a bad net exposed, mechanism corrected.)
 
 ---
 
@@ -181,7 +176,7 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Features and UI/UX
-- Add `ctrl+q` to lock+quit the app as keyboard shortcut, add `ctrl+m` to open menu
+- Add `ctrl+q` to lock+quit the app as keyboard shortcut (`ctrl+m` done in the keyboard sweep)
 - **Remove the tablet NavigationRail** (`tablet_vault_layout.dart`: Vault /
   Appearance / Security / About). Redundant with the app-bar overflow menu (same
   targets), low utility. Already excluded from the keyboard Tab-cycle.

@@ -122,20 +122,24 @@ IMEs pass Ctrl-chords through, so the physical match reaches the app regardless.
   in the tree, and the search field gets no focused outline (Material's default
   one is suppressed too). A tablet-width Android device gains nothing from it;
   gestures still drive. Consequence: no unfocus-on-tap-outside logic and no
-  keyboard-visibility observer — Android behaviour is simply untouched.
+  keyboard-visibility observer — Android behaviour is simply untouched. It also
+  splits the a11y layer below: control labels everywhere, regions on Linux only.
 
 ## Accessibility (non-negotiable, every phase)
 
-The visual frame is one cue among several — this work is not done until it works
-for assistive tech too:
+A screen-reader user hears the app instead of seeing it, so the visual frame can
+never be the only cue. D5 splits this in two, because regions only exist on Linux:
 
-- **Semantics label + hint on every region and control**, so a screen reader
-  (Orca on Linux, TalkBack on Android) announces *what* it is and *what Enter /
-  the arrows do* there. The focus frame must never be the sole indicator.
+**Both platforms — every control speaks its name.**
+- **Semantics label + hint on every control**, so Orca (Linux) and TalkBack
+  (Android) say *what it is* and *what Enter / the arrows do*.
 - **Tooltips on every icon-only control** (back arrows, index bar, chips).
-- **Entering a region announces it** to the screen reader (e.g. "Folder list").
 - Extend the a11y net (`test/a11y_net_test.dart` — labeled-tap-target + contrast
   sweeps) to the new controls; the keyboard net covers traversal.
+
+**Linux only — the regions speak too.**
+- **Semantics label + hint on each region**, and **entering one announces it**
+  (e.g. "Folder list"). There is nothing to announce on Android: no regions.
 - The **focus-frame colour passes contrast** in light, dark, and both
   high-contrast themes (the a11y net's contrast modes).
 
@@ -146,9 +150,9 @@ for assistive tech too:
 3. **Region Tab-cycle + within-region arrows (both layouts) + Ctrl+N/Ctrl+M —
    DONE, hardware-passed (round 13).** Rounds 10–12 each found one defect on
    hardware that no headless test could see; causes are in LEARNINGS.md.
-4. **a11y layer** — region Semantics label/hint, region-entry announcement,
-   a11y-net + focus-frame contrast, Orca pass. NOT started (after the hardware
-   pass, maintainer's call).
+4. **a11y layer** — control labels/hints on both platforms; region Semantics,
+   region-entry announcement and focus-frame contrast on Linux only (D5); a11y-net
+   extension; Orca pass. NOT started.
 
 Each phase: net-first (pin current behaviour), then canon-TDD, then hardware-test
 before moving on.
