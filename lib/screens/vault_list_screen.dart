@@ -178,13 +178,28 @@ Future<void> confirmAnyYubikey(
   );
 }
 
-/// Test-only: counts how many times the Tab-region override actually fired
-/// (`_jumpRegion` invoked via the Next/PreviousFocusIntent Actions). A hardware
-/// failure (round 10) showed Tab doing plain per-control traversal instead of
-/// region-jump; a net that only checks focus *moved* can't tell the two apart.
-/// This lets a net assert the override is the thing moving focus. Reset per test.
-@visibleForTesting
-int debugRegionJumpCalls = 0;
+/// Set by the active vault list so the GLOBAL Tab / Shift+Tab handler in
+/// main.dart can drive the region cycle regardless of where focus currently is.
+/// Returns true when it consumed the key (focus moved to the next/previous
+/// region stop), false to let Tab fall through to default traversal. Null when
+/// no vault list is mounted. Mirrors [focusVaultSearch]; same reason — a
+/// screen-local `Actions` override died on real hardware (round 10).
+bool Function({required bool forward})? vaultRegionTab;
+
+/// Set by the active vault list so the GLOBAL Esc handler (main.dart) can drop
+/// focus out of the region cycle from ANY region, not just the search field —
+/// Esc is the only exit back to the Unfocused state (KEYBOARD_NAV). Returns
+/// true when it consumed the key. Null when no vault list is mounted.
+bool Function()? vaultRegionEscape;
+
+/// Set by the active vault list so main.dart's app-root traversal absorber knows
+/// when to swallow Flutter's default Tab -> Next/PreviousFocusIntent traversal
+/// (the [vaultRegionTab] driver moves focus instead). Returns true only on
+/// desktop while the vault list is the current route; false elsewhere so Tab
+/// stays normal on other screens and inside dialogs. Null when no vault list is
+/// mounted. The absorber must sit BELOW WidgetsApp's default shortcuts (i.e.
+/// MaterialApp.builder) or the default traversal fires first.
+bool Function()? vaultRegionActive;
 
 /// Set by the active vault list so the GLOBAL Ctrl+F / Ctrl+Shift+F handler in
 /// main.dart can focus its search field regardless of where focus currently is.
@@ -192,6 +207,16 @@ int debugRegionJumpCalls = 0;
 /// "Ctrl+F worked once then not"), so search focus rides the same global key
 /// handler as Ctrl+L. `allFields` picks normal (false) vs all-fields (true) mode.
 void Function({required bool allFields})? focusVaultSearch;
+
+/// Set by the active vault list so the GLOBAL Ctrl+N handler (main.dart) can open
+/// the new-entry type picker from anywhere. The region Tab-cycle excludes the
+/// FAB, so this is the keyboard path to create an entry. No-op when null.
+void Function()? openNewEntry;
+
+/// Set by the active vault list so the GLOBAL Ctrl+M handler (main.dart) can open
+/// the overflow menu from anywhere. The region Tab-cycle excludes the menu
+/// button, so this is the keyboard path to it. No-op when null.
+void Function()? openVaultMenu;
 
 class VaultListScreen extends StatefulWidget {
   final String vaultPath;
@@ -337,22 +362,23 @@ class _VaultListScreenState extends State<VaultListScreen>
   // handled globally for every text field (main.dart _onKeyEvent).
   final FocusNode _searchFocus = FocusNode();
 
-  // Phase 3: one FocusScope per Tab region. Tab jumps between regions (see
-  // _jumpRegion); arrows stay within a region (Flutter's default directional
-  // focus). Order: search -> folder -> chips -> entry list (rail/detail on the
-  // tablet layout are handled there).
+  // Phase 3: one FocusScope per Tab region, each labelled 'region:<name>'. Tab
+  // (intercepted globally in main.dart, routed here via _handleRegionTab) steps
+  // a fixed cycle of regions; arrows stay within a region (Flutter's default
+  // directional focus). Order: search -> folder -> chips -> entry list (the
+  // tablet layout adds its detail pane — handled there). The search-mode toggle
+  // icon is NOT a stop: Ctrl+F / Ctrl+Shift+F reach and set it directly (DRY).
   final _searchScope = FocusScopeNode(debugLabel: 'region:search');
   final _folderScope = FocusScopeNode(debugLabel: 'region:folder');
   final _chipsScope = FocusScopeNode(debugLabel: 'region:chips');
   final _listScope = FocusScopeNode(debugLabel: 'region:list');
-
-  /// Present regions in Tab order (folder only when there are folders).
-  List<FocusScopeNode> get _regions => [
-    _searchScope,
-    if (_folders.isNotEmpty) _folderScope,
-    _chipsScope,
-    _listScope,
-  ];
+  // The two-pane detail pane's region. Owned here so the cycle can reach it, but
+  // mounted by TabletVaultLayout ONLY when an entry is selected — so its being
+  // non-empty is exactly "detail is a stop" (see _stopOrder). Never mounted in
+  // the single-pane layout.
+  final _detailScope = FocusScopeNode(debugLabel: 'region:detail');
+  // The folder dropdown's own node, so the 'folder' stop lands on it directly.
+  final FocusNode _folderFocus = FocusNode(debugLabel: 'folder');
 
   /// Wrap a Tab region in its FocusScope on desktop; pass the child through
   /// UNCHANGED on Android. Keyboard navigation is Linux-desktop only and must
@@ -360,27 +386,132 @@ class _VaultListScreenState extends State<VaultListScreen>
   Widget _region(FocusScopeNode scope, Widget child) =>
       widget.isAndroid ? child : FocusScope(node: scope, child: child);
 
-  /// Tab / Shift+Tab: move focus to the next / previous region's first control
-  /// (or the one it last had — FocusScope remembers). Arrows are untouched.
-  void _jumpRegion(bool forward) {
-    debugRegionJumpCalls++;
-    final r = _regions;
-    if (r.isEmpty) return;
-    final i = r.indexWhere((s) => s.hasFocus);
-    final next = i < 0
-        ? 0
-        : (forward ? (i + 1) % r.length : (i - 1 + r.length) % r.length);
-    final scope = r[next];
-    // The search region's entry is the text field itself (not its first
-    // focusable, which is the mode-toggle icon). Other regions: the control they
-    // last had (roving memory), else their first control.
-    final FocusNode? target = scope == _searchScope
-        ? _searchFocus
-        : (scope.focusedChild ??
-            (scope.traversalDescendants.isEmpty
-                ? null
-                : scope.traversalDescendants.first));
+  /// The Tab stops in cycle order for the current state. Folder appears only
+  /// when there are folders. Detail appears only when the two-pane layout has
+  /// mounted its region (i.e. wide AND an entry is selected) — its scope carries
+  /// focusable descendants exactly then; empty (never a stop) single-pane.
+  List<String> _stopOrder() => [
+    'search',
+    if (_folders.isNotEmpty) 'folder',
+    'chips',
+    'list',
+    if (_detailScope.traversalDescendants.isNotEmpty) 'detail',
+  ];
+
+  /// The scope backing each cycle stop. Regions are matched by node IDENTITY,
+  /// never by debugLabel: Flutter only assigns debugLabel inside an assert, so
+  /// it is null in every release build — a label lookup passes in `flutter test`
+  /// (debug) and silently matches nothing on the user's machine. That was the
+  /// round-11 hardware failure: every Tab re-entered the cycle at stop 0.
+  Map<String, FocusScopeNode> get _scopeOfStop => {
+    'search': _searchScope,
+    'folder': _folderScope,
+    'chips': _chipsScope,
+    'list': _listScope,
+    'detail': _detailScope,
+  };
+
+  /// Which cycle stop currently holds focus, '' if none (cold / excluded).
+  /// A region scope reports `hasFocus` when it or any descendant is the primary
+  /// focus, and the regions are siblings, so at most one matches.
+  String _currentStop() {
+    for (final stop in _scopeOfStop.entries) {
+      if (stop.value.hasFocus) return stop.key;
+    }
+    return '';
+  }
+
+  /// Focus a region scope's remembered child, else its first control.
+  void _focusRegionScope(FocusScopeNode scope) {
+    final target = scope.focusedChild ??
+        (scope.traversalDescendants.isEmpty
+            ? null
+            : scope.traversalDescendants.first);
     target?.requestFocus();
+  }
+
+  void _focusStop(String name) {
+    switch (name) {
+      case 'search':
+        _searchFocus.requestFocus();
+      case 'folder':
+        _folderFocus.requestFocus();
+      case 'chips':
+        _focusRegionScope(_chipsScope);
+      case 'list':
+        _focusRegionScope(_listScope);
+      case 'detail':
+        _focusRegionScope(_detailScope);
+    }
+  }
+
+  /// True when the region cycle should own Tab: desktop, and the vault list is
+  /// the current route (not behind a dialog / pushed screen). Gates both the
+  /// global Tab driver [_handleRegionTab] and the app-root traversal absorber
+  /// ([vaultRegionActive]) so Tab stays normal on Android, on other screens, and
+  /// inside dialogs. Both layouts (single- and two-pane) are wired.
+  bool _regionCycleActive() {
+    if (widget.isAndroid) return false;
+    final route = ModalRoute.of(context);
+    return route == null || route.isCurrent;
+  }
+
+  // Lets the Ctrl+M handler open the overflow menu programmatically.
+  final GlobalKey<PopupMenuButtonState<String>> _menuKey = GlobalKey();
+
+  /// Guard for the Ctrl+N / Ctrl+M action shortcuts: desktop, vault list is the
+  /// current route, and NOT in selection mode (the FAB and menu button are both
+  /// hidden then, so there is nothing to open).
+  bool _actionShortcutActive() {
+    if (widget.isAndroid || _isSelecting) return false;
+    final route = ModalRoute.of(context);
+    return route == null || route.isCurrent;
+  }
+
+  // Ctrl+N (global): open the new-entry type picker — the keyboard path to the
+  // FAB, which the region Tab-cycle excludes.
+  void _handleNewEntryShortcut() {
+    if (mounted && _actionShortcutActive()) _showTypePicker();
+  }
+
+  // Ctrl+M (global): open the overflow menu — the keyboard path to the menu
+  // button, which the region Tab-cycle excludes.
+  void _handleMenuShortcut() {
+    if (mounted && _actionShortcutActive()) _menuKey.currentState?.showButtonMenu();
+  }
+
+  /// Esc handler (registered as the global [vaultRegionEscape] hook): drop focus
+  /// out of the cycle, back to Unfocused. Returns true when it consumed the key.
+  ///
+  /// It unfocuses the REGION SCOPE, not the focused control: unfocusing a
+  /// control only parks focus on its enclosing scope, which is still inside the
+  /// region — the frame would stay lit and the next Tab would resume mid-cycle.
+  /// Unfocusing the scope hands focus to the route scope above the cycle, while
+  /// the region keeps its own memory of the control that was focused, so
+  /// Tabbing back in returns there.
+  bool _handleRegionEscape() {
+    if (!_regionCycleActive()) return false;
+    final stop = _currentStop();
+    if (stop.isEmpty) return false;
+    _scopeOfStop[stop]?.unfocus();
+    return true;
+  }
+
+  /// Tab / Shift+Tab handler (registered as the global [vaultRegionTab] hook):
+  /// move focus to the next / previous region stop, wrapping. Self-gates via
+  /// [_regionCycleActive].
+  bool _handleRegionTab({required bool forward}) {
+    if (!_regionCycleActive()) return false;
+    final stops = _stopOrder();
+    if (stops.isEmpty) return false;
+    final i = stops.indexOf(_currentStop());
+    final next = i < 0
+        ? (forward ? 0 : stops.length - 1)
+        : (forward
+            ? (i + 1) % stops.length
+            : (i - 1 + stops.length) % stops.length);
+    _focusStop(stops[next]);
+    return true;
   }
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ScrollController _chipScrollController = ScrollController();
@@ -416,6 +547,11 @@ class _VaultListScreenState extends State<VaultListScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     focusVaultSearch = _handleSearchShortcut;
+    vaultRegionTab = _handleRegionTab;
+    vaultRegionEscape = _handleRegionEscape;
+    vaultRegionActive = _regionCycleActive;
+    openNewEntry = _handleNewEntryShortcut;
+    openVaultMenu = _handleMenuShortcut;
     _yubikeyRecords = widget.yubikeyRecords ?? _detectYubikeyRecords();
     _loadEntries();
     _chipScrollController.addListener(_updateChevrons);
@@ -445,13 +581,20 @@ class _VaultListScreenState extends State<VaultListScreen>
     // unlock screen after lock) and crash when its Details action is tapped.
     _messenger?.clearSnackBars();
     if (focusVaultSearch == _handleSearchShortcut) focusVaultSearch = null;
+    if (vaultRegionTab == _handleRegionTab) vaultRegionTab = null;
+    if (vaultRegionEscape == _handleRegionEscape) vaultRegionEscape = null;
+    if (vaultRegionActive == _regionCycleActive) vaultRegionActive = null;
+    if (openNewEntry == _handleNewEntryShortcut) openNewEntry = null;
+    if (openVaultMenu == _handleMenuShortcut) openVaultMenu = null;
     WidgetsBinding.instance.removeObserver(this);
     _searchController.dispose();
     _searchFocus.dispose();
+    _folderFocus.dispose();
     _searchScope.dispose();
     _folderScope.dispose();
     _chipsScope.dispose();
     _listScope.dispose();
+    _detailScope.dispose();
     _chipScrollController.removeListener(_updateChevrons);
     _chipScrollController.dispose();
     super.dispose();
@@ -1490,6 +1633,7 @@ class _VaultListScreenState extends State<VaultListScreen>
               onPressed: _lockAndExit,
             ),
             PopupMenuButton<String>(
+              key: _menuKey,
               icon: const Icon(Icons.menu),
               iconSize: scaledIconSize(context),
               tooltip: l.tooltipMenu,
@@ -1738,14 +1882,21 @@ class _VaultListScreenState extends State<VaultListScreen>
               displayTitle: (e) => _localizedDisplayTitle(e, l),
               displayType: (t) => _displayType(t, l),
               entryTypeIcon: _entryTypeIcon,
-              searchBar: _buildSearchField(),
+              // Region-wrap search / folder / chips here (VaultListScreen owns
+              // these scopes); the list + detail scopes are passed in and wrapped
+              // inside TabletVaultLayout. See reference two-layout-paths.
+              searchBar: _region(_searchScope, _buildSearchField()),
               filterChipRow: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (_folders.isNotEmpty)
-                    Padding(
+                    _region(
+                      _folderScope,
+                      FocusRegion(
+                      child: Padding(
                       padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
                       child: DropdownButton<String>(
+                        focusNode: _folderFocus,
                         isExpanded: true,
                         // Let open-menu items grow to their wrapped height
                         // instead of clipping at the default 48px (ADR-016).
@@ -1781,7 +1932,9 @@ class _VaultListScreenState extends State<VaultListScreen>
                         ],
                       ),
                     ),
-                  _buildFilterChipRow(),
+                    ),
+                    ),
+                  _region(_chipsScope, _buildFilterChipRow()),
                 ],
               ),
               searchActive: _searchQuery.isNotEmpty,
@@ -1803,6 +1956,12 @@ class _VaultListScreenState extends State<VaultListScreen>
               clipboardClearTimeout:
                   GabbroApp.maybeOf(context)?.settings.clipboardClearTimeout ??
                   ClipboardClearTimeout.sixtySeconds,
+              // The list + detail Tab regions (desktop only — null on Android so
+              // the widget tree is unchanged there). Detail is wrapped by the
+              // layout only when an entry is selected, which is how the cycle
+              // knows to include it (see _stopOrder).
+              listScope: widget.isAndroid ? null : _listScope,
+              detailScope: widget.isAndroid ? null : _detailScope,
             );
           }
           final Widget body = SafeArea(
@@ -1812,9 +1971,11 @@ class _VaultListScreenState extends State<VaultListScreen>
                 if (_folders.isNotEmpty)
                   _region(
                     _folderScope,
-                    Padding(
+                    FocusRegion(
+                    child: Padding(
                     padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
                     child: DropdownButton<String>(
+                      focusNode: _folderFocus,
                       isExpanded: true,
                       // Let open-menu items grow to their wrapped height
                       // instead of clipping at the default 48px (ADR-016).
@@ -1853,11 +2014,13 @@ class _VaultListScreenState extends State<VaultListScreen>
                     ),
                   ),
                   ),
+                  ),
                 _region(_chipsScope, _buildFilterChipRow()),
                 Expanded(
                   child: _region(
                     _listScope,
-                    _groupedEntries.isEmpty
+                    FocusRegion(
+                    child: _groupedEntries.isEmpty
                       ? Center(child: Text(l.noEntriesMatch))
                       : Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1965,7 +2128,17 @@ class _VaultListScreenState extends State<VaultListScreen>
                                           MaterialPageRoute(
                                             builder: (context) =>
                                                 EntryDetailScreen(
-                                                  entry: getEntry(id: entry.id),
+                                                  // Honour the injected fetch
+                                                  // like the two-pane layout
+                                                  // does: calling the FFI
+                                                  // directly left this whole
+                                                  // path untestable.
+                                                  entry:
+                                                      (widget.getEntryFn ??
+                                                          (id) =>
+                                                              getEntry(id: id))(
+                                                        entry.id,
+                                                      ),
                                                   clipboardClearTimeout:
                                                       GabbroApp.of(context)
                                                           .settings
@@ -2005,28 +2178,14 @@ class _VaultListScreenState extends State<VaultListScreen>
                           ],
                         ),
                   ),
+                  ),
                 ),
               ],
             ),
           );
-          if (widget.isAndroid) return body;
-          return Actions(
-            actions: <Type, Action<Intent>>{
-              NextFocusIntent: CallbackAction<NextFocusIntent>(
-                onInvoke: (_) {
-                  _jumpRegion(true);
-                  return null;
-                },
-              ),
-              PreviousFocusIntent: CallbackAction<PreviousFocusIntent>(
-                onInvoke: (_) {
-                  _jumpRegion(false);
-                  return null;
-                },
-              ),
-            },
-            child: body,
-          );
+          // Tab traversal is driven globally (main.dart -> _handleRegionTab);
+          // no body-scoped Actions override (it failed on hardware, round 10).
+          return body;
         },
       ),
     );

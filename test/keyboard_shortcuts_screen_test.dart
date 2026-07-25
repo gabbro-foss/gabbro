@@ -23,10 +23,23 @@ Future<void> openMenu(WidgetTester tester) async {
 void main() {
   testWidgets('lists every documented shortcut with its description',
       (tester) async {
+    // Tall viewport so the whole (lazy) list renders — the no-copy note sits at
+    // the very bottom and would otherwise not be built.
+    tester.view.physicalSize = const Size(1200, 3000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(testApp(const KeyboardShortcutsListScreen()));
     final l = lOf(tester, KeyboardShortcutsListScreen);
 
-    for (final combo in const ['Ctrl+L', 'Ctrl+F', 'Ctrl+Shift+F', 'Esc']) {
+    for (final combo in const [
+      'Ctrl+L',
+      'Ctrl+N',
+      'Ctrl+M',
+      'Ctrl+F',
+      'Ctrl+Shift+F',
+      'Esc',
+    ]) {
       expect(find.text(combo), findsOneWidget, reason: '$combo combo missing');
     }
     expect(find.textContaining('Tab'), findsWidgets);
@@ -34,6 +47,9 @@ void main() {
 
     for (final desc in [
       l.kbLockVault,
+      // Ctrl+N / Ctrl+M reuse the existing localized action labels (DRY).
+      l.newEntryTitle,
+      l.tooltipMenu,
       l.kbFocusSearch,
       l.kbSearchAllFields,
       l.kbMoveBetweenControls,

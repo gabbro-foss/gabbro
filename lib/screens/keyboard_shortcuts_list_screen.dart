@@ -4,8 +4,9 @@ import 'package:gabbro/l10n/app_localizations.dart';
 /// Read-only reference of the desktop keyboard shortcuts (Linux). Reached from
 /// the vault-list overflow menu; not offered on Android, which has no physical
 /// keyboard. The key combos are literal identifiers (not localised); only the
-/// descriptions are. Keep in sync with the wiring in main.dart (Ctrl+L) and
-/// vault_list_screen.dart (Ctrl+F / Ctrl+Shift+F).
+/// descriptions are. Keep in sync with the wiring in main.dart (Ctrl+L / Ctrl+N /
+/// Ctrl+M) and vault_list_screen.dart (Ctrl+F / Ctrl+Shift+F). Ctrl+N / Ctrl+M
+/// reuse the existing New-entry / Menu labels (DRY).
 class KeyboardShortcutsListScreen extends StatelessWidget {
   const KeyboardShortcutsListScreen({super.key});
 
@@ -20,7 +21,9 @@ class KeyboardShortcutsListScreen extends StatelessWidget {
         children: [
           _Section(l.kbSectionGeneral, const [
             ('Ctrl+L', null),
-          ], descriptions: [l.kbLockVault]),
+            ('Ctrl+N', null),
+            ('Ctrl+M', null),
+          ], descriptions: [l.kbLockVault, l.newEntryTitle, l.tooltipMenu]),
           _Section(l.kbSectionSearch, const [
             ('Ctrl+F', null),
             ('Ctrl+Shift+F', null),

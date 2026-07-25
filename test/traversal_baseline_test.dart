@@ -34,22 +34,31 @@ Future<void> pumpVaultList(WidgetTester tester, Surface surface) async {
 }
 
 void main() {
-  testWidgets('BASELINE: Tab reaches the search field (phone)', (tester) async {
+  testWidgets('BASELINE: Tab reaches the search field (narrow layout)',
+      (tester) async {
     await pumpVaultList(tester, phone);
     expect(await tabReaches<EditableText>(tester), isTrue,
         reason: 'the search field must stay keyboard-reachable');
   });
 
-  testWidgets('BASELINE: Tab reaches a filter chip (phone)', (tester) async {
+  testWidgets('BASELINE: Tab reaches a filter chip (narrow layout)',
+      (tester) async {
     await pumpVaultList(tester, phone);
     expect(await tabReaches<FilterChip>(tester), isTrue,
         reason: 'a filter chip must stay keyboard-reachable');
   });
 
-  testWidgets('BASELINE: Tab reaches the navigation rail (tablet)',
+  // Phase 3 DELIBERATE change: the two-pane nav rail is EXCLUDED from the region
+  // Tab-cycle (maintainer decision; KEYBOARD_NAV.md — and it is slated for
+  // removal). So the old "Tab reaches the navigation rail" pin no longer holds.
+  // The floor that DOES hold: the wide layout's content stays keyboard-reachable
+  // — Tab still reaches the search field. Full wide reachability (search/folder/
+  // chips/list/detail) and the rail's exclusion are pinned in
+  // keyboard_region_cycle_test.dart.
+  testWidgets('BASELINE: Tab reaches the search field (wide two-pane)',
       (tester) async {
     await pumpVaultList(tester, tablet);
-    expect(await tabReaches<NavigationRail>(tester), isTrue,
-        reason: 'the navigation rail must stay keyboard-reachable');
+    expect(await tabReaches<EditableText>(tester), isTrue,
+        reason: 'the search field must stay keyboard-reachable (wide layout)');
   });
 }

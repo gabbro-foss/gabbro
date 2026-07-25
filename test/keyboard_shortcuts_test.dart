@@ -202,6 +202,110 @@ void main() {
     });
   });
 
+  // ── D. Ctrl+N new entry / Ctrl+M menu (Linux desktop) ────────────────────
+  // Both mirror Ctrl+L: a global handler routed to a vault-list hook, matched on
+  // the PHYSICAL key. They exist so keyboard-only users can still reach the two
+  // controls the region Tab-cycle deliberately excludes (the FAB / new entry and
+  // the overflow menu). Both self-gate: inert behind a dialog / pushed route and
+  // in selection mode. Layout labels are narrow / wide (two-pane) — Linux-only.
+  group('Ctrl+N new entry and Ctrl+M menu', () {
+    Future<void> pumpVaultList(WidgetTester tester, Surface surface) async {
+      setSurface(tester, surface);
+      await tester.pumpWidget(
+          appShell(screens['vault_list']!(), textScale: 1.0));
+      await tester.pump(const Duration(milliseconds: 300));
+    }
+
+    // The type picker uses the Note type's icon; a login list entry uses the
+    // lock icon, so this icon is unique to the open picker.
+    final pickerOpen = find.byIcon(Icons.note_outlined);
+    // The overflow menu's Export item icon — unique to the open menu.
+    final menuOpen = find.byIcon(Icons.upload_outlined);
+
+    testWidgets('Ctrl+N opens the new-entry type picker (narrow layout)',
+        (tester) async {
+      await pumpVaultList(tester, phone);
+      expect(pickerOpen, findsNothing);
+      await sendCtrl(tester, LogicalKeyboardKey.keyN);
+      await tester.pumpAndSettle();
+      expect(pickerOpen, findsOneWidget, reason: 'Ctrl+N opens the type picker');
+    });
+
+    testWidgets('Ctrl+N opens the type picker (wide two-pane layout)',
+        (tester) async {
+      await pumpVaultList(tester, tablet);
+      await sendCtrl(tester, LogicalKeyboardKey.keyN);
+      await tester.pumpAndSettle();
+      expect(pickerOpen, findsOneWidget);
+    });
+
+    testWidgets('plain N does not open the type picker', (tester) async {
+      await pumpVaultList(tester, phone);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyN);
+      await tester.pumpAndSettle();
+      expect(pickerOpen, findsNothing);
+    });
+
+    testWidgets('Ctrl+N works regardless of where focus is (global)',
+        (tester) async {
+      await pumpVaultList(tester, phone);
+      await sendCtrl(tester, LogicalKeyboardKey.keyF); // focus the search field
+      expect(focusedFields(tester), isNotEmpty);
+      await sendCtrl(tester, LogicalKeyboardKey.keyN);
+      await tester.pumpAndSettle();
+      expect(pickerOpen, findsOneWidget);
+    });
+
+    testWidgets('Ctrl+M opens the overflow menu (narrow layout)',
+        (tester) async {
+      await pumpVaultList(tester, phone);
+      expect(menuOpen, findsNothing);
+      await sendCtrl(tester, LogicalKeyboardKey.keyM);
+      await tester.pumpAndSettle();
+      expect(menuOpen, findsOneWidget, reason: 'Ctrl+M opens the overflow menu');
+    });
+
+    testWidgets('Ctrl+M opens the overflow menu (wide two-pane layout)',
+        (tester) async {
+      await pumpVaultList(tester, tablet);
+      await sendCtrl(tester, LogicalKeyboardKey.keyM);
+      await tester.pumpAndSettle();
+      expect(menuOpen, findsOneWidget);
+    });
+
+    testWidgets('plain M does not open the menu', (tester) async {
+      await pumpVaultList(tester, phone);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyM);
+      await tester.pumpAndSettle();
+      expect(menuOpen, findsNothing);
+    });
+
+    testWidgets('shortcuts are inert while a dialog / route is on top',
+        (tester) async {
+      await pumpVaultList(tester, phone);
+      await sendCtrl(tester, LogicalKeyboardKey.keyN); // open picker (modal route)
+      await tester.pumpAndSettle();
+      expect(pickerOpen, findsOneWidget);
+      await sendCtrl(tester, LogicalKeyboardKey.keyM); // must NOT open the menu
+      await tester.pumpAndSettle();
+      expect(menuOpen, findsNothing,
+          reason: 'inert when the vault list is not the current route');
+    });
+
+    testWidgets('Ctrl+N and Ctrl+M are inert in selection mode', (tester) async {
+      await pumpVaultList(tester, phone);
+      await tester.tap(find.byIcon(Icons.checklist)); // enter selection mode
+      await tester.pumpAndSettle();
+      await sendCtrl(tester, LogicalKeyboardKey.keyN);
+      await tester.pumpAndSettle();
+      expect(pickerOpen, findsNothing,
+          reason: 'no new-entry picker in selection mode');
+      await sendCtrl(tester, LogicalKeyboardKey.keyM);
+      await tester.pumpAndSettle();
+      expect(menuOpen, findsNothing, reason: 'no menu in selection mode');
+    });
+  });
+
   // ── C. Escape cancels the review dialogs ─────────────────────────────────
   group('Escape cancels review dialogs', () {
     testWidgets('Escape cancels sync review SAFELY (rollback, no apply)',

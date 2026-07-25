@@ -168,6 +168,93 @@ void main() {
         reason: 'Esc closes the dialog, not merely blur the field inside it');
   });
 
+  // NET (green before the region-Esc change, must stay green): Esc still GOES
+  // BACK from a pushed screen when a non-text control holds focus. The region
+  // cycle needs Esc to drop focus out of a region instead of popping — that
+  // must not leak onto other screens, where a focused button means "pop", not
+  // "blur".
+  testWidgets('Esc pops a pushed sub-screen when a non-text control is focused',
+      (tester) async {
+    final buttonFocus = FocusNode();
+    addTearDown(buttonFocus.dispose);
+    await tester.pumpWidget(appShell(
+      Builder(
+        builder: (ctx) => Scaffold(
+          body: Center(
+            child: ElevatedButton(
+              onPressed: () => Navigator.of(ctx).push(
+                MaterialPageRoute(
+                  builder: (_) => Scaffold(
+                    appBar: AppBar(title: const Text('SECOND')),
+                    body: Center(
+                      child: ElevatedButton(
+                        focusNode: buttonFocus,
+                        autofocus: true,
+                        onPressed: () {},
+                        child: const Text('a button'),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              child: const Text('push'),
+            ),
+          ),
+        ),
+      ),
+      textScale: 1.0,
+    ));
+    await tester.pump();
+    await tester.tap(find.text('push'));
+    await tester.pumpAndSettle();
+    expect(buttonFocus.hasFocus, isTrue, reason: 'the sub-screen button autofocuses');
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+    expect(find.text('SECOND'), findsNothing,
+        reason: 'a focused non-text control must not turn Esc into a blur');
+  });
+
+  // NET: the same guard for a dialog — Esc closes it whole, even when a button
+  // inside it holds focus.
+  testWidgets('Esc closes a dialog when a non-text control inside it is focused',
+      (tester) async {
+    await tester.pumpWidget(appShell(
+      Builder(
+        builder: (ctx) => Scaffold(
+          body: Center(
+            child: ElevatedButton(
+              onPressed: () => showDialog<void>(
+                context: ctx,
+                builder: (_) => AlertDialog(
+                  content: const Text('body'),
+                  actions: [
+                    ElevatedButton(
+                      autofocus: true,
+                      onPressed: () {},
+                      child: const Text('OK'),
+                    ),
+                  ],
+                ),
+              ),
+              child: const Text('open'),
+            ),
+          ),
+        ),
+      ),
+      textScale: 1.0,
+    ));
+    await tester.pump();
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsOneWidget);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsNothing,
+        reason: 'Esc closes the dialog, not merely blur the button inside it');
+  });
+
   testWidgets('Esc pops a pushed sub-screen when nothing is focused',
       (tester) async {
     await tester.pumpWidget(appShell(

@@ -101,6 +101,14 @@ class TabletVaultLayout extends StatefulWidget {
   /// Called when a list tile is long-pressed or tapped in selection mode.
   final void Function(String id) onToggleSelection;
 
+  /// Keyboard Tab-cycle regions for the list and detail panes (desktop only;
+  /// null on Android, so the widget tree is unchanged there). The scopes are
+  /// owned by the parent VaultListScreen — the regions span both widgets (see
+  /// reference two-layout-paths). The detail scope is mounted only while an entry
+  /// is selected, which is how the cycle knows detail is a reachable stop.
+  final FocusScopeNode? listScope;
+  final FocusScopeNode? detailScope;
+
   const TabletVaultLayout({
     super.key,
     required this.groupedEntries,
@@ -124,6 +132,8 @@ class TabletVaultLayout extends StatefulWidget {
     required this.selectionMode,
     required this.selectedIds,
     required this.onToggleSelection,
+    this.listScope,
+    this.detailScope,
   });
 
   @override
@@ -260,7 +270,9 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
         widget.searchBar,
         widget.filterChipRow,
         Expanded(
-          child: widget.groupedEntries.isEmpty
+          child: _region(
+            widget.listScope,
+            widget.groupedEntries.isEmpty
               ? Center(child: Text(AppLocalizations.of(context).noEntriesMatch))
               : Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -321,18 +333,29 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
                             final entry = item as EntrySummaryData;
                             final isSelected = entry.id == _selectedEntryId;
                             return Container(
-                              decoration: isSelected
-                                  ? BoxDecoration(
-                                      border: Border(
-                                        left: BorderSide(
-                                          color: theme.colorScheme.primary,
-                                          width: 3,
-                                        ),
-                                      ),
-                                      color: theme.colorScheme.primaryContainer
-                                          .withValues(alpha: 0.3),
-                                    )
-                                  : null,
+                              // The decoration is ALWAYS present (transparent
+                              // border, no fill, when unselected). Flipping it
+                              // between null and non-null changes the widget
+                              // tree's SHAPE, which rebuilds the ListTile's
+                              // InkWell and disposes its focus node — so
+                              // opening an entry with Enter threw keyboard
+                              // focus onto a neighbouring row. Keeping the
+                              // border reserved also stops the row shifting
+                              // 3px sideways when it is selected.
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  left: BorderSide(
+                                    color: isSelected
+                                        ? theme.colorScheme.primary
+                                        : Colors.transparent,
+                                    width: 3,
+                                  ),
+                                ),
+                                color: isSelected
+                                    ? theme.colorScheme.primaryContainer
+                                          .withValues(alpha: 0.3)
+                                    : null,
+                              ),
                               child: Material(
                                 color: Colors.transparent,
                                 child: ListTile(
@@ -389,10 +412,17 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
                     ),
                   ],
                 ),
+          ),
         ),
       ],
     );
   }
+
+  /// Wrap a pane in its Tab-cycle region (FocusScope for identity + FocusRegion
+  /// for the focus frame). Pass-through when [scope] is null (Android).
+  Widget _region(FocusScopeNode? scope, Widget child) => scope == null
+      ? child
+      : FocusScope(node: scope, child: FocusRegion(child: child));
 
   // Maximum list pane width: always leaves ≥200dp for the detail pane and
   // the navigation rail (~100dp combined). Grows naturally on wide screens.
@@ -511,7 +541,14 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
           ),
         ),
         // ── Detail pane (flex) ─────────────────────────────────────────────
-        Expanded(child: _buildDetailPane(context)),
+        // Mount the detail region only while an entry is selected: an empty
+        // detail pane must NOT be a Tab stop (the cycle checks the scope's
+        // descendants). Selected -> wrap; empty -> plain pass-through.
+        Expanded(
+          child: _selectedEntryId == null
+              ? _buildDetailPane(context)
+              : _region(widget.detailScope, _buildDetailPane(context)),
+        ),
       ],
     );
   }
