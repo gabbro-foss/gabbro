@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1763 | 21 |
+| Flutter (`flutter test`) | 1796 | 12 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -115,70 +115,56 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Keyboard accessibility sweep — IN PROGRESS on branch `keyboard_accessibility_sweep` (unpushed, NOT merged).**
+**Keyboard accessibility sweep — branch `keyboard_accessibility_sweep` (unpushed, NOT merged).**
 
-Shipped + hardware-passed: Ctrl+L lock, Esc dismiss/cancel (sync review cancels with
-rollback — safety-critical, verified), desktop-only Keyboard shortcuts reference screen
-(37 locales), Android regression clean.
+Spec: [KEYBOARD_NAV.md](KEYBOARD_NAV.md) (approved) — cycle order, exclusions, Esc
+precedence, resolved decisions. **Linux desktop only**; "narrow/wide" = layout WIDTH, not
+platform. Hardware matrix in `.scratchpad`; every hardware failure and its cause is in
+LEARNINGS.md. Phases are hardware-tested one at a time.
 
-Just fixed, 2nd hardware test PENDING: Ctrl+F / Ctrl+Shift+F now fire from the global key
-handler (`main.dart`) via `focusVaultSearch` — the screen-local version died once focus
-left the field. Ctrl+F forces normal search mode, Ctrl+Shift+F all-fields. Re-run the
-`.scratchpad` matrix before merging.
+**Mechanism.** Tab/Shift+Tab, Esc and Ctrl+L/F/N/M are all intercepted by the global
+`HardwareKeyboard` handler (`main.dart _onKeyEvent`) and routed to hooks the vault list
+registers (`vaultRegionTab`, `vaultRegionEscape`, `focusVaultSearch`, `openNewEntry`,
+`openVaultMenu`); every hook self-gates on desktop + current route. An app-root `Actions`
+absorber (`MaterialApp.builder`) swallows Flutter's default Tab traversal while the cycle
+owns it. Each region is a `FocusScopeNode` matched by **node identity** — never
+`debugLabel`, which is null in release builds. Regions span two widgets: VaultListScreen
+owns search/folder/chips, TabletVaultLayout owns list + detail.
 
-Now a full design: [KEYBOARD_NAV.md](KEYBOARD_NAV.md) (approved). Build in 3 phases,
-hardware-test between each.
-- **Phase 1 DONE + HARDWARE-PASSED (round 4): global Esc + physical-key shortcuts.** Esc
-  blurs ANY focused text field first, then a 2nd Esc goes back (closes dialogs incl. the
-  barrierDismissible:false sync-setup, pops back-arrow screens); sync review still cancels
-  with rollback (local handler wins). Ctrl+L/F match the PHYSICAL key (Cyrillic/Greek/CJK).
-  Net-first baseline in `esc_baseline_test.dart`, behaviour in `keyboard_global_esc_test.dart`.
-  (Round-3 bug found+fixed: a focused field was swallowing Esc.)
-- **Phase 2 DONE + HARDWARE-PASSED (round 9): focus frame.** `FocusRegion`
-  (`lib/widgets/focus_region.dart`) draws a qtile-style border around a region while a
-  control inside it holds focus — solid (normal), dashed + thicker (high-contrast, a
-  non-colour cue). Wired to the filter chips and the tablet navigation rail. The search box
-  instead lights up its OWN outline (`DashedOutlineInputBorder` in high-contrast) — an
-  overlay frame there gave a fade-double on Tab-in. Catalogued so all 3 nets sweep it.
-- **Phase 3 IN PROGRESS: region Tab-cycle (Linux desktop only, gated off on Android).**
-  (NB: "narrow/wide" = layout WIDTH, not platform.) Round-10 (narrow) HARDWARE-FAILED;
-  root cause found + mechanism pivoted (2026-07-24). Net-first RED spec written; green
-  implementation NOT yet started — this is where a fresh instance picks up.
-  - **Root cause (diagnosed):** the old approach wrapped a vault-list `Actions`
-    (NextFocusIntent → `_jumpRegion`) around **`body` only**. The AppBar buttons + FAB
-    (and, wide, the nav rail) are Scaffold siblings OUTSIDE `body`, so Tab can never be
-    intercepted while focus is on them → default per-control traversal, and those controls
-    are wrongly IN the cycle. Proven with a dense-fixture diagnostic + a `_jumpRegion` call
-    counter (`debugRegionJumpCalls`, still in `vault_list_screen.dart`): in-test the override
-    fires only once focus is already inside `body` (never for appbar/FAB) — and on real
-    hardware the `Actions`/`NextFocusIntent` resolution silently failed even inside `body`,
-    which a headless widget test cannot reproduce (forcing `TargetPlatform.linux` didn't
-    change it). Conclusion: body-scoped `Actions` is the wrong foundation.
-  - **Mechanism PIVOT (maintainer-approved):** drive Tab like Ctrl+L/F/Esc already work — a
-    GLOBAL `HardwareKeyboard` intercept in `main.dart _onKeyEvent`, routed to a vault-list-
-    registered hook (`vaultRegionTab`, the `focusVaultSearch` pattern). Captures Tab wherever
-    focus is; excluding controls is then trivial; it is the exact mechanism that hardware-
-    passed in Phase 1 (the `Actions` path is not). Guard the hook by `ModalRoute.isCurrent`
-    (+ `!isAndroid`) so Tab stays normal in dialogs / pushed screens.
-  - **Final cycle (maintainer, 2026-07-24):**
-    - narrow: `searchtype → search field → folder(if any) → chips → entry list → wrap`
-    - wide:   `… → chips → entry list → detail (skip if no entry selected) → wrap`
-    - EXCLUDED: FAB, select-entries, lock, menu, nav rail, **alphabet index bar** (dropped —
-      DRY, Up/Down in the list already covers it). `searchtype` (the search-mode toggle icon)
-      is its OWN stop before the field.
-  - **RED spec written:** `test/keyboard_region_cycle_test.dart` — 9 tests (narrow + wide),
-    dense fixture (3 folders, 7 chips, 12 lettered entries), the cycle as executable spec.
-    Verified RED for the right reasons (real app walks appbar/fab/rail, never a region), then
-    **`skip:`ed** (both groups, `_pendingGreen`) so `flutter test` stays green. A fresh
-    instance un-skips each test as it wires the matching region.
-  - **GREEN steps (not started):**
-    1. `main.dart _onKeyEvent`: intercept Tab/Shift+Tab (KeyDownEvent) → `vaultRegionTab?.call(forward: !isShift)`; consume when it returns true.
-    2. `vault_list_screen.dart`: register/clear `vaultRegionTab` (guard `ModalRoute.isCurrent` + `!isAndroid`); REPLACE the `Actions`/`_jumpRegion`/`debugRegionJumpCalls` block with a state-computed ordered stop list; add `searchtype` + `folder` FocusNodes; wrap folder + entry list in `FocusRegion` (the round-10 frame gap).
-    3. `tablet_vault_layout.dart`: region-wrap search/folder/chips/list/detail; detail is a stop, skipped when `_selectedEntryId == null`. Regions span two widgets — VaultListScreen owns search/folder/chips nodes (passed in); TabletVaultLayout owns list + detail (see reference_two_layout_paths).
-    4. Reconcile the older `keyboard_region_chips_test.dart` (its `_tabToChip` can't tell region-jump from default traversal); update `KEYBOARD_NAV.md` region order (drop index bar; add searchtype).
-    5. Then hardware-test narrow AND wide together (regenerate the `.scratchpad` matrix), then a11y (labels/tooltips/screen-reader).
+**Status**
+- **Phase 1 — global Esc + physical-key shortcuts: DONE, hardware-passed.**
+- **Phase 2 — focus frame (`lib/widgets/focus_region.dart`): DONE, hardware-passed.**
+- **Phase 3 — region Tab-cycle (both layouts) + Ctrl+N/Ctrl+M: DONE, hardware-passed
+  (round 13)**, except the Android item below.
 
-Merge to `master` only after the phases land + hardware-pass. (Untested code is broken code —
+**Current task — the focus highlight is Linux-only.** Round 13 passed everything but one
+Android row: once tapped, the search field stays highlighted. Decision (maintainer,
+2026-07-25): the highlight exists to serve keyboard navigation, which is Linux-desktop
+only, so none of it may appear on Android — a tablet-width Android device gains nothing
+either, gestures still drive. Three changes, red-first:
+1. Search field: the focused border only when `!isAndroid`; on Android it equals the
+   unfocused border. That also suppresses Material's own default focus outline, so the
+   Android search box changes from what alpha.16 ships — deliberate.
+2. `FocusRegion` moves inside `_region()` (and the chips row's unconditional one is gated)
+   so frame and scope leave together — today the frame widgets are still in the Android
+   tree even though the scopes are not.
+3. No unfocus logic, no keyboard-visibility observer: nothing new fires on Android.
+
+Then re-run the matrix (round 14): Android section F, plus a Linux spot-check that the
+highlight is untouched.
+
+**Phase 4 — a11y (NOT started).** The visual frame is currently the *only* region cue, which
+is precisely the cue a screen-reader user cannot see. Scope: `Semantics` label/hint per
+region so entering one is announced (`liveRegion`); extend `a11y_net_test.dart` and add a
+focus-frame contrast check; then an Orca screen-reader pass on Linux.
+
+**Merge gate:** master only once the Android gate and Phase 4 land and a full matrix passes.
+- **Phase 4 a11y — NOT STARTED (after the hardware pass):** region Semantics label/hint,
+  region-entry announcement (liveRegion), extend `a11y_net_test.dart` + focus-frame contrast,
+  Orca screen-reader pass. `FocusRegion` currently has no Semantics — the visual frame is the
+  only region cue today.
+
+Merge to `master` only after the hardware pass + a11y land. (Untested code is broken code —
 the round-10 failure was the method working: a bad net exposed, mechanism corrected.)
 
 ---
@@ -195,7 +181,7 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Features and UI/UX
-- Add `ctrl+q` to lock+quit the app as keyboard shortcut
+- Add `ctrl+q` to lock+quit the app as keyboard shortcut, add `ctrl+m` to open menu
 - **Remove the tablet NavigationRail** (`tablet_vault_layout.dart`: Vault /
   Appearance / Security / About). Redundant with the app-bar overflow menu (same
   targets), low utility. Already excluded from the keyboard Tab-cycle.
