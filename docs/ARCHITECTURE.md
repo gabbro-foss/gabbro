@@ -167,8 +167,7 @@ Android to announce. Then an Orca pass on Linux.
   the focus-frame contrast in all four themes. Both absence pins carry a
   guard-on-the-guard.
 - **Fixed as it went:** the folder selector was a 28dp tap target on a wide window — the
-  48dp minimum had been applied to the narrow branch only. **Layout change, not yet
-  hardware-tested:** put it in the next matrix.
+  48dp minimum had been applied to the narrow branch only. **Hardware-passed (round 15).**
 
 **Merge gate:** master only once the Android gate and Phase 4 land and a full matrix passes.
 
