@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1796 | 12 |
+| Flutter (`flutter test`) | 1802 | 12 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -137,21 +137,18 @@ owns search/folder/chips, TabletVaultLayout owns list + detail.
 - **Phase 3 — region Tab-cycle (both layouts) + Ctrl+N/Ctrl+M: DONE, hardware-passed
   (round 13)**, except the Android item below.
 
-**Current task — the focus highlight is Linux-only.** Round 13 passed everything but one
-Android row: once tapped, the search field stays highlighted. Decision (maintainer,
-2026-07-25): the highlight exists to serve keyboard navigation, which is Linux-desktop
-only, so none of it may appear on Android — a tablet-width Android device gains nothing
-either, gestures still drive. Three changes, red-first:
-1. Search field: the focused border only when `!isAndroid`; on Android it equals the
-   unfocused border. That also suppresses Material's own default focus outline, so the
-   Android search box changes from what alpha.16 ships — deliberate.
-2. `FocusRegion` moves inside `_region()` (and the chips row's unconditional one is gated)
-   so frame and scope leave together — today the frame widgets are still in the Android
-   tree even though the scopes are not.
-3. No unfocus logic, no keyboard-visibility observer: nothing new fires on Android.
+- **D5 — the focus highlight is Linux-only: DONE, hardware-passed (round 14).**
+  Every `FocusRegion` now hangs off the platform gate, so frame and scope leave together:
+  `_region()` supplies the frame (`frame: false` for the search box, which lights up its
+  own outline), and the two-pane nav-rail frame follows `listScope != null`. On Android the
+  search field's focused border equals its unfocused one, which also suppresses Material's
+  default outline — so the Android search box changes from what alpha.16 ships, deliberately.
+  No unfocus logic and no keyboard-visibility observer were added: nothing new fires on
+  Android. Pinned by N1/N2 (Linux keeps its frames and its lit search box) and R1/R2/R3
+  (Android: no frame narrow or wide, focused border == unfocused, search still filters) in
+  `keyboard_region_chips_test.dart`.
 
-Then re-run the matrix (round 14): Android section F, plus a Linux spot-check that the
-highlight is untouched.
+**Current task — Phase 4, a11y** (see below). Round 14 passed A-F on 2026-07-26.
 
 **Phase 4 — a11y (NOT started).** A screen-reader user hears the app instead of seeing it,
 and the visual frame is currently the only region cue. D5 splits the work: **both
