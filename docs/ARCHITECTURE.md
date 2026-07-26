@@ -168,7 +168,7 @@ are no regions on Android to announce).
   of the matrix is the guard: if Orca is silent there, nothing below it means anything.
   The unit tests prove the label and flag are in the tree, never that Orca speaks.
 - **Android TalkBack unverified.** The control hints ship on Android too, but round 16 is
-  Linux-only. A TalkBack pass is still owed before merge.
+  Linux-only. A TalkBack spot-check covers it — no matrix needed.
 - **Net-first floor (built first, all green).** The a11y net skipped `tablet_vault_layout`
   outright, so the two-pane layout had no a11y coverage at all; it and a wide `vault_list`
   entry (same screen at tablet width, reaching the two-pane branch through its real call
@@ -182,7 +182,9 @@ are no regions on Android to announce).
   `FilterChip`) merged the selection checkbox into the row when applied to `ListTile`,
   costing the checkbox its "title, tick box" reading — a plain `Semantics` works there.
 
-**Merge gate:** master only once the Android gate and Phase 4 land and a full matrix passes.
+**Merge gate:** master once round 16 (Orca, Linux) passes, plus a TalkBack spot-check on
+Android for the control hints — they are not platform-gated. Phases 1-3 and D5 are already
+hardware-passed (rounds 14 and 15); nothing there needs re-running.
 
 ---
 
