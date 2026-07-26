@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1846 | 10 |
+| Flutter (`flutter test`) | 1865 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -132,11 +132,29 @@ Phases 1-3 and D5 are done and hardware-passed (rounds 13-15).
 - Two smaller, separate failures: the entry list re-announces on every arrow move (B),
   and Ctrl+F/N/M announce nothing (F).
 
-**To do, each with its own hardware round**
+**To do**
 
-1. Fold the hint text into the label on Linux, keep `hint:` on Android — pin Android first.
-2. Entry list repeating itself on every arrow move.
-3. Shortcut feedback via `SemanticsService.announce()` (verified wired on Linux).
+1. **Outcome text folded into the label on Linux: DONE, hardware-passed (round 17).**
+   All six call sites (search, chips, folder and entry row in both layouts) compose
+   `"<name>. <what it does>"` on Linux; Android keeps its hint untouched. The search box
+   also names Ctrl+F and Ctrl+Shift+F — possible only because the wording is now split by
+   platform, and composed from the shortcuts screen's own strings, so no new translations.
+   Android is pinned by 9 net tests plus a 4-theme check that its placeholder still looks
+   identical. Mechanism and its two traps in LEARNINGS.md.
+2. **Delete regression, found by round 17 and fixed (hardware-passed).** Phase 3 mounted
+   the two-pane detail region only while an entry was selected; deleting cleared the
+   selection, unmounted the subtree mid-callback and swallowed the list reload, so the
+   deleted row stayed listed until the window was refocused. The region is now mounted
+   unconditionally (the empty pane has nothing focusable, so it is still not a Tab stop),
+   and the reload runs before the selection is cleared. The narrow layout also now honours
+   the injected delete, as it already does the injected fetch — that path was untestable.
+   New `test/vault_list_delete_refresh_test.dart` asserts the row leaves the list in both
+   layouts. **Caveat in LEARNINGS.md: it passes against the broken code too** — only
+   hardware sees this class of failure.
+3. Entry list repeating itself on every arrow move (round 16).
+4. Ticking a checkbox is announced only after moving away and back (round 17).
+5. Android: an entry row speaks its type twice (round 17).
+6. Shortcut feedback via `SemanticsService.announce()` (verified wired on Linux).
 
 **Merge gate:** master once a re-run of round 16 passes on Linux and the Android TalkBack
 spot-check stays green.
