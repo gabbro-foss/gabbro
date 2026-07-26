@@ -676,8 +676,6 @@ class _VaultListScreenState extends State<VaultListScreen>
   void _loadEntries() {
     try {
       final entries = widget.listEntries();
-      // TEMPORARY diagnostics (round 18) — remove once the cause is known.
-      debugPrint('GABBRO reload: vault returned ${entries.length} entries');
       List<String> folders = [];
       try {
         folders = (widget.listFolders ?? _defaultListFolders)();
@@ -692,8 +690,6 @@ class _VaultListScreenState extends State<VaultListScreen>
         }
       });
     } catch (e) {
-      // TEMPORARY diagnostics (round 18) — remove once the cause is known.
-      debugPrint('GABBRO reload FAILED: $e');
       setState(() {
         _error = e.toString();
         // Drop any retained decrypted summaries: if the load failed (e.g. the

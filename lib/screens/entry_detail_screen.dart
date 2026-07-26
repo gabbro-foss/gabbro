@@ -193,15 +193,19 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
       },
     );
     if (confirmed != true) return;
+    // Captured before the await: the two-pane layout drops this screen as soon
+    // as the entry leaves the filtered list, and the parent must still be told
+    // to reload — otherwise the deleted row sits in the list until something
+    // else forces a refresh (round 19). Only the Navigator use below needs a
+    // live context, so only it is guarded.
+    final onDeleted = widget.onDeleted;
     await widget.onDeleteEntry(_entryId());
-    // TEMPORARY diagnostics (round 18) — remove once the cause is known.
-    debugPrint('GABBRO delete: vault delete done, mounted=${context.mounted}');
-    if (!context.mounted) return;
-    if (widget.onDeleted != null) {
-      widget.onDeleted!();
-    } else {
-      Navigator.of(context).pop(true);
+    if (onDeleted != null) {
+      onDeleted();
+      return;
     }
+    if (!context.mounted) return;
+    Navigator.of(context).pop(true);
   }
 
   /// Export a file entry's bytes to a user-specified path.

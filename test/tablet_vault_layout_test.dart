@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gabbro/screens/entry_detail_screen.dart';
 import 'package:gabbro/screens/tablet_vault_layout.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
@@ -12,6 +13,8 @@ import 'test_helpers.dart';
 // drive the "entry vanished / session race" path that crashed on hardware.
 TabletVaultLayout _layout({
   required VaultEntryData Function(String id) getEntryFn,
+  Future<void> Function(String id)? onDeleteEntryFn,
+  void Function()? onRefresh,
 }) {
   final entry = EntrySummaryData(
     id: 'e1',
@@ -32,7 +35,8 @@ TabletVaultLayout _layout({
     filterChipRow: const SizedBox.shrink(),
     searchActive: false,
     onEntryTap: (_) {},
-    onRefresh: () {},
+    onRefresh: onRefresh ?? () {},
+    onDeleteEntryFn: onDeleteEntryFn,
     vaultPath: '/tmp/v.gabbro',
     clipboardClearTimeout: ClipboardClearTimeout.thirtySeconds,
     getEntryFn: getEntryFn,
@@ -54,6 +58,21 @@ void _setTablet(WidgetTester tester, {double? textScale}) {
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
   }
 }
+
+VaultEntryData _login(String id) => VaultEntryData.login(
+      LoginEntryData(
+        id: id,
+        title: 'Example',
+        url: '',
+        username: 'user@example.com',
+        password: 'secret',
+        notes: null,
+        customFields: const [],
+        createdAt: '2025-01-01T00:00:00Z',
+        updatedAt: '2025-01-01T00:00:00Z',
+        folder: '',
+      ),
+    );
 
 // getEntryFn is only invoked when an entry is tapped; these tests never tap, so
 // a throwing stub is never reached.
@@ -226,5 +245,35 @@ void main() {
         reason: 'a failed entry fetch must not throw during build');
     expect(find.text('Select an entry'), findsOneWidget,
         reason: 'the detail pane must fall back to the empty state');
+  });
+
+  // Net for the delete flow at this level: confirming a delete in the detail
+  // pane must tell the parent to reload the list AND clear the pane. Nothing
+  // pinned this here — the two-pane break found in round 17 was only visible
+  // on hardware.
+  testWidgets('deleting the selected entry reloads the list and clears the '
+      'detail pane', (tester) async {
+    _setTablet(tester);
+    var refreshes = 0;
+    await tester.pumpWidget(testApp(_layout(
+      getEntryFn: _login,
+      onDeleteEntryFn: (_) async {},
+      onRefresh: () => refreshes++,
+    )));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Example'));
+    await tester.pumpAndSettle();
+    expect(find.byType(EntryDetailScreen), findsOneWidget,
+        reason: 'sanity: the entry is open in the detail pane');
+
+    await tester.tap(find.byIcon(Icons.delete_outline));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete'));
+    await tester.pumpAndSettle();
+
+    expect(refreshes, 1, reason: 'the parent must be told to reload the list');
+    expect(find.text('Select an entry'), findsOneWidget,
+        reason: 'the detail pane must return to the empty state');
   });
 }

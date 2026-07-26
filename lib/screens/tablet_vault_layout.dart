@@ -256,16 +256,12 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
       clipboardClearTimeout: widget.clipboardClearTimeout,
       onDeleteEntry: widget.onDeleteEntryFn ?? (id) => deleteEntry(id: id),
       onDeleted: () {
-        // TEMPORARY diagnostics (round 18) — remove once the cause is known.
-        debugPrint('GABBRO delete: onDeleted entered');
         // Reload the list FIRST. It lives in the parent's state, so it must not
         // depend on this widget's own setState having succeeded — if that throws
         // (release builds swallow it), the deleted row would otherwise sit in
         // the list until something else forced a reload.
         widget.onRefresh();
-        debugPrint('GABBRO delete: onRefresh returned');
         setState(() => _selectedEntryId = null);
-        debugPrint('GABBRO delete: setState done');
       },
       onEdited: () => widget.onRefresh(),
     );
