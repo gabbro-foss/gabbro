@@ -121,43 +121,29 @@ Spec + mechanism as built: [KEYBOARD_NAV.md](KEYBOARD_NAV.md). **Linux desktop o
 "narrow/wide" = layout WIDTH, not platform. Hardware matrix in `.scratchpad`; every hardware
 failure and its cause is in LEARNINGS.md. Phases are hardware-tested one at a time.
 
-Phases 1-3 and D5 are done and hardware-passed (rounds 13-15).
+Phases 1-3, D5 and the Phase 4 control speech are done and hardware-passed (rounds 13-17).
 
-**Phase 4 — a11y: built and unit-green. Round 16 (Orca) run 2026-07-26 — Linux FAILED.**
+**Phase 4 — a11y. The constraint everything here obeys** (proven from the Flutter engine
+source, see LEARNINGS.md): on Linux a screen reader is given only a node's NAME. `hint` is
+never read and `liveRegion` is inert, so anything event-shaped has to go through
+`SemanticsService.announce()`. Android does read hints, passes today, and must not regress.
 
-- **Android TalkBack passed 4/4**; the control hints work there. No fix may regress it.
-- **Linux speaks no control hint at all** (matrix sections D and E). **One cause:** the
-  Linux embedder never reads a semantics node's `hint` and maps no live-region flag —
-  only the `label` reaches ATK. Proven from the Flutter engine source; see LEARNINGS.md.
-- Two smaller, separate failures: the entry list re-announces on every arrow move (B),
-  and Ctrl+F/N/M announce nothing (F).
+**To do** — four speech defects, all still open.
 
-**To do**
+1. The entry list repeats itself on every arrow move (round 16).
+2. Ticking a checkbox is announced only after moving away and back (round 17).
+3. Android: an entry row speaks its type twice (round 17).
+4. Ctrl+F/N/M announce nothing — needs `SemanticsService.announce()`, verified wired
+   on Linux (round 16).
 
-1. **Outcome text folded into the label on Linux: DONE, hardware-passed (round 17).**
-   All six call sites (search, chips, folder and entry row in both layouts) compose
-   `"<name>. <what it does>"` on Linux; Android keeps its hint untouched. The search box
-   also names Ctrl+F and Ctrl+Shift+F — possible only because the wording is now split by
-   platform, and composed from the shortcuts screen's own strings, so no new translations.
-   Android is pinned by 9 net tests plus a 4-theme check that its placeholder still looks
-   identical. Mechanism and its two traps in LEARNINGS.md.
-2. **Delete regression, found by round 17 and fixed (hardware-passed).** Phase 3 mounted
-   the two-pane detail region only while an entry was selected; deleting cleared the
-   selection, unmounted the subtree mid-callback and swallowed the list reload, so the
-   deleted row stayed listed until the window was refocused. The region is now mounted
-   unconditionally (the empty pane has nothing focusable, so it is still not a Tab stop),
-   and the reload runs before the selection is cleared. The narrow layout also now honours
-   the injected delete, as it already does the injected fetch — that path was untestable.
-   New `test/vault_list_delete_refresh_test.dart` asserts the row leaves the list in both
-   layouts. **Caveat in LEARNINGS.md: it passes against the broken code too** — only
-   hardware sees this class of failure.
-3. Entry list repeating itself on every arrow move (round 16).
-4. Ticking a checkbox is announced only after moving away and back (round 17).
-5. Android: an entry row speaks its type twice (round 17).
-6. Shortcut feedback via `SemanticsService.announce()` (verified wired on Linux).
+**Hardware lesson that outranks the rest:** round 17 caught a delete regression the
+widget harness cannot reproduce — a test written for that exact flow passes against the
+broken code. Every matrix from here on must demand the visible RESULT of the ordinary
+vault operations ("the row disappears"), never just "delete still works". See LEARNINGS.md.
 
-**Merge gate:** master once a re-run of round 16 passes on Linux and the Android TalkBack
-spot-check stays green.
+**Merge gate:** master once an Orca round covering the four above passes on Linux, the
+Android TalkBack spot-check stays green, and the matrix's core-vault-operations section
+passes.
 
 ---
 
