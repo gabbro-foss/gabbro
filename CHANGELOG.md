@@ -15,7 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
      finished: the a11y layer is not started. Nothing is added here until the branch
      merges. See ARCHITECTURE.md `### Next task`.
      At merge, add under Fixed: the folder selector was a 28dp tap target on a wide
-     window (the 48dp minimum was applied to the narrow layout only). -->
+     window (the 48dp minimum was applied to the narrow layout only).
+     At merge, add under Added: screen-reader support — every region is named and
+     announced (Linux), and the search box, category chips, folder selector and entry
+     rows say what they do, in all 37 languages. NOT yet hardware-tested. -->
 
 
 ## [0.1.0-alpha.16] – 2026-07-22

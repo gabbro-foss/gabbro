@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1837 | 10 |
+| Flutter (`flutter test`) | 1846 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -150,24 +150,37 @@ owns search/folder/chips, TabletVaultLayout owns list + detail.
 
 **Current task — Phase 4, a11y** (see below). Round 14 passed A-F on 2026-07-26.
 
-**Phase 4 — a11y. Net-first floor DONE; canon-TDD not started.** A screen-reader user
-hears the app instead of seeing it, and the visual frame is currently the only region
-cue. D5 splits the work: **both platforms** get a `Semantics` label/hint on every control
-(Orca and TalkBack alike); **Linux only** gets region labels, the "entering Folder list"
-announcement (`liveRegion`) and the focus-frame contrast check — there are no regions on
-Android to announce. Then an Orca pass on Linux.
+**Phase 4 — a11y. Code DONE and unit-green; NOT hardware-tested.** A screen-reader user
+hears the app instead of seeing it, so the visual frame can never be the only region cue.
+D5 splits it: control hints on **both platforms**, region names on **Linux only** (there
+are no regions on Android to announce).
 
-- **Net-first (green against current code).** The a11y net skipped `tablet_vault_layout`
-  outright, so the two-pane layout had no a11y coverage at all; it and a new wide
-  `vault_list` entry (the same screen at tablet width, reaching the two-pane branch
-  through its real call site) are now swept. `test/a11y_region_net_test.dart` holds the
-  targeted pins a sweep can't express: the semantics each control exposes today (a
-  wrapper stripped the text-size slider's adjust actions once), the absence Phase 4
-  fills (a region is silent, nothing is a `liveRegion`), the D5 negative on Android, and
-  the focus-frame contrast in all four themes. Both absence pins carry a
-  guard-on-the-guard.
-- **Fixed as it went:** the folder selector was a 28dp tap target on a wide window — the
-  48dp minimum had been applied to the narrow branch only. **Hardware-passed (round 15).**
+- **Built.** 9 new strings in all 37 locales. Hints — what a control *does*, not what it
+  is — on search, chips, folder selector and entry row (both layouts). `FocusRegion`
+  gained `label`/`showFrame` and emits a named `Semantics` container that is a
+  `liveRegion` **only while focused**, so exactly one region announces and Esc silences
+  it. Android rides the same gate as the frame: no label, no announcement.
+- **BLOCKED on hardware: round 16 needs Orca installed**, which waits for a full system
+  upgrade (no partial updates). The matrix is written in `.scratchpad`.
+- **Caveat that round 16 must settle.** `liveRegion` is documented for Android/iOS only —
+  Linux is not mentioned. On Linux the announcement should instead come from the region
+  being a *named container* (AT-SPI reads a container's name on focus entry). Section A
+  of the matrix is the guard: if Orca is silent there, nothing below it means anything.
+  The unit tests prove the label and flag are in the tree, never that Orca speaks.
+- **Android TalkBack unverified.** The control hints ship on Android too, but round 16 is
+  Linux-only. A TalkBack pass is still owed before merge.
+- **Net-first floor (built first, all green).** The a11y net skipped `tablet_vault_layout`
+  outright, so the two-pane layout had no a11y coverage at all; it and a wide `vault_list`
+  entry (same screen at tablet width, reaching the two-pane branch through its real call
+  site) are now swept. `test/a11y_region_net_test.dart` holds the pins a sweep can't
+  express: what each control exposes today, that an unlabelled region stays silent and an
+  untouched list announces nothing, the D5 negative on Android, and focus-frame contrast
+  in all four themes. Absence pins carry guards-on-the-guard.
+- **Two defects the net caught.** (1) The folder selector was a 28dp tap target on a wide
+  window — the 48dp minimum had been applied to the narrow branch only;
+  **hardware-passed (round 15).** (2) `MergeSemantics` (needed to get a hint onto a
+  `FilterChip`) merged the selection checkbox into the row when applied to `ListTile`,
+  costing the checkbox its "title, tick box" reading — a plain `Semantics` works there.
 
 **Merge gate:** master only once the Android gate and Phase 4 land and a full matrix passes.
 
