@@ -153,7 +153,8 @@ never be the only cue. D5 splits this in two, because regions only exist on Linu
    hardware that no headless test could see; causes are in LEARNINGS.md.
 4. **a11y layer** — control labels/hints on both platforms; region Semantics,
    region-entry announcement and focus-frame contrast on Linux only (D5); a11y-net
-   extension; Orca pass. NOT started.
+   extension; Orca pass. **Net-first floor done; canon-TDD not started** — see
+   ARCHITECTURE.md `### Next task`.
 
 Each phase: net-first (pin current behaviour), then canon-TDD, then hardware-test
 before moving on.
