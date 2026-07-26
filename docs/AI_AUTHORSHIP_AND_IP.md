@@ -48,10 +48,12 @@ architecture? — points firmly at yes for Gabbro as a whole.
 
 The following were human decisions, not AI suggestions:
 
-- The security boundary: secrets never cross the Flutter/Rust bridge in plaintext
+- The security boundary: keys never cross the Flutter/Rust bridge; only secrets the
+  user actively views do
 - The crypto stack: Argon2id → ML-KEM-1024 → AES-256-GCM
 - The hybrid PQC approach (belt and suspenders rationale — retracted, ADR-018)
-- The session model (Rust owns decrypted vault in memory; Flutter never holds it)
+- The session model (Rust owns the decrypted vault in memory; Flutter never holds the
+  decrypted vault)
 - The GPL-3.0-only licence and the reasoning behind it
 - The FIDO2/YubiKey-only authentication model (no TOTP)
 - The vault file format design

@@ -24,8 +24,9 @@ Named after the intrusive igneous rock — hard, stable, enduring.
   layer was removed as non-load-bearing (ADR-018)
 - **Hardware key (optional, recommended)** — FIDO2/YubiKey authentication; passphrase-only
   by default, with a minimum of two keys when keys are used (primary + backup)
-- **Rust for all secrets** — every cryptographic operation lives in
-  Rust; secrets never cross the Flutter/Rust bridge in plaintext
+- **Rust for all keys** — every cryptographic operation lives in Rust;
+  keys never cross the Flutter/Rust bridge. Secrets you view, generate
+  or autofill do reach Flutter in plaintext to be displayed
 - **Local-first** — your vault lives on your device; sync is your
   choice and your responsibility
 - **Localised** — UI available in many languages (EN, FR, DE, IT, ES, and more); follows system locale with in-app override
@@ -43,8 +44,8 @@ Named after the intrusive igneous rock — hard, stable, enduring.
 | Crypto & secrets | Rust |
 | Bridge | flutter_rust_bridge v2 (FFI) |
 
-The Flutter:Rust split follows a strict principle: if it touches a
-secret, it lives in Rust. Everything else lives in Flutter.
+The Flutter:Rust split follows a strict principle: if it touches a key,
+it lives in Rust. Everything else lives in Flutter.
 
 ---
 
