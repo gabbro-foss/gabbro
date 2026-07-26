@@ -380,11 +380,19 @@ class _VaultListScreenState extends State<VaultListScreen>
   // The folder dropdown's own node, so the 'folder' stop lands on it directly.
   final FocusNode _folderFocus = FocusNode(debugLabel: 'folder');
 
-  /// Wrap a Tab region in its FocusScope on desktop; pass the child through
-  /// UNCHANGED on Android. Keyboard navigation is Linux-desktop only and must
-  /// not alter the Android widget tree at all.
-  Widget _region(FocusScopeNode scope, Widget child) =>
-      widget.isAndroid ? child : FocusScope(node: scope, child: child);
+  /// Wrap a Tab region in its FocusScope plus the focus frame on desktop; pass
+  /// the child through UNCHANGED on Android. Keyboard navigation is
+  /// Linux-desktop only and must not alter the Android widget tree at all — so
+  /// scope and frame leave together, never one without the other.
+  /// [frame] is false for the search box, which lights up its OWN outline
+  /// instead (an overlay frame there gave a double border).
+  Widget _region(FocusScopeNode scope, Widget child, {bool frame = true}) {
+    if (widget.isAndroid) return child;
+    return FocusScope(
+      node: scope,
+      child: frame ? FocusRegion(child: child) : child,
+    );
+  }
 
   /// The Tab stops in cycle order for the current state. Folder appears only
   /// when there are folders. Detail appears only when the two-pane layout has
@@ -1483,15 +1491,18 @@ class _VaultListScreenState extends State<VaultListScreen>
     );
   }
 
-  // Shared by both layouts. FocusRegion draws the focus frame (dashed in
-  // high-contrast); the native TextField focus highlight is suppressed so the
-  // frame is the single indicator (no double border).
+  // Shared by both layouts. On desktop the field's own outline is the focus
+  // indicator (solid, or dashed + thicker in high-contrast). On Android there
+  // is no keyboard navigation, so it never highlights: focused and unfocused
+  // draw the same border, which also suppresses Material's own default.
   Widget _buildSearchField() {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final hc = theme.extension<GabbroContrast>()?.highContrast ?? false;
     final focusSide =
         BorderSide(color: theme.colorScheme.primary, width: hc ? 3 : 2);
+    final flat =
+        OutlineInputBorder(borderSide: BorderSide(color: theme.colorScheme.outline));
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
       child: TextField(
@@ -1520,8 +1531,12 @@ class _VaultListScreenState extends State<VaultListScreen>
           border: const OutlineInputBorder(),
           // The field's OWN outline is the focus indicator: it lights up solid
           // (normal) or dashed + thicker (high-contrast). One line that changes
-          // — no overlay frame, so no fade-double on Tab-in.
-          focusedBorder: hc
+          // — no overlay frame, so no fade-double on Tab-in. Android pins both
+          // states to the same flat outline: nothing lights up.
+          enabledBorder: widget.isAndroid ? flat : null,
+          focusedBorder: widget.isAndroid
+              ? flat
+              : hc
               ? DashedOutlineInputBorder(borderSide: focusSide)
               : OutlineInputBorder(borderSide: focusSide),
           isDense: true,
@@ -1532,10 +1547,11 @@ class _VaultListScreenState extends State<VaultListScreen>
     );
   }
 
+  // The focus frame comes from _region at the call sites, so it is absent on
+  // Android along with the rest of the keyboard wiring.
   Widget _buildFilterChipRow() {
     final l = AppLocalizations.of(context);
-    return FocusRegion(
-      child: Stack(
+    return Stack(
       alignment: Alignment.centerRight,
       children: [
         NotificationListener<ScrollMetricsNotification>(
@@ -1582,7 +1598,6 @@ class _VaultListScreenState extends State<VaultListScreen>
             ),
           ),
       ],
-      ),
     );
   }
 
@@ -1885,15 +1900,15 @@ class _VaultListScreenState extends State<VaultListScreen>
               // Region-wrap search / folder / chips here (VaultListScreen owns
               // these scopes); the list + detail scopes are passed in and wrapped
               // inside TabletVaultLayout. See reference two-layout-paths.
-              searchBar: _region(_searchScope, _buildSearchField()),
+              searchBar:
+                  _region(_searchScope, _buildSearchField(), frame: false),
               filterChipRow: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (_folders.isNotEmpty)
                     _region(
                       _folderScope,
-                      FocusRegion(
-                      child: Padding(
+                      Padding(
                       padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
                       child: DropdownButton<String>(
                         focusNode: _folderFocus,
@@ -1933,7 +1948,6 @@ class _VaultListScreenState extends State<VaultListScreen>
                       ),
                     ),
                     ),
-                    ),
                   _region(_chipsScope, _buildFilterChipRow()),
                 ],
               ),
@@ -1967,12 +1981,11 @@ class _VaultListScreenState extends State<VaultListScreen>
           final Widget body = SafeArea(
             child: Column(
               children: [
-                _region(_searchScope, _buildSearchField()),
+                _region(_searchScope, _buildSearchField(), frame: false),
                 if (_folders.isNotEmpty)
                   _region(
                     _folderScope,
-                    FocusRegion(
-                    child: Padding(
+                    Padding(
                     padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
                     child: DropdownButton<String>(
                       focusNode: _folderFocus,
@@ -2014,13 +2027,11 @@ class _VaultListScreenState extends State<VaultListScreen>
                     ),
                   ),
                   ),
-                  ),
                 _region(_chipsScope, _buildFilterChipRow()),
                 Expanded(
                   child: _region(
                     _listScope,
-                    FocusRegion(
-                    child: _groupedEntries.isEmpty
+                    _groupedEntries.isEmpty
                       ? Center(child: Text(l.noEntriesMatch))
                       : Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -2177,7 +2188,6 @@ class _VaultListScreenState extends State<VaultListScreen>
                               ),
                           ],
                         ),
-                  ),
                   ),
                 ),
               ],

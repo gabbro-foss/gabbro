@@ -46,6 +46,52 @@ Future<void> _pump(WidgetTester t) async {
   await t.pump(const Duration(milliseconds: 300));
 }
 
+/// A vault list with folders and two entries, so the folder region exists and
+/// search filtering is observable.
+VaultListScreen _screen({required bool isAndroid}) => VaultListScreen(
+  vaultPath: '/tmp/probe.gabbro',
+  isAndroid: isAndroid,
+  yubikeyRecords: const [],
+  listEntries: () => const [
+    EntrySummaryData(
+      id: 'e1',
+      entryType: 'login',
+      title: 'Alpha',
+      folder: 'Work',
+      searchBlob: '',
+    ),
+    EntrySummaryData(
+      id: 'e2',
+      entryType: 'login',
+      title: 'Bravo',
+      folder: 'Work',
+      searchBlob: '',
+    ),
+  ],
+  listFolders: () => const ['Work', 'Personal'],
+  onRefreshFn: () {},
+);
+
+Future<void> _pumpScreen(
+  WidgetTester t, {
+  required bool isAndroid,
+  Surface surface = phone,
+}) async {
+  t.view.physicalSize = surface.physical;
+  t.view.devicePixelRatio = surface.dpr;
+  addTearDown(t.view.resetPhysicalSize);
+  addTearDown(t.view.resetDevicePixelRatio);
+  await t.pumpWidget(appShell(_screen(isAndroid: isAndroid), textScale: 1.0));
+  await t.pump(const Duration(milliseconds: 300));
+}
+
+/// The search field's decoration — the only TextField on the vault list.
+InputDecoration _searchDecoration(WidgetTester t) =>
+    t.widget<TextField>(find.byType(TextField).first).decoration!;
+
+/// What the field draws when it is NOT focused.
+InputBorder? _unfocusedBorder(InputDecoration d) => d.enabledBorder ?? d.border;
+
 void main() {
   testWidgets('the chip row is a single Tab-stop', (tester) async {
     await _pump(tester);
@@ -108,5 +154,65 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
     expect(_hasRegionScope(tester), isFalse,
         reason: 'no keyboard-nav wiring may enter the Android widget tree');
+  });
+
+  // D5 — the focus highlight exists to serve keyboard navigation, which is
+  // Linux-desktop only. So NOTHING of it may appear on Android: no FocusRegion
+  // frame widgets, and a search field whose focused border equals its
+  // unfocused one (Material's own default suppressed too). N1/N2 pin what
+  // Linux must keep; R1-R3 are the Android change.
+  group('D5 focus highlight is Linux-only', () {
+    testWidgets('N1 desktop keeps a focus frame on folder, chips and list',
+        (tester) async {
+      await _pumpScreen(tester, isAndroid: false);
+      expect(find.byType(FocusRegion), findsAtLeast(3),
+          reason: 'folder, chips and list each draw a region frame on desktop');
+    });
+
+    testWidgets('N2 desktop search field lights up when focused',
+        (tester) async {
+      await _pumpScreen(tester, isAndroid: false);
+      final d = _searchDecoration(tester);
+      expect(d.focusedBorder, isNotNull);
+      expect(d.focusedBorder!.borderSide,
+          isNot(_unfocusedBorder(d)!.borderSide),
+          reason: 'the desktop search box is its own focus indicator');
+    });
+
+    testWidgets('R1 Android has NO focus frame, narrow', (tester) async {
+      await _pumpScreen(tester, isAndroid: true);
+      expect(find.byType(FocusRegion), findsNothing,
+          reason: 'no focus frame may enter the Android widget tree');
+    });
+
+    testWidgets('R1 Android has NO focus frame, wide', (tester) async {
+      await _pumpScreen(tester, isAndroid: true, surface: tablet);
+      expect(find.byType(FocusRegion), findsNothing,
+          reason: 'a wide Android device gains nothing from a focus frame');
+    });
+
+    testWidgets('R2 Android search field looks the same focused or not',
+        (tester) async {
+      await _pumpScreen(tester, isAndroid: true);
+      final d = _searchDecoration(tester);
+      expect(d.focusedBorder, isNotNull);
+      expect(_unfocusedBorder(d), isNotNull);
+      expect(d.focusedBorder!.borderSide, _unfocusedBorder(d)!.borderSide,
+          reason: 'tapping the Android search box must not highlight it');
+    });
+
+    testWidgets('R3 Android search still focuses, types and filters',
+        (tester) async {
+      await _pumpScreen(tester, isAndroid: true);
+      expect(find.text('Alpha'), findsOneWidget);
+      expect(find.text('Bravo'), findsOneWidget);
+      await tester.enterText(find.byType(TextField).first, 'Alph');
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(FocusManager.instance.primaryFocus?.hasFocus, isTrue,
+          reason: 'the field still takes focus so the keyboard opens');
+      expect(find.text('Alpha'), findsOneWidget);
+      expect(find.text('Bravo'), findsNothing,
+          reason: 'typing still filters the list');
+    });
   });
 }

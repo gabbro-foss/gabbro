@@ -424,6 +424,16 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
       ? child
       : FocusScope(node: scope, child: FocusRegion(child: child));
 
+  /// Whether keyboard navigation is live. The parent nulls the region scopes on
+  /// Android, where there is no keyboard — and then nothing keyboard-related,
+  /// the focus frame included, may appear anywhere in the tree.
+  bool get _keyboardNav => widget.listScope != null;
+
+  /// The nav rail is excluded from the Tab cycle (no scope of its own) but still
+  /// shows a frame when focus reaches it — on desktop only.
+  Widget _railFrame(Widget child) =>
+      _keyboardNav ? FocusRegion(child: child) : child;
+
   // Maximum list pane width: always leaves ≥200dp for the detail pane and
   // the navigation rail (~100dp combined). Grows naturally on wide screens.
   double _maxListPaneWidth(BuildContext context) =>
@@ -441,8 +451,8 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
     return Row(
       children: [
         // ── Navigation rail ────────────────────────────────────────────────
-        FocusRegion(
-          child: NavigationRail(
+        _railFrame(
+          NavigationRail(
           selectedIndex: _railIndex,
           onDestinationSelected: _onRailDestinationSelected,
           labelType: NavigationRailLabelType.all,
