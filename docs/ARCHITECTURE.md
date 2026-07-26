@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1865 | 10 |
+| Flutter (`flutter test`) | 1873 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -128,18 +128,27 @@ source, see LEARNINGS.md): on Linux a screen reader is given only a node's NAME.
 never read and `liveRegion` is inert, so anything event-shaped has to go through
 `SemanticsService.announce()`. Android does read hints, passes today, and must not regress.
 
-**To do** — four speech defects, all still open.
+**To do** — three speech defects.
 
 1. The entry list repeats itself on every arrow move (round 16).
 2. Ticking a checkbox is announced only after moving away and back (round 17).
-3. Android: an entry row speaks its type twice (round 17).
-4. Ctrl+F/N/M announce nothing — needs `SemanticsService.announce()`, verified wired
+3. Ctrl+F/N/M announce nothing — needs `SemanticsService.announce()`, verified wired
    on Linux (round 16).
 
-**Hardware lesson that outranks the rest:** round 17 caught a delete regression the
-widget harness cannot reproduce — a test written for that exact flow passes against the
-broken code. Every matrix from here on must demand the visible RESULT of the ordinary
-vault operations ("the row disappears"), never just "delete still works". See LEARNINGS.md.
+**Open, INTERMITTENT: a deleted entry sometimes stays in the two-pane list** until the
+window is refocused. Seen twice with Orca running, not reproducible on demand — and it
+passed a later Orca run both from the detail pane and from select-mode. The widget
+harness cannot reproduce it at all (`test/vault_list_delete_refresh_test.dart` passes
+against the broken code too). One captured log is from a WORKING run and shows the vault
+returning the right count, the reload running and the setState completing — so the data
+side is sound and the fault is later than that.
+
+- Two changes went in as hardening, NOT as a proven fix: the detail region is mounted
+  unconditionally (it was a `cond ? child : Wrapper(child)`, the known-bad pattern), and
+  the list reload runs before the selection is cleared.
+- **Temporary `debugPrint`s tagged `GABBRO` are in `tablet_vault_layout`, `vault_list_screen`
+  and `entry_detail_screen`. REMOVE BEFORE MERGE.** They stay until the fault recurs and a
+  failing log is captured — the missing line names the broken step in one pass.
 
 **Merge gate:** master once an Orca round covering the four above passes on Linux, the
 Android TalkBack spot-check stays green, and the matrix's core-vault-operations section
