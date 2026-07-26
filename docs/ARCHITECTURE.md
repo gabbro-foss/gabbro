@@ -139,12 +139,26 @@ never read and `liveRegion` is inert, so anything event-shaped has to go through
    frame stuck with Esc unable to clear it. **Its unit tests all passed** — they asserted
    the flag was on the row's node, which was true and irrelevant. The next attempt needs
    a different mechanism, and a hardware check before it is believed.
-2. Ctrl+N's dialog repeats its labels and never says "new entry" (round 16).
+2. **Ctrl+N's dialog repeats its labels** (round 16) — **cause found, one line.**
+   `_showTypePicker` gives the row icon `semanticLabel: t.$2`, the same text as the
+   row title, so each type is said twice. Identical to the round 18 entry-row fix.
+   The missing "new entry" is a separate lack: the sheet has no name, so it needs an
+   announce() from item 3.
 3. **Announcements — one package.** All of it needs `SemanticsService.announce()`
    (verified wired on Linux, round 16); none of it can be done with a named container.
-   - Ctrl+F, Ctrl+Shift+F, Ctrl+M and Ctrl+Q say nothing when pressed.
+   Reuses labels that already exist in all 37 locales — no new translations.
+   - Ctrl+F, Ctrl+Shift+F, Ctrl+M and Ctrl+Q say nothing when pressed; the new-entry
+     sheet does not say what it is.
    - The entry list repeats its region name on every arrow move — announcing region
-     entry explicitly replaces the named-container mechanism that causes it.
+     entry explicitly replaces the named-container mechanism that causes it. **This
+     sub-item is the risky one:** the named container is what makes region entry
+     audible at all today.
+
+**Cost, assessed 2026-07-26.** Item 2's duplicate label is quick and has a passed
+precedent. Item 3 is small, repetitive code whose real cost is that nothing counts
+until Orca says it. Item 1 is hard — one mechanism already failed on hardware while
+its unit tests passed. **Plan: item 2 + all of item 3 in one build, so a single Orca
+round covers them; then item 1 alone, with nothing else in the build.**
 
 **Merge gate:** master once an Orca round covering the three above passes on Linux, the
 Android TalkBack spot-check stays green, and the matrix's core-vault-operations section

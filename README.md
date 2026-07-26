@@ -323,6 +323,7 @@ Desktop-only; also listed in-app under the vault menu → **Keyboard shortcuts**
 | `Ctrl+L` | Lock the vault |
 | `Ctrl+N` | New entry |
 | `Ctrl+M` | Open the menu |
+| `Ctrl+Q` | Lock and quit (asks first) |
 | `Ctrl+F` | Focus search |
 | `Ctrl+Shift+F` | Search all fields |
 | `Tab` / `Shift+Tab` | Move between regions (search, folders, filters, list, detail) |
