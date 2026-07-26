@@ -128,12 +128,17 @@ source, see LEARNINGS.md): on Linux a screen reader is given only a node's NAME.
 never read and `liveRegion` is inert, so anything event-shaped has to go through
 `SemanticsService.announce()`. Android does read hints, passes today, and must not regress.
 
-**To do** — three speech defects.
+**To do**
 
-1. The entry list repeats itself on every arrow move (round 16).
-2. Ticking a checkbox is announced only after moving away and back (round 17).
-3. Ctrl+F/N/M announce nothing — needs `SemanticsService.announce()`, verified wired
-   on Linux (round 16).
+1. Ticking a checkbox is announced only after moving away and back (round 17).
+2. Ctrl+N's dialog repeats its labels and never says "new entry" (round 16).
+3. **Announcements — one package.** All of it needs `SemanticsService.announce()`
+   (verified wired on Linux, round 16); none of it can be done with a named container.
+   - Ctrl+F, Ctrl+Shift+F and Ctrl+M say nothing when pressed.
+   - **Ctrl+Q (lock and quit): add it here**, so every shortcut is wired, listed and
+     announced in one pass. Moved from the Bikeshed.
+   - The entry list repeats its region name on every arrow move — announcing region
+     entry explicitly replaces the named-container mechanism that causes it.
 
 **Open, INTERMITTENT: a deleted entry sometimes stays in the two-pane list** until the
 window is refocused. Seen twice with Orca running, not reproducible on demand — and it
@@ -169,13 +174,9 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 
 ### Features and UI/UX
 - Add fastlane images to README (at least some if not all)
-- Add `ctrl+q` to lock+quit the app as keyboard shortcut (`ctrl+m` done in the keyboard sweep)
 - **Remove the tablet NavigationRail** (`tablet_vault_layout.dart`: Vault /
   Appearance / Security / About). Redundant with the app-bar overflow menu (same
   targets), low utility. Already excluded from the keyboard Tab-cycle.
-- **Keyboard: arrow-key navigation within lists** (entry list, folder list, pickers) —
-  deferred sub-task of the keyboard-accessibility sweep. Tab/Enter/Esc/Ctrl+L/Ctrl+F
-  already shipped; arrows need a `FocusTraversalGroup` + directional focus per list.
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
