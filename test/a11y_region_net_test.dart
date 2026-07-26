@@ -399,6 +399,31 @@ void main() {
     });
   }
 
+  // ── H. An entry row must still say what TYPE it is ───────────────────────
+  // The type reaches a screen reader twice today (the row icon carries it as
+  // its label and the subtitle repeats it). Removing one of the two must not
+  // remove both: the type is how a user tells a card from a note without
+  // opening it. Green now, and green after the fix.
+
+  for (final platform in const [true, false]) {
+    final who = platform ? 'Android' : 'Linux';
+    for (final (name, surface) in const [('narrow', phone), ('wide', tablet)]) {
+      testWidgets('$who $name: an entry row still names its type', (t) async {
+        final handle = await pumpVaultList(
+          t,
+          isAndroid: platform,
+          surface: surface,
+        );
+        expect(
+          labelOf(t, find.text('Alpha')),
+          contains('login'),
+          reason: 'the row no longer says what kind of entry it is',
+        );
+        handle.dispose();
+      });
+    }
+  }
+
   // ── G. The search placeholder must look identical on both platforms ──────
   // The grey "Search entries…" text is also the box's NAME to a screen reader.
   // To speak that name before what the box does, Linux hands the placeholder

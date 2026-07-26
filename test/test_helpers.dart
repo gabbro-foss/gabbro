@@ -64,6 +64,12 @@ String hintOf(WidgetTester t, Finder finder) =>
 String labelOf(WidgetTester t, Finder finder) =>
     t.getSemantics(finder).getSemanticsData().label;
 
+/// How many times [needle] appears in [haystack]. Used to catch a screen reader
+/// being told the same thing twice by two different widgets.
+int occurrencesOf(String haystack, String needle) => needle.isEmpty
+    ? 0
+    : RegExp(RegExp.escape(needle)).allMatches(haystack).length;
+
 /// Installs a mock for the `Clipboard` platform channel and returns a growing
 /// list of every text written via `Clipboard.setData` — a copy writes the
 /// secret, the auto-clear writes an empty string. Used by the clipboard-clear

@@ -204,6 +204,30 @@ void main() {
     });
   }
 
+  // ── Nothing is said twice ────────────────────────────────────────────────
+  // The row icon carried the entry type as its label and the subtitle said it
+  // again, so a reader announced "card, amex, card, opens this entry". The
+  // subtitle is the one to keep: it is visible text as well as spoken.
+
+  for (final platform in const [true, false]) {
+    final who = platform ? 'Android' : 'Linux';
+    for (final (name, surface) in const [('narrow', phone), ('wide', tablet)]) {
+      testWidgets('$who $name: an entry row names its type once, not twice', (
+        t,
+      ) async {
+        final handle = await pumpDense(t, surface: surface, android: platform);
+        final label = labelOf(t, find.text('Apple'));
+        expect(
+          occurrencesOf(label, 'login'),
+          1,
+          reason: 'the row says what kind of entry it is more than once: '
+              '"${label.replaceAll('\n', ' / ')}"',
+        );
+        handle.dispose();
+      });
+    }
+  }
+
   // ── Linux only: the regions speak ────────────────────────────────────────
   // Tab moves between REGIONS, not controls, so a screen-reader user who Tabs
   // hears the newly-focused control with no idea they changed region. Entering

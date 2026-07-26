@@ -194,6 +194,8 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
     );
     if (confirmed != true) return;
     await widget.onDeleteEntry(_entryId());
+    // TEMPORARY diagnostics (round 18) — remove once the cause is known.
+    debugPrint('GABBRO delete: vault delete done, mounted=${context.mounted}');
     if (!context.mounted) return;
     if (widget.onDeleted != null) {
       widget.onDeleted!();

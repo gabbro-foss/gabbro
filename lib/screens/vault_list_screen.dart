@@ -676,6 +676,8 @@ class _VaultListScreenState extends State<VaultListScreen>
   void _loadEntries() {
     try {
       final entries = widget.listEntries();
+      // TEMPORARY diagnostics (round 18) — remove once the cause is known.
+      debugPrint('GABBRO reload: vault returned ${entries.length} entries');
       List<String> folders = [];
       try {
         folders = (widget.listFolders ?? _defaultListFolders)();
@@ -690,6 +692,8 @@ class _VaultListScreenState extends State<VaultListScreen>
         }
       });
     } catch (e) {
+      // TEMPORARY diagnostics (round 18) — remove once the cause is known.
+      debugPrint('GABBRO reload FAILED: $e');
       setState(() {
         _error = e.toString();
         // Drop any retained decrypted summaries: if the load failed (e.g. the
@@ -2237,16 +2241,17 @@ class _VaultListScreenState extends State<VaultListScreen>
                                               entry,
                                               _localizedDisplayTitle(entry, el),
                                             )
+                                          // No semanticLabel: the subtitle
+                                          // below already says the type, and
+                                          // labelling the icon too made a
+                                          // reader announce it twice
+                                          // ("card, amex, card").
                                           : Icon(
                                               _entryTypeIcon(entry.entryType),
                                               size: scaledIconSize(context, 20),
                                               color: Theme.of(
                                                 context,
                                               ).colorScheme.primary,
-                                              semanticLabel: _displayType(
-                                                entry.entryType,
-                                                el,
-                                              ),
                                             ),
                                       title: Text(
                                         _localizedDisplayTitle(entry, el),
