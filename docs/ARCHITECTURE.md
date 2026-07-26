@@ -130,7 +130,15 @@ never read and `liveRegion` is inert, so anything event-shaped has to go through
 
 **To do**
 
-1. Ticking a checkbox is announced only after moving away and back (round 17).
+1. **Ticking a checkbox is announced only after moving away and back** (round 17).
+   Cause established: the row takes focus but the checked state lives on a separate
+   checkbox node beneath it, and a reader only announces state changes on the FOCUSED
+   object. **One attempt was made and REVERTED (round 19).** Moving `checked` onto the
+   row's `Semantics` wrapper and excluding the checkbox made things worse on hardware:
+   Orca stopped announcing the row entirely, the title was no longer read, and a focus
+   frame stuck with Esc unable to clear it. **Its unit tests all passed** — they asserted
+   the flag was on the row's node, which was true and irrelevant. The next attempt needs
+   a different mechanism, and a hardware check before it is believed.
 2. Ctrl+N's dialog repeats its labels and never says "new entry" (round 16).
 3. **Announcements — one package.** All of it needs `SemanticsService.announce()`
    (verified wired on Linux, round 16); none of it can be done with a named container.
@@ -140,20 +148,30 @@ never read and `liveRegion` is inert, so anything event-shaped has to go through
    - The entry list repeats its region name on every arrow move — announcing region
      entry explicitly replaces the named-container mechanism that causes it.
 
-**Open, INTERMITTENT: a deleted entry sometimes stays in the two-pane list** until the
-window is refocused. Seen twice with Orca running, not reproducible on demand — and it
-passed a later Orca run both from the detail pane and from select-mode. The widget
-harness cannot reproduce it at all (`test/vault_list_delete_refresh_test.dart` passes
-against the broken code too). One captured log is from a WORKING run and shows the vault
-returning the right count, the reload running and the setState completing — so the data
-side is sound and the fault is later than that.
+**Open: a deleted entry stays in the two-pane list** until the window is refocused.
+Intermittent, needs Orca running; the widget harness cannot reproduce it at all
+(`test/vault_list_delete_refresh_test.dart` passes against the broken code too).
 
-- Two changes went in as hardening, NOT as a proven fix: the detail region is mounted
-  unconditionally (it was a `cond ? child : Wrapper(child)`, the known-bad pattern), and
-  the list reload runs before the selection is cleared.
+**CAUSE PROVEN (round 19 log), fix not yet written.** The failing run prints
+`delete: vault delete done, mounted=false`: the detail pane is disposed while the vault
+is still deleting, so `_confirmDelete`'s `if (!context.mounted) return;` bails out and
+`onDeleted` never runs — no reload, no cleared selection. The later reload in the log is
+the app-resume handler when the window was refocused. Likely trigger for the dispose:
+`TabletVaultLayout.didUpdateWidget` clears `_selectedEntryId` as soon as the entry leaves
+`filteredEntries`, which unmounts the detail pane mid-await.
+
+- **Fix designed:** capture `widget.onDeleted` *before* the await and call it regardless
+  of `context.mounted` — that guard should only cover uses of `context` (the
+  `Navigator.pop`). The parent's own `setState` guards itself with its own `mounted`, and
+  `onRefresh` is captured at build time so it survives the teardown. Testable headlessly:
+  pump the detail screen, start a delete that does not complete, replace the tree, then
+  complete it and assert the parent was still told.
+- Two earlier changes went in as hardening, NOT as a fix: the detail region is mounted
+  unconditionally (it was a `cond ? child : Wrapper(child)`), and the reload runs before
+  the selection is cleared.
 - **Temporary `debugPrint`s tagged `GABBRO` are in `tablet_vault_layout`, `vault_list_screen`
-  and `entry_detail_screen`. REMOVE BEFORE MERGE.** They stay until the fault recurs and a
-  failing log is captured — the missing line names the broken step in one pass.
+  and `entry_detail_screen`. REMOVE BEFORE MERGE** — keep them until the fix is
+  hardware-confirmed.
 
 **Merge gate:** master once an Orca round covering the four above passes on Linux, the
 Android TalkBack spot-check stays green, and the matrix's core-vault-operations section
