@@ -2125,4 +2125,31 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Изменить размер столбцов';
+
+  @override
+  String get regionSearch => 'Поиск';
+
+  @override
+  String get regionFolders => 'Папки';
+
+  @override
+  String get regionFilters => 'Категории записей';
+
+  @override
+  String get regionEntries => 'Список записей';
+
+  @override
+  String get regionDetails => 'Сведения о записи';
+
+  @override
+  String get hintSearch => 'Фильтрует записи по мере ввода';
+
+  @override
+  String get hintFolderSelector => 'Фильтрует записи по папке';
+
+  @override
+  String get hintFilterChip => 'Включает или отключает этот фильтр категории';
+
+  @override
+  String get hintEntryRow => 'Открывает эту запись';
 }

@@ -884,5 +884,15 @@
   "restoreFromFileButton": "Възстановяване от резервен файл",
   "vaultRestoredMessage": "Сейфът е възстановен. Отключете с вашите данни.",
   "restoreFromFileInvalidError": "Този файл не е използваем сейф на Gabbro.",
-  "resizeColumns": "Преоразмеряване на колоните"
+  "resizeColumns": "Преоразмеряване на колоните",
+
+  "regionSearch": "Търсене",
+  "regionFolders": "Папки",
+  "regionFilters": "Категории записи",
+  "regionEntries": "Списък със записи",
+  "regionDetails": "Детайли за записа",
+  "hintSearch": "Филтрира записите докато пишете",
+  "hintFolderSelector": "Филтрира записите по папка",
+  "hintFilterChip": "Включва или изключва този филтър по категория",
+  "hintEntryRow": "Отваря този запис"
 }

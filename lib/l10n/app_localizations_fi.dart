@@ -2119,4 +2119,32 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Muuta sarakkeiden kokoa';
+
+  @override
+  String get regionSearch => 'Haku';
+
+  @override
+  String get regionFolders => 'Kansiot';
+
+  @override
+  String get regionFilters => 'Merkintäluokat';
+
+  @override
+  String get regionEntries => 'Merkintäluettelo';
+
+  @override
+  String get regionDetails => 'Merkinnän tiedot';
+
+  @override
+  String get hintSearch => 'Suodattaa merkinnät kirjoittaessasi';
+
+  @override
+  String get hintFolderSelector => 'Suodattaa merkinnät kansion mukaan';
+
+  @override
+  String get hintFilterChip =>
+      'Ottaa tämän luokkasuodattimen käyttöön tai poistaa sen käytöstä';
+
+  @override
+  String get hintEntryRow => 'Avaa tämän merkinnän';
 }

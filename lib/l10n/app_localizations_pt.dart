@@ -2124,6 +2124,33 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Redimensionar colunas';
+
+  @override
+  String get regionSearch => 'Pesquisa';
+
+  @override
+  String get regionFolders => 'Pastas';
+
+  @override
+  String get regionFilters => 'Categorias de entradas';
+
+  @override
+  String get regionEntries => 'Lista de entradas';
+
+  @override
+  String get regionDetails => 'Detalhe da entrada';
+
+  @override
+  String get hintSearch => 'Filtra as entradas à medida que escreve';
+
+  @override
+  String get hintFolderSelector => 'Filtra as entradas por pasta';
+
+  @override
+  String get hintFilterChip => 'Ativa ou desativa este filtro de categoria';
+
+  @override
+  String get hintEntryRow => 'Abre esta entrada';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -4243,6 +4270,33 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get resizeColumns => 'Redimensionar colunas';
+
+  @override
+  String get regionSearch => 'Pesquisa';
+
+  @override
+  String get regionFolders => 'Pastas';
+
+  @override
+  String get regionFilters => 'Categorias de entradas';
+
+  @override
+  String get regionEntries => 'Lista de entradas';
+
+  @override
+  String get regionDetails => 'Detalhes da entrada';
+
+  @override
+  String get hintSearch => 'Filtra as entradas conforme você digita';
+
+  @override
+  String get hintFolderSelector => 'Filtra as entradas por pasta';
+
+  @override
+  String get hintFilterChip => 'Ativa ou desativa este filtro de categoria';
+
+  @override
+  String get hintEntryRow => 'Abre esta entrada';
 }
 
 /// The translations for Portuguese, as used in Portugal (`pt_PT`).
@@ -6368,4 +6422,31 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get resizeColumns => 'Redimensionar colunas';
+
+  @override
+  String get regionSearch => 'Pesquisa';
+
+  @override
+  String get regionFolders => 'Pastas';
+
+  @override
+  String get regionFilters => 'Categorias de entradas';
+
+  @override
+  String get regionEntries => 'Lista de entradas';
+
+  @override
+  String get regionDetails => 'Detalhe da entrada';
+
+  @override
+  String get hintSearch => 'Filtra as entradas à medida que escreve';
+
+  @override
+  String get hintFolderSelector => 'Filtra as entradas por pasta';
+
+  @override
+  String get hintFilterChip => 'Ativa ou desativa este filtro de categoria';
+
+  @override
+  String get hintEntryRow => 'Abre esta entrada';
 }

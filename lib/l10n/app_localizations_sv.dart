@@ -2114,4 +2114,31 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Ändra kolumnstorlek';
+
+  @override
+  String get regionSearch => 'Sökning';
+
+  @override
+  String get regionFolders => 'Mappar';
+
+  @override
+  String get regionFilters => 'Postkategorier';
+
+  @override
+  String get regionEntries => 'Postlista';
+
+  @override
+  String get regionDetails => 'Postdetaljer';
+
+  @override
+  String get hintSearch => 'Filtrerar posterna medan du skriver';
+
+  @override
+  String get hintFolderSelector => 'Filtrerar posterna efter mapp';
+
+  @override
+  String get hintFilterChip => 'Slår på eller av det här kategorifiltret';
+
+  @override
+  String get hintEntryRow => 'Öppnar den här posten';
 }

@@ -2129,4 +2129,31 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Ridimensiona colonne';
+
+  @override
+  String get regionSearch => 'Ricerca';
+
+  @override
+  String get regionFolders => 'Cartelle';
+
+  @override
+  String get regionFilters => 'Categorie di voci';
+
+  @override
+  String get regionEntries => 'Elenco voci';
+
+  @override
+  String get regionDetails => 'Dettaglio voce';
+
+  @override
+  String get hintSearch => 'Filtra le voci mentre digiti';
+
+  @override
+  String get hintFolderSelector => 'Filtra le voci per cartella';
+
+  @override
+  String get hintFilterChip => 'Attiva o disattiva questo filtro di categoria';
+
+  @override
+  String get hintEntryRow => 'Apre questa voce';
 }

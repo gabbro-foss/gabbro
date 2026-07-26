@@ -2126,4 +2126,31 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Kolommen aanpassen';
+
+  @override
+  String get regionSearch => 'Zoeken';
+
+  @override
+  String get regionFolders => 'Mappen';
+
+  @override
+  String get regionFilters => 'Itemcategorieën';
+
+  @override
+  String get regionEntries => 'Itemlijst';
+
+  @override
+  String get regionDetails => 'Itemdetails';
+
+  @override
+  String get hintSearch => 'Filtert de items terwijl u typt';
+
+  @override
+  String get hintFolderSelector => 'Filtert de items op map';
+
+  @override
+  String get hintFilterChip => 'Schakelt dit categoriefilter in of uit';
+
+  @override
+  String get hintEntryRow => 'Opent dit item';
 }

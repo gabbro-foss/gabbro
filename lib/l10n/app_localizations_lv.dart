@@ -2121,4 +2121,31 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Mainīt kolonnu izmērus';
+
+  @override
+  String get regionSearch => 'Meklēšana';
+
+  @override
+  String get regionFolders => 'Mapes';
+
+  @override
+  String get regionFilters => 'Ierakstu kategorijas';
+
+  @override
+  String get regionEntries => 'Ierakstu saraksts';
+
+  @override
+  String get regionDetails => 'Ieraksta detaļas';
+
+  @override
+  String get hintSearch => 'Filtrē ierakstus rakstīšanas laikā';
+
+  @override
+  String get hintFolderSelector => 'Filtrē ierakstus pēc mapes';
+
+  @override
+  String get hintFilterChip => 'Ieslēdz vai izslēdz šo kategorijas filtru';
+
+  @override
+  String get hintEntryRow => 'Atver šo ierakstu';
 }

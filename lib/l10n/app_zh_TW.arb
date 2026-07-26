@@ -883,5 +883,15 @@
   "restoreFromFileButton": "從備份檔案復原",
   "vaultRestoredMessage": "保險庫已復原。請使用你的憑證解鎖。",
   "restoreFromFileInvalidError": "該檔案不是可用的 Gabbro 保險庫。",
-  "resizeColumns": "調整欄寬"
+  "resizeColumns": "調整欄寬",
+
+  "regionSearch": "搜尋",
+  "regionFolders": "資料夾",
+  "regionFilters": "項目類別",
+  "regionEntries": "項目清單",
+  "regionDetails": "項目詳細資料",
+  "hintSearch": "輸入時篩選項目",
+  "hintFolderSelector": "依資料夾篩選項目",
+  "hintFilterChip": "開啟或關閉此類別篩選",
+  "hintEntryRow": "開啟此項目"
 }

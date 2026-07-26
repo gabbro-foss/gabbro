@@ -2118,4 +2118,31 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Změnit velikost sloupců';
+
+  @override
+  String get regionSearch => 'Hledání';
+
+  @override
+  String get regionFolders => 'Složky';
+
+  @override
+  String get regionFilters => 'Kategorie záznamů';
+
+  @override
+  String get regionEntries => 'Seznam záznamů';
+
+  @override
+  String get regionDetails => 'Detail záznamu';
+
+  @override
+  String get hintSearch => 'Filtruje záznamy během psaní';
+
+  @override
+  String get hintFolderSelector => 'Filtruje záznamy podle složky';
+
+  @override
+  String get hintFilterChip => 'Zapne nebo vypne tento filtr kategorie';
+
+  @override
+  String get hintEntryRow => 'Otevře tento záznam';
 }

@@ -883,5 +883,15 @@
   "restoreFromFileButton": "Сақтық көшірме файлынан қалпына келтіру",
   "vaultRestoredMessage": "Қойма қалпына келтірілді. Өз деректеріңізбен ашыңыз.",
   "restoreFromFileInvalidError": "Бұл файл жарамды Gabbro қоймасы емес.",
-  "resizeColumns": "Бағандар өлшемін өзгерту"
+  "resizeColumns": "Бағандар өлшемін өзгерту",
+
+  "regionSearch": "Іздеу",
+  "regionFolders": "Қалталар",
+  "regionFilters": "Жазба санаттары",
+  "regionEntries": "Жазбалар тізімі",
+  "regionDetails": "Жазба мәліметтері",
+  "hintSearch": "Терген кезде жазбаларды сүзеді",
+  "hintFolderSelector": "Жазбаларды қалта бойынша сүзеді",
+  "hintFilterChip": "Осы санат сүзгісін қосады немесе өшіреді",
+  "hintEntryRow": "Осы жазбаны ашады"
 }

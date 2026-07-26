@@ -136,10 +136,24 @@ class DashedOutlineInputBorder extends OutlineInputBorder {
 /// focus. The frame is the qtile-style "which area am I in" cue; individual
 /// items keep their own selection highlight. Colour is the theme primary; the
 /// high-contrast variant is dashed and thicker (see [focusFrameStyle]).
+/// [label] names the region to a screen reader and is announced when focus
+/// enters it — the audible counterpart of the frame, so a user who cannot see
+/// the frame still knows which region Tab moved them to. Null means the region
+/// stays silent. [showFrame] is false for the search box, which lights up its
+/// OWN outline instead (an overlay frame there gave a double border) but still
+/// needs to announce itself.
 class FocusRegion extends StatefulWidget {
   final Widget child;
   final double radius;
-  const FocusRegion({super.key, required this.child, this.radius = 8});
+  final String? label;
+  final bool showFrame;
+  const FocusRegion({
+    super.key,
+    required this.child,
+    this.radius = 8,
+    this.label,
+    this.showFrame = true,
+  });
 
   @override
   State<FocusRegion> createState() => _FocusRegionState();
@@ -158,17 +172,29 @@ class _FocusRegionState extends State<FocusRegion> {
       highContrast: highContrast,
       color: theme.colorScheme.primary,
     );
+    Widget content = CustomPaint(
+      foregroundPainter: style == null || !widget.showFrame
+          ? null
+          : FocusFramePainter(style, radius: widget.radius),
+      child: widget.child,
+    );
+    // liveRegion only while focused, so exactly one region announces itself and
+    // leaving the cycle (Esc) silences it again.
+    if (widget.label != null) {
+      content = Semantics(
+        container: true,
+        label: widget.label,
+        liveRegion: _focused,
+        child: content,
+      );
+    }
     return Focus(
       canRequestFocus: false,
       skipTraversal: true,
       onFocusChange: (hasFocus) {
         if (hasFocus != _focused) setState(() => _focused = hasFocus);
       },
-      child: CustomPaint(
-        foregroundPainter:
-            style == null ? null : FocusFramePainter(style, radius: widget.radius),
-        child: widget.child,
-      ),
+      child: content,
     );
   }
 }

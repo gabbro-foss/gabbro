@@ -883,5 +883,15 @@
   "restoreFromFileButton": "Ripristina da un file di backup",
   "vaultRestoredMessage": "Cassaforte ripristinata. Sblocca con le tue credenziali.",
   "restoreFromFileInvalidError": "Questo file non è una cassaforte Gabbro utilizzabile.",
-  "resizeColumns": "Ridimensiona colonne"
+  "resizeColumns": "Ridimensiona colonne",
+
+  "regionSearch": "Ricerca",
+  "regionFolders": "Cartelle",
+  "regionFilters": "Categorie di voci",
+  "regionEntries": "Elenco voci",
+  "regionDetails": "Dettaglio voce",
+  "hintSearch": "Filtra le voci mentre digiti",
+  "hintFolderSelector": "Filtra le voci per cartella",
+  "hintFilterChip": "Attiva o disattiva questo filtro di categoria",
+  "hintEntryRow": "Apre questa voce"
 }

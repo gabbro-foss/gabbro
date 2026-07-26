@@ -884,5 +884,15 @@
   "restoreFromFileButton": "Helyreállítás biztonsági mentési fájlból",
   "vaultRestoredMessage": "Széf helyreállítva. Oldja fel a hitelesítő adataival.",
   "restoreFromFileInvalidError": "Ez a fájl nem használható Gabbro-széf.",
-  "resizeColumns": "Oszlopok átméretezése"
+  "resizeColumns": "Oszlopok átméretezése",
+
+  "regionSearch": "Keresés",
+  "regionFolders": "Mappák",
+  "regionFilters": "Bejegyzéskategóriák",
+  "regionEntries": "Bejegyzéslista",
+  "regionDetails": "Bejegyzés részletei",
+  "hintSearch": "Gépelés közben szűri a bejegyzéseket",
+  "hintFolderSelector": "Mappa szerint szűri a bejegyzéseket",
+  "hintFilterChip": "Be- vagy kikapcsolja ezt a kategóriaszűrőt",
+  "hintEntryRow": "Megnyitja ezt a bejegyzést"
 }

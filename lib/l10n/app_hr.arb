@@ -883,5 +883,15 @@
   "restoreFromFileButton": "Vrati iz datoteke sigurnosne kopije",
   "vaultRestoredMessage": "Trezor vraćen. Otključajte svojim vjerodajnicama.",
   "restoreFromFileInvalidError": "Ta datoteka nije upotrebljiv Gabbro trezor.",
-  "resizeColumns": "Promijeni veličinu stupaca"
+  "resizeColumns": "Promijeni veličinu stupaca",
+
+  "regionSearch": "Pretraga",
+  "regionFolders": "Mape",
+  "regionFilters": "Kategorije unosa",
+  "regionEntries": "Popis unosa",
+  "regionDetails": "Pojedinosti unosa",
+  "hintSearch": "Filtrira unose dok tipkate",
+  "hintFolderSelector": "Filtrira unose po mapi",
+  "hintFilterChip": "Uključuje ili isključuje ovaj filtar kategorije",
+  "hintEntryRow": "Otvara ovaj unos"
 }

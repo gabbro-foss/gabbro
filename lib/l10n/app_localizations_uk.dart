@@ -2126,4 +2126,31 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Змінити розмір стовпців';
+
+  @override
+  String get regionSearch => 'Пошук';
+
+  @override
+  String get regionFolders => 'Папки';
+
+  @override
+  String get regionFilters => 'Категорії записів';
+
+  @override
+  String get regionEntries => 'Список записів';
+
+  @override
+  String get regionDetails => 'Відомості про запис';
+
+  @override
+  String get hintSearch => 'Фільтрує записи під час введення';
+
+  @override
+  String get hintFolderSelector => 'Фільтрує записи за папкою';
+
+  @override
+  String get hintFilterChip => 'Вмикає або вимикає цей фільтр категорії';
+
+  @override
+  String get hintEntryRow => 'Відкриває цей запис';
 }

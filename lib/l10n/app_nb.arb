@@ -884,5 +884,15 @@
   "restoreFromFileButton": "Gjenopprett fra en sikkerhetskopifil",
   "vaultRestoredMessage": "Hvelv gjenopprettet. Lås opp med påloggingsinformasjonen din.",
   "restoreFromFileInvalidError": "Den filen er ikke et brukbart Gabbro-hvelv.",
-  "resizeColumns": "Endre kolonnestørrelse"
+  "resizeColumns": "Endre kolonnestørrelse",
+
+  "regionSearch": "Søk",
+  "regionFolders": "Mapper",
+  "regionFilters": "Oppføringskategorier",
+  "regionEntries": "Oppføringsliste",
+  "regionDetails": "Oppføringsdetaljer",
+  "hintSearch": "Filtrerer oppføringene mens du skriver",
+  "hintFolderSelector": "Filtrerer oppføringene etter mappe",
+  "hintFilterChip": "Slår dette kategorifilteret av eller på",
+  "hintEntryRow": "Åpner denne oppføringen"
 }

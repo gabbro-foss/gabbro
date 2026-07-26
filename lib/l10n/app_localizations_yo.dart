@@ -2117,4 +2117,31 @@ class AppLocalizationsYo extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Ṣàtúnṣe ìwọ̀n àwọn ọ̀wọ́n';
+
+  @override
+  String get regionSearch => 'Ṣawari';
+
+  @override
+  String get regionFolders => 'Awọn folda';
+
+  @override
+  String get regionFilters => 'Awọn ẹka titẹ sii';
+
+  @override
+  String get regionEntries => 'Atokọ titẹ sii';
+
+  @override
+  String get regionDetails => 'Alaye titẹ sii';
+
+  @override
+  String get hintSearch => 'Ṣe ayẹwo awọn titẹ sii bi o ṣe ń tẹ';
+
+  @override
+  String get hintFolderSelector => 'Ṣe ayẹwo awọn titẹ sii nipa folda';
+
+  @override
+  String get hintFilterChip => 'Tan tabi pa asẹ ẹka yii';
+
+  @override
+  String get hintEntryRow => 'Ṣi titẹ sii yii';
 }

@@ -2121,4 +2121,31 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Spremeni velikost stolpcev';
+
+  @override
+  String get regionSearch => 'Iskanje';
+
+  @override
+  String get regionFolders => 'Mape';
+
+  @override
+  String get regionFilters => 'Kategorije vnosov';
+
+  @override
+  String get regionEntries => 'Seznam vnosov';
+
+  @override
+  String get regionDetails => 'Podrobnosti vnosa';
+
+  @override
+  String get hintSearch => 'Filtrira vnose med tipkanjem';
+
+  @override
+  String get hintFolderSelector => 'Filtrira vnose po mapi';
+
+  @override
+  String get hintFilterChip => 'Vklopi ali izklopi ta filter kategorije';
+
+  @override
+  String get hintEntryRow => 'Odpre ta vnos';
 }

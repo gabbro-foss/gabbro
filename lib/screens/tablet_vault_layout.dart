@@ -358,7 +358,15 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
                               ),
                               child: Material(
                                 color: Colors.transparent,
-                                child: ListTile(
+                                // Selection mode taps the row to tick it, so the
+                                // "opens this entry" hint would then be a lie.
+                                child: Semantics(
+                                  hint: widget.selectionMode
+                                      ? null
+                                      : AppLocalizations.of(
+                                          context,
+                                        ).hintEntryRow,
+                                  child: ListTile(
                                 dense: true,
                                 leading: widget.selectionMode
                                     // Label the checkbox with the entry title so
@@ -403,6 +411,7 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
                                   );
                                   widget.onEntryTap(entry.id);
                                 },
+                                  ),
                                 ),
                               ),
                             );
@@ -412,6 +421,7 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
                     ),
                   ],
                 ),
+            label: AppLocalizations.of(context).regionEntries,
           ),
         ),
       ],
@@ -419,10 +429,15 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
   }
 
   /// Wrap a pane in its Tab-cycle region (FocusScope for identity + FocusRegion
-  /// for the focus frame). Pass-through when [scope] is null (Android).
-  Widget _region(FocusScopeNode? scope, Widget child) => scope == null
+  /// for the focus frame and the spoken region name). Pass-through when [scope]
+  /// is null (Android) — so the announcement rides the same gate as the frame.
+  Widget _region(FocusScopeNode? scope, Widget child, {String? label}) =>
+      scope == null
       ? child
-      : FocusScope(node: scope, child: FocusRegion(child: child));
+      : FocusScope(
+          node: scope,
+          child: FocusRegion(label: label, child: child),
+        );
 
   /// Whether keyboard navigation is live. The parent nulls the region scopes on
   /// Android, where there is no keyboard — and then nothing keyboard-related,
@@ -557,7 +572,11 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
         Expanded(
           child: _selectedEntryId == null
               ? _buildDetailPane(context)
-              : _region(widget.detailScope, _buildDetailPane(context)),
+              : _region(
+                  widget.detailScope,
+                  _buildDetailPane(context),
+                  label: AppLocalizations.of(context).regionDetails,
+                ),
         ),
       ],
     );

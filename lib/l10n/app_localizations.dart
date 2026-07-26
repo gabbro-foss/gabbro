@@ -3912,6 +3912,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Resize columns'**
   String get resizeColumns;
+
+  /// No description provided for @regionSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get regionSearch;
+
+  /// No description provided for @regionFolders.
+  ///
+  /// In en, this message translates to:
+  /// **'Folders'**
+  String get regionFolders;
+
+  /// No description provided for @regionFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Entry categories'**
+  String get regionFilters;
+
+  /// No description provided for @regionEntries.
+  ///
+  /// In en, this message translates to:
+  /// **'Entry list'**
+  String get regionEntries;
+
+  /// No description provided for @regionDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Entry detail'**
+  String get regionDetails;
+
+  /// No description provided for @hintSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters the entries as you type'**
+  String get hintSearch;
+
+  /// No description provided for @hintFolderSelector.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters the entries by folder'**
+  String get hintFolderSelector;
+
+  /// No description provided for @hintFilterChip.
+  ///
+  /// In en, this message translates to:
+  /// **'Turns this category filter on or off'**
+  String get hintFilterChip;
+
+  /// No description provided for @hintEntryRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Opens this entry'**
+  String get hintEntryRow;
 }
 
 class _AppLocalizationsDelegate

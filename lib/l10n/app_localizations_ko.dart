@@ -2060,4 +2060,31 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get resizeColumns => '열 크기 조정';
+
+  @override
+  String get regionSearch => '검색';
+
+  @override
+  String get regionFolders => '폴더';
+
+  @override
+  String get regionFilters => '항목 범주';
+
+  @override
+  String get regionEntries => '항목 목록';
+
+  @override
+  String get regionDetails => '항목 세부정보';
+
+  @override
+  String get hintSearch => '입력하는 대로 항목을 필터링합니다';
+
+  @override
+  String get hintFolderSelector => '폴더별로 항목을 필터링합니다';
+
+  @override
+  String get hintFilterChip => '이 범주 필터를 켜거나 끕니다';
+
+  @override
+  String get hintEntryRow => '이 항목을 엽니다';
 }

@@ -884,5 +884,15 @@
   "restoreFromFileButton": "Відновити з файлу резервної копії",
   "vaultRestoredMessage": "Сховище відновлено. Розблокуйте за допомогою своїх облікових даних.",
   "restoreFromFileInvalidError": "Цей файл не є придатним сховищем Gabbro.",
-  "resizeColumns": "Змінити розмір стовпців"
+  "resizeColumns": "Змінити розмір стовпців",
+
+  "regionSearch": "Пошук",
+  "regionFolders": "Папки",
+  "regionFilters": "Категорії записів",
+  "regionEntries": "Список записів",
+  "regionDetails": "Відомості про запис",
+  "hintSearch": "Фільтрує записи під час введення",
+  "hintFolderSelector": "Фільтрує записи за папкою",
+  "hintFilterChip": "Вмикає або вимикає цей фільтр категорії",
+  "hintEntryRow": "Відкриває цей запис"
 }

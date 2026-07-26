@@ -2027,6 +2027,33 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get resizeColumns => '调整列宽';
+
+  @override
+  String get regionSearch => '搜索';
+
+  @override
+  String get regionFolders => '文件夹';
+
+  @override
+  String get regionFilters => '条目类别';
+
+  @override
+  String get regionEntries => '条目列表';
+
+  @override
+  String get regionDetails => '条目详情';
+
+  @override
+  String get hintSearch => '输入时筛选条目';
+
+  @override
+  String get hintFolderSelector => '按文件夹筛选条目';
+
+  @override
+  String get hintFilterChip => '打开或关闭此类别筛选';
+
+  @override
+  String get hintEntryRow => '打开此条目';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -4052,6 +4079,33 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get resizeColumns => '调整列宽';
+
+  @override
+  String get regionSearch => '搜索';
+
+  @override
+  String get regionFolders => '文件夹';
+
+  @override
+  String get regionFilters => '条目类别';
+
+  @override
+  String get regionEntries => '条目列表';
+
+  @override
+  String get regionDetails => '条目详情';
+
+  @override
+  String get hintSearch => '输入时筛选条目';
+
+  @override
+  String get hintFolderSelector => '按文件夹筛选条目';
+
+  @override
+  String get hintFilterChip => '打开或关闭此类别筛选';
+
+  @override
+  String get hintEntryRow => '打开此条目';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -6077,4 +6131,31 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get resizeColumns => '調整欄寬';
+
+  @override
+  String get regionSearch => '搜尋';
+
+  @override
+  String get regionFolders => '資料夾';
+
+  @override
+  String get regionFilters => '項目類別';
+
+  @override
+  String get regionEntries => '項目清單';
+
+  @override
+  String get regionDetails => '項目詳細資料';
+
+  @override
+  String get hintSearch => '輸入時篩選項目';
+
+  @override
+  String get hintFolderSelector => '依資料夾篩選項目';
+
+  @override
+  String get hintFilterChip => '開啟或關閉此類別篩選';
+
+  @override
+  String get hintEntryRow => '開啟此項目';
 }

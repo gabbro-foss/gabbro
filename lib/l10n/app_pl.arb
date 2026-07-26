@@ -884,5 +884,15 @@
   "restoreFromFileButton": "Przywróć z pliku kopii zapasowej",
   "vaultRestoredMessage": "Sejf przywrócony. Odblokuj swoimi danymi.",
   "restoreFromFileInvalidError": "Ten plik nie jest prawidłowym sejfem Gabbro.",
-  "resizeColumns": "Zmień rozmiar kolumn"
+  "resizeColumns": "Zmień rozmiar kolumn",
+
+  "regionSearch": "Wyszukiwanie",
+  "regionFolders": "Foldery",
+  "regionFilters": "Kategorie wpisów",
+  "regionEntries": "Lista wpisów",
+  "regionDetails": "Szczegóły wpisu",
+  "hintSearch": "Filtruje wpisy podczas pisania",
+  "hintFolderSelector": "Filtruje wpisy według folderu",
+  "hintFilterChip": "Włącza lub wyłącza ten filtr kategorii",
+  "hintEntryRow": "Otwiera ten wpis"
 }

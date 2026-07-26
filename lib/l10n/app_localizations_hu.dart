@@ -2124,4 +2124,31 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Oszlopok átméretezése';
+
+  @override
+  String get regionSearch => 'Keresés';
+
+  @override
+  String get regionFolders => 'Mappák';
+
+  @override
+  String get regionFilters => 'Bejegyzéskategóriák';
+
+  @override
+  String get regionEntries => 'Bejegyzéslista';
+
+  @override
+  String get regionDetails => 'Bejegyzés részletei';
+
+  @override
+  String get hintSearch => 'Gépelés közben szűri a bejegyzéseket';
+
+  @override
+  String get hintFolderSelector => 'Mappa szerint szűri a bejegyzéseket';
+
+  @override
+  String get hintFilterChip => 'Be- vagy kikapcsolja ezt a kategóriaszűrőt';
+
+  @override
+  String get hintEntryRow => 'Megnyitja ezt a bejegyzést';
 }

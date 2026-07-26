@@ -2141,4 +2141,32 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Αλλαγή μεγέθους στηλών';
+
+  @override
+  String get regionSearch => 'Αναζήτηση';
+
+  @override
+  String get regionFolders => 'Φάκελοι';
+
+  @override
+  String get regionFilters => 'Κατηγορίες καταχωρίσεων';
+
+  @override
+  String get regionEntries => 'Λίστα καταχωρίσεων';
+
+  @override
+  String get regionDetails => 'Λεπτομέρειες καταχώρισης';
+
+  @override
+  String get hintSearch => 'Φιλτράρει τις καταχωρίσεις καθώς πληκτρολογείτε';
+
+  @override
+  String get hintFolderSelector => 'Φιλτράρει τις καταχωρίσεις ανά φάκελο';
+
+  @override
+  String get hintFilterChip =>
+      'Ενεργοποιεί ή απενεργοποιεί αυτό το φίλτρο κατηγορίας';
+
+  @override
+  String get hintEntryRow => 'Ανοίγει αυτήν την καταχώριση';
 }

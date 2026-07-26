@@ -2128,4 +2128,31 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Zmień rozmiar kolumn';
+
+  @override
+  String get regionSearch => 'Wyszukiwanie';
+
+  @override
+  String get regionFolders => 'Foldery';
+
+  @override
+  String get regionFilters => 'Kategorie wpisów';
+
+  @override
+  String get regionEntries => 'Lista wpisów';
+
+  @override
+  String get regionDetails => 'Szczegóły wpisu';
+
+  @override
+  String get hintSearch => 'Filtruje wpisy podczas pisania';
+
+  @override
+  String get hintFolderSelector => 'Filtruje wpisy według folderu';
+
+  @override
+  String get hintFilterChip => 'Włącza lub wyłącza ten filtr kategorii';
+
+  @override
+  String get hintEntryRow => 'Otwiera ten wpis';
 }

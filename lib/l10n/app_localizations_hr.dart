@@ -2117,4 +2117,32 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Promijeni veličinu stupaca';
+
+  @override
+  String get regionSearch => 'Pretraga';
+
+  @override
+  String get regionFolders => 'Mape';
+
+  @override
+  String get regionFilters => 'Kategorije unosa';
+
+  @override
+  String get regionEntries => 'Popis unosa';
+
+  @override
+  String get regionDetails => 'Pojedinosti unosa';
+
+  @override
+  String get hintSearch => 'Filtrira unose dok tipkate';
+
+  @override
+  String get hintFolderSelector => 'Filtrira unose po mapi';
+
+  @override
+  String get hintFilterChip =>
+      'Uključuje ili isključuje ovaj filtar kategorije';
+
+  @override
+  String get hintEntryRow => 'Otvara ovaj unos';
 }

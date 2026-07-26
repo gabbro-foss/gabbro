@@ -884,5 +884,15 @@
   "restoreFromFileButton": "Gjenopprett frå ei tryggleikskopifil",
   "vaultRestoredMessage": "Kvelv gjenoppretta. Lås opp med innloggingsinformasjonen din.",
   "restoreFromFileInvalidError": "Den fila er ikkje eit brukbart Gabbro-kvelv.",
-  "resizeColumns": "Endre kolonnestorleik"
+  "resizeColumns": "Endre kolonnestorleik",
+
+  "regionSearch": "Søk",
+  "regionFolders": "Mapper",
+  "regionFilters": "Oppføringskategoriar",
+  "regionEntries": "Oppføringsliste",
+  "regionDetails": "Oppføringsdetaljar",
+  "hintSearch": "Filtrerer oppføringane medan du skriv",
+  "hintFolderSelector": "Filtrerer oppføringane etter mappe",
+  "hintFilterChip": "Slår dette kategorifilteret av eller på",
+  "hintEntryRow": "Opnar denne oppføringa"
 }

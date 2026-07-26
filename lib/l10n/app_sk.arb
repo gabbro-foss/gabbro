@@ -883,5 +883,15 @@
   "restoreFromFileButton": "Obnoviť zo záložného súboru",
   "vaultRestoredMessage": "Trezor obnovený. Odomknite pomocou svojich prihlasovacích údajov.",
   "restoreFromFileInvalidError": "Tento súbor nie je použiteľný trezor Gabbro.",
-  "resizeColumns": "Zmeniť veľkosť stĺpcov"
+  "resizeColumns": "Zmeniť veľkosť stĺpcov",
+
+  "regionSearch": "Hľadanie",
+  "regionFolders": "Priečinky",
+  "regionFilters": "Kategórie záznamov",
+  "regionEntries": "Zoznam záznamov",
+  "regionDetails": "Podrobnosti záznamu",
+  "hintSearch": "Filtruje záznamy počas písania",
+  "hintFolderSelector": "Filtruje záznamy podľa priečinka",
+  "hintFilterChip": "Zapne alebo vypne tento filter kategórie",
+  "hintEntryRow": "Otvorí tento záznam"
 }

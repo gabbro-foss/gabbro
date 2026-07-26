@@ -883,5 +883,15 @@
   "restoreFromFileButton": "Aus einer Sicherungsdatei wiederherstellen",
   "vaultRestoredMessage": "Tresor wiederhergestellt. Entsperren Sie mit Ihren Zugangsdaten.",
   "restoreFromFileInvalidError": "Diese Datei ist kein verwendbarer Gabbro-Tresor.",
-  "resizeColumns": "Spalten anpassen"
+  "resizeColumns": "Spalten anpassen",
+
+  "regionSearch": "Suche",
+  "regionFolders": "Ordner",
+  "regionFilters": "Eintragskategorien",
+  "regionEntries": "Eintragsliste",
+  "regionDetails": "Eintragsdetails",
+  "hintSearch": "Filtert die Einträge während der Eingabe",
+  "hintFolderSelector": "Filtert die Einträge nach Ordner",
+  "hintFilterChip": "Schaltet diesen Kategoriefilter ein oder aus",
+  "hintEntryRow": "Öffnet diesen Eintrag"
 }

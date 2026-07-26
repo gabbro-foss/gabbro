@@ -2118,4 +2118,31 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Бағандар өлшемін өзгерту';
+
+  @override
+  String get regionSearch => 'Іздеу';
+
+  @override
+  String get regionFolders => 'Қалталар';
+
+  @override
+  String get regionFilters => 'Жазба санаттары';
+
+  @override
+  String get regionEntries => 'Жазбалар тізімі';
+
+  @override
+  String get regionDetails => 'Жазба мәліметтері';
+
+  @override
+  String get hintSearch => 'Терген кезде жазбаларды сүзеді';
+
+  @override
+  String get hintFolderSelector => 'Жазбаларды қалта бойынша сүзеді';
+
+  @override
+  String get hintFilterChip => 'Осы санат сүзгісін қосады немесе өшіреді';
+
+  @override
+  String get hintEntryRow => 'Осы жазбаны ашады';
 }

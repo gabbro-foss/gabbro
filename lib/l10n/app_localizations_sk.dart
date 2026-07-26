@@ -2119,4 +2119,31 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Zmeniť veľkosť stĺpcov';
+
+  @override
+  String get regionSearch => 'Hľadanie';
+
+  @override
+  String get regionFolders => 'Priečinky';
+
+  @override
+  String get regionFilters => 'Kategórie záznamov';
+
+  @override
+  String get regionEntries => 'Zoznam záznamov';
+
+  @override
+  String get regionDetails => 'Podrobnosti záznamu';
+
+  @override
+  String get hintSearch => 'Filtruje záznamy počas písania';
+
+  @override
+  String get hintFolderSelector => 'Filtruje záznamy podľa priečinka';
+
+  @override
+  String get hintFilterChip => 'Zapne alebo vypne tento filter kategórie';
+
+  @override
+  String get hintEntryRow => 'Otvorí tento záznam';
 }

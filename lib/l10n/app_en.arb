@@ -1056,5 +1056,15 @@
   "restoreFromFileButton": "Restore from a backup file",
   "vaultRestoredMessage": "Vault restored. Unlock with your credentials.",
   "restoreFromFileInvalidError": "That file is not a usable Gabbro vault.",
-  "resizeColumns": "Resize columns"
+  "resizeColumns": "Resize columns",
+
+  "regionSearch": "Search",
+  "regionFolders": "Folders",
+  "regionFilters": "Entry categories",
+  "regionEntries": "Entry list",
+  "regionDetails": "Entry detail",
+  "hintSearch": "Filters the entries as you type",
+  "hintFolderSelector": "Filters the entries by folder",
+  "hintFilterChip": "Turns this category filter on or off",
+  "hintEntryRow": "Opens this entry"
 }

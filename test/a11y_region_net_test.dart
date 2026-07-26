@@ -9,6 +9,7 @@ import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
 import 'screen_catalog.dart';
+import 'test_helpers.dart';
 
 // Net-first floor for Phase 4 (the a11y layer). Every test here is GREEN against
 // the current code: it pins what Phase 4 must not break, and pins the absence of
@@ -70,27 +71,6 @@ Future<SemanticsHandle> pumpVaultList(
   );
   await t.pump(const Duration(milliseconds: 300));
   return handle;
-}
-
-/// Every semantics node currently in the tree, root first. Reached by climbing
-/// to the root from a node inside the app rather than through the binding's
-/// semantics owner, which is deprecated.
-List<SemanticsNode> allSemanticsNodes(WidgetTester t) {
-  var root = t.getSemantics(find.byType(MaterialApp));
-  while (root.parent != null) {
-    root = root.parent!;
-  }
-  final out = <SemanticsNode>[];
-  void walk(SemanticsNode n) {
-    out.add(n);
-    n.visitChildren((child) {
-      walk(child);
-      return true;
-    });
-  }
-
-  walk(root);
-  return out;
 }
 
 /// WCAG relative luminance.
@@ -198,12 +178,12 @@ void main() {
       isNotEmpty,
       reason: 'the search box lost the name a screen reader reads',
     );
-    // Baseline for Phase 4: the field says what it is, but nothing says what
-    // typing in it does. Adding that hint is the red step.
+    // The name says what the box IS; the hint says what typing in it DOES.
+    // Both must survive — the hint arrived with Phase 4.
     expect(
       data.hint,
-      isEmpty,
-      reason: 'the search box gained a hint — update the Phase 4 baseline',
+      isNotEmpty,
+      reason: 'the search box lost the hint that says what typing does',
     );
     handle.dispose();
   });
@@ -271,12 +251,14 @@ void main() {
     handle.dispose();
   });
 
-  // ── C. The baseline Phase 4 changes ──────────────────────────────────────
-  // Today the focus frame is the ONLY region cue: a region says nothing and
-  // announces nothing. These two pin that absence, so adding region semantics
-  // is a genuine red-to-green and not something already half-present.
+  // ── C. A region is silent unless it is named and focused ────────────────
+  // Phase 4 gives the vault list's regions a name and announces the focused
+  // one. These two pin the other side of that: an UNLABELLED region stays
+  // silent, and a labelled one announces only while it holds focus — otherwise
+  // a screen reader would read region names it was never meant to, or announce
+  // every region at once.
 
-  testWidgets('a focused region contributes no name of its own', (t) async {
+  testWidgets('an unlabelled region contributes no name of its own', (t) async {
     t.view.physicalSize = phone.physical;
     t.view.devicePixelRatio = phone.dpr;
     addTearDown(t.view.resetPhysicalSize);
@@ -294,24 +276,18 @@ void main() {
     expect(
       labels,
       ['A focused region long enough to stress the row'],
-      reason: 'only the button inside the region is named; the region itself '
-          'is silent — Phase 4 gives it a name',
+      reason: 'only the button inside the region is named; a region with no '
+          'label of its own must stay silent',
     );
     handle.dispose();
   });
 
-  testWidgets('nothing on the vault list announces itself as a live region', (
-    t,
-  ) async {
+  testWidgets('an untouched vault list announces nothing', (t) async {
     final handle = await pumpVaultList(t);
-    final live = allSemanticsNodes(
-      t,
-    ).where((n) => n.getSemanticsData().flagsCollection.isLiveRegion).toList();
     expect(
-      live,
+      liveRegionLabels(t),
       isEmpty,
-      reason: 'entering a region is not announced yet — Phase 4 adds that on '
-          'Linux only',
+      reason: 'a region announced itself before the user Tabbed into one',
     );
     handle.dispose();
   });
@@ -328,11 +304,8 @@ void main() {
         isAndroid: true,
         surface: surface,
       );
-      final live = allSemanticsNodes(
-        t,
-      ).where((n) => n.getSemanticsData().flagsCollection.isLiveRegion).toList();
       expect(
-        live,
+        liveRegionLabels(t),
         isEmpty,
         reason: 'Android has no regions, so nothing may announce one',
       );

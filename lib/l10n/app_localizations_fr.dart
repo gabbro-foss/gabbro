@@ -2144,4 +2144,31 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Redimensionner les colonnes';
+
+  @override
+  String get regionSearch => 'Recherche';
+
+  @override
+  String get regionFolders => 'Dossiers';
+
+  @override
+  String get regionFilters => 'Catégories d\'entrées';
+
+  @override
+  String get regionEntries => 'Liste des entrées';
+
+  @override
+  String get regionDetails => 'Détail de l\'entrée';
+
+  @override
+  String get hintSearch => 'Filtre les entrées au fur et à mesure de la saisie';
+
+  @override
+  String get hintFolderSelector => 'Filtre les entrées par dossier';
+
+  @override
+  String get hintFilterChip => 'Active ou désactive ce filtre de catégorie';
+
+  @override
+  String get hintEntryRow => 'Ouvre cette entrée';
 }

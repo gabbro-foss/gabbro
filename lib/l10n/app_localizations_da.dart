@@ -2118,4 +2118,31 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Ændr kolonnestørrelse';
+
+  @override
+  String get regionSearch => 'Søgning';
+
+  @override
+  String get regionFolders => 'Mapper';
+
+  @override
+  String get regionFilters => 'Postkategorier';
+
+  @override
+  String get regionEntries => 'Postliste';
+
+  @override
+  String get regionDetails => 'Postdetaljer';
+
+  @override
+  String get hintSearch => 'Filtrerer posterne, mens du skriver';
+
+  @override
+  String get hintFolderSelector => 'Filtrerer posterne efter mappe';
+
+  @override
+  String get hintFilterChip => 'Slår dette kategorifilter til eller fra';
+
+  @override
+  String get hintEntryRow => 'Åbner denne post';
 }

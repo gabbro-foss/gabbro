@@ -883,5 +883,15 @@
   "restoreFromFileButton": "Vrati iz datoteke rezervne kopije",
   "vaultRestoredMessage": "Sef vraćen. Otključajte svojim akreditivima.",
   "restoreFromFileInvalidError": "Ta datoteka nije upotrebljiv Gabbro sef.",
-  "resizeColumns": "Promeni veličinu kolona"
+  "resizeColumns": "Promeni veličinu kolona",
+
+  "regionSearch": "Pretraga",
+  "regionFolders": "Mape",
+  "regionFilters": "Kategorije unosa",
+  "regionEntries": "Spisak unosa",
+  "regionDetails": "Detalji unosa",
+  "hintSearch": "Filtrira unose dok kucate",
+  "hintFolderSelector": "Filtrira unose po mapi",
+  "hintFilterChip": "Uključuje ili isključuje ovaj filter kategorije",
+  "hintEntryRow": "Otvara ovaj unos"
 }

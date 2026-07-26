@@ -2055,4 +2055,31 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get resizeColumns => '列のサイズを変更';
+
+  @override
+  String get regionSearch => '検索';
+
+  @override
+  String get regionFolders => 'フォルダ';
+
+  @override
+  String get regionFilters => 'エントリのカテゴリ';
+
+  @override
+  String get regionEntries => 'エントリ一覧';
+
+  @override
+  String get regionDetails => 'エントリの詳細';
+
+  @override
+  String get hintSearch => '入力するとエントリを絞り込みます';
+
+  @override
+  String get hintFolderSelector => 'フォルダでエントリを絞り込みます';
+
+  @override
+  String get hintFilterChip => 'このカテゴリフィルターのオンとオフを切り替えます';
+
+  @override
+  String get hintEntryRow => 'このエントリを開きます';
 }

@@ -883,5 +883,15 @@
   "restoreFromFileButton": "バックアップファイルから復元",
   "vaultRestoredMessage": "ボールトを復元しました。認証情報でロックを解除してください。",
   "restoreFromFileInvalidError": "このファイルは使用可能な Gabbro ボールトではありません。",
-  "resizeColumns": "列のサイズを変更"
+  "resizeColumns": "列のサイズを変更",
+
+  "regionSearch": "検索",
+  "regionFolders": "フォルダ",
+  "regionFilters": "エントリのカテゴリ",
+  "regionEntries": "エントリ一覧",
+  "regionDetails": "エントリの詳細",
+  "hintSearch": "入力するとエントリを絞り込みます",
+  "hintFolderSelector": "フォルダでエントリを絞り込みます",
+  "hintFilterChip": "このカテゴリフィルターのオンとオフを切り替えます",
+  "hintEntryRow": "このエントリを開きます"
 }

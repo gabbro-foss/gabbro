@@ -386,11 +386,18 @@ class _VaultListScreenState extends State<VaultListScreen>
   /// scope and frame leave together, never one without the other.
   /// [frame] is false for the search box, which lights up its OWN outline
   /// instead (an overlay frame there gave a double border).
-  Widget _region(FocusScopeNode scope, Widget child, {bool frame = true}) {
+  /// [label] names the region aloud (Linux only — it rides the same gate, so
+  /// Android gains no announcement, per D5).
+  Widget _region(
+    FocusScopeNode scope,
+    Widget child, {
+    bool frame = true,
+    String? label,
+  }) {
     if (widget.isAndroid) return child;
     return FocusScope(
       node: scope,
-      child: frame ? FocusRegion(child: child) : child,
+      child: FocusRegion(label: label, showFrame: frame, child: child),
     );
   }
 
@@ -1505,7 +1512,10 @@ class _VaultListScreenState extends State<VaultListScreen>
         OutlineInputBorder(borderSide: BorderSide(color: theme.colorScheme.outline));
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-      child: TextField(
+      // The hint says what typing DOES; hintText only supplies the field's name.
+      child: Semantics(
+        hint: l.hintSearch,
+        child: TextField(
         controller: _searchController,
         focusNode: _searchFocus,
         decoration: InputDecoration(
@@ -1543,6 +1553,7 @@ class _VaultListScreenState extends State<VaultListScreen>
           contentPadding: const EdgeInsets.symmetric(vertical: 10),
         ),
         onChanged: (value) => setState(() => _searchQuery = value),
+        ),
       ),
     );
   }
@@ -1568,10 +1579,19 @@ class _VaultListScreenState extends State<VaultListScreen>
                   .map(
                     (f) => Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: FilterChip(
-                        label: Text(_filterLabel(f, l)),
-                        selected: _selectedFilter == f,
-                        onSelected: (_) => setState(() => _selectedFilter = f),
+                      // MergeSemantics: the chip builds its own container node,
+                      // so a bare Semantics above it would sit in a separate
+                      // node and the hint would never reach the chip.
+                      child: MergeSemantics(
+                        child: Semantics(
+                          hint: l.hintFilterChip,
+                          child: FilterChip(
+                            label: Text(_filterLabel(f, l)),
+                            selected: _selectedFilter == f,
+                            onSelected: (_) =>
+                                setState(() => _selectedFilter = f),
+                          ),
+                        ),
                       ),
                     ),
                   )
@@ -1900,8 +1920,12 @@ class _VaultListScreenState extends State<VaultListScreen>
               // Region-wrap search / folder / chips here (VaultListScreen owns
               // these scopes); the list + detail scopes are passed in and wrapped
               // inside TabletVaultLayout. See reference two-layout-paths.
-              searchBar:
-                  _region(_searchScope, _buildSearchField(), frame: false),
+              searchBar: _region(
+                _searchScope,
+                _buildSearchField(),
+                frame: false,
+                label: l.regionSearch,
+              ),
               filterChipRow: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -1910,7 +1934,10 @@ class _VaultListScreenState extends State<VaultListScreen>
                       _folderScope,
                       Padding(
                       padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
-                      child: DropdownButton<String>(
+                      child: MergeSemantics(
+                        child: Semantics(
+                        hint: l.hintFolderSelector,
+                        child: DropdownButton<String>(
                         focusNode: _folderFocus,
                         isExpanded: true,
                         // Let open-menu items grow to their wrapped height
@@ -1951,9 +1978,16 @@ class _VaultListScreenState extends State<VaultListScreen>
                           ),
                         ],
                       ),
+                      ),
+                      ),
                     ),
+                      label: l.regionFolders,
                     ),
-                  _region(_chipsScope, _buildFilterChipRow()),
+                  _region(
+                    _chipsScope,
+                    _buildFilterChipRow(),
+                    label: l.regionFilters,
+                  ),
                 ],
               ),
               searchActive: _searchQuery.isNotEmpty,
@@ -1986,12 +2020,20 @@ class _VaultListScreenState extends State<VaultListScreen>
           final Widget body = SafeArea(
             child: Column(
               children: [
-                _region(_searchScope, _buildSearchField(), frame: false),
+                _region(
+                  _searchScope,
+                  _buildSearchField(),
+                  frame: false,
+                  label: l.regionSearch,
+                ),
                 if (_folders.isNotEmpty)
                   _region(
                     _folderScope,
                     Padding(
                     padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
+                    child: MergeSemantics(
+                      child: Semantics(
+                    hint: l.hintFolderSelector,
                     child: DropdownButton<String>(
                       focusNode: _folderFocus,
                       isExpanded: true,
@@ -2030,9 +2072,16 @@ class _VaultListScreenState extends State<VaultListScreen>
                         ),
                       ],
                     ),
+                    ),
+                    ),
                   ),
+                    label: l.regionFolders,
                   ),
-                _region(_chipsScope, _buildFilterChipRow()),
+                _region(
+                  _chipsScope,
+                  _buildFilterChipRow(),
+                  label: l.regionFilters,
+                ),
                 Expanded(
                   child: _region(
                     _listScope,
@@ -2099,7 +2148,14 @@ class _VaultListScreenState extends State<VaultListScreen>
                                     }
                                     final entry = item as EntrySummaryData;
                                     final el = AppLocalizations.of(context);
-                                    return ListTile(
+                                    // Selection mode taps the row to tick it,
+                                    // so the "opens this entry" hint would then
+                                    // be a lie.
+                                    return Semantics(
+                                      hint: _isSelecting
+                                          ? null
+                                          : el.hintEntryRow,
+                                      child: ListTile(
                                       dense: true,
                                       leading: _isSelecting
                                           ? _selectionCheckbox(
@@ -2164,6 +2220,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                                         );
                                         if (mounted) _loadEntries();
                                       },
+                                      ),
                                     );
                                   },
                                 ),
@@ -2193,6 +2250,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                               ),
                           ],
                         ),
+                    label: l.regionEntries,
                   ),
                 ),
               ],

@@ -2115,4 +2115,31 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Endre kolonnestørrelse';
+
+  @override
+  String get regionSearch => 'Søk';
+
+  @override
+  String get regionFolders => 'Mapper';
+
+  @override
+  String get regionFilters => 'Oppføringskategorier';
+
+  @override
+  String get regionEntries => 'Oppføringsliste';
+
+  @override
+  String get regionDetails => 'Oppføringsdetaljer';
+
+  @override
+  String get hintSearch => 'Filtrerer oppføringene mens du skriver';
+
+  @override
+  String get hintFolderSelector => 'Filtrerer oppføringene etter mappe';
+
+  @override
+  String get hintFilterChip => 'Slår dette kategorifilteret av eller på';
+
+  @override
+  String get hintEntryRow => 'Åpner denne oppføringen';
 }

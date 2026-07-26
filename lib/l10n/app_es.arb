@@ -883,5 +883,15 @@
   "restoreFromFileButton": "Restaurar desde un archivo de copia de seguridad",
   "vaultRestoredMessage": "Caja fuerte restaurada. Desbloquea con tus credenciales.",
   "restoreFromFileInvalidError": "Ese archivo no es una caja fuerte de Gabbro utilizable.",
-  "resizeColumns": "Ajustar columnas"
+  "resizeColumns": "Ajustar columnas",
+
+  "regionSearch": "Búsqueda",
+  "regionFolders": "Carpetas",
+  "regionFilters": "Categorías de entradas",
+  "regionEntries": "Lista de entradas",
+  "regionDetails": "Detalle de la entrada",
+  "hintSearch": "Filtra las entradas mientras escribes",
+  "hintFolderSelector": "Filtra las entradas por carpeta",
+  "hintFilterChip": "Activa o desactiva este filtro de categoría",
+  "hintEntryRow": "Abre esta entrada"
 }

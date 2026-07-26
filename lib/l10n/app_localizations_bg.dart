@@ -2121,4 +2121,31 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Преоразмеряване на колоните';
+
+  @override
+  String get regionSearch => 'Търсене';
+
+  @override
+  String get regionFolders => 'Папки';
+
+  @override
+  String get regionFilters => 'Категории записи';
+
+  @override
+  String get regionEntries => 'Списък със записи';
+
+  @override
+  String get regionDetails => 'Детайли за записа';
+
+  @override
+  String get hintSearch => 'Филтрира записите докато пишете';
+
+  @override
+  String get hintFolderSelector => 'Филтрира записите по папка';
+
+  @override
+  String get hintFilterChip => 'Включва или изключва този филтър по категория';
+
+  @override
+  String get hintEntryRow => 'Отваря този запис';
 }

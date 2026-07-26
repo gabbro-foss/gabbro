@@ -884,5 +884,15 @@
   "restoreFromFileButton": "Gendan fra en sikkerhedskopifil",
   "vaultRestoredMessage": "Boks gendannet. Lås op med dine loginoplysninger.",
   "restoreFromFileInvalidError": "Den fil er ikke en brugbar Gabbro-boks.",
-  "resizeColumns": "Ændr kolonnestørrelse"
+  "resizeColumns": "Ændr kolonnestørrelse",
+
+  "regionSearch": "Søgning",
+  "regionFolders": "Mapper",
+  "regionFilters": "Postkategorier",
+  "regionEntries": "Postliste",
+  "regionDetails": "Postdetaljer",
+  "hintSearch": "Filtrerer posterne, mens du skriver",
+  "hintFolderSelector": "Filtrerer posterne efter mappe",
+  "hintFilterChip": "Slår dette kategorifilter til eller fra",
+  "hintEntryRow": "Åbner denne post"
 }

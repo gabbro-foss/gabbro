@@ -884,5 +884,15 @@
   "restoreFromFileButton": "Восстановить из файла резервной копии",
   "vaultRestoredMessage": "Хранилище восстановлено. Разблокируйте с помощью своих учётных данных.",
   "restoreFromFileInvalidError": "Этот файл не является пригодным хранилищем Gabbro.",
-  "resizeColumns": "Изменить размер столбцов"
+  "resizeColumns": "Изменить размер столбцов",
+
+  "regionSearch": "Поиск",
+  "regionFolders": "Папки",
+  "regionFilters": "Категории записей",
+  "regionEntries": "Список записей",
+  "regionDetails": "Сведения о записи",
+  "hintSearch": "Фильтрует записи по мере ввода",
+  "hintFolderSelector": "Фильтрует записи по папке",
+  "hintFilterChip": "Включает или отключает этот фильтр категории",
+  "hintEntryRow": "Открывает эту запись"
 }

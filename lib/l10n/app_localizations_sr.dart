@@ -2119,6 +2119,34 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Промени величину колона';
+
+  @override
+  String get regionSearch => 'Pretraga';
+
+  @override
+  String get regionFolders => 'Mape';
+
+  @override
+  String get regionFilters => 'Kategorije unosa';
+
+  @override
+  String get regionEntries => 'Spisak unosa';
+
+  @override
+  String get regionDetails => 'Detalji unosa';
+
+  @override
+  String get hintSearch => 'Filtrira unose dok kucate';
+
+  @override
+  String get hintFolderSelector => 'Filtrira unose po mapi';
+
+  @override
+  String get hintFilterChip =>
+      'Uključuje ili isključuje ovaj filter kategorije';
+
+  @override
+  String get hintEntryRow => 'Otvara ovaj unos';
 }
 
 /// The translations for Serbian, using the Latin script (`sr_Latn`).
@@ -4236,4 +4264,32 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get resizeColumns => 'Promeni veličinu kolona';
+
+  @override
+  String get regionSearch => 'Pretraga';
+
+  @override
+  String get regionFolders => 'Mape';
+
+  @override
+  String get regionFilters => 'Kategorije unosa';
+
+  @override
+  String get regionEntries => 'Spisak unosa';
+
+  @override
+  String get regionDetails => 'Detalji unosa';
+
+  @override
+  String get hintSearch => 'Filtrira unose dok kucate';
+
+  @override
+  String get hintFolderSelector => 'Filtrira unose po mapi';
+
+  @override
+  String get hintFilterChip =>
+      'Uključuje ili isključuje ovaj filter kategorije';
+
+  @override
+  String get hintEntryRow => 'Otvara ovaj unos';
 }

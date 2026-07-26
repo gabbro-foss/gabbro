@@ -2134,4 +2134,31 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Spalten anpassen';
+
+  @override
+  String get regionSearch => 'Suche';
+
+  @override
+  String get regionFolders => 'Ordner';
+
+  @override
+  String get regionFilters => 'Eintragskategorien';
+
+  @override
+  String get regionEntries => 'Eintragsliste';
+
+  @override
+  String get regionDetails => 'Eintragsdetails';
+
+  @override
+  String get hintSearch => 'Filtert die Einträge während der Eingabe';
+
+  @override
+  String get hintFolderSelector => 'Filtert die Einträge nach Ordner';
+
+  @override
+  String get hintFilterChip => 'Schaltet diesen Kategoriefilter ein oder aus';
+
+  @override
+  String get hintEntryRow => 'Öffnet diesen Eintrag';
 }

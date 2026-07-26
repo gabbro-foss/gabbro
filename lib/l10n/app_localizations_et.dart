@@ -2116,4 +2116,31 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Muuda veergude suurust';
+
+  @override
+  String get regionSearch => 'Otsing';
+
+  @override
+  String get regionFolders => 'Kaustad';
+
+  @override
+  String get regionFilters => 'Kirjete kategooriad';
+
+  @override
+  String get regionEntries => 'Kirjete loend';
+
+  @override
+  String get regionDetails => 'Kirje üksikasjad';
+
+  @override
+  String get hintSearch => 'Filtreerib kirjeid kirjutamise ajal';
+
+  @override
+  String get hintFolderSelector => 'Filtreerib kirjeid kausta järgi';
+
+  @override
+  String get hintFilterChip => 'Lülitab selle kategooriafiltri sisse või välja';
+
+  @override
+  String get hintEntryRow => 'Avab selle kirje';
 }

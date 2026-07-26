@@ -884,5 +884,15 @@
   "restoreFromFileButton": "Restaurar a partir de um ficheiro de cópia de segurança",
   "vaultRestoredMessage": "Cofre restaurado. Desbloqueie com as suas credenciais.",
   "restoreFromFileInvalidError": "Esse ficheiro não é um cofre Gabbro utilizável.",
-  "resizeColumns": "Redimensionar colunas"
+  "resizeColumns": "Redimensionar colunas",
+
+  "regionSearch": "Pesquisa",
+  "regionFolders": "Pastas",
+  "regionFilters": "Categorias de entradas",
+  "regionEntries": "Lista de entradas",
+  "regionDetails": "Detalhe da entrada",
+  "hintSearch": "Filtra as entradas à medida que escreve",
+  "hintFolderSelector": "Filtra as entradas por pasta",
+  "hintFilterChip": "Ativa ou desativa este filtro de categoria",
+  "hintEntryRow": "Abre esta entrada"
 }

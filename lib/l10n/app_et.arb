@@ -884,5 +884,15 @@
   "restoreFromFileButton": "Taasta varukoopia failist",
   "vaultRestoredMessage": "Hoidla taastatud. Avage oma mandaatidega.",
   "restoreFromFileInvalidError": "See fail ei ole kasutatav Gabbro hoidla.",
-  "resizeColumns": "Muuda veergude suurust"
+  "resizeColumns": "Muuda veergude suurust",
+
+  "regionSearch": "Otsing",
+  "regionFolders": "Kaustad",
+  "regionFilters": "Kirjete kategooriad",
+  "regionEntries": "Kirjete loend",
+  "regionDetails": "Kirje üksikasjad",
+  "hintSearch": "Filtreerib kirjeid kirjutamise ajal",
+  "hintFolderSelector": "Filtreerib kirjeid kausta järgi",
+  "hintFilterChip": "Lülitab selle kategooriafiltri sisse või välja",
+  "hintEntryRow": "Avab selle kirje"
 }

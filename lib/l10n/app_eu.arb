@@ -883,5 +883,15 @@
   "restoreFromFileButton": "Berreskuratu babeskopia-fitxategi batetik",
   "vaultRestoredMessage": "Kutxa gotorra berreskuratu da. Desblokeatu zure kredentzialekin.",
   "restoreFromFileInvalidError": "Fitxategi hori ez da erabilgarri den Gabbro kutxa gotor bat.",
-  "resizeColumns": "Aldatu zutabeen tamaina"
+  "resizeColumns": "Aldatu zutabeen tamaina",
+
+  "regionSearch": "Bilaketa",
+  "regionFolders": "Karpetak",
+  "regionFilters": "Sarreren kategoriak",
+  "regionEntries": "Sarreren zerrenda",
+  "regionDetails": "Sarreraren xehetasunak",
+  "hintSearch": "Sarrerak iragazten ditu idatzi ahala",
+  "hintFolderSelector": "Sarrerak karpetaka iragazten ditu",
+  "hintFilterChip": "Kategoria-iragazki hau aktibatu edo desaktibatzen du",
+  "hintEntryRow": "Sarrera hau irekitzen du"
 }

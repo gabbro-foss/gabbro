@@ -2119,4 +2119,32 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Aldatu zutabeen tamaina';
+
+  @override
+  String get regionSearch => 'Bilaketa';
+
+  @override
+  String get regionFolders => 'Karpetak';
+
+  @override
+  String get regionFilters => 'Sarreren kategoriak';
+
+  @override
+  String get regionEntries => 'Sarreren zerrenda';
+
+  @override
+  String get regionDetails => 'Sarreraren xehetasunak';
+
+  @override
+  String get hintSearch => 'Sarrerak iragazten ditu idatzi ahala';
+
+  @override
+  String get hintFolderSelector => 'Sarrerak karpetaka iragazten ditu';
+
+  @override
+  String get hintFilterChip =>
+      'Kategoria-iragazki hau aktibatu edo desaktibatzen du';
+
+  @override
+  String get hintEntryRow => 'Sarrera hau irekitzen du';
 }

@@ -883,5 +883,15 @@
   "restoreFromFileButton": "Dá padà láti fáìlì àfẹyìntì",
   "vaultRestoredMessage": "A ti dá àpótí ìṣúra padà. Ṣí i pẹ̀lú àwọn ìwé-ẹ̀rí rẹ.",
   "restoreFromFileInvalidError": "Fáìlì yẹn kì í ṣe àpótí ìṣúra Gabbro tó ṣeé lò.",
-  "resizeColumns": "Ṣàtúnṣe ìwọ̀n àwọn ọ̀wọ́n"
+  "resizeColumns": "Ṣàtúnṣe ìwọ̀n àwọn ọ̀wọ́n",
+
+  "regionSearch": "Ṣawari",
+  "regionFolders": "Awọn folda",
+  "regionFilters": "Awọn ẹka titẹ sii",
+  "regionEntries": "Atokọ titẹ sii",
+  "regionDetails": "Alaye titẹ sii",
+  "hintSearch": "Ṣe ayẹwo awọn titẹ sii bi o ṣe ń tẹ",
+  "hintFolderSelector": "Ṣe ayẹwo awọn titẹ sii nipa folda",
+  "hintFilterChip": "Tan tabi pa asẹ ẹka yii",
+  "hintEntryRow": "Ṣi titẹ sii yii"
 }
