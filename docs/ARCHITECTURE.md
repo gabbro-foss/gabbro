@@ -173,6 +173,7 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Features and UI/UX
+- Add fastlane images to README (at least some if not all)
 - Add `ctrl+q` to lock+quit the app as keyboard shortcut (`ctrl+m` done in the keyboard sweep)
 - **Remove the tablet NavigationRail** (`tablet_vault_layout.dart`: Vault /
   Appearance / Security / About). Redundant with the app-bar overflow menu (same
