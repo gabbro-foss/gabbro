@@ -117,74 +117,29 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 **Keyboard accessibility sweep — branch `keyboard_accessibility_sweep` (pushed, NOT merged).**
 
-Spec: [KEYBOARD_NAV.md](KEYBOARD_NAV.md) (approved) — cycle order, exclusions, Esc
-precedence, resolved decisions. **Linux desktop only**; "narrow/wide" = layout WIDTH, not
-platform. Hardware matrix in `.scratchpad`; every hardware failure and its cause is in
-LEARNINGS.md. Phases are hardware-tested one at a time.
+Spec + mechanism as built: [KEYBOARD_NAV.md](KEYBOARD_NAV.md). **Linux desktop only**;
+"narrow/wide" = layout WIDTH, not platform. Hardware matrix in `.scratchpad`; every hardware
+failure and its cause is in LEARNINGS.md. Phases are hardware-tested one at a time.
 
-**Mechanism.** Tab/Shift+Tab, Esc and Ctrl+L/F/N/M are all intercepted by the global
-`HardwareKeyboard` handler (`main.dart _onKeyEvent`) and routed to hooks the vault list
-registers (`vaultRegionTab`, `vaultRegionEscape`, `focusVaultSearch`, `openNewEntry`,
-`openVaultMenu`); every hook self-gates on desktop + current route. An app-root `Actions`
-absorber (`MaterialApp.builder`) swallows Flutter's default Tab traversal while the cycle
-owns it. Each region is a `FocusScopeNode` matched by **node identity** — never
-`debugLabel`, which is null in release builds. Regions span two widgets: VaultListScreen
-owns search/folder/chips, TabletVaultLayout owns list + detail.
+Phases 1-3 and D5 are done and hardware-passed (rounds 13-15).
 
-**Status**
-- **Phase 1 — global Esc + physical-key shortcuts: DONE, hardware-passed.**
-- **Phase 2 — focus frame (`lib/widgets/focus_region.dart`): DONE, hardware-passed.**
-- **Phase 3 — region Tab-cycle (both layouts) + Ctrl+N/Ctrl+M: DONE, hardware-passed
-  (round 13)**, except the Android item below.
+**Phase 4 — a11y: built and unit-green. Round 16 (Orca) run 2026-07-26 — Linux FAILED.**
 
-- **D5 — the focus highlight is Linux-only: DONE, hardware-passed (round 14).**
-  Every `FocusRegion` now hangs off the platform gate, so frame and scope leave together:
-  `_region()` supplies the frame (`frame: false` for the search box, which lights up its
-  own outline), and the two-pane nav-rail frame follows `listScope != null`. On Android the
-  search field's focused border equals its unfocused one, which also suppresses Material's
-  default outline — so the Android search box changes from what alpha.16 ships, deliberately.
-  No unfocus logic and no keyboard-visibility observer were added: nothing new fires on
-  Android. Pinned by N1/N2 (Linux keeps its frames and its lit search box) and R1/R2/R3
-  (Android: no frame narrow or wide, focused border == unfocused, search still filters) in
-  `keyboard_region_chips_test.dart`.
+- **Android TalkBack passed 4/4**; the control hints work there. No fix may regress it.
+- **Linux speaks no control hint at all** (matrix sections D and E). **One cause:** the
+  Linux embedder never reads a semantics node's `hint` and maps no live-region flag —
+  only the `label` reaches ATK. Proven from the Flutter engine source; see LEARNINGS.md.
+- Two smaller, separate failures: the entry list re-announces on every arrow move (B),
+  and Ctrl+F/N/M announce nothing (F).
 
-**Current task — Phase 4, a11y** (see below). Round 14 passed A-F on 2026-07-26.
+**To do, each with its own hardware round**
 
-**Phase 4 — a11y. Code DONE and unit-green; NOT hardware-tested.** A screen-reader user
-hears the app instead of seeing it, so the visual frame can never be the only region cue.
-D5 splits it: control hints on **both platforms**, region names on **Linux only** (there
-are no regions on Android to announce).
+1. Fold the hint text into the label on Linux, keep `hint:` on Android — pin Android first.
+2. Entry list repeating itself on every arrow move.
+3. Shortcut feedback via `SemanticsService.announce()` (verified wired on Linux).
 
-- **Built.** 9 new strings in all 37 locales. Hints — what a control *does*, not what it
-  is — on search, chips, folder selector and entry row (both layouts). `FocusRegion`
-  gained `label`/`showFrame` and emits a named `Semantics` container that is a
-  `liveRegion` **only while focused**, so exactly one region announces and Esc silences
-  it. Android rides the same gate as the frame: no label, no announcement.
-- **BLOCKED on hardware: round 16 needs Orca installed**, which waits for a full system
-  upgrade (no partial updates). The matrix is written in `.scratchpad`.
-- **Caveat that round 16 must settle.** `liveRegion` is documented for Android/iOS only —
-  Linux is not mentioned. On Linux the announcement should instead come from the region
-  being a *named container* (AT-SPI reads a container's name on focus entry). Section A
-  of the matrix is the guard: if Orca is silent there, nothing below it means anything.
-  The unit tests prove the label and flag are in the tree, never that Orca speaks.
-- **Android TalkBack unverified.** The control hints ship on Android too, but round 16 is
-  Linux-only. A TalkBack spot-check covers it — no matrix needed.
-- **Net-first floor (built first, all green).** The a11y net skipped `tablet_vault_layout`
-  outright, so the two-pane layout had no a11y coverage at all; it and a wide `vault_list`
-  entry (same screen at tablet width, reaching the two-pane branch through its real call
-  site) are now swept. `test/a11y_region_net_test.dart` holds the pins a sweep can't
-  express: what each control exposes today, that an unlabelled region stays silent and an
-  untouched list announces nothing, the D5 negative on Android, and focus-frame contrast
-  in all four themes. Absence pins carry guards-on-the-guard.
-- **Two defects the net caught.** (1) The folder selector was a 28dp tap target on a wide
-  window — the 48dp minimum had been applied to the narrow branch only;
-  **hardware-passed (round 15).** (2) `MergeSemantics` (needed to get a hint onto a
-  `FilterChip`) merged the selection checkbox into the row when applied to `ListTile`,
-  costing the checkbox its "title, tick box" reading — a plain `Semantics` works there.
-
-**Merge gate:** master once round 16 (Orca, Linux) passes, plus a TalkBack spot-check on
-Android for the control hints — they are not platform-gated. Phases 1-3 and D5 are already
-hardware-passed (rounds 14 and 15); nothing there needs re-running.
+**Merge gate:** master once a re-run of round 16 passes on Linux and the Android TalkBack
+spot-check stays green.
 
 ---
 
