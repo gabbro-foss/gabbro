@@ -54,8 +54,8 @@ This is not close. The architect (the maintainer) drove every consequential desi
 *before* the code existed, and the repository proves it. The same evidence
 catalogued in `AI_AUTHORSHIP_AND_IP.md` applies here:
 
-- the security boundary — secrets never cross the Flutter/Rust bridge in
-  plaintext, Rust owns all decrypted material in memory;
+- the security boundary — keys never cross the Flutter/Rust bridge, Rust owns
+  all decrypted material in memory;
 - the crypto stack and the hybrid-PQC "belt and suspenders" rationale
   (Argon2id → X25519 + ML-KEM-1024 → HKDF → AES-256-GCM) — rationale
   retracted, ADR-018;

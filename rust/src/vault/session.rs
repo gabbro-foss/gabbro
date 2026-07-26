@@ -1,8 +1,8 @@
 //! Vault session — in-memory state between bridge calls.
 //!
-//! The decrypted vault lives here after unlock. Flutter never holds
-//! the entries directly — it calls functions in this module to read
-//! and write them.
+//! The decrypted vault lives here after unlock. Flutter never holds the
+//! decrypted vault — it calls functions in this module to read and write
+//! entries. Only the secrets the user actively views cross the bridge.
 
 use std::path::PathBuf;
 use zeroize::{Zeroize, Zeroizing};
