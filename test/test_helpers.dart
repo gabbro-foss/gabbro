@@ -54,6 +54,16 @@ List<String> liveRegionLabels(WidgetTester t) => allSemanticsNodes(t)
     .map((d) => d.label)
     .toList();
 
+/// The hint a screen reader reads for the node [finder] resolves to. Android
+/// only: the Linux embedder never reads a node's hint (see LEARNINGS.md).
+String hintOf(WidgetTester t, Finder finder) =>
+    t.getSemantics(finder).getSemanticsData().hint;
+
+/// The name a screen reader reads for the node [finder] resolves to. On Linux
+/// this is the only text that reaches the reader at all.
+String labelOf(WidgetTester t, Finder finder) =>
+    t.getSemantics(finder).getSemanticsData().label;
+
 /// Installs a mock for the `Clipboard` platform channel and returns a growing
 /// list of every text written via `Clipboard.setData` — a copy writes the
 /// secret, the auto-clear writes an empty string. Used by the clipboard-clear

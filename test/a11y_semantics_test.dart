@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
@@ -68,66 +69,140 @@ Future<void> tab(WidgetTester t) async {
   await t.pump(const Duration(milliseconds: 300));
 }
 
-/// The hint a screen reader reads for the node [finder] resolves to.
-String hintOf(WidgetTester t, Finder finder) =>
-    t.getSemantics(finder).getSemanticsData().hint;
+/// The English strings, to assert against what a reader would actually hear.
+final en = lookupAppLocalizations(const Locale('en'));
+
+/// Asserts that [finder]'s node speaks [outcome] to a Linux screen reader:
+/// inside the NAME, after the control's own name, and never as a hint (which
+/// the Linux embedder does not read).
+void expectSpeaksOnLinux(
+  WidgetTester t,
+  Finder finder,
+  String outcome, {
+  required String what,
+}) {
+  final label = labelOf(t, finder);
+  expect(
+    label,
+    contains(outcome),
+    reason: '$what does not say what it does — Orca reads only the name, and '
+        'the outcome is not in it',
+  );
+  expect(
+    label.indexOf(outcome),
+    greaterThan(0),
+    reason: '$what says what it does before it says what it is; the name has '
+        'to come first',
+  );
+  expect(
+    hintOf(t, finder),
+    isEmpty,
+    reason: '$what still carries a hint on Linux, where nothing reads one — '
+        'the text was duplicated instead of moved',
+  );
+}
 
 void main() {
-  // ── Both platforms: every region control says what its keys do ───────────
-  // Each of these controls already has a NAME. None of them says what happens
-  // when the user presses Enter or an arrow, so a screen-reader user reaches a
-  // control and cannot tell what it will do.
+  // ── Linux: the outcome belongs in the NAME ───────────────────────────────
+  // Round 16 (Orca) heard none of these. The Linux embedder reads only a
+  // node's label — `hint` is never read at all — so on Linux "what this
+  // control does" has to be part of the name, after the control's own name.
+  // Android keeps the hint instead; that half is pinned green in
+  // a11y_region_net_test.dart and must not move.
 
-  testWidgets('the search box says that typing filters the entries', (t) async {
+  testWidgets('the search box name says that typing filters', (t) async {
     final handle = await pumpDense(t);
+    final finder = find.byType(EditableText).first;
+    expectSpeaksOnLinux(t, finder, en.hintSearch, what: 'the search box');
+    // Its own name is the field's placeholder, and it must be read first.
+    final label = labelOf(t, finder);
     expect(
-      hintOf(t, find.byType(EditableText).first),
-      isNotEmpty,
-      reason: 'the search box does not say what typing in it does',
+      label.indexOf(en.searchEntriesHint),
+      lessThan(label.indexOf(en.hintSearch)),
+      reason: 'the search box says what typing does before naming itself',
     );
     handle.dispose();
   });
 
-  testWidgets('a filter chip says that Enter toggles it', (t) async {
+  // The box is reached by two shortcuts that differ in WHAT they search, and
+  // a screen-reader user has no other way to discover that. These may only be
+  // spoken on Linux — Android has no keyboard to press them on, which is the
+  // whole reason the wording is split per platform.
+  testWidgets('the search box names both of its shortcuts', (t) async {
     final handle = await pumpDense(t);
+    final label = labelOf(t, find.byType(EditableText).first);
     expect(
-      hintOf(t, find.byType(FilterChip).first),
-      isNotEmpty,
-      reason: 'a filter chip does not say what Enter does to it',
+      label,
+      contains(en.kbFocusSearch),
+      reason: 'the search box never mentions Ctrl+F',
+    );
+    expect(
+      label,
+      contains(en.kbSearchAllFields),
+      reason: 'the search box never mentions Ctrl+Shift+F, so nothing says '
+          'that it can search every field',
     );
     handle.dispose();
   });
 
-  testWidgets('an entry row says that Enter opens it', (t) async {
+  testWidgets('a filter chip name says that Enter toggles it', (t) async {
     final handle = await pumpDense(t);
-    expect(
-      hintOf(t, find.text('Apple')),
-      isNotEmpty,
-      reason: 'an entry row does not say what Enter does to it',
+    expectSpeaksOnLinux(
+      t,
+      find.byType(FilterChip).first,
+      en.hintFilterChip,
+      what: 'a filter chip',
     );
     handle.dispose();
   });
 
-  // The two layouts build their own row, so the hint has to be wired in both.
-  testWidgets('wide: an entry row says that Enter opens it', (t) async {
-    final handle = await pumpDense(t, surface: tablet);
-    expect(
-      hintOf(t, find.text('Apple')),
-      isNotEmpty,
-      reason: 'the two-pane entry row does not say what Enter does to it',
-    );
-    handle.dispose();
-  });
+  // Each layout builds its own row and its own folder selector, so each has a
+  // separate call site that can regress on its own.
+  for (final (name, surface) in const [('narrow', phone), ('wide', tablet)]) {
+    testWidgets('$name: an entry row name says that Enter opens it', (t) async {
+      final handle = await pumpDense(t, surface: surface);
+      final finder = find.text('Apple');
+      expectSpeaksOnLinux(t, finder, en.hintEntryRow, what: 'an entry row');
+      // The entry's title is its name, and must be read before the outcome.
+      final label = labelOf(t, finder);
+      expect(
+        label.indexOf('Apple'),
+        lessThan(label.indexOf(en.hintEntryRow)),
+        reason: 'the row says what Enter does before it says which entry it is',
+      );
+      handle.dispose();
+    });
 
-  testWidgets('the folder selector says that it filters by folder', (t) async {
-    final handle = await pumpDense(t);
-    expect(
-      hintOf(t, find.byType(DropdownButton<String>).first),
-      isNotEmpty,
-      reason: 'the folder selector does not say what choosing one does',
-    );
-    handle.dispose();
-  });
+    testWidgets('$name: the folder selector name says that it filters', (
+      t,
+    ) async {
+      final handle = await pumpDense(t, surface: surface);
+      expectSpeaksOnLinux(
+        t,
+        find.byType(DropdownButton<String>).first,
+        en.hintFolderSelector,
+        what: 'the folder selector',
+      );
+      handle.dispose();
+    });
+
+    // Selection mode taps the row to tick it, so "opens this entry" is a lie.
+    // Guard on the guard: the row pin above proves the same lookup finds the
+    // outcome text when it is there, so this absence is real.
+    testWidgets('$name: a row in selection mode does not claim to open', (
+      t,
+    ) async {
+      final handle = await pumpDense(t, surface: surface);
+      await t.tap(find.byIcon(Icons.checklist));
+      await t.pump(const Duration(milliseconds: 300));
+      expect(
+        labelOf(t, find.text('Apple')),
+        isNot(contains(en.hintEntryRow)),
+        reason: 'a tickable row still claims that it opens the entry',
+      );
+      handle.dispose();
+    });
+  }
 
   // ── Linux only: the regions speak ────────────────────────────────────────
   // Tab moves between REGIONS, not controls, so a screen-reader user who Tabs

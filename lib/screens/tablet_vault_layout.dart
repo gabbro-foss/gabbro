@@ -256,8 +256,12 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
       clipboardClearTimeout: widget.clipboardClearTimeout,
       onDeleteEntry: widget.onDeleteEntryFn ?? (id) => deleteEntry(id: id),
       onDeleted: () {
-        setState(() => _selectedEntryId = null);
+        // Reload the list FIRST. It lives in the parent's state, so it must not
+        // depend on this widget's own setState having succeeded — if that throws
+        // (release builds swallow it), the deleted row would otherwise sit in
+        // the list until something else forced a reload.
         widget.onRefresh();
+        setState(() => _selectedEntryId = null);
       },
       onEdited: () => widget.onRefresh(),
     );
@@ -332,6 +336,9 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
                             }
                             final entry = item as EntrySummaryData;
                             final isSelected = entry.id == _selectedEntryId;
+                            final rowOutcome = widget.selectionMode
+                                ? null
+                                : AppLocalizations.of(context).hintEntryRow;
                             return Container(
                               // The decoration is ALWAYS present (transparent
                               // border, no fill, when unselected). Flipping it
@@ -358,15 +365,10 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
                               ),
                               child: Material(
                                 color: Colors.transparent,
-                                // Selection mode taps the row to tick it, so the
-                                // "opens this entry" hint would then be a lie.
-                                child: Semantics(
-                                  hint: widget.selectionMode
-                                      ? null
-                                      : AppLocalizations.of(
-                                          context,
-                                        ).hintEntryRow,
-                                  child: ListTile(
+                                // Selection mode taps the row to tick it, so
+                                // "opens this entry" would then be a lie.
+                                child: _saysWhatItDoes(
+                                  ListTile(
                                 dense: true,
                                 leading: widget.selectionMode
                                     // Label the checkbox with the entry title so
@@ -395,7 +397,12 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
                                           entry.entryType,
                                         ),
                                       ),
-                                title: Text(widget.displayTitle(entry)),
+                                title: Text(
+                                  widget.displayTitle(entry),
+                                  semanticsLabel: _ownNameLabel(
+                                    outcome: rowOutcome,
+                                  ),
+                                ),
                                 subtitle: Text(
                                   widget.displayType(entry.entryType),
                                 ),
@@ -412,6 +419,8 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
                                   widget.onEntryTap(entry.id);
                                 },
                                   ),
+                                  name: widget.displayTitle(entry),
+                                  outcome: rowOutcome,
                                 ),
                               ),
                             );
@@ -443,6 +452,32 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
   /// Android, where there is no keyboard — and then nothing keyboard-related,
   /// the focus frame included, may appear anywhere in the tree.
   bool get _keyboardNav => widget.listScope != null;
+
+  /// Makes a control say what it DOES. A Linux screen reader is given only a
+  /// node's NAME — the embedder never reads a semantics hint (LEARNINGS.md) —
+  /// so there the outcome goes inside the name, after the control's own name.
+  /// Android does read hints and keeps its own, unchanged. `_keyboardNav` is
+  /// the same Linux gate the focus frame already rides on.
+  ///
+  /// [outcome] null means the control promises nothing right now (a row in
+  /// selection mode ticks rather than opens), so nothing is added.
+  Widget _saysWhatItDoes(
+    Widget child, {
+    required String name,
+    String? outcome,
+  }) {
+    if (outcome == null) return child;
+    return _keyboardNav
+        ? Semantics(label: '$name. $outcome', child: child)
+        : Semantics(hint: outcome, child: child);
+  }
+
+  /// The `semanticsLabel` for the Text showing a control's own name: blank
+  /// where [_saysWhatItDoes] has already composed that name into the label,
+  /// null otherwise. A blanked VALUE, not a wrapper — a wrapper would change
+  /// the tree's shape, which is what disposed this row's focus node once.
+  String? _ownNameLabel({String? outcome}) =>
+      outcome != null && _keyboardNav ? '' : null;
 
   /// The nav rail is excluded from the Tab cycle (no scope of its own) but still
   /// shows a frame when focus reaches it — on desktop only.
@@ -566,17 +601,18 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
           ),
         ),
         // ── Detail pane (flex) ─────────────────────────────────────────────
-        // Mount the detail region only while an entry is selected: an empty
-        // detail pane must NOT be a Tab stop (the cycle checks the scope's
-        // descendants). Selected -> wrap; empty -> plain pass-through.
+        // Always wrapped, selected or not. The cycle decides whether detail is
+        // a Tab stop from the scope's FOCUSABLE DESCENDANTS, and the empty
+        // pane has none (an icon and a line of text), so it is still never a
+        // stop. Mounting the wrapper conditionally instead changed the widget
+        // tree's SHAPE every time the selection cleared, which tore down and
+        // rebuilt the whole detail subtree — see the round-17 delete bug.
         Expanded(
-          child: _selectedEntryId == null
-              ? _buildDetailPane(context)
-              : _region(
-                  widget.detailScope,
-                  _buildDetailPane(context),
-                  label: AppLocalizations.of(context).regionDetails,
-                ),
+          child: _region(
+            widget.detailScope,
+            _buildDetailPane(context),
+            label: AppLocalizations.of(context).regionDetails,
+          ),
         ),
       ],
     );

@@ -4,6 +4,7 @@ import 'dart:ui' show Tristate;
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -71,6 +72,28 @@ Future<SemanticsHandle> pumpVaultList(
   );
   await t.pump(const Duration(milliseconds: 300));
   return handle;
+}
+
+/// The grey placeholder inside the empty search box, in the test locale.
+final searchPlaceholder =
+    lookupAppLocalizations(const Locale('en')).searchEntriesHint;
+
+/// The style actually applied to that placeholder under one platform/theme.
+Future<TextStyle?> placeholderStyleUnder(
+  WidgetTester t, {
+  required bool isAndroid,
+  required ThemeChoice theme,
+  required bool highContrast,
+}) async {
+  final handle = await pumpVaultList(
+    t,
+    isAndroid: isAndroid,
+    theme: theme,
+    highContrast: highContrast,
+  );
+  final style = t.widget<Text>(find.text(searchPlaceholder).first).style;
+  handle.dispose();
+  return style;
 }
 
 /// WCAG relative luminance.
@@ -178,12 +201,14 @@ void main() {
       isNotEmpty,
       reason: 'the search box lost the name a screen reader reads',
     );
-    // The name says what the box IS; the hint says what typing in it DOES.
-    // Both must survive — the hint arrived with Phase 4.
+    // On Linux the name carries everything: what the box IS and what it does.
+    // A hint here would be dead text — the Linux embedder never reads one
+    // (round 16, LEARNINGS.md). Android's hint is pinned in section F.
     expect(
       data.hint,
-      isNotEmpty,
-      reason: 'the search box lost the hint that says what typing does',
+      isEmpty,
+      reason: 'the search box carries a hint on Linux, where nothing reads '
+          'one — the text belongs in the name',
     );
     handle.dispose();
   });
@@ -371,6 +396,148 @@ void main() {
             'the background in $name — a keyboard user cannot see which '
             'region they are in',
       );
+    });
+  }
+
+  // ── G. The search placeholder must look identical on both platforms ──────
+  // The grey "Search entries…" text is also the box's NAME to a screen reader.
+  // To speak that name before what the box does, Linux hands the placeholder
+  // to Flutter as a widget — and Flutter then stops styling it. So Linux has
+  // to restate the styling itself. These compare the Linux placeholder against
+  // the Android one, which still goes through Flutter's own path: green before
+  // the change (one shared path), and green after it only if the restatement
+  // matches exactly. A wrong shade fails here instead of on hardware.
+
+  for (final (name, theme, hc) in const [
+    ('light', ThemeChoice.light, false),
+    ('dark', ThemeChoice.dark, false),
+    ('high-contrast light', ThemeChoice.light, true),
+    ('high-contrast dark', ThemeChoice.dark, true),
+  ]) {
+    testWidgets('the search placeholder is styled the same on both platforms '
+        '($name)', (t) async {
+      final android = await placeholderStyleUnder(
+        t,
+        isAndroid: true,
+        theme: theme,
+        highContrast: hc,
+      );
+      final linux = await placeholderStyleUnder(
+        t,
+        isAndroid: false,
+        theme: theme,
+        highContrast: hc,
+      );
+      // Guard on the guard: comparing two nulls would pass and prove nothing.
+      expect(
+        android,
+        isNotNull,
+        reason: 'the placeholder carries no style at all, so this pin is void',
+      );
+      expect(
+        linux,
+        equals(android),
+        reason: 'the search placeholder no longer looks the same on Linux as '
+            'it does on Android — it is meant to stay grey, not read as '
+            'typed text',
+      );
+    });
+  }
+
+  // ── F. Android keeps its hints ───────────────────────────────────────────
+  // Round 16 (Orca) proved Linux never receives a semantics HINT at all: the
+  // Linux embedder reads only the label. The fix moves the outcome text into
+  // the label ON LINUX. TalkBack passed 4/4 with the hint, so Android must be
+  // left exactly as it is — these pin that, green before the fix and after.
+  // See LEARNINGS.md, "On Linux a screen reader gets the semantics NAME".
+
+  testWidgets('Android: the search box keeps its hint', (t) async {
+    final handle = await pumpVaultList(t, isAndroid: true);
+    expect(
+      hintOf(t, find.byType(EditableText).first),
+      isNotEmpty,
+      reason: 'the Linux fix stripped the hint TalkBack reads',
+    );
+    handle.dispose();
+  });
+
+  // Android has no keyboard to press them on, so naming the shortcuts there
+  // would send a TalkBack user looking for keys that do not exist.
+  testWidgets('Android: the search box names no keyboard shortcut', (t) async {
+    final handle = await pumpVaultList(t, isAndroid: true);
+    expect(
+      hintOf(t, find.byType(EditableText).first),
+      isNot(contains('Ctrl')),
+      reason: 'Android is told about a key combination it cannot press',
+    );
+    handle.dispose();
+  });
+
+  testWidgets('Android: a filter chip keeps its hint', (t) async {
+    final handle = await pumpVaultList(t, isAndroid: true);
+    expect(
+      hintOf(t, find.byType(FilterChip).first),
+      isNotEmpty,
+      reason: 'the Linux fix stripped the hint TalkBack reads',
+    );
+    handle.dispose();
+  });
+
+  // Both layouts build their own folder selector and their own entry row, so
+  // each has its own call site and each can regress on its own.
+  for (final (name, surface) in const [('narrow', phone), ('wide', tablet)]) {
+    testWidgets('Android $name: the folder selector keeps its hint', (t) async {
+      final handle = await pumpVaultList(
+        t,
+        isAndroid: true,
+        surface: surface,
+      );
+      expect(
+        hintOf(t, find.byType(DropdownButton<String>).first),
+        isNotEmpty,
+        reason: 'the Linux fix stripped the hint TalkBack reads',
+      );
+      handle.dispose();
+    });
+
+    testWidgets('Android $name: an entry row keeps its hint', (t) async {
+      final handle = await pumpVaultList(
+        t,
+        isAndroid: true,
+        surface: surface,
+      );
+      expect(
+        hintOf(t, find.text('Alpha')),
+        isNotEmpty,
+        reason: 'the Linux fix stripped the hint TalkBack reads',
+      );
+      handle.dispose();
+    });
+
+    // Selection mode taps the row to tick it, so "opens this entry" would be a
+    // lie. Guard on the guard: the pin directly above proves the same lookup
+    // finds a hint when there is one, so this absence is real.
+    testWidgets('Android $name: a row in selection mode has no hint', (t) async {
+      final handle = await pumpVaultList(
+        t,
+        isAndroid: true,
+        surface: surface,
+      );
+      await t.tap(find.byIcon(Icons.checklist));
+      await t.pump(const Duration(milliseconds: 300));
+      expect(
+        hintOf(t, find.text('Alpha')),
+        isEmpty,
+        reason: 'a tickable row still claims that it opens the entry',
+      );
+      // The checkbox carries the entry title, so the row is not read as a bare
+      // "tick box". A merge wrapper has swallowed this label once before.
+      expect(
+        labelOf(t, find.text('Alpha')),
+        contains('Alpha'),
+        reason: 'the row in selection mode lost the entry title',
+      );
+      handle.dispose();
     });
   }
 }

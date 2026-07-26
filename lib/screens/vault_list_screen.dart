@@ -401,6 +401,40 @@ class _VaultListScreenState extends State<VaultListScreen>
     );
   }
 
+  /// Makes a control say what it DOES, not just what it is.
+  ///
+  /// A Linux screen reader is given only a node's NAME — the embedder never
+  /// reads a semantics hint at all (LEARNINGS.md), which is why Orca spoke
+  /// none of these in round 16. So on Linux the outcome goes inside the name,
+  /// after the control's own name. Android does read hints and TalkBack
+  /// already passes, so there the hint is left exactly as it was.
+  ///
+  /// [outcome] null means the control has nothing to promise right now (a row
+  /// in selection mode ticks rather than opens), so nothing is added at all.
+  ///
+  /// `isAndroid` is fixed for the life of the app, so this branch never
+  /// reshapes the tree at runtime — unlike the decoration flip that once cost
+  /// a row its focus node.
+  Widget _saysWhatItDoes(
+    Widget child, {
+    required String name,
+    String? outcome,
+  }) {
+    if (outcome == null) return child;
+    return widget.isAndroid
+        ? Semantics(hint: outcome, child: child)
+        : Semantics(label: '$name. $outcome', child: child);
+  }
+
+  /// The `semanticsLabel` for the Text that shows a control's own name: blank
+  /// where [_saysWhatItDoes] has already composed that name into the label, so
+  /// it is not spoken twice; null (unchanged) otherwise.
+  ///
+  /// A blanked VALUE, not a wrapper widget: wrapping would change the widget
+  /// tree's shape, which is what disposed a row's focus node once before.
+  String? _ownNameLabel({String? outcome}) =>
+      outcome != null && !widget.isAndroid ? '' : null;
+
   /// The Tab stops in cycle order for the current state. Folder appears only
   /// when there are folders. Detail appears only when the two-pane layout has
   /// mounted its region (i.e. wide AND an entry is selected) — its scope carries
@@ -1510,17 +1544,38 @@ class _VaultListScreenState extends State<VaultListScreen>
         BorderSide(color: theme.colorScheme.primary, width: hc ? 3 : 2);
     final flat =
         OutlineInputBorder(borderSide: BorderSide(color: theme.colorScheme.outline));
+    final placeholder =
+        _fullTextSearch ? l.searchAllFieldsHint : l.searchEntriesHint;
+    // Two shortcuts reach this box and they differ in WHAT they search, which
+    // a screen-reader user has no other way to discover. Only Linux is told:
+    // there is no keyboard on Android to press them on.
+    final searchOutcome = widget.isAndroid
+        ? l.hintSearch
+        : '${l.hintSearch}. Ctrl+F: ${l.kbFocusSearch}. '
+              'Ctrl+Shift+F: ${l.kbSearchAllFields}';
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-      // The hint says what typing DOES; hintText only supplies the field's name.
-      child: Semantics(
-        hint: l.hintSearch,
-        child: TextField(
+      child: _saysWhatItDoes(
+        TextField(
         controller: _searchController,
         focusNode: _searchFocus,
         decoration: InputDecoration(
-          hintText:
-              _fullTextSearch ? l.searchAllFieldsHint : l.searchEntriesHint,
+          // Android keeps Flutter's own placeholder, styling and all. Linux
+          // has to supply it as a WIDGET so its own name can be excluded from
+          // the semantics and composed into the label first instead — and
+          // Flutter does not style a placeholder it did not build, so the
+          // grey is restated here. Pinned against Android in
+          // a11y_region_net_test.dart.
+          hintText: widget.isAndroid ? placeholder : null,
+          hint: widget.isAndroid
+              ? null
+              : Text(
+                  placeholder,
+                  semanticsLabel: '',
+                  style: theme.textTheme.bodyLarge!.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
           prefixIcon: IconButton(
             icon: Icon(_fullTextSearch ? Icons.manage_search : Icons.search),
             tooltip: _fullTextSearch
@@ -1554,6 +1609,8 @@ class _VaultListScreenState extends State<VaultListScreen>
         ),
         onChanged: (value) => setState(() => _searchQuery = value),
         ),
+        name: placeholder,
+        outcome: searchOutcome,
       ),
     );
   }
@@ -1581,16 +1638,22 @@ class _VaultListScreenState extends State<VaultListScreen>
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                       // MergeSemantics: the chip builds its own container node,
                       // so a bare Semantics above it would sit in a separate
-                      // node and the hint would never reach the chip.
+                      // node and never reach the chip.
                       child: MergeSemantics(
-                        child: Semantics(
-                          hint: l.hintFilterChip,
-                          child: FilterChip(
-                            label: Text(_filterLabel(f, l)),
+                        child: _saysWhatItDoes(
+                          FilterChip(
+                            label: Text(
+                              _filterLabel(f, l),
+                              semanticsLabel: _ownNameLabel(
+                                outcome: l.hintFilterChip,
+                              ),
+                            ),
                             selected: _selectedFilter == f,
                             onSelected: (_) =>
                                 setState(() => _selectedFilter = f),
                           ),
+                          name: _filterLabel(f, l),
+                          outcome: l.hintFilterChip,
                         ),
                       ),
                     ),
@@ -1935,9 +1998,8 @@ class _VaultListScreenState extends State<VaultListScreen>
                       Padding(
                       padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
                       child: MergeSemantics(
-                        child: Semantics(
-                        hint: l.hintFolderSelector,
-                        child: DropdownButton<String>(
+                        child: _saysWhatItDoes(
+                        DropdownButton<String>(
                         focusNode: _folderFocus,
                         isExpanded: true,
                         // Let open-menu items grow to their wrapped height
@@ -1962,6 +2024,9 @@ class _VaultListScreenState extends State<VaultListScreen>
                                       label,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
+                                      semanticsLabel: _ownNameLabel(
+                                        outcome: l.hintFolderSelector,
+                                      ),
                                     ),
                                   ),
                                 )
@@ -1978,6 +2043,10 @@ class _VaultListScreenState extends State<VaultListScreen>
                           ),
                         ],
                       ),
+                        name: _selectedFolder.isEmpty
+                            ? l.allFolders
+                            : _selectedFolder,
+                        outcome: l.hintFolderSelector,
                       ),
                       ),
                     ),
@@ -2032,9 +2101,8 @@ class _VaultListScreenState extends State<VaultListScreen>
                     Padding(
                     padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
                     child: MergeSemantics(
-                      child: Semantics(
-                    hint: l.hintFolderSelector,
-                    child: DropdownButton<String>(
+                      child: _saysWhatItDoes(
+                    DropdownButton<String>(
                       focusNode: _folderFocus,
                       isExpanded: true,
                       // Let open-menu items grow to their wrapped height
@@ -2059,6 +2127,9 @@ class _VaultListScreenState extends State<VaultListScreen>
                                     label,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
+                                    semanticsLabel: _ownNameLabel(
+                                      outcome: l.hintFolderSelector,
+                                    ),
                                   ),
                                 ),
                               )
@@ -2072,6 +2143,10 @@ class _VaultListScreenState extends State<VaultListScreen>
                         ),
                       ],
                     ),
+                    name: _selectedFolder.isEmpty
+                        ? l.allFolders
+                        : _selectedFolder,
+                    outcome: l.hintFolderSelector,
                     ),
                     ),
                   ),
@@ -2149,13 +2224,13 @@ class _VaultListScreenState extends State<VaultListScreen>
                                     final entry = item as EntrySummaryData;
                                     final el = AppLocalizations.of(context);
                                     // Selection mode taps the row to tick it,
-                                    // so the "opens this entry" hint would then
-                                    // be a lie.
-                                    return Semantics(
-                                      hint: _isSelecting
-                                          ? null
-                                          : el.hintEntryRow,
-                                      child: ListTile(
+                                    // so "opens this entry" would then be a
+                                    // lie.
+                                    final rowOutcome = _isSelecting
+                                        ? null
+                                        : el.hintEntryRow;
+                                    return _saysWhatItDoes(
+                                      ListTile(
                                       dense: true,
                                       leading: _isSelecting
                                           ? _selectionCheckbox(
@@ -2175,6 +2250,9 @@ class _VaultListScreenState extends State<VaultListScreen>
                                             ),
                                       title: Text(
                                         _localizedDisplayTitle(entry, el),
+                                        semanticsLabel: _ownNameLabel(
+                                          outcome: rowOutcome,
+                                        ),
                                       ),
                                       subtitle: Text(
                                         _displayType(entry.entryType, el),
@@ -2211,6 +2289,15 @@ class _VaultListScreenState extends State<VaultListScreen>
                                                               getEntry(id: id))(
                                                         entry.id,
                                                       ),
+                                                  // Honour the injected delete
+                                                  // too — same reason as the
+                                                  // fetch above: calling the
+                                                  // FFI directly left deleting
+                                                  // from here untestable.
+                                                  onDeleteEntry:
+                                                      widget.onDeleteEntryFn ??
+                                                      (id) =>
+                                                          deleteEntry(id: id),
                                                   clipboardClearTimeout:
                                                       GabbroApp.of(context)
                                                           .settings
@@ -2221,6 +2308,8 @@ class _VaultListScreenState extends State<VaultListScreen>
                                         if (mounted) _loadEntries();
                                       },
                                       ),
+                                      name: _localizedDisplayTitle(entry, el),
+                                      outcome: rowOutcome,
                                     );
                                   },
                                 ),
