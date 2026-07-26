@@ -41,8 +41,8 @@ cycle. Ctrl shortcuts (L, F) are global and matched on the **physical** key.
   rail. Consequence — since Tab is the only traversal (the default is absorbed),
   excluded controls are keyboard-*unreachable*, so the ones a keyboard user still
   needs get a shortcut: **Ctrl+N** opens the new-entry picker (the FAB), **Ctrl+M**
-  opens the overflow menu, **Ctrl+L** locks. (Ctrl+M itself is a Bikeshed item;
-  Ctrl+N shipped here.) Select-entries stays mouse-only for now.
+  opens the overflow menu, **Ctrl+L** locks, **Ctrl+Q** raises the menu's own
+  lock-and-quit confirm. Select-entries stays mouse-only for now.
 - Narrow (single-pane): the detail view is a separate pushed screen, so it is not
   a Tab region on the list screen; `Enter` on an entry pushes it, `Esc` pops it.
 

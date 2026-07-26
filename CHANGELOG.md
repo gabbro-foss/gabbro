@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
      window (the 48dp minimum was applied to the narrow layout only).
      At merge, add under Fixed: on a wide window a deleted entry could stay in the
      list until the window was refocused.
+     At merge, add under Added: Ctrl+Q asks to lock and quit (same confirm as the
+     menu item), listed on the keyboard shortcuts screen.
      At merge, add under Added: screen-reader support — the search box, category chips,
      folder selector and entry rows say what they DO, and each region is named (Linux),
      in all 37 languages; the search box also names its two shortcuts. -->

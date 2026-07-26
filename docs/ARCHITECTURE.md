@@ -26,7 +26,7 @@ Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
 
 **Settings:** `~/.config/gabbro/settings.jsonc` (Linux). JSONC format — human-editable. Theme, text scale (`text_scale`, 0.8-8.0), high-contrast, alphabet bar position.
 
-**Keyboard shortcuts (Linux desktop):** Ctrl+L lock, Ctrl+F / Ctrl+Shift+F search, Esc dismiss/cancel. No Ctrl+C (copying a secret stays a deliberate, auto-clearing action); no Super key. Listed in-app on the desktop-only Keyboard shortcuts screen.
+**Keyboard shortcuts (Linux desktop):** Ctrl+L lock, Ctrl+F / Ctrl+Shift+F search, Ctrl+N new entry, Ctrl+M menu, Ctrl+Q lock and quit (confirms first), Esc dismiss/cancel. No Ctrl+C (copying a secret stays a deliberate, auto-clearing action); no Super key. Listed in-app on the desktop-only Keyboard shortcuts screen.
 
 **Platforms:** v1: Linux (Arch + Mint/deb), Android, GrapheneOS. v2 maybe: Windows.
 
@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1876 | 10 |
+| Flutter (`flutter test`) | 1884 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -142,9 +142,7 @@ never read and `liveRegion` is inert, so anything event-shaped has to go through
 2. Ctrl+N's dialog repeats its labels and never says "new entry" (round 16).
 3. **Announcements — one package.** All of it needs `SemanticsService.announce()`
    (verified wired on Linux, round 16); none of it can be done with a named container.
-   - Ctrl+F, Ctrl+Shift+F and Ctrl+M say nothing when pressed.
-   - **Ctrl+Q (lock and quit): add it here**, so every shortcut is wired, listed and
-     announced in one pass. Moved from the Bikeshed.
+   - Ctrl+F, Ctrl+Shift+F, Ctrl+M and Ctrl+Q say nothing when pressed.
    - The entry list repeats its region name on every arrow move — announcing region
      entry explicitly replaces the named-container mechanism that causes it.
 
