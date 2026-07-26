@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1873 | 10 |
+| Flutter (`flutter test`) | 1876 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -148,32 +148,7 @@ never read and `liveRegion` is inert, so anything event-shaped has to go through
    - The entry list repeats its region name on every arrow move — announcing region
      entry explicitly replaces the named-container mechanism that causes it.
 
-**Open: a deleted entry stays in the two-pane list** until the window is refocused.
-Intermittent, needs Orca running; the widget harness cannot reproduce it at all
-(`test/vault_list_delete_refresh_test.dart` passes against the broken code too).
-
-**CAUSE PROVEN (round 19 log), fix not yet written.** The failing run prints
-`delete: vault delete done, mounted=false`: the detail pane is disposed while the vault
-is still deleting, so `_confirmDelete`'s `if (!context.mounted) return;` bails out and
-`onDeleted` never runs — no reload, no cleared selection. The later reload in the log is
-the app-resume handler when the window was refocused. Likely trigger for the dispose:
-`TabletVaultLayout.didUpdateWidget` clears `_selectedEntryId` as soon as the entry leaves
-`filteredEntries`, which unmounts the detail pane mid-await.
-
-- **Fix designed:** capture `widget.onDeleted` *before* the await and call it regardless
-  of `context.mounted` — that guard should only cover uses of `context` (the
-  `Navigator.pop`). The parent's own `setState` guards itself with its own `mounted`, and
-  `onRefresh` is captured at build time so it survives the teardown. Testable headlessly:
-  pump the detail screen, start a delete that does not complete, replace the tree, then
-  complete it and assert the parent was still told.
-- Two earlier changes went in as hardening, NOT as a fix: the detail region is mounted
-  unconditionally (it was a `cond ? child : Wrapper(child)`), and the reload runs before
-  the selection is cleared.
-- **Temporary `debugPrint`s tagged `GABBRO` are in `tablet_vault_layout`, `vault_list_screen`
-  and `entry_detail_screen`. REMOVE BEFORE MERGE** — keep them until the fix is
-  hardware-confirmed.
-
-**Merge gate:** master once an Orca round covering the four above passes on Linux, the
+**Merge gate:** master once an Orca round covering the three above passes on Linux, the
 Android TalkBack spot-check stays green, and the matrix's core-vault-operations section
 passes.
 
