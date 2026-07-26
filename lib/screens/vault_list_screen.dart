@@ -218,6 +218,13 @@ void Function()? openNewEntry;
 /// button, so this is the keyboard path to it. No-op when null.
 void Function()? openVaultMenu;
 
+/// Set by the active vault list so the GLOBAL Ctrl+Q handler (main.dart) can
+/// lock and quit from anywhere on that screen. It raises the SAME confirm dialog
+/// as the menu's Quit item — an accidental keystroke must not end a live session.
+/// Null when no vault list is mounted, or when quitting isn't offered (`onQuit`
+/// is null off Linux), so the key is inert exactly where the menu item is absent.
+void Function()? quitVault;
+
 class VaultListScreen extends StatefulWidget {
   final String vaultPath;
   final String? vaultAlias;
@@ -529,6 +536,12 @@ class _VaultListScreenState extends State<VaultListScreen>
     if (mounted && _actionShortcutActive()) _menuKey.currentState?.showButtonMenu();
   }
 
+  void _handleQuitShortcut() {
+    if (mounted && _actionShortcutActive() && widget.onQuit != null) {
+      _confirmQuit();
+    }
+  }
+
   /// Esc handler (registered as the global [vaultRegionEscape] hook): drop focus
   /// out of the cycle, back to Unfocused. Returns true when it consumed the key.
   ///
@@ -601,6 +614,7 @@ class _VaultListScreenState extends State<VaultListScreen>
     vaultRegionActive = _regionCycleActive;
     openNewEntry = _handleNewEntryShortcut;
     openVaultMenu = _handleMenuShortcut;
+    quitVault = _handleQuitShortcut;
     _yubikeyRecords = widget.yubikeyRecords ?? _detectYubikeyRecords();
     _loadEntries();
     _chipScrollController.addListener(_updateChevrons);
@@ -635,6 +649,7 @@ class _VaultListScreenState extends State<VaultListScreen>
     if (vaultRegionActive == _regionCycleActive) vaultRegionActive = null;
     if (openNewEntry == _handleNewEntryShortcut) openNewEntry = null;
     if (openVaultMenu == _handleMenuShortcut) openVaultMenu = null;
+    if (quitVault == _handleQuitShortcut) quitVault = null;
     WidgetsBinding.instance.removeObserver(this);
     _searchController.dispose();
     _searchFocus.dispose();

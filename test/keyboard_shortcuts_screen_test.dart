@@ -36,6 +36,7 @@ void main() {
       'Ctrl+L',
       'Ctrl+N',
       'Ctrl+M',
+      'Ctrl+Q',
       'Ctrl+F',
       'Ctrl+Shift+F',
       'Esc',
@@ -47,9 +48,10 @@ void main() {
 
     for (final desc in [
       l.kbLockVault,
-      // Ctrl+N / Ctrl+M reuse the existing localized action labels (DRY).
+      // Ctrl+N / Ctrl+M / Ctrl+Q reuse existing localized action labels (DRY).
       l.newEntryTitle,
       l.tooltipMenu,
+      l.quit,
       l.kbFocusSearch,
       l.kbSearchAllFields,
       l.kbMoveBetweenControls,

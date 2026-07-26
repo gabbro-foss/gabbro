@@ -7,9 +7,11 @@ import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/screens/import_failures_dialog.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
+import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/src/rust/api/import.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
+import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/vault_registry.dart';
 import 'package:gabbro/widgets/sync_review.dart';
 
@@ -303,6 +305,143 @@ void main() {
       await sendCtrl(tester, LogicalKeyboardKey.keyM);
       await tester.pumpAndSettle();
       expect(menuOpen, findsNothing, reason: 'no menu in selection mode');
+    });
+  });
+
+  // ── E. Ctrl+Q lock and quit (Linux desktop) ──────────────────────────────
+  // Same shape as Ctrl+N / Ctrl+M: a global handler routed to a vault-list hook,
+  // matched on the PHYSICAL key, self-gating. It must open the SAME confirm
+  // dialog as the menu's Quit item — an accidental keystroke must not end a live
+  // session.
+  group('Ctrl+Q lock and quit', () {
+    Widget quitList(
+      List<String> calls, {
+      bool isAndroid = false,
+      bool withEntry = false,
+    }) =>
+        appShell(
+          VaultListScreen(
+            vaultPath: '/tmp/probe.gabbro',
+            isAndroid: isAndroid,
+            yubikeyRecords: const [],
+            listEntries: () => withEntry
+                ? const [
+                    EntrySummaryData(
+                      id: 'e1',
+                      entryType: 'login',
+                      title: 'Alpha',
+                      folder: '',
+                      searchBlob: 'alpha',
+                    ),
+                  ]
+                : const <EntrySummaryData>[],
+            onLock: () => calls.add('lock'),
+            onQuit: () => calls.add('quit'),
+          ),
+          textScale: 1.0,
+        );
+
+    Future<List<String>> pumpQuitList(
+      WidgetTester tester, {
+      bool isAndroid = false,
+      bool withEntry = false,
+    }) async {
+      setSurface(tester, phone);
+      final calls = <String>[];
+      await tester.pumpWidget(
+          quitList(calls, isAndroid: isAndroid, withEntry: withEntry));
+      await tester.pump(const Duration(milliseconds: 300));
+      return calls;
+    }
+
+    // The menu item's own dialog title — the same one Ctrl+Q must raise.
+    Finder confirmDialog(WidgetTester tester) => find.text(
+        AppLocalizations.of(tester.element(find.byType(VaultListScreen)))
+            .quitConfirmTitle);
+
+    testWidgets('Ctrl+Q opens the confirm dialog and quits nothing yet',
+        (tester) async {
+      final calls = await pumpQuitList(tester);
+      await sendCtrl(tester, LogicalKeyboardKey.keyQ);
+      await tester.pumpAndSettle();
+
+      expect(confirmDialog(tester), findsOneWidget,
+          reason: 'Ctrl+Q must raise the same confirm as the menu item');
+      expect(calls, isEmpty, reason: 'nothing happens until it is confirmed');
+    });
+
+    testWidgets('confirming locks then exits', (tester) async {
+      final calls = await pumpQuitList(tester);
+      await sendCtrl(tester, LogicalKeyboardKey.keyQ);
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, 'Quit'));
+      await tester.pumpAndSettle();
+
+      expect(calls, ['lock', 'quit'],
+          reason: 'keys must be wiped before the process exits');
+    });
+
+    testWidgets('cancelling neither locks nor exits', (tester) async {
+      final calls = await pumpQuitList(tester);
+      await sendCtrl(tester, LogicalKeyboardKey.keyQ);
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
+      await tester.pumpAndSettle();
+
+      expect(calls, isEmpty);
+    });
+
+    testWidgets('plain Q does nothing', (tester) async {
+      final calls = await pumpQuitList(tester);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyQ);
+      await tester.pumpAndSettle();
+
+      expect(confirmDialog(tester), findsNothing);
+      expect(calls, isEmpty);
+    });
+
+    testWidgets('Ctrl+Q is inert on Android', (tester) async {
+      final calls = await pumpQuitList(tester, isAndroid: true);
+      await sendCtrl(tester, LogicalKeyboardKey.keyQ);
+      await tester.pumpAndSettle();
+
+      expect(confirmDialog(tester), findsNothing,
+          reason: 'no physical keyboard on Android');
+      expect(calls, isEmpty);
+    });
+
+    testWidgets('Ctrl+Q is inert in selection mode', (tester) async {
+      final calls = await pumpQuitList(tester, withEntry: true);
+      await tester.tap(find.byIcon(Icons.checklist));
+      await tester.pumpAndSettle();
+      await sendCtrl(tester, LogicalKeyboardKey.keyQ);
+      await tester.pumpAndSettle();
+
+      expect(confirmDialog(tester), findsNothing);
+      expect(calls, isEmpty);
+    });
+
+    testWidgets('Ctrl+Q is inert while another route is on top', (tester) async {
+      final calls = await pumpQuitList(tester);
+      await sendCtrl(tester, LogicalKeyboardKey.keyN); // type picker
+      await tester.pumpAndSettle();
+      await sendCtrl(tester, LogicalKeyboardKey.keyQ);
+      await tester.pumpAndSettle();
+
+      expect(confirmDialog(tester), findsNothing,
+          reason: 'inert when the vault list is not the current route');
+      expect(calls, isEmpty);
+    });
+
+    testWidgets('Ctrl+Q is inert once the vault list is gone', (tester) async {
+      final calls = await pumpQuitList(tester);
+      await tester.pumpWidget(const SizedBox.shrink());
+      await sendCtrl(tester, LogicalKeyboardKey.keyQ);
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull,
+          reason: 'the global hook must be cleared when the screen disposes');
+      expect(calls, isEmpty);
     });
   });
 

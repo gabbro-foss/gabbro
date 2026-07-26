@@ -24,7 +24,8 @@ import 'package:gabbro/screens/vault_list_screen.dart'
         vaultRegionEscape,
         vaultRegionActive,
         openNewEntry,
-        openVaultMenu;
+        openVaultMenu,
+        quitVault;
 import 'package:gabbro/src/rust/api/autotype_bridge.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/settings.dart';
@@ -773,6 +774,13 @@ class _GabbroAppState extends State<GabbroApp>
       if (isCtrlShortcut(event, PhysicalKeyboardKey.keyM) &&
           openVaultMenu != null) {
         openVaultMenu!();
+        return true;
+      }
+      // Ctrl+Q asks to lock and quit — it raises the menu item's own confirm
+      // dialog rather than exiting, so a mistyped key costs a live session
+      // nothing. Same gating as Ctrl+N / Ctrl+M.
+      if (isCtrlShortcut(event, PhysicalKeyboardKey.keyQ) && quitVault != null) {
+        quitVault!();
         return true;
       }
       // Tab / Shift+Tab drives the vault-list region cycle when a vault list has
