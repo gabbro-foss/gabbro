@@ -39,11 +39,15 @@ const Map<String, ({ThemeChoice theme, bool highContrast})> _contrastModes = {
   'high-contrast dark': (theme: ThemeChoice.dark, highContrast: true),
 };
 
-/// Set the phone surface + a semantics handle, pump [app] at natural text scale,
-/// and settle. Caller disposes the returned handle.
-Future<SemanticsHandle> _pump(WidgetTester tester, Widget app) async {
-  tester.view.physicalSize = phone.physical;
-  tester.view.devicePixelRatio = phone.dpr;
+/// Set [surface] + a semantics handle, pump [app] at natural text scale, and
+/// settle. Caller disposes the returned handle.
+Future<SemanticsHandle> _pump(
+  WidgetTester tester,
+  Widget app, {
+  Surface surface = phone,
+}) async {
+  tester.view.physicalSize = surface.physical;
+  tester.view.devicePixelRatio = surface.dpr;
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
   final handle = tester.ensureSemantics();
@@ -51,6 +55,13 @@ Future<SemanticsHandle> _pump(WidgetTester tester, Widget app) async {
   await tester.pump(const Duration(milliseconds: 300));
   return handle;
 }
+
+/// The surface a catalog screen is swept on. Entries that only exist above a
+/// width breakpoint are rendered on the TABLET surface rather than skipped —
+/// skipping left the whole two-pane layout (its list and detail regions) with no
+/// accessibility coverage at all. Mirrors what the overflow probe already does.
+Surface _surfaceFor(String key) =>
+    tabletOnly.containsKey(key) ? tablet : phone;
 
 /// Wrap a dialog opener the same way the overflow probe does, tap it, settle.
 Widget _dialogOpener(Future<void> Function(BuildContext) dialog) => Builder(
@@ -286,12 +297,12 @@ void main() {
               theme: mode.value.theme,
               highContrast: mode.value.highContrast,
             ),
+            surface: _surfaceFor(entry.key),
           );
           await expectLater(tester, meetsGuideline(textContrastGuideline));
           handle.dispose();
         },
-        skip: _knownLowContrast.containsKey(entry.key) ||
-            tabletOnly.containsKey(entry.key),
+        skip: _knownLowContrast.containsKey(entry.key),
       );
     }
 
@@ -326,12 +337,12 @@ void main() {
         final handle = await _pump(
           tester,
           appShell(entry.value(), textScale: 1.0),
+          surface: _surfaceFor(entry.key),
         );
         await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
         handle.dispose();
       },
-      skip: _knownTapTargetTooSmall.containsKey(entry.key) ||
-          tabletOnly.containsKey(entry.key),
+      skip: _knownTapTargetTooSmall.containsKey(entry.key),
     );
   }
 
@@ -360,12 +371,12 @@ void main() {
         final handle = await _pump(
           tester,
           appShell(entry.value(), textScale: 1.0),
+          surface: _surfaceFor(entry.key),
         );
         await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
         handle.dispose();
       },
-      skip: _knownUnlabelled.containsKey(entry.key) ||
-          tabletOnly.containsKey(entry.key),
+      skip: _knownUnlabelled.containsKey(entry.key),
     );
   }
 

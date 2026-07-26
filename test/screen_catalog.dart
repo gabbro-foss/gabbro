@@ -114,6 +114,28 @@ VaultEntryData login(String password, String notes) => VaultEntryData.login(
   ),
 );
 
+/// The vault list, seamed. Shared by the narrow and wide catalog entries so the
+/// two surfaces render an identical screen and only the width differs.
+Widget vaultListScreen() => VaultListScreen(
+  vaultPath: '/tmp/probe.gabbro',
+  vaultAlias: 'A rather long vault alias to stress the header',
+  isAndroid: false,
+  yubikeyRecords: const [],
+  listEntries: () => const [
+    EntrySummaryData(
+      id: 'e1',
+      entryType: 'login',
+      title: 'An entry title long enough to stress the row at max text',
+      folder: 'A rather long folder name',
+      searchBlob: '',
+    ),
+  ],
+  listFolders: () => const ['A rather long folder name', 'Work'],
+  getEntryFn: (_) => login('secret', 'Some notes'),
+  onDeleteEntryFn: (_) async {},
+  onRefreshFn: () {},
+);
+
 // Headless-instantiable screens. Platform-channel defaults are seamed out so a
 // MissingPluginException can't masquerade as a layout overflow or a11y failure.
 final Map<String, Widget Function()> screens = {
@@ -210,6 +232,23 @@ final Map<String, Widget Function()> screens = {
       ),
     ),
   ),
+  // The same region with a descendant holding focus, so the frame is actually
+  // painted. Without this entry both nets only ever saw the unfocused state, and
+  // the frame is exactly what the a11y layer has to describe.
+  'focus_region (focused)': () => Scaffold(
+    body: Center(
+      child: FocusRegion(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: ElevatedButton(
+            autofocus: true,
+            onPressed: () {},
+            child: const Text('A focused region long enough to stress the row'),
+          ),
+        ),
+      ),
+    ),
+  ),
   'gabbro_logo': () => const Scaffold(body: GabbroLogo(withText: true)),
   'segmented_row': () => Scaffold(
     body: Column(
@@ -261,48 +300,41 @@ final Map<String, Widget Function()> screens = {
   'import': () => ImportScreen(isAndroid: false),
   // The two-pane tablet layout. Probed on both surfaces even though it only
   // ships on the tablet path, so a phone-width regression cannot hide.
-  'tablet_vault_layout': () => TabletVaultLayout(
-    groupedEntries: const ['A', probeEntry],
-    filteredEntries: const [probeEntry],
-    letterIndex: const {'A': 0},
-    onLetterSelected: (_) {},
-    displayTitle: (e) => e.title,
-    displayType: (t) => t,
-    entryTypeIcon: (_) => Icons.lock,
-    searchBar: const SizedBox(height: 48),
-    filterChipRow: const SizedBox(height: 48),
-    searchActive: false,
-    onEntryTap: (_) {},
-    onRefresh: () {},
-    vaultPath: '/tmp/probe.gabbro',
-    clipboardClearTimeout: ClipboardClearTimeout.sixtySeconds,
-    getEntryFn: (_) => login('secret', 'Some notes'),
-    onDeleteEntryFn: (_) async {},
-    selectionMode: false,
-    selectedIds: const {},
-    onToggleSelection: (_) {},
+  // Wrapped in a Scaffold: in production it is the BODY of VaultListScreen's
+  // Scaffold, so it inherits that Material's text style. Rendered bare it picks
+  // up WidgetsApp's red error text style instead, which reads as a contrast
+  // failure the user can never meet.
+  'tablet_vault_layout': () => Scaffold(
+    body: TabletVaultLayout(
+      groupedEntries: const ['A', probeEntry],
+      filteredEntries: const [probeEntry],
+      letterIndex: const {'A': 0},
+      onLetterSelected: (_) {},
+      displayTitle: (e) => e.title,
+      displayType: (t) => t,
+      entryTypeIcon: (_) => Icons.lock,
+      searchBar: const SizedBox(height: 48),
+      filterChipRow: const SizedBox(height: 48),
+      searchActive: false,
+      onEntryTap: (_) {},
+      onRefresh: () {},
+      vaultPath: '/tmp/probe.gabbro',
+      clipboardClearTimeout: ClipboardClearTimeout.sixtySeconds,
+      getEntryFn: (_) => login('secret', 'Some notes'),
+      onDeleteEntryFn: (_) async {},
+      selectionMode: false,
+      selectedIds: const {},
+      onToggleSelection: (_) {},
+    ),
   ),
   // listEntries defaults to a real FFI call that fires at build, so it must be
   // seamed or the probe reaches the bridge instead of rendering.
-  'vault_list': () => VaultListScreen(
-    vaultPath: '/tmp/probe.gabbro',
-    vaultAlias: 'A rather long vault alias to stress the header',
-    isAndroid: false,
-    yubikeyRecords: const [],
-    listEntries: () => const [
-      EntrySummaryData(
-        id: 'e1',
-        entryType: 'login',
-        title: 'An entry title long enough to stress the row at max text',
-        folder: 'A rather long folder name',
-        searchBlob: '',
-      ),
-    ],
-    listFolders: () => const ['A rather long folder name', 'Work'],
-    getEntryFn: (_) => login('secret', 'Some notes'),
-    onDeleteEntryFn: (_) async {},
-    onRefreshFn: () {},
-  ),
+  'vault_list': vaultListScreen,
+  // The SAME screen at tablet width, where its LayoutBuilder switches to the
+  // two-pane layout. The 'tablet_vault_layout' entry above renders that pane
+  // directly; this one reaches it through the real call site, so a defect in the
+  // wiring between them cannot hide (see the two-layout-paths rule).
+  'vault_list (wide)': vaultListScreen,
   // yubikeyRecords: [] forces passphrase-only; left null it probes the vault
   // file over FFI at construction. The async checks below fire on init, so they
   // are seamed too or the probe would hit the real bridge.
@@ -460,6 +492,7 @@ final Map<String, Future<void> Function(BuildContext)> dialogs = {
 // artifact. vault_list_screen.dart gates the two-pane layout at >= 600dp.
 const Map<String, String> tabletOnly = {
   'tablet_vault_layout': 'built only at width >= 600dp',
+  'vault_list (wide)': 'the two-pane branch exists only at width >= 600dp',
 };
 
 /// Source files each catalog entry stands for. Declared explicitly rather than
@@ -482,6 +515,7 @@ const Map<String, String> covers = {
   'create_entry (card)': 'create_entry_screen',
   'onboarding': 'onboarding_screen',
   'focus_region': 'focus_region',
+  'focus_region (focused)': 'focus_region',
   'gabbro_logo': 'gabbro_logo',
   'segmented_row': 'segmented_row',
   'text_size_slider': 'text_size_slider',
@@ -498,6 +532,7 @@ const Map<String, String> covers = {
   'import': 'import_screen',
   'unlock': 'unlock_screen',
   'vault_list': 'vault_list_screen',
+  'vault_list (wide)': 'vault_list_screen',
   'tablet_vault_layout': 'tablet_vault_layout',
   'csv_mapping': 'csv_mapping_screen',
   'manage_yubikeys': 'manage_yubikeys_screen',
