@@ -73,7 +73,7 @@ class _HelpScreenState extends State<HelpScreen> {
             backgroundColor: Colors.black,
             foregroundColor: Colors.white,
             leading: IconButton(
-              icon: const Icon(Icons.close),
+              icon: Icon(Icons.close, semanticLabel: l.close),
               iconSize: scaledIconSize(context),
               tooltip: l.close,
               onPressed: () => Navigator.of(ctx).pop(),
@@ -129,7 +129,12 @@ class _HelpScreenState extends State<HelpScreen> {
                               // it and FLAG_SECURE blocks an external magnifier,
                               // so tap to open a full-screen pinch-zoom viewer
                               // (ADR-016 Phase 2b).
-                              child: Tooltip(
+                              // Merged so the image's semanticLabel lands on
+                              // the same node as the tap action: a Linux screen
+                              // reader reads only a node's name, and the
+                              // Tooltip's message never reaches it.
+                              child: MergeSemantics(
+                                child: Tooltip(
                                 message: l.helpEnlargeImage,
                                 child: InkWell(
                                   onTap: () => _openZoom(context, _kAssets[i]),
@@ -138,6 +143,10 @@ class _HelpScreenState extends State<HelpScreen> {
                                       Image.asset(
                                         _kAssets[i],
                                         fit: BoxFit.contain,
+                                        // The Tooltip above is invisible to a
+                                        // Linux screen reader; this is what
+                                        // names the tap target.
+                                        semanticLabel: l.helpEnlargeImage,
                                       ),
                                       Positioned(
                                         right: 4,
@@ -158,6 +167,7 @@ class _HelpScreenState extends State<HelpScreen> {
                                       ),
                                     ],
                                   ),
+                                ),
                                 ),
                               ),
                             ),
@@ -183,7 +193,10 @@ class _HelpScreenState extends State<HelpScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.chevron_left),
+                    icon: Icon(
+                      Icons.chevron_left,
+                      semanticLabel: l.tooltipPreviousPage,
+                    ),
                     iconSize: scaledIconSize(context),
                     tooltip: l.tooltipPreviousPage,
                     onPressed: _currentPage > 0 ? () => _goTo(_currentPage - 1) : null,
@@ -208,7 +221,10 @@ class _HelpScreenState extends State<HelpScreen> {
                     }),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.chevron_right),
+                    icon: Icon(
+                      Icons.chevron_right,
+                      semanticLabel: l.tooltipNextPage,
+                    ),
                     iconSize: scaledIconSize(context),
                     tooltip: l.tooltipNextPage,
                     onPressed: _currentPage < count - 1 ? () => _goTo(_currentPage + 1) : null,

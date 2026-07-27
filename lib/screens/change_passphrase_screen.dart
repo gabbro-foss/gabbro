@@ -360,6 +360,9 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                             _pinObscured
                                 ? Icons.visibility_off
                                 : Icons.visibility,
+                            semanticLabel: _pinObscured
+                                ? l.tooltipShowPin
+                                : l.tooltipHidePin,
                           ),
                           tooltip: _pinObscured
                               ? l.tooltipShowPin
@@ -404,6 +407,9 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                           _oldObscured
                               ? Icons.visibility_off
                               : Icons.visibility,
+                          semanticLabel: _oldObscured
+                              ? l.tooltipShow
+                              : l.tooltipHide,
                         ),
                         tooltip: _oldObscured ? l.tooltipShow : l.tooltipHide,
                         onPressed: () =>
@@ -431,6 +437,9 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                           _newObscured
                               ? Icons.visibility_off
                               : Icons.visibility,
+                          semanticLabel: _newObscured
+                              ? l.tooltipShow
+                              : l.tooltipHide,
                         ),
                         tooltip: _newObscured ? l.tooltipShow : l.tooltipHide,
                         onPressed: () =>
@@ -504,6 +513,9 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                           _confirmObscured
                               ? Icons.visibility_off
                               : Icons.visibility,
+                          semanticLabel: _confirmObscured
+                              ? l.tooltipShow
+                              : l.tooltipHide,
                         ),
                         tooltip: _confirmObscured
                             ? l.tooltipShow

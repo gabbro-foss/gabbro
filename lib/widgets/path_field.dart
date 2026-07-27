@@ -114,7 +114,10 @@ class _PathFieldState extends State<PathField> {
         suffixIcon: widget.readOnly
             ? null
             : IconButton(
-                icon: const Icon(Icons.folder_open),
+                icon: Icon(
+                  Icons.folder_open,
+                  semanticLabel: AppLocalizations.of(context).tooltipBrowse,
+                ),
                 tooltip: AppLocalizations.of(context).tooltipBrowse,
                 onPressed: _pick,
               ),

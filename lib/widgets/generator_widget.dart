@@ -570,7 +570,10 @@ class _GeneratorWidgetState extends State<GeneratorWidget>
           if (!_obscured && _generated.isNotEmpty)
             IconButton(
               key: const Key('breakdown_button'),
-              icon: const Icon(Icons.analytics_outlined),
+              icon: Icon(
+                Icons.analytics_outlined,
+                semanticLabel: l.passwordBreakdownTitle,
+              ),
               tooltip: l.passwordBreakdownTitle,
               onPressed: _showBreakdown,
             ),
@@ -578,14 +581,20 @@ class _GeneratorWidgetState extends State<GeneratorWidget>
           IconButton(
             key: const Key('visibility_toggle'),
             iconSize: scaledIconSize(context),
-            icon: Icon(_obscured ? Icons.visibility_off : Icons.visibility),
+            icon: Icon(
+              _obscured ? Icons.visibility_off : Icons.visibility,
+              semanticLabel: _obscured ? l.tooltipShow : l.tooltipHide,
+            ),
             tooltip: _obscured ? l.tooltipShow : l.tooltipHide,
             onPressed: () => setState(() => _obscured = !_obscured),
           ),
           // Copy button
           IconButton(
             key: const Key('copy_button'),
-            icon: Icon(_copied ? Icons.check : Icons.copy_outlined),
+            icon: Icon(
+              _copied ? Icons.check : Icons.copy_outlined,
+              semanticLabel: _copied ? l.tooltipCopied : l.tooltipCopy,
+            ),
             tooltip: _copied ? l.tooltipCopied : l.tooltipCopy,
             onPressed: _copy,
           ),

@@ -806,7 +806,10 @@ class _UnlockScreenState extends State<UnlockScreen>
                           return IconButton.outlined(
                             onPressed:
                                 _isUnlocking ? null : _unlockWithBiometrics,
-                            icon: const Icon(Icons.fingerprint),
+                            icon: Icon(
+                              Icons.fingerprint,
+                              semanticLabel: label,
+                            ),
                             iconSize: 24 * target,
                             tooltip: label,
                           );
@@ -1060,6 +1063,9 @@ class _UnlockScreenState extends State<UnlockScreen>
                             _obscured
                                 ? Icons.visibility_off
                                 : Icons.visibility,
+                            semanticLabel: _obscured
+                                ? l.tooltipShow
+                                : l.tooltipHide,
                           ),
                           tooltip: _obscured ? l.tooltipShow : l.tooltipHide,
                           onPressed: () =>
@@ -1111,6 +1117,9 @@ class _UnlockScreenState extends State<UnlockScreen>
                               _pinObscured
                                   ? Icons.visibility_off
                                   : Icons.visibility,
+                              semanticLabel: _pinObscured
+                                  ? l.tooltipShowPin
+                                  : l.tooltipHidePin,
                             ),
                             tooltip: _pinObscured
                                 ? l.tooltipShowPin
@@ -1185,7 +1194,7 @@ class _UnlockScreenState extends State<UnlockScreen>
         Align(
           alignment: Alignment.topLeft,
           child: IconButton(
-            icon: const Icon(Icons.power_settings_new),
+            icon: Icon(Icons.power_settings_new, semanticLabel: l.quit),
             tooltip: l.quit,
             onPressed: widget.onQuit,
           ),

@@ -230,7 +230,11 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddDialog,
         tooltip: l.addFolderTitle,
-        child: Icon(Icons.add, size: scaledIconSize(context)),
+        child: Icon(
+          Icons.add,
+          size: scaledIconSize(context),
+          semanticLabel: l.addFolderTitle,
+        ),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
@@ -261,12 +265,18 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              icon: const Icon(Icons.edit_outlined),
+                              icon: Icon(
+                                Icons.edit_outlined,
+                                semanticLabel: l.rename,
+                              ),
                               tooltip: l.rename,
                               onPressed: () => _showRenameDialog(folder),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.delete_outline),
+                              icon: Icon(
+                                Icons.delete_outline,
+                                semanticLabel: l.delete,
+                              ),
                               tooltip: l.delete,
                               onPressed: () => _showDeleteDialog(folder),
                             ),

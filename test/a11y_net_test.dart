@@ -31,21 +31,7 @@ const Map<String, String> _knownUnlabelled = <String, String>{};
 // listed here so they are visible rather than silently passing. Each is the
 // same one-line change (add semanticLabel beside the tooltip). Remove the entry
 // once the screen is fixed.
-const Map<String, String> _knownTooltipOnly = <String, String>{
-  'help': 'not yet swept',
-  'generator': 'not yet swept',
-  'generator_widget': 'not yet swept',
-  'export': 'not yet swept',
-  'import': 'not yet swept',
-  'change_passphrase': 'not yet swept',
-  'manage_folders': 'not yet swept',
-  'manage_vaults': 'not yet swept',
-  'recovery_history': 'not yet swept',
-  'path_field': 'not yet swept',
-  'unlock': 'not yet swept',
-  'review_changes': 'not yet swept',
-  'onboarding': 'not yet swept',
-};
+const Map<String, String> _knownTooltipOnly = <String, String>{};
 
 // Screens/dialogs with a KNOWN unfixed text-contrast failure, each skipped (not
 // silently passing) with a reason. Remove the entry once fixed. textContrast
