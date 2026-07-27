@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **The new-entry type picker said each entry type twice** to a screen reader.
 - **The folder selector was a 28dp tap target on a wide window** — the 48dp minimum was applied to the narrow layout only.
 - **On a wide window a deleted entry could stay in the list** until the window was refocused.
+- **The APK fingerprint in the README could not be pasted into AppVerifier** — the `Package:` and `SHA-256:` labels were rejected; it now shows the two bare lines AppVerifier expects.
 
 
 ## [0.1.0-alpha.16] – 2026-07-22
