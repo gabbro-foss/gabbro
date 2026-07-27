@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
@@ -262,6 +263,19 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
         // the list until something else forced a reload.
         widget.onRefresh();
         setState(() => _selectedEntryId = null);
+        // The pane the user was working in vanishes and the empty state takes
+        // its place. A Linux screen reader reads a node's NAME when focus
+        // arrives at it, and nothing here moves focus, so the whole thing
+        // happened in silence (round 27). Speaking the empty state's own
+        // visible text says the entry is gone and what is there instead.
+        // Linux only, on the same gate as the rest of the region layer.
+        if (_keyboardNav) {
+          SemanticsService.sendAnnouncement(
+            View.of(context),
+            AppLocalizations.of(context).selectEntry,
+            Directionality.of(context),
+          );
+        }
       },
       onEdited: () => widget.onRefresh(),
     );
