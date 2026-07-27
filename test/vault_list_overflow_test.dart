@@ -57,7 +57,46 @@ Future<void> _pumpWithKeyboard(
   await tester.pumpAndSettle();
 }
 
+/// Pumps the vault list at [w]x[h] logical px at [textScale], no keyboard.
+///
+/// Large text is where the two-pane layout is most fragile. In a Row, changing
+/// any child's width changes every sibling's height: a narrower left-hand
+/// column gives the detail pane more room, its placeholder wraps onto fewer
+/// lines, and the vertical extent changes throughout. That is what made a
+/// previous overflow look like the nav rail's fault when it was not (see
+/// LEARNINGS, "A layout fix that 'works' can be pure correlation"), so any
+/// change to the row's children needs this pinned before and after.
+Future<void> _pumpAtTextScale(
+  WidgetTester tester, {
+  required double w,
+  required double h,
+  required double textScale,
+}) async {
+  tester.view.physicalSize = Size(w, h);
+  tester.view.devicePixelRatio = 1.0;
+  tester.platformDispatcher.textScaleFactorTestValue = textScale;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+  addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+  await tester.pumpWidget(testApp(VaultListScreen(
+    vaultPath: '/tmp/test.gabbro',
+    listEntries: _entries,
+    listFolders: () => ['Work', 'Personal'],
+  )));
+  await tester.pumpAndSettle();
+}
+
 void main() {
+  // Two-pane layout at large text, no keyboard. Pins the current geometry so a
+  // change to the row's children is judged against a known-good baseline.
+  for (final scale in <double>[2.0, 4.0]) {
+    testWidgets('two-pane at ${scale}x text: no overflow', (tester) async {
+      await _pumpAtTextScale(tester, w: 900, h: 700, textScale: scale);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   testWidgets('phone portrait, alphabet bar left + FAB: no overflow with keyboard',
       (tester) async {
     await _pumpWithKeyboard(tester, w: 400, h: 800, bar: AlphabetBarPosition.left);

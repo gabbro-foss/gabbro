@@ -16,7 +16,7 @@ import 'screen_catalog.dart';
 //
 // Cycle (narrow): search -> folder(if any) -> chips -> list -> wrap.
 // Cycle (wide): ... -> list -> detail(skip if no entry selected) -> wrap.
-// Excluded everywhere: FAB, select-entries, lock, menu, nav rail, alphabet bar
+// Excluded everywhere: FAB, select-entries, lock, menu, alphabet bar
 // (the bar is a touch scroll-shortcut; Up/Down in the list already covers it — DRY),
 // and the search-mode toggle icon (Ctrl+F / Ctrl+Shift+F reach + set it directly — DRY).
 //
@@ -67,7 +67,6 @@ String _stop() {
   if (n == null) return 'none';
   final ctx = n.context;
   if (ctx == null) return 'other';
-  if (ctx.findAncestorWidgetOfExactType<NavigationRail>() != null) return 'rail';
   if (ctx.findAncestorWidgetOfExactType<FloatingActionButton>() != null) {
     return 'fab';
   }
@@ -136,7 +135,9 @@ Future<void> _pump(WidgetTester t, Surface surface, Widget screen) async {
   _stripDebugLabels(t);
 }
 
-const _excluded = {'fab', 'appbar', 'rail'};
+// 'rail' was here too, until the nav rail was removed — the widget is gone, so
+// _stop() can no longer report it and an entry for it would guard nothing.
+const _excluded = {'fab', 'appbar'};
 
 const _cycleStops = {'search', 'folder', 'chips', 'list', 'detail'};
 
@@ -410,7 +411,7 @@ void main() {
       ]);
     });
 
-    testWidgets('the nav rail is never in the cycle', (t) async {
+    testWidgets('the FAB and the app bar are never in the cycle', (t) async {
       await _pump(t, tablet, _denseVaultList());
       final seq = await _walk(t, 12);
       for (final s in seq) {

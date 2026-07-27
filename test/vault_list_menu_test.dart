@@ -118,6 +118,39 @@ void main() {
     expect(icon.size, greaterThan(24));
   });
 
+  // ADR-016 Phase 3: the two icons inside the search box — the search-mode
+  // toggle (title-only vs all-fields) and the clear button — were the last
+  // fixed-24 icons on this screen. A low-vision user reading 3x text still got
+  // 24px glyphs there while every other icon around them grew.
+  testWidgets('search box icons are base 24 at normal text', (tester) async {
+    await tester.pumpWidget(_buildScreenWithLoginEntry());
+    await _setNarrow(tester);
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).first, 'ex');
+    await tester.pumpAndSettle();
+
+    for (final glyph in [Icons.search, Icons.clear]) {
+      final icon = tester.widget<Icon>(find.byIcon(glyph));
+      expect(icon.size, 24, reason: '$glyph should be base 24');
+    }
+  });
+
+  testWidgets('search box icons scale up at large text', (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpWidget(_buildScreenWithLoginEntry());
+    await _setNarrow(tester);
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).first, 'ex');
+    await tester.pumpAndSettle();
+
+    for (final glyph in [Icons.search, Icons.clear]) {
+      final icon = tester.widget<Icon>(find.byIcon(glyph));
+      expect(icon.size, isNotNull, reason: '$glyph has no size');
+      expect(icon.size, greaterThan(24), reason: '$glyph should scale');
+    }
+  });
+
   // ADR-016 Phase 3: the app-bar popup-menu item icons are a fixed size 20 and
   // don't grow with the text scale — scale them (base 20 kept for menu density)
   // so a low-vision user gets proportionally larger menu glyphs.

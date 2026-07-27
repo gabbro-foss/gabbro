@@ -43,7 +43,6 @@ TabletVaultLayout _layout({
     onDeleteEntryFn: onDeleteEntryFn,
     listScope: listScope,
     detailScope: detailScope,
-    vaultPath: '/tmp/v.gabbro',
     clipboardClearTimeout: ClipboardClearTimeout.thirtySeconds,
     getEntryFn: getEntryFn,
     selectionMode: false,
@@ -85,40 +84,10 @@ VaultEntryData _login(String id) => VaultEntryData.login(
 TabletVaultLayout _listLayout() =>
     _layout(getEntryFn: (id) => throw Exception('unused'));
 
-Finder _railIcons() => find.descendant(
-      of: find.byType(NavigationRail),
-      matching: find.byType(Icon),
-    );
-
 void main() {
-  // ADR-016 Phase 3: the NavigationRail destination icons (default 24) don't
-  // grow with the text scale — scale them for low-vision users.
-  testWidgets('NavigationRail destination icons are base 24 at normal text',
-      (tester) async {
-    _setTablet(tester);
-    await tester.pumpWidget(testApp(_listLayout()));
-    await tester.pumpAndSettle();
-
-    final icons = _railIcons();
-    expect(icons, findsWidgets);
-    for (final icon in tester.widgetList<Icon>(icons)) {
-      expect(icon.size, 24);
-    }
-  });
-
-  testWidgets('NavigationRail destination icons scale up at large text',
-      (tester) async {
-    _setTablet(tester, textScale: 2.0);
-    await tester.pumpWidget(testApp(_listLayout()));
-    await tester.pumpAndSettle();
-
-    final icons = _railIcons();
-    expect(icons, findsWidgets);
-    for (final icon in tester.widgetList<Icon>(icons)) {
-      expect(icon.size, isNotNull);
-      expect(icon.size, greaterThan(24));
-    }
-  });
+  // The two NavigationRail icon-scaling tests that stood here went with the
+  // rail. ADR-016 Phase 3 stays covered by the list-row icon tests below, which
+  // pin the same helper on a widget that survives.
 
   // ADR-016 Phase 3: the tablet list-row type icon is a fixed size 20 — scale
   // it with the text.
