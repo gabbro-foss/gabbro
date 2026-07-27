@@ -115,22 +115,9 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Read the `gabbro_test` result for `remove_tablet_navigation_rail`, then act on it.**
-The gate was started at the end of the previous session (no `--warm` — no dependency
-changed). Nothing else should start until it is read.
-
-- **Green** -> merge to master (`--no-ff`, subject `Merge <branch>: <summary>`, short, no
-  body), push, then delete the branch locally and on origin. No second gate: the merged
-  tree is byte-identical to the one that passed.
-- **Red** -> fix on the branch. Master is unaffected either way.
-
-After the merge the next task is **empty** — pick the next item with the maintainer.
-
-The branch removes the wide-window NavigationRail (its Appearance / Security / About
-destinations are all in the app-bar menu; "Vault" did nothing) and fixes two pre-existing
-large-text defects: the wide list pane ran off the bottom because the search box and chips
-took the whole height, and the two search-box icons never grew with the text size. Tests
-green and hardware-passed.
+**Sync without a second unlock.** See if a vault sync can skip re-entering
+`passphrase + YubiKey` for the incoming vault, *if and only if* it shares the same
+`alias`, `passphrase` and `yubikey(s)` as the currently open vault.
 
 ---
 
@@ -149,7 +136,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
-- See if vault `syncing` can do without a second `passphrase + yubikey` if and only if the current vault and the incoming vault share the same `alias`, `passphrase`, `yubikey(s)`
 - in `sync` path, we currently have `auto-merge` and `review all changes`, the `auto-merge` is additive only (check and verify) and therefore never deletes items in the receiving vault: (1) add a message that explains this (or the correct) behaviour to the user, (2) add a third `sync` mechanism that simply takes the incoming vault and clobbers the existing one - discuss this
 
 ### Code Quality
