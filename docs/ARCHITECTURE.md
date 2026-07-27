@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1966 | 10 |
+| Flutter (`flutter test`) | 1972 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -118,9 +118,10 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 _(empty — pick the next item with the maintainer)_
 
 The wide-window NavigationRail is removed on branch `remove_tablet_navigation_rail`:
-code + tests green (Flutter 1970), **hardware test still outstanding**. The sweep also
-fixed a pre-existing overflow — at large text the wide list pane ran off the bottom
-because the search box and chips took the whole height.
+tests green and **hardware-passed**; pushed, not merged — it needs a full
+`gabbro_test` run first. The sweep also fixed two pre-existing large-text defects: the
+wide list pane ran off the bottom because the search box and chips took the whole height,
+and the two search-box icons never grew with the text size.
 
 ---
 
