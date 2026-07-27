@@ -140,6 +140,9 @@ never read and `liveRegion` is inert, so anything event-shaped has to go through
   tooltip, so every one of them said only "button".
 - The lock-and-quit confirm carries `semanticLabel`, so its question is read.
   Flutter supplies a default dialog name on Android only.
+- The search box says one thing, not five (round 24). It was reciting its
+  placeholder, what typing does and both shortcuts; the region above already
+  says "Search" and the shortcuts are on the Keyboard shortcuts screen.
 
 **Attempted and reverted (round 22).** Replacing each region's named Semantics
 container with an announcement on focus entry. Announcements leave the Linux
@@ -169,8 +172,8 @@ repeats its region name on every arrow press, which the maintainer has accepted
    says "button" for each. Listed by name in `_knownTooltipOnly`
    (`test/a11y_net_test.dart`), where the sweep skips them with a reason rather
    than passing silently. Each is the same one-line change.
-4. **The search box's name is too long to sit through** (round 22) — it carries
-   the placeholder, what typing does, and both shortcuts. Needs a wording call.
+Order of the remaining three, quickest first: the icon buttons (3), the silent
+delete (1), then the checkbox (2).
 
 **Merge gate:** master once an Orca round covering the three above passes on Linux, the
 Android TalkBack spot-check stays green, and the matrix's core-vault-operations section
