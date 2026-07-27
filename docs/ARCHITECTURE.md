@@ -115,16 +115,9 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Run the full gate (`gabbro_test`) before any other feature work.**
-
-The keyboard accessibility sweep is finished and hardware-passed — the a11y layer,
-the Android TalkBack spot-check and the core-vault-operations matrix all pass
-(rounds 13-31). What is left is mechanical: push `keyboard_accessibility_sweep`
-and merge it to master.
-
-Spec and mechanism as built: [KEYBOARD_NAV.md](KEYBOARD_NAV.md). Every hardware
-failure and its cause is in LEARNINGS.md — read those two before touching the
-semantics or focus code again, not this section.
+**Remove the tablet NavigationRail** (`tablet_vault_layout.dart`: Vault /
+Appearance / Security / About). Redundant with the app-bar overflow menu (same
+targets), low utility. Already excluded from the keyboard Tab-cycle.
 
 ---
 
@@ -140,10 +133,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Features and UI/UX
-- Add fastlane images to README (at least some if not all)
-- **Remove the tablet NavigationRail** (`tablet_vault_layout.dart`: Vault /
-  Appearance / Security / About). Redundant with the app-bar overflow menu (same
-  targets), low utility. Already excluded from the keyboard Tab-cycle.
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
