@@ -9,6 +9,40 @@ class AppLocalizationsIt extends AppLocalizations {
   AppLocalizationsIt([String locale = 'it']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Scorciatoie da tastiera';
+
+  @override
+  String get kbSectionGeneral => 'Generale';
+
+  @override
+  String get kbSectionSearch => 'Ricerca';
+
+  @override
+  String get kbSectionNavigation => 'Navigazione';
+
+  @override
+  String get kbLockVault => 'Blocca archivio';
+
+  @override
+  String get kbFocusSearch => 'Metti a fuoco la ricerca';
+
+  @override
+  String get kbSearchAllFields => 'Cerca in tutti i campi';
+
+  @override
+  String get kbMoveBetweenControls => 'Spostati tra i controlli';
+
+  @override
+  String get kbActivateControl => 'Attiva l\'elemento attivo';
+
+  @override
+  String get kbCloseDialog => 'Chiudi una finestra di dialogo o annulla';
+
+  @override
+  String get kbNoCopyNote =>
+      'Non esiste una scorciatoia per copiare: copiare un segreto è un\'azione deliberata che si cancella automaticamente.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override
@@ -2095,4 +2129,31 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Ridimensiona colonne';
+
+  @override
+  String get regionSearch => 'Ricerca';
+
+  @override
+  String get regionFolders => 'Cartelle';
+
+  @override
+  String get regionFilters => 'Categorie di voci';
+
+  @override
+  String get regionEntries => 'Elenco voci';
+
+  @override
+  String get regionDetails => 'Dettaglio voce';
+
+  @override
+  String get hintSearch => 'Filtra le voci mentre digiti';
+
+  @override
+  String get hintFolderSelector => 'Filtra le voci per cartella';
+
+  @override
+  String get hintFilterChip => 'Attiva o disattiva questo filtro di categoria';
+
+  @override
+  String get hintEntryRow => 'Apre questa voce';
 }

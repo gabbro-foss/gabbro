@@ -1,5 +1,17 @@
 {
   "@@locale": "yo",
+
+  "keyboardShortcutsTitle": "Àwọn kọ́tuulẹ́tẹ̀ bọ́tìnì",
+  "kbSectionGeneral": "Gbogbogbò",
+  "kbSectionSearch": "Ìwáàṣàwárí",
+  "kbSectionNavigation": "Ìtọ́nà",
+  "kbLockVault": "Titi vọọliti",
+  "kbFocusSearch": "Da ojú sí ìwáàṣàwárí",
+  "kbSearchAllFields": "Ṣawari gbogbo awọn aaye",
+  "kbMoveBetweenControls": "Rìn láàrin àwọn ìdarí",
+  "kbActivateControl": "Mú ìdarí tí a dá ojú sí ṣiṣẹ́",
+  "kbCloseDialog": "Ti onídirọ̀rọ̀ pa tàbí fagilé",
+  "kbNoCopyNote": "Kò sí kọ́tuulẹ́tẹ̀ láti daakọ: didaakọ àṣírí jẹ́ ìgbésẹ̀ onímọ̀ọ́mọ̀ tí ó ń parẹ́ fúnra rẹ̀.",
   "importSizeLimitNote": "Iwọn faili to pọ̀ jù: {textLimit} (CSV, Bitwarden, Dashlane, Google) tàbí {enpassLimit} (Enpass).",
   "importFileTooLarge": "Faili yìí ré ààlà {limit} kọjá.",
   "saveConfirmTitle": "Fi pamọ́ sí Gabbro",
@@ -871,5 +883,15 @@
   "restoreFromFileButton": "Dá padà láti fáìlì àfẹyìntì",
   "vaultRestoredMessage": "A ti dá àpótí ìṣúra padà. Ṣí i pẹ̀lú àwọn ìwé-ẹ̀rí rẹ.",
   "restoreFromFileInvalidError": "Fáìlì yẹn kì í ṣe àpótí ìṣúra Gabbro tó ṣeé lò.",
-  "resizeColumns": "Ṣàtúnṣe ìwọ̀n àwọn ọ̀wọ́n"
+  "resizeColumns": "Ṣàtúnṣe ìwọ̀n àwọn ọ̀wọ́n",
+
+  "regionSearch": "Ṣawari",
+  "regionFolders": "Awọn folda",
+  "regionFilters": "Awọn ẹka titẹ sii",
+  "regionEntries": "Atokọ titẹ sii",
+  "regionDetails": "Alaye titẹ sii",
+  "hintSearch": "Ṣe ayẹwo awọn titẹ sii bi o ṣe ń tẹ",
+  "hintFolderSelector": "Ṣe ayẹwo awọn titẹ sii nipa folda",
+  "hintFilterChip": "Tan tabi pa asẹ ẹka yii",
+  "hintEntryRow": "Ṣi titẹ sii yii"
 }

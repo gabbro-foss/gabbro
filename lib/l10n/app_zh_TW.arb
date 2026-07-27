@@ -1,5 +1,17 @@
 {
   "@@locale": "zh_TW",
+
+  "keyboardShortcutsTitle": "鍵盤快速鍵",
+  "kbSectionGeneral": "一般",
+  "kbSectionSearch": "搜尋",
+  "kbSectionNavigation": "導覽",
+  "kbLockVault": "鎖定保險庫",
+  "kbFocusSearch": "聚焦搜尋",
+  "kbSearchAllFields": "搜尋所有欄位",
+  "kbMoveBetweenControls": "在控制項之間移動",
+  "kbActivateControl": "啟動聚焦的控制項",
+  "kbCloseDialog": "關閉對話方塊或取消",
+  "kbNoCopyNote": "沒有複製快速鍵：複製機密是刻意的操作，並會自動清除。",
   "importSizeLimitNote": "檔案大小上限：{textLimit}（CSV、Bitwarden、Dashlane、Google）或 {enpassLimit}（Enpass）。",
   "importFileTooLarge": "此檔案超過 {limit} 的限制。",
   "saveConfirmTitle": "儲存到 Gabbro",
@@ -871,5 +883,15 @@
   "restoreFromFileButton": "從備份檔案復原",
   "vaultRestoredMessage": "保險庫已復原。請使用你的憑證解鎖。",
   "restoreFromFileInvalidError": "該檔案不是可用的 Gabbro 保險庫。",
-  "resizeColumns": "調整欄寬"
+  "resizeColumns": "調整欄寬",
+
+  "regionSearch": "搜尋",
+  "regionFolders": "資料夾",
+  "regionFilters": "項目類別",
+  "regionEntries": "項目清單",
+  "regionDetails": "項目詳細資料",
+  "hintSearch": "輸入時篩選項目",
+  "hintFolderSelector": "依資料夾篩選項目",
+  "hintFilterChip": "開啟或關閉此類別篩選",
+  "hintEntryRow": "開啟此項目"
 }

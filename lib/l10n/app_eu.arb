@@ -1,5 +1,17 @@
 {
   "@@locale": "eu",
+
+  "keyboardShortcutsTitle": "Teklatuko lasterbideak",
+  "kbSectionGeneral": "Orokorra",
+  "kbSectionSearch": "Bilaketa",
+  "kbSectionNavigation": "Nabigazioa",
+  "kbLockVault": "Gandegiak blokeatu",
+  "kbFocusSearch": "Bilaketan fokatu",
+  "kbSearchAllFields": "Eremu guztietan bilatu",
+  "kbMoveBetweenControls": "Kontrolen artean mugitu",
+  "kbActivateControl": "Fokatutako kontrola aktibatu",
+  "kbCloseDialog": "Itxi elkarrizketa-koadroa edo utzi",
+  "kbNoCopyNote": "Ez dago kopiatzeko lasterbiderik: sekretu bat kopiatzea nahita egindako ekintza da, automatikoki garbitzen dena.",
   "importSizeLimitNote": "Fitxategiaren gehienezko tamaina: {textLimit} (CSV, Bitwarden, Dashlane, Google) edo {enpassLimit} (Enpass).",
   "importFileTooLarge": "Fitxategi honek {limit} muga gainditzen du.",
   "saveConfirmTitle": "Gabbron gorde",
@@ -871,5 +883,15 @@
   "restoreFromFileButton": "Berreskuratu babeskopia-fitxategi batetik",
   "vaultRestoredMessage": "Kutxa gotorra berreskuratu da. Desblokeatu zure kredentzialekin.",
   "restoreFromFileInvalidError": "Fitxategi hori ez da erabilgarri den Gabbro kutxa gotor bat.",
-  "resizeColumns": "Aldatu zutabeen tamaina"
+  "resizeColumns": "Aldatu zutabeen tamaina",
+
+  "regionSearch": "Bilaketa",
+  "regionFolders": "Karpetak",
+  "regionFilters": "Sarreren kategoriak",
+  "regionEntries": "Sarreren zerrenda",
+  "regionDetails": "Sarreraren xehetasunak",
+  "hintSearch": "Sarrerak iragazten ditu idatzi ahala",
+  "hintFolderSelector": "Sarrerak karpetaka iragazten ditu",
+  "hintFilterChip": "Kategoria-iragazki hau aktibatu edo desaktibatzen du",
+  "hintEntryRow": "Sarrera hau irekitzen du"
 }

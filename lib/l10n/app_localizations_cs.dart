@@ -9,6 +9,40 @@ class AppLocalizationsCs extends AppLocalizations {
   AppLocalizationsCs([String locale = 'cs']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Klávesové zkratky';
+
+  @override
+  String get kbSectionGeneral => 'Obecné';
+
+  @override
+  String get kbSectionSearch => 'Hledání';
+
+  @override
+  String get kbSectionNavigation => 'Navigace';
+
+  @override
+  String get kbLockVault => 'Zamknout trezor';
+
+  @override
+  String get kbFocusSearch => 'Zaměřit hledání';
+
+  @override
+  String get kbSearchAllFields => 'Hledat ve všech polích';
+
+  @override
+  String get kbMoveBetweenControls => 'Přecházení mezi prvky';
+
+  @override
+  String get kbActivateControl => 'Aktivovat zaměřený prvek';
+
+  @override
+  String get kbCloseDialog => 'Zavřít dialog nebo zrušit';
+
+  @override
+  String get kbNoCopyNote =>
+      'Neexistuje zkratka pro kopírování: kopírování tajemství je záměrná akce s automatickým vymazáním.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override
@@ -2084,4 +2118,31 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Změnit velikost sloupců';
+
+  @override
+  String get regionSearch => 'Hledání';
+
+  @override
+  String get regionFolders => 'Složky';
+
+  @override
+  String get regionFilters => 'Kategorie záznamů';
+
+  @override
+  String get regionEntries => 'Seznam záznamů';
+
+  @override
+  String get regionDetails => 'Detail záznamu';
+
+  @override
+  String get hintSearch => 'Filtruje záznamy během psaní';
+
+  @override
+  String get hintFolderSelector => 'Filtruje záznamy podle složky';
+
+  @override
+  String get hintFilterChip => 'Zapne nebo vypne tento filtr kategorie';
+
+  @override
+  String get hintEntryRow => 'Otevře tento záznam';
 }

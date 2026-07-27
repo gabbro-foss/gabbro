@@ -9,6 +9,40 @@ class AppLocalizationsHu extends AppLocalizations {
   AppLocalizationsHu([String locale = 'hu']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Billentyűparancsok';
+
+  @override
+  String get kbSectionGeneral => 'Általános';
+
+  @override
+  String get kbSectionSearch => 'Keresés';
+
+  @override
+  String get kbSectionNavigation => 'Navigáció';
+
+  @override
+  String get kbLockVault => 'Széf zárolása';
+
+  @override
+  String get kbFocusSearch => 'Keresés fókuszálása';
+
+  @override
+  String get kbSearchAllFields => 'Keresés az összes mezőben';
+
+  @override
+  String get kbMoveBetweenControls => 'Váltás a vezérlők között';
+
+  @override
+  String get kbActivateControl => 'Fókuszált vezérlő aktiválása';
+
+  @override
+  String get kbCloseDialog => 'Párbeszédpanel bezárása vagy mégse';
+
+  @override
+  String get kbNoCopyNote =>
+      'Nincs másolási billentyűparancs: egy titok másolása szándékos, automatikusan törlődő művelet.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override
@@ -2090,4 +2124,31 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Oszlopok átméretezése';
+
+  @override
+  String get regionSearch => 'Keresés';
+
+  @override
+  String get regionFolders => 'Mappák';
+
+  @override
+  String get regionFilters => 'Bejegyzéskategóriák';
+
+  @override
+  String get regionEntries => 'Bejegyzéslista';
+
+  @override
+  String get regionDetails => 'Bejegyzés részletei';
+
+  @override
+  String get hintSearch => 'Gépelés közben szűri a bejegyzéseket';
+
+  @override
+  String get hintFolderSelector => 'Mappa szerint szűri a bejegyzéseket';
+
+  @override
+  String get hintFilterChip => 'Be- vagy kikapcsolja ezt a kategóriaszűrőt';
+
+  @override
+  String get hintEntryRow => 'Megnyitja ezt a bejegyzést';
 }

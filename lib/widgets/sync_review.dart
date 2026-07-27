@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 
@@ -261,7 +262,7 @@ class _SyncReviewSheet extends StatefulWidget {
 class _SyncReviewSheetState extends State<_SyncReviewSheet> {
   int _index = 0;
 
-  // Keyed "id field" or by id, as noted. Defaults favour keeping everything.
+  // Keyed "id field" or by id, as noted. Defaults favour keeping everything.
   final Map<String, bool> _keepBrought = {}; // default true
   final Map<String, bool> _keepNewEntry = {}; // default true
   final Map<String, bool> _deleteItem = {}; // default false
@@ -272,7 +273,7 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
   /// Secret fields the user has revealed, keyed by "id field". Default hidden.
   final Set<String> _revealed = {};
 
-  String _k(String id, String field) => '$id $field';
+  String _k(String id, String field) => '$id $field';
 
   bool _stepSatisfied(SyncReviewStep step) {
     for (final c in step.conflicts) {
@@ -529,7 +530,20 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
     final isLast = _index == widget.steps.length - 1;
     final canAdvance = _stepSatisfied(step);
 
-    return AlertDialog(
+    // Escape cancels the review the safe way: pop with cancelled:true so the
+    // caller rolls the vault back to its pre-sync state and applies nothing.
+    // (Same result as the Cancel button's final choice.)
+    return CallbackShortcuts(
+      bindings: <ShortcutActivator, VoidCallback>{
+        const SingleActivator(LogicalKeyboardKey.escape): () =>
+            Navigator.of(context).pop(const SyncReviewDecisions(cancelled: true)),
+      },
+      // autofocus so primary focus starts inside the shortcut subtree; without
+      // it the key bubbles to the route scope above and Escape is missed.
+      child: Focus(
+        autofocus: true,
+        skipTraversal: true,
+        child: AlertDialog(
       // Scroll the whole dialog (title + content + actions) so nothing is
       // stranded off-screen at large text (ADR-016). A plain Column here, not an
       // inner SingleChildScrollView, which would nest scrollables and throw.
@@ -551,6 +565,8 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
           child: Text(isLast ? l.ok : l.continueAction),
         ),
       ],
+      ),
+      ),
     );
   }
 

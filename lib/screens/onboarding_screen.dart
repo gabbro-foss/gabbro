@@ -762,7 +762,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 children: [
                   if (Navigator.canPop(context))
                     IconButton(
-                      icon: const Icon(Icons.close),
+                      icon: Icon(Icons.close, semanticLabel: l.tooltipCancel),
                       tooltip: l.tooltipCancel,
                       onPressed: () => Navigator.of(context).pop(),
                     )
@@ -774,12 +774,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         // and only the language button remains on the left.
                         if (widget.onQuit != null)
                           IconButton(
-                            icon: const Icon(Icons.power_settings_new),
+                            icon: Icon(
+                              Icons.power_settings_new,
+                              semanticLabel: l.quit,
+                            ),
                             tooltip: l.quit,
                             onPressed: widget.onQuit,
                           ),
                         IconButton(
-                          icon: const Icon(Icons.language),
+                          icon: Icon(
+                            Icons.language,
+                            semanticLabel: AppLocalizations.of(
+                              context,
+                            ).sectionLanguage,
+                          ),
                           tooltip: AppLocalizations.of(context).sectionLanguage,
                           onPressed: _showLanguagePicker,
                         ),
@@ -993,6 +1001,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   _passphraseObscured
                                       ? Icons.visibility_off
                                       : Icons.visibility,
+                                  semanticLabel: _passphraseObscured
+                                      ? l.tooltipShow
+                                      : l.tooltipHide,
                                 ),
                                 tooltip: _passphraseObscured
                                     ? l.tooltipShow
@@ -1080,6 +1091,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   _confirmObscured
                                       ? Icons.visibility_off
                                       : Icons.visibility,
+                                  semanticLabel: _confirmObscured
+                                      ? l.tooltipShow
+                                      : l.tooltipHide,
                                 ),
                                 tooltip: _confirmObscured
                                     ? l.tooltipShow
@@ -1152,6 +1166,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                         _pinObscured[i]
                                             ? Icons.visibility_off
                                             : Icons.visibility,
+                                        semanticLabel: _pinObscured[i]
+                                            ? l.tooltipShowPin
+                                            : l.tooltipHidePin,
                                       ),
                                       tooltip: _pinObscured[i]
                                           ? l.tooltipShowPin

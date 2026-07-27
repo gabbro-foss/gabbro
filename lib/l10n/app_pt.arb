@@ -1,5 +1,17 @@
 {
   "@@locale": "pt",
+
+  "keyboardShortcutsTitle": "Atalhos de teclado",
+  "kbSectionGeneral": "Geral",
+  "kbSectionSearch": "Pesquisa",
+  "kbSectionNavigation": "Navegação",
+  "kbLockVault": "Bloquear cofre",
+  "kbFocusSearch": "Focar a pesquisa",
+  "kbSearchAllFields": "Pesquisar todos os campos",
+  "kbMoveBetweenControls": "Mover entre controlos",
+  "kbActivateControl": "Ativar o controlo focado",
+  "kbCloseDialog": "Fechar uma caixa de diálogo ou cancelar",
+  "kbNoCopyNote": "Não existe atalho para copiar: copiar um segredo é uma ação deliberada, com limpeza automática.",
   "importSizeLimitNote": "Tamanho máximo do arquivo: {textLimit} (CSV, Bitwarden, Dashlane, Google) ou {enpassLimit} (Enpass).",
   "importFileTooLarge": "Este arquivo excede o limite de {limit}.",
   "saveConfirmTitle": "Guardar no Gabbro",
@@ -872,5 +884,15 @@
   "restoreFromFileButton": "Restaurar a partir de um ficheiro de cópia de segurança",
   "vaultRestoredMessage": "Cofre restaurado. Desbloqueie com as suas credenciais.",
   "restoreFromFileInvalidError": "Esse ficheiro não é um cofre Gabbro utilizável.",
-  "resizeColumns": "Redimensionar colunas"
+  "resizeColumns": "Redimensionar colunas",
+
+  "regionSearch": "Pesquisa",
+  "regionFolders": "Pastas",
+  "regionFilters": "Categorias de entradas",
+  "regionEntries": "Lista de entradas",
+  "regionDetails": "Detalhe da entrada",
+  "hintSearch": "Filtra as entradas à medida que escreve",
+  "hintFolderSelector": "Filtra as entradas por pasta",
+  "hintFilterChip": "Ativa ou desativa este filtro de categoria",
+  "hintEntryRow": "Abre esta entrada"
 }

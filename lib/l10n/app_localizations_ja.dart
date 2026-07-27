@@ -9,6 +9,39 @@ class AppLocalizationsJa extends AppLocalizations {
   AppLocalizationsJa([String locale = 'ja']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'キーボードショートカット';
+
+  @override
+  String get kbSectionGeneral => '一般';
+
+  @override
+  String get kbSectionSearch => '検索';
+
+  @override
+  String get kbSectionNavigation => 'ナビゲーション';
+
+  @override
+  String get kbLockVault => 'ボルトをロック';
+
+  @override
+  String get kbFocusSearch => '検索にフォーカス';
+
+  @override
+  String get kbSearchAllFields => 'すべてのフィールドを検索';
+
+  @override
+  String get kbMoveBetweenControls => 'コントロール間を移動';
+
+  @override
+  String get kbActivateControl => 'フォーカス中のコントロールを実行';
+
+  @override
+  String get kbCloseDialog => 'ダイアログを閉じる、またはキャンセル';
+
+  @override
+  String get kbNoCopyNote => 'コピー用のショートカットはありません: 秘密のコピーは意図的な操作であり、自動的に消去されます。';
+
+  @override
   String get appName => 'Gabbro';
 
   @override
@@ -2022,4 +2055,31 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get resizeColumns => '列のサイズを変更';
+
+  @override
+  String get regionSearch => '検索';
+
+  @override
+  String get regionFolders => 'フォルダ';
+
+  @override
+  String get regionFilters => 'エントリのカテゴリ';
+
+  @override
+  String get regionEntries => 'エントリ一覧';
+
+  @override
+  String get regionDetails => 'エントリの詳細';
+
+  @override
+  String get hintSearch => '入力するとエントリを絞り込みます';
+
+  @override
+  String get hintFolderSelector => 'フォルダでエントリを絞り込みます';
+
+  @override
+  String get hintFilterChip => 'このカテゴリフィルターのオンとオフを切り替えます';
+
+  @override
+  String get hintEntryRow => 'このエントリを開きます';
 }

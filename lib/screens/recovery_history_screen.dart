@@ -107,6 +107,9 @@ class _RecoveryHistoryScreenState extends State<RecoveryHistoryScreen> {
                         iconSize: scaledIconSize(context),
                         icon: Icon(
                           revealed ? Icons.visibility : Icons.visibility_off,
+                          semanticLabel: revealed
+                              ? l.tooltipHide
+                              : l.tooltipShow,
                         ),
                         tooltip: revealed ? l.tooltipHide : l.tooltipShow,
                         onPressed: () => setState(() {
@@ -123,7 +126,10 @@ class _RecoveryHistoryScreenState extends State<RecoveryHistoryScreen> {
                     ),
                     IconButton(
                       tooltip: l.delete,
-                      icon: const Icon(Icons.delete_outline),
+                      icon: Icon(
+                        Icons.delete_outline,
+                        semanticLabel: l.delete,
+                      ),
                       onPressed: () => _act(index, widget.onDelete),
                     ),
                   ],

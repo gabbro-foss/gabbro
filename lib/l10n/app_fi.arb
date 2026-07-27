@@ -1,5 +1,17 @@
 {
   "@@locale": "fi",
+
+  "keyboardShortcutsTitle": "Pikanäppäimet",
+  "kbSectionGeneral": "Yleiset",
+  "kbSectionSearch": "Haku",
+  "kbSectionNavigation": "Navigointi",
+  "kbLockVault": "Lukitse holvi",
+  "kbFocusSearch": "Kohdista haku",
+  "kbSearchAllFields": "Hae kaikista kentistä",
+  "kbMoveBetweenControls": "Siirry hallintojen välillä",
+  "kbActivateControl": "Aktivoi kohdistettu elementti",
+  "kbCloseDialog": "Sulje valintaikkuna tai peruuta",
+  "kbNoCopyNote": "Kopiointipikanäppäintä ei ole: salaisuuden kopiointi on tarkoituksellinen, automaattisesti tyhjentyvä toiminto.",
   "importSizeLimitNote": "Tiedoston enimmäiskoko: {textLimit} (CSV, Bitwarden, Dashlane, Google) tai {enpassLimit} (Enpass).",
   "importFileTooLarge": "Tämä tiedosto ylittää {limit} rajan.",
   "saveConfirmTitle": "Tallenna Gabbroon",
@@ -872,5 +884,15 @@
   "restoreFromFileButton": "Palauta varmuuskopiotiedostosta",
   "vaultRestoredMessage": "Holvi palautettu. Avaa lukitus tunnuksillasi.",
   "restoreFromFileInvalidError": "Tämä tiedosto ei ole käyttökelpoinen Gabbro-holvi.",
-  "resizeColumns": "Muuta sarakkeiden kokoa"
+  "resizeColumns": "Muuta sarakkeiden kokoa",
+
+  "regionSearch": "Haku",
+  "regionFolders": "Kansiot",
+  "regionFilters": "Merkintäluokat",
+  "regionEntries": "Merkintäluettelo",
+  "regionDetails": "Merkinnän tiedot",
+  "hintSearch": "Suodattaa merkinnät kirjoittaessasi",
+  "hintFolderSelector": "Suodattaa merkinnät kansion mukaan",
+  "hintFilterChip": "Ottaa tämän luokkasuodattimen käyttöön tai poistaa sen käytöstä",
+  "hintEntryRow": "Avaa tämän merkinnän"
 }

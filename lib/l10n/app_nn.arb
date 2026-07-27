@@ -1,5 +1,17 @@
 {
   "@@locale": "nn",
+
+  "keyboardShortcutsTitle": "Snøggtastar",
+  "kbSectionGeneral": "Generelt",
+  "kbSectionSearch": "Søk",
+  "kbSectionNavigation": "Navigasjon",
+  "kbLockVault": "Lås kvelv",
+  "kbFocusSearch": "Fokuser søk",
+  "kbSearchAllFields": "Søk i alle felt",
+  "kbMoveBetweenControls": "Flytt mellom kontrollar",
+  "kbActivateControl": "Aktiver den fokuserte kontrollen",
+  "kbCloseDialog": "Lukk ein dialog eller avbryt",
+  "kbNoCopyNote": "Det finst ingen kopisnarveg: å kopiere ein løyndom er ei medviten handling som vert tømd automatisk.",
   "importSizeLimitNote": "Maksimal filstorleik: {textLimit} (CSV, Bitwarden, Dashlane, Google) eller {enpassLimit} (Enpass).",
   "importFileTooLarge": "Denne fila overskrid grensa på {limit}.",
   "saveConfirmTitle": "Lagre i Gabbro",
@@ -872,5 +884,15 @@
   "restoreFromFileButton": "Gjenopprett frå ei tryggleikskopifil",
   "vaultRestoredMessage": "Kvelv gjenoppretta. Lås opp med innloggingsinformasjonen din.",
   "restoreFromFileInvalidError": "Den fila er ikkje eit brukbart Gabbro-kvelv.",
-  "resizeColumns": "Endre kolonnestorleik"
+  "resizeColumns": "Endre kolonnestorleik",
+
+  "regionSearch": "Søk",
+  "regionFolders": "Mapper",
+  "regionFilters": "Oppføringskategoriar",
+  "regionEntries": "Oppføringsliste",
+  "regionDetails": "Oppføringsdetaljar",
+  "hintSearch": "Filtrerer oppføringane medan du skriv",
+  "hintFolderSelector": "Filtrerer oppføringane etter mappe",
+  "hintFilterChip": "Slår dette kategorifilteret av eller på",
+  "hintEntryRow": "Opnar denne oppføringa"
 }

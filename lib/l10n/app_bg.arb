@@ -1,5 +1,17 @@
 {
   "@@locale": "bg",
+
+  "keyboardShortcutsTitle": "Клавишни комбинации",
+  "kbSectionGeneral": "Общи",
+  "kbSectionSearch": "Търсене",
+  "kbSectionNavigation": "Навигация",
+  "kbLockVault": "Заключи трезора",
+  "kbFocusSearch": "Фокусиране на търсенето",
+  "kbSearchAllFields": "Търси във всички полета",
+  "kbMoveBetweenControls": "Преминаване между елементите",
+  "kbActivateControl": "Активиране на фокусирания елемент",
+  "kbCloseDialog": "Затваряне на диалог или отказ",
+  "kbNoCopyNote": "Няма комбинация за копиране: копирането на тайна е умишлено действие с автоматично изчистване.",
   "importSizeLimitNote": "Максимален размер на файла: {textLimit} (CSV, Bitwarden, Dashlane, Google) или {enpassLimit} (Enpass).",
   "importFileTooLarge": "Този файл надвишава ограничението от {limit}.",
   "saveConfirmTitle": "Запазване в Gabbro",
@@ -872,5 +884,15 @@
   "restoreFromFileButton": "Възстановяване от резервен файл",
   "vaultRestoredMessage": "Сейфът е възстановен. Отключете с вашите данни.",
   "restoreFromFileInvalidError": "Този файл не е използваем сейф на Gabbro.",
-  "resizeColumns": "Преоразмеряване на колоните"
+  "resizeColumns": "Преоразмеряване на колоните",
+
+  "regionSearch": "Търсене",
+  "regionFolders": "Папки",
+  "regionFilters": "Категории записи",
+  "regionEntries": "Списък със записи",
+  "regionDetails": "Детайли за записа",
+  "hintSearch": "Филтрира записите докато пишете",
+  "hintFolderSelector": "Филтрира записите по папка",
+  "hintFilterChip": "Включва или изключва този филтър по категория",
+  "hintEntryRow": "Отваря този запис"
 }

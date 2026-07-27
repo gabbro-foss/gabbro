@@ -1,5 +1,17 @@
 {
   "@@locale": "ru",
+
+  "keyboardShortcutsTitle": "Сочетания клавиш",
+  "kbSectionGeneral": "Общие",
+  "kbSectionSearch": "Поиск",
+  "kbSectionNavigation": "Навигация",
+  "kbLockVault": "Заблокировать хранилище",
+  "kbFocusSearch": "Фокус на поиске",
+  "kbSearchAllFields": "Поиск по всем полям",
+  "kbMoveBetweenControls": "Перемещение между элементами",
+  "kbActivateControl": "Активировать выбранный элемент",
+  "kbCloseDialog": "Закрыть диалог или отменить",
+  "kbNoCopyNote": "Нет сочетания для копирования: копирование секрета — намеренное действие с автоматической очисткой.",
   "importSizeLimitNote": "Максимальный размер файла: {textLimit} (CSV, Bitwarden, Dashlane, Google) или {enpassLimit} (Enpass).",
   "importFileTooLarge": "Этот файл превышает ограничение в {limit}.",
   "saveConfirmTitle": "Сохранить в Gabbro",
@@ -872,5 +884,15 @@
   "restoreFromFileButton": "Восстановить из файла резервной копии",
   "vaultRestoredMessage": "Хранилище восстановлено. Разблокируйте с помощью своих учётных данных.",
   "restoreFromFileInvalidError": "Этот файл не является пригодным хранилищем Gabbro.",
-  "resizeColumns": "Изменить размер столбцов"
+  "resizeColumns": "Изменить размер столбцов",
+
+  "regionSearch": "Поиск",
+  "regionFolders": "Папки",
+  "regionFilters": "Категории записей",
+  "regionEntries": "Список записей",
+  "regionDetails": "Сведения о записи",
+  "hintSearch": "Фильтрует записи по мере ввода",
+  "hintFolderSelector": "Фильтрует записи по папке",
+  "hintFilterChip": "Включает или отключает этот фильтр категории",
+  "hintEntryRow": "Открывает эту запись"
 }

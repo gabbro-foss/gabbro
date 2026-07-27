@@ -1,5 +1,17 @@
 {
   "@@locale": "da",
+
+  "keyboardShortcutsTitle": "Tastaturgenveje",
+  "kbSectionGeneral": "Generelt",
+  "kbSectionSearch": "Søgning",
+  "kbSectionNavigation": "Navigation",
+  "kbLockVault": "Lås hvælving",
+  "kbFocusSearch": "Fokusér søgning",
+  "kbSearchAllFields": "Søg i alle felter",
+  "kbMoveBetweenControls": "Skift mellem kontroller",
+  "kbActivateControl": "Aktivér det fokuserede element",
+  "kbCloseDialog": "Luk en dialog eller annullér",
+  "kbNoCopyNote": "Der er ingen kopieringsgenvej: kopiering af en hemmelighed er en bevidst handling, der ryddes automatisk.",
   "importSizeLimitNote": "Maksimal filstørrelse: {textLimit} (CSV, Bitwarden, Dashlane, Google) eller {enpassLimit} (Enpass).",
   "importFileTooLarge": "Denne fil overskrider grænsen på {limit}.",
   "saveConfirmTitle": "Gem i Gabbro",
@@ -872,5 +884,15 @@
   "restoreFromFileButton": "Gendan fra en sikkerhedskopifil",
   "vaultRestoredMessage": "Boks gendannet. Lås op med dine loginoplysninger.",
   "restoreFromFileInvalidError": "Den fil er ikke en brugbar Gabbro-boks.",
-  "resizeColumns": "Ændr kolonnestørrelse"
+  "resizeColumns": "Ændr kolonnestørrelse",
+
+  "regionSearch": "Søgning",
+  "regionFolders": "Mapper",
+  "regionFilters": "Postkategorier",
+  "regionEntries": "Postliste",
+  "regionDetails": "Postdetaljer",
+  "hintSearch": "Filtrerer posterne, mens du skriver",
+  "hintFolderSelector": "Filtrerer posterne efter mappe",
+  "hintFilterChip": "Slår dette kategorifilter til eller fra",
+  "hintEntryRow": "Åbner denne post"
 }

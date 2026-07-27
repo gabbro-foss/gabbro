@@ -1,5 +1,17 @@
 {
   "@@locale": "es",
+
+  "keyboardShortcutsTitle": "Atajos de teclado",
+  "kbSectionGeneral": "General",
+  "kbSectionSearch": "Búsqueda",
+  "kbSectionNavigation": "Navegación",
+  "kbLockVault": "Bloquear almacén",
+  "kbFocusSearch": "Enfocar la búsqueda",
+  "kbSearchAllFields": "Buscar en todos los campos",
+  "kbMoveBetweenControls": "Moverse entre controles",
+  "kbActivateControl": "Activar el control enfocado",
+  "kbCloseDialog": "Cerrar un diálogo o cancelar",
+  "kbNoCopyNote": "No hay atajo para copiar: copiar un secreto es una acción deliberada que se borra automáticamente.",
   "importSizeLimitNote": "Tamaño máximo de archivo: {textLimit} (CSV, Bitwarden, Dashlane, Google) o {enpassLimit} (Enpass).",
   "importFileTooLarge": "Este archivo supera el límite de {limit}.",
   "saveConfirmTitle": "Guardar en Gabbro",
@@ -871,5 +883,15 @@
   "restoreFromFileButton": "Restaurar desde un archivo de copia de seguridad",
   "vaultRestoredMessage": "Caja fuerte restaurada. Desbloquea con tus credenciales.",
   "restoreFromFileInvalidError": "Ese archivo no es una caja fuerte de Gabbro utilizable.",
-  "resizeColumns": "Ajustar columnas"
+  "resizeColumns": "Ajustar columnas",
+
+  "regionSearch": "Búsqueda",
+  "regionFolders": "Carpetas",
+  "regionFilters": "Categorías de entradas",
+  "regionEntries": "Lista de entradas",
+  "regionDetails": "Detalle de la entrada",
+  "hintSearch": "Filtra las entradas mientras escribes",
+  "hintFolderSelector": "Filtra las entradas por carpeta",
+  "hintFilterChip": "Activa o desactiva este filtro de categoría",
+  "hintEntryRow": "Abre esta entrada"
 }

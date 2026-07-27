@@ -1,5 +1,17 @@
 {
   "@@locale": "lt",
+
+  "keyboardShortcutsTitle": "Klaviatūros spartieji klavišai",
+  "kbSectionGeneral": "Bendra",
+  "kbSectionSearch": "Paieška",
+  "kbSectionNavigation": "Naršymas",
+  "kbLockVault": "Užrakinti saugyklą",
+  "kbFocusSearch": "Fokusuoti paiešką",
+  "kbSearchAllFields": "Ieškoti visuose laukuose",
+  "kbMoveBetweenControls": "Judėti tarp valdiklių",
+  "kbActivateControl": "Aktyvinti fokusuotą valdiklį",
+  "kbCloseDialog": "Uždaryti dialogą arba atšaukti",
+  "kbNoCopyNote": "Kopijavimo sparčiojo klavišo nėra: paslapties kopijavimas yra tyčinis, automatiškai išsivalantis veiksmas.",
   "importSizeLimitNote": "Didžiausias failo dydis: {textLimit} (CSV, Bitwarden, Dashlane, Google) arba {enpassLimit} (Enpass).",
   "importFileTooLarge": "Šis failas viršija {limit} ribą.",
   "saveConfirmTitle": "Įrašyti į Gabbro",
@@ -872,5 +884,15 @@
   "restoreFromFileButton": "Atkurti iš atsarginės kopijos failo",
   "vaultRestoredMessage": "Saugykla atkurta. Atrakinkite savo prisijungimo duomenimis.",
   "restoreFromFileInvalidError": "Šis failas nėra tinkama Gabbro saugykla.",
-  "resizeColumns": "Keisti stulpelių dydį"
+  "resizeColumns": "Keisti stulpelių dydį",
+
+  "regionSearch": "Paieška",
+  "regionFolders": "Aplankai",
+  "regionFilters": "Įrašų kategorijos",
+  "regionEntries": "Įrašų sąrašas",
+  "regionDetails": "Įrašo informacija",
+  "hintSearch": "Filtruoja įrašus jums rašant",
+  "hintFolderSelector": "Filtruoja įrašus pagal aplanką",
+  "hintFilterChip": "Įjungia arba išjungia šį kategorijos filtrą",
+  "hintEntryRow": "Atidaro šį įrašą"
 }

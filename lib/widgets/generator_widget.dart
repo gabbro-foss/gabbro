@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:gabbro/clipboard_clear.dart';
 import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
@@ -173,15 +176,22 @@ class GeneratorWidget extends StatefulWidget {
   passphraseEntropyBitsFn;
   final double Function(int poolSize, int length) entropyBitsFn;
 
-  const GeneratorWidget({
+  /// Whether this is running on Android. Only the copy announcement depends on
+  /// it, and only Linux gets one: TalkBack drops its speech queue for an
+  /// announcement and already reads the button itself. Tests simulating Android
+  /// can pass `isAndroid: true`.
+  final bool isAndroid;
+
+  GeneratorWidget({
     super.key,
     this.onUsePassword,
     this.clipboardClearTimeout = ClipboardClearTimeout.sixtySeconds,
+    bool? isAndroid,
     this.generatePasswordFn = _defaultGeneratePassword,
     this.generatePassphraseFn = _defaultGeneratePassphrase,
     this.passphraseEntropyBitsFn = _defaultPassphraseEntropyBits,
     this.entropyBitsFn = _defaultEntropyBits,
-  });
+  }) : isAndroid = isAndroid ?? Platform.isAndroid;
 
   @override
   State<GeneratorWidget> createState() => _GeneratorWidgetState();
@@ -361,6 +371,17 @@ class _GeneratorWidgetState extends State<GeneratorWidget>
     if (_generated.isEmpty) return;
     await copyThenClear(_generated, widget.clipboardClearTimeout);
     setState(() => _copied = true);
+    // The button renames itself to "Copied", but the name changed under a
+    // control that already held focus and a Linux screen reader is never told
+    // about that (round 25: the copy worked, nothing was said). Copying moves
+    // no focus, so this announcement has nothing competing with it.
+    if (!widget.isAndroid && mounted) {
+      SemanticsService.sendAnnouncement(
+        View.of(context),
+        AppLocalizations.of(context).tooltipCopied,
+        Directionality.of(context),
+      );
+    }
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) setState(() => _copied = false);
     });
@@ -570,7 +591,10 @@ class _GeneratorWidgetState extends State<GeneratorWidget>
           if (!_obscured && _generated.isNotEmpty)
             IconButton(
               key: const Key('breakdown_button'),
-              icon: const Icon(Icons.analytics_outlined),
+              icon: Icon(
+                Icons.analytics_outlined,
+                semanticLabel: l.passwordBreakdownTitle,
+              ),
               tooltip: l.passwordBreakdownTitle,
               onPressed: _showBreakdown,
             ),
@@ -578,14 +602,20 @@ class _GeneratorWidgetState extends State<GeneratorWidget>
           IconButton(
             key: const Key('visibility_toggle'),
             iconSize: scaledIconSize(context),
-            icon: Icon(_obscured ? Icons.visibility_off : Icons.visibility),
+            icon: Icon(
+              _obscured ? Icons.visibility_off : Icons.visibility,
+              semanticLabel: _obscured ? l.tooltipShow : l.tooltipHide,
+            ),
             tooltip: _obscured ? l.tooltipShow : l.tooltipHide,
             onPressed: () => setState(() => _obscured = !_obscured),
           ),
           // Copy button
           IconButton(
             key: const Key('copy_button'),
-            icon: Icon(_copied ? Icons.check : Icons.copy_outlined),
+            icon: Icon(
+              _copied ? Icons.check : Icons.copy_outlined,
+              semanticLabel: _copied ? l.tooltipCopied : l.tooltipCopy,
+            ),
             tooltip: _copied ? l.tooltipCopied : l.tooltipCopy,
             onPressed: _copy,
           ),

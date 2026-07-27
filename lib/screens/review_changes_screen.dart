@@ -361,6 +361,9 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
                 iconSize: scaledIconSize(context, 18),
                 icon: Icon(
                   obscured ? Icons.visibility_off : Icons.visibility,
+                  semanticLabel: obscured
+                      ? AppLocalizations.of(context).tooltipShowValues
+                      : AppLocalizations.of(context).tooltipHide,
                 ),
                 tooltip: obscured
                     ? AppLocalizations.of(context).tooltipShowValues

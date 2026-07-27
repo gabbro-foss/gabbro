@@ -15,7 +15,17 @@ import 'package:gabbro/screens/manage_vaults_screen.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/screens/save_confirm_screen.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
-import 'package:gabbro/screens/vault_list_screen.dart' show confirmYubikey, confirmAnyYubikey;
+import 'package:gabbro/screens/vault_list_screen.dart'
+    show
+        confirmYubikey,
+        confirmAnyYubikey,
+        focusVaultSearch,
+        vaultRegionTab,
+        vaultRegionEscape,
+        vaultRegionActive,
+        openNewEntry,
+        openVaultMenu,
+        quitVault;
 import 'package:gabbro/src/rust/api/autotype_bridge.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/settings.dart';
@@ -611,6 +621,51 @@ ThemeData gabbroDarkTheme({required bool highContrast}) {
   );
 }
 
+/// True when [event] is a key-down of the physical [key] with Ctrl held. Matches
+/// the PHYSICAL key (not the logical one) so Ctrl+L / Ctrl+F work on any keyboard
+/// layout — on a Cyrillic/Greek layout the physical L/F position emits a non-Latin
+/// letter, which a logical match would silently miss.
+bool isCtrlShortcut(KeyEvent event, PhysicalKeyboardKey key) =>
+    event is KeyDownEvent &&
+    event.physicalKey == key &&
+    HardwareKeyboard.instance.isControlPressed;
+
+/// App-root fallback for the Escape key: peel one focus level (blur a field, or
+/// close a dialog / pop a screen). Dispatched only when nothing deeper handled
+/// Escape first, so a dialog's own Esc (e.g. the sync review's cancel-with-
+/// rollback) always wins.
+class _EscapeFallbackIntent extends Intent {
+  const _EscapeFallbackIntent();
+}
+
+/// Owns Tab -> Next/PreviousFocusIntent traversal app-wide. While the vault list
+/// owns Tab ([vaultRegionActive] true — desktop + vault list is the current
+/// route) it ABSORBS the intent (the global HardwareKeyboard handler drives the
+/// region cycle instead; that handler does NOT stop the focus/shortcuts path, so
+/// without this the two fight and focus lands one control too far). Everywhere
+/// else it performs the NORMAL traversal, so Tab is unchanged on other screens
+/// and inside dialogs. It must stay ALWAYS-enabled: a disabled action still
+/// shadows WidgetsApp's default in the Actions lookup, which would kill traversal
+/// outright. Registered via MaterialApp.builder — below WidgetsApp's default
+/// shortcuts, above every route's ModalScope — so it also covers the cold-start
+/// case, where the key dispatches from the route scope with nothing focused.
+class _RegionTraversalAction<T extends Intent> extends Action<T> {
+  _RegionTraversalAction({required this.forward});
+  final bool forward;
+
+  @override
+  Object? invoke(T intent) {
+    if (vaultRegionActive?.call() ?? false) return null; // vault list drives Tab
+    final focus = FocusManager.instance.primaryFocus;
+    if (forward) {
+      focus?.nextFocus();
+    } else {
+      focus?.previousFocus();
+    }
+    return null;
+  }
+}
+
 class GabbroApp extends StatefulWidget {
   final VaultRegistry registry;
 
@@ -690,7 +745,77 @@ class _GabbroAppState extends State<GabbroApp>
   }
 
   bool _onKeyEvent(KeyEvent event) {
-    if (event is KeyDownEvent) _resetForegroundTimer();
+    if (event is KeyDownEvent) {
+      _resetForegroundTimer();
+      // Ctrl+L locks the vault from anywhere. (No Ctrl+C binding: copying a
+      // secret stays a deliberate, auto-clearing action — see
+      // keyboard_shortcuts_list_screen.)
+      if (isCtrlShortcut(event, PhysicalKeyboardKey.keyL)) {
+        _lock();
+        return true;
+      }
+      // Ctrl+F focuses the vault-list search (Ctrl+Shift+F: all-fields mode).
+      // Global like Ctrl+L so it keeps working wherever focus is; a no-op on
+      // screens that haven't registered a handler.
+      if (isCtrlShortcut(event, PhysicalKeyboardKey.keyF) &&
+          focusVaultSearch != null) {
+        focusVaultSearch!(allFields: HardwareKeyboard.instance.isShiftPressed);
+        return true;
+      }
+      // Ctrl+N opens the new-entry type picker; Ctrl+M opens the overflow menu.
+      // Both reach controls the region Tab-cycle excludes, so keyboard-only users
+      // can still create entries and open the menu. Global like Ctrl+L; the
+      // vault-list hooks self-gate (current route, not selection mode).
+      if (isCtrlShortcut(event, PhysicalKeyboardKey.keyN) &&
+          openNewEntry != null) {
+        openNewEntry!();
+        return true;
+      }
+      if (isCtrlShortcut(event, PhysicalKeyboardKey.keyM) &&
+          openVaultMenu != null) {
+        openVaultMenu!();
+        return true;
+      }
+      // Ctrl+Q asks to lock and quit — it raises the menu item's own confirm
+      // dialog rather than exiting, so a mistyped key costs a live session
+      // nothing. Same gating as Ctrl+N / Ctrl+M.
+      if (isCtrlShortcut(event, PhysicalKeyboardKey.keyQ) && quitVault != null) {
+        quitVault!();
+        return true;
+      }
+      // Tab / Shift+Tab drives the vault-list region cycle when a vault list has
+      // registered a handler. Global like Ctrl+L/F so it fires wherever focus is
+      // — a body-scoped Actions override silently failed on real hardware (round
+      // 10). The handler self-gates (Linux desktop only, current route only) and
+      // returns false to let Tab fall through to default traversal.
+      if (event.logicalKey == LogicalKeyboardKey.tab &&
+          vaultRegionTab != null) {
+        final forward = !HardwareKeyboard.instance.isShiftPressed;
+        if (vaultRegionTab!(forward: forward)) return true;
+      }
+      // Esc blurs a focused text field on a SCREEN before anything else (D4:
+      // unfocus first, then a 2nd Esc goes back via the app-root fallback).
+      // Handled here — ahead of focus dispatch — because a focused text field
+      // otherwise swallows Escape. A field inside a dialog is left alone so the
+      // app-root fallback closes the whole dialog instead of just blurring.
+      if (event.logicalKey == LogicalKeyboardKey.escape) {
+        // The vault-list region cycle owns Esc while focus is inside it: Esc is
+        // the only exit back to Unfocused, from ANY region — not only the
+        // search field, which was the one region the blur below could reach.
+        // The hook self-gates (desktop, current route, focus inside a region),
+        // so Esc still pops screens and closes dialogs everywhere else.
+        if (vaultRegionEscape?.call() ?? false) return true;
+        final focus = FocusManager.instance.primaryFocus;
+        final ctx = focus?.context;
+        final inField =
+            ctx != null && ctx.findAncestorStateOfType<EditableTextState>() != null;
+        final inDialog = ctx != null && ModalRoute.of(ctx) is PopupRoute;
+        if (inField && !inDialog) {
+          focus!.unfocus();
+          return true;
+        }
+      }
+    }
     return false;
   }
 
@@ -1019,8 +1144,23 @@ class _GabbroAppState extends State<GabbroApp>
       child: Listener(
         behavior: HitTestBehavior.translucent,
         onPointerDown: (_) => _resetForegroundTimer(),
-        child: MaterialApp(
-          navigatorKey: _navigatorKey,
+        // App-root Escape fallback. Ancestor of the navigator, so any dialog's
+        // own Esc handler wins; this only fires when nothing deeper did.
+        child: Shortcuts(
+          shortcuts: const <ShortcutActivator, Intent>{
+            SingleActivator(LogicalKeyboardKey.escape): _EscapeFallbackIntent(),
+          },
+          child: Actions(
+            actions: <Type, Action<Intent>>{
+              _EscapeFallbackIntent: CallbackAction<_EscapeFallbackIntent>(
+                onInvoke: (_) {
+                  _handleEscape();
+                  return null;
+                },
+              ),
+            },
+            child: MaterialApp(
+              navigatorKey: _navigatorKey,
           title: 'Gabbro',
           debugShowCheckedModeBanner: false,
           localizationsDelegates: widget.localizationsDelegates,
@@ -1031,9 +1171,29 @@ class _GabbroAppState extends State<GabbroApp>
           themeMode: _themeMode,
           theme: gabbroLightTheme(highContrast: hc),
           darkTheme: gabbroDarkTheme(highContrast: hc),
+          // Below WidgetsApp's default shortcuts, above the Navigator: the only
+          // place a Tab-traversal absorber overrides the default in every focus
+          // state (including cold-start, dispatched from the route scope).
+          builder: (context, child) => Actions(
+            actions: <Type, Action<Intent>>{
+              NextFocusIntent:
+                  _RegionTraversalAction<NextFocusIntent>(forward: true),
+              PreviousFocusIntent:
+                  _RegionTraversalAction<PreviousFocusIntent>(forward: false),
+            },
+            child: child!,
+          ),
           home: widget.initialScreen ?? _buildHome(),
+            ),
+          ),
         ),
       ),
     );
   }
+
+  /// Escape fallback: close the top dialog, or pop the current screen (its back
+  /// arrow). Fires only when nothing deeper handled Escape — a focused search
+  /// field blurs itself (vault_list), and a dialog with its own Esc (sync review)
+  /// cancels with rollback, both winning over this.
+  void _handleEscape() => _navigatorKey.currentState?.maybePop();
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/screens/create_entry_screen.dart';
 import 'package:gabbro/src/rust/api/import.dart';
@@ -71,7 +72,19 @@ class _ImportFailureDialog extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return AlertDialog(
+    // Escape closes this failure the same as the Skip button (the import loop
+    // moves on to the next one).
+    return CallbackShortcuts(
+      bindings: <ShortcutActivator, VoidCallback>{
+        const SingleActivator(LogicalKeyboardKey.escape): () =>
+            Navigator.of(context).pop(_FailureAction.skip),
+      },
+      // autofocus so primary focus starts inside the shortcut subtree; without
+      // it the key bubbles to the route scope above and Escape is missed.
+      child: Focus(
+        autofocus: true,
+        skipTraversal: true,
+        child: AlertDialog(
       scrollable: true, // scroll title+content+actions together (ADR-016)
       title: Row(
         children: [
@@ -131,6 +144,8 @@ class _ImportFailureDialog extends StatelessWidget {
           label: Text(l.edit),
         ),
       ],
+      ),
+      ),
     );
   }
 }

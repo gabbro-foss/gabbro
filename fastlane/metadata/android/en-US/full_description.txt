@@ -6,7 +6,7 @@ Features:
 
 * Quantum-resistant by design - vault security rests on Argon2id + AES-256-GCM.
 * Optional hardware key - FIDO2/YubiKey authentication (passphrase-only by default; two keys minimum when keys are used).
-* Rust for all secrets - every cryptographic operation lives in Rust; secrets never cross the Flutter/Rust bridge in plaintext.
+* Rust for all keys - every cryptographic operation lives in Rust; keys never cross the Flutter/Rust bridge. Secrets you view, generate or autofill do reach the UI in plaintext to be displayed.
 * Local-first - your vault lives on your device; sync is your choice and your responsibility.
 * No telemetry - no analytics, no accounts, no tracking; works fully offline.
 * Localised - UI available in many languages, following your system locale with an in-app override.

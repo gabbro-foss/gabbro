@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gabbro/screens/entry_detail_screen.dart';
 import 'package:gabbro/screens/tablet_vault_layout.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
@@ -12,6 +13,12 @@ import 'test_helpers.dart';
 // drive the "entry vanished / session race" path that crashed on hardware.
 TabletVaultLayout _layout({
   required VaultEntryData Function(String id) getEntryFn,
+  Future<void> Function(String id)? onDeleteEntryFn,
+  void Function()? onRefresh,
+  // Non-null on Linux only: the parent nulls these on Android, and everything
+  // keyboard- or screen-reader-related in this layout rides that same gate.
+  FocusScopeNode? listScope,
+  FocusScopeNode? detailScope,
 }) {
   final entry = EntrySummaryData(
     id: 'e1',
@@ -32,7 +39,10 @@ TabletVaultLayout _layout({
     filterChipRow: const SizedBox.shrink(),
     searchActive: false,
     onEntryTap: (_) {},
-    onRefresh: () {},
+    onRefresh: onRefresh ?? () {},
+    onDeleteEntryFn: onDeleteEntryFn,
+    listScope: listScope,
+    detailScope: detailScope,
     vaultPath: '/tmp/v.gabbro',
     clipboardClearTimeout: ClipboardClearTimeout.thirtySeconds,
     getEntryFn: getEntryFn,
@@ -54,6 +64,21 @@ void _setTablet(WidgetTester tester, {double? textScale}) {
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
   }
 }
+
+VaultEntryData _login(String id) => VaultEntryData.login(
+      LoginEntryData(
+        id: id,
+        title: 'Example',
+        url: '',
+        username: 'user@example.com',
+        password: 'secret',
+        notes: null,
+        customFields: const [],
+        createdAt: '2025-01-01T00:00:00Z',
+        updatedAt: '2025-01-01T00:00:00Z',
+        folder: '',
+      ),
+    );
 
 // getEntryFn is only invoked when an entry is tapped; these tests never tap, so
 // a throwing stub is never reached.
@@ -226,5 +251,90 @@ void main() {
         reason: 'a failed entry fetch must not throw during build');
     expect(find.text('Select an entry'), findsOneWidget,
         reason: 'the detail pane must fall back to the empty state');
+  });
+
+  // Net for the delete flow at this level: confirming a delete in the detail
+  // pane must tell the parent to reload the list AND clear the pane. Nothing
+  // pinned this here — the two-pane break found in round 17 was only visible
+  // on hardware.
+  testWidgets('deleting the selected entry reloads the list and clears the '
+      'detail pane', (tester) async {
+    _setTablet(tester);
+    var refreshes = 0;
+    await tester.pumpWidget(testApp(_layout(
+      getEntryFn: _login,
+      onDeleteEntryFn: (_) async {},
+      onRefresh: () => refreshes++,
+    )));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Example'));
+    await tester.pumpAndSettle();
+    expect(find.byType(EntryDetailScreen), findsOneWidget,
+        reason: 'sanity: the entry is open in the detail pane');
+
+    await tester.tap(find.byIcon(Icons.delete_outline));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete'));
+    await tester.pumpAndSettle();
+
+    expect(refreshes, 1, reason: 'the parent must be told to reload the list');
+    expect(find.text('Select an entry'), findsOneWidget,
+        reason: 'the detail pane must return to the empty state');
+  });
+
+  // Round 27 (Orca): deleting the open entry was completely silent. The pane it
+  // was in disappears and is replaced by the empty state, and a Linux screen
+  // reader is told none of that — it reads a node's name when focus moves to
+  // it, and nothing moved. Speaking the empty state's own visible text says
+  // both that the entry is gone and what is there now, with no new strings.
+  Future<List<String>> deleteAndListen(
+    WidgetTester tester, {
+    required bool linux,
+  }) async {
+    final said = recordAnnouncements(tester);
+    _setTablet(tester);
+    final scopes = linux
+        ? (FocusScopeNode(), FocusScopeNode())
+        : (null, null);
+    if (linux) {
+      addTearDown(scopes.$1!.dispose);
+      addTearDown(scopes.$2!.dispose);
+    }
+    await tester.pumpWidget(testApp(_layout(
+      getEntryFn: _login,
+      onDeleteEntryFn: (_) async {},
+      listScope: scopes.$1,
+      detailScope: scopes.$2,
+    )));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Example'));
+    await tester.pumpAndSettle();
+    said.clear();
+    await tester.tap(find.byIcon(Icons.delete_outline));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete'));
+    await tester.pumpAndSettle();
+    return said;
+  }
+
+  testWidgets('deleting the open entry says what is there now', (tester) async {
+    final said = await deleteAndListen(tester, linux: true);
+    expect(
+      said,
+      contains('Select an entry'),
+      reason: 'the delete emptied the pane in silence: $said',
+    );
+  });
+
+  testWidgets('Android: deleting the open entry announces nothing',
+      (tester) async {
+    final said = await deleteAndListen(tester, linux: false);
+    expect(
+      said,
+      isEmpty,
+      reason: 'Android has no region layer and TalkBack drops its queue for an '
+          'announcement: $said',
+    );
   });
 }

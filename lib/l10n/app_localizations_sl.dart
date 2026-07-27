@@ -9,6 +9,40 @@ class AppLocalizationsSl extends AppLocalizations {
   AppLocalizationsSl([String locale = 'sl']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Bližnjice na tipkovnici';
+
+  @override
+  String get kbSectionGeneral => 'Splošno';
+
+  @override
+  String get kbSectionSearch => 'Iskanje';
+
+  @override
+  String get kbSectionNavigation => 'Krmarjenje';
+
+  @override
+  String get kbLockVault => 'Zakleni trezor';
+
+  @override
+  String get kbFocusSearch => 'Fokusiraj iskanje';
+
+  @override
+  String get kbSearchAllFields => 'Išči po vseh poljih';
+
+  @override
+  String get kbMoveBetweenControls => 'Premikanje med kontrolniki';
+
+  @override
+  String get kbActivateControl => 'Aktiviraj izbrani kontrolnik';
+
+  @override
+  String get kbCloseDialog => 'Zapri pogovorno okno ali prekliči';
+
+  @override
+  String get kbNoCopyNote =>
+      'Bližnjice za kopiranje ni: kopiranje skrivnosti je namerno dejanje s samodejnim brisanjem.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override
@@ -2087,4 +2121,31 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Spremeni velikost stolpcev';
+
+  @override
+  String get regionSearch => 'Iskanje';
+
+  @override
+  String get regionFolders => 'Mape';
+
+  @override
+  String get regionFilters => 'Kategorije vnosov';
+
+  @override
+  String get regionEntries => 'Seznam vnosov';
+
+  @override
+  String get regionDetails => 'Podrobnosti vnosa';
+
+  @override
+  String get hintSearch => 'Filtrira vnose med tipkanjem';
+
+  @override
+  String get hintFolderSelector => 'Filtrira vnose po mapi';
+
+  @override
+  String get hintFilterChip => 'Vklopi ali izklopi ta filter kategorije';
+
+  @override
+  String get hintEntryRow => 'Odpre ta vnos';
 }

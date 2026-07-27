@@ -206,6 +206,7 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
       icon: Icon(
         Icons.delete_outlined,
         color: Theme.of(context).colorScheme.error,
+        semanticLabel: l.deleteVaultTooltip,
       ),
       tooltip: l.deleteVaultTooltip,
       onPressed: () => _showDeleteDialog(record),
@@ -369,6 +370,9 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
                         iconSize: scaledSuffixIconSize(context),
                         icon: Icon(
                           obscurePin ? Icons.visibility_off : Icons.visibility,
+                          semanticLabel: obscurePin
+                              ? l.tooltipShowPin
+                              : l.tooltipHidePin,
                         ),
                         tooltip: obscurePin
                             ? l.tooltipShowPin
@@ -454,7 +458,10 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
         title: Text(l.manageVaultsTitle),
         actions: [
           IconButton(
-            icon: const Icon(Icons.info_outline),
+            icon: Icon(
+              Icons.info_outline,
+              semanticLabel: l.backupEmergencyHeading,
+            ),
             iconSize: scaledIconSize(context),
             tooltip: l.backupEmergencyHeading,
             onPressed: () => _showBackupInfoDialog(l),
@@ -486,7 +493,10 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                icon: const Icon(Icons.edit_outlined),
+                                icon: Icon(
+                                  Icons.edit_outlined,
+                                  semanticLabel: l.rename,
+                                ),
                                 tooltip: l.rename,
                                 onPressed: () => _showRenameDialog(record),
                               ),

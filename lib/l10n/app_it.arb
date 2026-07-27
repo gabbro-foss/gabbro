@@ -1,5 +1,17 @@
 {
   "@@locale": "it",
+
+  "keyboardShortcutsTitle": "Scorciatoie da tastiera",
+  "kbSectionGeneral": "Generale",
+  "kbSectionSearch": "Ricerca",
+  "kbSectionNavigation": "Navigazione",
+  "kbLockVault": "Blocca archivio",
+  "kbFocusSearch": "Metti a fuoco la ricerca",
+  "kbSearchAllFields": "Cerca in tutti i campi",
+  "kbMoveBetweenControls": "Spostati tra i controlli",
+  "kbActivateControl": "Attiva l'elemento attivo",
+  "kbCloseDialog": "Chiudi una finestra di dialogo o annulla",
+  "kbNoCopyNote": "Non esiste una scorciatoia per copiare: copiare un segreto è un'azione deliberata che si cancella automaticamente.",
   "importSizeLimitNote": "Dimensione massima del file: {textLimit} (CSV, Bitwarden, Dashlane, Google) o {enpassLimit} (Enpass).",
   "importFileTooLarge": "Questo file supera il limite di {limit}.",
   "saveConfirmTitle": "Salva in Gabbro",
@@ -871,5 +883,15 @@
   "restoreFromFileButton": "Ripristina da un file di backup",
   "vaultRestoredMessage": "Cassaforte ripristinata. Sblocca con le tue credenziali.",
   "restoreFromFileInvalidError": "Questo file non è una cassaforte Gabbro utilizzabile.",
-  "resizeColumns": "Ridimensiona colonne"
+  "resizeColumns": "Ridimensiona colonne",
+
+  "regionSearch": "Ricerca",
+  "regionFolders": "Cartelle",
+  "regionFilters": "Categorie di voci",
+  "regionEntries": "Elenco voci",
+  "regionDetails": "Dettaglio voce",
+  "hintSearch": "Filtra le voci mentre digiti",
+  "hintFolderSelector": "Filtra le voci per cartella",
+  "hintFilterChip": "Attiva o disattiva questo filtro di categoria",
+  "hintEntryRow": "Apre questa voce"
 }

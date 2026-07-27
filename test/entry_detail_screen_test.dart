@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -70,9 +71,11 @@ Widget _buildScreen(
   Future<void> Function(String url)? onLaunchUrl,
   Future<String?> Function(String filename)? exportFilePicker,
   Future<List<HistoryRecordData>> Function(String id)? onFetchHistory,
+  bool isAndroid = false,
 }) =>
     testApp(EntryDetailScreen(
       entry: entry,
+      isAndroid: isAndroid,
       onDeleteEntry: onDeleteEntry ?? (_) async {},
       clipboardClearTimeout: clipboardClearTimeout,
       onLaunchUrl: onLaunchUrl ?? (_) async {},
@@ -232,6 +235,45 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.textContaining('Copied'), findsOneWidget);
+  });
+
+  // Round 26 (Orca): copying from the detail pane said nothing — the snackbar
+  // that confirms it is invisible to a Linux screen reader, which reads only a
+  // node's name and never sees a snackbar appear. Copying moves no focus, so an
+  // announcement of the same text has nothing competing with it.
+  testWidgets('copying says so out loud', (tester) async {
+    final said = recordAnnouncements(tester);
+    recordClipboardWrites(tester);
+    await tester.pumpWidget(
+      _buildScreen(VaultEntryData.login(_loginEntry())),
+    );
+
+    await tester.tap(find.byIcon(Icons.copy_outlined).first);
+    await tester.pumpAndSettle();
+
+    expect(
+      said.where((s) => s.contains('Copied')),
+      hasLength(1),
+      reason: 'nothing tells a screen-reader user the copy happened: $said',
+    );
+  });
+
+  testWidgets('Android: copying announces nothing', (tester) async {
+    final said = recordAnnouncements(tester);
+    recordClipboardWrites(tester);
+    await tester.pumpWidget(
+      _buildScreen(VaultEntryData.login(_loginEntry()), isAndroid: true),
+    );
+
+    await tester.tap(find.byIcon(Icons.copy_outlined).first);
+    await tester.pumpAndSettle();
+
+    expect(
+      said,
+      isEmpty,
+      reason: 'TalkBack reads the snackbar itself and drops its queue for an '
+          'announcement: $said',
+    );
   });
 
   testWidgets('delete icon shows confirmation dialog', (tester) async {
@@ -436,6 +478,74 @@ void main() {
 
     expect(deleteEntryCalled, isTrue);
     expect(popped, isTrue);
+  });
+
+  // Round 19 proved the two-pane delete fault: the layout drops the detail
+  // pane the moment the entry leaves the filtered list, so by the time the
+  // vault delete returns this screen is gone and the parent is never told —
+  // the row sits in the list until something else forces a reload. The parent
+  // callback must not depend on this screen surviving; only the Navigator use
+  // below does.
+  testWidgets('the parent is still told when the detail pane is torn down '
+      'mid-delete', (tester) async {
+    final deleteRunning = Completer<void>();
+    int deletedCalls = 0;
+    await tester.pumpWidget(
+      testApp(EntryDetailScreen(
+        entry: VaultEntryData.login(_loginEntry()),
+        onDeleteEntry: (_) => deleteRunning.future,
+        onDeleted: () => deletedCalls++,
+      )),
+    );
+
+    await tester.tap(find.byIcon(Icons.delete_outline));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete'));
+    await tester.pump(); // dialog closes; the vault delete is still running
+
+    // What the two-pane layout does while the delete is in flight.
+    await tester.pumpWidget(testApp(const SizedBox.shrink()));
+    deleteRunning.complete();
+    await tester.pumpAndSettle();
+
+    expect(deletedCalls, 1,
+        reason: 'the parent must be told exactly once, mounted or not');
+  });
+
+  testWidgets('a detail route torn down mid-delete does not try to navigate',
+      (tester) async {
+    final deleteRunning = Completer<void>();
+    await tester.pumpWidget(
+      testApp(Builder(
+        builder: (context) => ElevatedButton(
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => EntryDetailScreen(
+                entry: VaultEntryData.login(_loginEntry()),
+                onDeleteEntry: (_) => deleteRunning.future,
+              ),
+            ),
+          ),
+          child: const Text('Open'),
+        ),
+      )),
+    );
+
+    await tester.tap(find.text('Open'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.delete_outline));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete'));
+    await tester.pump();
+
+    // A bare root, not another app shell: a pushed route survives a swap that
+    // keeps the same Navigator, so the screen would never actually go away.
+    await tester.pumpWidget(const SizedBox.shrink());
+    deleteRunning.complete();
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull,
+        reason: 'navigating from a dead context must not throw');
   });
 
   testWidgets('URL field shows launch icon when URL is non-empty',

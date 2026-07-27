@@ -9,6 +9,40 @@ class AppLocalizationsFi extends AppLocalizations {
   AppLocalizationsFi([String locale = 'fi']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Pikanäppäimet';
+
+  @override
+  String get kbSectionGeneral => 'Yleiset';
+
+  @override
+  String get kbSectionSearch => 'Haku';
+
+  @override
+  String get kbSectionNavigation => 'Navigointi';
+
+  @override
+  String get kbLockVault => 'Lukitse holvi';
+
+  @override
+  String get kbFocusSearch => 'Kohdista haku';
+
+  @override
+  String get kbSearchAllFields => 'Hae kaikista kentistä';
+
+  @override
+  String get kbMoveBetweenControls => 'Siirry hallintojen välillä';
+
+  @override
+  String get kbActivateControl => 'Aktivoi kohdistettu elementti';
+
+  @override
+  String get kbCloseDialog => 'Sulje valintaikkuna tai peruuta';
+
+  @override
+  String get kbNoCopyNote =>
+      'Kopiointipikanäppäintä ei ole: salaisuuden kopiointi on tarkoituksellinen, automaattisesti tyhjentyvä toiminto.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override
@@ -2085,4 +2119,32 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Muuta sarakkeiden kokoa';
+
+  @override
+  String get regionSearch => 'Haku';
+
+  @override
+  String get regionFolders => 'Kansiot';
+
+  @override
+  String get regionFilters => 'Merkintäluokat';
+
+  @override
+  String get regionEntries => 'Merkintäluettelo';
+
+  @override
+  String get regionDetails => 'Merkinnän tiedot';
+
+  @override
+  String get hintSearch => 'Suodattaa merkinnät kirjoittaessasi';
+
+  @override
+  String get hintFolderSelector => 'Suodattaa merkinnät kansion mukaan';
+
+  @override
+  String get hintFilterChip =>
+      'Ottaa tämän luokkasuodattimen käyttöön tai poistaa sen käytöstä';
+
+  @override
+  String get hintEntryRow => 'Avaa tämän merkinnän';
 }

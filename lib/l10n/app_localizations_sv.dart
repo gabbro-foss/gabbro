@@ -9,6 +9,40 @@ class AppLocalizationsSv extends AppLocalizations {
   AppLocalizationsSv([String locale = 'sv']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Kortkommandon';
+
+  @override
+  String get kbSectionGeneral => 'Allmänt';
+
+  @override
+  String get kbSectionSearch => 'Sök';
+
+  @override
+  String get kbSectionNavigation => 'Navigering';
+
+  @override
+  String get kbLockVault => 'Lås valv';
+
+  @override
+  String get kbFocusSearch => 'Fokusera sökningen';
+
+  @override
+  String get kbSearchAllFields => 'Sök i alla fält';
+
+  @override
+  String get kbMoveBetweenControls => 'Flytta mellan kontroller';
+
+  @override
+  String get kbActivateControl => 'Aktivera den fokuserade kontrollen';
+
+  @override
+  String get kbCloseDialog => 'Stäng en dialogruta eller avbryt';
+
+  @override
+  String get kbNoCopyNote =>
+      'Det finns inget kopieringskortkommando: att kopiera en hemlighet är en avsiktlig åtgärd som rensas automatiskt.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override
@@ -2080,4 +2114,31 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Ändra kolumnstorlek';
+
+  @override
+  String get regionSearch => 'Sökning';
+
+  @override
+  String get regionFolders => 'Mappar';
+
+  @override
+  String get regionFilters => 'Postkategorier';
+
+  @override
+  String get regionEntries => 'Postlista';
+
+  @override
+  String get regionDetails => 'Postdetaljer';
+
+  @override
+  String get hintSearch => 'Filtrerar posterna medan du skriver';
+
+  @override
+  String get hintFolderSelector => 'Filtrerar posterna efter mapp';
+
+  @override
+  String get hintFilterChip => 'Slår på eller av det här kategorifiltret';
+
+  @override
+  String get hintEntryRow => 'Öppnar den här posten';
 }

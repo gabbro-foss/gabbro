@@ -1,5 +1,17 @@
 {
   "@@locale": "sr",
+
+  "keyboardShortcutsTitle": "Prečice na tastaturi",
+  "kbSectionGeneral": "Opšte",
+  "kbSectionSearch": "Pretraga",
+  "kbSectionNavigation": "Navigacija",
+  "kbLockVault": "Zaključaj trezor",
+  "kbFocusSearch": "Fokusiraj pretragu",
+  "kbSearchAllFields": "Pretraži sva polja",
+  "kbMoveBetweenControls": "Kretanje između kontrola",
+  "kbActivateControl": "Aktiviraj fokusiranu kontrolu",
+  "kbCloseDialog": "Zatvori dijalog ili otkaži",
+  "kbNoCopyNote": "Ne postoji prečica za kopiranje: kopiranje tajne je namerna radnja koja se automatski briše.",
   "importSizeLimitNote": "Највећа величина датотеке: {textLimit} (CSV, Bitwarden, Dashlane, Google) или {enpassLimit} (Enpass).",
   "importFileTooLarge": "Ова датотека прекорачује ограничење од {limit}.",
   "saveConfirmTitle": "Sačuvaj u Gabbro",
@@ -871,5 +883,15 @@
   "restoreFromFileButton": "Врати из датотеке резервне копије",
   "vaultRestoredMessage": "Сеф враћен. Откључајте својим акредитивима.",
   "restoreFromFileInvalidError": "Та датотека није употребљив Gabbro сеф.",
-  "resizeColumns": "Промени величину колона"
+  "resizeColumns": "Промени величину колона",
+
+  "regionSearch": "Pretraga",
+  "regionFolders": "Mape",
+  "regionFilters": "Kategorije unosa",
+  "regionEntries": "Spisak unosa",
+  "regionDetails": "Detalji unosa",
+  "hintSearch": "Filtrira unose dok kucate",
+  "hintFolderSelector": "Filtrira unose po mapi",
+  "hintFilterChip": "Uključuje ili isključuje ovaj filter kategorije",
+  "hintEntryRow": "Otvara ovaj unos"
 }

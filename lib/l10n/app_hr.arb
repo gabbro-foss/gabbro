@@ -1,5 +1,17 @@
 {
   "@@locale": "hr",
+
+  "keyboardShortcutsTitle": "Tipkovnički prečaci",
+  "kbSectionGeneral": "Općenito",
+  "kbSectionSearch": "Pretraživanje",
+  "kbSectionNavigation": "Navigacija",
+  "kbLockVault": "Zaključaj trezor",
+  "kbFocusSearch": "Fokusiraj pretraživanje",
+  "kbSearchAllFields": "Pretraži sva polja",
+  "kbMoveBetweenControls": "Kretanje između kontrola",
+  "kbActivateControl": "Aktiviraj fokusiranu kontrolu",
+  "kbCloseDialog": "Zatvori dijalog ili odustani",
+  "kbNoCopyNote": "Ne postoji prečac za kopiranje: kopiranje tajne namjerna je radnja koja se automatski briše.",
   "importSizeLimitNote": "Najveća veličina datoteke: {textLimit} (CSV, Bitwarden, Dashlane, Google) ili {enpassLimit} (Enpass).",
   "importFileTooLarge": "Ova datoteka premašuje ograničenje od {limit}.",
   "saveConfirmTitle": "Spremi u Gabbro",
@@ -871,5 +883,15 @@
   "restoreFromFileButton": "Vrati iz datoteke sigurnosne kopije",
   "vaultRestoredMessage": "Trezor vraćen. Otključajte svojim vjerodajnicama.",
   "restoreFromFileInvalidError": "Ta datoteka nije upotrebljiv Gabbro trezor.",
-  "resizeColumns": "Promijeni veličinu stupaca"
+  "resizeColumns": "Promijeni veličinu stupaca",
+
+  "regionSearch": "Pretraga",
+  "regionFolders": "Mape",
+  "regionFilters": "Kategorije unosa",
+  "regionEntries": "Popis unosa",
+  "regionDetails": "Pojedinosti unosa",
+  "hintSearch": "Filtrira unose dok tipkate",
+  "hintFolderSelector": "Filtrira unose po mapi",
+  "hintFilterChip": "Uključuje ili isključuje ovaj filtar kategorije",
+  "hintEntryRow": "Otvara ovaj unos"
 }

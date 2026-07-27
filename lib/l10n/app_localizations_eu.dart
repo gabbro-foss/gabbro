@@ -9,6 +9,40 @@ class AppLocalizationsEu extends AppLocalizations {
   AppLocalizationsEu([String locale = 'eu']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Teklatuko lasterbideak';
+
+  @override
+  String get kbSectionGeneral => 'Orokorra';
+
+  @override
+  String get kbSectionSearch => 'Bilaketa';
+
+  @override
+  String get kbSectionNavigation => 'Nabigazioa';
+
+  @override
+  String get kbLockVault => 'Gandegiak blokeatu';
+
+  @override
+  String get kbFocusSearch => 'Bilaketan fokatu';
+
+  @override
+  String get kbSearchAllFields => 'Eremu guztietan bilatu';
+
+  @override
+  String get kbMoveBetweenControls => 'Kontrolen artean mugitu';
+
+  @override
+  String get kbActivateControl => 'Fokatutako kontrola aktibatu';
+
+  @override
+  String get kbCloseDialog => 'Itxi elkarrizketa-koadroa edo utzi';
+
+  @override
+  String get kbNoCopyNote =>
+      'Ez dago kopiatzeko lasterbiderik: sekretu bat kopiatzea nahita egindako ekintza da, automatikoki garbitzen dena.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override
@@ -2085,4 +2119,32 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Aldatu zutabeen tamaina';
+
+  @override
+  String get regionSearch => 'Bilaketa';
+
+  @override
+  String get regionFolders => 'Karpetak';
+
+  @override
+  String get regionFilters => 'Sarreren kategoriak';
+
+  @override
+  String get regionEntries => 'Sarreren zerrenda';
+
+  @override
+  String get regionDetails => 'Sarreraren xehetasunak';
+
+  @override
+  String get hintSearch => 'Sarrerak iragazten ditu idatzi ahala';
+
+  @override
+  String get hintFolderSelector => 'Sarrerak karpetaka iragazten ditu';
+
+  @override
+  String get hintFilterChip =>
+      'Kategoria-iragazki hau aktibatu edo desaktibatzen du';
+
+  @override
+  String get hintEntryRow => 'Sarrera hau irekitzen du';
 }

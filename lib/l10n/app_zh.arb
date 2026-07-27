@@ -1,5 +1,17 @@
 {
   "@@locale": "zh",
+
+  "keyboardShortcutsTitle": "键盘快捷键",
+  "kbSectionGeneral": "常规",
+  "kbSectionSearch": "搜索",
+  "kbSectionNavigation": "导航",
+  "kbLockVault": "锁定保险库",
+  "kbFocusSearch": "聚焦搜索",
+  "kbSearchAllFields": "搜索所有字段",
+  "kbMoveBetweenControls": "在控件之间移动",
+  "kbActivateControl": "激活聚焦的控件",
+  "kbCloseDialog": "关闭对话框或取消",
+  "kbNoCopyNote": "没有复制快捷键：复制机密是有意的操作，并会自动清除。",
   "importSizeLimitNote": "最大文件大小：{textLimit}（CSV、Bitwarden、Dashlane、Google）或 {enpassLimit}（Enpass）。",
   "importFileTooLarge": "此文件超过 {limit} 的限制。",
   "saveConfirmTitle": "保存到 Gabbro",
@@ -871,5 +883,15 @@
   "restoreFromFileButton": "从备份文件恢复",
   "vaultRestoredMessage": "保险库已恢复。请使用你的凭据解锁。",
   "restoreFromFileInvalidError": "该文件不是可用的 Gabbro 保险库。",
-  "resizeColumns": "调整列宽"
+  "resizeColumns": "调整列宽",
+
+  "regionSearch": "搜索",
+  "regionFolders": "文件夹",
+  "regionFilters": "条目类别",
+  "regionEntries": "条目列表",
+  "regionDetails": "条目详情",
+  "hintSearch": "输入时筛选条目",
+  "hintFolderSelector": "按文件夹筛选条目",
+  "hintFilterChip": "打开或关闭此类别筛选",
+  "hintEntryRow": "打开此条目"
 }

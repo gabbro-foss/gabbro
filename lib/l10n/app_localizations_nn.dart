@@ -9,6 +9,40 @@ class AppLocalizationsNn extends AppLocalizations {
   AppLocalizationsNn([String locale = 'nn']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Snøggtastar';
+
+  @override
+  String get kbSectionGeneral => 'Generelt';
+
+  @override
+  String get kbSectionSearch => 'Søk';
+
+  @override
+  String get kbSectionNavigation => 'Navigasjon';
+
+  @override
+  String get kbLockVault => 'Lås kvelv';
+
+  @override
+  String get kbFocusSearch => 'Fokuser søk';
+
+  @override
+  String get kbSearchAllFields => 'Søk i alle felt';
+
+  @override
+  String get kbMoveBetweenControls => 'Flytt mellom kontrollar';
+
+  @override
+  String get kbActivateControl => 'Aktiver den fokuserte kontrollen';
+
+  @override
+  String get kbCloseDialog => 'Lukk ein dialog eller avbryt';
+
+  @override
+  String get kbNoCopyNote =>
+      'Det finst ingen kopisnarveg: å kopiere ein løyndom er ei medviten handling som vert tømd automatisk.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override
@@ -2083,4 +2117,31 @@ class AppLocalizationsNn extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Endre kolonnestorleik';
+
+  @override
+  String get regionSearch => 'Søk';
+
+  @override
+  String get regionFolders => 'Mapper';
+
+  @override
+  String get regionFilters => 'Oppføringskategoriar';
+
+  @override
+  String get regionEntries => 'Oppføringsliste';
+
+  @override
+  String get regionDetails => 'Oppføringsdetaljar';
+
+  @override
+  String get hintSearch => 'Filtrerer oppføringane medan du skriv';
+
+  @override
+  String get hintFolderSelector => 'Filtrerer oppføringane etter mappe';
+
+  @override
+  String get hintFilterChip => 'Slår dette kategorifilteret av eller på';
+
+  @override
+  String get hintEntryRow => 'Opnar denne oppføringa';
 }

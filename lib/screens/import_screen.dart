@@ -733,6 +733,9 @@ class _ImportScreenState extends State<ImportScreen> {
               iconSize: scaledSuffixIconSize(context),
               icon: Icon(
                 _showPassphrase ? Icons.visibility_off : Icons.visibility,
+                semanticLabel: _showPassphrase
+                    ? l.tooltipHide
+                    : l.tooltipShow,
               ),
               tooltip: _showPassphrase ? l.tooltipHide : l.tooltipShow,
               onPressed: () =>
@@ -772,6 +775,9 @@ class _ImportScreenState extends State<ImportScreen> {
                 iconSize: scaledSuffixIconSize(context),
                 icon: Icon(
                   _yubikeyPinObscured ? Icons.visibility : Icons.visibility_off,
+                  semanticLabel: _yubikeyPinObscured
+                      ? l.tooltipShowPin
+                      : l.tooltipHidePin,
                 ),
                 tooltip: _yubikeyPinObscured
                     ? l.tooltipShowPin

@@ -9,6 +9,40 @@ class AppLocalizationsUk extends AppLocalizations {
   AppLocalizationsUk([String locale = 'uk']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Комбінації клавіш';
+
+  @override
+  String get kbSectionGeneral => 'Загальні';
+
+  @override
+  String get kbSectionSearch => 'Пошук';
+
+  @override
+  String get kbSectionNavigation => 'Навігація';
+
+  @override
+  String get kbLockVault => 'Заблокувати сховище';
+
+  @override
+  String get kbFocusSearch => 'Фокус на пошуку';
+
+  @override
+  String get kbSearchAllFields => 'Пошук у всіх полях';
+
+  @override
+  String get kbMoveBetweenControls => 'Переміщення між елементами';
+
+  @override
+  String get kbActivateControl => 'Активувати вибраний елемент';
+
+  @override
+  String get kbCloseDialog => 'Закрити діалог або скасувати';
+
+  @override
+  String get kbNoCopyNote =>
+      'Немає комбінації для копіювання: копіювання секрету — навмисна дія з автоматичним очищенням.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override
@@ -2092,4 +2126,31 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Змінити розмір стовпців';
+
+  @override
+  String get regionSearch => 'Пошук';
+
+  @override
+  String get regionFolders => 'Папки';
+
+  @override
+  String get regionFilters => 'Категорії записів';
+
+  @override
+  String get regionEntries => 'Список записів';
+
+  @override
+  String get regionDetails => 'Відомості про запис';
+
+  @override
+  String get hintSearch => 'Фільтрує записи під час введення';
+
+  @override
+  String get hintFolderSelector => 'Фільтрує записи за папкою';
+
+  @override
+  String get hintFilterChip => 'Вмикає або вимикає цей фільтр категорії';
+
+  @override
+  String get hintEntryRow => 'Відкриває цей запис';
 }

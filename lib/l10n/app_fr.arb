@@ -1,5 +1,17 @@
 {
   "@@locale": "fr",
+
+  "keyboardShortcutsTitle": "Raccourcis clavier",
+  "kbSectionGeneral": "Général",
+  "kbSectionSearch": "Recherche",
+  "kbSectionNavigation": "Navigation",
+  "kbLockVault": "Verrouiller le coffre",
+  "kbFocusSearch": "Activer la recherche",
+  "kbSearchAllFields": "Rechercher dans tous les champs",
+  "kbMoveBetweenControls": "Se déplacer entre les contrôles",
+  "kbActivateControl": "Activer le contrôle sélectionné",
+  "kbCloseDialog": "Fermer une boîte de dialogue ou annuler",
+  "kbNoCopyNote": "Il n'existe aucun raccourci de copie : copier un secret est une action délibérée qui s'efface automatiquement.",
   "importSizeLimitNote": "Taille de fichier maximale : {textLimit} (CSV, Bitwarden, Dashlane, Google) ou {enpassLimit} (Enpass).",
   "importFileTooLarge": "Ce fichier dépasse la limite de {limit}.",
   "saveConfirmTitle": "Enregistrer dans Gabbro",
@@ -871,5 +883,15 @@
   "restoreFromFileButton": "Restaurer depuis un fichier de sauvegarde",
   "vaultRestoredMessage": "Coffre restauré. Déverrouillez avec vos identifiants.",
   "restoreFromFileInvalidError": "Ce fichier n'est pas un coffre Gabbro utilisable.",
-  "resizeColumns": "Redimensionner les colonnes"
+  "resizeColumns": "Redimensionner les colonnes",
+
+  "regionSearch": "Recherche",
+  "regionFolders": "Dossiers",
+  "regionFilters": "Catégories d'entrées",
+  "regionEntries": "Liste des entrées",
+  "regionDetails": "Détail de l'entrée",
+  "hintSearch": "Filtre les entrées au fur et à mesure de la saisie",
+  "hintFolderSelector": "Filtre les entrées par dossier",
+  "hintFilterChip": "Active ou désactive ce filtre de catégorie",
+  "hintEntryRow": "Ouvre cette entrée"
 }

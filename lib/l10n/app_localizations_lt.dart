@@ -9,6 +9,40 @@ class AppLocalizationsLt extends AppLocalizations {
   AppLocalizationsLt([String locale = 'lt']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Klaviatūros spartieji klavišai';
+
+  @override
+  String get kbSectionGeneral => 'Bendra';
+
+  @override
+  String get kbSectionSearch => 'Paieška';
+
+  @override
+  String get kbSectionNavigation => 'Naršymas';
+
+  @override
+  String get kbLockVault => 'Užrakinti saugyklą';
+
+  @override
+  String get kbFocusSearch => 'Fokusuoti paiešką';
+
+  @override
+  String get kbSearchAllFields => 'Ieškoti visuose laukuose';
+
+  @override
+  String get kbMoveBetweenControls => 'Judėti tarp valdiklių';
+
+  @override
+  String get kbActivateControl => 'Aktyvinti fokusuotą valdiklį';
+
+  @override
+  String get kbCloseDialog => 'Uždaryti dialogą arba atšaukti';
+
+  @override
+  String get kbNoCopyNote =>
+      'Kopijavimo sparčiojo klavišo nėra: paslapties kopijavimas yra tyčinis, automatiškai išsivalantis veiksmas.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override
@@ -2091,4 +2125,31 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Keisti stulpelių dydį';
+
+  @override
+  String get regionSearch => 'Paieška';
+
+  @override
+  String get regionFolders => 'Aplankai';
+
+  @override
+  String get regionFilters => 'Įrašų kategorijos';
+
+  @override
+  String get regionEntries => 'Įrašų sąrašas';
+
+  @override
+  String get regionDetails => 'Įrašo informacija';
+
+  @override
+  String get hintSearch => 'Filtruoja įrašus jums rašant';
+
+  @override
+  String get hintFolderSelector => 'Filtruoja įrašus pagal aplanką';
+
+  @override
+  String get hintFilterChip => 'Įjungia arba išjungia šį kategorijos filtrą';
+
+  @override
+  String get hintEntryRow => 'Atidaro šį įrašą';
 }

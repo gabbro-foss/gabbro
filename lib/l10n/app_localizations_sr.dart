@@ -9,6 +9,40 @@ class AppLocalizationsSr extends AppLocalizations {
   AppLocalizationsSr([String locale = 'sr']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Prečice na tastaturi';
+
+  @override
+  String get kbSectionGeneral => 'Opšte';
+
+  @override
+  String get kbSectionSearch => 'Pretraga';
+
+  @override
+  String get kbSectionNavigation => 'Navigacija';
+
+  @override
+  String get kbLockVault => 'Zaključaj trezor';
+
+  @override
+  String get kbFocusSearch => 'Fokusiraj pretragu';
+
+  @override
+  String get kbSearchAllFields => 'Pretraži sva polja';
+
+  @override
+  String get kbMoveBetweenControls => 'Kretanje između kontrola';
+
+  @override
+  String get kbActivateControl => 'Aktiviraj fokusiranu kontrolu';
+
+  @override
+  String get kbCloseDialog => 'Zatvori dijalog ili otkaži';
+
+  @override
+  String get kbNoCopyNote =>
+      'Ne postoji prečica za kopiranje: kopiranje tajne je namerna radnja koja se automatski briše.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override
@@ -2085,11 +2119,73 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Промени величину колона';
+
+  @override
+  String get regionSearch => 'Pretraga';
+
+  @override
+  String get regionFolders => 'Mape';
+
+  @override
+  String get regionFilters => 'Kategorije unosa';
+
+  @override
+  String get regionEntries => 'Spisak unosa';
+
+  @override
+  String get regionDetails => 'Detalji unosa';
+
+  @override
+  String get hintSearch => 'Filtrira unose dok kucate';
+
+  @override
+  String get hintFolderSelector => 'Filtrira unose po mapi';
+
+  @override
+  String get hintFilterChip =>
+      'Uključuje ili isključuje ovaj filter kategorije';
+
+  @override
+  String get hintEntryRow => 'Otvara ovaj unos';
 }
 
 /// The translations for Serbian, using the Latin script (`sr_Latn`).
 class AppLocalizationsSrLatn extends AppLocalizationsSr {
   AppLocalizationsSrLatn() : super('sr_Latn');
+
+  @override
+  String get keyboardShortcutsTitle => 'Prečice na tastaturi';
+
+  @override
+  String get kbSectionGeneral => 'Opšte';
+
+  @override
+  String get kbSectionSearch => 'Pretraga';
+
+  @override
+  String get kbSectionNavigation => 'Navigacija';
+
+  @override
+  String get kbLockVault => 'Zaključaj trezor';
+
+  @override
+  String get kbFocusSearch => 'Fokusiraj pretragu';
+
+  @override
+  String get kbSearchAllFields => 'Pretraži sva polja';
+
+  @override
+  String get kbMoveBetweenControls => 'Kretanje između kontrola';
+
+  @override
+  String get kbActivateControl => 'Aktiviraj fokusiranu kontrolu';
+
+  @override
+  String get kbCloseDialog => 'Zatvori dijalog ili otkaži';
+
+  @override
+  String get kbNoCopyNote =>
+      'Ne postoji prečica za kopiranje: kopiranje tajne je namerna radnja koja se automatski briše.';
 
   @override
   String get appName => 'Gabbro';
@@ -4168,4 +4264,32 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get resizeColumns => 'Promeni veličinu kolona';
+
+  @override
+  String get regionSearch => 'Pretraga';
+
+  @override
+  String get regionFolders => 'Mape';
+
+  @override
+  String get regionFilters => 'Kategorije unosa';
+
+  @override
+  String get regionEntries => 'Spisak unosa';
+
+  @override
+  String get regionDetails => 'Detalji unosa';
+
+  @override
+  String get hintSearch => 'Filtrira unose dok kucate';
+
+  @override
+  String get hintFolderSelector => 'Filtrira unose po mapi';
+
+  @override
+  String get hintFilterChip =>
+      'Uključuje ili isključuje ovaj filter kategorije';
+
+  @override
+  String get hintEntryRow => 'Otvara ovaj unos';
 }

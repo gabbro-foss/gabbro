@@ -1,5 +1,17 @@
 {
   "@@locale": "lv",
+
+  "keyboardShortcutsTitle": "Tastatūras saīsnes",
+  "kbSectionGeneral": "Vispārīgi",
+  "kbSectionSearch": "Meklēšana",
+  "kbSectionNavigation": "Navigācija",
+  "kbLockVault": "Bloķēt seifu",
+  "kbFocusSearch": "Fokusēt meklēšanu",
+  "kbSearchAllFields": "Meklēt visos laukos",
+  "kbMoveBetweenControls": "Pārvietoties starp vadīklām",
+  "kbActivateControl": "Aktivizēt fokusēto vadīklu",
+  "kbCloseDialog": "Aizvērt dialoglodziņu vai atcelt",
+  "kbNoCopyNote": "Kopēšanas īsinājumtaustiņa nav: noslēpuma kopēšana ir apzināta, automātiski notīrāma darbība.",
   "importSizeLimitNote": "Maksimālais faila izmērs: {textLimit} (CSV, Bitwarden, Dashlane, Google) vai {enpassLimit} (Enpass).",
   "importFileTooLarge": "Šis fails pārsniedz {limit} ierobežojumu.",
   "saveConfirmTitle": "Saglabāt Gabbro",
@@ -872,5 +884,15 @@
   "restoreFromFileButton": "Atjaunot no dublējuma faila",
   "vaultRestoredMessage": "Seifs atjaunots. Atbloķējiet ar saviem akreditācijas datiem.",
   "restoreFromFileInvalidError": "Šis fails nav izmantojams Gabbro seifs.",
-  "resizeColumns": "Mainīt kolonnu izmērus"
+  "resizeColumns": "Mainīt kolonnu izmērus",
+
+  "regionSearch": "Meklēšana",
+  "regionFolders": "Mapes",
+  "regionFilters": "Ierakstu kategorijas",
+  "regionEntries": "Ierakstu saraksts",
+  "regionDetails": "Ieraksta detaļas",
+  "hintSearch": "Filtrē ierakstus rakstīšanas laikā",
+  "hintFolderSelector": "Filtrē ierakstus pēc mapes",
+  "hintFilterChip": "Ieslēdz vai izslēdz šo kategorijas filtru",
+  "hintEntryRow": "Atver šo ierakstu"
 }

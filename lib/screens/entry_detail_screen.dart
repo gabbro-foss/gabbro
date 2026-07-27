@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:gabbro/autotype_target.dart';
 import 'package:gabbro/clipboard_clear.dart';
 import 'package:gabbro/control_scale.dart';
@@ -101,9 +102,16 @@ class EntryDetailScreen extends StatefulWidget {
   /// bottom-right corner; the phone full-screen route (no FAB) leaves it 0.
   final double bottomReserve;
 
-  const EntryDetailScreen({
+  /// Whether this is running on Android. Only the copy announcement depends on
+  /// it, and only Linux gets one: TalkBack reads the snackbar itself, and an
+  /// announcement would make it drop its speech queue. Tests simulating Android
+  /// can pass `isAndroid: true`.
+  final bool isAndroid;
+
+  EntryDetailScreen({
     super.key,
     required this.entry,
+    bool? isAndroid,
     this.onDeleteEntry = _defaultDelete,
     this.clipboardClearTimeout = ClipboardClearTimeout.sixtySeconds,
     this.onFetchHistory = _defaultFetchHistory,
@@ -114,7 +122,7 @@ class EntryDetailScreen extends StatefulWidget {
     this.onEdited,
     this.exportFilePicker = _defaultExportFilePicker,
     this.bottomReserve = 0,
-  });
+  }) : isAndroid = isAndroid ?? Platform.isAndroid;
 
   @override
   State<EntryDetailScreen> createState() => _EntryDetailScreenState();
@@ -193,13 +201,19 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
       },
     );
     if (confirmed != true) return;
+    // Captured before the await: the two-pane layout drops this screen as soon
+    // as the entry leaves the filtered list, and the parent must still be told
+    // to reload — otherwise the deleted row sits in the list until something
+    // else forces a refresh (round 19). Only the Navigator use below needs a
+    // live context, so only it is guarded.
+    final onDeleted = widget.onDeleted;
     await widget.onDeleteEntry(_entryId());
-    if (!context.mounted) return;
-    if (widget.onDeleted != null) {
-      widget.onDeleted!();
-    } else {
-      Navigator.of(context).pop(true);
+    if (onDeleted != null) {
+      onDeleted();
+      return;
     }
+    if (!context.mounted) return;
+    Navigator.of(context).pop(true);
   }
 
   /// Export a file entry's bytes to a user-specified path.
@@ -306,7 +320,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
               onPressed: () => _exportFile(field0),
             ),
           IconButton(
-            icon: const Icon(Icons.edit_outlined),
+            icon: Icon(Icons.edit_outlined, semanticLabel: l.tooltipEditEntry),
             iconSize: scaledIconSize(context),
             tooltip: l.tooltipEditEntry,
             onPressed: () async {
@@ -331,7 +345,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
             },
           ),
           IconButton(
-            icon: const Icon(Icons.delete_outline),
+            icon: Icon(Icons.delete_outline, semanticLabel: l.tooltipDeleteEntry),
             iconSize: scaledIconSize(context),
             tooltip: l.tooltipDeleteEntry,
             onPressed: () => _confirmDelete(context),
@@ -691,12 +705,12 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
             children: [
               Expanded(child: Text(url, style: const TextStyle(fontSize: 16))),
               IconButton(
-                icon: const Icon(Icons.open_in_browser_outlined, size: 18),
+                icon: Icon(Icons.open_in_browser_outlined, size: 18, semanticLabel: l.openInBrowser),
                 tooltip: l.openInBrowser,
                 onPressed: () => _launchUrl(context, url),
               ),
               IconButton(
-                icon: const Icon(Icons.copy_outlined, size: 18),
+                icon: Icon(Icons.copy_outlined, size: 18, semanticLabel: l.tooltipCopy),
                 tooltip: l.tooltipCopy,
                 onPressed: () => _copyToClipboard(url),
               ),
@@ -722,6 +736,17 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(label), duration: const Duration(seconds: 3)),
       );
+      // A Linux screen reader never sees the snackbar: it reads a node's name
+      // and is not told one appeared, so copying was completely silent
+      // (round 26). The copy moves no focus, so this has nothing competing
+      // with it. Same text, so no new translations.
+      if (!widget.isAndroid) {
+        SemanticsService.sendAnnouncement(
+          View.of(context),
+          label,
+          Directionality.of(context),
+        );
+      }
     }
   }
 
@@ -761,7 +786,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.copy_outlined, size: 18),
+                icon: Icon(Icons.copy_outlined, size: 18, semanticLabel: l.tooltipCopy),
                 tooltip: l.tooltipCopy,
                 onPressed: () => _copyToClipboard(value),
               ),
@@ -809,12 +834,16 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
               if (onLongPress != null && !obscured)
                 IconButton(
                   key: const Key('breakdown_button'),
-                  icon: const Icon(Icons.analytics_outlined, size: 18),
+                  icon: Icon(
+                    Icons.analytics_outlined,
+                    size: 18,
+                    semanticLabel: l.passwordBreakdownTitle,
+                  ),
                   tooltip: l.passwordBreakdownTitle,
                   onPressed: onLongPress,
                 ),
               IconButton(
-                icon: const Icon(Icons.copy_outlined, size: 18),
+                icon: Icon(Icons.copy_outlined, size: 18, semanticLabel: l.tooltipCopy),
                 tooltip: l.tooltipCopy,
                 onPressed: () => _copyToClipboard(value),
               ),
@@ -822,6 +851,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
                 iconSize: scaledIconSize(context, 18),
                 icon: Icon(
                   obscured ? Icons.visibility_off : Icons.visibility,
+                  semanticLabel: obscured ? l.tooltipShow : l.tooltipHide,
                 ),
                 tooltip: obscured ? l.tooltipShow : l.tooltipHide,
                 onPressed: onToggle,

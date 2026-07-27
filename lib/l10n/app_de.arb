@@ -1,5 +1,17 @@
 {
   "@@locale": "de",
+
+  "keyboardShortcutsTitle": "Tastenkürzel",
+  "kbSectionGeneral": "Allgemein",
+  "kbSectionSearch": "Suche",
+  "kbSectionNavigation": "Navigation",
+  "kbLockVault": "Tresor sperren",
+  "kbFocusSearch": "Suche fokussieren",
+  "kbSearchAllFields": "In allen Feldern suchen",
+  "kbMoveBetweenControls": "Zwischen Steuerelementen wechseln",
+  "kbActivateControl": "Fokussiertes Element aktivieren",
+  "kbCloseDialog": "Dialog schließen oder abbrechen",
+  "kbNoCopyNote": "Es gibt kein Kopierkürzel: Das Kopieren eines Geheimnisses ist eine bewusste Aktion, die automatisch geleert wird.",
   "importSizeLimitNote": "Maximale Dateigröße: {textLimit} (CSV, Bitwarden, Dashlane, Google) oder {enpassLimit} (Enpass).",
   "importFileTooLarge": "Diese Datei überschreitet das Limit von {limit}.",
   "saveConfirmTitle": "In Gabbro speichern",
@@ -871,5 +883,15 @@
   "restoreFromFileButton": "Aus einer Sicherungsdatei wiederherstellen",
   "vaultRestoredMessage": "Tresor wiederhergestellt. Entsperren Sie mit Ihren Zugangsdaten.",
   "restoreFromFileInvalidError": "Diese Datei ist kein verwendbarer Gabbro-Tresor.",
-  "resizeColumns": "Spalten anpassen"
+  "resizeColumns": "Spalten anpassen",
+
+  "regionSearch": "Suche",
+  "regionFolders": "Ordner",
+  "regionFilters": "Eintragskategorien",
+  "regionEntries": "Eintragsliste",
+  "regionDetails": "Eintragsdetails",
+  "hintSearch": "Filtert die Einträge während der Eingabe",
+  "hintFolderSelector": "Filtert die Einträge nach Ordner",
+  "hintFilterChip": "Schaltet diesen Kategoriefilter ein oder aus",
+  "hintEntryRow": "Öffnet diesen Eintrag"
 }

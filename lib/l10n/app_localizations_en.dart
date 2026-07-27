@@ -9,6 +9,40 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Keyboard shortcuts';
+
+  @override
+  String get kbSectionGeneral => 'General';
+
+  @override
+  String get kbSectionSearch => 'Search';
+
+  @override
+  String get kbSectionNavigation => 'Navigation';
+
+  @override
+  String get kbLockVault => 'Lock vault';
+
+  @override
+  String get kbFocusSearch => 'Focus search';
+
+  @override
+  String get kbSearchAllFields => 'Search all fields';
+
+  @override
+  String get kbMoveBetweenControls => 'Move between controls';
+
+  @override
+  String get kbActivateControl => 'Activate the focused control';
+
+  @override
+  String get kbCloseDialog => 'Close a dialog or cancel';
+
+  @override
+  String get kbNoCopyNote =>
+      'There is no copy shortcut: copying a secret is a deliberate, auto-clearing action.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override
@@ -2069,4 +2103,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Resize columns';
+
+  @override
+  String get regionSearch => 'Search';
+
+  @override
+  String get regionFolders => 'Folders';
+
+  @override
+  String get regionFilters => 'Entry categories';
+
+  @override
+  String get regionEntries => 'Entry list';
+
+  @override
+  String get regionDetails => 'Entry detail';
+
+  @override
+  String get hintSearch => 'Filters the entries as you type';
+
+  @override
+  String get hintFolderSelector => 'Filters the entries by folder';
+
+  @override
+  String get hintFilterChip => 'Turns this category filter on or off';
+
+  @override
+  String get hintEntryRow => 'Opens this entry';
 }

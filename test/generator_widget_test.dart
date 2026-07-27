@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 import 'test_helpers.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/settings.dart';
@@ -69,14 +70,17 @@ GeneratorWidget _stubWidget({void Function(String)? onUsePassword}) =>
 
 /// Stub widget with an explicit clipboard-clear [timeout], for the auto-clear
 /// pins. Classic mode + [_stubPassword] means the generated value is 32 'A's.
-GeneratorWidget _clearStubWidget(ClipboardClearTimeout timeout) =>
-    GeneratorWidget(
-      clipboardClearTimeout: timeout,
-      generatePasswordFn: _stubPassword,
-      generatePassphraseFn: _stubPassphrase,
-      passphraseEntropyBitsFn: _stubEntropyBits,
-      entropyBitsFn: _stubEntropy,
-    );
+GeneratorWidget _clearStubWidget(
+  ClipboardClearTimeout timeout, {
+  bool isAndroid = false,
+}) => GeneratorWidget(
+  clipboardClearTimeout: timeout,
+  isAndroid: isAndroid,
+  generatePasswordFn: _stubPassword,
+  generatePassphraseFn: _stubPassphrase,
+  passphraseEntropyBitsFn: _stubEntropyBits,
+  entropyBitsFn: _stubEntropy,
+);
 
 /// The value [_stubPassword] produces at the default length (32).
 final String _stubGenerated = 'A' * 32;
@@ -671,6 +675,49 @@ void _uiToGeneratorLanguageMappingTests() {
       await tester.pump();
       expect(writes, contains(_stubGenerated));
       await tester.pump(const Duration(seconds: 30)); // flush pending timers
+    });
+
+    // Round 25 (Orca): the copy worked and the button's name changed to
+    // "Copied", but nothing was heard — the name changed under a control that
+    // already had focus, and a Linux screen reader is not told about that.
+    // Copying moves no focus, so an announcement has nothing competing with it.
+    testWidgets('copying says so out loud', (tester) async {
+      final said = recordAnnouncements(tester);
+      recordClipboardWrites(tester);
+      await tester.pumpWidget(
+          _wrap(_clearStubWidget(ClipboardClearTimeout.thirtySeconds)));
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('copy_button')));
+      await tester.pump();
+      expect(
+        said,
+        contains(lookupAppLocalizations(const Locale('en')).tooltipCopied),
+        reason: 'nothing tells a screen-reader user the copy happened: $said',
+      );
+      await tester.pump(const Duration(seconds: 30));
+    });
+
+    testWidgets('Android: copying announces nothing', (tester) async {
+      final said = recordAnnouncements(tester);
+      recordClipboardWrites(tester);
+      await tester.pumpWidget(
+        _wrap(
+          _clearStubWidget(
+            ClipboardClearTimeout.thirtySeconds,
+            isAndroid: true,
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('copy_button')));
+      await tester.pump();
+      expect(
+        said,
+        isEmpty,
+        reason: 'TalkBack drops its speech queue for an announcement, and it '
+            'already reads the button itself: $said',
+      );
+      await tester.pump(const Duration(seconds: 30));
     });
 
     testWidgets('copy clears the clipboard after the configured timeout',

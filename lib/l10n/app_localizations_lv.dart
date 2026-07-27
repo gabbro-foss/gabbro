@@ -9,6 +9,40 @@ class AppLocalizationsLv extends AppLocalizations {
   AppLocalizationsLv([String locale = 'lv']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Tastatūras saīsnes';
+
+  @override
+  String get kbSectionGeneral => 'Vispārīgi';
+
+  @override
+  String get kbSectionSearch => 'Meklēšana';
+
+  @override
+  String get kbSectionNavigation => 'Navigācija';
+
+  @override
+  String get kbLockVault => 'Bloķēt seifu';
+
+  @override
+  String get kbFocusSearch => 'Fokusēt meklēšanu';
+
+  @override
+  String get kbSearchAllFields => 'Meklēt visos laukos';
+
+  @override
+  String get kbMoveBetweenControls => 'Pārvietoties starp vadīklām';
+
+  @override
+  String get kbActivateControl => 'Aktivizēt fokusēto vadīklu';
+
+  @override
+  String get kbCloseDialog => 'Aizvērt dialoglodziņu vai atcelt';
+
+  @override
+  String get kbNoCopyNote =>
+      'Kopēšanas īsinājumtaustiņa nav: noslēpuma kopēšana ir apzināta, automātiski notīrāma darbība.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override
@@ -2087,4 +2121,31 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Mainīt kolonnu izmērus';
+
+  @override
+  String get regionSearch => 'Meklēšana';
+
+  @override
+  String get regionFolders => 'Mapes';
+
+  @override
+  String get regionFilters => 'Ierakstu kategorijas';
+
+  @override
+  String get regionEntries => 'Ierakstu saraksts';
+
+  @override
+  String get regionDetails => 'Ieraksta detaļas';
+
+  @override
+  String get hintSearch => 'Filtrē ierakstus rakstīšanas laikā';
+
+  @override
+  String get hintFolderSelector => 'Filtrē ierakstus pēc mapes';
+
+  @override
+  String get hintFilterChip => 'Ieslēdz vai izslēdz šo kategorijas filtru';
+
+  @override
+  String get hintEntryRow => 'Atver šo ierakstu';
 }

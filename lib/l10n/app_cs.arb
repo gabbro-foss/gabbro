@@ -1,5 +1,17 @@
 {
   "@@locale": "cs",
+
+  "keyboardShortcutsTitle": "Klávesové zkratky",
+  "kbSectionGeneral": "Obecné",
+  "kbSectionSearch": "Hledání",
+  "kbSectionNavigation": "Navigace",
+  "kbLockVault": "Zamknout trezor",
+  "kbFocusSearch": "Zaměřit hledání",
+  "kbSearchAllFields": "Hledat ve všech polích",
+  "kbMoveBetweenControls": "Přecházení mezi prvky",
+  "kbActivateControl": "Aktivovat zaměřený prvek",
+  "kbCloseDialog": "Zavřít dialog nebo zrušit",
+  "kbNoCopyNote": "Neexistuje zkratka pro kopírování: kopírování tajemství je záměrná akce s automatickým vymazáním.",
   "importSizeLimitNote": "Maximální velikost souboru: {textLimit} (CSV, Bitwarden, Dashlane, Google) nebo {enpassLimit} (Enpass).",
   "importFileTooLarge": "Tento soubor překračuje limit {limit}.",
   "saveConfirmTitle": "Uložit do Gabbro",
@@ -872,5 +884,15 @@
   "restoreFromFileButton": "Obnovit ze záložního souboru",
   "vaultRestoredMessage": "Trezor obnoven. Odemkněte pomocí svých přihlašovacích údajů.",
   "restoreFromFileInvalidError": "Tento soubor není použitelný trezor Gabbro.",
-  "resizeColumns": "Změnit velikost sloupců"
+  "resizeColumns": "Změnit velikost sloupců",
+
+  "regionSearch": "Hledání",
+  "regionFolders": "Složky",
+  "regionFilters": "Kategorie záznamů",
+  "regionEntries": "Seznam záznamů",
+  "regionDetails": "Detail záznamu",
+  "hintSearch": "Filtruje záznamy během psaní",
+  "hintFolderSelector": "Filtruje záznamy podle složky",
+  "hintFilterChip": "Zapne nebo vypne tento filtr kategorie",
+  "hintEntryRow": "Otevře tento záznam"
 }

@@ -9,6 +9,40 @@ class AppLocalizationsPt extends AppLocalizations {
   AppLocalizationsPt([String locale = 'pt']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Atalhos de teclado';
+
+  @override
+  String get kbSectionGeneral => 'Geral';
+
+  @override
+  String get kbSectionSearch => 'Pesquisa';
+
+  @override
+  String get kbSectionNavigation => 'Navegação';
+
+  @override
+  String get kbLockVault => 'Bloquear cofre';
+
+  @override
+  String get kbFocusSearch => 'Focar a pesquisa';
+
+  @override
+  String get kbSearchAllFields => 'Pesquisar todos os campos';
+
+  @override
+  String get kbMoveBetweenControls => 'Mover entre controlos';
+
+  @override
+  String get kbActivateControl => 'Ativar o controlo focado';
+
+  @override
+  String get kbCloseDialog => 'Fechar uma caixa de diálogo ou cancelar';
+
+  @override
+  String get kbNoCopyNote =>
+      'Não existe atalho para copiar: copiar um segredo é uma ação deliberada, com limpeza automática.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override
@@ -2090,11 +2124,72 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Redimensionar colunas';
+
+  @override
+  String get regionSearch => 'Pesquisa';
+
+  @override
+  String get regionFolders => 'Pastas';
+
+  @override
+  String get regionFilters => 'Categorias de entradas';
+
+  @override
+  String get regionEntries => 'Lista de entradas';
+
+  @override
+  String get regionDetails => 'Detalhe da entrada';
+
+  @override
+  String get hintSearch => 'Filtra as entradas à medida que escreve';
+
+  @override
+  String get hintFolderSelector => 'Filtra as entradas por pasta';
+
+  @override
+  String get hintFilterChip => 'Ativa ou desativa este filtro de categoria';
+
+  @override
+  String get hintEntryRow => 'Abre esta entrada';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
 class AppLocalizationsPtBr extends AppLocalizationsPt {
   AppLocalizationsPtBr() : super('pt_BR');
+
+  @override
+  String get keyboardShortcutsTitle => 'Atalhos de teclado';
+
+  @override
+  String get kbSectionGeneral => 'Geral';
+
+  @override
+  String get kbSectionSearch => 'Pesquisa';
+
+  @override
+  String get kbSectionNavigation => 'Navegação';
+
+  @override
+  String get kbLockVault => 'Bloquear cofre';
+
+  @override
+  String get kbFocusSearch => 'Focar a pesquisa';
+
+  @override
+  String get kbSearchAllFields => 'Pesquisar todos os campos';
+
+  @override
+  String get kbMoveBetweenControls => 'Mover entre controles';
+
+  @override
+  String get kbActivateControl => 'Ativar o controle focado';
+
+  @override
+  String get kbCloseDialog => 'Fechar uma caixa de diálogo ou cancelar';
+
+  @override
+  String get kbNoCopyNote =>
+      'Não há atalho para copiar: copiar um segredo é uma ação deliberada, com limpeza automática.';
 
   @override
   String get appName => 'Gabbro';
@@ -4175,11 +4270,72 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get resizeColumns => 'Redimensionar colunas';
+
+  @override
+  String get regionSearch => 'Pesquisa';
+
+  @override
+  String get regionFolders => 'Pastas';
+
+  @override
+  String get regionFilters => 'Categorias de entradas';
+
+  @override
+  String get regionEntries => 'Lista de entradas';
+
+  @override
+  String get regionDetails => 'Detalhes da entrada';
+
+  @override
+  String get hintSearch => 'Filtra as entradas conforme você digita';
+
+  @override
+  String get hintFolderSelector => 'Filtra as entradas por pasta';
+
+  @override
+  String get hintFilterChip => 'Ativa ou desativa este filtro de categoria';
+
+  @override
+  String get hintEntryRow => 'Abre esta entrada';
 }
 
 /// The translations for Portuguese, as used in Portugal (`pt_PT`).
 class AppLocalizationsPtPt extends AppLocalizationsPt {
   AppLocalizationsPtPt() : super('pt_PT');
+
+  @override
+  String get keyboardShortcutsTitle => 'Atalhos de teclado';
+
+  @override
+  String get kbSectionGeneral => 'Geral';
+
+  @override
+  String get kbSectionSearch => 'Pesquisa';
+
+  @override
+  String get kbSectionNavigation => 'Navegação';
+
+  @override
+  String get kbLockVault => 'Bloquear cofre';
+
+  @override
+  String get kbFocusSearch => 'Focar a pesquisa';
+
+  @override
+  String get kbSearchAllFields => 'Pesquisar todos os campos';
+
+  @override
+  String get kbMoveBetweenControls => 'Mover entre controlos';
+
+  @override
+  String get kbActivateControl => 'Ativar o controlo focado';
+
+  @override
+  String get kbCloseDialog => 'Fechar uma caixa de diálogo ou cancelar';
+
+  @override
+  String get kbNoCopyNote =>
+      'Não existe atalho para copiar: copiar um segredo é uma ação deliberada, com limpeza automática.';
 
   @override
   String get appName => 'Gabbro';
@@ -6266,4 +6422,31 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get resizeColumns => 'Redimensionar colunas';
+
+  @override
+  String get regionSearch => 'Pesquisa';
+
+  @override
+  String get regionFolders => 'Pastas';
+
+  @override
+  String get regionFilters => 'Categorias de entradas';
+
+  @override
+  String get regionEntries => 'Lista de entradas';
+
+  @override
+  String get regionDetails => 'Detalhe da entrada';
+
+  @override
+  String get hintSearch => 'Filtra as entradas à medida que escreve';
+
+  @override
+  String get hintFolderSelector => 'Filtra as entradas por pasta';
+
+  @override
+  String get hintFilterChip => 'Ativa ou desativa este filtro de categoria';
+
+  @override
+  String get hintEntryRow => 'Abre esta entrada';
 }

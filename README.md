@@ -24,8 +24,9 @@ Named after the intrusive igneous rock — hard, stable, enduring.
   layer was removed as non-load-bearing (ADR-018)
 - **Hardware key (optional, recommended)** — FIDO2/YubiKey authentication; passphrase-only
   by default, with a minimum of two keys when keys are used (primary + backup)
-- **Rust for all secrets** — every cryptographic operation lives in
-  Rust; secrets never cross the Flutter/Rust bridge in plaintext
+- **Rust for all keys** — every cryptographic operation lives in Rust;
+  keys never cross the Flutter/Rust bridge. Secrets you view, generate
+  or autofill do reach Flutter in plaintext to be displayed
 - **Local-first** — your vault lives on your device; sync is your
   choice and your responsibility
 - **Localised** — UI available in many languages (EN, FR, DE, IT, ES, and more); follows system locale with in-app override
@@ -43,8 +44,8 @@ Named after the intrusive igneous rock — hard, stable, enduring.
 | Crypto & secrets | Rust |
 | Bridge | flutter_rust_bridge v2 (FFI) |
 
-The Flutter:Rust split follows a strict principle: if it touches a
-secret, it lives in Rust. Everything else lives in Flutter.
+The Flutter:Rust split follows a strict principle: if it touches a key,
+it lives in Rust. Everything else lives in Flutter.
 
 ---
 
@@ -310,6 +311,28 @@ SHA-256: 0F:0A:B8:1B:9B:B8:F0:21:68:25:83:73:17:C6:49:F3:64:F4:47:B0:D0:93:5B:FA
   `SHA-256` certificate digest (`<abi>` is whichever file you downloaded — `arm64-v8a`, `armeabi-v7a` or `x86_64`). All three per-ABI APKs are signed by the same key and share this fingerprint.
 
 A mismatch means the file is **not** an official Gabbro build — do not install it.
+
+---
+
+## Keyboard shortcuts (Linux)
+
+Desktop-only; also listed in-app under the vault menu → **Keyboard shortcuts**.
+
+| Shortcut | Action |
+|---|---|
+| `Ctrl+L` | Lock the vault |
+| `Ctrl+N` | New entry |
+| `Ctrl+M` | Open the menu |
+| `Ctrl+Q` | Lock and quit (asks first) |
+| `Ctrl+F` | Focus search |
+| `Ctrl+Shift+F` | Search all fields |
+| `Tab` / `Shift+Tab` | Move between regions (search, folders, filters, list, detail) |
+| `↑` `↓` `←` `→` | Move within the focused region |
+| `Enter` / `Space` | Activate the focused control |
+| `Esc` | Leave the focused region; again to close a dialog or go back |
+
+There is deliberately **no copy shortcut** — copying a secret stays an explicit,
+auto-clearing action.
 
 ---
 

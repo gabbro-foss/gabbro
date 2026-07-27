@@ -1,5 +1,17 @@
 {
   "@@locale": "ja",
+
+  "keyboardShortcutsTitle": "キーボードショートカット",
+  "kbSectionGeneral": "一般",
+  "kbSectionSearch": "検索",
+  "kbSectionNavigation": "ナビゲーション",
+  "kbLockVault": "ボルトをロック",
+  "kbFocusSearch": "検索にフォーカス",
+  "kbSearchAllFields": "すべてのフィールドを検索",
+  "kbMoveBetweenControls": "コントロール間を移動",
+  "kbActivateControl": "フォーカス中のコントロールを実行",
+  "kbCloseDialog": "ダイアログを閉じる、またはキャンセル",
+  "kbNoCopyNote": "コピー用のショートカットはありません: 秘密のコピーは意図的な操作であり、自動的に消去されます。",
   "importSizeLimitNote": "最大ファイルサイズ：{textLimit}（CSV、Bitwarden、Dashlane、Google）または {enpassLimit}（Enpass）。",
   "importFileTooLarge": "このファイルは {limit} の上限を超えています。",
   "saveConfirmTitle": "Gabbro に保存",
@@ -871,5 +883,15 @@
   "restoreFromFileButton": "バックアップファイルから復元",
   "vaultRestoredMessage": "ボールトを復元しました。認証情報でロックを解除してください。",
   "restoreFromFileInvalidError": "このファイルは使用可能な Gabbro ボールトではありません。",
-  "resizeColumns": "列のサイズを変更"
+  "resizeColumns": "列のサイズを変更",
+
+  "regionSearch": "検索",
+  "regionFolders": "フォルダ",
+  "regionFilters": "エントリのカテゴリ",
+  "regionEntries": "エントリ一覧",
+  "regionDetails": "エントリの詳細",
+  "hintSearch": "入力するとエントリを絞り込みます",
+  "hintFolderSelector": "フォルダでエントリを絞り込みます",
+  "hintFilterChip": "このカテゴリフィルターのオンとオフを切り替えます",
+  "hintEntryRow": "このエントリを開きます"
 }

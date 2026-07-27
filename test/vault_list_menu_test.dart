@@ -246,10 +246,11 @@ void main() {
       expect(find.text('Help'), findsOneWidget);
       expect(find.text('About'), findsOneWidget);
       expect(find.text('Manage folders'), findsOneWidget);
+      expect(find.text('Keyboard shortcuts'), findsOneWidget);
       expect(find.text('Quit'), findsOneWidget);
       // Net (2026-07-21): pin the exact count so a silently added or removed item
       // is caught. Bump this when the menu gains an item.
-      expect(find.byType(PopupMenuItem<String>), findsNWidgets(14));
+      expect(find.byType(PopupMenuItem<String>), findsNWidgets(15));
     });
 
     // Linux-only: off-Linux onQuit is null, so the menu has no Quit item.
@@ -261,7 +262,7 @@ void main() {
       await tester.tap(find.byIcon(Icons.menu));
       await tester.pumpAndSettle();
       expect(find.text('Quit'), findsNothing);
-      expect(find.byType(PopupMenuItem<String>), findsNWidgets(13));
+      expect(find.byType(PopupMenuItem<String>), findsNWidgets(14));
     });
 
     // Quit from an unlocked vault confirms first (an accidental menu tap must
@@ -273,6 +274,8 @@ void main() {
       await _setNarrow(tester);
       await tester.pumpAndSettle();
       await tester.tap(find.byIcon(Icons.menu));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Quit'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Quit'));
       await tester.pumpAndSettle();
@@ -290,6 +293,8 @@ void main() {
       await _setNarrow(tester);
       await tester.pumpAndSettle();
       await tester.tap(find.byIcon(Icons.menu));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Quit'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Quit'));
       await tester.pumpAndSettle();
@@ -310,6 +315,8 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byIcon(Icons.menu));
       await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Quit'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Quit'));
       await tester.pumpAndSettle();
       await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
@@ -324,6 +331,8 @@ void main() {
       await _setNarrow(tester);
       await tester.pumpAndSettle();
       await tester.tap(find.byIcon(Icons.menu));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Quit'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Quit'));
       await tester.pumpAndSettle();

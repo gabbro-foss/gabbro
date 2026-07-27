@@ -1,5 +1,17 @@
 {
   "@@locale": "sk",
+
+  "keyboardShortcutsTitle": "Klávesové skratky",
+  "kbSectionGeneral": "Všeobecné",
+  "kbSectionSearch": "Hľadanie",
+  "kbSectionNavigation": "Navigácia",
+  "kbLockVault": "Zamknúť trezor",
+  "kbFocusSearch": "Zamerať hľadanie",
+  "kbSearchAllFields": "Hľadať vo všetkých poliach",
+  "kbMoveBetweenControls": "Prechádzanie medzi prvkami",
+  "kbActivateControl": "Aktivovať zameraný prvok",
+  "kbCloseDialog": "Zavrieť dialóg alebo zrušiť",
+  "kbNoCopyNote": "Neexistuje skratka na kopírovanie: kopírovanie tajomstva je zámerná akcia s automatickým vymazaním.",
   "importSizeLimitNote": "Maximálna veľkosť súboru: {textLimit} (CSV, Bitwarden, Dashlane, Google) alebo {enpassLimit} (Enpass).",
   "importFileTooLarge": "Tento súbor prekračuje limit {limit}.",
   "saveConfirmTitle": "Uložiť do Gabbro",
@@ -871,5 +883,15 @@
   "restoreFromFileButton": "Obnoviť zo záložného súboru",
   "vaultRestoredMessage": "Trezor obnovený. Odomknite pomocou svojich prihlasovacích údajov.",
   "restoreFromFileInvalidError": "Tento súbor nie je použiteľný trezor Gabbro.",
-  "resizeColumns": "Zmeniť veľkosť stĺpcov"
+  "resizeColumns": "Zmeniť veľkosť stĺpcov",
+
+  "regionSearch": "Hľadanie",
+  "regionFolders": "Priečinky",
+  "regionFilters": "Kategórie záznamov",
+  "regionEntries": "Zoznam záznamov",
+  "regionDetails": "Podrobnosti záznamu",
+  "hintSearch": "Filtruje záznamy počas písania",
+  "hintFolderSelector": "Filtruje záznamy podľa priečinka",
+  "hintFilterChip": "Zapne alebo vypne tento filter kategórie",
+  "hintEntryRow": "Otvorí tento záznam"
 }

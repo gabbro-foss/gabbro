@@ -1,5 +1,17 @@
 {
   "@@locale": "kk",
+
+  "keyboardShortcutsTitle": "Пернетақта тіркесімдері",
+  "kbSectionGeneral": "Жалпы",
+  "kbSectionSearch": "Іздеу",
+  "kbSectionNavigation": "Навигация",
+  "kbLockVault": "Сейфті бекіту",
+  "kbFocusSearch": "Іздеуге фокус",
+  "kbSearchAllFields": "Барлық өрістерде іздеу",
+  "kbMoveBetweenControls": "Басқару элементтері арасында жылжу",
+  "kbActivateControl": "Фокустағы элементті іске қосу",
+  "kbCloseDialog": "Диалогты жабу немесе бас тарту",
+  "kbNoCopyNote": "Көшіру төте жолы жоқ: құпияны көшіру — қасақана жасалатын, автоматты түрде тазаланатын әрекет.",
   "importSizeLimitNote": "Файлдың ең үлкен өлшемі: {textLimit} (CSV, Bitwarden, Dashlane, Google) немесе {enpassLimit} (Enpass).",
   "importFileTooLarge": "Бұл файл {limit} шегінен асып кетті.",
   "saveConfirmTitle": "Gabbro-ға сақтау",
@@ -871,5 +883,15 @@
   "restoreFromFileButton": "Сақтық көшірме файлынан қалпына келтіру",
   "vaultRestoredMessage": "Қойма қалпына келтірілді. Өз деректеріңізбен ашыңыз.",
   "restoreFromFileInvalidError": "Бұл файл жарамды Gabbro қоймасы емес.",
-  "resizeColumns": "Бағандар өлшемін өзгерту"
+  "resizeColumns": "Бағандар өлшемін өзгерту",
+
+  "regionSearch": "Іздеу",
+  "regionFolders": "Қалталар",
+  "regionFilters": "Жазба санаттары",
+  "regionEntries": "Жазбалар тізімі",
+  "regionDetails": "Жазба мәліметтері",
+  "hintSearch": "Терген кезде жазбаларды сүзеді",
+  "hintFolderSelector": "Жазбаларды қалта бойынша сүзеді",
+  "hintFilterChip": "Осы санат сүзгісін қосады немесе өшіреді",
+  "hintEntryRow": "Осы жазбаны ашады"
 }

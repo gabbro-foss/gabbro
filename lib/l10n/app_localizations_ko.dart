@@ -9,6 +9,39 @@ class AppLocalizationsKo extends AppLocalizations {
   AppLocalizationsKo([String locale = 'ko']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => '키보드 단축키';
+
+  @override
+  String get kbSectionGeneral => '일반';
+
+  @override
+  String get kbSectionSearch => '검색';
+
+  @override
+  String get kbSectionNavigation => '탐색';
+
+  @override
+  String get kbLockVault => '볼트 잠금';
+
+  @override
+  String get kbFocusSearch => '검색에 포커스';
+
+  @override
+  String get kbSearchAllFields => '모든 필드 검색';
+
+  @override
+  String get kbMoveBetweenControls => '컨트롤 간 이동';
+
+  @override
+  String get kbActivateControl => '포커스된 컨트롤 활성화';
+
+  @override
+  String get kbCloseDialog => '대화상자 닫기 또는 취소';
+
+  @override
+  String get kbNoCopyNote => '복사 단축키는 없습니다: 비밀 복사는 의도적이며 자동으로 지워지는 작업입니다.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override
@@ -2027,4 +2060,31 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get resizeColumns => '열 크기 조정';
+
+  @override
+  String get regionSearch => '검색';
+
+  @override
+  String get regionFolders => '폴더';
+
+  @override
+  String get regionFilters => '항목 범주';
+
+  @override
+  String get regionEntries => '항목 목록';
+
+  @override
+  String get regionDetails => '항목 세부정보';
+
+  @override
+  String get hintSearch => '입력하는 대로 항목을 필터링합니다';
+
+  @override
+  String get hintFolderSelector => '폴더별로 항목을 필터링합니다';
+
+  @override
+  String get hintFilterChip => '이 범주 필터를 켜거나 끕니다';
+
+  @override
+  String get hintEntryRow => '이 항목을 엽니다';
 }

@@ -9,6 +9,40 @@ class AppLocalizationsPl extends AppLocalizations {
   AppLocalizationsPl([String locale = 'pl']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Skróty klawiszowe';
+
+  @override
+  String get kbSectionGeneral => 'Ogólne';
+
+  @override
+  String get kbSectionSearch => 'Wyszukiwanie';
+
+  @override
+  String get kbSectionNavigation => 'Nawigacja';
+
+  @override
+  String get kbLockVault => 'Zablokuj skarbiec';
+
+  @override
+  String get kbFocusSearch => 'Fokus na wyszukiwaniu';
+
+  @override
+  String get kbSearchAllFields => 'Szukaj we wszystkich polach';
+
+  @override
+  String get kbMoveBetweenControls => 'Przechodzenie między kontrolkami';
+
+  @override
+  String get kbActivateControl => 'Aktywuj wyróżnioną kontrolkę';
+
+  @override
+  String get kbCloseDialog => 'Zamknij okno dialogowe lub anuluj';
+
+  @override
+  String get kbNoCopyNote =>
+      'Nie ma skrótu do kopiowania: skopiowanie sekretu to celowe działanie z automatycznym czyszczeniem.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override
@@ -2094,4 +2128,31 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Zmień rozmiar kolumn';
+
+  @override
+  String get regionSearch => 'Wyszukiwanie';
+
+  @override
+  String get regionFolders => 'Foldery';
+
+  @override
+  String get regionFilters => 'Kategorie wpisów';
+
+  @override
+  String get regionEntries => 'Lista wpisów';
+
+  @override
+  String get regionDetails => 'Szczegóły wpisu';
+
+  @override
+  String get hintSearch => 'Filtruje wpisy podczas pisania';
+
+  @override
+  String get hintFolderSelector => 'Filtruje wpisy według folderu';
+
+  @override
+  String get hintFilterChip => 'Włącza lub wyłącza ten filtr kategorii';
+
+  @override
+  String get hintEntryRow => 'Otwiera ten wpis';
 }

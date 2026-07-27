@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
@@ -10,6 +11,7 @@ import 'package:gabbro/screens/section_index.dart';
 import 'package:gabbro/screens/security_screen.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
+import 'package:gabbro/widgets/focus_region.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 // ---------------------------------------------------------------------------
@@ -100,6 +102,14 @@ class TabletVaultLayout extends StatefulWidget {
   /// Called when a list tile is long-pressed or tapped in selection mode.
   final void Function(String id) onToggleSelection;
 
+  /// Keyboard Tab-cycle regions for the list and detail panes (desktop only;
+  /// null on Android, so the widget tree is unchanged there). The scopes are
+  /// owned by the parent VaultListScreen — the regions span both widgets (see
+  /// reference two-layout-paths). The detail scope is mounted only while an entry
+  /// is selected, which is how the cycle knows detail is a reachable stop.
+  final FocusScopeNode? listScope;
+  final FocusScopeNode? detailScope;
+
   const TabletVaultLayout({
     super.key,
     required this.groupedEntries,
@@ -123,6 +133,8 @@ class TabletVaultLayout extends StatefulWidget {
     required this.selectionMode,
     required this.selectedIds,
     required this.onToggleSelection,
+    this.listScope,
+    this.detailScope,
   });
 
   @override
@@ -245,8 +257,25 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
       clipboardClearTimeout: widget.clipboardClearTimeout,
       onDeleteEntry: widget.onDeleteEntryFn ?? (id) => deleteEntry(id: id),
       onDeleted: () {
-        setState(() => _selectedEntryId = null);
+        // Reload the list FIRST. It lives in the parent's state, so it must not
+        // depend on this widget's own setState having succeeded — if that throws
+        // (release builds swallow it), the deleted row would otherwise sit in
+        // the list until something else forced a reload.
         widget.onRefresh();
+        setState(() => _selectedEntryId = null);
+        // The pane the user was working in vanishes and the empty state takes
+        // its place. A Linux screen reader reads a node's NAME when focus
+        // arrives at it, and nothing here moves focus, so the whole thing
+        // happened in silence (round 27). Speaking the empty state's own
+        // visible text says the entry is gone and what is there instead.
+        // Linux only, on the same gate as the rest of the region layer.
+        if (_keyboardNav) {
+          SemanticsService.sendAnnouncement(
+            View.of(context),
+            AppLocalizations.of(context).selectEntry,
+            Directionality.of(context),
+          );
+        }
       },
       onEdited: () => widget.onRefresh(),
     );
@@ -259,7 +288,9 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
         widget.searchBar,
         widget.filterChipRow,
         Expanded(
-          child: widget.groupedEntries.isEmpty
+          child: _region(
+            widget.listScope,
+            widget.groupedEntries.isEmpty
               ? Center(child: Text(AppLocalizations.of(context).noEntriesMatch))
               : Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -319,22 +350,39 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
                             }
                             final entry = item as EntrySummaryData;
                             final isSelected = entry.id == _selectedEntryId;
+                            final rowOutcome = widget.selectionMode
+                                ? null
+                                : AppLocalizations.of(context).hintEntryRow;
                             return Container(
-                              decoration: isSelected
-                                  ? BoxDecoration(
-                                      border: Border(
-                                        left: BorderSide(
-                                          color: theme.colorScheme.primary,
-                                          width: 3,
-                                        ),
-                                      ),
-                                      color: theme.colorScheme.primaryContainer
-                                          .withValues(alpha: 0.3),
-                                    )
-                                  : null,
+                              // The decoration is ALWAYS present (transparent
+                              // border, no fill, when unselected). Flipping it
+                              // between null and non-null changes the widget
+                              // tree's SHAPE, which rebuilds the ListTile's
+                              // InkWell and disposes its focus node — so
+                              // opening an entry with Enter threw keyboard
+                              // focus onto a neighbouring row. Keeping the
+                              // border reserved also stops the row shifting
+                              // 3px sideways when it is selected.
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  left: BorderSide(
+                                    color: isSelected
+                                        ? theme.colorScheme.primary
+                                        : Colors.transparent,
+                                    width: 3,
+                                  ),
+                                ),
+                                color: isSelected
+                                    ? theme.colorScheme.primaryContainer
+                                          .withValues(alpha: 0.3)
+                                    : null,
+                              ),
                               child: Material(
                                 color: Colors.transparent,
-                                child: ListTile(
+                                // Selection mode taps the row to tick it, so
+                                // "opens this entry" would then be a lie.
+                                child: _saysWhatItDoes(
+                                  ListTile(
                                 dense: true,
                                 leading: widget.selectionMode
                                     // Label the checkbox with the entry title so
@@ -355,15 +403,21 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
                                           ),
                                         ),
                                       )
+                                    // No semanticLabel: the subtitle below
+                                    // already says the type, and labelling the
+                                    // icon too made a reader announce it twice
+                                    // ("card, amex, card").
                                     : Icon(
                                         widget.entryTypeIcon(entry.entryType),
                                         size: scaledIconSize(context, 20),
                                         color: theme.colorScheme.primary,
-                                        semanticLabel: widget.displayType(
-                                          entry.entryType,
-                                        ),
                                       ),
-                                title: Text(widget.displayTitle(entry)),
+                                title: Text(
+                                  widget.displayTitle(entry),
+                                  semanticsLabel: _ownNameLabel(
+                                    outcome: rowOutcome,
+                                  ),
+                                ),
                                 subtitle: Text(
                                   widget.displayType(entry.entryType),
                                 ),
@@ -379,6 +433,9 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
                                   );
                                   widget.onEntryTap(entry.id);
                                 },
+                                  ),
+                                  name: widget.displayTitle(entry),
+                                  outcome: rowOutcome,
                                 ),
                               ),
                             );
@@ -388,10 +445,59 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
                     ),
                   ],
                 ),
+            label: AppLocalizations.of(context).regionEntries,
+          ),
         ),
       ],
     );
   }
+
+  /// Wrap a pane in its Tab-cycle region (FocusScope for identity + FocusRegion
+  /// for the focus frame and the spoken region name). Pass-through when [scope]
+  /// is null (Android) — so the announcement rides the same gate as the frame.
+  Widget _region(FocusScopeNode? scope, Widget child, {String? label}) =>
+      scope == null
+      ? child
+      : FocusScope(
+          node: scope,
+          child: FocusRegion(label: label, child: child),
+        );
+
+  /// Whether keyboard navigation is live. The parent nulls the region scopes on
+  /// Android, where there is no keyboard — and then nothing keyboard-related,
+  /// the focus frame included, may appear anywhere in the tree.
+  bool get _keyboardNav => widget.listScope != null;
+
+  /// Makes a control say what it DOES. A Linux screen reader is given only a
+  /// node's NAME — the embedder never reads a semantics hint (LEARNINGS.md) —
+  /// so there the outcome goes inside the name, after the control's own name.
+  /// Android does read hints and keeps its own, unchanged. `_keyboardNav` is
+  /// the same Linux gate the focus frame already rides on.
+  ///
+  /// [outcome] null means the control promises nothing right now (a row in
+  /// selection mode ticks rather than opens), so nothing is added.
+  Widget _saysWhatItDoes(
+    Widget child, {
+    required String name,
+    String? outcome,
+  }) {
+    if (outcome == null) return child;
+    return _keyboardNav
+        ? Semantics(label: '$name. $outcome', child: child)
+        : Semantics(hint: outcome, child: child);
+  }
+
+  /// The `semanticsLabel` for the Text showing a control's own name: blank
+  /// where [_saysWhatItDoes] has already composed that name into the label,
+  /// null otherwise. A blanked VALUE, not a wrapper — a wrapper would change
+  /// the tree's shape, which is what disposed this row's focus node once.
+  String? _ownNameLabel({String? outcome}) =>
+      outcome != null && _keyboardNav ? '' : null;
+
+  /// The nav rail is excluded from the Tab cycle (no scope of its own) but still
+  /// shows a frame when focus reaches it — on desktop only.
+  Widget _railFrame(Widget child) =>
+      _keyboardNav ? FocusRegion(child: child) : child;
 
   // Maximum list pane width: always leaves ≥200dp for the detail pane and
   // the navigation rail (~100dp combined). Grows naturally on wide screens.
@@ -410,7 +516,8 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
     return Row(
       children: [
         // ── Navigation rail ────────────────────────────────────────────────
-        NavigationRail(
+        _railFrame(
+          NavigationRail(
           selectedIndex: _railIndex,
           onDestinationSelected: _onRailDestinationSelected,
           labelType: NavigationRailLabelType.all,
@@ -436,6 +543,7 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
               label: Text(l.navAbout),
             ),
           ],
+        ),
         ),
         const VerticalDivider(width: 1),
         // ── List pane (resizable) ──────────────────────────────────────────
@@ -508,7 +616,19 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
           ),
         ),
         // ── Detail pane (flex) ─────────────────────────────────────────────
-        Expanded(child: _buildDetailPane(context)),
+        // Always wrapped, selected or not. The cycle decides whether detail is
+        // a Tab stop from the scope's FOCUSABLE DESCENDANTS, and the empty
+        // pane has none (an icon and a line of text), so it is still never a
+        // stop. Mounting the wrapper conditionally instead changed the widget
+        // tree's SHAPE every time the selection cleared, which tore down and
+        // rebuilt the whole detail subtree — see the round-17 delete bug.
+        Expanded(
+          child: _region(
+            widget.detailScope,
+            _buildDetailPane(context),
+            label: AppLocalizations.of(context).regionDetails,
+          ),
+        ),
       ],
     );
   }

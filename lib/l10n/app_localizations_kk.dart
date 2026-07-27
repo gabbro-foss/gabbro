@@ -9,6 +9,40 @@ class AppLocalizationsKk extends AppLocalizations {
   AppLocalizationsKk([String locale = 'kk']) : super(locale);
 
   @override
+  String get keyboardShortcutsTitle => 'Пернетақта тіркесімдері';
+
+  @override
+  String get kbSectionGeneral => 'Жалпы';
+
+  @override
+  String get kbSectionSearch => 'Іздеу';
+
+  @override
+  String get kbSectionNavigation => 'Навигация';
+
+  @override
+  String get kbLockVault => 'Сейфті бекіту';
+
+  @override
+  String get kbFocusSearch => 'Іздеуге фокус';
+
+  @override
+  String get kbSearchAllFields => 'Барлық өрістерде іздеу';
+
+  @override
+  String get kbMoveBetweenControls => 'Басқару элементтері арасында жылжу';
+
+  @override
+  String get kbActivateControl => 'Фокустағы элементті іске қосу';
+
+  @override
+  String get kbCloseDialog => 'Диалогты жабу немесе бас тарту';
+
+  @override
+  String get kbNoCopyNote =>
+      'Көшіру төте жолы жоқ: құпияны көшіру — қасақана жасалатын, автоматты түрде тазаланатын әрекет.';
+
+  @override
   String get appName => 'Gabbro';
 
   @override
@@ -2084,4 +2118,31 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Бағандар өлшемін өзгерту';
+
+  @override
+  String get regionSearch => 'Іздеу';
+
+  @override
+  String get regionFolders => 'Қалталар';
+
+  @override
+  String get regionFilters => 'Жазба санаттары';
+
+  @override
+  String get regionEntries => 'Жазбалар тізімі';
+
+  @override
+  String get regionDetails => 'Жазба мәліметтері';
+
+  @override
+  String get hintSearch => 'Терген кезде жазбаларды сүзеді';
+
+  @override
+  String get hintFolderSelector => 'Жазбаларды қалта бойынша сүзеді';
+
+  @override
+  String get hintFilterChip => 'Осы санат сүзгісін қосады немесе өшіреді';
+
+  @override
+  String get hintEntryRow => 'Осы жазбаны ашады';
 }

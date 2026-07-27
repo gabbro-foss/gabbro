@@ -5,6 +5,7 @@ import 'package:gabbro/settings.dart';
 import 'package:gabbro/screens/alphabet_index_bar.dart';
 
 import 'screen_catalog.dart';
+import 'test_helpers.dart';
 
 // Accessibility net (item 6). Sweeps every catalog screen and dialog and asserts
 // two Flutter accessibility guidelines on a phone at natural text scale:
@@ -24,6 +25,14 @@ const Map<String, String> _knownTapTargetTooSmall = <String, String>{};
 // Screens/dialogs with a KNOWN unfixed unlabelled tappable node. Same rules.
 const Map<String, String> _knownUnlabelled = <String, String>{};
 
+// Screens whose icon buttons still carry their text ONLY as a tooltip, so Orca
+// says just "button" for them. Found by the sweep at the end of this file after
+// round 22; the vault list and the entry detail pane are fixed, the rest are
+// listed here so they are visible rather than silently passing. Each is the
+// same one-line change (add semanticLabel beside the tooltip). Remove the entry
+// once the screen is fixed.
+const Map<String, String> _knownTooltipOnly = <String, String>{};
+
 // Screens/dialogs with a KNOWN unfixed text-contrast failure, each skipped (not
 // silently passing) with a reason. Remove the entry once fixed. textContrast
 // guideline demands >= 4.5:1 for normal text; a real failure here is a
@@ -39,11 +48,15 @@ const Map<String, ({ThemeChoice theme, bool highContrast})> _contrastModes = {
   'high-contrast dark': (theme: ThemeChoice.dark, highContrast: true),
 };
 
-/// Set the phone surface + a semantics handle, pump [app] at natural text scale,
-/// and settle. Caller disposes the returned handle.
-Future<SemanticsHandle> _pump(WidgetTester tester, Widget app) async {
-  tester.view.physicalSize = phone.physical;
-  tester.view.devicePixelRatio = phone.dpr;
+/// Set [surface] + a semantics handle, pump [app] at natural text scale, and
+/// settle. Caller disposes the returned handle.
+Future<SemanticsHandle> _pump(
+  WidgetTester tester,
+  Widget app, {
+  Surface surface = phone,
+}) async {
+  tester.view.physicalSize = surface.physical;
+  tester.view.devicePixelRatio = surface.dpr;
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
   final handle = tester.ensureSemantics();
@@ -51,6 +64,13 @@ Future<SemanticsHandle> _pump(WidgetTester tester, Widget app) async {
   await tester.pump(const Duration(milliseconds: 300));
   return handle;
 }
+
+/// The surface a catalog screen is swept on. Entries that only exist above a
+/// width breakpoint are rendered on the TABLET surface rather than skipped —
+/// skipping left the whole two-pane layout (its list and detail regions) with no
+/// accessibility coverage at all. Mirrors what the overflow probe already does.
+Surface _surfaceFor(String key) =>
+    tabletOnly.containsKey(key) ? tablet : phone;
 
 /// Wrap a dialog opener the same way the overflow probe does, tap it, settle.
 Widget _dialogOpener(Future<void> Function(BuildContext) dialog) => Builder(
@@ -286,12 +306,12 @@ void main() {
               theme: mode.value.theme,
               highContrast: mode.value.highContrast,
             ),
+            surface: _surfaceFor(entry.key),
           );
           await expectLater(tester, meetsGuideline(textContrastGuideline));
           handle.dispose();
         },
-        skip: _knownLowContrast.containsKey(entry.key) ||
-            tabletOnly.containsKey(entry.key),
+        skip: _knownLowContrast.containsKey(entry.key),
       );
     }
 
@@ -326,12 +346,12 @@ void main() {
         final handle = await _pump(
           tester,
           appShell(entry.value(), textScale: 1.0),
+          surface: _surfaceFor(entry.key),
         );
         await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
         handle.dispose();
       },
-      skip: _knownTapTargetTooSmall.containsKey(entry.key) ||
-          tabletOnly.containsKey(entry.key),
+      skip: _knownTapTargetTooSmall.containsKey(entry.key),
     );
   }
 
@@ -360,12 +380,12 @@ void main() {
         final handle = await _pump(
           tester,
           appShell(entry.value(), textScale: 1.0),
+          surface: _surfaceFor(entry.key),
         );
         await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
         handle.dispose();
       },
-      skip: _knownUnlabelled.containsKey(entry.key) ||
-          tabletOnly.containsKey(entry.key),
+      skip: _knownUnlabelled.containsKey(entry.key),
     );
   }
 
@@ -383,6 +403,40 @@ void main() {
         handle.dispose();
       },
       skip: _knownUnlabelled.containsKey(entry.key),
+    );
+  }
+
+  // --- A tooltip is not a name on Linux ------------------------------------
+  // labeledTapTargetGuideline above accepts a tooltip as a label, so every
+  // icon-only button in the app passed it while Orca said just "button" for
+  // all of them (round 22). The Linux embedder copies a node's label and
+  // ignores its tooltip entirely (LEARNINGS.md), so an icon button whose text
+  // lives only in the tooltip has no name a screen reader can reach: a user
+  // cannot tell Copy from Delete entry. The tooltip stays — it is what a mouse
+  // user sees — the name is added beside it.
+  for (final entry in screens.entries) {
+    testWidgets(
+      '${entry.key}: icon buttons are named, not just tooltipped',
+      (tester) async {
+        final handle = await _pump(
+          tester,
+          appShell(entry.value(), textScale: 1.0),
+          surface: _surfaceFor(entry.key),
+        );
+        final nameless = allSemanticsNodes(tester)
+            .map((n) => n.getSemanticsData())
+            .where((d) => d.tooltip.isNotEmpty && d.label.isEmpty)
+            .map((d) => d.tooltip)
+            .toList();
+        expect(
+          nameless,
+          isEmpty,
+          reason: 'these controls say only "button" to Orca — their text is in '
+              'a tooltip, which Linux never reads: $nameless',
+        );
+        handle.dispose();
+      },
+      skip: _knownTooltipOnly.containsKey(entry.key),
     );
   }
 }

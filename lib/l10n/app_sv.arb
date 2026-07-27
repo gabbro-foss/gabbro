@@ -1,5 +1,17 @@
 {
   "@@locale": "sv",
+
+  "keyboardShortcutsTitle": "Kortkommandon",
+  "kbSectionGeneral": "Allmänt",
+  "kbSectionSearch": "Sök",
+  "kbSectionNavigation": "Navigering",
+  "kbLockVault": "Lås valv",
+  "kbFocusSearch": "Fokusera sökningen",
+  "kbSearchAllFields": "Sök i alla fält",
+  "kbMoveBetweenControls": "Flytta mellan kontroller",
+  "kbActivateControl": "Aktivera den fokuserade kontrollen",
+  "kbCloseDialog": "Stäng en dialogruta eller avbryt",
+  "kbNoCopyNote": "Det finns inget kopieringskortkommando: att kopiera en hemlighet är en avsiktlig åtgärd som rensas automatiskt.",
   "importSizeLimitNote": "Maximal filstorlek: {textLimit} (CSV, Bitwarden, Dashlane, Google) eller {enpassLimit} (Enpass).",
   "importFileTooLarge": "Den här filen överskrider gränsen på {limit}.",
   "saveConfirmTitle": "Spara i Gabbro",
@@ -872,5 +884,15 @@
   "restoreFromFileButton": "Återställ från en säkerhetskopia",
   "vaultRestoredMessage": "Valv återställt. Lås upp med dina uppgifter.",
   "restoreFromFileInvalidError": "Den filen är inte ett användbart Gabbro-valv.",
-  "resizeColumns": "Ändra kolumnstorlek"
+  "resizeColumns": "Ändra kolumnstorlek",
+
+  "regionSearch": "Sökning",
+  "regionFolders": "Mappar",
+  "regionFilters": "Postkategorier",
+  "regionEntries": "Postlista",
+  "regionDetails": "Postdetaljer",
+  "hintSearch": "Filtrerar posterna medan du skriver",
+  "hintFolderSelector": "Filtrerar posterna efter mapp",
+  "hintFilterChip": "Slår på eller av det här kategorifiltret",
+  "hintEntryRow": "Öppnar den här posten"
 }

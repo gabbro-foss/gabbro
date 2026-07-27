@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/control_scale.dart';
@@ -16,6 +17,9 @@ import 'package:gabbro/screens/import_screen.dart';
 import 'package:gabbro/screens/entry_detail_screen.dart';
 import 'package:gabbro/screens/about_screen.dart';
 import 'package:gabbro/screens/help_screen.dart';
+import 'package:gabbro/gabbro_contrast.dart';
+import 'package:gabbro/screens/keyboard_shortcuts_list_screen.dart';
+import 'package:gabbro/widgets/focus_region.dart';
 import 'package:gabbro/screens/export_screen.dart';
 import 'package:gabbro/screens/appearance_screen.dart';
 import 'package:gabbro/screens/language_screen.dart';
@@ -175,6 +179,53 @@ Future<void> confirmAnyYubikey(
   );
 }
 
+/// Set by the active vault list so the GLOBAL Tab / Shift+Tab handler in
+/// main.dart can drive the region cycle regardless of where focus currently is.
+/// Returns true when it consumed the key (focus moved to the next/previous
+/// region stop), false to let Tab fall through to default traversal. Null when
+/// no vault list is mounted. Mirrors [focusVaultSearch]; same reason — a
+/// screen-local `Actions` override died on real hardware (round 10).
+bool Function({required bool forward})? vaultRegionTab;
+
+/// Set by the active vault list so the GLOBAL Esc handler (main.dart) can drop
+/// focus out of the region cycle from ANY region, not just the search field —
+/// Esc is the only exit back to the Unfocused state (KEYBOARD_NAV). Returns
+/// true when it consumed the key. Null when no vault list is mounted.
+bool Function()? vaultRegionEscape;
+
+/// Set by the active vault list so main.dart's app-root traversal absorber knows
+/// when to swallow Flutter's default Tab -> Next/PreviousFocusIntent traversal
+/// (the [vaultRegionTab] driver moves focus instead). Returns true only on
+/// desktop while the vault list is the current route; false elsewhere so Tab
+/// stays normal on other screens and inside dialogs. Null when no vault list is
+/// mounted. The absorber must sit BELOW WidgetsApp's default shortcuts (i.e.
+/// MaterialApp.builder) or the default traversal fires first.
+bool Function()? vaultRegionActive;
+
+/// Set by the active vault list so the GLOBAL Ctrl+F / Ctrl+Shift+F handler in
+/// main.dart can focus its search field regardless of where focus currently is.
+/// A screen-local shortcut dies once focus leaves the screen subtree (hardware:
+/// "Ctrl+F worked once then not"), so search focus rides the same global key
+/// handler as Ctrl+L. `allFields` picks normal (false) vs all-fields (true) mode.
+void Function({required bool allFields})? focusVaultSearch;
+
+/// Set by the active vault list so the GLOBAL Ctrl+N handler (main.dart) can open
+/// the new-entry type picker from anywhere. The region Tab-cycle excludes the
+/// FAB, so this is the keyboard path to create an entry. No-op when null.
+void Function()? openNewEntry;
+
+/// Set by the active vault list so the GLOBAL Ctrl+M handler (main.dart) can open
+/// the overflow menu from anywhere. The region Tab-cycle excludes the menu
+/// button, so this is the keyboard path to it. No-op when null.
+void Function()? openVaultMenu;
+
+/// Set by the active vault list so the GLOBAL Ctrl+Q handler (main.dart) can
+/// lock and quit from anywhere on that screen. It raises the SAME confirm dialog
+/// as the menu's Quit item — an accidental keystroke must not end a live session.
+/// Null when no vault list is mounted, or when quitting isn't offered (`onQuit`
+/// is null off Linux), so the key is inert exactly where the menu item is absent.
+void Function()? quitVault;
+
 class VaultListScreen extends StatefulWidget {
   final String vaultPath;
   final String? vaultAlias;
@@ -314,6 +365,245 @@ class _VaultListScreenState extends State<VaultListScreen>
   String _searchQuery = '';
   bool _fullTextSearch = false;
   final TextEditingController _searchController = TextEditingController();
+  // Shared by whichever layout (phone XOR tablet) is built, so Ctrl+F can focus
+  // the search field without either layout duplicating the node. Esc-to-blur is
+  // handled globally for every text field (main.dart _onKeyEvent).
+  final FocusNode _searchFocus = FocusNode();
+
+  // Phase 3: one FocusScope per Tab region, each labelled 'region:<name>'. Tab
+  // (intercepted globally in main.dart, routed here via _handleRegionTab) steps
+  // a fixed cycle of regions; arrows stay within a region (Flutter's default
+  // directional focus). Order: search -> folder -> chips -> entry list (the
+  // tablet layout adds its detail pane — handled there). The search-mode toggle
+  // icon is NOT a stop: Ctrl+F / Ctrl+Shift+F reach and set it directly (DRY).
+  final _searchScope = FocusScopeNode(debugLabel: 'region:search');
+  final _folderScope = FocusScopeNode(debugLabel: 'region:folder');
+  final _chipsScope = FocusScopeNode(debugLabel: 'region:chips');
+  final _listScope = FocusScopeNode(debugLabel: 'region:list');
+  // The two-pane detail pane's region. Owned here so the cycle can reach it, but
+  // mounted by TabletVaultLayout ONLY when an entry is selected — so its being
+  // non-empty is exactly "detail is a stop" (see _stopOrder). Never mounted in
+  // the single-pane layout.
+  final _detailScope = FocusScopeNode(debugLabel: 'region:detail');
+  // The folder dropdown's own node, so the 'folder' stop lands on it directly.
+  final FocusNode _folderFocus = FocusNode(debugLabel: 'folder');
+
+  /// Wrap a Tab region in its FocusScope plus the focus frame on desktop; pass
+  /// the child through UNCHANGED on Android. Keyboard navigation is
+  /// Linux-desktop only and must not alter the Android widget tree at all — so
+  /// scope and frame leave together, never one without the other.
+  /// [frame] is false for the search box, which lights up its OWN outline
+  /// instead (an overlay frame there gave a double border).
+  /// [label] names the region aloud (Linux only — it rides the same gate, so
+  /// Android gains no announcement, per D5).
+  Widget _region(
+    FocusScopeNode scope,
+    Widget child, {
+    bool frame = true,
+    String? label,
+  }) {
+    if (widget.isAndroid) return child;
+    return FocusScope(
+      node: scope,
+      child: FocusRegion(label: label, showFrame: frame, child: child),
+    );
+  }
+
+  /// Says something that has no node for a reader to land on — a shortcut
+  /// firing, a sheet opening, focus arriving in a region. On Linux the reader
+  /// is handed a node's NAME and nothing else, so an event that changes no
+  /// name is otherwise completely silent (round 16: Orca said nothing for any
+  /// shortcut).
+  ///
+  /// Linux only, on the same D5 gate as the regions: Android has deprecated
+  /// announcement events (they force TalkBack to drop its speech queue), and
+  /// TalkBack already reads these flows from the widgets themselves.
+  void _announce(String message) {
+    if (widget.isAndroid || !mounted) return;
+    SemanticsService.sendAnnouncement(
+      View.of(context),
+      message,
+      Directionality.of(context),
+    );
+  }
+
+  /// Makes a control say what it DOES, not just what it is.
+  ///
+  /// A Linux screen reader is given only a node's NAME — the embedder never
+  /// reads a semantics hint at all (LEARNINGS.md), which is why Orca spoke
+  /// none of these in round 16. So on Linux the outcome goes inside the name,
+  /// after the control's own name. Android does read hints and TalkBack
+  /// already passes, so there the hint is left exactly as it was.
+  ///
+  /// [outcome] null means the control has nothing to promise right now (a row
+  /// in selection mode ticks rather than opens), so nothing is added at all.
+  ///
+  /// `isAndroid` is fixed for the life of the app, so this branch never
+  /// reshapes the tree at runtime — unlike the decoration flip that once cost
+  /// a row its focus node.
+  Widget _saysWhatItDoes(
+    Widget child, {
+    required String name,
+    String? outcome,
+  }) {
+    if (outcome == null) return child;
+    if (widget.isAndroid) return Semantics(hint: outcome, child: child);
+    // An empty [name] means the control has nothing to add before the outcome —
+    // the search box, whose region already says "Search" and whose placeholder
+    // would just repeat it. Compose only when there is a name, or the label
+    // starts with a stray ". ".
+    return Semantics(
+      label: name.isEmpty ? outcome : '$name. $outcome',
+      child: child,
+    );
+  }
+
+  /// The `semanticsLabel` for the Text that shows a control's own name: blank
+  /// where [_saysWhatItDoes] has already composed that name into the label, so
+  /// it is not spoken twice; null (unchanged) otherwise.
+  ///
+  /// A blanked VALUE, not a wrapper widget: wrapping would change the widget
+  /// tree's shape, which is what disposed a row's focus node once before.
+  String? _ownNameLabel({String? outcome}) =>
+      outcome != null && !widget.isAndroid ? '' : null;
+
+  /// The Tab stops in cycle order for the current state. Folder appears only
+  /// when there are folders. Detail appears only when the two-pane layout has
+  /// mounted its region (i.e. wide AND an entry is selected) — its scope carries
+  /// focusable descendants exactly then; empty (never a stop) single-pane.
+  List<String> _stopOrder() => [
+    'search',
+    if (_folders.isNotEmpty) 'folder',
+    'chips',
+    'list',
+    if (_detailScope.traversalDescendants.isNotEmpty) 'detail',
+  ];
+
+  /// The scope backing each cycle stop. Regions are matched by node IDENTITY,
+  /// never by debugLabel: Flutter only assigns debugLabel inside an assert, so
+  /// it is null in every release build — a label lookup passes in `flutter test`
+  /// (debug) and silently matches nothing on the user's machine. That was the
+  /// round-11 hardware failure: every Tab re-entered the cycle at stop 0.
+  Map<String, FocusScopeNode> get _scopeOfStop => {
+    'search': _searchScope,
+    'folder': _folderScope,
+    'chips': _chipsScope,
+    'list': _listScope,
+    'detail': _detailScope,
+  };
+
+  /// Which cycle stop currently holds focus, '' if none (cold / excluded).
+  /// A region scope reports `hasFocus` when it or any descendant is the primary
+  /// focus, and the regions are siblings, so at most one matches.
+  String _currentStop() {
+    for (final stop in _scopeOfStop.entries) {
+      if (stop.value.hasFocus) return stop.key;
+    }
+    return '';
+  }
+
+  /// Focus a region scope's remembered child, else its first control.
+  void _focusRegionScope(FocusScopeNode scope) {
+    final target = scope.focusedChild ??
+        (scope.traversalDescendants.isEmpty
+            ? null
+            : scope.traversalDescendants.first);
+    target?.requestFocus();
+  }
+
+  void _focusStop(String name) {
+    switch (name) {
+      case 'search':
+        _searchFocus.requestFocus();
+      case 'folder':
+        _folderFocus.requestFocus();
+      case 'chips':
+        _focusRegionScope(_chipsScope);
+      case 'list':
+        _focusRegionScope(_listScope);
+      case 'detail':
+        _focusRegionScope(_detailScope);
+    }
+  }
+
+  /// True when the region cycle should own Tab: desktop, and the vault list is
+  /// the current route (not behind a dialog / pushed screen). Gates both the
+  /// global Tab driver [_handleRegionTab] and the app-root traversal absorber
+  /// ([vaultRegionActive]) so Tab stays normal on Android, on other screens, and
+  /// inside dialogs. Both layouts (single- and two-pane) are wired.
+  bool _regionCycleActive() {
+    if (widget.isAndroid) return false;
+    final route = ModalRoute.of(context);
+    return route == null || route.isCurrent;
+  }
+
+  // Lets the Ctrl+M handler open the overflow menu programmatically.
+  final GlobalKey<PopupMenuButtonState<String>> _menuKey = GlobalKey();
+
+  /// Guard for the Ctrl+N / Ctrl+M action shortcuts: desktop, vault list is the
+  /// current route, and NOT in selection mode (the FAB and menu button are both
+  /// hidden then, so there is nothing to open).
+  bool _actionShortcutActive() {
+    if (widget.isAndroid || _isSelecting) return false;
+    final route = ModalRoute.of(context);
+    return route == null || route.isCurrent;
+  }
+
+  // Ctrl+N (global): open the new-entry type picker — the keyboard path to the
+  // FAB, which the region Tab-cycle excludes.
+  void _handleNewEntryShortcut() {
+    if (mounted && _actionShortcutActive()) _showTypePicker();
+  }
+
+  // Ctrl+M (global): open the overflow menu — the keyboard path to the menu
+  // button, which the region Tab-cycle excludes.
+  void _handleMenuShortcut() {
+    if (mounted && _actionShortcutActive()) {
+      _menuKey.currentState?.showButtonMenu();
+      _announce(AppLocalizations.of(context).tooltipMenu);
+    }
+  }
+
+  void _handleQuitShortcut() {
+    if (mounted && _actionShortcutActive() && widget.onQuit != null) {
+      _announce(AppLocalizations.of(context).quit);
+      _confirmQuit();
+    }
+  }
+
+  /// Esc handler (registered as the global [vaultRegionEscape] hook): drop focus
+  /// out of the cycle, back to Unfocused. Returns true when it consumed the key.
+  ///
+  /// It unfocuses the REGION SCOPE, not the focused control: unfocusing a
+  /// control only parks focus on its enclosing scope, which is still inside the
+  /// region — the frame would stay lit and the next Tab would resume mid-cycle.
+  /// Unfocusing the scope hands focus to the route scope above the cycle, while
+  /// the region keeps its own memory of the control that was focused, so
+  /// Tabbing back in returns there.
+  bool _handleRegionEscape() {
+    if (!_regionCycleActive()) return false;
+    final stop = _currentStop();
+    if (stop.isEmpty) return false;
+    _scopeOfStop[stop]?.unfocus();
+    return true;
+  }
+
+  /// Tab / Shift+Tab handler (registered as the global [vaultRegionTab] hook):
+  /// move focus to the next / previous region stop, wrapping. Self-gates via
+  /// [_regionCycleActive].
+  bool _handleRegionTab({required bool forward}) {
+    if (!_regionCycleActive()) return false;
+    final stops = _stopOrder();
+    if (stops.isEmpty) return false;
+    final i = stops.indexOf(_currentStop());
+    final next = i < 0
+        ? (forward ? 0 : stops.length - 1)
+        : (forward
+            ? (i + 1) % stops.length
+            : (i - 1 + stops.length) % stops.length);
+    _focusStop(stops[next]);
+    return true;
+  }
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ScrollController _chipScrollController = ScrollController();
   bool _showLeftChevron = false;
@@ -335,10 +625,29 @@ class _VaultListScreenState extends State<VaultListScreen>
     }
   }
 
+  // Driven by the global Ctrl+F / Ctrl+Shift+F handler (main.dart). Ctrl+F picks
+  // normal (title) mode; Ctrl+Shift+F picks all-fields. Focus-independent, so it
+  // keeps working after focus has left the search field.
+  void _handleSearchShortcut({required bool allFields}) {
+    setState(() => _fullTextSearch = allFields);
+    _searchFocus.requestFocus();
+    // Only the all-fields variant announces: plain Ctrl+F lands in the search
+    // region, which names itself, and the field's own name already ends in
+    // "Ctrl+F: Focus search". All-fields mode has no other audible sign.
+    if (allFields) _announce(AppLocalizations.of(context).kbSearchAllFields);
+  }
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    focusVaultSearch = _handleSearchShortcut;
+    vaultRegionTab = _handleRegionTab;
+    vaultRegionEscape = _handleRegionEscape;
+    vaultRegionActive = _regionCycleActive;
+    openNewEntry = _handleNewEntryShortcut;
+    openVaultMenu = _handleMenuShortcut;
+    quitVault = _handleQuitShortcut;
     _yubikeyRecords = widget.yubikeyRecords ?? _detectYubikeyRecords();
     _loadEntries();
     _chipScrollController.addListener(_updateChevrons);
@@ -367,8 +676,22 @@ class _VaultListScreenState extends State<VaultListScreen>
     // Clear any sync snackbar so it can't linger on the next screen (e.g. the
     // unlock screen after lock) and crash when its Details action is tapped.
     _messenger?.clearSnackBars();
+    if (focusVaultSearch == _handleSearchShortcut) focusVaultSearch = null;
+    if (vaultRegionTab == _handleRegionTab) vaultRegionTab = null;
+    if (vaultRegionEscape == _handleRegionEscape) vaultRegionEscape = null;
+    if (vaultRegionActive == _regionCycleActive) vaultRegionActive = null;
+    if (openNewEntry == _handleNewEntryShortcut) openNewEntry = null;
+    if (openVaultMenu == _handleMenuShortcut) openVaultMenu = null;
+    if (quitVault == _handleQuitShortcut) quitVault = null;
     WidgetsBinding.instance.removeObserver(this);
     _searchController.dispose();
+    _searchFocus.dispose();
+    _folderFocus.dispose();
+    _searchScope.dispose();
+    _folderScope.dispose();
+    _chipsScope.dispose();
+    _listScope.dispose();
+    _detailScope.dispose();
     _chipScrollController.removeListener(_updateChevrons);
     _chipScrollController.dispose();
     super.dispose();
@@ -565,6 +888,9 @@ class _VaultListScreenState extends State<VaultListScreen>
 
   Future<void> _showTypePicker() async {
     final l = AppLocalizations.of(context);
+    // The sheet has no name of its own, so without this a reader is given no
+    // clue what just appeared over the vault list.
+    _announce(l.newEntryTitle);
     final types = [
       ('Login', l.entryTypePassword),
       ('Note', l.entryTypeNote),
@@ -592,11 +918,13 @@ class _VaultListScreenState extends State<VaultListScreen>
               ),
               ...types.map(
                 (t) => ListTile(
+                  // No semanticLabel: the title below already says the type,
+                  // and naming the icon too made a reader say each of the six
+                  // types twice.
                   leading: Icon(
                     _entryTypeIcon(t.$1),
                     size: scaledIconSize(context),
                     color: Theme.of(context).colorScheme.primary,
-                    semanticLabel: t.$2,
                   ),
                   title: Text(t.$2),
                   onTap: () => Navigator.of(context).pop(t.$1),
@@ -1165,6 +1493,12 @@ class _VaultListScreenState extends State<VaultListScreen>
           ),
         );
         if (mounted) _loadEntries();
+      case 'keyboard_shortcuts':
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => const KeyboardShortcutsListScreen(),
+          ),
+        );
       case 'help':
         Navigator.of(
           context,
@@ -1186,6 +1520,11 @@ class _VaultListScreenState extends State<VaultListScreen>
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
+        // Flutter only supplies a default dialog name on Android, so on Linux
+        // Orca announced "alert" and then the focused Cancel button — the
+        // question itself was never read, leaving a screen-reader user
+        // confirming something they were never told.
+        semanticLabel: l.quitConfirmTitle,
         title: Text(l.quitConfirmTitle),
         actions: [
           TextButton(
@@ -1226,6 +1565,29 @@ class _VaultListScreenState extends State<VaultListScreen>
     );
   }
 
+  /// The one place an entry is ticked or unticked. Both layouts and both ways
+  /// of ticking (the row, the checkbox) come through here, so no one of them
+  /// can be left silent — the logic used to be written out three times over.
+  ///
+  /// Ticking moves no focus, and a reader announces a state change only on the
+  /// object it is already sitting on. The tick is not on that object: the state
+  /// lives on the checkbox node beneath the row, so hardware round 29 heard
+  /// nothing at all (the "space" Orca said was its echo of the key). It
+  /// therefore speaks the selection count the app bar is already showing —
+  /// nothing takes focus afterwards, which is the condition an announcement
+  /// has to meet to be heard on Linux at all (LEARNINGS.md).
+  void _toggleSelection(String id) {
+    setState(() {
+      if (_selectedIds.contains(id)) {
+        _selectedIds.remove(id);
+      } else {
+        _selectedIds.add(id);
+        _selectionMode = true;
+      }
+    });
+    _announce(AppLocalizations.of(context).selectedCount(_selectedIds.length));
+  }
+
   // Selection-mode checkbox labelled with the entry title, so a screen reader
   // announces "<title>, tick box, ticked" instead of a bare "tick box". The
   // checkbox role + checked state come from Checkbox; MergeSemantics folds the
@@ -1238,19 +1600,107 @@ class _VaultListScreenState extends State<VaultListScreen>
           context,
           Checkbox(
             value: _selectedIds.contains(entry.id),
-            onChanged: (_) => setState(() {
-              if (_selectedIds.contains(entry.id)) {
-                _selectedIds.remove(entry.id);
-              } else {
-                _selectedIds.add(entry.id);
-              }
-            }),
+            onChanged: (_) => _toggleSelection(entry.id),
           ),
         ),
       ),
     );
   }
 
+  // Shared by both layouts. On desktop the field's own outline is the focus
+  // indicator (solid, or dashed + thicker in high-contrast). On Android there
+  // is no keyboard navigation, so it never highlights: focused and unfocused
+  // draw the same border, which also suppresses Material's own default.
+  Widget _buildSearchField() {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final hc = theme.extension<GabbroContrast>()?.highContrast ?? false;
+    final focusSide =
+        BorderSide(color: theme.colorScheme.primary, width: hc ? 3 : 2);
+    final flat =
+        OutlineInputBorder(borderSide: BorderSide(color: theme.colorScheme.outline));
+    final placeholder =
+        _fullTextSearch ? l.searchAllFieldsHint : l.searchEntriesHint;
+    // One thing, not five. This used to name the box, say what typing does and
+    // then recite both shortcuts, which on hardware was too long to sit through
+    // (round 23) — and "Ctrl+F: focus search" is useless once you are already
+    // in the box. The region above already says "Search", so the placeholder
+    // would be a repeat too; both shortcuts stay on the Keyboard shortcuts
+    // screen, which is where a user goes looking for them.
+    final searchOutcome = l.hintSearch;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+      child: _saysWhatItDoes(
+        TextField(
+        controller: _searchController,
+        focusNode: _searchFocus,
+        decoration: InputDecoration(
+          // Android keeps Flutter's own placeholder, styling and all. Linux
+          // has to supply it as a WIDGET so its own name can be excluded from
+          // the semantics and composed into the label first instead — and
+          // Flutter does not style a placeholder it did not build, so the
+          // grey is restated here. Pinned against Android in
+          // a11y_region_net_test.dart.
+          hintText: widget.isAndroid ? placeholder : null,
+          hint: widget.isAndroid
+              ? null
+              : Text(
+                  placeholder,
+                  semanticsLabel: '',
+                  style: theme.textTheme.bodyLarge!.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+          prefixIcon: IconButton(
+            // semanticLabel as well as tooltip: Orca reads a control's name and
+            // never its tooltip, so a tooltip alone leaves this saying "button".
+            icon: Icon(
+              _fullTextSearch ? Icons.manage_search : Icons.search,
+              semanticLabel: _fullTextSearch
+                  ? l.searchAllFieldsTooltip
+                  : l.searchByTitleTooltip,
+            ),
+            tooltip: _fullTextSearch
+                ? l.searchAllFieldsTooltip
+                : l.searchByTitleTooltip,
+            onPressed: () => setState(() => _fullTextSearch = !_fullTextSearch),
+          ),
+          suffixIcon: _searchQuery.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(Icons.clear),
+                  tooltip: l.tooltipClearSearch,
+                  onPressed: () => setState(() {
+                    _searchQuery = '';
+                    _searchController.clear();
+                  }),
+                )
+              : null,
+          border: const OutlineInputBorder(),
+          // The field's OWN outline is the focus indicator: it lights up solid
+          // (normal) or dashed + thicker (high-contrast). One line that changes
+          // — no overlay frame, so no fade-double on Tab-in. Android pins both
+          // states to the same flat outline: nothing lights up.
+          enabledBorder: widget.isAndroid ? flat : null,
+          focusedBorder: widget.isAndroid
+              ? flat
+              : hc
+              ? DashedOutlineInputBorder(borderSide: focusSide)
+              : OutlineInputBorder(borderSide: focusSide),
+          isDense: true,
+          contentPadding: const EdgeInsets.symmetric(vertical: 10),
+        ),
+        onChanged: (value) => setState(() => _searchQuery = value),
+        ),
+        // No name: the "Search" region above already identifies the box, so
+        // reading the placeholder here would say it twice.
+        name: '',
+        outcome: searchOutcome,
+      ),
+    );
+  }
+
+  // The focus frame comes from _region at the call sites, so it is absent on
+  // Android along with the rest of the keyboard wiring.
   Widget _buildFilterChipRow() {
     final l = AppLocalizations.of(context);
     return Stack(
@@ -1270,10 +1720,25 @@ class _VaultListScreenState extends State<VaultListScreen>
                   .map(
                     (f) => Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: FilterChip(
-                        label: Text(_filterLabel(f, l)),
-                        selected: _selectedFilter == f,
-                        onSelected: (_) => setState(() => _selectedFilter = f),
+                      // MergeSemantics: the chip builds its own container node,
+                      // so a bare Semantics above it would sit in a separate
+                      // node and never reach the chip.
+                      child: MergeSemantics(
+                        child: _saysWhatItDoes(
+                          FilterChip(
+                            label: Text(
+                              _filterLabel(f, l),
+                              semanticsLabel: _ownNameLabel(
+                                outcome: l.hintFilterChip,
+                              ),
+                            ),
+                            selected: _selectedFilter == f,
+                            onSelected: (_) =>
+                                setState(() => _selectedFilter = f),
+                          ),
+                          name: _filterLabel(f, l),
+                          outcome: l.hintFilterChip,
+                        ),
                       ),
                     ),
                   )
@@ -1310,6 +1775,9 @@ class _VaultListScreenState extends State<VaultListScreen>
       return Scaffold(body: Center(child: Text(l.vaultLoadFailed(_error!))));
     }
 
+    // Ctrl+F / Ctrl+Shift+F focus search via the global handler (main.dart) — see
+    // focusVaultSearch above; no screen-local shortcut wrapper (it died once
+    // focus left the screen).
     return Scaffold(
       // Search field sits at the top; let the keyboard overlay the scrollable
       // list rather than shrink the body (which overflowed the header). The
@@ -1335,19 +1803,23 @@ class _VaultListScreenState extends State<VaultListScreen>
             ),
           if (!_isSelecting) ...[
             IconButton(
-              icon: const Icon(Icons.checklist),
+              icon: Icon(
+                Icons.checklist,
+                semanticLabel: l.tooltipSelectEntries,
+              ),
               iconSize: scaledIconSize(context),
               tooltip: l.tooltipSelectEntries,
               onPressed: () => setState(() => _selectionMode = true),
             ),
             IconButton(
-              icon: const Icon(Icons.lock_outline),
+              icon: Icon(Icons.lock_outline, semanticLabel: l.tooltipLockVault),
               iconSize: scaledIconSize(context),
               tooltip: l.tooltipLockVault,
               onPressed: _lockAndExit,
             ),
             PopupMenuButton<String>(
-              icon: const Icon(Icons.menu),
+              key: _menuKey,
+              icon: Icon(Icons.menu, semanticLabel: l.tooltipMenu),
               iconSize: scaledIconSize(context),
               tooltip: l.tooltipMenu,
               onSelected: _onMenuSelected,
@@ -1469,6 +1941,19 @@ class _VaultListScreenState extends State<VaultListScreen>
                     ),
                   ),
                   const PopupMenuDivider(),
+                  // Desktop-only: a touch phone has no physical keyboard.
+                  if (!widget.isAndroid)
+                    PopupMenuItem(
+                      value: 'keyboard_shortcuts',
+                      child: Row(
+                        children: [
+                          Icon(Icons.keyboard_outlined,
+                              size: scaledIconSize(context, 20)),
+                          const SizedBox(width: 12),
+                          Expanded(child: Text(ml.keyboardShortcutsTitle)),
+                        ],
+                      ),
+                    ),
                   PopupMenuItem(
                     value: 'help',
                     child: Row(
@@ -1567,7 +2052,11 @@ class _VaultListScreenState extends State<VaultListScreen>
           : FloatingActionButton(
               onPressed: _showTypePicker,
               tooltip: l.newEntryTitle,
-              child: Icon(Icons.add, size: scaledIconSize(context)),
+              child: Icon(
+                Icons.add,
+                size: scaledIconSize(context),
+                semanticLabel: l.newEntryTitle,
+              ),
             ),
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -1582,48 +2071,27 @@ class _VaultListScreenState extends State<VaultListScreen>
               displayTitle: (e) => _localizedDisplayTitle(e, l),
               displayType: (t) => _displayType(t, l),
               entryTypeIcon: _entryTypeIcon,
-              searchBar: Padding(
-                padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                child: TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: _fullTextSearch
-                        ? l.searchAllFieldsHint
-                        : l.searchEntriesHint,
-                    prefixIcon: IconButton(
-                      icon: Icon(
-                        _fullTextSearch ? Icons.manage_search : Icons.search,
-                      ),
-                      tooltip: _fullTextSearch
-                          ? l.searchAllFieldsTooltip
-                          : l.searchByTitleTooltip,
-                      onPressed: () =>
-                          setState(() => _fullTextSearch = !_fullTextSearch),
-                    ),
-                    suffixIcon: _searchQuery.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear),
-                            tooltip: l.tooltipClearSearch,
-                            onPressed: () => setState(() {
-                              _searchQuery = '';
-                              _searchController.clear();
-                            }),
-                          )
-                        : null,
-                    border: const OutlineInputBorder(),
-                    isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                  ),
-                  onChanged: (value) => setState(() => _searchQuery = value),
-                ),
+              // Region-wrap search / folder / chips here (VaultListScreen owns
+              // these scopes); the list + detail scopes are passed in and wrapped
+              // inside TabletVaultLayout. See reference two-layout-paths.
+              searchBar: _region(
+                _searchScope,
+                _buildSearchField(),
+                frame: false,
+                label: l.regionSearch,
               ),
               filterChipRow: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (_folders.isNotEmpty)
-                    Padding(
+                    _region(
+                      _folderScope,
+                      Padding(
                       padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
-                      child: DropdownButton<String>(
+                      child: MergeSemantics(
+                        child: _saysWhatItDoes(
+                        DropdownButton<String>(
+                        focusNode: _folderFocus,
                         isExpanded: true,
                         // Let open-menu items grow to their wrapped height
                         // instead of clipping at the default 48px (ADR-016).
@@ -1632,20 +2100,28 @@ class _VaultListScreenState extends State<VaultListScreen>
                         // The button shows the selection on one line; ellipsize
                         // it so a long folder truncates cleanly instead of
                         // hard-clipping mid-glyph at large text (ADR-016).
-                        selectedItemBuilder: (context) => [
-                          Text(
-                            l.allFolders,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          ..._folders.map(
-                            (f) => Text(
-                              f,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
+                        selectedItemBuilder: (context) =>
+                            [l.allFolders, ..._folders]
+                                .map(
+                                  // minHeight 48 so the collapsed button is a
+                                  // 48dp tap target (a11y net); open menu items
+                                  // still grow via itemHeight: null (ADR-016).
+                                  (label) => Container(
+                                    alignment: AlignmentDirectional.centerStart,
+                                    constraints: const BoxConstraints(
+                                      minHeight: 48,
+                                    ),
+                                    child: Text(
+                                      label,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      semanticsLabel: _ownNameLabel(
+                                        outcome: l.hintFolderSelector,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
                         onChanged: (value) =>
                             setState(() => _selectedFolder = value ?? ''),
                         items: [
@@ -1658,8 +2134,20 @@ class _VaultListScreenState extends State<VaultListScreen>
                           ),
                         ],
                       ),
+                        name: _selectedFolder.isEmpty
+                            ? l.allFolders
+                            : _selectedFolder,
+                        outcome: l.hintFolderSelector,
+                      ),
+                      ),
                     ),
-                  _buildFilterChipRow(),
+                      label: l.regionFolders,
+                    ),
+                  _region(
+                    _chipsScope,
+                    _buildFilterChipRow(),
+                    label: l.regionFilters,
+                  ),
                 ],
               ),
               searchActive: _searchQuery.isNotEmpty,
@@ -1669,62 +2157,37 @@ class _VaultListScreenState extends State<VaultListScreen>
               onDeleteEntryFn: widget.onDeleteEntryFn,
               selectionMode: _selectionMode,
               selectedIds: _selectedIds,
-              onToggleSelection: (id) => setState(() {
-                if (_selectedIds.contains(id)) {
-                  _selectedIds.remove(id);
-                } else {
-                  _selectedIds.add(id);
-                  _selectionMode = true;
-                }
-              }),
+              onToggleSelection: _toggleSelection,
               vaultPath: widget.vaultPath,
               clipboardClearTimeout:
                   GabbroApp.maybeOf(context)?.settings.clipboardClearTimeout ??
                   ClipboardClearTimeout.sixtySeconds,
+              // The list + detail Tab regions (desktop only — null on Android so
+              // the widget tree is unchanged there). Detail is wrapped by the
+              // layout only when an entry is selected, which is how the cycle
+              // knows to include it (see _stopOrder).
+              listScope: widget.isAndroid ? null : _listScope,
+              detailScope: widget.isAndroid ? null : _detailScope,
             );
           }
-          return SafeArea(
+          final Widget body = SafeArea(
             child: Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: _fullTextSearch
-                          ? l.searchAllFieldsHint
-                          : l.searchEntriesHint,
-                      prefixIcon: IconButton(
-                        icon: Icon(
-                          _fullTextSearch ? Icons.manage_search : Icons.search,
-                        ),
-                        tooltip: _fullTextSearch
-                            ? l.searchAllFieldsTooltip
-                            : l.searchByTitleTooltip,
-                        onPressed: () =>
-                            setState(() => _fullTextSearch = !_fullTextSearch),
-                      ),
-                      suffixIcon: _searchQuery.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear),
-                              tooltip: l.tooltipClearSearch,
-                              onPressed: () => setState(() {
-                                _searchQuery = '';
-                                _searchController.clear();
-                              }),
-                            )
-                          : null,
-                      border: const OutlineInputBorder(),
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                    ),
-                    onChanged: (value) => setState(() => _searchQuery = value),
-                  ),
+                _region(
+                  _searchScope,
+                  _buildSearchField(),
+                  frame: false,
+                  label: l.regionSearch,
                 ),
                 if (_folders.isNotEmpty)
-                  Padding(
+                  _region(
+                    _folderScope,
+                    Padding(
                     padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
-                    child: DropdownButton<String>(
+                    child: MergeSemantics(
+                      child: _saysWhatItDoes(
+                    DropdownButton<String>(
+                      focusNode: _folderFocus,
                       isExpanded: true,
                       // Let open-menu items grow to their wrapped height
                       // instead of clipping at the default 48px (ADR-016).
@@ -1748,6 +2211,9 @@ class _VaultListScreenState extends State<VaultListScreen>
                                     label,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
+                                    semanticsLabel: _ownNameLabel(
+                                      outcome: l.hintFolderSelector,
+                                    ),
                                   ),
                                 ),
                               )
@@ -1761,10 +2227,24 @@ class _VaultListScreenState extends State<VaultListScreen>
                         ),
                       ],
                     ),
+                    name: _selectedFolder.isEmpty
+                        ? l.allFolders
+                        : _selectedFolder,
+                    outcome: l.hintFolderSelector,
+                    ),
+                    ),
                   ),
-                _buildFilterChipRow(),
+                    label: l.regionFolders,
+                  ),
+                _region(
+                  _chipsScope,
+                  _buildFilterChipRow(),
+                  label: l.regionFilters,
+                ),
                 Expanded(
-                  child: _groupedEntries.isEmpty
+                  child: _region(
+                    _listScope,
+                    _groupedEntries.isEmpty
                       ? Center(child: Text(l.noEntriesMatch))
                       : Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1827,26 +2307,37 @@ class _VaultListScreenState extends State<VaultListScreen>
                                     }
                                     final entry = item as EntrySummaryData;
                                     final el = AppLocalizations.of(context);
-                                    return ListTile(
+                                    // Selection mode taps the row to tick it,
+                                    // so "opens this entry" would then be a
+                                    // lie.
+                                    final rowOutcome = _isSelecting
+                                        ? null
+                                        : el.hintEntryRow;
+                                    return _saysWhatItDoes(
+                                      ListTile(
                                       dense: true,
                                       leading: _isSelecting
                                           ? _selectionCheckbox(
                                               entry,
                                               _localizedDisplayTitle(entry, el),
                                             )
+                                          // No semanticLabel: the subtitle
+                                          // below already says the type, and
+                                          // labelling the icon too made a
+                                          // reader announce it twice
+                                          // ("card, amex, card").
                                           : Icon(
                                               _entryTypeIcon(entry.entryType),
                                               size: scaledIconSize(context, 20),
                                               color: Theme.of(
                                                 context,
                                               ).colorScheme.primary,
-                                              semanticLabel: _displayType(
-                                                entry.entryType,
-                                                el,
-                                              ),
                                             ),
                                       title: Text(
                                         _localizedDisplayTitle(entry, el),
+                                        semanticsLabel: _ownNameLabel(
+                                          outcome: rowOutcome,
+                                        ),
                                       ),
                                       subtitle: Text(
                                         _displayType(entry.entryType, el),
@@ -1857,22 +2348,33 @@ class _VaultListScreenState extends State<VaultListScreen>
                                       }),
                                       onTap: () async {
                                         if (_isSelecting) {
-                                          setState(() {
-                                            if (_selectedIds.contains(
-                                              entry.id,
-                                            )) {
-                                              _selectedIds.remove(entry.id);
-                                            } else {
-                                              _selectedIds.add(entry.id);
-                                            }
-                                          });
+                                          _toggleSelection(entry.id);
                                           return;
                                         }
                                         await Navigator.of(context).push(
                                           MaterialPageRoute(
                                             builder: (context) =>
                                                 EntryDetailScreen(
-                                                  entry: getEntry(id: entry.id),
+                                                  // Honour the injected fetch
+                                                  // like the two-pane layout
+                                                  // does: calling the FFI
+                                                  // directly left this whole
+                                                  // path untestable.
+                                                  entry:
+                                                      (widget.getEntryFn ??
+                                                          (id) =>
+                                                              getEntry(id: id))(
+                                                        entry.id,
+                                                      ),
+                                                  // Honour the injected delete
+                                                  // too — same reason as the
+                                                  // fetch above: calling the
+                                                  // FFI directly left deleting
+                                                  // from here untestable.
+                                                  onDeleteEntry:
+                                                      widget.onDeleteEntryFn ??
+                                                      (id) =>
+                                                          deleteEntry(id: id),
                                                   clipboardClearTimeout:
                                                       GabbroApp.of(context)
                                                           .settings
@@ -1882,6 +2384,9 @@ class _VaultListScreenState extends State<VaultListScreen>
                                         );
                                         if (mounted) _loadEntries();
                                       },
+                                      ),
+                                      name: _localizedDisplayTitle(entry, el),
+                                      outcome: rowOutcome,
                                     );
                                   },
                                 ),
@@ -1911,10 +2416,15 @@ class _VaultListScreenState extends State<VaultListScreen>
                               ),
                           ],
                         ),
+                    label: l.regionEntries,
+                  ),
                 ),
               ],
             ),
           );
+          // Tab traversal is driven globally (main.dart -> _handleRegionTab);
+          // no body-scoped Actions override (it failed on hardware, round 10).
+          return body;
         },
       ),
     );
