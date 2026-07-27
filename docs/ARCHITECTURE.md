@@ -115,13 +115,22 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-_(empty — pick the next item with the maintainer)_
+**Read the `gabbro_test` result for `remove_tablet_navigation_rail`, then act on it.**
+The gate was started at the end of the previous session (no `--warm` — no dependency
+changed). Nothing else should start until it is read.
 
-The wide-window NavigationRail is removed on branch `remove_tablet_navigation_rail`:
-tests green and **hardware-passed**; pushed, not merged — it needs a full
-`gabbro_test` run first. The sweep also fixed two pre-existing large-text defects: the
-wide list pane ran off the bottom because the search box and chips took the whole height,
-and the two search-box icons never grew with the text size.
+- **Green** -> merge to master (`--no-ff`, subject `Merge <branch>: <summary>`, short, no
+  body), push, then delete the branch locally and on origin. No second gate: the merged
+  tree is byte-identical to the one that passed.
+- **Red** -> fix on the branch. Master is unaffected either way.
+
+After the merge the next task is **empty** — pick the next item with the maintainer.
+
+The branch removes the wide-window NavigationRail (its Appearance / Security / About
+destinations are all in the app-bar menu; "Vault" did nothing) and fixes two pre-existing
+large-text defects: the wide list pane ran off the bottom because the search box and chips
+took the whole height, and the two search-box icons never grew with the text size. Tests
+green and hardware-passed.
 
 ---
 
