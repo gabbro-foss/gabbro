@@ -356,4 +356,144 @@ void main() {
     );
     handle.dispose();
   });
+
+  // ── E. Ticking an entry in selection mode ────────────────────────────────
+  // Hardware round 29, listening only: ticking a row says NOTHING about the
+  // state. Orca speaks "space" — that is its echo of the key, not the tick.
+  // The state is only heard on re-focus, where the merged row node reads the
+  // title and then the tick state.
+  //
+  // So this is the shape rounds 26-27 already solved: a change under a control
+  // that ALREADY holds focus. A name that changes under the focus is not
+  // re-read, and ticking moves no focus, so an announcement survives.
+  //
+  // What it says is the selection count the app bar is already showing, which
+  // exists in every locale and goes up or down with the tick. Section E6 pins
+  // it to the app bar's own text so the two cannot drift apart.
+  //
+  // Both layouts build their own rows and their own checkbox, and the toggle
+  // exists three times over (narrow checkbox, narrow row tap, and the wide
+  // layout's onToggleSelection callback) — so every case runs on both surfaces.
+
+  Future<void> enterSelectionMode(WidgetTester t) async {
+    await t.tap(find.byTooltip(en.tooltipSelectEntries));
+    await t.pumpAndSettle();
+  }
+
+  Future<void> tapRow(WidgetTester t, String title) async {
+    await t.tap(find.text(title).first);
+    await t.pumpAndSettle();
+  }
+
+  for (final (name, surface) in const [('narrow', phone), ('wide', tablet)]) {
+    testWidgets('Linux $name: ticking a row announces the new count', (
+      t,
+    ) async {
+      final said = recordAnnouncements(t);
+      final handle = await pumpNet(t, surface: surface);
+      await enterSelectionMode(t);
+      await tapRow(t, 'Apple');
+      expect(
+        said,
+        [en.selectedCount(1)],
+        reason: 'ticking a row said nothing about the tick — the state lives '
+            'on the row a reader is already sitting on, so it is only heard '
+            'on re-focus: $said',
+      );
+      handle.dispose();
+    });
+
+    testWidgets('Linux $name: unticking announces the reduced count', (
+      t,
+    ) async {
+      final said = recordAnnouncements(t);
+      final handle = await pumpNet(t, surface: surface);
+      await enterSelectionMode(t);
+      await tapRow(t, 'Apple');
+      await tapRow(t, 'Banana');
+      await tapRow(t, 'Apple');
+      expect(
+        said,
+        [en.selectedCount(1), en.selectedCount(2), en.selectedCount(1)],
+        reason: 'taking a tick off must be as audible as putting one on, or '
+            'the count is the only way to tell them apart: $said',
+      );
+      handle.dispose();
+    });
+
+    testWidgets('Linux $name: ticking the checkbox itself announces too', (
+      t,
+    ) async {
+      final said = recordAnnouncements(t);
+      final handle = await pumpNet(t, surface: surface);
+      await enterSelectionMode(t);
+      await t.tap(find.byType(Checkbox).first);
+      await t.pumpAndSettle();
+      expect(
+        said,
+        [en.selectedCount(1)],
+        reason: 'the checkbox is a separate tick path from the row tap and '
+            'must not be the silent one: $said',
+      );
+      handle.dispose();
+    });
+
+    // Green now and after. Outside selection mode a row tap OPENS the entry —
+    // a focus change, which is the one thing an announcement cannot survive
+    // (round 22). Speaking here would talk over what the user moved to.
+    testWidgets('Linux $name: opening an entry announces nothing', (t) async {
+      final said = recordAnnouncements(t);
+      final handle = await pumpNet(t, surface: surface);
+      await tapRow(t, 'Apple');
+      expect(
+        said,
+        isEmpty,
+        reason: 'opening an entry now speaks over the screen the user just '
+            'moved to: $said',
+      );
+      handle.dispose();
+    });
+
+    // Green now and after: D5. TalkBack reads the checkbox state from the
+    // widget itself and announcements make it drop its queue.
+    testWidgets('Android $name: ticking announces nothing', (t) async {
+      final said = recordAnnouncements(t);
+      final handle = await pumpNet(t, surface: surface, android: true);
+      await enterSelectionMode(t);
+      await tapRow(t, 'Apple');
+      expect(
+        said,
+        isEmpty,
+        reason: 'Android must stay silent — TalkBack already reads the tick, '
+            'and an announcement makes it drop its speech queue: $said',
+      );
+      handle.dispose();
+    });
+  }
+
+  // E6. The spoken text and the app bar's text must be the same string, not two
+  // literals that agree today. If the bar's wording is ever changed, this fails
+  // rather than letting a reader hear something the screen no longer shows.
+  testWidgets('Linux: the tick announcement is the app bar text itself', (
+    t,
+  ) async {
+    final said = recordAnnouncements(t);
+    final handle = await pumpNet(t);
+    await enterSelectionMode(t);
+    await tapRow(t, 'Apple');
+    final barTitle = t
+        .widget<Text>(
+          find
+              .descendant(of: find.byType(AppBar), matching: find.byType(Text))
+              .first,
+        )
+        .data;
+    expect(
+      said.single,
+      barTitle,
+      reason: 'the tick speaks something other than what the app bar shows, '
+          'so the two can drift: $said vs "$barTitle"',
+    );
+    handle.dispose();
+  });
 }

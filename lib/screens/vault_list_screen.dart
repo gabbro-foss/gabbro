@@ -1565,6 +1565,29 @@ class _VaultListScreenState extends State<VaultListScreen>
     );
   }
 
+  /// The one place an entry is ticked or unticked. Both layouts and both ways
+  /// of ticking (the row, the checkbox) come through here, so no one of them
+  /// can be left silent — the logic used to be written out three times over.
+  ///
+  /// Ticking moves no focus, and a reader announces a state change only on the
+  /// object it is already sitting on. The tick is not on that object: the state
+  /// lives on the checkbox node beneath the row, so hardware round 29 heard
+  /// nothing at all (the "space" Orca said was its echo of the key). It
+  /// therefore speaks the selection count the app bar is already showing —
+  /// nothing takes focus afterwards, which is the condition an announcement
+  /// has to meet to be heard on Linux at all (LEARNINGS.md).
+  void _toggleSelection(String id) {
+    setState(() {
+      if (_selectedIds.contains(id)) {
+        _selectedIds.remove(id);
+      } else {
+        _selectedIds.add(id);
+        _selectionMode = true;
+      }
+    });
+    _announce(AppLocalizations.of(context).selectedCount(_selectedIds.length));
+  }
+
   // Selection-mode checkbox labelled with the entry title, so a screen reader
   // announces "<title>, tick box, ticked" instead of a bare "tick box". The
   // checkbox role + checked state come from Checkbox; MergeSemantics folds the
@@ -1577,13 +1600,7 @@ class _VaultListScreenState extends State<VaultListScreen>
           context,
           Checkbox(
             value: _selectedIds.contains(entry.id),
-            onChanged: (_) => setState(() {
-              if (_selectedIds.contains(entry.id)) {
-                _selectedIds.remove(entry.id);
-              } else {
-                _selectedIds.add(entry.id);
-              }
-            }),
+            onChanged: (_) => _toggleSelection(entry.id),
           ),
         ),
       ),
@@ -2140,14 +2157,7 @@ class _VaultListScreenState extends State<VaultListScreen>
               onDeleteEntryFn: widget.onDeleteEntryFn,
               selectionMode: _selectionMode,
               selectedIds: _selectedIds,
-              onToggleSelection: (id) => setState(() {
-                if (_selectedIds.contains(id)) {
-                  _selectedIds.remove(id);
-                } else {
-                  _selectedIds.add(id);
-                  _selectionMode = true;
-                }
-              }),
+              onToggleSelection: _toggleSelection,
               vaultPath: widget.vaultPath,
               clipboardClearTimeout:
                   GabbroApp.maybeOf(context)?.settings.clipboardClearTimeout ??
@@ -2338,15 +2348,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                                       }),
                                       onTap: () async {
                                         if (_isSelecting) {
-                                          setState(() {
-                                            if (_selectedIds.contains(
-                                              entry.id,
-                                            )) {
-                                              _selectedIds.remove(entry.id);
-                                            } else {
-                                              _selectedIds.add(entry.id);
-                                            }
-                                          });
+                                          _toggleSelection(entry.id);
                                           return;
                                         }
                                         await Navigator.of(context).push(
