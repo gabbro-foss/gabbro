@@ -37,31 +37,62 @@ List<EntrySummaryData> denseEntries() {
   ];
 }
 
-VaultListScreen denseVaultList({bool android = false}) => VaultListScreen(
-  vaultPath: '/tmp/probe.gabbro',
-  vaultAlias: 'Dense',
-  isAndroid: android,
-  yubikeyRecords: const [],
-  listEntries: denseEntries,
-  listFolders: () => const ['Work', 'Personal'],
-  getEntryFn: (_) => login('secret', 'notes'),
-  onDeleteEntryFn: (_) async {},
-  onRefreshFn: () {},
-);
+VaultListScreen denseVaultList({bool android = false, bool quit = false}) =>
+    VaultListScreen(
+      vaultPath: '/tmp/probe.gabbro',
+      vaultAlias: 'Dense',
+      isAndroid: android,
+      yubikeyRecords: const [],
+      listEntries: denseEntries,
+      listFolders: () => const ['Work', 'Personal'],
+      getEntryFn: (_) => login('secret', 'notes'),
+      onDeleteEntryFn: (_) async {},
+      onRefreshFn: () {},
+      // Ctrl+Q is inert unless a quit hook is wired, so the announcement test
+      // needs one; everything else leaves it off, as the app does on Android.
+      onQuit: quit ? () {} : null,
+    );
 
 Future<SemanticsHandle> pumpDense(
   WidgetTester t, {
   Surface surface = phone,
   bool android = false,
+  bool quit = false,
 }) async {
   t.view.physicalSize = surface.physical;
   t.view.devicePixelRatio = surface.dpr;
   addTearDown(t.view.resetPhysicalSize);
   addTearDown(t.view.resetDevicePixelRatio);
   final handle = t.ensureSemantics();
-  await t.pumpWidget(appShell(denseVaultList(android: android), textScale: 1.0));
+  await t.pumpWidget(
+    appShell(denseVaultList(android: android, quit: quit), textScale: 1.0),
+  );
   await t.pump(const Duration(milliseconds: 300));
   return handle;
+}
+
+Future<void> sendCtrl(
+  WidgetTester t,
+  LogicalKeyboardKey key, {
+  bool shift = false,
+}) async {
+  await t.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+  if (shift) await t.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
+  await t.sendKeyEvent(key);
+  if (shift) await t.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
+  await t.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+  await t.pump();
+}
+
+/// Opens the new-entry type picker the way both platforms can: the FAB.
+Future<void> openTypePicker(WidgetTester t) async {
+  await t.tap(
+    find.descendant(
+      of: find.byType(FloatingActionButton),
+      matching: find.byIcon(Icons.add),
+    ),
+  );
+  await t.pumpAndSettle();
 }
 
 Future<void> tab(WidgetTester t) async {
@@ -228,64 +259,265 @@ void main() {
     }
   }
 
+  // The new-entry picker had the same fault as the entry row: the leading icon
+  // carried the type name as its semanticLabel and the row title said it again,
+  // so a reader worked through "Password, Password, Note, Note, …" for all six.
+  // The title is the one to keep — it is visible text as well as spoken.
+
+  for (final android in const [true, false]) {
+    final who = android ? 'Android' : 'Linux';
+    for (final (name, surface) in const [('narrow', phone), ('wide', tablet)]) {
+      testWidgets('$who $name: the picker names each type once, not twice', (
+        t,
+      ) async {
+        final handle = await pumpDense(t, surface: surface, android: android);
+        await t.tap(
+          find.descendant(
+            of: find.byType(FloatingActionButton),
+            matching: find.byIcon(Icons.add),
+          ),
+        );
+        await t.pumpAndSettle();
+        final heard = subtreeLabels(t, find.byType(BottomSheet)).join(' | ');
+        for (final type in [
+          en.entryTypePassword,
+          en.entryTypeNote,
+          en.entryTypeIdentity,
+          en.entryTypeCard,
+          en.entryTypeFile,
+          en.entryTypeCustom,
+        ]) {
+          expect(
+            occurrencesOf(heard, type),
+            1,
+            reason: 'the picker says "$type" more than once: "$heard"',
+          );
+        }
+        handle.dispose();
+      });
+    }
+  }
+
+  // ── Linux only: events have to be announced ──────────────────────────────
+  // A shortcut firing or a sheet opening is an EVENT, not a place, so there is
+  // no node for a reader to land on and read. Linux ignores liveRegion
+  // entirely (LEARNINGS.md), which leaves SemanticsService as the only way to
+  // say anything at all. Android is excluded throughout: it has deprecated
+  // announcement events, and TalkBack already passes.
+  //
+  // Ctrl+F deliberately announces nothing of its own — it lands in the search
+  // region, which announces itself, and the field's own name already ends in
+  // "Ctrl+F: Focus search". Ctrl+Shift+F does announce, because the all-fields
+  // mode is otherwise completely inaudible.
+
+  testWidgets('opening the new-entry picker says what it is', (t) async {
+    final said = recordAnnouncements(t);
+    final handle = await pumpDense(t);
+    await openTypePicker(t);
+    expect(
+      said.where((s) => s == en.newEntryTitle),
+      hasLength(1),
+      reason: 'the new-entry sheet does not say what it is, exactly once: '
+          '$said',
+    );
+    handle.dispose();
+  });
+
+  testWidgets('Android: opening the picker announces nothing', (t) async {
+    final said = recordAnnouncements(t);
+    final handle = await pumpDense(t, android: true);
+    await openTypePicker(t);
+    expect(
+      said,
+      isEmpty,
+      reason: 'TalkBack has deprecated announcement events; Android must be '
+          'left to its own semantics: $said',
+    );
+    handle.dispose();
+  });
+
+  testWidgets('Ctrl+Shift+F says that it searches every field', (t) async {
+    final said = recordAnnouncements(t);
+    final handle = await pumpDense(t);
+    await sendCtrl(t, LogicalKeyboardKey.keyF, shift: true);
+    await t.pumpAndSettle();
+    expect(
+      said,
+      contains(en.kbSearchAllFields),
+      reason: 'nothing says the search switched to all-fields mode: $said',
+    );
+    handle.dispose();
+  });
+
+  testWidgets('Ctrl+M says the menu opened', (t) async {
+    final said = recordAnnouncements(t);
+    final handle = await pumpDense(t);
+    await sendCtrl(t, LogicalKeyboardKey.keyM);
+    await t.pumpAndSettle();
+    expect(
+      said,
+      contains(en.tooltipMenu),
+      reason: 'the overflow menu opens silently: $said',
+    );
+    handle.dispose();
+  });
+
+  testWidgets('Ctrl+Q says the quit confirm opened', (t) async {
+    final said = recordAnnouncements(t);
+    final handle = await pumpDense(t, quit: true);
+    await sendCtrl(t, LogicalKeyboardKey.keyQ);
+    await t.pumpAndSettle();
+    expect(
+      said,
+      contains(en.quit),
+      reason: 'the quit confirm appears silently: $said',
+    );
+    handle.dispose();
+  });
+
+  // A shortcut that does nothing must say nothing, or a reader is told the app
+  // did something it did not do. Selection mode hides the FAB and the menu
+  // button, so Ctrl+N and Ctrl+M are inert there by design.
+  testWidgets('an inert shortcut announces nothing (selection mode)', (
+    t,
+  ) async {
+    final said = recordAnnouncements(t);
+    final handle = await pumpDense(t, quit: true);
+    await t.tap(find.byIcon(Icons.checklist));
+    await t.pumpAndSettle();
+    said.clear();
+    await sendCtrl(t, LogicalKeyboardKey.keyN);
+    await sendCtrl(t, LogicalKeyboardKey.keyM);
+    await sendCtrl(t, LogicalKeyboardKey.keyQ);
+    await t.pumpAndSettle();
+    expect(
+      said,
+      isEmpty,
+      reason: 'a shortcut that did nothing still announced itself: $said',
+    );
+    handle.dispose();
+  });
+
+  testWidgets('Android: the shortcuts announce nothing', (t) async {
+    final said = recordAnnouncements(t);
+    final handle = await pumpDense(t, android: true, quit: true);
+    await sendCtrl(t, LogicalKeyboardKey.keyF, shift: true);
+    await sendCtrl(t, LogicalKeyboardKey.keyM);
+    await sendCtrl(t, LogicalKeyboardKey.keyQ);
+    await t.pumpAndSettle();
+    expect(said, isEmpty, reason: 'Android announced a shortcut: $said');
+    handle.dispose();
+  });
+
+  testWidgets('the same keys without Ctrl announce nothing', (t) async {
+    final said = recordAnnouncements(t);
+    final handle = await pumpDense(t, quit: true);
+    for (final key in [
+      LogicalKeyboardKey.keyF,
+      LogicalKeyboardKey.keyM,
+      LogicalKeyboardKey.keyN,
+      LogicalKeyboardKey.keyQ,
+    ]) {
+      await t.sendKeyEvent(key);
+    }
+    await t.pumpAndSettle();
+    expect(
+      said,
+      isEmpty,
+      reason: 'a bare letter key announced a shortcut: $said',
+    );
+    handle.dispose();
+  });
+
   // ── Linux only: the regions speak ────────────────────────────────────────
   // Tab moves between REGIONS, not controls, so a screen-reader user who Tabs
-  // hears the newly-focused control with no idea they changed region. Entering
-  // one must announce it ("Folder list"), which is what liveRegion does.
+  // hears the newly-focused control with no idea they changed region.
+  //
+  // The region's name lives on its Semantics container, which Orca reads as an
+  // ATK panel when focus lands inside it (round 16). Round 22 replaced this
+  // with SemanticsService announcements and every one that mattered was
+  // inaudible: the Linux embedder sends them as ATK "polite", and Orca discards
+  // a polite notification while it is speaking — which it always is right after
+  // a focus change. Reverted.
+  //
+  // Accepted cost: the panel is an ancestor of every row, so the name is read
+  // again on each arrow press inside the entry list. That repeat is a known,
+  // maintainer-accepted defect (see ARCHITECTURE.md), not a regression.
 
-  testWidgets('entering each region announces a distinct name', (t) async {
+  testWidgets('each region carries its own name, in cycle order', (t) async {
     final handle = await pumpDense(t);
-    // Narrow cycle: search -> folder -> chips -> list.
-    final announced = <String>[];
+    // Narrow cycle: search -> folders -> chips -> list. No detail pane.
+    expect(
+      containerNames(t),
+      containsAllInOrder([
+        en.regionSearch,
+        en.regionFolders,
+        en.regionFilters,
+        en.regionEntries,
+      ]),
+      reason: 'a region lost the name Orca reads when focus enters it',
+    );
+    handle.dispose();
+  });
+
+  testWidgets('wide: the detail pane is named once entered', (t) async {
+    final handle = await pumpDense(t, surface: tablet);
+    // Walk to the list and open an entry so the detail region mounts.
     for (var i = 0; i < 4; i++) {
       await tab(t);
-      final live = liveRegionLabels(t).where((l) => l.isNotEmpty).toList();
-      expect(
-        live,
-        hasLength(1),
-        reason: 'stop ${i + 1}: expected exactly one region to announce itself, '
-            'got $live',
-      );
-      announced.add(live.single);
     }
-    expect(
-      announced.toSet(),
-      hasLength(4),
-      reason: 'each region must announce its OWN name; got $announced',
-    );
-    handle.dispose();
-  });
-
-  testWidgets('wide: the detail pane announces itself when entered', (t) async {
-    final handle = await pumpDense(t, surface: tablet);
-    // Select an entry so the detail region joins the cycle, then walk to it:
-    // search -> folder -> chips -> list -> detail.
-    await tab(t);
-    await tab(t);
-    await tab(t);
-    await tab(t);
     await t.sendKeyEvent(LogicalKeyboardKey.enter);
     await t.pump(const Duration(milliseconds: 300));
-    await tab(t);
     expect(
-      liveRegionLabels(t).where((l) => l.isNotEmpty),
-      hasLength(1),
-      reason: 'the detail pane does not announce itself',
+      containerNames(t),
+      contains(en.regionDetails),
+      reason: 'the detail pane has no name for Orca to read',
     );
     handle.dispose();
   });
 
-  // The announcement must be the REGION's, not a stray live region on some
-  // control inside it: leaving the cycle must silence it again.
-  testWidgets('Esc out of the cycle leaves nothing announcing', (t) async {
-    final handle = await pumpDense(t);
-    await tab(t);
-    await t.sendKeyEvent(LogicalKeyboardKey.escape);
-    await t.pump(const Duration(milliseconds: 300));
+  testWidgets('Android: no region is named', (t) async {
+    final handle = await pumpDense(t, android: true);
     expect(
-      liveRegionLabels(t).where((l) => l.isNotEmpty),
+      containerNames(t),
+      isNot(anyElement(isIn([
+        en.regionSearch,
+        en.regionFolders,
+        en.regionFilters,
+        en.regionEntries,
+        en.regionDetails,
+      ]))),
+      reason: 'Android has no regions, so none may be named there',
+    );
+    handle.dispose();
+  });
+
+  // Tab must not announce anything: the region name travels on the container,
+  // and a second copy as an announcement would be heard twice wherever Orca
+  // did accept it.
+  testWidgets('Tabbing the cycle announces nothing', (t) async {
+    final said = recordAnnouncements(t);
+    final handle = await pumpDense(t);
+    for (var i = 0; i < 4; i++) {
+      await tab(t);
+    }
+    expect(
+      said,
       isEmpty,
-      reason: 'a region still announces itself after Esc left the cycle',
+      reason: 'the region name is being both named and announced: $said',
+    );
+    handle.dispose();
+  });
+
+  // The container names the REGION, not the row. If its name were merged down,
+  // every row would be read as "Entry list, Apple, …".
+  testWidgets('the region name stays off the controls inside it', (t) async {
+    final handle = await pumpDense(t);
+    expect(labelOf(t, find.text('Apple')), contains('Apple'));
+    expect(labelOf(t, find.text('Apple')), isNot(contains(en.regionEntries)));
+    expect(
+      labelOf(t, find.byType(FilterChip).first),
+      isNot(contains(en.regionFilters)),
     );
     handle.dispose();
   });

@@ -70,6 +70,65 @@ int occurrencesOf(String haystack, String needle) => needle.isEmpty
     ? 0
     : RegExp(RegExp.escape(needle)).allMatches(haystack).length;
 
+/// The label of every semantics node that has a name of its own AND children
+/// beneath it — a "named container". This is what actually reaches Orca when
+/// focus lands on a control inside it: the Linux embedder reads only names, so
+/// a region is audible because it is a named ancestor, not because it is a
+/// live region (which Linux ignores entirely — see LEARNINGS.md).
+List<String> namedContainerLabels(WidgetTester t) => allSemanticsNodes(t)
+    .where((n) => n.childrenCount > 0)
+    .map((n) => n.getSemanticsData().label)
+    .where((l) => l.isNotEmpty)
+    .toList();
+
+/// The first line of every named container's label — what a screen reader is
+/// given first when focus lands inside it. Two of the vault list's regions have
+/// a child's own name merged onto the end of theirs (the search box's
+/// placeholder, the chips row's page chevron), so an exact match would miss
+/// them; the region name still comes first, which is what matters.
+List<String> containerNames(WidgetTester t) =>
+    namedContainerLabels(t).map((l) => l.split('\n').first).toList();
+
+/// Every label in the semantics subtree rooted at the node [finder] resolves
+/// to, in tree order. Lets a test count what a reader works through for one
+/// region or one row without depending on which widget carries each name.
+List<String> subtreeLabels(WidgetTester t, Finder finder) {
+  final out = <String>[];
+  void walk(SemanticsNode n) {
+    final label = n.getSemanticsData().label;
+    if (label.isNotEmpty) out.add(label);
+    n.visitChildren((child) {
+      walk(child);
+      return true;
+    });
+  }
+
+  walk(t.getSemantics(finder));
+  return out;
+}
+
+/// Captures every `SemanticsService.announce()` the app makes, in order — the
+/// only channel that speaks on Linux for something that is an EVENT rather
+/// than a place (a shortcut firing, a sheet opening). Returns a growing list.
+List<String> recordAnnouncements(WidgetTester t) {
+  final said = <String>[];
+  t.binding.defaultBinaryMessenger.setMockDecodedMessageHandler<dynamic>(
+    SystemChannels.accessibility,
+    (message) async {
+      final map = message as Map?;
+      if (map != null && map['type'] == 'announce') {
+        said.add((map['data'] as Map)['message'] as String? ?? '');
+      }
+      return null;
+    },
+  );
+  addTearDown(
+    () => t.binding.defaultBinaryMessenger
+        .setMockDecodedMessageHandler<dynamic>(SystemChannels.accessibility, null),
+  );
+  return said;
+}
+
 /// Installs a mock for the `Clipboard` platform channel and returns a growing
 /// list of every text written via `Clipboard.setData` — a copy writes the
 /// secret, the auto-clear writes an empty string. Used by the clipboard-clear

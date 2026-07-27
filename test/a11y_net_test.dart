@@ -5,6 +5,7 @@ import 'package:gabbro/settings.dart';
 import 'package:gabbro/screens/alphabet_index_bar.dart';
 
 import 'screen_catalog.dart';
+import 'test_helpers.dart';
 
 // Accessibility net (item 6). Sweeps every catalog screen and dialog and asserts
 // two Flutter accessibility guidelines on a phone at natural text scale:
@@ -23,6 +24,28 @@ const Map<String, String> _knownTapTargetTooSmall = <String, String>{};
 
 // Screens/dialogs with a KNOWN unfixed unlabelled tappable node. Same rules.
 const Map<String, String> _knownUnlabelled = <String, String>{};
+
+// Screens whose icon buttons still carry their text ONLY as a tooltip, so Orca
+// says just "button" for them. Found by the sweep at the end of this file after
+// round 22; the vault list and the entry detail pane are fixed, the rest are
+// listed here so they are visible rather than silently passing. Each is the
+// same one-line change (add semanticLabel beside the tooltip). Remove the entry
+// once the screen is fixed.
+const Map<String, String> _knownTooltipOnly = <String, String>{
+  'help': 'not yet swept',
+  'generator': 'not yet swept',
+  'generator_widget': 'not yet swept',
+  'export': 'not yet swept',
+  'import': 'not yet swept',
+  'change_passphrase': 'not yet swept',
+  'manage_folders': 'not yet swept',
+  'manage_vaults': 'not yet swept',
+  'recovery_history': 'not yet swept',
+  'path_field': 'not yet swept',
+  'unlock': 'not yet swept',
+  'review_changes': 'not yet swept',
+  'onboarding': 'not yet swept',
+};
 
 // Screens/dialogs with a KNOWN unfixed text-contrast failure, each skipped (not
 // silently passing) with a reason. Remove the entry once fixed. textContrast
@@ -394,6 +417,40 @@ void main() {
         handle.dispose();
       },
       skip: _knownUnlabelled.containsKey(entry.key),
+    );
+  }
+
+  // --- A tooltip is not a name on Linux ------------------------------------
+  // labeledTapTargetGuideline above accepts a tooltip as a label, so every
+  // icon-only button in the app passed it while Orca said just "button" for
+  // all of them (round 22). The Linux embedder copies a node's label and
+  // ignores its tooltip entirely (LEARNINGS.md), so an icon button whose text
+  // lives only in the tooltip has no name a screen reader can reach: a user
+  // cannot tell Copy from Delete entry. The tooltip stays — it is what a mouse
+  // user sees — the name is added beside it.
+  for (final entry in screens.entries) {
+    testWidgets(
+      '${entry.key}: icon buttons are named, not just tooltipped',
+      (tester) async {
+        final handle = await _pump(
+          tester,
+          appShell(entry.value(), textScale: 1.0),
+          surface: _surfaceFor(entry.key),
+        );
+        final nameless = allSemanticsNodes(tester)
+            .map((n) => n.getSemanticsData())
+            .where((d) => d.tooltip.isNotEmpty && d.label.isEmpty)
+            .map((d) => d.tooltip)
+            .toList();
+        expect(
+          nameless,
+          isEmpty,
+          reason: 'these controls say only "button" to Orca — their text is in '
+              'a tooltip, which Linux never reads: $nameless',
+        );
+        handle.dispose();
+      },
+      skip: _knownTooltipOnly.containsKey(entry.key),
     );
   }
 }

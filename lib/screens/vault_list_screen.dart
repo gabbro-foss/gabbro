@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/control_scale.dart';
@@ -408,6 +409,24 @@ class _VaultListScreenState extends State<VaultListScreen>
     );
   }
 
+  /// Says something that has no node for a reader to land on — a shortcut
+  /// firing, a sheet opening, focus arriving in a region. On Linux the reader
+  /// is handed a node's NAME and nothing else, so an event that changes no
+  /// name is otherwise completely silent (round 16: Orca said nothing for any
+  /// shortcut).
+  ///
+  /// Linux only, on the same D5 gate as the regions: Android has deprecated
+  /// announcement events (they force TalkBack to drop its speech queue), and
+  /// TalkBack already reads these flows from the widgets themselves.
+  void _announce(String message) {
+    if (widget.isAndroid || !mounted) return;
+    SemanticsService.sendAnnouncement(
+      View.of(context),
+      message,
+      Directionality.of(context),
+    );
+  }
+
   /// Makes a control say what it DOES, not just what it is.
   ///
   /// A Linux screen reader is given only a node's NAME — the embedder never
@@ -533,11 +552,15 @@ class _VaultListScreenState extends State<VaultListScreen>
   // Ctrl+M (global): open the overflow menu — the keyboard path to the menu
   // button, which the region Tab-cycle excludes.
   void _handleMenuShortcut() {
-    if (mounted && _actionShortcutActive()) _menuKey.currentState?.showButtonMenu();
+    if (mounted && _actionShortcutActive()) {
+      _menuKey.currentState?.showButtonMenu();
+      _announce(AppLocalizations.of(context).tooltipMenu);
+    }
   }
 
   void _handleQuitShortcut() {
     if (mounted && _actionShortcutActive() && widget.onQuit != null) {
+      _announce(AppLocalizations.of(context).quit);
       _confirmQuit();
     }
   }
@@ -602,6 +625,10 @@ class _VaultListScreenState extends State<VaultListScreen>
   void _handleSearchShortcut({required bool allFields}) {
     setState(() => _fullTextSearch = allFields);
     _searchFocus.requestFocus();
+    // Only the all-fields variant announces: plain Ctrl+F lands in the search
+    // region, which names itself, and the field's own name already ends in
+    // "Ctrl+F: Focus search". All-fields mode has no other audible sign.
+    if (allFields) _announce(AppLocalizations.of(context).kbSearchAllFields);
   }
 
   @override
@@ -855,6 +882,9 @@ class _VaultListScreenState extends State<VaultListScreen>
 
   Future<void> _showTypePicker() async {
     final l = AppLocalizations.of(context);
+    // The sheet has no name of its own, so without this a reader is given no
+    // clue what just appeared over the vault list.
+    _announce(l.newEntryTitle);
     final types = [
       ('Login', l.entryTypePassword),
       ('Note', l.entryTypeNote),
@@ -882,11 +912,13 @@ class _VaultListScreenState extends State<VaultListScreen>
               ),
               ...types.map(
                 (t) => ListTile(
+                  // No semanticLabel: the title below already says the type,
+                  // and naming the icon too made a reader say each of the six
+                  // types twice.
                   leading: Icon(
                     _entryTypeIcon(t.$1),
                     size: scaledIconSize(context),
                     color: Theme.of(context).colorScheme.primary,
-                    semanticLabel: t.$2,
                   ),
                   title: Text(t.$2),
                   onTap: () => Navigator.of(context).pop(t.$1),
@@ -1482,6 +1514,11 @@ class _VaultListScreenState extends State<VaultListScreen>
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
+        // Flutter only supplies a default dialog name on Android, so on Linux
+        // Orca announced "alert" and then the focused Cancel button — the
+        // question itself was never read, leaving a screen-reader user
+        // confirming something they were never told.
+        semanticLabel: l.quitConfirmTitle,
         title: Text(l.quitConfirmTitle),
         actions: [
           TextButton(
@@ -1592,7 +1629,14 @@ class _VaultListScreenState extends State<VaultListScreen>
                   ),
                 ),
           prefixIcon: IconButton(
-            icon: Icon(_fullTextSearch ? Icons.manage_search : Icons.search),
+            // semanticLabel as well as tooltip: Orca reads a control's name and
+            // never its tooltip, so a tooltip alone leaves this saying "button".
+            icon: Icon(
+              _fullTextSearch ? Icons.manage_search : Icons.search,
+              semanticLabel: _fullTextSearch
+                  ? l.searchAllFieldsTooltip
+                  : l.searchByTitleTooltip,
+            ),
             tooltip: _fullTextSearch
                 ? l.searchAllFieldsTooltip
                 : l.searchByTitleTooltip,
@@ -1734,20 +1778,23 @@ class _VaultListScreenState extends State<VaultListScreen>
             ),
           if (!_isSelecting) ...[
             IconButton(
-              icon: const Icon(Icons.checklist),
+              icon: Icon(
+                Icons.checklist,
+                semanticLabel: l.tooltipSelectEntries,
+              ),
               iconSize: scaledIconSize(context),
               tooltip: l.tooltipSelectEntries,
               onPressed: () => setState(() => _selectionMode = true),
             ),
             IconButton(
-              icon: const Icon(Icons.lock_outline),
+              icon: Icon(Icons.lock_outline, semanticLabel: l.tooltipLockVault),
               iconSize: scaledIconSize(context),
               tooltip: l.tooltipLockVault,
               onPressed: _lockAndExit,
             ),
             PopupMenuButton<String>(
               key: _menuKey,
-              icon: const Icon(Icons.menu),
+              icon: Icon(Icons.menu, semanticLabel: l.tooltipMenu),
               iconSize: scaledIconSize(context),
               tooltip: l.tooltipMenu,
               onSelected: _onMenuSelected,
@@ -1980,7 +2027,11 @@ class _VaultListScreenState extends State<VaultListScreen>
           : FloatingActionButton(
               onPressed: _showTypePicker,
               tooltip: l.newEntryTitle,
-              child: Icon(Icons.add, size: scaledIconSize(context)),
+              child: Icon(
+                Icons.add,
+                size: scaledIconSize(context),
+                semanticLabel: l.newEntryTitle,
+              ),
             ),
       body: LayoutBuilder(
         builder: (context, constraints) {

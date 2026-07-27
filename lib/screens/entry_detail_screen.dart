@@ -312,7 +312,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
               onPressed: () => _exportFile(field0),
             ),
           IconButton(
-            icon: const Icon(Icons.edit_outlined),
+            icon: Icon(Icons.edit_outlined, semanticLabel: l.tooltipEditEntry),
             iconSize: scaledIconSize(context),
             tooltip: l.tooltipEditEntry,
             onPressed: () async {
@@ -337,7 +337,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
             },
           ),
           IconButton(
-            icon: const Icon(Icons.delete_outline),
+            icon: Icon(Icons.delete_outline, semanticLabel: l.tooltipDeleteEntry),
             iconSize: scaledIconSize(context),
             tooltip: l.tooltipDeleteEntry,
             onPressed: () => _confirmDelete(context),
@@ -697,12 +697,12 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
             children: [
               Expanded(child: Text(url, style: const TextStyle(fontSize: 16))),
               IconButton(
-                icon: const Icon(Icons.open_in_browser_outlined, size: 18),
+                icon: Icon(Icons.open_in_browser_outlined, size: 18, semanticLabel: l.openInBrowser),
                 tooltip: l.openInBrowser,
                 onPressed: () => _launchUrl(context, url),
               ),
               IconButton(
-                icon: const Icon(Icons.copy_outlined, size: 18),
+                icon: Icon(Icons.copy_outlined, size: 18, semanticLabel: l.tooltipCopy),
                 tooltip: l.tooltipCopy,
                 onPressed: () => _copyToClipboard(url),
               ),
@@ -767,7 +767,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.copy_outlined, size: 18),
+                icon: Icon(Icons.copy_outlined, size: 18, semanticLabel: l.tooltipCopy),
                 tooltip: l.tooltipCopy,
                 onPressed: () => _copyToClipboard(value),
               ),
@@ -815,12 +815,16 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
               if (onLongPress != null && !obscured)
                 IconButton(
                   key: const Key('breakdown_button'),
-                  icon: const Icon(Icons.analytics_outlined, size: 18),
+                  icon: Icon(
+                    Icons.analytics_outlined,
+                    size: 18,
+                    semanticLabel: l.passwordBreakdownTitle,
+                  ),
                   tooltip: l.passwordBreakdownTitle,
                   onPressed: onLongPress,
                 ),
               IconButton(
-                icon: const Icon(Icons.copy_outlined, size: 18),
+                icon: Icon(Icons.copy_outlined, size: 18, semanticLabel: l.tooltipCopy),
                 tooltip: l.tooltipCopy,
                 onPressed: () => _copyToClipboard(value),
               ),
@@ -828,6 +832,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
                 iconSize: scaledIconSize(context, 18),
                 icon: Icon(
                   obscured ? Icons.visibility_off : Icons.visibility,
+                  semanticLabel: obscured ? l.tooltipShow : l.tooltipHide,
                 ),
                 tooltip: obscured ? l.tooltipShow : l.tooltipHide,
                 onPressed: onToggle,

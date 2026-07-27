@@ -136,12 +136,24 @@ class DashedOutlineInputBorder extends OutlineInputBorder {
 /// focus. The frame is the qtile-style "which area am I in" cue; individual
 /// items keep their own selection highlight. Colour is the theme primary; the
 /// high-contrast variant is dashed and thicker (see [focusFrameStyle]).
-/// [label] names the region to a screen reader and is announced when focus
-/// enters it — the audible counterpart of the frame, so a user who cannot see
-/// the frame still knows which region Tab moved them to. Null means the region
-/// stays silent. [showFrame] is false for the search box, which lights up its
-/// OWN outline instead (an overlay frame there gave a double border) but still
-/// needs to announce itself.
+/// [label] names the region to a screen reader and is read when focus enters
+/// it — the audible counterpart of the frame, so a user who cannot see the
+/// frame still knows which region Tab moved them to. Null means the region
+/// stays silent.
+///
+/// It is a NAME on a Semantics container, not a `SemanticsService` announcement.
+/// Round 22 tried the announcement and it was inaudible wherever it mattered:
+/// the Linux embedder sends announcements as ATK "polite", and Orca discards a
+/// polite notification while it is already speaking — which it always is when
+/// focus has just landed on a row or a button. The named container is read as
+/// an `ATK_ROLE_PANEL` ancestor and cannot be discarded that way (round 16).
+///
+/// Known cost, accepted by the maintainer: because the panel is an ancestor of
+/// every row, Orca reads the region name again on each arrow press inside the
+/// entry list. An audible repeat beats inaudible silence.
+///
+/// [showFrame] is false for the search box, which lights up its OWN outline
+/// instead (an overlay frame there gave a double border) but is still named.
 class FocusRegion extends StatefulWidget {
   final Widget child;
   final double radius;
@@ -178,8 +190,9 @@ class _FocusRegionState extends State<FocusRegion> {
           : FocusFramePainter(style, radius: widget.radius),
       child: widget.child,
     );
-    // liveRegion only while focused, so exactly one region announces itself and
-    // leaving the cycle (Esc) silences it again.
+    // liveRegion only while focused, so exactly one region carries it. It is
+    // inert on Linux (the embedder maps no live-region flag) and kept only for
+    // the platforms that do read it; the NAME is what Orca actually speaks.
     if (widget.label != null) {
       content = Semantics(
         container: true,
