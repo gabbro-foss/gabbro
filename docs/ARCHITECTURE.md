@@ -151,10 +151,11 @@ repeats its region name on every arrow press, which the maintainer has accepted
 
 **To do**
 
-1. **Focus frame stuck after deleting an entry** (round 23). The list keeps its
-   frame after a delete until you Tab past it again, so the app shows focus in a
-   region focus has left. Pre-existing — `focus_region.dart` is unchanged from
-   before this work.
+1. **Deleting an entry moves focus silently** (round 23). Deleting from the
+   two-pane detail pane unmounts it and focus lands on a row in the entry list —
+   verified: the frame is correct and arrows work from there. Nothing says so,
+   so the only sign is a frame appearing where you were not looking. Reported as
+   a stuck frame; it is not one. Pre-existing.
 2. **Ticking a checkbox is announced only after moving away and back** (round 17).
    Cause established: the row takes focus but the checked state lives on a separate
    checkbox node beneath it, and a reader only announces state changes on the FOCUSED
