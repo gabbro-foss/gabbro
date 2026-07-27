@@ -115,9 +115,46 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Sync without a second unlock.** See if a vault sync can skip re-entering
-`passphrase + YubiKey` for the incoming vault, *if and only if* it shares the same
-`alias`, `passphrase` and `yubikey(s)` as the currently open vault.
+**Sync without a second unlock.** `sync from file` (`lib/screens/vault_list_screen.dart:1068`)
+always asks for the source passphrase, plus PIN and tap when the source is key-protected —
+4 prompts to sync a three-device setup. Investigated 2026-07-27; every scenario reviewed
+and the plan below approved.
+
+> **Rule: sync silently when the incoming file's alias matches the open vault's AND the
+> credentials already in the session open it. Anything else falls back to today's
+> credential screen.**
+
+The session already holds `passphrase` always (`rust/src/vault/session.rs:55`) and
+`vault_key_master` when key-protected (`session.rs:36`), so the whole check stays in Rust
+and no new secret crosses the bridge.
+
+| Incoming file, vs the open vault | Outcome |
+|---|---|
+| Same vault, key-protected (incl. a diverged YubiKey set) | silent |
+| Same vault, passphrase-only | silent **+ warning** |
+| Different vault sharing passphrase + alias, passphrase-only | silent **+ warning** — indistinguishable from the row above |
+| Alias differs (incl. a passphrase-only downgrade export, which carries none) | credential screen |
+| Anything the held credentials do not open | credential screen |
+
+- A key-protected save re-seals the body only (`reseal_vault_body`,
+  `rust/src/crypto/vault_crypto.rs:335`), so the header and the random per-vault master key
+  survive every save, alias change and key add/remove. The cached master opening a file
+  therefore *proves* it is the same vault — no passphrase, no tap, no Argon2.
+- A passphrase-only save re-seals the whole file (`do_save` -> `save_vault` -> `seal_vault`,
+  `session.rs:186`, `rust/src/api/vault.rs:1079`), minting fresh salts each time. Nothing
+  per-vault survives but the alias, so "it opened" proves only *same passphrase* — hence the
+  warning on every passphrase-only silent sync. An entry-UUID-overlap heuristic was
+  considered and **rejected** (cries wolf on an empty or fully-replaced vault); do not
+  re-propose it.
+- The AES-GCM Additional Authenticated Data (AAD) binds a header to its own body only and is
+  computed from the file being opened (`header_aad`, `rust/src/vault/file_format.rs:163`) —
+  it is **not** a cross-file check, so the alias comparison is explicit policy, not crypto.
+- A YubiKey set that differs per device is fine and must **not** be compared: add/remove
+  rewraps the same master. The hmac-secret salt is random per registration
+  (`rust/src/fido/device.rs:123`), so a genuinely different vault always needs a tap.
+
+**Net-first: current sync behaviour is not pinned by tests yet — no production change until
+it is.**
 
 ---
 
@@ -146,6 +183,12 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   never carry secret material, leave all three auto-type prints (`main.dart:459, 462, 478`)
   as useful diagnostics for a feature that talks to X11; if it can, silence that one in
   release. Answer the question before changing anything.
+
+- **Does a passphrase-only downgrade export mean to drop the vault's name?**
+  `build_passphrase_only_bytes` (`rust/src/api/vault.rs:1013`) passes `None` as the alias,
+  so the exported copy has no name and opens as an unnamed vault. May be deliberate
+  (ADR-013) or an oversight — decide before changing anything. Found during the
+  sync-without-a-second-unlock investigation.
 
 ### Security (pre-v1)
 - Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
