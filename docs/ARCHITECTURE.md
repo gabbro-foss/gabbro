@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1955 | 10 |
+| Flutter (`flutter test`) | 1966 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -140,7 +140,7 @@ speak the text the UI already shows for it. No new strings, and it stays true if
 wording changes. Assertiveness is not a way round constraint 2 — it wins the race by
 talking over the thing the user just moved to.
 
-**Done and hardware-passed (rounds 22-23)**
+**Done and hardware-passed (rounds 22-30)**
 
 - The new-entry picker said each of the six types twice; the row icon's
   `semanticLabel` is gone and the title carries it alone.
@@ -173,6 +173,14 @@ talking over the thing the user just moved to.
   focus, so it was silent; it now speaks the empty state's own visible text
   ("Select an entry"). The narrow layout is untouched — it pops back to the
   list, a screen change Orca already handles (hardware-confirmed).
+- Ticking an entry says how many are selected (round 30). The tick state sits
+  on the checkbox node beneath the row, and a reader only announces a state
+  change on the object it is already on, so a tick was silent until you moved
+  away and came back. It now speaks the app bar's own selection count. The
+  three hand-copied toggle bodies became one `_toggleSelection`, so both
+  layouts and both tick paths speak from the same line. Space is echoed by
+  Orca as "space" and the announcement still landed — the race is with a focus
+  change, not with speech.
 
 **Attempted and reverted (round 22).** Replacing each region's named Semantics
 container with an announcement on focus entry. Announcements leave the Linux
@@ -182,30 +190,9 @@ silent on hardware. The named container is back; the entry list therefore
 repeats its region name on every arrow press, which the maintainer has accepted
 (round 23) as better than silence.
 
-**To do**
-
-1. **Ticking a checkbox is announced only after moving away and back** (round 17).
-   Cause established: the row takes focus but the checked state lives on a separate
-   checkbox node beneath it, and a reader only announces state changes on the FOCUSED
-   object. **One attempt was made and REVERTED (round 19).** Moving `checked` onto the
-   row's `Semantics` wrapper and excluding the checkbox made things worse on hardware:
-   Orca stopped announcing the row entirely, the title was no longer read, and a focus
-   frame stuck with Esc unable to clear it. **Its unit tests all passed** — they asserted
-   the flag was on the row's node, which was true and irrelevant. The next attempt needs
-   a different mechanism, and a hardware check before it is believed.
-
-   **Untried lead, from rounds 26-27:** a tick is a change under a control that ALREADY
-   has focus — the same shape as the Copy button renaming itself to "Copied", which was
-   equally silent and was fixed by announcing instead. Ticking moves no focus, so
-   constraint 2 is satisfied. Before coding, establish on hardware what Orca says today
-   when a row is ticked (nothing at all, or the row re-read without its state) — the two
-   need different fixes, and guessing between them is what lost rounds 19 and 22.
-
-This is the last item in the a11y layer.
-
-**Merge gate:** master once an Orca round covering the items above passes on Linux, the
-Android TalkBack spot-check stays green, and the matrix's core-vault-operations section
-passes.
+**To do — the merge gate.** The a11y layer is complete: every item above has passed on
+Linux hardware. Before master, the Android TalkBack spot-check must stay green and the
+matrix's core-vault-operations section must pass.
 
 ---
 

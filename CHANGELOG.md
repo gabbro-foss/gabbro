@@ -30,7 +30,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
      At merge, add under Added: copying a secret is spoken aloud, in the generator and
      the entry detail pane, including when the clipboard will clear.
      At merge, add under Added: deleting the open entry on a wide window says what
-     replaced it, instead of emptying the pane in silence. -->
+     replaced it, instead of emptying the pane in silence.
+     At merge, add under Added: ticking an entry in selection mode says how many are
+     selected, instead of being silent until you move away and back. -->
 
 
 ## [0.1.0-alpha.16] – 2026-07-22
