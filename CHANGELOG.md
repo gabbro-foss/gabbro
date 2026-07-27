@@ -26,7 +26,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
      At merge, add under Fixed: the new-entry type picker said each entry type twice.
      At merge, add under Added: every icon-only control across the app now says what it
      is to a screen reader, in all 37 languages; the search box says one thing instead
-     of reciting its placeholder and both shortcuts. -->
+     of reciting its placeholder and both shortcuts.
+     At merge, add under Added: copying a secret is spoken aloud, in the generator and
+     the entry detail pane, including when the clipboard will clear. -->
 
 
 ## [0.1.0-alpha.16] – 2026-07-22

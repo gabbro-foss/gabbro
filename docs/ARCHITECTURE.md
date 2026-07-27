@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1949 | 10 |
+| Flutter (`flutter test`) | 1953 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -149,6 +149,13 @@ never read and `liveRegion` is inert, so anything event-shaped has to go through
   `tooltip.isNotEmpty && label.isEmpty` with no skips left. The help screen's
   tap-to-enlarge image needed `MergeSemantics` instead: it is a `Tooltip` around
   a picture, so the name had to be merged onto the node carrying the tap.
+- Copying a secret says so (rounds 26-27), in the generator and the entry detail
+  pane. Both were silent: the generator's button renames itself to "Copied" and
+  the detail pane shows a snackbar, and Linux reads neither — a name that changes
+  under an already-focused control is not re-read, and a snackbar is not seen at
+  all. The detail pane speaks the snackbar's own text, so it also says when the
+  clipboard will clear. `GeneratorWidget` and `EntryDetailScreen` gained an
+  `isAndroid` flag defaulting to `Platform.isAndroid`, so Android stays silent.
 
 **Attempted and reverted (round 22).** Replacing each region's named Semantics
 container with an announcement on focus entry. Announcements leave the Linux
@@ -174,15 +181,7 @@ repeats its region name on every arrow press, which the maintainer has accepted
    frame stuck with Esc unable to clear it. **Its unit tests all passed** — they asserted
    the flag was on the row's node, which was true and irrelevant. The next attempt needs
    a different mechanism, and a hardware check before it is believed.
-3. **The generator's Copy button does not say "Copied"** (round 25). The copy
-   works and the button's name does change, but the name changed under a control
-   that already had focus, so Orca never re-reads it. Fixable, unlike item 2:
-   copying moves no focus, and an announcement is reliably heard when nothing
-   else is speaking (round 22). `GeneratorWidget` has no platform flag, so both
-   call sites — `generator_screen.dart` and `create_entry_screen.dart` — must
-   pass one to keep Android silent.
-
-Order, quickest first: Copied (3), the silent delete (1), the checkbox (2).
+Order, quickest first: the silent delete (1), then the checkbox (2).
 
 **Merge gate:** master once an Orca round covering the items above passes on Linux, the
 Android TalkBack spot-check stays green, and the matrix's core-vault-operations section
