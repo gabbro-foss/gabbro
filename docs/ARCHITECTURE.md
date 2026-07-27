@@ -115,9 +115,12 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Remove the tablet NavigationRail** (`tablet_vault_layout.dart`: Vault /
-Appearance / Security / About). Redundant with the app-bar overflow menu (same
-targets), low utility. Already excluded from the keyboard Tab-cycle.
+_(empty — pick the next item with the maintainer)_
+
+The wide-window NavigationRail is removed on branch `remove_tablet_navigation_rail`:
+code + tests green (Flutter 1970), **hardware test still outstanding**. The sweep also
+fixed a pre-existing overflow — at large text the wide list pane ran off the bottom
+because the search box and chips took the whole height.
 
 ---
 
