@@ -447,9 +447,15 @@ class _VaultListScreenState extends State<VaultListScreen>
     String? outcome,
   }) {
     if (outcome == null) return child;
-    return widget.isAndroid
-        ? Semantics(hint: outcome, child: child)
-        : Semantics(label: '$name. $outcome', child: child);
+    if (widget.isAndroid) return Semantics(hint: outcome, child: child);
+    // An empty [name] means the control has nothing to add before the outcome —
+    // the search box, whose region already says "Search" and whose placeholder
+    // would just repeat it. Compose only when there is a name, or the label
+    // starts with a stray ". ".
+    return Semantics(
+      label: name.isEmpty ? outcome : '$name. $outcome',
+      child: child,
+    );
   }
 
   /// The `semanticsLabel` for the Text that shows a control's own name: blank
@@ -1598,13 +1604,13 @@ class _VaultListScreenState extends State<VaultListScreen>
         OutlineInputBorder(borderSide: BorderSide(color: theme.colorScheme.outline));
     final placeholder =
         _fullTextSearch ? l.searchAllFieldsHint : l.searchEntriesHint;
-    // Two shortcuts reach this box and they differ in WHAT they search, which
-    // a screen-reader user has no other way to discover. Only Linux is told:
-    // there is no keyboard on Android to press them on.
-    final searchOutcome = widget.isAndroid
-        ? l.hintSearch
-        : '${l.hintSearch}. Ctrl+F: ${l.kbFocusSearch}. '
-              'Ctrl+Shift+F: ${l.kbSearchAllFields}';
+    // One thing, not five. This used to name the box, say what typing does and
+    // then recite both shortcuts, which on hardware was too long to sit through
+    // (round 23) — and "Ctrl+F: focus search" is useless once you are already
+    // in the box. The region above already says "Search", so the placeholder
+    // would be a repeat too; both shortcuts stay on the Keyboard shortcuts
+    // screen, which is where a user goes looking for them.
+    final searchOutcome = l.hintSearch;
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
       child: _saysWhatItDoes(
@@ -1668,7 +1674,9 @@ class _VaultListScreenState extends State<VaultListScreen>
         ),
         onChanged: (value) => setState(() => _searchQuery = value),
         ),
-        name: placeholder,
+        // No name: the "Search" region above already identifies the box, so
+        // reading the placeholder here would say it twice.
+        name: '',
         outcome: searchOutcome,
       ),
     );

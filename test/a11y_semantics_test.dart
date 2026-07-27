@@ -141,37 +141,41 @@ void main() {
   // Android keeps the hint instead; that half is pinned green in
   // a11y_region_net_test.dart and must not move.
 
-  testWidgets('the search box name says that typing filters', (t) async {
-    final handle = await pumpDense(t);
-    final finder = find.byType(EditableText).first;
-    expectSpeaksOnLinux(t, finder, en.hintSearch, what: 'the search box');
-    // Its own name is the field's placeholder, and it must be read first.
-    final label = labelOf(t, finder);
-    expect(
-      label.indexOf(en.searchEntriesHint),
-      lessThan(label.indexOf(en.hintSearch)),
-      reason: 'the search box says what typing does before naming itself',
-    );
-    handle.dispose();
-  });
-
-  // The box is reached by two shortcuts that differ in WHAT they search, and
-  // a screen-reader user has no other way to discover that. These may only be
-  // spoken on Linux — Android has no keyboard to press them on, which is the
-  // whole reason the wording is split per platform.
-  testWidgets('the search box names both of its shortcuts', (t) async {
+  // The search box says ONE thing (round 23): landing on it used to produce
+  // "Search, Search entries, Filters the entries as you type, Ctrl+F Focus
+  // search, Ctrl+Shift+F Search all fields" — five parts, too long to sit
+  // through, and the maintainer could not catch the end of it on hardware.
+  // The region above already says "Search", so the box's own placeholder was
+  // a repeat, and "Ctrl+F: Focus search" is useless once you are in the box.
+  // Both shortcuts stay documented on the Keyboard shortcuts screen.
+  // The search region's container name merges into the field's node, so what
+  // Orca actually reads is "Search" then this — two parts, which is the whole
+  // point. The placeholder must NOT be in there: it would make "Search" thrice.
+  testWidgets('the search box name is just what typing does', (t) async {
     final handle = await pumpDense(t);
     final label = labelOf(t, find.byType(EditableText).first);
     expect(
       label,
-      contains(en.kbFocusSearch),
-      reason: 'the search box never mentions Ctrl+F',
+      contains(en.hintSearch),
+      reason: 'the search box no longer says what typing does',
     );
     expect(
       label,
-      contains(en.kbSearchAllFields),
-      reason: 'the search box never mentions Ctrl+Shift+F, so nothing says '
-          'that it can search every field',
+      isNot(contains(en.searchEntriesHint)),
+      reason: 'the box repeats its placeholder on top of the "Search" region '
+          'name: "$label"',
+    );
+    handle.dispose();
+  });
+
+  testWidgets('the search box name mentions no shortcut', (t) async {
+    final handle = await pumpDense(t);
+    final label = labelOf(t, find.byType(EditableText).first);
+    expect(
+      label,
+      isNot(contains('Ctrl')),
+      reason: 'a shortcut is being read out every time focus lands on the box; '
+          'the Keyboard shortcuts screen is where they belong',
     );
     handle.dispose();
   });
