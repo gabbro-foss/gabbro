@@ -23,7 +23,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
      At merge, add under Added: icon-only buttons on the vault list and entry detail
      say what they are to a screen reader, and the lock-and-quit confirm reads its
      question; Ctrl+Shift+F, Ctrl+M, Ctrl+Q and the new-entry sheet announce themselves.
-     At merge, add under Fixed: the new-entry type picker said each entry type twice. -->
+     At merge, add under Fixed: the new-entry type picker said each entry type twice.
+     At merge, add under Added: every icon-only control across the app now says what it
+     is to a screen reader, in all 37 languages; the search box says one thing instead
+     of reciting its placeholder and both shortcuts. -->
 
 
 ## [0.1.0-alpha.16] – 2026-07-22

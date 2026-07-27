@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1936 | 23 |
+| Flutter (`flutter test`) | 1949 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -143,6 +143,12 @@ never read and `liveRegion` is inert, so anything event-shaped has to go through
 - The search box says one thing, not five (round 24). It was reciting its
   placeholder, what typing does and both shortcuts; the region above already
   says "Search" and the shortcuts are on the Keyboard shortcuts screen.
+- Every remaining icon-only control is named (round 25) — unlock, generator,
+  help, manage folders/vaults, export, import, change passphrase, review
+  changes, onboarding. The a11y net sweeps all 33 catalog screens for
+  `tooltip.isNotEmpty && label.isEmpty` with no skips left. The help screen's
+  tap-to-enlarge image needed `MergeSemantics` instead: it is a `Tooltip` around
+  a picture, so the name had to be merged onto the node carrying the tap.
 
 **Attempted and reverted (round 22).** Replacing each region's named Semantics
 container with an announcement on focus entry. Announcements leave the Linux
@@ -168,14 +174,17 @@ repeats its region name on every arrow press, which the maintainer has accepted
    frame stuck with Esc unable to clear it. **Its unit tests all passed** — they asserted
    the flag was on the row's node, which was true and irrelevant. The next attempt needs
    a different mechanism, and a hardware check before it is believed.
-3. **Thirteen screens still name their icon buttons only in a tooltip**, so Orca
-   says "button" for each. Listed by name in `_knownTooltipOnly`
-   (`test/a11y_net_test.dart`), where the sweep skips them with a reason rather
-   than passing silently. Each is the same one-line change.
-Order of the remaining three, quickest first: the icon buttons (3), the silent
-delete (1), then the checkbox (2).
+3. **The generator's Copy button does not say "Copied"** (round 25). The copy
+   works and the button's name does change, but the name changed under a control
+   that already had focus, so Orca never re-reads it. Fixable, unlike item 2:
+   copying moves no focus, and an announcement is reliably heard when nothing
+   else is speaking (round 22). `GeneratorWidget` has no platform flag, so both
+   call sites — `generator_screen.dart` and `create_entry_screen.dart` — must
+   pass one to keep Android silent.
 
-**Merge gate:** master once an Orca round covering the three above passes on Linux, the
+Order, quickest first: Copied (3), the silent delete (1), the checkbox (2).
+
+**Merge gate:** master once an Orca round covering the items above passes on Linux, the
 Android TalkBack spot-check stays green, and the matrix's core-vault-operations section
 passes.
 
