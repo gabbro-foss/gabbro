@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:gabbro/autotype_target.dart';
 import 'package:gabbro/clipboard_clear.dart';
 import 'package:gabbro/control_scale.dart';
@@ -101,9 +102,16 @@ class EntryDetailScreen extends StatefulWidget {
   /// bottom-right corner; the phone full-screen route (no FAB) leaves it 0.
   final double bottomReserve;
 
-  const EntryDetailScreen({
+  /// Whether this is running on Android. Only the copy announcement depends on
+  /// it, and only Linux gets one: TalkBack reads the snackbar itself, and an
+  /// announcement would make it drop its speech queue. Tests simulating Android
+  /// can pass `isAndroid: true`.
+  final bool isAndroid;
+
+  EntryDetailScreen({
     super.key,
     required this.entry,
+    bool? isAndroid,
     this.onDeleteEntry = _defaultDelete,
     this.clipboardClearTimeout = ClipboardClearTimeout.sixtySeconds,
     this.onFetchHistory = _defaultFetchHistory,
@@ -114,7 +122,7 @@ class EntryDetailScreen extends StatefulWidget {
     this.onEdited,
     this.exportFilePicker = _defaultExportFilePicker,
     this.bottomReserve = 0,
-  });
+  }) : isAndroid = isAndroid ?? Platform.isAndroid;
 
   @override
   State<EntryDetailScreen> createState() => _EntryDetailScreenState();
@@ -728,6 +736,17 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(label), duration: const Duration(seconds: 3)),
       );
+      // A Linux screen reader never sees the snackbar: it reads a node's name
+      // and is not told one appeared, so copying was completely silent
+      // (round 26). The copy moves no focus, so this has nothing competing
+      // with it. Same text, so no new translations.
+      if (!widget.isAndroid) {
+        SemanticsService.sendAnnouncement(
+          View.of(context),
+          label,
+          Directionality.of(context),
+        );
+      }
     }
   }
 

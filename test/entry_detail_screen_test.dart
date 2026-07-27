@@ -71,9 +71,11 @@ Widget _buildScreen(
   Future<void> Function(String url)? onLaunchUrl,
   Future<String?> Function(String filename)? exportFilePicker,
   Future<List<HistoryRecordData>> Function(String id)? onFetchHistory,
+  bool isAndroid = false,
 }) =>
     testApp(EntryDetailScreen(
       entry: entry,
+      isAndroid: isAndroid,
       onDeleteEntry: onDeleteEntry ?? (_) async {},
       clipboardClearTimeout: clipboardClearTimeout,
       onLaunchUrl: onLaunchUrl ?? (_) async {},
@@ -233,6 +235,45 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.textContaining('Copied'), findsOneWidget);
+  });
+
+  // Round 26 (Orca): copying from the detail pane said nothing — the snackbar
+  // that confirms it is invisible to a Linux screen reader, which reads only a
+  // node's name and never sees a snackbar appear. Copying moves no focus, so an
+  // announcement of the same text has nothing competing with it.
+  testWidgets('copying says so out loud', (tester) async {
+    final said = recordAnnouncements(tester);
+    recordClipboardWrites(tester);
+    await tester.pumpWidget(
+      _buildScreen(VaultEntryData.login(_loginEntry())),
+    );
+
+    await tester.tap(find.byIcon(Icons.copy_outlined).first);
+    await tester.pumpAndSettle();
+
+    expect(
+      said.where((s) => s.contains('Copied')),
+      hasLength(1),
+      reason: 'nothing tells a screen-reader user the copy happened: $said',
+    );
+  });
+
+  testWidgets('Android: copying announces nothing', (tester) async {
+    final said = recordAnnouncements(tester);
+    recordClipboardWrites(tester);
+    await tester.pumpWidget(
+      _buildScreen(VaultEntryData.login(_loginEntry()), isAndroid: true),
+    );
+
+    await tester.tap(find.byIcon(Icons.copy_outlined).first);
+    await tester.pumpAndSettle();
+
+    expect(
+      said,
+      isEmpty,
+      reason: 'TalkBack reads the snackbar itself and drops its queue for an '
+          'announcement: $said',
+    );
   });
 
   testWidgets('delete icon shows confirmation dialog', (tester) async {
