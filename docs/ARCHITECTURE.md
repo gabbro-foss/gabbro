@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1884 | 10 |
+| Flutter (`flutter test`) | 1936 | 23 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -128,9 +128,34 @@ source, see LEARNINGS.md): on Linux a screen reader is given only a node's NAME.
 never read and `liveRegion` is inert, so anything event-shaped has to go through
 `SemanticsService.announce()`. Android does read hints, passes today, and must not regress.
 
+**Done and hardware-passed (rounds 22-23)**
+
+- The new-entry picker said each of the six types twice; the row icon's
+  `semanticLabel` is gone and the title carries it alone.
+- Ctrl+Shift+F, Ctrl+M, Ctrl+Q and the new-entry sheet announce themselves via
+  `SemanticsService.sendAnnouncement`. Ctrl+F deliberately does not: it lands in
+  the named search region and the box's own name already carries its shortcuts.
+- Icon-only buttons on the **vault list and entry detail** now carry a
+  `semanticLabel` beside their tooltip. Orca reads a control's name and never its
+  tooltip, so every one of them said only "button".
+- The lock-and-quit confirm carries `semanticLabel`, so its question is read.
+  Flutter supplies a default dialog name on Android only.
+
+**Attempted and reverted (round 22).** Replacing each region's named Semantics
+container with an announcement on focus entry. Announcements leave the Linux
+embedder as ATK **polite**, and Orca discards a polite notification while it is
+speaking — which it always is right after a focus change. Region entry went
+silent on hardware. The named container is back; the entry list therefore
+repeats its region name on every arrow press, which the maintainer has accepted
+(round 23) as better than silence.
+
 **To do**
 
-1. **Ticking a checkbox is announced only after moving away and back** (round 17).
+1. **Focus frame stuck after deleting an entry** (round 23). The list keeps its
+   frame after a delete until you Tab past it again, so the app shows focus in a
+   region focus has left. Pre-existing — `focus_region.dart` is unchanged from
+   before this work.
+2. **Ticking a checkbox is announced only after moving away and back** (round 17).
    Cause established: the row takes focus but the checked state lives on a separate
    checkbox node beneath it, and a reader only announces state changes on the FOCUSED
    object. **One attempt was made and REVERTED (round 19).** Moving `checked` onto the
@@ -139,26 +164,12 @@ never read and `liveRegion` is inert, so anything event-shaped has to go through
    frame stuck with Esc unable to clear it. **Its unit tests all passed** — they asserted
    the flag was on the row's node, which was true and irrelevant. The next attempt needs
    a different mechanism, and a hardware check before it is believed.
-2. **Ctrl+N's dialog repeats its labels** (round 16) — **cause found, one line.**
-   `_showTypePicker` gives the row icon `semanticLabel: t.$2`, the same text as the
-   row title, so each type is said twice. Identical to the round 18 entry-row fix.
-   The missing "new entry" is a separate lack: the sheet has no name, so it needs an
-   announce() from item 3.
-3. **Announcements — one package.** All of it needs `SemanticsService.announce()`
-   (verified wired on Linux, round 16); none of it can be done with a named container.
-   Reuses labels that already exist in all 37 locales — no new translations.
-   - Ctrl+F, Ctrl+Shift+F, Ctrl+M and Ctrl+Q say nothing when pressed; the new-entry
-     sheet does not say what it is.
-   - The entry list repeats its region name on every arrow move — announcing region
-     entry explicitly replaces the named-container mechanism that causes it. **This
-     sub-item is the risky one:** the named container is what makes region entry
-     audible at all today.
-
-**Cost, assessed 2026-07-26.** Item 2's duplicate label is quick and has a passed
-precedent. Item 3 is small, repetitive code whose real cost is that nothing counts
-until Orca says it. Item 1 is hard — one mechanism already failed on hardware while
-its unit tests passed. **Plan: item 2 + all of item 3 in one build, so a single Orca
-round covers them; then item 1 alone, with nothing else in the build.**
+3. **Thirteen screens still name their icon buttons only in a tooltip**, so Orca
+   says "button" for each. Listed by name in `_knownTooltipOnly`
+   (`test/a11y_net_test.dart`), where the sweep skips them with a reason rather
+   than passing silently. Each is the same one-line change.
+4. **The search box's name is too long to sit through** (round 22) — it carries
+   the placeholder, what typing does, and both shortcuts. Needs a wording call.
 
 **Merge gate:** master once an Orca round covering the three above passes on Linux, the
 Android TalkBack spot-check stays green, and the matrix's core-vault-operations section
