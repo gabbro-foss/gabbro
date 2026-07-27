@@ -123,10 +123,22 @@ failure and its cause is in LEARNINGS.md. Phases are hardware-tested one at a ti
 
 Phases 1-3, D5 and the Phase 4 control speech are done and hardware-passed (rounds 13-17).
 
-**Phase 4 — a11y. The constraint everything here obeys** (proven from the Flutter engine
-source, see LEARNINGS.md): on Linux a screen reader is given only a node's NAME. `hint` is
-never read and `liveRegion` is inert, so anything event-shaped has to go through
-`SemanticsService.announce()`. Android does read hints, passes today, and must not regress.
+**Phase 4 — a11y. The two constraints everything here obeys** (both proven from the
+Flutter engine source, see LEARNINGS.md):
+
+1. On Linux a screen reader is given only a node's **NAME**. `hint` is never read,
+   `liveRegion` is inert and `tooltip` is never copied, so a name is the only thing that
+   reaches Orca for anything that sits still. Android does read hints, passes today, and
+   must not regress.
+2. `SemanticsService.sendAnnouncement` (not the deprecated `announce`) leaves the embedder
+   as ATK **polite**, and Orca discards a polite notification while it is speaking. So an
+   announcement is only heard when **no focus change follows it** — that is why "Copied",
+   "Menu" and the delete all work, and why region entry did not (round 22).
+
+**The pattern that has worked every time:** when something changes with no focus move,
+speak the text the UI already shows for it. No new strings, and it stays true if the UI
+wording changes. Assertiveness is not a way round constraint 2 — it wins the race by
+talking over the thing the user just moved to.
 
 **Done and hardware-passed (rounds 22-23)**
 
@@ -181,7 +193,15 @@ repeats its region name on every arrow press, which the maintainer has accepted
    frame stuck with Esc unable to clear it. **Its unit tests all passed** — they asserted
    the flag was on the row's node, which was true and irrelevant. The next attempt needs
    a different mechanism, and a hardware check before it is believed.
-The checkbox is the last item in the a11y layer.
+
+   **Untried lead, from rounds 26-27:** a tick is a change under a control that ALREADY
+   has focus — the same shape as the Copy button renaming itself to "Copied", which was
+   equally silent and was fixed by announcing instead. Ticking moves no focus, so
+   constraint 2 is satisfied. Before coding, establish on hardware what Orca says today
+   when a row is ticked (nothing at all, or the row re-read without its state) — the two
+   need different fixes, and guessing between them is what lost rounds 19 and 22.
+
+This is the last item in the a11y layer.
 
 **Merge gate:** master once an Orca round covering the items above passes on Linux, the
 Android TalkBack spot-check stays green, and the matrix's core-vault-operations section
