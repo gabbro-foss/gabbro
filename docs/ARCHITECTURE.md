@@ -115,84 +115,16 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Keyboard accessibility sweep — branch `keyboard_accessibility_sweep` (pushed, NOT merged).**
+**Run the full gate (`gabbro_test`) before any other feature work.**
 
-Spec + mechanism as built: [KEYBOARD_NAV.md](KEYBOARD_NAV.md). **Linux desktop only**;
-"narrow/wide" = layout WIDTH, not platform. Hardware matrix in `.scratchpad`; every hardware
-failure and its cause is in LEARNINGS.md. Phases are hardware-tested one at a time.
+The keyboard accessibility sweep is finished and hardware-passed — the a11y layer,
+the Android TalkBack spot-check and the core-vault-operations matrix all pass
+(rounds 13-31). What is left is mechanical: push `keyboard_accessibility_sweep`
+and merge it to master.
 
-Phases 1-3, D5 and the Phase 4 control speech are done and hardware-passed (rounds 13-17).
-
-**Phase 4 — a11y. The two constraints everything here obeys** (both proven from the
-Flutter engine source, see LEARNINGS.md):
-
-1. On Linux a screen reader is given only a node's **NAME**. `hint` is never read,
-   `liveRegion` is inert and `tooltip` is never copied, so a name is the only thing that
-   reaches Orca for anything that sits still. Android does read hints, passes today, and
-   must not regress.
-2. `SemanticsService.sendAnnouncement` (not the deprecated `announce`) leaves the embedder
-   as ATK **polite**, and Orca discards a polite notification while it is speaking. So an
-   announcement is only heard when **no focus change follows it** — that is why "Copied",
-   "Menu" and the delete all work, and why region entry did not (round 22).
-
-**The pattern that has worked every time:** when something changes with no focus move,
-speak the text the UI already shows for it. No new strings, and it stays true if the UI
-wording changes. Assertiveness is not a way round constraint 2 — it wins the race by
-talking over the thing the user just moved to.
-
-**Done and hardware-passed (rounds 22-30)**
-
-- The new-entry picker said each of the six types twice; the row icon's
-  `semanticLabel` is gone and the title carries it alone.
-- Ctrl+Shift+F, Ctrl+M, Ctrl+Q and the new-entry sheet announce themselves via
-  `SemanticsService.sendAnnouncement`. Ctrl+F deliberately does not: it lands in
-  the named search region and the box's own name already carries its shortcuts.
-- Icon-only buttons on the **vault list and entry detail** now carry a
-  `semanticLabel` beside their tooltip. Orca reads a control's name and never its
-  tooltip, so every one of them said only "button".
-- The lock-and-quit confirm carries `semanticLabel`, so its question is read.
-  Flutter supplies a default dialog name on Android only.
-- The search box says one thing, not five (round 24). It was reciting its
-  placeholder, what typing does and both shortcuts; the region above already
-  says "Search" and the shortcuts are on the Keyboard shortcuts screen.
-- Every remaining icon-only control is named (round 25) — unlock, generator,
-  help, manage folders/vaults, export, import, change passphrase, review
-  changes, onboarding. The a11y net sweeps all 33 catalog screens for
-  `tooltip.isNotEmpty && label.isEmpty` with no skips left. The help screen's
-  tap-to-enlarge image needed `MergeSemantics` instead: it is a `Tooltip` around
-  a picture, so the name had to be merged onto the node carrying the tap.
-- Copying a secret says so (rounds 26-27), in the generator and the entry detail
-  pane. Both were silent: the generator's button renames itself to "Copied" and
-  the detail pane shows a snackbar, and Linux reads neither — a name that changes
-  under an already-focused control is not re-read, and a snackbar is not seen at
-  all. The detail pane speaks the snackbar's own text, so it also says when the
-  clipboard will clear. `GeneratorWidget` and `EntryDetailScreen` gained an
-  `isAndroid` flag defaulting to `Platform.isAndroid`, so Android stays silent.
-- Deleting the open entry says what replaced it (round 28). In two panes the
-  detail pane vanishes and the empty state takes its place with nothing moving
-  focus, so it was silent; it now speaks the empty state's own visible text
-  ("Select an entry"). The narrow layout is untouched — it pops back to the
-  list, a screen change Orca already handles (hardware-confirmed).
-- Ticking an entry says how many are selected (round 30). The tick state sits
-  on the checkbox node beneath the row, and a reader only announces a state
-  change on the object it is already on, so a tick was silent until you moved
-  away and came back. It now speaks the app bar's own selection count. The
-  three hand-copied toggle bodies became one `_toggleSelection`, so both
-  layouts and both tick paths speak from the same line. Space is echoed by
-  Orca as "space" and the announcement still landed — the race is with a focus
-  change, not with speech.
-
-**Attempted and reverted (round 22).** Replacing each region's named Semantics
-container with an announcement on focus entry. Announcements leave the Linux
-embedder as ATK **polite**, and Orca discards a polite notification while it is
-speaking — which it always is right after a focus change. Region entry went
-silent on hardware. The named container is back; the entry list therefore
-repeats its region name on every arrow press, which the maintainer has accepted
-(round 23) as better than silence.
-
-**To do — the merge gate.** The a11y layer is complete: every item above has passed on
-Linux hardware. Before master, the Android TalkBack spot-check must stay green and the
-matrix's core-vault-operations section must pass.
+Spec and mechanism as built: [KEYBOARD_NAV.md](KEYBOARD_NAV.md). Every hardware
+failure and its cause is in LEARNINGS.md — read those two before touching the
+semantics or focus code again, not this section.
 
 ---
 

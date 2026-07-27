@@ -1,11 +1,10 @@
 # Keyboard Navigation — Design Spec
 
-Status: approved. Phases 1–3 built and hardware-passed on branch
-`keyboard_accessibility_sweep` (NOT merged); D5 (highlight gated to Linux)
-hardware-passed at round 14. Open: the a11y layer.
-See ARCHITECTURE.md `### Next task`
-for state, `.scratchpad` for the hardware matrix. Supersedes the ad-hoc Tab
-behaviour surfaced in round-2 hardware testing (illogical order, no visible focus).
+Status: built. Every phase, D5 (highlight gated to Linux) and the a11y layer are
+hardware-passed on branch `keyboard_accessibility_sweep` (rounds 13-31; NOT yet
+merged). Why each mechanism is what it is — and what failed on hardware first —
+is in LEARNINGS.md. Supersedes the ad-hoc Tab behaviour surfaced in round-2
+hardware testing (illogical order, no visible focus).
 
 ## Model in one sentence
 

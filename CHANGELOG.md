@@ -8,31 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- **Desktop keyboard shortcuts (Linux).** `Ctrl+L` locks the vault, `Ctrl+F` focuses search (`Ctrl+Shift+F` searches all fields), and `Esc` dismisses dialogs — including a safe cancel (rollback) of the sync review and import-failures flows. A **Keyboard shortcuts** item in the vault menu opens an in-app reference screen (desktop-only; localized across all 37 languages). No copy shortcut by design — copying a secret stays a deliberate, auto-clearing action.
+- **Desktop keyboard shortcuts (Linux).** `Ctrl+L` locks the vault, `Ctrl+Q` locks and quits (asking first, the same confirm as the menu item), `Ctrl+F` focuses search (`Ctrl+Shift+F` searches all fields), `Ctrl+N` starts a new entry, `Ctrl+M` opens the menu, and `Esc` dismisses dialogs — including a safe cancel (rollback) of the sync review and import-failures flows. A **Keyboard shortcuts** item in the vault menu opens an in-app reference screen (desktop-only; localized across all 37 languages). No copy shortcut by design — copying a secret stays a deliberate, auto-clearing action.
 
-<!-- Nothing is added here until the branch merges. See ARCHITECTURE.md `### Next task`.
-     At merge, add under Fixed: the folder selector was a 28dp tap target on a wide
-     window (the 48dp minimum was applied to the narrow layout only).
-     At merge, add under Fixed: on a wide window a deleted entry could stay in the
-     list until the window was refocused.
-     At merge, add under Added: Ctrl+Q asks to lock and quit (same confirm as the
-     menu item), listed on the keyboard shortcuts screen.
-     At merge, add under Added: screen-reader support — the search box, category chips,
-     folder selector and entry rows say what they DO, and each region is named (Linux),
-     in all 37 languages; the search box also names its two shortcuts.
-     At merge, add under Added: icon-only buttons on the vault list and entry detail
-     say what they are to a screen reader, and the lock-and-quit confirm reads its
-     question; Ctrl+Shift+F, Ctrl+M, Ctrl+Q and the new-entry sheet announce themselves.
-     At merge, add under Fixed: the new-entry type picker said each entry type twice.
-     At merge, add under Added: every icon-only control across the app now says what it
-     is to a screen reader, in all 37 languages; the search box says one thing instead
-     of reciting its placeholder and both shortcuts.
-     At merge, add under Added: copying a secret is spoken aloud, in the generator and
-     the entry detail pane, including when the clipboard will clear.
-     At merge, add under Added: deleting the open entry on a wide window says what
-     replaced it, instead of emptying the pane in silence.
-     At merge, add under Added: ticking an entry in selection mode says how many are
-     selected, instead of being silent until you move away and back. -->
+- **Keyboard navigation (Linux).** `Tab` / `Shift+Tab` move between a screen's regions — search, folders, filters, entry list, details — and the arrow keys move within the focused one. `Enter` or `Space` activates, `Esc` steps back out. The focused region is outlined, so it is always visible where the keyboard is.
+- **Screen-reader support (Linux, all 37 languages).** Every control now says what it is and what it does — the search box, category chips, folder selector and entry rows, and every icon-only button across the app, all of which a reader previously announced as just "button". Each region is named, and the lock-and-quit confirm reads its question.
+- **Actions that change nothing visible are now spoken (Linux).** Copying a secret says so, in the generator and the entry detail pane, including when the clipboard will clear; ticking an entry says how many are selected; deleting the open entry says what replaced it; and `Ctrl+Shift+F`, `Ctrl+M`, `Ctrl+Q` and the new-entry sheet announce themselves.
+
+### Fixed
+- **The new-entry type picker said each entry type twice** to a screen reader.
+- **The folder selector was a 28dp tap target on a wide window** — the 48dp minimum was applied to the narrow layout only.
+- **On a wide window a deleted entry could stay in the list** until the window was refocused.
 
 
 ## [0.1.0-alpha.16] – 2026-07-22
