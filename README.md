@@ -36,6 +36,23 @@ Named after the intrusive igneous rock — hard, stable, enduring.
 
 ---
 
+## Screenshots
+
+<table>
+  <tr>
+    <td width="33%"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/03_vault_list.png" width="100%" alt="Vault list: entries grouped alphabetically by first letter, with a search box, a folder filter and type filter chips."></td>
+    <td width="33%"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/09_generator_passphrase.png" width="100%" alt="Passphrase generator: a five-word passphrase with its entropy in bits, plus language, word count, separator and capitalisation controls."></td>
+    <td width="33%"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/05_password_breakdown.png" width="100%" alt="Password breakdown sheet: each character of a password colour-coded as uppercase, lowercase or digit, with its position index."></td>
+  </tr>
+  <tr>
+    <td align="center">Your vault</td>
+    <td align="center">Passphrase generator</td>
+    <td align="center">Password breakdown</td>
+  </tr>
+</table>
+
+---
+
 ## Tech Stack
 
 | Layer | Technology |
@@ -298,15 +315,18 @@ Verify the signing fingerprint on first install (below); Obtainium pins it there
 
 Before installing, confirm the APK was signed by the project's key — this proves
 it has not been tampered with or repackaged. The signing certificate's public
-SHA-256 fingerprint is:
+SHA-256 fingerprint is (package name, then fingerprint — copy both lines as they
+are, AppVerifier pastes them directly):
 
 ```
-Package: app.gabbro.gabbro
-SHA-256: 0F:0A:B8:1B:9B:B8:F0:21:68:25:83:73:17:C6:49:F3:64:F4:47:B0:D0:93:5B:FA:1B:67:82:A9:FF:3A:1D:2C
+app.gabbro.gabbro
+0F:0A:B8:1B:9B:B8:F0:21:68:25:83:73:17:C6:49:F3:64:F4:47:B0:D0:93:5B:FA:1B:67:82:A9:FF:3A:1D:2C
 ```
 
 - **GrapheneOS / Accrescent users:** install [AppVerifier](https://github.com/soupslurpr/AppVerifier),
   open it, pick Gabbro (or the APK file), and check the reported hash matches the one above.
+  To compare by paste instead, copy the two lines above verbatim — AppVerifier rejects them
+  if a `Package:` or `SHA-256:` label is included.
 - **Any platform:** run `apksigner verify --print-certs gabbro-<version>-android-<abi>.apk` and compare the
   `SHA-256` certificate digest (`<abi>` is whichever file you downloaded — `arm64-v8a`, `armeabi-v7a` or `x86_64`). All three per-ABI APKs are signed by the same key and share this fingerprint.
 
