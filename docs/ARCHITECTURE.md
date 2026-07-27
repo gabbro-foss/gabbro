@@ -152,6 +152,15 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - See if vault `syncing` can do without a second `passphrase + yubikey` if and only if the current vault and the incoming vault share the same `alias`, `passphrase`, `yubikey(s)`
 - in `sync` path, we currently have `auto-merge` and `review all changes`, the `auto-merge` is additive only (check and verify) and therefore never deletes items in the receiving vault: (1) add a message that explains this (or the correct) behaviour to the user, (2) add a third `sync` mechanism that simply takes the incoming vault and clobbers the existing one - discuss this
 
+### Code Quality
+- **Can the auto-type fill error carry secret material to stdout?** `lib/main.dart:478`
+  prints the exception text from `autotypeFill`, and `debugPrint` writes in release builds
+  too — visible to anyone who launched Gabbro from a terminal. The fill runs in Rust, so the
+  error is expected to be something like "window not found", but that is untraced. If it can
+  never carry secret material, leave all three auto-type prints (`main.dart:459, 462, 478`)
+  as useful diagnostics for a feature that talks to X11; if it can, silence that one in
+  release. Answer the question before changing anything.
+
 ### Security (pre-v1)
 - Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
 
