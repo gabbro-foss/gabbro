@@ -3,12 +3,9 @@ import 'package:flutter/semantics.dart';
 import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
-import 'package:gabbro/screens/about_screen.dart';
 import 'package:gabbro/screens/alphabet_index_bar.dart';
-import 'package:gabbro/screens/appearance_screen.dart';
 import 'package:gabbro/screens/entry_detail_screen.dart';
 import 'package:gabbro/screens/section_index.dart';
-import 'package:gabbro/screens/security_screen.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/widgets/focus_region.dart';
@@ -20,11 +17,12 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 // Two-pane layout for screens ≥600dp wide.
 //
 // Structure (left → right):
-//   NavigationRail (≈68dp) | AlphabetIndexBar (≈28dp) | list pane | detail pane
+//   AlphabetIndexBar (≈28dp) | list pane | detail pane
 //
-// The NavigationRail handles Vault / Appearance / Security / About.
-// Vault operations (export, import, etc.) remain in the app-bar popup menu,
-// which is owned by the parent VaultListScreen.
+// Appearance / Security / About, and every vault operation (export, import,
+// etc.), live in the app-bar popup menu owned by the parent VaultListScreen.
+// A NavigationRail used to offer the first three as well; it was removed as a
+// second way to the same screens.
 //
 // Interaction states:
 //   browse   — list selection active, detail shows selected entry or empty state
@@ -80,9 +78,6 @@ class TabletVaultLayout extends StatefulWidget {
   /// Called when the list needs refreshing (after edit/delete).
   final void Function() onRefresh;
 
-  /// The vault path — needed for navigation targets that require it.
-  final String vaultPath;
-
   /// Clipboard clear timeout from settings.
   final ClipboardClearTimeout clipboardClearTimeout;
 
@@ -126,7 +121,6 @@ class TabletVaultLayout extends StatefulWidget {
     required this.searchActive,
     required this.onEntryTap,
     required this.onRefresh,
-    required this.vaultPath,
     required this.clipboardClearTimeout,
     this.getEntryFn,
     this.onDeleteEntryFn,
@@ -144,10 +138,6 @@ class TabletVaultLayout extends StatefulWidget {
 class _TabletVaultLayoutState extends State<TabletVaultLayout> {
   // Currently selected entry id — null means empty state in detail pane.
   String? _selectedEntryId;
-
-  // NavigationRail destination index.
-  // 0 = Vault (default), 1 = Appearance, 2 = Security, 3 = About
-  int _railIndex = 0;
 
   final ItemScrollController _itemScrollController = ItemScrollController();
 
@@ -171,35 +161,6 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
         !widget.filteredEntries.any((e) => e.id == _selectedEntryId)) {
       setState(() => _selectedEntryId = null);
     }
-  }
-
-  void _onRailDestinationSelected(int index) {
-    if (index == 0) {
-      // Already on Vault — nothing to do.
-      setState(() => _railIndex = 0);
-      return;
-    }
-    setState(() => _railIndex = index);
-    // Push the target screen. On return, reset to Vault tab.
-    Widget screen;
-    switch (index) {
-      case 1:
-        screen = const AppearanceScreen();
-      case 2:
-        final appState = GabbroApp.of(context);
-        screen = SecurityScreen(
-          settings: appState.settings,
-          onUpdate: (updated) => appState.updateSettings(updated),
-          vaultPath: widget.vaultPath,
-        );
-      case 3:
-        screen = const AboutScreen();
-      default:
-        return;
-    }
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (_) => screen))
-        .then((_) => setState(() => _railIndex = 0));
   }
 
   Widget _buildEmptyState(BuildContext context) {
@@ -283,10 +244,24 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
 
   Widget _buildListPane(BuildContext context) {
     final theme = Theme.of(context);
-    return Column(
+    // At a large text scale the search box and the filter chips grow tall
+    // enough to fill the window on their own. Only the list below them could
+    // give way, so the pane ran off the bottom and the last entries could not
+    // be reached (262px over, at 4x text on a 900x700 window). Cap the header
+    // at 60% of the pane and let it scroll within that, so the list always
+    // keeps the remaining 40%. At normal text the header is far shorter than
+    // the cap, so the constraint is inert and the layout is unchanged.
+    return LayoutBuilder(builder: (context, constraints) => Column(
       children: [
-        widget.searchBar,
-        widget.filterChipRow,
+        ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: constraints.maxHeight * 0.6),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [widget.searchBar, widget.filterChipRow],
+            ),
+          ),
+        ),
         Expanded(
           child: _region(
             widget.listScope,
@@ -449,7 +424,7 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
           ),
         ),
       ],
-    );
+    ));
   }
 
   /// Wrap a pane in its Tab-cycle region (FocusScope for identity + FocusRegion
@@ -494,15 +469,11 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
   String? _ownNameLabel({String? outcome}) =>
       outcome != null && _keyboardNav ? '' : null;
 
-  /// The nav rail is excluded from the Tab cycle (no scope of its own) but still
-  /// shows a frame when focus reaches it — on desktop only.
-  Widget _railFrame(Widget child) =>
-      _keyboardNav ? FocusRegion(child: child) : child;
-
-  // Maximum list pane width: always leaves ≥200dp for the detail pane and
-  // the navigation rail (~100dp combined). Grows naturally on wide screens.
+  // Maximum list pane width: always leaves ≥200dp for the detail pane. Grows
+  // naturally on wide screens. Was 300dp while the nav rail took ~100dp of the
+  // row; with the rail gone that 100dp was reserved for nothing.
   double _maxListPaneWidth(BuildContext context) =>
-      (MediaQuery.sizeOf(context).width - 300.0).clamp(180.0, double.infinity);
+      (MediaQuery.sizeOf(context).width - 200.0).clamp(180.0, double.infinity);
 
   @override
   Widget build(BuildContext context) {
@@ -515,37 +486,6 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
 
     return Row(
       children: [
-        // ── Navigation rail ────────────────────────────────────────────────
-        _railFrame(
-          NavigationRail(
-          selectedIndex: _railIndex,
-          onDestinationSelected: _onRailDestinationSelected,
-          labelType: NavigationRailLabelType.all,
-          destinations: [
-            NavigationRailDestination(
-              icon: Icon(Icons.lock_outline, size: scaledIconSize(context)),
-              selectedIcon: Icon(Icons.lock, size: scaledIconSize(context)),
-              label: Text(l.navVault),
-            ),
-            NavigationRailDestination(
-              icon: Icon(Icons.palette_outlined, size: scaledIconSize(context)),
-              selectedIcon: Icon(Icons.palette, size: scaledIconSize(context)),
-              label: Text(l.appearanceTitle),
-            ),
-            NavigationRailDestination(
-              icon: Icon(Icons.security_outlined, size: scaledIconSize(context)),
-              selectedIcon: Icon(Icons.security, size: scaledIconSize(context)),
-              label: Text(l.securityTitle),
-            ),
-            NavigationRailDestination(
-              icon: Icon(Icons.info_outline, size: scaledIconSize(context)),
-              selectedIcon: Icon(Icons.info, size: scaledIconSize(context)),
-              label: Text(l.navAbout),
-            ),
-          ],
-        ),
-        ),
-        const VerticalDivider(width: 1),
         // ── List pane (resizable) ──────────────────────────────────────────
         SizedBox(
           key: const ValueKey('tablet-list-pane'),

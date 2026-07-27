@@ -1656,6 +1656,7 @@ class _VaultListScreenState extends State<VaultListScreen>
             // never its tooltip, so a tooltip alone leaves this saying "button".
             icon: Icon(
               _fullTextSearch ? Icons.manage_search : Icons.search,
+              size: scaledIconSize(context),
               semanticLabel: _fullTextSearch
                   ? l.searchAllFieldsTooltip
                   : l.searchByTitleTooltip,
@@ -1667,7 +1668,7 @@ class _VaultListScreenState extends State<VaultListScreen>
           ),
           suffixIcon: _searchQuery.isNotEmpty
               ? IconButton(
-                  icon: const Icon(Icons.clear),
+                  icon: Icon(Icons.clear, size: scaledIconSize(context)),
                   tooltip: l.tooltipClearSearch,
                   onPressed: () => setState(() {
                     _searchQuery = '';
@@ -2158,7 +2159,6 @@ class _VaultListScreenState extends State<VaultListScreen>
               selectionMode: _selectionMode,
               selectedIds: _selectedIds,
               onToggleSelection: _toggleSelection,
-              vaultPath: widget.vaultPath,
               clipboardClearTimeout:
                   GabbroApp.maybeOf(context)?.settings.clipboardClearTimeout ??
                   ClipboardClearTimeout.sixtySeconds,

@@ -14,7 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Screen-reader support (Linux, all 37 languages).** Every control now says what it is and what it does — the search box, category chips, folder selector and entry rows, and every icon-only button across the app, all of which a reader previously announced as just "button". Each region is named, and the lock-and-quit confirm reads its question.
 - **Actions that change nothing visible are now spoken (Linux).** Copying a secret says so, in the generator and the entry detail pane, including when the clipboard will clear; ticking an entry says how many are selected; deleting the open entry says what replaced it; and `Ctrl+Shift+F`, `Ctrl+M`, `Ctrl+Q` and the new-entry sheet announce themselves.
 
+### Removed
+- **The navigation rail on wide windows.** Its Appearance, Security and About destinations are all in the app-bar menu, which is the single route to them now; its "Vault" destination did nothing. The list pane can be dragged wider than before, since the width the rail reserved is free.
+
 ### Fixed
+- **On a wide window at large text the vault list ran off the bottom of the screen.** The search box and filter chips grew to fill the height and the entry list was left with no room; the last entries could not be reached. The search box and chips now scroll within the top part of the pane, so the list always keeps its share.
+- **The two icons in the search box ignored the text size.** The search-mode toggle (by title / all fields) and the clear button stayed at their default size while every other icon on the screen grew.
 - **The new-entry type picker said each entry type twice** to a screen reader.
 - **The folder selector was a 28dp tap target on a wide window** — the 48dp minimum was applied to the narrow layout only.
 - **On a wide window a deleted entry could stay in the list** until the window was refocused.

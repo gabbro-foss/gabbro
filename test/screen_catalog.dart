@@ -318,7 +318,6 @@ final Map<String, Widget Function()> screens = {
       searchActive: false,
       onEntryTap: (_) {},
       onRefresh: () {},
-      vaultPath: '/tmp/probe.gabbro',
       clipboardClearTimeout: ClipboardClearTimeout.sixtySeconds,
       getEntryFn: (_) => login('secret', 'Some notes'),
       onDeleteEntryFn: (_) async {},

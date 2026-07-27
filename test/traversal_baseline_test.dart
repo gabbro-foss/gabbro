@@ -48,12 +48,11 @@ void main() {
         reason: 'a filter chip must stay keyboard-reachable');
   });
 
-  // Phase 3 DELIBERATE change: the two-pane nav rail is EXCLUDED from the region
-  // Tab-cycle (maintainer decision; KEYBOARD_NAV.md — and it is slated for
-  // removal). So the old "Tab reaches the navigation rail" pin no longer holds.
-  // The floor that DOES hold: the wide layout's content stays keyboard-reachable
-  // — Tab still reaches the search field. Full wide reachability (search/folder/
-  // chips/list/detail) and the rail's exclusion are pinned in
+  // Phase 3 excluded the two-pane nav rail from the region Tab-cycle, and the
+  // rail has since been removed outright, so the old "Tab reaches the navigation
+  // rail" pin is doubly gone. The floor that DOES hold: the wide layout's content
+  // stays keyboard-reachable — Tab still reaches the search field. Full wide
+  // reachability (search/folder/chips/list/detail) is pinned in
   // keyboard_region_cycle_test.dart.
   testWidgets('BASELINE: Tab reaches the search field (wide two-pane)',
       (tester) async {

@@ -5,6 +5,8 @@ import 'package:gabbro/main.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/screens/tablet_vault_layout.dart';
+import 'package:gabbro/screens/about_screen.dart';
+import 'package:gabbro/screens/appearance_screen.dart';
 import 'package:gabbro/screens/security_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
@@ -77,12 +79,20 @@ void _setWidth(WidgetTester tester, double width) {
 void main() {
   group('VaultListScreen - tablet two-pane layout', () {
     // -----------------------------------------------------------------------
-    // Test 1: NavigationRail present at ≥600dp
+    // Test 1: no NavigationRail at any width. It offered Vault (a no-op) plus
+    // Appearance / Security / About, all three of which the app-bar overflow
+    // menu already reaches — see the group at the end of this file, which pins
+    // those routes. Removing it also takes the last widget that sat outside the
+    // keyboard Tab-cycle.
     // -----------------------------------------------------------------------
-    testWidgets('NavigationRail visible at >=600dp', (tester) async {
+    testWidgets('no NavigationRail at either width', (tester) async {
       _setWidth(tester, 700);
       await tester.pumpWidget(_buildScreen());
-      expect(find.byType(NavigationRail), findsOneWidget);
+      expect(find.byType(NavigationRail), findsNothing);
+
+      tester.view.physicalSize = const Size(400, 900);
+      await tester.pumpAndSettle();
+      expect(find.byType(NavigationRail), findsNothing);
     });
 
     // -----------------------------------------------------------------------
@@ -92,15 +102,6 @@ void main() {
       _setWidth(tester, 700);
       await tester.pumpWidget(_buildScreen());
       expect(find.byType(NavigationBar), findsNothing);
-    });
-
-    // -----------------------------------------------------------------------
-    // Test 3: NavigationRail absent below 600dp (phone layout unchanged)
-    // -----------------------------------------------------------------------
-    testWidgets('NavigationRail absent below 600dp', (tester) async {
-      _setWidth(tester, 400);
-      await tester.pumpWidget(_buildScreen());
-      expect(find.byType(NavigationRail), findsNothing);
     });
 
     // -----------------------------------------------------------------------
@@ -198,13 +199,16 @@ void main() {
     // Test 8: Layout switches when width crosses 600dp threshold.
     // -----------------------------------------------------------------------
     testWidgets('layout switches across 600dp threshold', (tester) async {
+      // The resizable list pane is the marker for two-pane mode; it exists only
+      // above the threshold. (The nav rail used to be the marker, but it was a
+      // second route to screens the menu already reaches and has been removed.)
       _setWidth(tester, 400);
       await tester.pumpWidget(_buildScreen());
-      expect(find.byType(NavigationRail), findsNothing);
+      expect(find.byKey(const ValueKey('tablet-list-pane')), findsNothing);
 
       tester.view.physicalSize = const Size(700, 900);
       await tester.pumpAndSettle();
-      expect(find.byType(NavigationRail), findsOneWidget);
+      expect(find.byKey(const ValueKey('tablet-list-pane')), findsOneWidget);
     });
 
     // -----------------------------------------------------------------------
@@ -240,7 +244,6 @@ void main() {
               searchActive: false,
               onEntryTap: (_) {},
               onRefresh: () {},
-              vaultPath: '/tmp/test.gabbro',
               clipboardClearTimeout: ClipboardClearTimeout.sixtySeconds,
               getEntryFn: (_) => _fakeLoginEntry(),
               onDeleteEntryFn: (_) async {},
@@ -287,7 +290,6 @@ void main() {
           searchActive: false,
           onEntryTap: (_) {},
           onRefresh: () {},
-          vaultPath: '/tmp/test.gabbro',
           clipboardClearTimeout: ClipboardClearTimeout.sixtySeconds,
           selectionMode: false,
           selectedIds: const {},
@@ -336,7 +338,6 @@ void main() {
           searchActive: false,
           onEntryTap: (_) {},
           onRefresh: () {},
-          vaultPath: '/tmp/test.gabbro',
           clipboardClearTimeout: ClipboardClearTimeout.sixtySeconds,
           selectionMode: false,
           selectedIds: const {},
@@ -345,7 +346,9 @@ void main() {
       )));
       await tester.pumpAndSettle();
 
-      // Drag far beyond the screen — max for 900dp screen = 900 - 300 = 600dp.
+      // Drag far beyond the screen — max for a 900dp screen = 900 - 200 = 700dp.
+      // The reserve is 200dp (the detail pane's minimum); it was 300dp while the
+      // nav rail took ~100dp of the row.
       await tester.drag(
         find.byKey(const ValueKey('list-pane-divider')),
         const Offset(2000, 0),
@@ -356,7 +359,7 @@ void main() {
         find.byKey(const ValueKey('tablet-list-pane')),
       ) as RenderBox).size.width;
 
-      expect(width, lessThanOrEqualTo(600.0));
+      expect(width, lessThanOrEqualTo(700.0));
     });
 
     // -----------------------------------------------------------------------
@@ -405,7 +408,6 @@ void main() {
               searchActive: false,
               onEntryTap: (_) {},
               onRefresh: () {},
-              vaultPath: '/tmp/test.gabbro',
               clipboardClearTimeout: ClipboardClearTimeout.sixtySeconds,
               getEntryFn: (_) => _fakeLoginEntry(),
               onDeleteEntryFn: (_) async {},
@@ -432,28 +434,76 @@ void main() {
       expect(find.text('Select an entry'), findsOneWidget);
     });
 
-    // -----------------------------------------------------------------------
-    // Test 13: The Security rail destination must hand the vault path to
-    // SecurityScreen. Biometric enrollment is keyed per vault; without the
-    // path the tablet enrolls against "" so it never persists / is never
-    // offered at unlock. The phone layout passes it; the tablet layout did
-    // not (regression once a device crosses the 600dp threshold).
-    // -----------------------------------------------------------------------
-    testWidgets('Security rail destination passes the vault path to SecurityScreen', (
-      tester,
-    ) async {
-      _setWidth(tester, 700);
-      await tester.pumpWidget(_buildScreen());
-      await tester.pumpAndSettle();
+    // Test 13 pinned that the Security *rail destination* handed the vault path
+    // to SecurityScreen — biometric enrollment is keyed per vault, and enrolling
+    // against "" never persists. The rail is gone; the same guarantee is now
+    // pinned on the menu route, at both widths, in the group below.
+  });
 
-      // Tap Security in the NavigationRail (security_outlined is unique to it).
-      await tester.tap(find.byIcon(Icons.security_outlined));
+  // -------------------------------------------------------------------------
+  // Net for removing the NavigationRail. The rail offers Vault / Appearance /
+  // Security / About; "Vault" is a no-op and the other three are also in the
+  // app-bar overflow menu, which is owned by VaultListScreen and so is present
+  // at both layout widths. These pin the menu route before the rail goes, so a
+  // regression shows up as a red test rather than a target with no way in.
+  //
+  // The finders are scoped to the popup menu on purpose: the rail's own labels
+  // are the same words, so an unscoped find.text would be satisfied by the rail
+  // and would keep passing even if the menu item were broken or missing.
+  // -------------------------------------------------------------------------
+  group('settings screens reachable from the overflow menu', () {
+    Future<void> openMenu(WidgetTester tester) async {
+      await tester.tap(find.byIcon(Icons.menu));
       await tester.pumpAndSettle();
+    }
 
-      final security = tester.widget<SecurityScreen>(
-        find.byType(SecurityScreen),
-      );
-      expect(security.vaultPath, '/tmp/test.gabbro');
-    });
+    Finder menuItem(String label) => find.descendant(
+      of: find.byType(PopupMenuItem<String>),
+      matching: find.text(label),
+    );
+
+    for (final width in <double>[700, 400]) {
+      final layout = width >= 600 ? 'wide' : 'narrow';
+
+      testWidgets('Appearance opens from the menu ($layout)', (tester) async {
+        _setWidth(tester, width);
+        await tester.pumpWidget(_buildScreen());
+        await tester.pumpAndSettle();
+        await openMenu(tester);
+        await tester.tap(menuItem('Appearance'));
+        await tester.pumpAndSettle();
+        expect(find.byType(AppearanceScreen), findsOneWidget);
+      });
+
+      testWidgets('About opens from the menu ($layout)', (tester) async {
+        _setWidth(tester, width);
+        await tester.pumpWidget(_buildScreen());
+        await tester.pumpAndSettle();
+        await openMenu(tester);
+        await tester.tap(menuItem('About'));
+        await tester.pumpAndSettle();
+        expect(find.byType(AboutScreen), findsOneWidget);
+      });
+
+      // Biometric enrollment is keyed per vault, so the path has to survive the
+      // menu route as well: with an empty path the vault enrolls against "" and
+      // is never offered at unlock. Test 13 above pins the same thing for the
+      // rail; this is its replacement.
+      testWidgets('Security opens from the menu with the vault path ($layout)', (
+        tester,
+      ) async {
+        _setWidth(tester, width);
+        await tester.pumpWidget(_buildScreen());
+        await tester.pumpAndSettle();
+        await openMenu(tester);
+        await tester.tap(menuItem('Security'));
+        await tester.pumpAndSettle();
+
+        final security = tester.widget<SecurityScreen>(
+          find.byType(SecurityScreen),
+        );
+        expect(security.vaultPath, '/tmp/test.gabbro');
+      });
+    }
   });
 }

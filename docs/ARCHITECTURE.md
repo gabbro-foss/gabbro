@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1966 | 10 |
+| Flutter (`flutter test`) | 1972 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -115,9 +115,22 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Remove the tablet NavigationRail** (`tablet_vault_layout.dart`: Vault /
-Appearance / Security / About). Redundant with the app-bar overflow menu (same
-targets), low utility. Already excluded from the keyboard Tab-cycle.
+**Read the `gabbro_test` result for `remove_tablet_navigation_rail`, then act on it.**
+The gate was started at the end of the previous session (no `--warm` — no dependency
+changed). Nothing else should start until it is read.
+
+- **Green** -> merge to master (`--no-ff`, subject `Merge <branch>: <summary>`, short, no
+  body), push, then delete the branch locally and on origin. No second gate: the merged
+  tree is byte-identical to the one that passed.
+- **Red** -> fix on the branch. Master is unaffected either way.
+
+After the merge the next task is **empty** — pick the next item with the maintainer.
+
+The branch removes the wide-window NavigationRail (its Appearance / Security / About
+destinations are all in the app-bar menu; "Vault" did nothing) and fixes two pre-existing
+large-text defects: the wide list pane ran off the bottom because the search box and chips
+took the whole height, and the two search-box icons never grew with the text size. Tests
+green and hardware-passed.
 
 ---
 
@@ -138,6 +151,15 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
 - See if vault `syncing` can do without a second `passphrase + yubikey` if and only if the current vault and the incoming vault share the same `alias`, `passphrase`, `yubikey(s)`
 - in `sync` path, we currently have `auto-merge` and `review all changes`, the `auto-merge` is additive only (check and verify) and therefore never deletes items in the receiving vault: (1) add a message that explains this (or the correct) behaviour to the user, (2) add a third `sync` mechanism that simply takes the incoming vault and clobbers the existing one - discuss this
+
+### Code Quality
+- **Can the auto-type fill error carry secret material to stdout?** `lib/main.dart:478`
+  prints the exception text from `autotypeFill`, and `debugPrint` writes in release builds
+  too — visible to anyone who launched Gabbro from a terminal. The fill runs in Rust, so the
+  error is expected to be something like "window not found", but that is untraced. If it can
+  never carry secret material, leave all three auto-type prints (`main.dart:459, 462, 478`)
+  as useful diagnostics for a feature that talks to X11; if it can, silence that one in
+  release. Answer the question before changing anything.
 
 ### Security (pre-v1)
 - Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
