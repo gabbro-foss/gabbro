@@ -28,7 +28,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
      is to a screen reader, in all 37 languages; the search box says one thing instead
      of reciting its placeholder and both shortcuts.
      At merge, add under Added: copying a secret is spoken aloud, in the generator and
-     the entry detail pane, including when the clipboard will clear. -->
+     the entry detail pane, including when the clipboard will clear.
+     At merge, add under Added: deleting the open entry on a wide window says what
+     replaced it, instead of emptying the pane in silence. -->
 
 
 ## [0.1.0-alpha.16] – 2026-07-22

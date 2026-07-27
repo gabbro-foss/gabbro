@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1953 | 10 |
+| Flutter (`flutter test`) | 1955 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -156,6 +156,11 @@ never read and `liveRegion` is inert, so anything event-shaped has to go through
   all. The detail pane speaks the snackbar's own text, so it also says when the
   clipboard will clear. `GeneratorWidget` and `EntryDetailScreen` gained an
   `isAndroid` flag defaulting to `Platform.isAndroid`, so Android stays silent.
+- Deleting the open entry says what replaced it (round 28). In two panes the
+  detail pane vanishes and the empty state takes its place with nothing moving
+  focus, so it was silent; it now speaks the empty state's own visible text
+  ("Select an entry"). The narrow layout is untouched — it pops back to the
+  list, a screen change Orca already handles (hardware-confirmed).
 
 **Attempted and reverted (round 22).** Replacing each region's named Semantics
 container with an announcement on focus entry. Announcements leave the Linux
@@ -167,12 +172,7 @@ repeats its region name on every arrow press, which the maintainer has accepted
 
 **To do**
 
-1. **Deleting an entry moves focus silently** (round 23). Deleting from the
-   two-pane detail pane unmounts it and focus lands on a row in the entry list —
-   verified: the frame is correct and arrows work from there. Nothing says so,
-   so the only sign is a frame appearing where you were not looking. Reported as
-   a stuck frame; it is not one. Pre-existing.
-2. **Ticking a checkbox is announced only after moving away and back** (round 17).
+1. **Ticking a checkbox is announced only after moving away and back** (round 17).
    Cause established: the row takes focus but the checked state lives on a separate
    checkbox node beneath it, and a reader only announces state changes on the FOCUSED
    object. **One attempt was made and REVERTED (round 19).** Moving `checked` onto the
@@ -181,7 +181,7 @@ repeats its region name on every arrow press, which the maintainer has accepted
    frame stuck with Esc unable to clear it. **Its unit tests all passed** — they asserted
    the flag was on the row's node, which was true and irrelevant. The next attempt needs
    a different mechanism, and a hardware check before it is believed.
-Order, quickest first: the silent delete (1), then the checkbox (2).
+The checkbox is the last item in the a11y layer.
 
 **Merge gate:** master once an Orca round covering the items above passes on Linux, the
 Android TalkBack spot-check stays green, and the matrix's core-vault-operations section
