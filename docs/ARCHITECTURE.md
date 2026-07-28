@@ -115,46 +115,74 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Sync without a second unlock.** `sync from file` (`lib/screens/vault_list_screen.dart:1068`)
-always asks for the source passphrase, plus PIN and tap when the source is key-protected —
-4 prompts to sync a three-device setup. Investigated 2026-07-27; every scenario reviewed
-and the plan below approved.
+_(empty — agree the next one with the maintainer)_
 
-> **Rule: sync silently when the incoming file's alias matches the open vault's AND the
-> credentials already in the session open it. Anything else falls back to today's
-> credential screen.**
+### Faster sync, attempt 2 — this branch
 
-The session already holds `passphrase` always (`rust/src/vault/session.rs:55`) and
-`vault_key_master` when key-protected (`session.rs:36`), so the whole check stays in Rust
-and no new secret crosses the bridge.
+Branched from master 2026-07-28. Documentation only; no code yet.
 
-| Incoming file, vs the open vault | Outcome |
+**Why attempt 1 failed.** `sync_without_second_unlock` is code-complete, never
+hardware-tested, and its key-protected path is unreachable by construction. The cause was
+process: the assistant applied `net-first` rule 1 (verify the wiring, never trust the
+framing) to the code and never to the premise — how a vault comes to exist on a second
+device — and never asked. Broken alongside it: terse messages, ask-then-wait, and a
+hardware matrix written three times without one being run. **That branch is not to be
+merged, and not to be deleted until picked clean.**
+
+**How it works today** (verified 2026-07-28: `rust/src/vault/session.rs:3757`,
+`lib/screens/vault_list_screen.dart:1095`):
+
+| Action | What the user must supply |
 |---|---|
-| Same vault, key-protected (incl. a diverged YubiKey set) | silent |
-| Same vault, passphrase-only | silent **+ warning** |
-| Different vault sharing passphrase + alias, passphrase-only | silent **+ warning** — indistinguishable from the row above |
-| Alias differs (incl. a passphrase-only downgrade export, which carries none) | credential screen |
-| Anything the held credentials do not open | credential screen |
+| `sync from file`, passphrase-only source | the source file's passphrase |
+| `sync from file`, key-protected source | the source file's passphrase + PIN + tap |
+| `import entries` from another vault | the same, full credentials |
 
-- A key-protected save re-seals the body only (`reseal_vault_body`,
-  `rust/src/crypto/vault_crypto.rs:335`), so the header and the random per-vault master key
-  survive every save, alias change and key add/remove. The cached master opening a file
-  therefore *proves* it is the same vault — no passphrase, no tap, no Argon2.
-- A passphrase-only save re-seals the whole file (`do_save` -> `save_vault` -> `seal_vault`,
-  `session.rs:186`, `rust/src/api/vault.rs:1079`), minting fresh salts each time. Nothing
-  per-vault survives but the alias, so "it opened" proves only *same passphrase* — hence the
-  warning on every passphrase-only silent sync. An entry-UUID-overlap heuristic was
-  considered and **rejected** (cries wolf on an empty or fully-replaced vault); do not
-  re-propose it.
-- The AES-GCM Additional Authenticated Data (AAD) binds a header to its own body only and is
-  computed from the file being opened (`header_aad`, `rust/src/vault/file_format.rs:163`) —
-  it is **not** a cross-file check, so the alias comparison is explicit policy, not crypto.
-- A YubiKey set that differs per device is fine and must **not** be compared: add/remove
+The tap is matched against the **incoming file's** registered keys, never the receiving
+vault's — device A's file syncs into device B using one of A's keys. Each device's vault
+was created locally, so each holds its own random master key.
+
+**The format is not the problem.** A key-protected save re-seals the body only
+(`reseal_vault_body`, `rust/src/crypto/vault_crypto.rs:335`), so the random per-vault master
+survives every save, alias change and key add/remove. Two files sharing a master are
+provably the same vault — no passphrase, no tap, no Argon2id. A "vault identity" field would
+add nothing: two vaults could *claim* to be the same while the body still could not be
+opened.
+
+**The missing piece is a flow, not a field.** There is no way to open an existing `.gabbro`
+file as a vault on a second device. With one, device B unlocks A's file once, registers its
+own keys onto that same master, and every later sync is silent. It cannot live in
+`sync from file` — reaching that screen needs an already-open vault with its own master.
+Candidates: `onboarding_screen`, `unlock_screen`, manage-vaults. **Unverified: whether such
+a flow already exists — check before designing anything.**
+
+**Agreed split:** `sync from file` is the same vault, only ever. `import entries` is any
+other source, always full credentials.
+
+**Salvage from attempt 1, in this order:**
+1. The net tests — green against unchanged production code, so they apply to master as-is.
+2. The Cancel button unreachable at 8x text in the sync-method chooser, and the chooser
+   extraction that carried it. Needs its `warnSamePassphrase` parameter stripped.
+3. Passphrase-only silent sync, rebuilt without the cached-master branch: the probe collapses
+   to one bool and the warning becomes unconditional. Never hardware-tested.
+4. The findings below, and the new Bikeshed Code Quality entry.
+
+**Discard — but not yet.** The cached-master silent path and `open_vault_body_with_master`
+are dead for independently created vaults, and are exactly what an adoption flow would need.
+Keep until that question is settled.
+
+**Findings not to be re-litigated:**
+- A passphrase-only save re-seals the whole file (`session.rs:186`, `rust/src/api/vault.rs:1079`)
+  with fresh salts. Nothing per-vault survives but the alias, so "it opened" proves only
+  *same passphrase* — hence the warning. An entry-UUID-overlap heuristic was **rejected**
+  (cries wolf on an empty or fully-replaced vault); do not re-propose it.
+- The AES-GCM AAD binds a header to its own body only (`rust/src/vault/file_format.rs:163`).
+  Not a cross-file check — the alias comparison is policy, not crypto.
+- A YubiKey set that differs per device is expected and must **not** be compared: add/remove
   rewraps the same master. The hmac-secret salt is random per registration
   (`rust/src/fido/device.rs:123`), so a genuinely different vault always needs a tap.
-
-**Net-first: current sync behaviour is not pinned by tests yet — no production change until
-it is.**
+- The credential screen stays the fallback for every case not proven silent.
+- Nothing here is done until it runs on hardware with mock vaults.
 
 ---
 
@@ -176,6 +204,12 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - in `sync` path, we currently have `auto-merge` and `review all changes`, the `auto-merge` is additive only (check and verify) and therefore never deletes items in the receiving vault: (1) add a message that explains this (or the correct) behaviour to the user, (2) add a third `sync` mechanism that simply takes the incoming vault and clobbers the existing one - discuss this
 
 ### Code Quality
+- **The vault list body overflows at 8x text on a 360dp phone.** A `Column` in
+  `vault_list_screen.dart`, ~232-814 px over. The overflow probe sweeps at 2x, which is why
+  it never saw this. Related: an `AlertDialog`'s `actions` never scroll, so any button left
+  there is unreachable at the maximum text scale — audit every dialog that still puts one
+  there. Found during the sync-without-a-second-unlock investigation.
+
 - **Can the auto-type fill error carry secret material to stdout?** `lib/main.dart:478`
   prints the exception text from `autotypeFill`, and `debugPrint` writes in release builds
   too — visible to anyone who launched Gabbro from a terminal. The fill runs in Rust, so the
