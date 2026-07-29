@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **The navigation rail on wide windows.** Its Appearance, Security and About destinations are all in the app-bar menu, which is the single route to them now; its "Vault" destination did nothing. The list pane can be dragged wider than before, since the width the rail reserved is free.
 
 ### Fixed
+- **After restoring a vault from a file, its safety copy still held the old vault.** Restoring from that safety copy afterwards would have brought the previous vault back. The safety copy is now refreshed to match the vault you restored.
 - **After restoring a vault from a file, fingerprint unlock could stop working with no explanation (Android).** The phone still held the passphrase of the vault that was replaced, so the fingerprint handed over the wrong one. Restoring now turns fingerprint unlock off and says so, the same as changing your passphrase does.
 - **At the largest text size there was no way out of the "How should this sync apply?" dialog.** Cancel sat in the dialog's button row, which does not scroll, so it was pushed off the bottom of a phone screen; the dialog also ran over the edge in 32 of the 37 languages. All three choices now scroll with the rest of the dialog.
 - **Creating a vault could overwrite an existing one.** Pointing "Create vault" at a `.gabbro` file that already exists — what you try when you mean to open your vault on a second device — sealed an empty vault over it. Creating now refuses an occupied path; export, restore and saving are unchanged.

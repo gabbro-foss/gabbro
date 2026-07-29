@@ -73,7 +73,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 655 | 17 |
+| Rust (`cargo test -q`) | 656 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 11 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -179,11 +179,16 @@ notice only for a user who had it on, survives the picker's resume, renders in a
 locales at 8x on a 360dp phone). New ARB key `vaultRestoredBiometricDisabled`,
 translated in all 37.
 
-| # | Pins | Level |
-|---|---|---|
-| R10 | no `.bak` after restore-from-file today, then red for H2 | Rust |
+R10 done. H2 as written was wrong: a mis-picked file is not undo-less, because the
+`.bak` survives and the screen offers it whenever it is usable. The real defect was the
+mirror of H1 — after a restore the `.bak` still held the *previous, unrelated* vault and
+was advertised as this vault's safety copy, so restoring from it handed the old vault
+back. `restore_vault_from_file` now refreshes the `.bak` to the restored bytes
+(`rust/src/vault/io.rs`). 1 red-then-green test.
 
-**Three defects to fix in this branch:**
+**The net is complete: R1–R10 green.**
+
+**Defects found and fixed in this branch:**
 - **H1 — biometrics survive a vault swap at the same path.** `unenroll` fires on passphrase
   change only (`lib/screens/vault_list_screen.dart:1412`); restore-from-file replaces the
   bytes and leaves an enrolment that unlocks with the *previous* vault's passphrase (keyed by
@@ -194,8 +199,8 @@ translated in all 37.
   and say so in the post-restore banner. No Kotlin change; the `unenroll` handler exists
   (`GabbroUnlockHostActivity.kt:140`). Costs one new string in all 37 ARBs.
   **Done 2026-07-29, hardware-verified.**
-- **H2 — restore-from-file rotates no `.bak`** (`rust/src/vault/io.rs:221`). Every other write
-  path does. A mis-picked file destroys the previous vault with no undo.
+- **H2 — restore-from-file left a stale `.bak`.** Recorded as "no undo", which was wrong;
+  see R10 above for what it actually was and how it was fixed. **Done 2026-07-29.**
 - **H3 — the occupied-path refusal reaches the user in English only.** The create screen shows
   "Setup failed: A file already exists at …" (Rust text via `onboarding_screen.dart:515`).
   Needs a localized check in the screen before create is called, all 37 ARBs; the Rust guard
