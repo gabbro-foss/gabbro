@@ -73,7 +73,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 641 | 17 |
+| Rust (`cargo test -q`) | 649 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 11 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -115,7 +115,7 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-Build the net (R1–R10 below). No production change starts until it is green.
+Build the net (R4–R10 below). No production change starts until it is green.
 
 ### Faster sync, attempt 2 — this branch
 
@@ -150,11 +150,10 @@ do not delete until picked clean.**
 
 **The net — R1–R10:**
 
+R1–R3 done: 8 pins in `rust/src/api/vault_bridge.rs`, green in release.
+
 | # | Pins | Level |
 |---|---|---|
-| R1 | passphrase-only `merge_vault_from_file` **succeeds** against a different vault (only the refusal is tested) | Rust bridge |
-| R2 | `fast_merge_vault_from_file` / `_with_key` — no test exists | Rust bridge |
-| R3 | a merge leaves the receiving vault's protection unchanged (keyed stays keyed) | Rust bridge |
 | R4 | `VaultRegistry.add` appends blind — no path dedup, no alias collision (`lib/vault_registry.dart:76`) | Dart unit |
 | R5 | adoption refuses pre-v11 and too-new files, as unlock does (`rust/src/vault/io.rs:239,252`) | Rust + widget |
 | R6 | no screen registers an existing file as a vault — 3 negative pins | widget |
