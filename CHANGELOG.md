@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **The navigation rail on wide windows.** Its Appearance, Security and About destinations are all in the app-bar menu, which is the single route to them now; its "Vault" destination did nothing. The list pane can be dragged wider than before, since the width the rail reserved is free.
 
 ### Fixed
+- **Creating a vault could overwrite an existing one.** Pointing "Create vault" at a `.gabbro` file that already exists — what you try when you mean to open your vault on a second device — sealed an empty vault over it. Creating now refuses an occupied path; export, restore and saving are unchanged.
 - **On a wide window at large text the vault list ran off the bottom of the screen.** The search box and filter chips grew to fill the height and the entry list was left with no room; the last entries could not be reached. The search box and chips now scroll within the top part of the pane, so the list always keeps its share.
 - **The two icons in the search box ignored the text size.** The search-mode toggle (by title / all fields) and the clear button stayed at their default size while every other icon on the screen grew.
 - **The new-entry type picker said each entry type twice** to a screen reader.
