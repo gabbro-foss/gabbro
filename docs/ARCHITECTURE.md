@@ -115,11 +115,9 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-Build the net (R9–R10 below). No production change starts until it is green.
+Implement the two changes below. The net is green and every defect it surfaced is fixed.
 
 ### Faster sync, attempt 2 — this branch
-
-Branched from master 2026-07-28. Documentation only; no code yet.
 
 **Two changes, both touching the vault:**
 1. **Silent sync** for the same vault; a warning when only the passphrase matched.
@@ -127,84 +125,21 @@ Branched from master 2026-07-28. Documentation only; no code yet.
    `manage_vaults_screen` that opens an existing `.gabbro` as a vault on a second device.
 
 **Agreed split:** `sync from file` is the same vault, only ever. `import entries` is any
-other source, always full credentials.
+other source, always full credentials — wording only, the guards are already there.
 
 Attempt 1 (`sync_without_second_unlock`) is unmerged and never hardware-tested; its
 key-protected silent path is unreachable for independently created vaults. **Do not merge,
-do not delete until picked clean.**
+do not delete until picked clean.** Its chooser extraction is already salvaged; rebuild
+silent sync without the cached-master branch, so the probe collapses to one bool and the
+warning becomes unconditional. Keep the cached-master path and `open_vault_body_with_master`
+until adoption is designed — adoption is what needs them.
 
-**Verified 2026-07-29:**
-- One save choke point: `do_save` (`rust/src/vault/session.rs:178`). All five importers,
-  alias change, YubiKey add/remove and CRUD reach it. Pin it once, not per importer.
-- No adoption flow exists. `onAddVault` (`lib/main.dart:1109`) only creates;
-  `_restoreFromFile` (`lib/screens/unlock_screen.dart:450`) is gated on a corrupt vault and
-  overwrites a registered path.
-- `import entries` (`lib/screens/import_screen.dart:445`) already demands full credentials.
-  Wording only.
-- Already pinned, do not re-pin: export, all 3 write paths (`rust/src/api/vault.rs:2786-3093`);
-  alias AAD rebinding (`rust/src/api/vault_bridge.rs:1658`); YubiKey add/remove + `.bak`
-  (`rust/src/vault/session.rs:5202-5293`); keyed file→disk sync of a different vault
-  (`rust/src/api/vault_bridge.rs:2376`); cancel-sync, no-leak, batched apply, fast-merge walk
-  (6 `#[ignore]` tests, run by `gabbro_test:80-85`).
-- Export date on/off is a filename only, no crypto (`lib/screens/export_screen.dart:25`).
-
-**The net — R1–R10:**
-
-R1–R3 done: 8 pins in `rust/src/api/vault_bridge.rs`, green in release.
-R4 done: 7 pins in `test/vault_registry_test.dart`. Registering a known path twice
-leaves the vault listed twice; `remove`/`updateAlias`/`touchLastUsed` then hit both.
-
-R5 done: 4 pins in `rust/src/vault/io.rs`. `restore_vault_from_file` already refuses
-pre-v11 and too-new sources and leaves the target untouched; the refusal carries the
-version + upgrade URL. Widget half was already covered by `unlock_screen_test.dart`.
-
-R6 done: create now refuses an occupied path (`refuse_if_path_taken`,
-`rust/src/vault/io.rs:13`) — it used to seal an empty vault over an existing one.
-2 red-then-green tests + 2 unlock-screen pins. Export, restore and save overwrite by
-design and are unchanged. Every route to "add a vault" is the create screen.
-
-R7 done: 4 pins in `test/import_screen_test.dart`. All four Sync-from-vault guards
-(`import_screen.dart:448-466`) were untested; an empty PIN would have reached the key.
-
-R8 done: chooser extracted to `lib/widgets/sync_method_dialog.dart`, catalogued
-(`widgetFileCount` 11). Cancel moved out of `actions` — it never scrolls, so at 8x on a
-360dp phone Cancel was untappable and the dialog overflowed by 232px in 32 of 37
-locales. 3 tests in `test/sync_chooser_l10n_overflow_test.dart`. No new ARB keys were
-needed; the catalog nets found nothing else.
-
-R9 done, hardware-verified 2026-07-29 on an emulator: a restore-from-file unenrols
-biometrics and the notice appears. `onDisableBiometric` seam on `UnlockScreen`; 8 tests
-(Android unenrols, Linux does not, cancelled picker and refused restore leave it alone,
-notice only for a user who had it on, survives the picker's resume, renders in all 37
-locales at 8x on a 360dp phone). New ARB key `vaultRestoredBiometricDisabled`,
-translated in all 37.
-
-R10 done. H2 as written was wrong: a mis-picked file is not undo-less, because the
-`.bak` survives and the screen offers it whenever it is usable. The real defect was the
-mirror of H1 — after a restore the `.bak` still held the *previous, unrelated* vault and
-was advertised as this vault's safety copy, so restoring from it handed the old vault
-back. `restore_vault_from_file` now refreshes the `.bak` to the restored bytes
-(`rust/src/vault/io.rs`). 1 red-then-green test.
-
-**The net is complete: R1–R10 green.**
-
-**Defects found and fixed in this branch:**
-- **H1 — biometrics survive a vault swap at the same path.** `unenroll` fires on passphrase
-  change only (`lib/screens/vault_list_screen.dart:1412`); restore-from-file replaces the
-  bytes and leaves an enrolment that unlocks with the *previous* vault's passphrase (keyed by
-  SHA of the path, `BiometricStore.kt:21`).
-  **Fix (agreed):** treat it like the two triggers that already exist — passphrase change
-  (`change_passphrase_screen.dart:284`) and a device fingerprint change (Android invalidates
-  the key, `BiometricHelper.kt:148`). On a successful restore-from-file, unenroll that path
-  and say so in the post-restore banner. No Kotlin change; the `unenroll` handler exists
-  (`GabbroUnlockHostActivity.kt:140`). Costs one new string in all 37 ARBs.
-  **Done 2026-07-29, hardware-verified.**
-- **H2 — restore-from-file left a stale `.bak`.** Recorded as "no undo", which was wrong;
-  see R10 above for what it actually was and how it was fixed. **Done 2026-07-29.**
-- **H3 — the occupied-path refusal reached the user in English only.** The create screen now
-  checks the path itself and shows `onboardingPathTaken` (all 37 ARBs) without starting the
-  creation; the Rust guard stays as the backstop. 1 red-then-green test.
-  **Done 2026-07-29.**
+No adoption flow exists today: every route to "add a vault" ends at the create screen
+(`onAddVault`, `lib/main.dart:1109`), and `_restoreFromFile`
+(`lib/screens/unlock_screen.dart:450`) is gated on a corrupt vault and overwrites a
+registered path. If adoption reuses `restore_vault_from_file`, note it now also refreshes
+the `.bak` and (via the unlock screen) unenrols biometrics for that path — correct for a
+restore, wrong for adopting a file that is already this vault.
 
 **Design notes:**
 - Linux adoption needs no file copy — register a `VaultRecord` at the picked path. Android's
@@ -214,11 +149,6 @@ back. `restore_vault_from_file` now refreshes the `.bak` to the restored bytes
   it in the overflow probe, three a11y nets, three keyboard nets and the traversal baseline.
   New strings need all 37 ARBs (`test/l10n_test.dart` enforces the key set).
 - Any new `#[ignore]` sync test must be added to `gabbro_test`, or it never runs.
-
-**Salvage from attempt 1:** the sync-method chooser extraction and its l10n/overflow test
-(R8). Rebuild passphrase-only silent sync without the cached-master branch — the probe
-collapses to one bool, the warning becomes unconditional. Keep the cached-master path and
-`open_vault_body_with_master` until adoption is designed; adoption is what needs them.
 
 **Findings not to be re-litigated:**
 - A passphrase-only save re-seals the whole file with fresh salts (`session.rs:186`,
