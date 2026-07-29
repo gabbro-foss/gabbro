@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1997 | 10 |
+| Flutter (`flutter test`) | 2001 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -172,9 +172,13 @@ R8 done: chooser extracted to `lib/widgets/sync_method_dialog.dart`, catalogued
 locales. 3 tests in `test/sync_chooser_l10n_overflow_test.dart`. No new ARB keys were
 needed; the catalog nets found nothing else.
 
+R9 **part done** (4 of 6 tests). `onDisableBiometric` seam added to `UnlockScreen`;
+a successful restore-from-file now unenrols on Android. Green: Android unenrols, Linux
+does not, a cancelled picker and a refused restore leave it alone.
+
 | # | Pins | Level |
 |---|---|---|
-| R9 | restore-from-file does not unenroll biometrics today, then red for H1 | widget, Android |
+| R9 (rest) | tell the user biometric was turned off: new ARB key in all 37 locales + the banner line. `TODO(H1)` marks the spot (`unlock_screen.dart`). Then hardware-test on Android with mock vaults — widget-green is not done here. | widget, Android |
 | R10 | no `.bak` after restore-from-file today, then red for H2 | Rust |
 
 **Three defects to fix in this branch:**
@@ -244,6 +248,13 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - in `sync` path, we currently have `auto-merge` and `review all changes`, the `auto-merge` is additive only (check and verify) and therefore never deletes items in the receiving vault: (1) add a message that explains this (or the correct) behaviour to the user, (2) add a third `sync` mechanism that simply takes the incoming vault and clobbers the existing one - discuss this
 
 ### Code Quality
+- **Shipped strings are still in English in every locale.** Found 2026-07-29:
+  `changePassphraseBiometricDisabled` is the untranslated English sentence in all 37
+  ARBs and in the generated Dart (`app_localizations_fr.dart:1113`). `l10n_test.dart`
+  enforces the key set, not that a value was ever translated. Size the problem first
+  (how many keys, which locales — `jq`/`grep`, never python), then decide. A net that
+  fails on "value identical to English" would stop the next one.
+
 - **The vault list body overflows at 8x text on a 360dp phone.** A `Column` in
   `vault_list_screen.dart`, ~232-814 px over. The overflow probe sweeps at 2x, which is why
   it never saw this. Related: an `AlertDialog`'s `actions` never scroll, so any button left
