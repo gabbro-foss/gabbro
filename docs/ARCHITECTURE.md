@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2001 | 10 |
+| Flutter (`flutter test`) | 2004 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -172,13 +172,15 @@ R8 done: chooser extracted to `lib/widgets/sync_method_dialog.dart`, catalogued
 locales. 3 tests in `test/sync_chooser_l10n_overflow_test.dart`. No new ARB keys were
 needed; the catalog nets found nothing else.
 
-R9 **part done** (4 of 6 tests). `onDisableBiometric` seam added to `UnlockScreen`;
-a successful restore-from-file now unenrols on Android. Green: Android unenrols, Linux
-does not, a cancelled picker and a refused restore leave it alone.
+R9 done in software, **not on hardware**. `onDisableBiometric` seam on `UnlockScreen`;
+a successful restore-from-file unenrols on Android and says so. 7 tests: Android unenrols,
+Linux does not, cancelled picker and refused restore leave it alone, the notice shows only
+for a user who had it on, and it renders in all 37 locales at 8x on a 360dp phone.
+New ARB key `vaultRestoredBiometricDisabled`, translated in all 37.
 
 | # | Pins | Level |
 |---|---|---|
-| R9 (rest) | tell the user biometric was turned off: new ARB key in all 37 locales + the banner line. `TODO(H1)` marks the spot (`unlock_screen.dart`). Then hardware-test on Android with mock vaults — widget-green is not done here. | widget, Android |
+| R9 (hardware) | run the restore-from-file flow on a real Android device with mock vaults: biometric really unenrols and the notice appears. Widget-green is not done. | Android |
 | R10 | no `.bak` after restore-from-file today, then red for H2 | Rust |
 
 **Three defects to fix in this branch:**
@@ -191,6 +193,7 @@ does not, a cancelled picker and a refused restore leave it alone.
   the key, `BiometricHelper.kt:148`). On a successful restore-from-file, unenroll that path
   and say so in the post-restore banner. No Kotlin change; the `unenroll` handler exists
   (`GabbroUnlockHostActivity.kt:140`). Costs one new string in all 37 ARBs.
+  **Implemented 2026-07-29; hardware run still outstanding.**
 - **H2 — restore-from-file rotates no `.bak`** (`rust/src/vault/io.rs:221`). Every other write
   path does. A mis-picked file destroys the previous vault with no undo.
 - **H3 — the occupied-path refusal reaches the user in English only.** The create screen shows
@@ -248,6 +251,16 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - in `sync` path, we currently have `auto-merge` and `review all changes`, the `auto-merge` is additive only (check and verify) and therefore never deletes items in the receiving vault: (1) add a message that explains this (or the correct) behaviour to the user, (2) add a third `sync` mechanism that simply takes the incoming vault and clobbers the existing one - discuss this
 
 ### Code Quality
+- **One locale sweep lets an error through, so it could hide an overflow.** The
+  format-too-old sweep (`test/unlock_screen_test.dart:633`) tolerates the "locale not
+  supported by all delegates" warning for nn and yo. If a real overflow lands in the
+  same frame the two collapse into an opaque "Multiple exceptions" wrapper and the
+  tolerance swallows it. Cause: the shared `_appShell` helper uses
+  `AppLocalizations.localizationsDelegates`, while production uses
+  `gabbroLocalizationsDelegates`, which ships fallbacks for both locales — so the
+  warning is a test artefact users never meet. Fix `_appShell` to match production and
+  the sweep can demand a clean render, as the biometric-notice sweep now does.
+
 - **Shipped strings are still in English in every locale.** Found 2026-07-29:
   `changePassphraseBiometricDisabled` is the untranslated English sentence in all 37
   ARBs and in the generated Dart (`app_localizations_fr.dart:1113`). `l10n_test.dart`
