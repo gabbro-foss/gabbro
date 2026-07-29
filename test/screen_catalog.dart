@@ -35,6 +35,7 @@ import 'package:gabbro/widgets/gabbro_logo.dart';
 import 'package:gabbro/widgets/generator_widget.dart';
 import 'package:gabbro/widgets/password_breakdown_sheet.dart';
 import 'package:gabbro/widgets/sync_review.dart';
+import 'package:gabbro/widgets/sync_method_dialog.dart';
 import 'package:gabbro/widgets/url_link.dart';
 import 'package:gabbro/screens/import_failures_dialog.dart';
 import 'package:gabbro/screens/import_skipped_dialog.dart';
@@ -470,6 +471,10 @@ final Map<String, Future<void> Function(BuildContext)> dialogs = {
       ),
     ),
   ),
+  'sync_method_dialog': (ctx) async => showDialog<bool>(
+    context: ctx,
+    builder: (_) => const SyncMethodDialog(),
+  ),
   'import_skipped_dialog': (ctx) => showSkippedEntriesDialog(ctx, const [
     SkippedEntryData(
       title: 'An entry title long enough to stress the row at max text',
@@ -523,6 +528,7 @@ const Map<String, String> covers = {
   'generator_widget': 'generator_widget',
   'url_link': 'url_link',
   'sync_review': 'sync_review',
+  'sync_method_dialog': 'sync_method_dialog',
   'import_skipped_dialog': 'import_skipped_dialog',
   'import_failures_dialog': 'import_failures_dialog',
   'alphabet_index_bar': 'alphabet_index_bar',
@@ -570,4 +576,4 @@ List<String> uiSources() =>
 // nothing. Adding a screen or widget fails here first: the new file must be
 // swept or waived deliberately.
 const screenFileCount = 27;
-const widgetFileCount = 10;
+const widgetFileCount = 11;

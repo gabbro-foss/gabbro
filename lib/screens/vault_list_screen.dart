@@ -38,6 +38,7 @@ import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/widgets/yubikey_tap.dart';
 import 'package:gabbro/widgets/sync_review.dart';
+import 'package:gabbro/widgets/sync_method_dialog.dart';
 
 List<String> _defaultListFolders() => listFolders();
 Future<MergeSummary> _defaultMergeVault(String path, List<int> passphrase) =>
@@ -1108,37 +1109,9 @@ class _VaultListScreenState extends State<VaultListScreen>
 
     // Choose how to apply: automatically (incoming wins, no prompts) or a
     // granular one-by-one review.
-    final chooseL = AppLocalizations.of(context);
     final fast = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        // The two choices are long buttons; at large text they must stay
-        // reachable, so they live in scrollable content, not the actions bar
-        // (which does not scroll). Cancel replaces the barrier tap (ADR-016).
-        scrollable: true,
-        title: Text(chooseL.syncMethodTitle),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            FilledButton(
-              onPressed: () => Navigator.of(ctx).pop(true),
-              child: Text(chooseL.syncMergeAutomatically),
-            ),
-            const SizedBox(height: 8),
-            OutlinedButton(
-              onPressed: () => Navigator.of(ctx).pop(false),
-              child: Text(chooseL.syncReviewAllChanges),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(chooseL.cancel),
-          ),
-        ],
-      ),
+      builder: (_) => const SyncMethodDialog(),
     );
     if (fast == null || !mounted) return;
 
