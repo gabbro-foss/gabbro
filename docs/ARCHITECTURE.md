@@ -42,7 +42,7 @@ Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
 gabbro/
 ├── lib/                  # Flutter app
 │   ├── screens/          # unlock, vault list, export, import, generator, keyboard shortcuts, settings, manage vaults/folders, …
-│   ├── widgets/          # path_field, generator_widget, yubikey_tap, password_breakdown_sheet, sync_review, text_size_slider, url_link, …
+│   ├── widgets/          # path_field, generator_widget, yubikey_tap, password_breakdown_sheet, sync_review, sync_method_dialog, text_size_slider, url_link, …
 │   ├── src/rust/         # Auto-generated bridge (do not edit)
 │   └── *.dart            # main, app_paths (GabbroPaths), settings, text_scale, control_scale, gabbro_contrast (high-contrast theme flag), vault_registry, safe_file_picker, autotype_listener, autotype_target, clipboard_clear
 ├── rust/src/
@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1985 | 10 |
+| Flutter (`flutter test`) | 1997 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -115,7 +115,7 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-Build the net (R8–R10 below). No production change starts until it is green.
+Build the net (R9–R10 below). No production change starts until it is green.
 
 ### Faster sync, attempt 2 — this branch
 
@@ -166,9 +166,14 @@ design and are unchanged. Every route to "add a vault" is the create screen.
 R7 done: 4 pins in `test/import_screen_test.dart`. All four Sync-from-vault guards
 (`import_screen.dart:448-466`) were untested; an empty PIN would have reached the key.
 
+R8 done: chooser extracted to `lib/widgets/sync_method_dialog.dart`, catalogued
+(`widgetFileCount` 11). Cancel moved out of `actions` — it never scrolls, so at 8x on a
+360dp phone Cancel was untappable and the dialog overflowed by 232px in 32 of 37
+locales. 3 tests in `test/sync_chooser_l10n_overflow_test.dart`. No new ARB keys were
+needed; the catalog nets found nothing else.
+
 | # | Pins | Level |
 |---|---|---|
-| R8 | sync-method chooser reachable + translated, 37 locales x 8x x 360dp — port from attempt 1, strip `warnSamePassphrase` | widget |
 | R9 | restore-from-file does not unenroll biometrics today, then red for H1 | widget, Android |
 | R10 | no `.bak` after restore-from-file today, then red for H2 | Rust |
 
