@@ -734,6 +734,9 @@ pub async fn init_vault(
     use crate::vault::io::write_vault;
     use crate::vault::serialization::{serialize_vault_body, VaultBody};
     let vault_path = PathBuf::from(&path);
+    // Refuse before Argon2id: creating over an existing vault would replace it
+    // with an empty one.
+    crate::vault::io::refuse_if_path_taken(&vault_path)?;
     let plaintext = serialize_vault_body(&VaultBody::empty())?;
     let sealed = seal_vault(&passphrase, &plaintext, alias)?;
     write_vault(&sealed, &vault_path)?;
@@ -789,6 +792,9 @@ pub async fn init_vault_with_keys(
         .collect::<Result<Vec<_>, String>>()?;
 
     let vault_path = PathBuf::from(&path);
+    // Refuse before Argon2id: creating over an existing vault would replace it
+    // with an empty one.
+    crate::vault::io::refuse_if_path_taken(&vault_path)?;
     let plaintext = serialize_vault_body(&VaultBody::empty())?;
     let sealed = seal_vault_with_keys(&passphrase, &registrations, &plaintext, alias)?;
     write_vault(&sealed, &vault_path)?;
@@ -1096,6 +1102,92 @@ mod tests {
         assert_eq!(
             after_refuse, b"still corrupt",
             "a refused restore leaves the vault untouched"
+        );
+    }
+
+    // ── R6: creating a vault must never destroy one ───────────────────────────
+    //
+    // The create screen auto-picks a free filename, so this fires only when the
+    // user deliberately types or picks an existing `.gabbro` — which is exactly
+    // what someone tries when they mean to open their vault on a second device.
+    // Today the file is replaced by an empty vault and the old bytes survive only
+    // as the rotated `.bak`, which the app offers only for a *corrupt* vault.
+    // Export, restore and save all overwrite by design and are untouched.
+
+    /// Existing bytes at `path`, plus the paths to clean up afterwards.
+    fn occupied_vault_path(suffix: &str) -> (PathBuf, &'static [u8]) {
+        const EXISTING: &[u8] = b"an existing vault the user relies on";
+        let mut path = std::env::temp_dir();
+        path.push(format!("gabbro_bridge_no_overwrite_{suffix}.gabbro"));
+        let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
+        std::fs::write(&path, EXISTING).unwrap();
+        (path, EXISTING)
+    }
+
+    #[test]
+    #[serial]
+    fn init_vault_refuses_to_overwrite_an_existing_file() {
+        let (path, existing) = occupied_vault_path("passphrase");
+
+        let result = run(init_vault(
+            b"create over an existing vault".to_vec(),
+            path.to_str().unwrap().to_string(),
+            None,
+        ));
+
+        let after = std::fs::read(&path).unwrap();
+        if result.is_ok() {
+            let _ = lock_vault(); // do not poison the next serial test
+        }
+        sync_cleanup(&[&path]);
+
+        assert!(
+            result.is_err(),
+            "creating a vault must refuse a path that already holds a file"
+        );
+        assert_eq!(
+            after, existing,
+            "a refused create must leave the existing file untouched"
+        );
+    }
+
+    #[test]
+    #[serial]
+    fn init_vault_with_keys_refuses_to_overwrite_an_existing_file() {
+        let (path, existing) = occupied_vault_path("keyed");
+
+        let result = run(init_vault_with_keys(
+            b"create over an existing vault".to_vec(),
+            vec![
+                YubiKeyInitData {
+                    credential_id: vec![0xA1u8; 64],
+                    hmac_secret: vec![0x11u8; 32],
+                    hkdf_salt: vec![0x12u8; 32],
+                },
+                YubiKeyInitData {
+                    credential_id: vec![0xA2u8; 48],
+                    hmac_secret: vec![0x21u8; 32],
+                    hkdf_salt: vec![0x22u8; 32],
+                },
+            ],
+            path.to_str().unwrap().to_string(),
+            None,
+        ));
+
+        let after = std::fs::read(&path).unwrap();
+        if result.is_ok() {
+            let _ = lock_vault();
+        }
+        sync_cleanup(&[&path]);
+
+        assert!(
+            result.is_err(),
+            "creating a keyed vault must refuse a path that already holds a file"
+        );
+        assert_eq!(
+            after, existing,
+            "a refused create must leave the existing file untouched"
         );
     }
 
@@ -1731,6 +1823,9 @@ mod tests {
 
         let mut path = temp_dir();
         path.push("gabbro_bridge_init_alias_test.gabbro");
+        // Creating now refuses an occupied path: clear a leftover from an
+        // aborted run so this test does not inherit one.
+        let _ = std::fs::remove_file(&path);
         let pass = b"init-alias-pass";
 
         run(init_vault(
@@ -2153,6 +2248,7 @@ mod tests {
 
         let mut path = temp_dir();
         path.push("gabbro_bridge_init_keys_min_test.gabbro");
+        let _ = std::fs::remove_file(&path);
 
         // Single key — must fail (ADR-010: minimum 2 keys at creation).
         let result = run(init_vault_with_keys(
@@ -2751,6 +2847,7 @@ mod tests {
 
         let mut recv = std::env::temp_dir();
         recv.push("gabbro_bridge_sync_recv_r3_keyed.gabbro");
+        let _ = std::fs::remove_file(&recv);
         run(init_vault_with_keys(
             pass_b.to_vec(),
             vec![
@@ -2885,6 +2982,7 @@ mod tests {
         let pass = b"export-bytes-downgrade-pass";
         let mut path = temp_dir();
         path.push("gabbro_bridge_export_bytes_downgrade.gabbro");
+        let _ = std::fs::remove_file(&path);
 
         // Key-protected session: passphrase + 2 keys (ADR-010 minimum).
         run(init_vault_with_keys(

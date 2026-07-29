@@ -1777,4 +1777,45 @@ void main() {
     expect(find.textContaining('stays on disk'), findsOneWidget);
     expect(find.textContaining("app's private storage"), findsNothing);
   });
+
+  // ── R6: the unlock screen never adopts a vault ─────────────────────────────
+  //
+  // Picking a `.gabbro` here is a repair for a vault that cannot be read, not a
+  // way to add one: it replaces the bytes at the path already in the list.
+
+  testWidgets('a healthy vault offers no restore-from-file', (tester) async {
+    await tester.pumpWidget(_buildScreen());
+    await tester.pumpAndSettle();
+
+    expect(find.text('Restore from a backup file'), findsNothing);
+  });
+
+  testWidgets('restore-from-file replaces the registered vault and adds no new one',
+      (tester) async {
+    final registry = VaultRegistry([
+      _vaultRecord(path: '/tmp/only.gabbro', alias: 'Only'),
+    ]);
+    String? restoredOver;
+
+    await tester.pumpWidget(_buildScreen(
+      vaultPath: '/tmp/only.gabbro',
+      registry: registry,
+      onVaultIsReadable: (_) async => false,
+      onBackupUsable: (_) async => false,
+      onRestoreFromFile: (path) async {
+        restoredOver = path;
+        return true;
+      },
+    ));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('Restore from a backup file'));
+    await tester.tap(find.text('Restore from a backup file'));
+    await tester.pumpAndSettle();
+
+    expect(restoredOver, '/tmp/only.gabbro',
+        reason: 'the picked file overwrites the vault already registered here');
+    expect(registry.records.length, 1,
+        reason: 'the picked file is never registered as a second vault');
+  });
 }

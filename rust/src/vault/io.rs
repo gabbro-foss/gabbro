@@ -10,6 +10,23 @@ use std::path::{Path, PathBuf};
 
 use crate::vault::file_format::{SealedVault, YubiKeyRecord};
 
+/// Reject a path that already holds a file — for vault **creation** only.
+///
+/// Creating seals an *empty* vault, so pointing it at an existing vault replaces
+/// that vault with nothing; the old bytes survive only as the rotated `.bak`,
+/// which the app offers only for a vault that is corrupt. Export, restore and
+/// saving an open vault all overwrite deliberately and must not use this.
+pub(crate) fn refuse_if_path_taken(path: &Path) -> Result<(), String> {
+    if fs::symlink_metadata(path).is_ok() {
+        return Err(format!(
+            "A file already exists at {} — creating a vault there would replace it. \
+             Choose a different name, or open the existing vault instead.",
+            path.display()
+        ));
+    }
+    Ok(())
+}
+
 /// Reject a path that is a symlink.
 fn check_not_symlink(path: &Path) -> Result<(), String> {
     if let Ok(m) = fs::symlink_metadata(path) {
