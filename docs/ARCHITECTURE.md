@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1981 | 10 |
+| Flutter (`flutter test`) | 1985 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -115,7 +115,7 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-Build the net (R7–R10 below). No production change starts until it is green.
+Build the net (R8–R10 below). No production change starts until it is green.
 
 ### Faster sync, attempt 2 — this branch
 
@@ -163,9 +163,11 @@ R6 done: create now refuses an occupied path (`refuse_if_path_taken`,
 2 red-then-green tests + 2 unlock-screen pins. Export, restore and save overwrite by
 design and are unchanged. Every route to "add a vault" is the create screen.
 
+R7 done: 4 pins in `test/import_screen_test.dart`. All four Sync-from-vault guards
+(`import_screen.dart:448-466`) were untested; an empty PIN would have reached the key.
+
 | # | Pins | Level |
 |---|---|---|
-| R7 | `import entries` refuses an empty passphrase / empty PIN | widget |
 | R8 | sync-method chooser reachable + translated, 37 locales x 8x x 360dp — port from attempt 1, strip `warnSamePassphrase` | widget |
 | R9 | restore-from-file does not unenroll biometrics today, then red for H1 | widget, Android |
 | R10 | no `.bak` after restore-from-file today, then red for H2 | Rust |
