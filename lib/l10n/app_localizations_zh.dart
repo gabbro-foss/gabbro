@@ -2023,6 +2023,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get vaultRestoredMessage => '保险库已恢复。请使用你的凭据解锁。';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      '已关闭生物特征解锁，因为恢复的文件可能使用不同的密码短语。请在“安全”中重新启用。';
+
+  @override
   String get restoreFromFileInvalidError => '该文件不是可用的 Gabbro 保险库。';
 
   @override
@@ -4075,6 +4079,10 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get vaultRestoredMessage => '保险库已恢复。请使用你的凭据解锁。';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      '已关闭生物特征解锁，因为恢复的文件可能使用不同的密码短语。请在“安全”中重新启用。';
+
+  @override
   String get restoreFromFileInvalidError => '该文件不是可用的 Gabbro 保险库。';
 
   @override
@@ -6125,6 +6133,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get vaultRestoredMessage => '保險庫已復原。請使用你的憑證解鎖。';
+
+  @override
+  String get vaultRestoredBiometricDisabled =>
+      '已關閉生物特徵解鎖，因為還原的檔案可能使用不同的密碼片語。請在「安全性」中重新啟用。';
 
   @override
   String get restoreFromFileInvalidError => '該檔案不是可用的 Gabbro 保險庫。';

@@ -881,7 +881,8 @@
   "deleteVaultFileConfirmTitle": "Trajno izbrišem poškodovano datoteko trezorja?",
   "deleteVaultFileConfirmBody": "Trajno izbrišem ta trezor? Neberljiva datoteka in njena rešilna kopija bosta odstranjeni s te naprave. Tega dejanja ni mogoče razveljaviti.",
   "restoreFromFileButton": "Obnovi iz datoteke varnostne kopije",
-  "vaultRestoredMessage": "Trezor obnovljen. Odklenite s svojimi poverilnicami.",
+  "vaultRestoredBiometricDisabled": "Biometrično odklepanje je bilo izklopljeno, ker obnovljena datoteka morda uporablja drugo geslo. Znova ga vklopite v razdelku Varnost.",
+  "vaultRestoredMessage":"Trezor obnovljen. Odklenite s svojimi poverilnicami.",
   "restoreFromFileInvalidError": "Ta datoteka ni uporaben trezor Gabbro.",
   "resizeColumns": "Spremeni velikost stolpcev",
 

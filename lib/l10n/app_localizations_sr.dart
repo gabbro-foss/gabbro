@@ -2114,6 +2114,10 @@ class AppLocalizationsSr extends AppLocalizations {
       'Сеф враћен. Откључајте својим акредитивима.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Biometrijsko otključavanje je isključeno jer vraćena datoteka može koristiti drugu pristupnu frazu. Ponovo ga uključite u odeljku Bezbednost.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Та датотека није употребљив Gabbro сеф.';
 
@@ -4257,6 +4261,10 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   @override
   String get vaultRestoredMessage =>
       'Sef vraćen. Otključajte svojim akreditivima.';
+
+  @override
+  String get vaultRestoredBiometricDisabled =>
+      'Biometrijsko otključavanje je isključeno jer vraćena datoteka može koristiti drugu pristupnu frazu. Ponovo ga uključite u odeljku Bezbednost.';
 
   @override
   String get restoreFromFileInvalidError =>

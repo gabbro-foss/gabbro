@@ -2116,6 +2116,10 @@ class AppLocalizationsSl extends AppLocalizations {
       'Trezor obnovljen. Odklenite s svojimi poverilnicami.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Biometrično odklepanje je bilo izklopljeno, ker obnovljena datoteka morda uporablja drugo geslo. Znova ga vklopite v razdelku Varnost.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Ta datoteka ni uporaben trezor Gabbro.';
 

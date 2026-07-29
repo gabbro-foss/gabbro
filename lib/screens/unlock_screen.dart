@@ -348,6 +348,11 @@ class _UnlockScreenState extends State<UnlockScreen>
   late List<YubikeyRecordData> _yubikeyRecords;
   late String _selectedPath;
   bool _biometricEnrolled = false;
+
+  /// H1: set when a restore-from-file turned biometric unlock off, so the
+  /// post-restore message can tell the user to switch it back on. Only for a
+  /// user who actually had it enrolled — the rest have nothing to re-enable.
+  bool _biometricDisabledByRestore = false;
   // R-03 restore flow: set only by the parse probe, never by auth failures.
   bool _vaultCorrupt = false;
   /// RT-3: the file is an intact vault in a format older than this build reads.
@@ -484,9 +489,8 @@ class _UnlockScreenState extends State<UnlockScreen>
     // H1: the file just written may be a different vault, so the passphrase
     // biometric stored for this path is stale — drop it, exactly as a
     // passphrase change does. Best-effort: the restore already succeeded.
-    // TODO(H1): tell the user it was turned off — needs one new ARB key in all
-    // 37 locales (see ARCHITECTURE.md, Current Focus).
     final onAndroid = widget.isAndroid ?? Platform.isAndroid;
+    final wasEnrolled = _biometricEnrolled;
     if (onAndroid) {
       try {
         await widget.onDisableBiometric(widget.vaultPath);
@@ -497,6 +501,7 @@ class _UnlockScreenState extends State<UnlockScreen>
       _vaultCorrupt = false;
       _backupAvailable = false;
       _vaultRestoredFromFile = true;
+      _biometricDisabledByRestore = onAndroid && wasEnrolled;
       if (onAndroid) _biometricEnrolled = false;
       _errorMessage = null;
       // The restored file may carry a different credential set: re-detect.
@@ -1038,6 +1043,17 @@ class _UnlockScreenState extends State<UnlockScreen>
                         style: Theme.of(context).textTheme.bodySmall,
                         textAlign: TextAlign.center,
                       ),
+                      // H1: the fingerprint held the replaced vault's
+                      // passphrase, so it was dropped — say so, or the user is
+                      // left with an unlock that silently stopped working.
+                      if (_biometricDisabledByRestore) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          l.vaultRestoredBiometricDisabled,
+                          style: Theme.of(context).textTheme.bodySmall,
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                       const SizedBox(height: 16),
                     ],
                     if (_showDropdown) ...[

@@ -2119,6 +2119,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Széf helyreállítva. Oldja fel a hitelesítő adataival.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'A biometrikus feloldás ki lett kapcsolva, mert a visszaállított fájl más jelmondatot használhat. Kapcsolja be újra a Biztonság menüben.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Ez a fájl nem használható Gabbro-széf.';
 

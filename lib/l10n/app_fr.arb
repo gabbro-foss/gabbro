@@ -881,7 +881,8 @@
   "deleteVaultFileConfirmTitle": "Supprimer définitivement le fichier de coffre corrompu ?",
   "deleteVaultFileConfirmBody": "Supprimer définitivement ce coffre ? Le fichier illisible et sa copie de secours seront supprimés de cet appareil. Cette action est irréversible.",
   "restoreFromFileButton": "Restaurer depuis un fichier de sauvegarde",
-  "vaultRestoredMessage": "Coffre restauré. Déverrouillez avec vos identifiants.",
+  "vaultRestoredBiometricDisabled": "Le déverrouillage biométrique a été désactivé, car le fichier restauré peut utiliser un autre mot de passe. Réactivez-le dans Sécurité.",
+  "vaultRestoredMessage":"Coffre restauré. Déverrouillez avec vos identifiants.",
   "restoreFromFileInvalidError": "Ce fichier n'est pas un coffre Gabbro utilisable.",
   "resizeColumns": "Redimensionner les colonnes",
 

@@ -2124,6 +2124,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Cassaforte ripristinata. Sblocca con le tue credenziali.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Lo sblocco biometrico è stato disattivato, perché il file ripristinato potrebbe usare una passphrase diversa. Riattivalo in Sicurezza.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Questo file non è una cassaforte Gabbro utilizzabile.';
 

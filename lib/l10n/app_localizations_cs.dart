@@ -2113,6 +2113,10 @@ class AppLocalizationsCs extends AppLocalizations {
       'Trezor obnoven. Odemkněte pomocí svých přihlašovacích údajů.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Biometrické odemknutí bylo vypnuto, protože obnovený soubor může používat jinou přístupovou frázi. Znovu jej zapněte v Zabezpečení.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Tento soubor není použitelný trezor Gabbro.';
 

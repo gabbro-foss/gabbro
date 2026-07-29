@@ -2121,6 +2121,10 @@ class AppLocalizationsUk extends AppLocalizations {
       'Сховище відновлено. Розблокуйте за допомогою своїх облікових даних.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Біометричне розблокування вимкнено, оскільки відновлений файл може використовувати іншу кодову фразу. Увімкніть його знову в розділі «Безпека».';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Цей файл не є придатним сховищем Gabbro.';
 

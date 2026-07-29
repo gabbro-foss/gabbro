@@ -2112,6 +2112,10 @@ class AppLocalizationsHr extends AppLocalizations {
       'Trezor vraćen. Otključajte svojim vjerodajnicama.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Biometrijsko otključavanje je isključeno jer vraćena datoteka može koristiti drugu pristupnu frazu. Ponovno ga uključite u Sigurnost.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Ta datoteka nije upotrebljiv Gabbro trezor.';
 

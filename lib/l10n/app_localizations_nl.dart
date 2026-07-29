@@ -2121,6 +2121,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Kluis hersteld. Ontgrendel met je gegevens.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Biometrisch ontgrendelen is uitgeschakeld, omdat het herstelde bestand een andere wachtwoordzin kan gebruiken. Schakel het weer in bij Beveiliging.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Dat bestand is geen bruikbare Gabbro-kluis.';
 

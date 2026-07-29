@@ -2112,6 +2112,10 @@ class AppLocalizationsNn extends AppLocalizations {
       'Kvelv gjenoppretta. Lås opp med innloggingsinformasjonen din.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Biometrisk opplåsing vart slått av, fordi den gjenoppretta fila kan bruke ein annan passfrase. Slå han på att under Tryggleik.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Den fila er ikkje eit brukbart Gabbro-kvelv.';
 

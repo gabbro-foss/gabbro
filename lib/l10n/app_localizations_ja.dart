@@ -2051,6 +2051,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get vaultRestoredMessage => 'ボールトを復元しました。認証情報でロックを解除してください。';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      '復元したファイルが別のパスフレーズを使用している可能性があるため、生体認証ロック解除を無効にしました。セキュリティで再度有効にしてください。';
+
+  @override
   String get restoreFromFileInvalidError => 'このファイルは使用可能な Gabbro ボールトではありません。';
 
   @override

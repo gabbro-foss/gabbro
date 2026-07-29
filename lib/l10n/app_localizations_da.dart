@@ -2113,6 +2113,10 @@ class AppLocalizationsDa extends AppLocalizations {
       'Boks gendannet. Lås op med dine loginoplysninger.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Biometrisk oplåsning blev slået fra, fordi den gendannede fil kan bruge en anden adgangssætning. Slå den til igen under Sikkerhed.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Den fil er ikke en brugbar Gabbro-boks.';
 

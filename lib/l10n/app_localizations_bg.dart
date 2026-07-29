@@ -2116,6 +2116,10 @@ class AppLocalizationsBg extends AppLocalizations {
       'Сейфът е възстановен. Отключете с вашите данни.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Биометричното отключване беше изключено, защото възстановеният файл може да използва различна паролна фраза. Включете го отново в Сигурност.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Този файл не е използваем сейф на Gabbro.';
 

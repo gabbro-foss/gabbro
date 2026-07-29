@@ -882,7 +882,8 @@
   "deleteVaultFileConfirmTitle": "Eliminar permanentemente o ficheiro de cofre danificado?",
   "deleteVaultFileConfirmBody": "Eliminar permanentemente este cofre? O ficheiro ilegível e a sua cópia de recuperação serão removidos deste dispositivo. Esta ação não pode ser anulada.",
   "restoreFromFileButton": "Restaurar a partir de um ficheiro de cópia de segurança",
-  "vaultRestoredMessage": "Cofre restaurado. Desbloqueie com as suas credenciais.",
+  "vaultRestoredBiometricDisabled": "O desbloqueio biométrico foi desativado, porque o ficheiro restaurado pode usar outra frase secreta. Reative-o em Segurança.",
+  "vaultRestoredMessage":"Cofre restaurado. Desbloqueie com as suas credenciais.",
   "restoreFromFileInvalidError": "Esse ficheiro não é um cofre Gabbro utilizável.",
   "resizeColumns": "Redimensionar colunas",
 

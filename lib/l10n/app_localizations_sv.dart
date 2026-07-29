@@ -2109,6 +2109,10 @@ class AppLocalizationsSv extends AppLocalizations {
       'Valv återställt. Lås upp med dina uppgifter.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Biometrisk upplåsning stängdes av, eftersom den återställda filen kan använda en annan lösenfras. Slå på den igen under Säkerhet.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Den filen är inte ett användbart Gabbro-valv.';
 

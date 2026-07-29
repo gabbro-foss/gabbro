@@ -2123,6 +2123,10 @@ class AppLocalizationsPl extends AppLocalizations {
       'Sejf przywrócony. Odblokuj swoimi danymi.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Odblokowywanie biometryczne zostało wyłączone, ponieważ przywrócony plik może używać innego hasła głównego. Włącz je ponownie w sekcji Bezpieczeństwo.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Ten plik nie jest prawidłowym sejfem Gabbro.';
 

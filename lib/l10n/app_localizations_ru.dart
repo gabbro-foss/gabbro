@@ -2120,6 +2120,10 @@ class AppLocalizationsRu extends AppLocalizations {
       'Хранилище восстановлено. Разблокируйте с помощью своих учётных данных.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Биометрическая разблокировка отключена, так как восстановленный файл может использовать другую кодовую фразу. Включите её снова в разделе «Безопасность».';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Этот файл не является пригодным хранилищем Gabbro.';
 

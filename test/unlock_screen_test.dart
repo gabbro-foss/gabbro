@@ -1892,4 +1892,119 @@ void main() {
       reason: 'a refused restore replaced nothing',
     );
   });
+
+  /// Drives a corrupt vault through a successful restore-from-file, with
+  /// biometric [enrolled] beforehand.
+  Future<void> restoreWithBiometric(
+    WidgetTester tester, {
+    required bool enrolled,
+  }) async {
+    await tester.pumpWidget(_buildScreen(
+      isAndroid: true,
+      onBiometricIsEnrolled: (_) async => enrolled,
+      onVaultIsReadable: (_) async => false,
+      onBackupUsable: (_) async => false,
+      onRestoreFromFile: (_) async => true,
+    ));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('Restore from a backup file'));
+    await tester.tap(find.text('Restore from a backup file'));
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('the user is told biometric unlock was turned off',
+      (tester) async {
+    await restoreWithBiometric(tester, enrolled: true);
+
+    expect(
+      find.textContaining('Biometric unlock was turned off'),
+      findsOneWidget,
+      reason: 'silently losing the fingerprint is what left the user stuck',
+    );
+  });
+
+  testWidgets('no biometric notice for a user who never enabled it',
+      (tester) async {
+    await restoreWithBiometric(tester, enrolled: false);
+
+    expect(find.textContaining('Biometric unlock was turned off'), findsNothing);
+    expect(find.textContaining('Vault restored'), findsOneWidget);
+  });
+
+  // A new string is not done until the longest translation survives the largest
+  // text on the narrowest phone. Testing scale and locale apart never meets that
+  // case — the sync chooser overflowed in 32 of 37 languages while its English
+  // check passed.
+  testWidgets('the biometric notice survives every locale at 8x on a 360dp phone',
+      (tester) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() => tester.view.reset());
+
+    for (final locale in AppLocalizations.supportedLocales) {
+      // Tear the previous tree down first. Without this the UnlockScreen State
+      // is reused across iterations, so the second locale opens on a screen
+      // already restored — no corrupt block, no button, and nothing swept.
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+
+      await tester.pumpWidget(MaterialApp(
+        locale: locale,
+        // Production's delegate list, which ships fallbacks for nn and yo. The
+        // shared _appShell uses the bare AppLocalizations list, whose missing
+        // Material/Cupertino delegates warn for those two — a test-helper
+        // artefact users never meet.
+        localizationsDelegates: gabbroLocalizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context)
+              .copyWith(textScaler: const TextScaler.linear(8.0)),
+          child: child!,
+        ),
+        home: UnlockScreen(
+          vaultPath: '/tmp/test.gabbro',
+          onEstimateEntropy: _fakeEntropy,
+          yubikeyRecords: const [],
+          isAndroid: true,
+          onBiometricIsEnrolled: (_) async => true,
+          onVaultIsReadable: (_) async => false,
+          // Stubbed like _buildScreen does: left at their defaults these call
+          // the real bridge, the probe never settles and the corrupt block —
+          // which holds the restore button — never renders.
+          onVaultFormatTooOld: (_) async => false,
+          onVaultFormatTooNew: (_) async => false,
+          onBackupUsable: (_) async => false,
+          onRestoreFromFile: (_) async => true,
+          onDisableBiometric: (_) async {},
+        ),
+      ));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull,
+          reason: '$locale must render the corrupt screen cleanly at 8x');
+
+      // Drive the restore, or the notice never renders and this sweep passes
+      // without ever laying the new string out.
+      final l = lookupAppLocalizations(locale);
+      final restoreButton = find.text(l.restoreFromFileButton).first;
+      await tester.ensureVisible(restoreButton);
+      await tester.pumpAndSettle();
+      // At 8x the wrapped label is taller than the screen, so its centre (what
+      // tap aims at) is off the bottom while the control is reachable. Hit a
+      // point inside its visible part, as a finger would.
+      final rect = tester.getRect(restoreButton);
+      final y = (rect.top < 0 ? 0.0 : rect.top) + 20;
+      await tester.tapAt(Offset(rect.center.dx, y));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull,
+          reason: 'the notice must scroll at 8x in $locale, never overflow');
+
+      expect(
+        find.text(l.vaultRestoredBiometricDisabled),
+        findsOneWidget,
+        reason: 'the notice must be on screen for $locale to mean anything',
+      );
+    }
+  });
 }

@@ -1055,6 +1055,10 @@
   "deleteVaultFileConfirmBody": "Delete this vault permanently? The unreadable file and its safety copy will be removed from this device. This cannot be undone.",
   "restoreFromFileButton": "Restore from a backup file",
   "vaultRestoredMessage": "Vault restored. Unlock with your credentials.",
+  "vaultRestoredBiometricDisabled": "Biometric unlock was turned off, because the restored file may use a different passphrase. Re-enable it in Security.",
+  "@vaultRestoredBiometricDisabled": {
+    "description": "Shown after a restore-from-file when biometric unlock was enrolled for this vault: the stored passphrase belongs to the replaced vault, so the enrolment was dropped."
+  },
   "restoreFromFileInvalidError": "That file is not a usable Gabbro vault.",
   "resizeColumns": "Resize columns",
 

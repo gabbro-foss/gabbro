@@ -2139,6 +2139,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Coffre restauré. Déverrouillez avec vos identifiants.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Le déverrouillage biométrique a été désactivé, car le fichier restauré peut utiliser un autre mot de passe. Réactivez-le dans Sécurité.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Ce fichier n\'est pas un coffre Gabbro utilisable.';
 

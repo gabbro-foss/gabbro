@@ -2111,6 +2111,10 @@ class AppLocalizationsEt extends AppLocalizations {
       'Hoidla taastatud. Avage oma mandaatidega.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Biomeetriline avamine lülitati välja, sest taastatud fail võib kasutada teist pääslauset. Lülitage see uuesti sisse jaotises Turvalisus.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'See fail ei ole kasutatav Gabbro hoidla.';
 

@@ -2129,6 +2129,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Tresor wiederhergestellt. Entsperren Sie mit Ihren Zugangsdaten.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Die biometrische Entsperrung wurde deaktiviert, weil die wiederhergestellte Datei eine andere Passphrase verwenden könnte. Aktiviere sie unter Sicherheit erneut.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Diese Datei ist kein verwendbarer Gabbro-Tresor.';
 

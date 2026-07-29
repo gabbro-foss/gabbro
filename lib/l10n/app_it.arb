@@ -881,7 +881,8 @@
   "deleteVaultFileConfirmTitle": "Eliminare definitivamente il file della cassaforte danneggiato?",
   "deleteVaultFileConfirmBody": "Eliminare definitivamente questa cassaforte? Il file illeggibile e la sua copia di sicurezza verranno rimossi da questo dispositivo. L'operazione non può essere annullata.",
   "restoreFromFileButton": "Ripristina da un file di backup",
-  "vaultRestoredMessage": "Cassaforte ripristinata. Sblocca con le tue credenziali.",
+  "vaultRestoredBiometricDisabled": "Lo sblocco biometrico è stato disattivato, perché il file ripristinato potrebbe usare una passphrase diversa. Riattivalo in Sicurezza.",
+  "vaultRestoredMessage":"Cassaforte ripristinata. Sblocca con le tue credenziali.",
   "restoreFromFileInvalidError": "Questo file non è una cassaforte Gabbro utilizzabile.",
   "resizeColumns": "Ridimensiona colonne",
 

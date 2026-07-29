@@ -2116,6 +2116,10 @@ class AppLocalizationsLv extends AppLocalizations {
       'Seifs atjaunots. Atbloķējiet ar saviem akreditācijas datiem.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Biometriskā atbloķēšana tika izslēgta, jo atjaunotais fails var izmantot citu ieejas frāzi. Ieslēdziet to atkal sadaļā Drošība.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Šis fails nav izmantojams Gabbro seifs.';
 

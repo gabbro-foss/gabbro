@@ -2120,6 +2120,10 @@ class AppLocalizationsLt extends AppLocalizations {
       'Saugykla atkurta. Atrakinkite savo prisijungimo duomenimis.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Biometrinis atrakinimas išjungtas, nes atkurtas failas gali naudoti kitą slaptafrazę. Vėl jį įjunkite skiltyje Saugumas.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Šis failas nėra tinkama Gabbro saugykla.';
 

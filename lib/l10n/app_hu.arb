@@ -882,7 +882,8 @@
   "deleteVaultFileConfirmTitle": "Véglegesen törli a sérült széffájlt?",
   "deleteVaultFileConfirmBody": "Véglegesen törli ezt a széfet? Az olvashatatlan fájl és a vészmásolata eltávolításra kerül erről az eszközről. Ez a művelet nem vonható vissza.",
   "restoreFromFileButton": "Helyreállítás biztonsági mentési fájlból",
-  "vaultRestoredMessage": "Széf helyreállítva. Oldja fel a hitelesítő adataival.",
+  "vaultRestoredBiometricDisabled": "A biometrikus feloldás ki lett kapcsolva, mert a visszaállított fájl más jelmondatot használhat. Kapcsolja be újra a Biztonság menüben.",
+  "vaultRestoredMessage":"Széf helyreállítva. Oldja fel a hitelesítő adataival.",
   "restoreFromFileInvalidError": "Ez a fájl nem használható Gabbro-széf.",
   "resizeColumns": "Oszlopok átméretezése",
 

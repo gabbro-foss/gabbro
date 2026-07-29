@@ -881,7 +881,8 @@
   "deleteVaultFileConfirmTitle": "永久删除损坏的保险库文件？",
   "deleteVaultFileConfirmBody": "永久删除此保险库？无法读取的文件及其安全副本将从此设备中移除。此操作无法撤销。",
   "restoreFromFileButton": "从备份文件恢复",
-  "vaultRestoredMessage": "保险库已恢复。请使用你的凭据解锁。",
+  "vaultRestoredBiometricDisabled": "已关闭生物特征解锁，因为恢复的文件可能使用不同的密码短语。请在“安全”中重新启用。",
+  "vaultRestoredMessage":"保险库已恢复。请使用你的凭据解锁。",
   "restoreFromFileInvalidError": "该文件不是可用的 Gabbro 保险库。",
   "resizeColumns": "调整列宽",
 

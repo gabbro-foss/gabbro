@@ -2114,6 +2114,10 @@ class AppLocalizationsEu extends AppLocalizations {
       'Kutxa gotorra berreskuratu da. Desblokeatu zure kredentzialekin.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Desblokeo biometrikoa desaktibatu da, leheneratutako fitxategiak beste pasaesaldi bat erabil dezakeelako. Gaitu berriro Segurtasuna atalean.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Fitxategi hori ez da erabilgarri den Gabbro kutxa gotor bat.';
 

@@ -2113,6 +2113,10 @@ class AppLocalizationsKk extends AppLocalizations {
       'Қойма қалпына келтірілді. Өз деректеріңізбен ашыңыз.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Биометриялық бекітуді ашу өшірілді, себебі қалпына келтірілген файл басқа кілт фразасын пайдалануы мүмкін. Оны Қауіпсіздік бөлімінде қайта қосыңыз.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Бұл файл жарамды Gabbro қоймасы емес.';
 

@@ -2119,6 +2119,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'Cofre restaurado. Desbloqueie com as suas credenciais.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'O desbloqueio biométrico foi desativado, porque o ficheiro restaurado pode usar outra frase secreta. Reative-o em Segurança.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Esse ficheiro não é um cofre Gabbro utilizável.';
 
@@ -4263,6 +4267,10 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   @override
   String get vaultRestoredMessage =>
       'Cofre restaurado. Desbloqueie com suas credenciais.';
+
+  @override
+  String get vaultRestoredBiometricDisabled =>
+      'O desbloqueio biométrico foi desativado, porque o arquivo restaurado pode usar outra frase secreta. Reative-o em Segurança.';
 
   @override
   String get restoreFromFileInvalidError =>
@@ -6415,6 +6423,10 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   @override
   String get vaultRestoredMessage =>
       'Cofre restaurado. Desbloqueie com as suas credenciais.';
+
+  @override
+  String get vaultRestoredBiometricDisabled =>
+      'O desbloqueio biométrico foi desativado, porque o ficheiro restaurado pode usar outra frase-passe. Reative-o em Segurança.';
 
   @override
   String get restoreFromFileInvalidError =>

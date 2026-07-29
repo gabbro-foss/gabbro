@@ -2112,6 +2112,10 @@ class AppLocalizationsYo extends AppLocalizations {
       'A ti dá àpótí ìṣúra padà. Ṣí i pẹ̀lú àwọn ìwé-ẹ̀rí rẹ.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'A ti pa ṣiṣi ẹya ara, nítorí pé fáìlì tí a mú padà lè lo gbolohun ọrọ igbaniwọle mìíràn. Tún un ṣí ní Aabo.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Fáìlì yẹn kì í ṣe àpótí ìṣúra Gabbro tó ṣeé lò.';
 

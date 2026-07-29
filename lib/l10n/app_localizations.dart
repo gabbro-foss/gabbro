@@ -3901,6 +3901,12 @@ abstract class AppLocalizations {
   /// **'Vault restored. Unlock with your credentials.'**
   String get vaultRestoredMessage;
 
+  /// Shown after a restore-from-file when biometric unlock was enrolled for this vault: the stored passphrase belongs to the replaced vault, so the enrolment was dropped.
+  ///
+  /// In en, this message translates to:
+  /// **'Biometric unlock was turned off, because the restored file may use a different passphrase. Re-enable it in Security.'**
+  String get vaultRestoredBiometricDisabled;
+
   /// No description provided for @restoreFromFileInvalidError.
   ///
   /// In en, this message translates to:

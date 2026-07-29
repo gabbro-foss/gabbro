@@ -2132,6 +2132,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Caja fuerte restaurada. Desbloquea con tus credenciales.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Se desactivó el desbloqueo biométrico, porque el archivo restaurado puede usar otra contraseña. Vuelve a activarlo en Seguridad.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Ese archivo no es una caja fuerte de Gabbro utilizable.';
 

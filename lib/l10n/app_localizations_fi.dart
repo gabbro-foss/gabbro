@@ -2114,6 +2114,10 @@ class AppLocalizationsFi extends AppLocalizations {
       'Holvi palautettu. Avaa lukitus tunnuksillasi.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Biometrinen avaaminen poistettiin käytöstä, koska palautettu tiedosto voi käyttää eri salauslausetta. Ota se uudelleen käyttöön kohdassa Tietoturva.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Tämä tiedosto ei ole käyttökelpoinen Gabbro-holvi.';
 

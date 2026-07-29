@@ -2136,6 +2136,10 @@ class AppLocalizationsEl extends AppLocalizations {
       'Το θησαυροφυλάκιο επαναφέρθηκε. Ξεκλειδώστε με τα διαπιστευτήριά σας.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Το βιομετρικό ξεκλείδωμα απενεργοποιήθηκε, επειδή το αρχείο που επαναφέρθηκε μπορεί να χρησιμοποιεί διαφορετική φράση πρόσβασης. Ενεργοποιήστε το ξανά στην Ασφάλεια.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Αυτό το αρχείο δεν είναι χρησιμοποιήσιμο θησαυροφυλάκιο Gabbro.';
 
