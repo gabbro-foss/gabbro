@@ -316,6 +316,107 @@ void main() {
       await tester.pump();
     });
 
+    // ── R7: Sync from vault demands full credentials ─────────────────────────
+    //
+    // Four guards on one button, none of them previously tested. The last one
+    // matters most: without it, pressing Sync with an empty PIN box sends that
+    // empty PIN to the YubiKey.
+
+    testWidgets('no file chosen is refused before any import', (tester) async {
+      var imported = false;
+      await tester.pumpWidget(testApp(ImportScreen(
+        isAndroid: false,
+        onDetectSourceRecords: (_) => [],
+        onImportGabbro: (_, _) async {
+          imported = true;
+          return GabbroImportResult(imported: BigInt.zero, skipped: []);
+        },
+      )));
+
+      await tester.ensureVisible(find.text('Sync from vault'));
+      await tester.tap(find.text('Sync from vault'));
+      await tester.pump();
+
+      expect(find.text('Select a file.'), findsOneWidget);
+      expect(imported, isFalse);
+    });
+
+    testWidgets('a file that is gone from disk is refused', (tester) async {
+      final tmp = tempGabbroFile();
+      var imported = false;
+      await tester.pumpWidget(testApp(ImportScreen(
+        isAndroid: false,
+        initialGabbroPath: tmp.path,
+        onDetectSourceRecords: (_) => [],
+        onImportGabbro: (_, _) async {
+          imported = true;
+          return GabbroImportResult(imported: BigInt.zero, skipped: []);
+        },
+      )));
+      tmp.deleteSync();
+
+      await tester.enterText(
+          find.widgetWithText(TextField, 'Vault passphrase'), 'pw');
+      await tester.ensureVisible(find.text('Sync from vault'));
+      await tester.tap(find.text('Sync from vault'));
+      await tester.pump();
+
+      expect(find.text('File not found.'), findsOneWidget);
+      expect(imported, isFalse);
+    });
+
+    testWidgets('an empty passphrase is refused before any import',
+        (tester) async {
+      final tmp = tempGabbroFile();
+      var imported = false;
+      await tester.pumpWidget(testApp(ImportScreen(
+        isAndroid: false,
+        initialGabbroPath: tmp.path,
+        onDetectSourceRecords: (_) => [],
+        onImportGabbro: (_, _) async {
+          imported = true;
+          return GabbroImportResult(imported: BigInt.zero, skipped: []);
+        },
+      )));
+
+      await tester.ensureVisible(find.text('Sync from vault'));
+      await tester.tap(find.text('Sync from vault'));
+      await tester.pump();
+
+      expect(find.text('Enter the passphrase for this vault.'), findsOneWidget);
+      expect(imported, isFalse);
+    });
+
+    testWidgets('an empty PIN is refused before the key is asked for',
+        (tester) async {
+      final tmp = tempGabbroFile();
+      var tapped = false;
+      var imported = false;
+      await tester.pumpWidget(testApp(ImportScreen(
+        isAndroid: false,
+        initialGabbroPath: tmp.path,
+        onDetectSourceRecords: (_) => [fakeRecord()],
+        onGetYubikeyHmac: (_, _, _) async {
+          tapped = true;
+          return (hmac: <int>[9], credentialId: <int>[1, 2]);
+        },
+        onImportGabbroWithKey: (_, _, _, _) async {
+          imported = true;
+          return GabbroImportResult(imported: BigInt.one, skipped: []);
+        },
+      )));
+
+      await tester.enterText(
+          find.widgetWithText(TextField, 'Vault passphrase'), 'pw');
+      await tester.ensureVisible(find.text('Sync from vault'));
+      await tester.tap(find.text('Sync from vault'));
+      await tester.pump();
+
+      expect(find.text('YubiKey PIN is required'), findsOneWidget);
+      expect(tapped, isFalse, reason: 'no empty PIN may reach the key');
+      expect(imported, isFalse);
+    });
+
     // ── Enter-submit / focus chain (Gabbro source) ───────────────────────────
     testWidgets('Enter on the passphrase runs the import (passphrase-only source)',
         (tester) async {
