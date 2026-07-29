@@ -73,7 +73,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 649 | 17 |
+| Rust (`cargo test -q`) | 653 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 11 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -115,7 +115,7 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-Build the net (R5–R10 below). No production change starts until it is green.
+Build the net (R6–R10 below). No production change starts until it is green.
 
 ### Faster sync, attempt 2 — this branch
 
@@ -154,9 +154,12 @@ R1–R3 done: 8 pins in `rust/src/api/vault_bridge.rs`, green in release.
 R4 done: 7 pins in `test/vault_registry_test.dart`. Registering a known path twice
 leaves the vault listed twice; `remove`/`updateAlias`/`touchLastUsed` then hit both.
 
+R5 done: 4 pins in `rust/src/vault/io.rs`. `restore_vault_from_file` already refuses
+pre-v11 and too-new sources and leaves the target untouched; the refusal carries the
+version + upgrade URL. Widget half was already covered by `unlock_screen_test.dart`.
+
 | # | Pins | Level |
 |---|---|---|
-| R5 | adoption refuses pre-v11 and too-new files, as unlock does (`rust/src/vault/io.rs:239,252`) | Rust + widget |
 | R6 | no screen registers an existing file as a vault — 3 negative pins | widget |
 | R7 | `import entries` refuses an empty passphrase / empty PIN | widget |
 | R8 | sync-method chooser reachable + translated, 37 locales x 8x x 360dp — port from attempt 1, strip `warnSamePassphrase` | widget |
