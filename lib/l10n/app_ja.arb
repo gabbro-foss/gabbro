@@ -772,6 +772,7 @@
   "onboardingVaultLocation": "ボルトの場所",
   "onboardingLoadingPath": "読み込み中…",
   "onboardingPathHint": "ボルトファイルのパス",
+  "onboardingPathTaken": "ここにはすでにファイルがあります。別の名前を選んでください。ボールトを作成すると置き換えられます。",
   "onboardingPathRequired": "パスは必須です",
   "onboardingReusePassphraseHint": "新しいマスターパスフレーズを選択するか、以前のものを再使用してください。",
   "onboardingPassphraseRequired": "パスフレーズは必須です",

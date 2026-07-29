@@ -773,6 +773,7 @@
   "onboardingVaultLocation": "Lokalizacja skarbca",
   "onboardingLoadingPath": "Ładowanie…",
   "onboardingPathHint": "Ścieżka do pliku skarbca",
+  "onboardingPathTaken": "Tutaj już istnieje plik. Wybierz inną nazwę — utworzenie skarbca zastąpiłoby go.",
   "onboardingPathRequired": "Ścieżka jest wymagana",
   "onboardingReusePassphraseHint": "Wybierz nowe hasło główne lub ponownie użyj poprzedniego.",
   "onboardingPassphraseRequired": "Hasło główne jest wymagane",

@@ -1777,6 +1777,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get onboardingPathRequired => 'Az útvonal kötelező';
 
   @override
+  String get onboardingPathTaken =>
+      'Itt már van egy fájl. Válasszon másik nevet — a széf létrehozása felülírná.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Válassz új fő jelmondatot, vagy használd újra az előzőt, ha preferálod.';
 

@@ -773,6 +773,7 @@
   "onboardingVaultLocation": "Seifa atrašanās vieta",
   "onboardingLoadingPath": "Ielāde…",
   "onboardingPathHint": "Ceļš uz seifa failu",
+  "onboardingPathTaken": "Šeit jau ir fails. Izvēlieties citu nosaukumu — seifa izveide to aizstātu.",
   "onboardingPathRequired": "Ceļš ir nepieciešams",
   "onboardingReusePassphraseHint": "Izvēlieties jaunu galveno ieejas frāzi vai atkārtoti izmantojiet iepriekšējo, ja vēlaties.",
   "onboardingPassphraseRequired": "Ieejas frāze ir nepieciešama",

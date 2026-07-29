@@ -1774,6 +1774,10 @@ class AppLocalizationsEt extends AppLocalizations {
   String get onboardingPathRequired => 'Tee on nõutav';
 
   @override
+  String get onboardingPathTaken =>
+      'Siin on juba fail. Valige teine nimi — seifi loomine asendaks selle.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Vali uus peamine pääslause või kasuta eelmist uuesti, kui eelistad.';
 

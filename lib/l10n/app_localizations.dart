@@ -3319,6 +3319,12 @@ abstract class AppLocalizations {
   /// **'Path is required'**
   String get onboardingPathRequired;
 
+  /// Shown when the chosen vault path already holds a file. Creating seals an empty vault, so it would replace whatever is there.
+  ///
+  /// In en, this message translates to:
+  /// **'A file already exists here. Choose a different name — creating a vault would replace it.'**
+  String get onboardingPathTaken;
+
   /// No description provided for @onboardingReusePassphraseHint.
   ///
   /// In en, this message translates to:

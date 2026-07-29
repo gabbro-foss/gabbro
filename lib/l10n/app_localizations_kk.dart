@@ -1773,6 +1773,10 @@ class AppLocalizationsKk extends AppLocalizations {
   String get onboardingPathRequired => 'Жол міндетті';
 
   @override
+  String get onboardingPathTaken =>
+      'Мұнда файл бұрыннан бар. Басқа атау таңдаңыз — сейф жасау оны ауыстырады.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Жаңа негізгі кілт фразасын таңдаңыз немесе бұрынғысын қайта пайдаланыңыз.';
 

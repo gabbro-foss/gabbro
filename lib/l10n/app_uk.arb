@@ -773,6 +773,7 @@
   "onboardingVaultLocation": "Розташування сховища",
   "onboardingLoadingPath": "Завантаження…",
   "onboardingPathHint": "Шлях до файлу сховища",
+  "onboardingPathTaken": "Тут уже є файл. Виберіть іншу назву — створення сховища замінило б його.",
   "onboardingPathRequired": "Шлях обов'язковий",
   "onboardingReusePassphraseHint": "Виберіть нову головну кодову фразу або повторно використайте попередню.",
   "onboardingPassphraseRequired": "Кодова фраза обов'язкова",

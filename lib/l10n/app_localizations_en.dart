@@ -1763,6 +1763,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingPathRequired => 'Path is required';
 
   @override
+  String get onboardingPathTaken =>
+      'A file already exists here. Choose a different name — creating a vault would replace it.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Choose a new master passphrase, or re-use your previous one if you prefer.';
 

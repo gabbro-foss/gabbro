@@ -1778,6 +1778,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get onboardingPathRequired => 'O caminho é obrigatório';
 
   @override
+  String get onboardingPathTaken =>
+      'Já existe um ficheiro aqui. Escolha outro nome — criar um cofre substituí-lo-ia.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Escolha uma nova frase secreta principal, ou reutilize a anterior se preferir.';
 
@@ -3928,6 +3932,10 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get onboardingPathRequired => 'O caminho é obrigatório';
+
+  @override
+  String get onboardingPathTaken =>
+      'Já existe um arquivo aqui. Escolha outro nome — criar um cofre o substituiria.';
 
   @override
   String get onboardingReusePassphraseHint =>
@@ -6081,6 +6089,10 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get onboardingPathRequired => 'O caminho é obrigatório';
+
+  @override
+  String get onboardingPathTaken =>
+      'Já existe um ficheiro aqui. Escolha outro nome — criar um cofre substituí-lo-ia.';
 
   @override
   String get onboardingReusePassphraseHint =>

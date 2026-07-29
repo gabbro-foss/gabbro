@@ -454,6 +454,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Future<void> _createVault() async {
     if (!_formKey.currentState!.validate()) return;
+    // The Rust guard refuses an occupied path too, but its message is English
+    // and arrives wrapped in "Setup failed". Someone pointing Create at their
+    // existing vault has made an ordinary mistake, so say so in their language
+    // and never start the creation.
+    if (File(_vaultPath).existsSync()) {
+      setState(() => _error = AppLocalizations.of(context).onboardingPathTaken);
+      return;
+    }
     setState(() {
       _isCreating = true;
       _error = null;

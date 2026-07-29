@@ -772,6 +772,7 @@
   "onboardingVaultLocation": "Emplacement du coffre",
   "onboardingLoadingPath": "Chargement…",
   "onboardingPathHint": "Chemin vers le fichier coffre",
+  "onboardingPathTaken": "Un fichier existe déjà ici. Choisissez un autre nom : créer un coffre le remplacerait.",
   "onboardingPathRequired": "Le chemin est requis",
   "onboardingReusePassphraseHint": "Choisissez une nouvelle phrase secrète principale, ou réutilisez l'ancienne si vous préférez.",
   "onboardingPassphraseRequired": "La phrase secrète est requise",

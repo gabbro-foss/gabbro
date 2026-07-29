@@ -1774,6 +1774,10 @@ class AppLocalizationsBg extends AppLocalizations {
   String get onboardingPathRequired => 'Пътят е задължителен';
 
   @override
+  String get onboardingPathTaken =>
+      'Тук вече съществува файл. Изберете друго име — създаването на трезор би го заменило.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Избери нова главна паролна фраза или повторно използвай предишната.';
 

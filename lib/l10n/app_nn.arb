@@ -773,6 +773,7 @@
   "onboardingVaultLocation": "Kvelvplassering",
   "onboardingLoadingPath": "Lastar…",
   "onboardingPathHint": "Sti til kvelvfil",
+  "onboardingPathTaken": "Det finst allereie ei fil her. Vel eit anna namn — å opprette eit kvelv ville erstatta ho.",
   "onboardingPathRequired": "Sti er påkravd",
   "onboardingReusePassphraseHint": "Vel ei ny hovud­passfrase, eller bruk den førre på nytt om du vil.",
   "onboardingPassphraseRequired": "Passfrase er påkravd",

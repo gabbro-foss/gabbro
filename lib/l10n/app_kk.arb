@@ -772,6 +772,7 @@
   "onboardingVaultLocation": "Сейфтің орны",
   "onboardingLoadingPath": "Жүктелуде…",
   "onboardingPathHint": "Сейф файлының жолы",
+  "onboardingPathTaken": "Мұнда файл бұрыннан бар. Басқа атау таңдаңыз — сейф жасау оны ауыстырады.",
   "onboardingPathRequired": "Жол міндетті",
   "onboardingReusePassphraseHint": "Жаңа негізгі кілт фразасын таңдаңыз немесе бұрынғысын қайта пайдаланыңыз.",
   "onboardingPassphraseRequired": "Кілт фразасы міндетті",

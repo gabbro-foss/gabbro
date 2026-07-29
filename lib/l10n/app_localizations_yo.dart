@@ -1771,6 +1771,10 @@ class AppLocalizationsYo extends AppLocalizations {
   String get onboardingPathRequired => 'Ipa ọna jẹ dandan';
 
   @override
+  String get onboardingPathTaken =>
+      'Fáìlì kan ti wà níbí tẹ́lẹ̀. Yan orúkọ mìíràn — dídá vọ́ọ̀lítì sílẹ̀ yóò rọ́pò rẹ̀.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Yan gbolohun ọrọ igbaniwọle akọkọ tuntun tabi lo atijọ lẹẹkansi.';
 

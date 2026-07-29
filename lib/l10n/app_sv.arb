@@ -773,6 +773,7 @@
   "onboardingVaultLocation": "Valvplats",
   "onboardingLoadingPath": "Läser in…",
   "onboardingPathHint": "Sökväg till valvfil",
+  "onboardingPathTaken": "Det finns redan en fil här. Välj ett annat namn — att skapa ett valv skulle ersätta den.",
   "onboardingPathRequired": "Sökväg krävs",
   "onboardingReusePassphraseHint": "Välj en ny huvud­lösenfras, eller återanvänd din tidigare om du föredrar det.",
   "onboardingPassphraseRequired": "Lösenfras krävs",

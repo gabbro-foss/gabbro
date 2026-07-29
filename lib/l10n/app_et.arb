@@ -773,6 +773,7 @@
   "onboardingVaultLocation": "Seifi asukoht",
   "onboardingLoadingPath": "Laadimine…",
   "onboardingPathHint": "Tee seififailini",
+  "onboardingPathTaken": "Siin on juba fail. Valige teine nimi — seifi loomine asendaks selle.",
   "onboardingPathRequired": "Tee on nõutav",
   "onboardingReusePassphraseHint": "Vali uus peamine pääslause või kasuta eelmist uuesti, kui eelistad.",
   "onboardingPassphraseRequired": "Pääslause on nõutav",

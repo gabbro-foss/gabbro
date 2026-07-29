@@ -772,6 +772,7 @@
   "onboardingVaultLocation": "Ubicación del vault",
   "onboardingLoadingPath": "Cargando…",
   "onboardingPathHint": "Ruta al archivo vault",
+  "onboardingPathTaken": "Ya existe un archivo aquí. Elige otro nombre: crear un almacén lo reemplazaría.",
   "onboardingPathRequired": "La ruta es obligatoria",
   "onboardingReusePassphraseHint": "Elija una nueva frase de contraseña maestra, o reutilice la anterior si lo prefiere.",
   "onboardingPassphraseRequired": "La frase de contraseña es obligatoria",

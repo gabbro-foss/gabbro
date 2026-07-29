@@ -773,6 +773,7 @@
   "onboardingVaultLocation": "Hvælvingplacering",
   "onboardingLoadingPath": "Indlæser…",
   "onboardingPathHint": "Sti til hvælvingsfil",
+  "onboardingPathTaken": "Der findes allerede en fil her. Vælg et andet navn — oprettelse af en hvælving ville erstatte den.",
   "onboardingPathRequired": "Sti er påkrævet",
   "onboardingReusePassphraseHint": "Vælg en ny hovedadgangssætning, eller genbruge din tidligere, hvis du foretrækker det.",
   "onboardingPassphraseRequired": "Adgangssætning er påkrævet",

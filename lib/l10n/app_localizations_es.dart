@@ -1784,6 +1784,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get onboardingPathRequired => 'La ruta es obligatoria';
 
   @override
+  String get onboardingPathTaken =>
+      'Ya existe un archivo aquí. Elige otro nombre: crear un almacén lo reemplazaría.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Elija una nueva frase de contraseña maestra, o reutilice la anterior si lo prefiere.';
 

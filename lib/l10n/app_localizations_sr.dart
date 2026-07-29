@@ -1778,6 +1778,10 @@ class AppLocalizationsSr extends AppLocalizations {
   String get onboardingPathRequired => 'Putanja je obavezna';
 
   @override
+  String get onboardingPathTaken =>
+      'Ovde već postoji datoteka. Izaberite drugo ime — kreiranje trezora bi je zamenilo.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Izaberite novu glavnu pristupnu frazu ili ponovo koristite prethodnu.';
 
@@ -3925,6 +3929,10 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get onboardingPathRequired => 'Putanja je obavezna';
+
+  @override
+  String get onboardingPathTaken =>
+      'Ovde već postoji datoteka. Izaberite drugo ime — kreiranje trezora bi je zamenilo.';
 
   @override
   String get onboardingReusePassphraseHint =>

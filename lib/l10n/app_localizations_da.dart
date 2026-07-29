@@ -1776,6 +1776,10 @@ class AppLocalizationsDa extends AppLocalizations {
   String get onboardingPathRequired => 'Sti er påkrævet';
 
   @override
+  String get onboardingPathTaken =>
+      'Der findes allerede en fil her. Vælg et andet navn — oprettelse af en hvælving ville erstatte den.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Vælg en ny hovedadgangssætning, eller genbruge din tidligere, hvis du foretrækker det.';
 

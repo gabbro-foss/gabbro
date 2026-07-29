@@ -1778,6 +1778,10 @@ class AppLocalizationsLt extends AppLocalizations {
   String get onboardingPathRequired => 'Kelias yra privalomas';
 
   @override
+  String get onboardingPathTaken =>
+      'Čia jau yra failas. Pasirinkite kitą pavadinimą — sukūrus saugyklą jis būtų pakeistas.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Pasirinkite naują pagrindinę slaptafrazę arba pakartotinai naudokite ankstesnę, jei norite.';
 

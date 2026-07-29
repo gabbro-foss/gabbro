@@ -931,6 +931,10 @@
   "onboardingLoadingPath": "Loading…",
   "onboardingPathHint": "Path to vault file",
   "onboardingPathRequired": "Path is required",
+  "onboardingPathTaken": "A file already exists here. Choose a different name — creating a vault would replace it.",
+  "@onboardingPathTaken": {
+    "description": "Shown when the chosen vault path already holds a file. Creating seals an empty vault, so it would replace whatever is there."
+  },
   "onboardingReusePassphraseHint": "Choose a new master passphrase, or re-use your previous one if you prefer.",
   "onboardingPassphraseRequired": "Passphrase is required",
   "onboardingConfirmRequired": "Please confirm your passphrase",

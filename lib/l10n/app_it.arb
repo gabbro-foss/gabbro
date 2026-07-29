@@ -772,6 +772,7 @@
   "onboardingVaultLocation": "Posizione del vault",
   "onboardingLoadingPath": "Caricamento…",
   "onboardingPathHint": "Percorso al file vault",
+  "onboardingPathTaken": "Qui esiste già un file. Scegli un altro nome: creare un archivio lo sostituirebbe.",
   "onboardingPathRequired": "Il percorso è richiesto",
   "onboardingReusePassphraseHint": "Scegli una nuova passphrase principale, o riutilizza quella precedente se preferisci.",
   "onboardingPassphraseRequired": "La passphrase è richiesta",

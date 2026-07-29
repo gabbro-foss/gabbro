@@ -772,6 +772,7 @@
   "onboardingVaultLocation": "Umiestnenie trezora",
   "onboardingLoadingPath": "Načítavanie…",
   "onboardingPathHint": "Cesta k súboru trezora",
+  "onboardingPathTaken": "Tu už súbor existuje. Zvoľte iný názov — vytvorenie trezora by ho nahradilo.",
   "onboardingPathRequired": "Cesta je povinná",
   "onboardingReusePassphraseHint": "Zvoľte novú hlavnú prístupovú frázu alebo znovu použite predchádzajúcu.",
   "onboardingPassphraseRequired": "Prístupová fráza je povinná",

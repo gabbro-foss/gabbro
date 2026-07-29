@@ -772,6 +772,7 @@
   "onboardingVaultLocation": "Gandegi-kokapena",
   "onboardingLoadingPath": "Kargatzen…",
   "onboardingPathHint": "Gandegi-fitxategiaren bidea",
+  "onboardingPathTaken": "Hemen fitxategi bat dago jada. Aukeratu beste izen bat — gandegi bat sortzeak ordezkatuko luke.",
   "onboardingPathRequired": "Bidea nahitaezkoa da",
   "onboardingReusePassphraseHint": "Aukeratu pasaesaldi nagusi berria edo berrerabili aurrekoa.",
   "onboardingPassphraseRequired": "Pasaesaldia nahitaezkoa da",

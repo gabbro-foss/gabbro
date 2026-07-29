@@ -773,6 +773,7 @@
   "onboardingVaultLocation": "Расположение хранилища",
   "onboardingLoadingPath": "Загрузка…",
   "onboardingPathHint": "Путь к файлу хранилища",
+  "onboardingPathTaken": "Здесь уже есть файл. Выберите другое имя — создание хранилища заменило бы его.",
   "onboardingPathRequired": "Путь обязателен",
   "onboardingReusePassphraseHint": "Выберите новую главную кодовую фразу или повторно используйте предыдущую.",
   "onboardingPassphraseRequired": "Кодовая фраза обязательна",

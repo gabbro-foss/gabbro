@@ -1776,6 +1776,10 @@ class AppLocalizationsSk extends AppLocalizations {
   String get onboardingPathRequired => 'Cesta je povinná';
 
   @override
+  String get onboardingPathTaken =>
+      'Tu už súbor existuje. Zvoľte iný názov — vytvorenie trezora by ho nahradilo.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Zvoľte novú hlavnú prístupovú frázu alebo znovu použite predchádzajúcu.';
 

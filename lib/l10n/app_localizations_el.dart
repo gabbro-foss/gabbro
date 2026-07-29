@@ -1789,6 +1789,10 @@ class AppLocalizationsEl extends AppLocalizations {
   String get onboardingPathRequired => 'Η διαδρομή είναι υποχρεωτική';
 
   @override
+  String get onboardingPathTaken =>
+      'Υπάρχει ήδη αρχείο εδώ. Επιλέξτε άλλο όνομα — η δημιουργία θησαυροφυλακίου θα το αντικαθιστούσε.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Επιλέξτε νέα κύρια φράση πρόσβασης ή επαναχρησιμοποιήστε την προηγούμενη.';
 

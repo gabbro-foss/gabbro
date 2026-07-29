@@ -772,6 +772,7 @@
   "onboardingVaultLocation": "Τοποθεσία θησαυροφυλακίου",
   "onboardingLoadingPath": "Φόρτωση…",
   "onboardingPathHint": "Διαδρομή αρχείου θησαυροφυλακίου",
+  "onboardingPathTaken": "Υπάρχει ήδη αρχείο εδώ. Επιλέξτε άλλο όνομα — η δημιουργία θησαυροφυλακίου θα το αντικαθιστούσε.",
   "onboardingPathRequired": "Η διαδρομή είναι υποχρεωτική",
   "onboardingReusePassphraseHint": "Επιλέξτε νέα κύρια φράση πρόσβασης ή επαναχρησιμοποιήστε την προηγούμενη.",
   "onboardingPassphraseRequired": "Η φράση πρόσβασης είναι υποχρεωτική",

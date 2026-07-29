@@ -1780,6 +1780,10 @@ class AppLocalizationsUk extends AppLocalizations {
   String get onboardingPathRequired => 'Шлях обов\'язковий';
 
   @override
+  String get onboardingPathTaken =>
+      'Тут уже є файл. Виберіть іншу назву — створення сховища замінило б його.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Виберіть нову головну кодову фразу або повторно використайте попередню.';
 

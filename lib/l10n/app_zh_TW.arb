@@ -772,6 +772,7 @@
   "onboardingVaultLocation": "保險庫位置",
   "onboardingLoadingPath": "載入中…",
   "onboardingPathHint": "保險庫檔案路徑",
+  "onboardingPathTaken": "此處已有檔案。請選擇其他名稱——建立保險庫會將其取代。",
   "onboardingPathRequired": "路徑為必填項",
   "onboardingReusePassphraseHint": "選擇新的主要密碼片語或重複使用之前的。",
   "onboardingPassphraseRequired": "密碼片語為必填項",

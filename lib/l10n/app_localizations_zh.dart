@@ -1718,6 +1718,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onboardingPathRequired => '路径为必填项';
 
   @override
+  String get onboardingPathTaken => '此处已存在文件。请选择其他名称——创建保险库会将其替换。';
+
+  @override
   String get onboardingReusePassphraseHint => '选择新的主密码短语或重复使用以前的。';
 
   @override
@@ -3774,6 +3777,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get onboardingPathRequired => '路径为必填项';
 
   @override
+  String get onboardingPathTaken => '此处已存在文件。请选择其他名称——创建保险库会将其替换。';
+
+  @override
   String get onboardingReusePassphraseHint => '选择新的主密码短语或重复使用以前的。';
 
   @override
@@ -5828,6 +5834,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get onboardingPathRequired => '路徑為必填項';
+
+  @override
+  String get onboardingPathTaken => '此處已有檔案。請選擇其他名稱——建立保險庫會將其取代。';
 
   @override
   String get onboardingReusePassphraseHint => '選擇新的主要密碼片語或重複使用之前的。';

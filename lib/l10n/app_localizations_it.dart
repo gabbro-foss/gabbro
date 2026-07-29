@@ -1780,6 +1780,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get onboardingPathRequired => 'Il percorso è richiesto';
 
   @override
+  String get onboardingPathTaken =>
+      'Qui esiste già un file. Scegli un altro nome: creare un archivio lo sostituirebbe.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Scegli una nuova passphrase principale, o riutilizza quella precedente se preferisci.';
 

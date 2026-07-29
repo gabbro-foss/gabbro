@@ -773,6 +773,7 @@
   "onboardingVaultLocation": "Kluislocatie",
   "onboardingLoadingPath": "Laden…",
   "onboardingPathHint": "Pad naar kluisbestand",
+  "onboardingPathTaken": "Hier bestaat al een bestand. Kies een andere naam — een kluis aanmaken zou het vervangen.",
   "onboardingPathRequired": "Pad is vereist",
   "onboardingReusePassphraseHint": "Kies een nieuwe hoofdwachtwoordzin, of hergebruik uw vorige als u dat liever heeft.",
   "onboardingPassphraseRequired": "Wachtwoordzin is vereist",

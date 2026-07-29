@@ -772,6 +772,7 @@
   "onboardingVaultLocation": "保险库位置",
   "onboardingLoadingPath": "加载中…",
   "onboardingPathHint": "保险库文件路径",
+  "onboardingPathTaken": "此处已存在文件。请选择其他名称——创建保险库会将其替换。",
   "onboardingPathRequired": "路径为必填项",
   "onboardingReusePassphraseHint": "选择新的主密码短语或重复使用以前的。",
   "onboardingPassphraseRequired": "密码短语为必填项",

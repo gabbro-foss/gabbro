@@ -1795,6 +1795,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get onboardingPathRequired => 'Le chemin est requis';
 
   @override
+  String get onboardingPathTaken =>
+      'Un fichier existe déjà ici. Choisissez un autre nom : créer un coffre le remplacerait.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Choisissez une nouvelle phrase secrète principale, ou réutilisez l\'ancienne si vous préférez.';
 

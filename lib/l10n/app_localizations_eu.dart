@@ -1773,6 +1773,10 @@ class AppLocalizationsEu extends AppLocalizations {
   String get onboardingPathRequired => 'Bidea nahitaezkoa da';
 
   @override
+  String get onboardingPathTaken =>
+      'Hemen fitxategi bat dago jada. Aukeratu beste izen bat — gandegi bat sortzeak ordezkatuko luke.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Aukeratu pasaesaldi nagusi berria edo berrerabili aurrekoa.';
 

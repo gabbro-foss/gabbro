@@ -773,6 +773,7 @@
   "onboardingVaultLocation": "Saugyklos vieta",
   "onboardingLoadingPath": "Kraunama…",
   "onboardingPathHint": "Kelias į saugyklos failą",
+  "onboardingPathTaken": "Čia jau yra failas. Pasirinkite kitą pavadinimą — sukūrus saugyklą jis būtų pakeistas.",
   "onboardingPathRequired": "Kelias yra privalomas",
   "onboardingReusePassphraseHint": "Pasirinkite naują pagrindinę slaptafrazę arba pakartotinai naudokite ankstesnę, jei norite.",
   "onboardingPassphraseRequired": "Slaptafrazė yra privaloma",

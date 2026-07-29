@@ -773,6 +773,7 @@
   "onboardingVaultLocation": "Holvisijainti",
   "onboardingLoadingPath": "Ladataan…",
   "onboardingPathHint": "Polku holvitiedostoon",
+  "onboardingPathTaken": "Täällä on jo tiedosto. Valitse toinen nimi — holvin luominen korvaisi sen.",
   "onboardingPathRequired": "Polku vaaditaan",
   "onboardingReusePassphraseHint": "Valitse uusi pääsalauslause tai käytä edellistä uudelleen.",
   "onboardingPassphraseRequired": "Salauslause vaaditaan",

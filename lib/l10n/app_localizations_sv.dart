@@ -1771,6 +1771,10 @@ class AppLocalizationsSv extends AppLocalizations {
   String get onboardingPathRequired => 'Sökväg krävs';
 
   @override
+  String get onboardingPathTaken =>
+      'Det finns redan en fil här. Välj ett annat namn — att skapa ett valv skulle ersätta den.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Välj en ny huvud­lösenfras, eller återanvänd din tidigare om du föredrar det.';
 

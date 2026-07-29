@@ -1732,6 +1732,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get onboardingPathRequired => 'パスは必須です';
 
   @override
+  String get onboardingPathTaken =>
+      'ここにはすでにファイルがあります。別の名前を選んでください。ボールトを作成すると置き換えられます。';
+
+  @override
   String get onboardingReusePassphraseHint =>
       '新しいマスターパスフレーズを選択するか、以前のものを再使用してください。';
 

@@ -1776,6 +1776,10 @@ class AppLocalizationsFi extends AppLocalizations {
   String get onboardingPathRequired => 'Polku vaaditaan';
 
   @override
+  String get onboardingPathTaken =>
+      'Täällä on jo tiedosto. Valitse toinen nimi — holvin luominen korvaisi sen.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Valitse uusi pääsalauslause tai käytä edellistä uudelleen.';
 

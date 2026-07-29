@@ -1777,6 +1777,10 @@ class AppLocalizationsLv extends AppLocalizations {
   String get onboardingPathRequired => 'Ceļš ir nepieciešams';
 
   @override
+  String get onboardingPathTaken =>
+      'Šeit jau ir fails. Izvēlieties citu nosaukumu — seifa izveide to aizstātu.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Izvēlieties jaunu galveno ieejas frāzi vai atkārtoti izmantojiet iepriekšējo, ja vēlaties.';
 

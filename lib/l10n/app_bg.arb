@@ -773,6 +773,7 @@
   "onboardingVaultLocation": "Местоположение на трезора",
   "onboardingLoadingPath": "Зареждане…",
   "onboardingPathHint": "Път до файла на трезора",
+  "onboardingPathTaken": "Тук вече съществува файл. Изберете друго име — създаването на трезор би го заменило.",
   "onboardingPathRequired": "Пътят е задължителен",
   "onboardingReusePassphraseHint": "Избери нова главна паролна фраза или повторно използвай предишната.",
   "onboardingPassphraseRequired": "Паролната фраза е задължителна",

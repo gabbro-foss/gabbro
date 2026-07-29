@@ -1782,6 +1782,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get onboardingPathRequired => 'Pad is vereist';
 
   @override
+  String get onboardingPathTaken =>
+      'Hier bestaat al een bestand. Kies een andere naam — een kluis aanmaken zou het vervangen.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Kies een nieuwe hoofdwachtwoordzin, of hergebruik uw vorige als u dat liever heeft.';
 

@@ -773,6 +773,7 @@
   "onboardingVaultLocation": "Localização do cofre",
   "onboardingLoadingPath": "Carregando…",
   "onboardingPathHint": "Caminho para o arquivo de cofre",
+  "onboardingPathTaken": "Já existe um ficheiro aqui. Escolha outro nome — criar um cofre substituí-lo-ia.",
   "onboardingPathRequired": "O caminho é obrigatório",
   "onboardingReusePassphraseHint": "Escolha uma nova frase secreta principal, ou reutilize a anterior se preferir.",
   "onboardingPassphraseRequired": "A frase secreta é obrigatória",

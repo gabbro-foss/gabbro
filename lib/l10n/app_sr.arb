@@ -772,6 +772,7 @@
   "onboardingVaultLocation": "Lokacija trezora",
   "onboardingLoadingPath": "Učitavanje…",
   "onboardingPathHint": "Putanja do datoteke trezora",
+  "onboardingPathTaken": "Ovde već postoji datoteka. Izaberite drugo ime — kreiranje trezora bi je zamenilo.",
   "onboardingPathRequired": "Putanja je obavezna",
   "onboardingReusePassphraseHint": "Izaberite novu glavnu pristupnu frazu ili ponovo koristite prethodnu.",
   "onboardingPassphraseRequired": "Pristupna fraza je obavezna",

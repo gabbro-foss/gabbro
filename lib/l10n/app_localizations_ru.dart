@@ -1779,6 +1779,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get onboardingPathRequired => 'Путь обязателен';
 
   @override
+  String get onboardingPathTaken =>
+      'Здесь уже есть файл. Выберите другое имя — создание хранилища заменило бы его.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Выберите новую главную кодовую фразу или повторно используйте предыдущую.';
 

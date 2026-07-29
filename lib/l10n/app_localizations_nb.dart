@@ -1771,6 +1771,10 @@ class AppLocalizationsNb extends AppLocalizations {
   String get onboardingPathRequired => 'Sti er påkrevd';
 
   @override
+  String get onboardingPathTaken =>
+      'Det finnes allerede en fil her. Velg et annet navn — å opprette et hvelv ville erstattet den.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Velg en ny hoved­passfrase, eller gjenbruk din forrige hvis du foretrekker det.';
 

@@ -772,6 +772,7 @@
   "onboardingVaultLocation": "Tresorpfad",
   "onboardingLoadingPath": "Laden…",
   "onboardingPathHint": "Pfad zur Tresordatei",
+  "onboardingPathTaken": "Hier existiert bereits eine Datei. Wähle einen anderen Namen — das Anlegen eines Tresors würde sie ersetzen.",
   "onboardingPathRequired": "Pfad ist erforderlich",
   "onboardingReusePassphraseHint": "Wählen Sie eine neue Hauptpassphrase oder verwenden Sie die vorherige wieder.",
   "onboardingPassphraseRequired": "Passphrase ist erforderlich",

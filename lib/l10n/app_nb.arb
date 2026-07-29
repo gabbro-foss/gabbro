@@ -773,6 +773,7 @@
   "onboardingVaultLocation": "Hvelvplassering",
   "onboardingLoadingPath": "Laster…",
   "onboardingPathHint": "Sti til hvelvfil",
+  "onboardingPathTaken": "Det finnes allerede en fil her. Velg et annet navn — å opprette et hvelv ville erstattet den.",
   "onboardingPathRequired": "Sti er påkrevd",
   "onboardingReusePassphraseHint": "Velg en ny hoved­passfrase, eller gjenbruk din forrige hvis du foretrekker det.",
   "onboardingPassphraseRequired": "Passfrase er påkrevd",

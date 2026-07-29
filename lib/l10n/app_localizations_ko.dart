@@ -1735,6 +1735,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get onboardingPathRequired => '경로는 필수입니다';
 
   @override
+  String get onboardingPathTaken =>
+      '여기에 이미 파일이 있습니다. 다른 이름을 선택하세요. 볼트를 만들면 대체됩니다.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       '새 마스터 암호 문구를 선택하거나 이전 것을 재사용하세요.';
 

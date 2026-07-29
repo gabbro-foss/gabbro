@@ -1774,6 +1774,10 @@ class AppLocalizationsHr extends AppLocalizations {
   String get onboardingPathRequired => 'Put je obavezan';
 
   @override
+  String get onboardingPathTaken =>
+      'Ovdje već postoji datoteka. Odaberite drugo ime — stvaranje trezora zamijenilo bi je.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Odaberite novu glavnu pristupnu frazu ili ponovno koristite prethodnu.';
 

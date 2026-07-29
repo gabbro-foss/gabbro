@@ -773,6 +773,7 @@
   "onboardingVaultLocation": "Széf helye",
   "onboardingLoadingPath": "Betöltés…",
   "onboardingPathHint": "Útvonal a széffájlhoz",
+  "onboardingPathTaken": "Itt már van egy fájl. Válasszon másik nevet — a széf létrehozása felülírná.",
   "onboardingPathRequired": "Az útvonal kötelező",
   "onboardingReusePassphraseHint": "Válassz új fő jelmondatot, vagy használd újra az előzőt, ha preferálod.",
   "onboardingPassphraseRequired": "A jelmondat kötelező",

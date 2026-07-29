@@ -1784,6 +1784,10 @@ class AppLocalizationsPl extends AppLocalizations {
   String get onboardingPathRequired => 'Ścieżka jest wymagana';
 
   @override
+  String get onboardingPathTaken =>
+      'Tutaj już istnieje plik. Wybierz inną nazwę — utworzenie skarbca zastąpiłoby go.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Wybierz nowe hasło główne lub ponownie użyj poprzedniego.';
 

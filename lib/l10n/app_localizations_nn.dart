@@ -1772,6 +1772,10 @@ class AppLocalizationsNn extends AppLocalizations {
   String get onboardingPathRequired => 'Sti er påkravd';
 
   @override
+  String get onboardingPathTaken =>
+      'Det finst allereie ei fil her. Vel eit anna namn — å opprette eit kvelv ville erstatta ho.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Vel ei ny hovud­passfrase, eller bruk den førre på nytt om du vil.';
 
