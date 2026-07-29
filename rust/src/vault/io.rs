@@ -235,13 +235,19 @@ pub fn restore_vault_backup(path: &Path) -> Result<(), String> {
 /// an unreadable vault with another unreadable file. Refuses symlinks on both
 /// paths. The restored vault still requires full credentials to open, so this
 /// grants no access by itself.
+///
+/// The `.bak` is refreshed to the restored bytes, not rotated: it belongs to
+/// whatever vault sits at this path, and the file just replaced may be an
+/// entirely different vault. Left alone it would be offered as this vault's
+/// safety copy and hand the user the previous vault back.
 pub fn restore_vault_from_file(path: &Path, source: &Path) -> Result<(), String> {
     check_not_symlink(path)?;
     check_not_symlink(source)?;
     let bytes = fs::read(source).map_err(|e| format!("Could not read the backup file: {e}"))?;
     SealedVault::from_bytes(&bytes)
         .map_err(|e| format!("That file is not a usable Gabbro vault — restore refused: {e}"))?;
-    atomic_write_0600(path, &bytes)
+    atomic_write_0600(path, &bytes)?;
+    sync_backup_to_current(path)
 }
 
 /// Read a `.gabbro` file from disk and deserialize it into a `SealedVault`.
@@ -873,6 +879,53 @@ mod tests {
         assert_eq!(
             main_after, b"corrupt main",
             "a refused restore must leave the existing vault untouched"
+        );
+    }
+
+    // R10: the `.bak` beside a vault is that vault's safety copy. A
+    // restore-from-file replaces the vault but used to leave the `.bak` holding
+    // the *previous, unrelated* vault — which the unlock screen then offers as
+    // this vault's backup, handing the user the old vault back.
+    #[test]
+    fn restore_from_file_refreshes_the_backup_to_the_restored_vault() {
+        let dir = temp_dir();
+        let path = dir.join("gabbro_io_restore_bak_refresh.gabbro");
+        let source = dir.join("gabbro_io_restore_bak_refresh_source.gabbro");
+        let bak = PathBuf::from(format!("{}.bak", path.display()));
+        let source_bak = PathBuf::from(format!("{}.bak", source.display()));
+        for p in [&path, &source, &bak, &source_bak] {
+            let _ = fs::remove_file(p);
+        }
+
+        // The vault that is about to be replaced, with its own safety copy.
+        let old = seal_vault(b"old pw", b"old body", None).unwrap();
+        write_vault(&old, &path).unwrap();
+        let old_bytes = fs::read(&path).unwrap();
+        assert_eq!(
+            fs::read(&bak).unwrap(),
+            old_bytes,
+            "precondition: the .bak holds the old vault"
+        );
+
+        // A different vault, picked from disk.
+        let new = seal_vault(b"new pw", b"new body", None).unwrap();
+        write_vault(&new, &source).unwrap();
+        let new_bytes = fs::read(&source).unwrap();
+
+        restore_vault_from_file(&path, &source).expect("restore must succeed");
+
+        let bak_after = fs::read(&bak).unwrap();
+        for p in [&path, &source, &bak, &source_bak] {
+            let _ = fs::remove_file(p);
+        }
+
+        assert_ne!(
+            bak_after, old_bytes,
+            "the safety copy must not still hold the replaced vault"
+        );
+        assert_eq!(
+            bak_after, new_bytes,
+            "the safety copy must match the vault now at this path"
         );
     }
 
