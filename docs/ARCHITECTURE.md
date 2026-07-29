@@ -179,9 +179,14 @@ needed; the catalog nets found nothing else.
 
 **Three defects to fix in this branch:**
 - **H1 — biometrics survive a vault swap at the same path.** `unenroll` fires on passphrase
-  change only (`lib/screens/vault_list_screen.dart:1436`); restore-from-file replaces the
+  change only (`lib/screens/vault_list_screen.dart:1412`); restore-from-file replaces the
   bytes and leaves an enrolment that unlocks with the *previous* vault's passphrase (keyed by
   SHA of the path, `BiometricStore.kt:21`).
+  **Fix (agreed):** treat it like the two triggers that already exist — passphrase change
+  (`change_passphrase_screen.dart:284`) and a device fingerprint change (Android invalidates
+  the key, `BiometricHelper.kt:148`). On a successful restore-from-file, unenroll that path
+  and say so in the post-restore banner. No Kotlin change; the `unenroll` handler exists
+  (`GabbroUnlockHostActivity.kt:140`). Costs one new string in all 37 ARBs.
 - **H2 — restore-from-file rotates no `.bak`** (`rust/src/vault/io.rs:221`). Every other write
   path does. A mis-picked file destroys the previous vault with no undo.
 - **H3 — the occupied-path refusal reaches the user in English only.** The create screen shows
