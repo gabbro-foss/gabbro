@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2005 | 10 |
+| Flutter (`flutter test`) | 2006 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -201,10 +201,10 @@ back. `restore_vault_from_file` now refreshes the `.bak` to the restored bytes
   **Done 2026-07-29, hardware-verified.**
 - **H2 — restore-from-file left a stale `.bak`.** Recorded as "no undo", which was wrong;
   see R10 above for what it actually was and how it was fixed. **Done 2026-07-29.**
-- **H3 — the occupied-path refusal reaches the user in English only.** The create screen shows
-  "Setup failed: A file already exists at …" (Rust text via `onboarding_screen.dart:515`).
-  Needs a localized check in the screen before create is called, all 37 ARBs; the Rust guard
-  stays as the backstop.
+- **H3 — the occupied-path refusal reached the user in English only.** The create screen now
+  checks the path itself and shows `onboardingPathTaken` (all 37 ARBs) without starting the
+  creation; the Rust guard stays as the backstop. 1 red-then-green test.
+  **Done 2026-07-29.**
 
 **Design notes:**
 - Linux adoption needs no file copy — register a `VaultRecord` at the picked path. Android's
