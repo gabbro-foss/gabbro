@@ -115,67 +115,84 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-_(empty — agree the next one with the maintainer)_
+Build the net (R1–R10 below). No production change starts until it is green.
 
 ### Faster sync, attempt 2 — this branch
 
 Branched from master 2026-07-28. Documentation only; no code yet.
 
-**Why attempt 1 failed.** `sync_without_second_unlock` is code-complete, never
-hardware-tested, and its key-protected path is unreachable by construction. The cause was
-process: the assistant applied `net-first` rule 1 (verify the wiring, never trust the
-framing) to the code and never to the premise — how a vault comes to exist on a second
-device — and never asked. Broken alongside it: terse messages, ask-then-wait, and a
-hardware matrix written three times without one being run. **That branch is not to be
-merged, and not to be deleted until picked clean.**
-
-**How it works today** (verified 2026-07-28: `rust/src/vault/session.rs:3757`,
-`lib/screens/vault_list_screen.dart:1095`):
-
-| Action | What the user must supply |
-|---|---|
-| `sync from file`, passphrase-only source | the source file's passphrase |
-| `sync from file`, key-protected source | the source file's passphrase + PIN + tap |
-| `import entries` from another vault | the same, full credentials |
-
-The tap is matched against the **incoming file's** registered keys, never the receiving
-vault's — device A's file syncs into device B using one of A's keys. Each device's vault
-was created locally, so each holds its own random master key.
-
-**The format is not the problem.** A key-protected save re-seals the body only
-(`reseal_vault_body`, `rust/src/crypto/vault_crypto.rs:335`), so the random per-vault master
-survives every save, alias change and key add/remove. Two files sharing a master are
-provably the same vault — no passphrase, no tap, no Argon2id. A "vault identity" field would
-add nothing: two vaults could *claim* to be the same while the body still could not be
-opened.
-
-**The missing piece is a flow, not a field.** There is no way to open an existing `.gabbro`
-file as a vault on a second device. With one, device B unlocks A's file once, registers its
-own keys onto that same master, and every later sync is silent. It cannot live in
-`sync from file` — reaching that screen needs an already-open vault with its own master.
-Candidates: `onboarding_screen`, `unlock_screen`, manage-vaults. **Unverified: whether such
-a flow already exists — check before designing anything.**
+**Two changes, both touching the vault:**
+1. **Silent sync** for the same vault; a warning when only the passphrase matched.
+2. **Adopt a vault file** — a new flow from `onboarding_screen`, `unlock_screen` and
+   `manage_vaults_screen` that opens an existing `.gabbro` as a vault on a second device.
 
 **Agreed split:** `sync from file` is the same vault, only ever. `import entries` is any
 other source, always full credentials.
 
-**Salvage from attempt 1, in this order:**
-1. The net tests — green against unchanged production code, so they apply to master as-is.
-2. The Cancel button unreachable at 8x text in the sync-method chooser, and the chooser
-   extraction that carried it. Needs its `warnSamePassphrase` parameter stripped.
-3. Passphrase-only silent sync, rebuilt without the cached-master branch: the probe collapses
-   to one bool and the warning becomes unconditional. Never hardware-tested.
-4. The findings below, and the new Bikeshed Code Quality entry.
+Attempt 1 (`sync_without_second_unlock`) is unmerged and never hardware-tested; its
+key-protected silent path is unreachable for independently created vaults. **Do not merge,
+do not delete until picked clean.**
 
-**Discard — but not yet.** The cached-master silent path and `open_vault_body_with_master`
-are dead for independently created vaults, and are exactly what an adoption flow would need.
-Keep until that question is settled.
+**Verified 2026-07-29:**
+- One save choke point: `do_save` (`rust/src/vault/session.rs:178`). All five importers,
+  alias change, YubiKey add/remove and CRUD reach it. Pin it once, not per importer.
+- No adoption flow exists. `onAddVault` (`lib/main.dart:1109`) only creates;
+  `_restoreFromFile` (`lib/screens/unlock_screen.dart:450`) is gated on a corrupt vault and
+  overwrites a registered path.
+- `import entries` (`lib/screens/import_screen.dart:445`) already demands full credentials.
+  Wording only.
+- Already pinned, do not re-pin: export, all 3 write paths (`rust/src/api/vault.rs:2786-3093`);
+  alias AAD rebinding (`rust/src/api/vault_bridge.rs:1658`); YubiKey add/remove + `.bak`
+  (`rust/src/vault/session.rs:5202-5293`); keyed file→disk sync of a different vault
+  (`rust/src/api/vault_bridge.rs:2376`); cancel-sync, no-leak, batched apply, fast-merge walk
+  (6 `#[ignore]` tests, run by `gabbro_test:80-85`).
+- Export date on/off is a filename only, no crypto (`lib/screens/export_screen.dart:25`).
+
+**The net — R1–R10:**
+
+| # | Pins | Level |
+|---|---|---|
+| R1 | passphrase-only `merge_vault_from_file` **succeeds** against a different vault (only the refusal is tested) | Rust bridge |
+| R2 | `fast_merge_vault_from_file` / `_with_key` — no test exists | Rust bridge |
+| R3 | a merge leaves the receiving vault's protection unchanged (keyed stays keyed) | Rust bridge |
+| R4 | `VaultRegistry.add` appends blind — no path dedup, no alias collision (`lib/vault_registry.dart:76`) | Dart unit |
+| R5 | adoption refuses pre-v11 and too-new files, as unlock does (`rust/src/vault/io.rs:239,252`) | Rust + widget |
+| R6 | no screen registers an existing file as a vault — 3 negative pins | widget |
+| R7 | `import entries` refuses an empty passphrase / empty PIN | widget |
+| R8 | sync-method chooser reachable + translated, 37 locales x 8x x 360dp — port from attempt 1, strip `warnSamePassphrase` | widget |
+| R9 | restore-from-file does not unenroll biometrics today, then red for H1 | widget, Android |
+| R10 | no `.bak` after restore-from-file today, then red for H2 | Rust |
+
+**Two defects to fix in this branch:**
+- **H1 — biometrics survive a vault swap at the same path.** `unenroll` fires on passphrase
+  change only (`lib/screens/vault_list_screen.dart:1436`); restore-from-file replaces the
+  bytes and leaves an enrolment that unlocks with the *previous* vault's passphrase (keyed by
+  SHA of the path, `BiometricStore.kt:21`).
+- **H2 — restore-from-file rotates no `.bak`** (`rust/src/vault/io.rs:221`). Every other write
+  path does. A mis-picked file destroys the previous vault with no undo.
+
+**Design notes:**
+- Linux adoption needs no file copy — register a `VaultRecord` at the picked path. Android's
+  picker returns a cache copy, so a copy into app storage is forced there. That asymmetry
+  decides whether adoption reuses `restore_vault_from_file`.
+- A new screen must enter `test/screen_catalog.dart` and bump `screenFileCount`; that enrols
+  it in the overflow probe, three a11y nets, three keyboard nets and the traversal baseline.
+  New strings need all 37 ARBs (`test/l10n_test.dart` enforces the key set).
+- Any new `#[ignore]` sync test must be added to `gabbro_test`, or it never runs.
+
+**Salvage from attempt 1:** the sync-method chooser extraction and its l10n/overflow test
+(R8). Rebuild passphrase-only silent sync without the cached-master branch — the probe
+collapses to one bool, the warning becomes unconditional. Keep the cached-master path and
+`open_vault_body_with_master` until adoption is designed; adoption is what needs them.
 
 **Findings not to be re-litigated:**
-- A passphrase-only save re-seals the whole file (`session.rs:186`, `rust/src/api/vault.rs:1079`)
-  with fresh salts. Nothing per-vault survives but the alias, so "it opened" proves only
-  *same passphrase* — hence the warning. An entry-UUID-overlap heuristic was **rejected**
-  (cries wolf on an empty or fully-replaced vault); do not re-propose it.
+- A passphrase-only save re-seals the whole file with fresh salts (`session.rs:186`,
+  `rust/src/api/vault.rs:1079`). Nothing per-vault survives but the alias, so "it opened"
+  proves only *same passphrase* — hence the warning. An entry-UUID-overlap heuristic was
+  **rejected** (cries wolf on an empty or fully-replaced vault); do not re-propose it.
+- A key-protected save re-seals the body only (`reseal_vault_body`,
+  `rust/src/crypto/vault_crypto.rs:335`), so the random per-vault master survives every save,
+  alias change and key add/remove. Two files sharing a master are provably the same vault.
 - The AES-GCM AAD binds a header to its own body only (`rust/src/vault/file_format.rs:163`).
   Not a cross-file check — the alias comparison is policy, not crypto.
 - A YubiKey set that differs per device is expected and must **not** be compared: add/remove
