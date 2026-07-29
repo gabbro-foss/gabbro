@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2004 | 10 |
+| Flutter (`flutter test`) | 2005 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -172,15 +172,15 @@ R8 done: chooser extracted to `lib/widgets/sync_method_dialog.dart`, catalogued
 locales. 3 tests in `test/sync_chooser_l10n_overflow_test.dart`. No new ARB keys were
 needed; the catalog nets found nothing else.
 
-R9 done in software, **not on hardware**. `onDisableBiometric` seam on `UnlockScreen`;
-a successful restore-from-file unenrols on Android and says so. 7 tests: Android unenrols,
-Linux does not, cancelled picker and refused restore leave it alone, the notice shows only
-for a user who had it on, and it renders in all 37 locales at 8x on a 360dp phone.
-New ARB key `vaultRestoredBiometricDisabled`, translated in all 37.
+R9 done, hardware-verified 2026-07-29 on an emulator: a restore-from-file unenrols
+biometrics and the notice appears. `onDisableBiometric` seam on `UnlockScreen`; 8 tests
+(Android unenrols, Linux does not, cancelled picker and refused restore leave it alone,
+notice only for a user who had it on, survives the picker's resume, renders in all 37
+locales at 8x on a 360dp phone). New ARB key `vaultRestoredBiometricDisabled`,
+translated in all 37.
 
 | # | Pins | Level |
 |---|---|---|
-| R9 (hardware) | run the restore-from-file flow on a real Android device with mock vaults: biometric really unenrols and the notice appears. Widget-green is not done. | Android |
 | R10 | no `.bak` after restore-from-file today, then red for H2 | Rust |
 
 **Three defects to fix in this branch:**
@@ -193,7 +193,7 @@ New ARB key `vaultRestoredBiometricDisabled`, translated in all 37.
   the key, `BiometricHelper.kt:148`). On a successful restore-from-file, unenroll that path
   and say so in the post-restore banner. No Kotlin change; the `unenroll` handler exists
   (`GabbroUnlockHostActivity.kt:140`). Costs one new string in all 37 ARBs.
-  **Implemented 2026-07-29; hardware run still outstanding.**
+  **Done 2026-07-29, hardware-verified.**
 - **H2 — restore-from-file rotates no `.bak`** (`rust/src/vault/io.rs:221`). Every other write
   path does. A mis-picked file destroys the previous vault with no undo.
 - **H3 — the occupied-path refusal reaches the user in English only.** The create screen shows
