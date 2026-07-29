@@ -1913,6 +1913,37 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  // On Android the file picker backgrounds the app, so the screen re-probes the
+  // vault on the way back (didChangeAppLifecycleState). The restore's own
+  // setState and that probe race, and the emulator run showed neither message
+  // afterwards.
+  testWidgets('the messages survive the resume the file picker causes',
+      (tester) async {
+    var readable = false;
+    await tester.pumpWidget(_buildScreen(
+      isAndroid: true,
+      onBiometricIsEnrolled: (_) async => true,
+      onVaultIsReadable: (_) async => readable,
+      onBackupUsable: (_) async => false,
+      onRestoreFromFile: (_) async {
+        readable = true; // the file on disk is a good vault again
+        return true;
+      },
+    ));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('Restore from a backup file'));
+    await tester.tap(find.text('Restore from a backup file'));
+    // The picker returning wakes the app before the restore's setState lands.
+    tester.binding
+        .handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Vault restored'), findsOneWidget);
+    expect(
+        find.textContaining('Biometric unlock was turned off'), findsOneWidget);
+  });
+
   testWidgets('the user is told biometric unlock was turned off',
       (tester) async {
     await restoreWithBiometric(tester, enrolled: true);
