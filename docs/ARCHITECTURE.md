@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1972 | 10 |
+| Flutter (`flutter test`) | 1979 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -115,7 +115,7 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-Build the net (R4–R10 below). No production change starts until it is green.
+Build the net (R5–R10 below). No production change starts until it is green.
 
 ### Faster sync, attempt 2 — this branch
 
@@ -151,10 +151,11 @@ do not delete until picked clean.**
 **The net — R1–R10:**
 
 R1–R3 done: 8 pins in `rust/src/api/vault_bridge.rs`, green in release.
+R4 done: 7 pins in `test/vault_registry_test.dart`. Registering a known path twice
+leaves the vault listed twice; `remove`/`updateAlias`/`touchLastUsed` then hit both.
 
 | # | Pins | Level |
 |---|---|---|
-| R4 | `VaultRegistry.add` appends blind — no path dedup, no alias collision (`lib/vault_registry.dart:76`) | Dart unit |
 | R5 | adoption refuses pre-v11 and too-new files, as unlock does (`rust/src/vault/io.rs:239,252`) | Rust + widget |
 | R6 | no screen registers an existing file as a vault — 3 negative pins | widget |
 | R7 | `import entries` refuses an empty passphrase / empty PIN | widget |
