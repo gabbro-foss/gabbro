@@ -859,6 +859,113 @@ mod tests {
         );
     }
 
+    // ── R5: the file-adoption entry point vs a format it cannot open ──────────
+    //
+    // `restore_vault_from_file` is the only existing "take a file the user
+    // picked" path, so adoption will reuse it. Unlock already explains a pre-v11
+    // or too-new vault instead of calling it corrupt (unlock_screen.dart, and
+    // the backward-compat gate). These pin what THIS path does with the same
+    // files today.
+
+    fn version_fixture(name: &str) -> PathBuf {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("tests/fixtures/vaults")
+            .join(name)
+    }
+
+    // R5 (1): an intact vault below the readable floor is refused, and the file
+    // being restored over is left exactly as it was.
+    #[test]
+    fn restore_vault_from_file_refuses_a_pre_v11_source() {
+        let path = temp_dir().join("gabbro_io_restore_v10_target.gabbro");
+        let _ = fs::remove_file(&path);
+        fs::write(&path, b"existing vault bytes").unwrap();
+
+        let result = restore_vault_from_file(&path, &version_fixture("v10_passphrase.gabbro"));
+        let main_after = fs::read(&path).unwrap();
+        let _ = fs::remove_file(&path);
+
+        assert!(
+            result.is_err(),
+            "a pre-v11 source must not be written over the existing vault"
+        );
+        assert_eq!(
+            main_after, b"existing vault bytes",
+            "a refused restore must leave the existing vault untouched"
+        );
+    }
+
+    // R5 (2): the refusal must carry the version and the way back. Without this
+    // an adoption flow can only tell the user their intact vault is unusable.
+    #[test]
+    fn refusing_a_pre_v11_source_names_the_version_and_the_upgrade_path() {
+        let path = temp_dir().join("gabbro_io_restore_v10_message.gabbro");
+        let _ = fs::remove_file(&path);
+        fs::write(&path, b"existing vault bytes").unwrap();
+
+        let err = restore_vault_from_file(&path, &version_fixture("v10_passphrase.gabbro"))
+            .expect_err("a pre-v11 source must be refused");
+        let _ = fs::remove_file(&path);
+
+        assert!(
+            err.contains("v10"),
+            "the refusal must name the version: {err}"
+        );
+        assert!(
+            err.contains("VAULT_UPGRADE_PATH.md"),
+            "the refusal must carry the upgrade path: {err}"
+        );
+    }
+
+    // R5 (3): a vault written by a newer build is refused the same way — fail
+    // closed rather than write bytes this build cannot read back.
+    #[test]
+    fn restore_vault_from_file_refuses_a_too_new_source() {
+        let path = temp_dir().join("gabbro_io_restore_toonew_target.gabbro");
+        let source = temp_dir().join("gabbro_io_restore_toonew_source.gabbro");
+        for p in [&path, &source] {
+            let _ = fs::remove_file(p);
+        }
+        fs::write(&path, b"existing vault bytes").unwrap();
+
+        // A real v11 vault with only the version byte (offset 6) bumped.
+        let mut bytes = fs::read(version_fixture("v11_passphrase.gabbro")).unwrap();
+        bytes[6] = crate::vault::file_format::VERSION + 1;
+        fs::write(&source, &bytes).unwrap();
+
+        let result = restore_vault_from_file(&path, &source);
+        let main_after = fs::read(&path).unwrap();
+        for p in [&path, &source] {
+            let _ = fs::remove_file(p);
+        }
+
+        let err = result.expect_err("a too-new source must be refused");
+        assert!(
+            err.to_lowercase().contains("newer"),
+            "the refusal must say the file is newer: {err}"
+        );
+        assert_eq!(
+            main_after, b"existing vault bytes",
+            "a refused restore must leave the existing vault untouched"
+        );
+    }
+
+    // R5 (4): the two probes an adoption screen would ask agree with the refusal
+    // above, so the explanation it shows cannot contradict what the write did.
+    #[test]
+    fn format_probes_agree_with_the_restore_refusal() {
+        let v10 = version_fixture("v10_passphrase.gabbro");
+        let v11 = version_fixture("v11_passphrase.gabbro");
+
+        assert!(
+            vault_format_too_old(&v10).unwrap(),
+            "v10 is below the floor"
+        );
+        assert!(!vault_format_too_new(&v10).unwrap(), "v10 is not too new");
+        assert!(!vault_format_too_old(&v11).unwrap(), "v11 is readable");
+        assert!(!vault_format_too_new(&v11).unwrap(), "v11 is this build");
+    }
+
     // F-08: vault files must be written with mode 0600 on Unix
     #[cfg(unix)]
     #[test]
