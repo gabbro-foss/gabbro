@@ -170,13 +170,17 @@ design and are unchanged. Every route to "add a vault" is the create screen.
 | R9 | restore-from-file does not unenroll biometrics today, then red for H1 | widget, Android |
 | R10 | no `.bak` after restore-from-file today, then red for H2 | Rust |
 
-**Two defects to fix in this branch:**
+**Three defects to fix in this branch:**
 - **H1 — biometrics survive a vault swap at the same path.** `unenroll` fires on passphrase
   change only (`lib/screens/vault_list_screen.dart:1436`); restore-from-file replaces the
   bytes and leaves an enrolment that unlocks with the *previous* vault's passphrase (keyed by
   SHA of the path, `BiometricStore.kt:21`).
 - **H2 — restore-from-file rotates no `.bak`** (`rust/src/vault/io.rs:221`). Every other write
   path does. A mis-picked file destroys the previous vault with no undo.
+- **H3 — the occupied-path refusal reaches the user in English only.** The create screen shows
+  "Setup failed: A file already exists at …" (Rust text via `onboarding_screen.dart:515`).
+  Needs a localized check in the screen before create is called, all 37 ARBs; the Rust guard
+  stays as the backstop.
 
 **Design notes:**
 - Linux adoption needs no file copy — register a `VaultRecord` at the picked path. Android's
