@@ -105,6 +105,17 @@ const _biometricChannel = MethodChannel('app.gabbro.gabbro/biometric');
 
 Future<void> _defaultCancelTap() => cancelYubikeyTap();
 
+// H1: drop this vault's biometric enrolment. Android-only; elsewhere there is
+// nothing enrolled to drop.
+Future<void> _defaultDisableBiometric(String vaultPath) async {
+  if (!Platform.isAndroid) return;
+  try {
+    await _biometricChannel.invokeMethod<void>('unenroll', {
+      'vaultPath': vaultPath,
+    });
+  } catch (_) {}
+}
+
 Future<bool> _defaultBiometricIsEnrolled(String vaultPath) async {
   if (!Platform.isAndroid) return false;
   try {
@@ -271,6 +282,12 @@ class UnlockScreen extends StatefulWidget {
   /// Throws if the picked file is not a usable vault.
   final Future<bool> Function(String vaultPath) onRestoreFromFile;
 
+  /// H1: turn biometric unlock off for [vaultPath] (unenroll on the native
+  /// side). Biometric stores the passphrase of whatever vault was at this path;
+  /// restoring a different file makes that copy stale, exactly as a passphrase
+  /// change does. Best-effort — the restore itself has already succeeded.
+  final Future<void> Function(String vaultPath) onDisableBiometric;
+
   /// R-03 P5: remove an unrecoverable vault from the list, leaving the bytes on
   /// disk. Null → routes through GabbroApp.removeVault(deleteFiles: false).
   final Future<void> Function(String path)? onRemoveVaultFromList;
@@ -307,6 +324,7 @@ class UnlockScreen extends StatefulWidget {
     this.onBackupUsable = _defaultBackupUsable,
     this.onRestoreBackup = _defaultRestoreBackup,
     this.onRestoreFromFile = _defaultRestoreFromFile,
+    this.onDisableBiometric = _defaultDisableBiometric,
     this.onRemoveVaultFromList,
     this.onDeleteVaultFile,
     this.onQuit,
@@ -463,10 +481,23 @@ class _UnlockScreenState extends State<UnlockScreen>
       return;
     }
     if (!mounted || !restored) return; // user cancelled the picker
+    // H1: the file just written may be a different vault, so the passphrase
+    // biometric stored for this path is stale — drop it, exactly as a
+    // passphrase change does. Best-effort: the restore already succeeded.
+    // TODO(H1): tell the user it was turned off — needs one new ARB key in all
+    // 37 locales (see ARCHITECTURE.md, Current Focus).
+    final onAndroid = widget.isAndroid ?? Platform.isAndroid;
+    if (onAndroid) {
+      try {
+        await widget.onDisableBiometric(widget.vaultPath);
+      } catch (_) {}
+    }
+    if (!mounted) return;
     setState(() {
       _vaultCorrupt = false;
       _backupAvailable = false;
       _vaultRestoredFromFile = true;
+      if (onAndroid) _biometricEnrolled = false;
       _errorMessage = null;
       // The restored file may carry a different credential set: re-detect.
       if (widget.yubikeyRecords == null) {

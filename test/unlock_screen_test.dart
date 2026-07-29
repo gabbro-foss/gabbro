@@ -67,6 +67,7 @@ Widget _buildScreen({
   Future<bool> Function(String)? onBackupUsable,
   Future<void> Function(String)? onRestoreBackup,
   Future<bool> Function(String)? onRestoreFromFile,
+  Future<void> Function(String)? onDisableBiometric,
   Future<void> Function(String)? onRemoveVaultFromList,
   Future<void> Function(String)? onDeleteVaultFile,
   VoidCallback? onQuit,
@@ -93,6 +94,7 @@ Widget _buildScreen({
       onBackupUsable: onBackupUsable ?? (_) async => false,
       onRestoreBackup: onRestoreBackup ?? (_) async {},
       onRestoreFromFile: onRestoreFromFile ?? (_) async => false,
+      onDisableBiometric: onDisableBiometric ?? (_) async {},
       onRemoveVaultFromList: onRemoveVaultFromList ?? (_) async {},
       onDeleteVaultFile: onDeleteVaultFile ?? (_) async {},
       onQuit: onQuit,
@@ -1817,5 +1819,77 @@ void main() {
         reason: 'the picked file overwrites the vault already registered here');
     expect(registry.records.length, 1,
         reason: 'the picked file is never registered as a second vault');
+  });
+
+  // ── H1: a restored file makes the stored fingerprint passphrase stale ──────
+  //
+  // Biometric keeps a copy of the passphrase of whatever vault sat at this path
+  // (`BiometricStore.kt:21`). Restoring a different file leaves that copy
+  // behind, so the fingerprint hands the vault a passphrase it no longer
+  // accepts and unlock fails with nothing to explain it. A passphrase change
+  // already unenrols for exactly this reason; so does a device fingerprint
+  // change. Restoring is the third case.
+
+  /// Drives a corrupt vault through restore-from-file and reports whether the
+  /// biometric enrolment was dropped.
+  Future<bool> restoreAndReportUnenrol(
+    WidgetTester tester, {
+    required bool isAndroid,
+    required Future<bool> Function(String) onRestoreFromFile,
+  }) async {
+    var disabled = false;
+    await tester.pumpWidget(_buildScreen(
+      isAndroid: isAndroid,
+      onVaultIsReadable: (_) async => false,
+      onBackupUsable: (_) async => false,
+      onRestoreFromFile: onRestoreFromFile,
+      onDisableBiometric: (_) async => disabled = true,
+    ));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('Restore from a backup file'));
+    await tester.tap(find.text('Restore from a backup file'));
+    await tester.pumpAndSettle();
+    return disabled;
+  }
+
+  testWidgets('Android: a successful restore turns biometric unlock off',
+      (tester) async {
+    expect(
+      await restoreAndReportUnenrol(tester,
+          isAndroid: true, onRestoreFromFile: (_) async => true),
+      isTrue,
+      reason: 'the stored passphrase belongs to the vault that was replaced',
+    );
+  });
+
+  testWidgets('Linux: a successful restore touches no biometric enrolment',
+      (tester) async {
+    expect(
+      await restoreAndReportUnenrol(tester,
+          isAndroid: false, onRestoreFromFile: (_) async => true),
+      isFalse,
+      reason: 'there is no biometric unlock off Android',
+    );
+  });
+
+  testWidgets('a cancelled picker leaves biometric unlock alone',
+      (tester) async {
+    expect(
+      await restoreAndReportUnenrol(tester,
+          isAndroid: true, onRestoreFromFile: (_) async => false),
+      isFalse,
+      reason: 'nothing was replaced, so the stored passphrase still fits',
+    );
+  });
+
+  testWidgets('a refused restore leaves biometric unlock alone', (tester) async {
+    expect(
+      await restoreAndReportUnenrol(tester,
+          isAndroid: true,
+          onRestoreFromFile: (_) async => throw Exception('not a vault')),
+      isFalse,
+      reason: 'a refused restore replaced nothing',
+    );
   });
 }
