@@ -73,7 +73,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 662 | 17 |
+| Rust (`cargo test -q`) | 667 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 11 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2010 | 10 |
+| Flutter (`flutter test`) | 2012 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -127,7 +127,7 @@ file and stay keyed).
 | | passphrase | p+yk | notes |
 |---|---|---|---|
 | import entries | done | done | always asks for passphrase + PIN + tap |
-| sync from file | done | in progress | passphrase column hardware-passed (T1-T9 + W1-W3). PIN + tap stay for a keyed file; open question: should the held passphrase at least skip the typed passphrase there? |
+| sync from file | done | built, unit-green | passphrase column hardware-passed (T1-T9 + W1-W3). Keyed: PIN + tap only — the held passphrase is tried after the tap; a typed passphrase appears only on fallback, reusing the same tap (one tap total). Hardware round pending (`.scratchpad` K1-K5) |
 | adopt a file | todo | todo | new flow from `onboarding_screen`, `unlock_screen`, `manage_vaults_screen` |
 
 **`sync` / passphrase — progress.** Order flipped: pick file -> apply choice -> merge with the
@@ -141,6 +141,12 @@ Items 4-8 built and pinned: the apply-choice dialog warns "Same passphrase does 
 prove same vault." on passphrase-only sources (all 37 locales; absent on the keyed path,
 where a wrong vault fails to decrypt outright), and cancel/fallback/keyed-order each have
 a test. **W1-W3 hardware-passed 2026-07-30 — the cell is done.**
+
+**`sync` / p+yk — built, unit-green, hardware pending.** New Rust pair
+`merge_vault_from_file_with_key_held` / `fast_…` (`Option<MergeSummary>`, 5 tests); the
+keyed dialog is PIN-only and says "Use incoming vault's YubiKey" (37 locales — the file's
+key set may differ from this vault's); fallback reuses the tap's hmac, so one tap total.
+The hmac output is deterministic per registration, which is what makes the reuse sound.
 
 **UNBLOCKED 2026-07-30 — hash mismatch explained and fixed on disk; launch not yet verified.**
 The bridge loader on Linux (`flutter_rust_bridge` 2.12.0, `loader/_io.dart`) opens
