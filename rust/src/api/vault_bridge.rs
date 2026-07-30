@@ -890,6 +890,31 @@ pub async fn merge_vault_from_file(
     session::session_merge_vault_from_body(incoming_body)
 }
 
+/// Merge a `.gabbro` file using the passphrase the unlocked session already holds,
+/// so the user types nothing to sync their own vault.
+///
+/// `None` means that passphrase does not open the file — a different vault, a
+/// key-protected file, or a passphrase changed on the other device — and the caller
+/// should ask for credentials. `Err` is reserved for a file that cannot be used at
+/// all (missing, not a Gabbro vault, a refused old format), which is a different
+/// message to the user. The file at `path` is only ever read.
+///
+/// The vault must be unlocked — returns `Err` if auto-lock fired meanwhile.
+pub async fn merge_vault_from_file_held(
+    path: String,
+) -> Result<Option<crate::api::vault::MergeSummary>, String> {
+    session::session_merge_vault_from_file_held(&PathBuf::from(path))
+}
+
+/// Fast auto-merge (incoming wins, no prompts) using the passphrase the session
+/// already holds. The analogue of [`merge_vault_from_file_held`] for the "Merge
+/// automatically" path. Persists (async — a single vault save).
+pub async fn fast_merge_vault_from_file_held(
+    path: String,
+) -> Result<Option<crate::api::vault::MergeSummary>, String> {
+    session::session_fast_merge_from_file_held(&PathBuf::from(path))
+}
+
 /// Apply a whole granular-sync review in one call: field resolutions, kept-value
 /// history replacements, item deletes, folder picks, and whole-entry deletes.
 /// Re-seals the vault once for the entire review instead of once per decision.

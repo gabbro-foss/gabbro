@@ -3443,6 +3443,51 @@ fn do_merge(session: &mut VaultSession, incoming: VaultBody) -> MergeSummary {
     }
 }
 
+/// Opens `path` with the passphrase the live session already holds, so the user
+/// types nothing to sync a file that is their own vault.
+///
+/// `Ok(None)` means that passphrase does not open the file — a different vault, a
+/// key-protected file, or a passphrase changed on the other device — so the caller
+/// asks the user for one. `Err` is kept for a genuinely unusable file (missing,
+/// not a Gabbro vault, too old), which is a different message to the user.
+///
+/// Reads only; the file on disk is never written.
+fn open_with_held_passphrase(path: &std::path::Path) -> Result<Option<VaultBody>, String> {
+    let passphrase = {
+        let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+        let session = session.as_ref().ok_or("Vault is locked")?;
+        session.passphrase.clone()
+    }; // ← lock released before the Argon2id derivation below
+    let sealed = crate::vault::io::read_vault(path)?;
+    let plaintext = match crate::crypto::vault_crypto::open_vault(&passphrase, &sealed) {
+        Ok(p) => zeroize::Zeroizing::new(p),
+        Err(_) => return Ok(None),
+    };
+    crate::vault::serialization::deserialize_vault_body(&plaintext).map(Some)
+}
+
+/// Granular sync of `path` using the session's own passphrase. `Ok(None)` when
+/// that passphrase does not open the file — see [`open_with_held_passphrase`].
+pub fn session_merge_vault_from_file_held(
+    path: &std::path::Path,
+) -> Result<Option<MergeSummary>, String> {
+    match open_with_held_passphrase(path)? {
+        Some(incoming) => session_merge_vault_from_body(incoming).map(Some),
+        None => Ok(None),
+    }
+}
+
+/// Fast auto-merge of `path` using the session's own passphrase. The analogue of
+/// [`session_merge_vault_from_file_held`] for the "Merge automatically" path.
+pub fn session_fast_merge_from_file_held(
+    path: &std::path::Path,
+) -> Result<Option<MergeSummary>, String> {
+    match open_with_held_passphrase(path)? {
+        Some(incoming) => session_fast_merge_from_body(incoming).map(Some),
+        None => Ok(None),
+    }
+}
+
 /// Merge an already-decrypted incoming `VaultBody` into the live session,
 /// then persist the result.
 ///
@@ -6276,6 +6321,150 @@ mod merge_tests {
         session_cancel_sync().unwrap();
         assert_sealed(&path);
         teardown(&path);
+    }
+
+    // ── sync using the passphrase the session already holds ───────────────────
+
+    // Writes a second vault sealed with `pass`, for the session to open unaided.
+    fn source_file(pass: &[u8], suffix: &str, entries: Vec<VaultEntry>) -> std::path::PathBuf {
+        let mut path = temp_dir();
+        path.push(format!("gabbro_held_src_{suffix}.gabbro"));
+        save_vault(
+            &VaultBody {
+                entries,
+                folders: vec![],
+                ..Default::default()
+            },
+            pass,
+            &path,
+        )
+        .unwrap();
+        path
+    }
+
+    // The file was sealed with the passphrase the session holds, so it merges with
+    // nothing typed.
+    #[test]
+    #[serial]
+    fn held_passphrase_merges_a_file_sealed_with_it() {
+        let pass = b"merge-test-pass";
+        let path = setup(
+            pass,
+            "held_ok",
+            vec![note("local-1", "Local", "2026-01-01T00:00:00Z")],
+        );
+        let src = source_file(
+            pass,
+            "ok",
+            vec![note("remote-1", "Remote", "2026-01-02T00:00:00Z")],
+        );
+
+        unlock_vault(pass, path.clone()).unwrap();
+        let summary = session_merge_vault_from_file_held(&src).unwrap();
+
+        let ids: Vec<String> = list_entry_summaries()
+            .unwrap()
+            .into_iter()
+            .map(|s| s.id)
+            .collect();
+        teardown(&path);
+        let _ = std::fs::remove_file(&src);
+        assert_eq!(summary.map(|s| s.added), Some(1), "one entry merged in");
+        assert!(ids.contains(&String::from("remote-1")), "arrived: {ids:?}");
+    }
+
+    // A file sealed with a different passphrase is not an error: it reports
+    // needs-credentials so the caller can ask, instead of claiming the file is
+    // broken.
+    #[test]
+    #[serial]
+    fn held_passphrase_reports_needs_credentials_not_an_error() {
+        let pass = b"merge-test-pass";
+        let path = setup(
+            pass,
+            "held_other",
+            vec![note("local-1", "Local", "2026-01-01T00:00:00Z")],
+        );
+        let src = source_file(
+            b"a-completely-different-pass",
+            "other",
+            vec![note("remote-1", "Remote", "2026-01-02T00:00:00Z")],
+        );
+
+        unlock_vault(pass, path.clone()).unwrap();
+        let result = session_merge_vault_from_file_held(&src);
+        teardown(&path);
+        let _ = std::fs::remove_file(&src);
+        assert!(
+            matches!(result, Ok(None)),
+            "needs credentials, not Err and not a merge",
+        );
+    }
+
+    // A file that is not a Gabbro vault stays an error, so the two cases give the
+    // user different messages.
+    #[test]
+    #[serial]
+    fn held_passphrase_errors_on_a_file_that_is_not_a_vault() {
+        let pass = b"merge-test-pass";
+        let path = setup(
+            pass,
+            "held_junk",
+            vec![note("local-1", "Local", "2026-01-01T00:00:00Z")],
+        );
+        let mut junk = temp_dir();
+        junk.push("gabbro_held_src_junk.gabbro");
+        std::fs::write(&junk, b"not a vault at all").unwrap();
+
+        unlock_vault(pass, path.clone()).unwrap();
+        let result = session_merge_vault_from_file_held(&junk);
+        teardown(&path);
+        let _ = std::fs::remove_file(&junk);
+        assert!(result.is_err(), "an unusable file must be an error");
+    }
+
+    // Auto-lock can fire while the file picker is open, so the merge must refuse
+    // rather than act on no session.
+    #[test]
+    #[serial]
+    fn held_passphrase_refuses_when_the_vault_is_locked() {
+        let pass = b"merge-test-pass";
+        let src = source_file(
+            pass,
+            "locked",
+            vec![note("remote-1", "Remote", "2026-01-02T00:00:00Z")],
+        );
+        let _ = lock_vault();
+
+        let result = session_merge_vault_from_file_held(&src);
+        let _ = std::fs::remove_file(&src);
+        assert_eq!(result.err().as_deref(), Some("Vault is locked"));
+    }
+
+    // Needs-credentials must not have touched the incoming file: the user can
+    // retry with a typed passphrase against the same bytes.
+    #[test]
+    #[serial]
+    fn held_passphrase_leaves_the_file_untouched_when_it_does_not_open() {
+        let pass = b"merge-test-pass";
+        let path = setup(
+            pass,
+            "held_untouched",
+            vec![note("local-1", "Local", "2026-01-01T00:00:00Z")],
+        );
+        let src = source_file(
+            b"a-completely-different-pass",
+            "untouched",
+            vec![note("remote-1", "Remote", "2026-01-02T00:00:00Z")],
+        );
+        let before = std::fs::read(&src).unwrap();
+
+        unlock_vault(pass, path.clone()).unwrap();
+        let _ = session_merge_vault_from_file_held(&src);
+        let after = std::fs::read(&src).unwrap();
+        teardown(&path);
+        let _ = std::fs::remove_file(&src);
+        assert_eq!(before, after, "the incoming file must be byte-identical");
     }
 
     // Auto-merge does apply an incoming delete (a tombstone), but must never drop

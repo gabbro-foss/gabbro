@@ -78,13 +78,10 @@ Future<MergeSummary> _defaultFastMergeVaultWithKey(
 
 /// Sync using the passphrase the session already holds. Returns `null` when that
 /// passphrase does not open the file, so the caller asks the user for one.
-///
-/// PLACEHOLDER: returns `null` unconditionally until the Rust calls land, which
-/// keeps production on today's ask-for-a-passphrase behaviour. Wire both to the
-/// real bridge calls; `test/vault_list_sync_test.dart` covers the wired flow via
-/// injected stand-ins, so it cannot catch these two being left unwired.
-Future<MergeSummary?> _defaultMergeVaultHeld(String path) async => null;
-Future<MergeSummary?> _defaultFastMergeVaultHeld(String path) async => null;
+Future<MergeSummary?> _defaultMergeVaultHeld(String path) =>
+    mergeVaultFromFileHeld(path: path);
+Future<MergeSummary?> _defaultFastMergeVaultHeld(String path) =>
+    fastMergeVaultFromFileHeld(path: path);
 
 /// Cancel an in-progress granular sync: roll the vault back to its pre-sync state.
 Future<void> _defaultCancelSync() => cancelSync();

@@ -60,6 +60,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   LoginEntryData dco_decode_box_autoadd_login_entry_data(dynamic raw);
 
   @protected
+  MergeSummary dco_decode_box_autoadd_merge_summary(dynamic raw);
+
+  @protected
   NoteEntryData dco_decode_box_autoadd_note_entry_data(dynamic raw);
 
   @protected
@@ -241,6 +244,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  MergeSummary? dco_decode_opt_box_autoadd_merge_summary(dynamic raw);
+
+  @protected
   int? dco_decode_opt_box_autoadd_u_32(dynamic raw);
 
   @protected
@@ -349,6 +355,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   LoginEntryData sse_decode_box_autoadd_login_entry_data(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  MergeSummary sse_decode_box_autoadd_merge_summary(
     SseDeserializer deserializer,
   );
 
@@ -594,6 +605,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  MergeSummary? sse_decode_opt_box_autoadd_merge_summary(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   int? sse_decode_opt_box_autoadd_u_32(SseDeserializer deserializer);
 
   @protected
@@ -724,6 +740,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_login_entry_data(
     LoginEntryData self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_merge_summary(
+    MergeSummary self,
     SseSerializer serializer,
   );
 
@@ -1030,6 +1052,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_opt_box_autoadd_captured_window_data(
     CapturedWindowData? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_merge_summary(
+    MergeSummary? self,
     SseSerializer serializer,
   );
 

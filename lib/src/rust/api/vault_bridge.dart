@@ -366,6 +366,27 @@ Future<MergeSummary> mergeVaultFromFile({
   passphrase: passphrase,
 );
 
+/// Merge a `.gabbro` file using the passphrase the unlocked session already holds,
+/// so the user types nothing to sync their own vault.
+///
+/// `None` means that passphrase does not open the file — a different vault, a
+/// key-protected file, or a passphrase changed on the other device — and the caller
+/// should ask for credentials. `Err` is reserved for a file that cannot be used at
+/// all (missing, not a Gabbro vault, a refused old format), which is a different
+/// message to the user. The file at `path` is only ever read.
+///
+/// The vault must be unlocked — returns `Err` if auto-lock fired meanwhile.
+Future<MergeSummary?> mergeVaultFromFileHeld({required String path}) =>
+    RustLib.instance.api.crateApiVaultBridgeMergeVaultFromFileHeld(path: path);
+
+/// Fast auto-merge (incoming wins, no prompts) using the passphrase the session
+/// already holds. The analogue of [`merge_vault_from_file_held`] for the "Merge
+/// automatically" path. Persists (async — a single vault save).
+Future<MergeSummary?> fastMergeVaultFromFileHeld({required String path}) =>
+    RustLib.instance.api.crateApiVaultBridgeFastMergeVaultFromFileHeld(
+      path: path,
+    );
+
 /// Apply a whole granular-sync review in one call: field resolutions, kept-value
 /// history replacements, item deletes, folder picks, and whole-entry deletes.
 /// Re-seals the vault once for the entire review instead of once per decision.
