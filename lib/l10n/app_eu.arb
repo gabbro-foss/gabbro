@@ -280,6 +280,7 @@
   "syncFromFileTitle": "Fitxategitik sinkronizatu",
   "nothingToSync": "Ez dago sinkronizatzeko ezer — bi gandegiak eguneratuta daude dagoeneko.",
   "syncMethodTitle": "Nola aplikatu behar da sinkronizazio hau?",
+  "syncSamePassphraseWarning": "Pasaesaldi bera izateak ez du gandegi bera frogatzen.",
   "syncMergeAutomatically": "Batu automatikoki",
   "syncReviewAllChanges": "Berrikusi aldaketa guztiak",
   "syncDetailsAction": "Xehetasunak",

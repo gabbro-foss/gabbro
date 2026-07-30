@@ -1139,7 +1139,8 @@ class _VaultListScreenState extends State<VaultListScreen>
     // granular one-by-one review.
     final fast = await showDialog<bool>(
       context: context,
-      builder: (_) => const SyncMethodDialog(),
+      builder: (_) =>
+          SyncMethodDialog(showsPassphraseWarning: !isKeyProtected),
     );
     if (fast == null || !mounted) return;
 

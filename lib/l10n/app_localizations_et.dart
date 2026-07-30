@@ -723,6 +723,10 @@ class AppLocalizationsEt extends AppLocalizations {
   String get syncMethodTitle => 'Kuidas seda sünkroonimist rakendada?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Sama pääslause ei tõesta sama seifi.';
+
+  @override
   String get syncMergeAutomatically => 'Ühenda automaatselt';
 
   @override

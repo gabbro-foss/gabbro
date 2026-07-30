@@ -724,6 +724,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Hoe moet deze synchronisatie worden toegepast?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Dezelfde wachtwoordzin bewijst niet dezelfde kluis.';
+
+  @override
   String get syncMergeAutomatically => 'Automatisch samenvoegen';
 
   @override

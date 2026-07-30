@@ -721,6 +721,10 @@ class AppLocalizationsDa extends AppLocalizations {
   String get syncMethodTitle => 'Hvordan skal denne synkronisering anvendes?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Samme adgangssætning beviser ikke samme hvælving.';
+
+  @override
   String get syncMergeAutomatically => 'Flet automatisk';
 
   @override

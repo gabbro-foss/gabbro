@@ -280,6 +280,7 @@
   "syncFromFileTitle": "Sinhronizēt no faila",
   "nothingToSync": "Nav ko sinhronizēt — abi seifi jau ir atjaunināti.",
   "syncMethodTitle": "Kā piemērot šo sinhronizāciju?",
+  "syncSamePassphraseWarning": "Tāda pati ieejas frāze nepierāda to pašu seifu.",
   "syncMergeAutomatically": "Apvienot automātiski",
   "syncReviewAllChanges": "Pārskatīt visas izmaiņas",
   "syncDetailsAction": "Detaļas",

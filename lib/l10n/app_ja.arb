@@ -280,6 +280,7 @@
   "syncFromFileTitle": "ファイルから同期",
   "nothingToSync": "同期するものはありません — 両方のボルトはすでに最新です。",
   "syncMethodTitle": "この同期をどのように適用しますか？",
+  "syncSamePassphraseWarning": "同じパスフレーズでも同じボルトとは限りません。",
   "syncMergeAutomatically": "自動的にマージ",
   "syncReviewAllChanges": "すべての変更を確認",
   "syncDetailsAction": "詳細",

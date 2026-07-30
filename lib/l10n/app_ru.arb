@@ -280,6 +280,7 @@
   "syncFromFileTitle": "Синхронизировать из файла",
   "nothingToSync": "Нечего синхронизировать — оба хранилища уже актуальны.",
   "syncMethodTitle": "Как применить эту синхронизацию?",
+  "syncSamePassphraseWarning": "Одна и та же кодовая фраза не доказывает, что это то же хранилище.",
   "syncMergeAutomatically": "Объединить автоматически",
   "syncReviewAllChanges": "Просмотреть все изменения",
   "syncDetailsAction": "Подробности",

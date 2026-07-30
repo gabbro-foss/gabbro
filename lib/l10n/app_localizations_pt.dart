@@ -723,6 +723,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get syncMethodTitle => 'Como aplicar esta sincronização?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'A mesma frase secreta não prova que seja o mesmo cofre.';
+
+  @override
   String get syncMergeAutomatically => 'Mesclar automaticamente';
 
   @override
@@ -2880,6 +2884,10 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get syncMethodTitle => 'Como esta sincronização deve ser aplicada?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'A mesma frase secreta não prova que seja o mesmo cofre.';
+
+  @override
   String get syncMergeAutomatically => 'Mesclar automaticamente';
 
   @override
@@ -5032,6 +5040,10 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get syncMethodTitle => 'Como aplicar esta sincronização?';
+
+  @override
+  String get syncSamePassphraseWarning =>
+      'A mesma frase-passe não prova que seja o mesmo cofre.';
 
   @override
   String get syncMergeAutomatically => 'Intercalar automaticamente';

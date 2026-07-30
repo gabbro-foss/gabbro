@@ -280,6 +280,7 @@
   "syncFromFileTitle": "Синхронізувати з файлу",
   "nothingToSync": "Нічого синхронізувати — обидва сховища вже актуальні.",
   "syncMethodTitle": "Як застосувати цю синхронізацію?",
+  "syncSamePassphraseWarning": "Однакова кодова фраза не доводить, що це те саме сховище.",
   "syncMergeAutomatically": "Обʼєднати автоматично",
   "syncReviewAllChanges": "Переглянути всі зміни",
   "syncDetailsAction": "Подробиці",

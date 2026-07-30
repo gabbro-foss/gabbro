@@ -280,6 +280,7 @@
   "syncFromFileTitle": "Файлдан синхрондау",
   "nothingToSync": "Синхрондайтын ештеңе жоқ — екі сейф те жаңартылған.",
   "syncMethodTitle": "Бұл синхрондау қалай қолданылсын?",
+  "syncSamePassphraseWarning": "Бірдей кілт фразасы бірдей сейфті дәлелдемейді.",
   "syncMergeAutomatically": "Автоматты біріктіру",
   "syncReviewAllChanges": "Барлық өзгерістерді қарау",
   "syncDetailsAction": "Мәліметтер",

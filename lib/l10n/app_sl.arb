@@ -280,6 +280,7 @@
   "syncFromFileTitle": "Sinhroniziraj iz datoteke",
   "nothingToSync": "Ni ničesar za sinhronizacijo — oba trezorja sta že posodobljena.",
   "syncMethodTitle": "Kako naj se uporabi ta sinhronizacija?",
+  "syncSamePassphraseWarning": "Enako geslo za dostop ne dokazuje enakega trezorja.",
   "syncMergeAutomatically": "Samodejno združi",
   "syncReviewAllChanges": "Preglej vse spremembe",
   "syncDetailsAction": "Podrobnosti",

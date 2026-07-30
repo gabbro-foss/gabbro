@@ -724,6 +724,10 @@ class AppLocalizationsSr extends AppLocalizations {
   String get syncMethodTitle => 'Како применити ову синхронизацију?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Иста приступна фраза не доказује исти трезор.';
+
+  @override
   String get syncMergeAutomatically => 'Аутоматски споји';
 
   @override
@@ -2875,6 +2879,10 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get syncMethodTitle => 'Kako primeniti ovu sinhronizaciju?';
+
+  @override
+  String get syncSamePassphraseWarning =>
+      'Ista pristupna fraza ne dokazuje isti trezor.';
 
   @override
   String get syncMergeAutomatically => 'Automatski spoji';

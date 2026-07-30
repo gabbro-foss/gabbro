@@ -723,6 +723,10 @@ class AppLocalizationsHr extends AppLocalizations {
   String get syncMethodTitle => 'Kako primijeniti ovu sinkronizaciju?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Ista pristupna fraza ne dokazuje isti trezor.';
+
+  @override
   String get syncMergeAutomatically => 'Automatski spoji';
 
   @override

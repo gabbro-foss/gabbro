@@ -725,6 +725,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wie soll diese Synchronisierung angewendet werden?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Dieselbe Passphrase beweist nicht denselben Tresor.';
+
+  @override
   String get syncMergeAutomatically => 'Automatisch zusammenführen';
 
   @override

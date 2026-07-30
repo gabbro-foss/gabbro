@@ -725,6 +725,10 @@ class AppLocalizationsUk extends AppLocalizations {
   String get syncMethodTitle => 'Як застосувати цю синхронізацію?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Однакова кодова фраза не доводить, що це те саме сховище.';
+
+  @override
   String get syncMergeAutomatically => 'Обʼєднати автоматично';
 
   @override

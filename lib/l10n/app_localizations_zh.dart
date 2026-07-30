@@ -711,6 +711,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get syncMethodTitle => '此次同步应如何应用？';
 
   @override
+  String get syncSamePassphraseWarning => '相同的密码短语不能证明是同一个保险库。';
+
+  @override
   String get syncMergeAutomatically => '自动合并';
 
   @override
@@ -2770,6 +2773,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get syncMethodTitle => '此次同步应如何应用？';
 
   @override
+  String get syncSamePassphraseWarning => '相同的密码短语不能证明是同一个保险库。';
+
+  @override
   String get syncMergeAutomatically => '自动合并';
 
   @override
@@ -4827,6 +4833,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get syncMethodTitle => '此次同步應如何套用？';
+
+  @override
+  String get syncSamePassphraseWarning => '相同的密碼片語不能證明是同一個保險庫。';
 
   @override
   String get syncMergeAutomatically => '自動合併';

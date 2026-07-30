@@ -713,6 +713,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get syncMethodTitle => 'この同期をどのように適用しますか？';
 
   @override
+  String get syncSamePassphraseWarning => '同じパスフレーズでも同じボルトとは限りません。';
+
+  @override
   String get syncMergeAutomatically => '自動的にマージ';
 
   @override

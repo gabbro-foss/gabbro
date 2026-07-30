@@ -280,6 +280,7 @@
   "syncFromFileTitle": "Synkroniser fra fil",
   "nothingToSync": "Ingenting å synkronisere — begge hvelvingene er allerede oppdatert.",
   "syncMethodTitle": "Hvordan skal denne synkroniseringen brukes?",
+  "syncSamePassphraseWarning": "Samme passfrase beviser ikke samme hvelving.",
   "syncMergeAutomatically": "Slå sammen automatisk",
   "syncReviewAllChanges": "Gjennomgå alle endringer",
   "syncDetailsAction": "Detaljer",

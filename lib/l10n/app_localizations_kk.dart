@@ -721,6 +721,10 @@ class AppLocalizationsKk extends AppLocalizations {
   String get syncMethodTitle => 'Бұл синхрондау қалай қолданылсын?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Бірдей кілт фразасы бірдей сейфті дәлелдемейді.';
+
+  @override
   String get syncMergeAutomatically => 'Автоматты біріктіру';
 
   @override

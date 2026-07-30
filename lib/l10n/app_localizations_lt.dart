@@ -724,6 +724,10 @@ class AppLocalizationsLt extends AppLocalizations {
   String get syncMethodTitle => 'Kaip taikyti šią sinchronizaciją?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Ta pati slaptafrazė neįrodo, kad tai ta pati saugykla.';
+
+  @override
   String get syncMergeAutomatically => 'Sulieti automatiškai';
 
   @override

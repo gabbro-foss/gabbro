@@ -725,6 +725,10 @@ class AppLocalizationsSl extends AppLocalizations {
   String get syncMethodTitle => 'Kako naj se uporabi ta sinhronizacija?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Enako geslo za dostop ne dokazuje enakega trezorja.';
+
+  @override
   String get syncMergeAutomatically => 'Samodejno združi';
 
   @override

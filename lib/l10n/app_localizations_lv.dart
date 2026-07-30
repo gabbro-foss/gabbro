@@ -722,6 +722,10 @@ class AppLocalizationsLv extends AppLocalizations {
   String get syncMethodTitle => 'Kā piemērot šo sinhronizāciju?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Tāda pati ieejas frāze nepierāda to pašu seifu.';
+
+  @override
   String get syncMergeAutomatically => 'Apvienot automātiski';
 
   @override

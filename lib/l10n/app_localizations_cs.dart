@@ -724,6 +724,10 @@ class AppLocalizationsCs extends AppLocalizations {
   String get syncMethodTitle => 'Jak použít tuto synchronizaci?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Stejná přístupová fráze nedokazuje stejný trezor.';
+
+  @override
   String get syncMergeAutomatically => 'Sloučit automaticky';
 
   @override

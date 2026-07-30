@@ -724,6 +724,10 @@ class AppLocalizationsBg extends AppLocalizations {
   String get syncMethodTitle => 'Как да се приложи тази синхронизация?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Еднаквата паролна фраза не доказва еднакъв трезор.';
+
+  @override
   String get syncMergeAutomatically => 'Обединяване автоматично';
 
   @override

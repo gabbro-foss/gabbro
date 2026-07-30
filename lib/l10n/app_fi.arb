@@ -280,6 +280,7 @@
   "syncFromFileTitle": "Synkronoi tiedostosta",
   "nothingToSync": "Ei synkronoitavaa — molemmat holvit ovat jo ajan tasalla.",
   "syncMethodTitle": "Miten tämä synkronointi otetaan käyttöön?",
+  "syncSamePassphraseWarning": "Sama salauslause ei todista samaa holvia.",
   "syncMergeAutomatically": "Yhdistä automaattisesti",
   "syncReviewAllChanges": "Tarkista kaikki muutokset",
   "syncDetailsAction": "Tiedot",

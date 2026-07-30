@@ -722,6 +722,10 @@ class AppLocalizationsNn extends AppLocalizations {
   String get syncMethodTitle => 'Korleis skal denne synkroniseringa brukast?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Same passfrase provar ikkje same kvelv.';
+
+  @override
   String get syncMergeAutomatically => 'Slå saman automatisk';
 
   @override

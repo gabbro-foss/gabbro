@@ -280,6 +280,7 @@
   "syncFromFileTitle": "Synkroniser frå fil",
   "nothingToSync": "Inkje å synkronisere — begge kvelva er allereie oppdaterte.",
   "syncMethodTitle": "Korleis skal denne synkroniseringa brukast?",
+  "syncSamePassphraseWarning": "Same passfrase provar ikkje same kvelv.",
   "syncMergeAutomatically": "Slå saman automatisk",
   "syncReviewAllChanges": "Gå gjennom alle endringar",
   "syncDetailsAction": "Detaljar",

@@ -280,6 +280,7 @@
   "syncFromFileTitle": "Sünkrooni failist",
   "nothingToSync": "Midagi ei ole sünkroonida — mõlemad seifid on juba ajakohased.",
   "syncMethodTitle": "Kuidas seda sünkroonimist rakendada?",
+  "syncSamePassphraseWarning": "Sama pääslause ei tõesta sama seifi.",
   "syncMergeAutomatically": "Ühenda automaatselt",
   "syncReviewAllChanges": "Vaata kõik muudatused üle",
   "syncDetailsAction": "Üksikasjad",

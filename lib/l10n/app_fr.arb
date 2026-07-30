@@ -280,6 +280,7 @@
   "syncFromFileTitle": "Synchroniser depuis un fichier",
   "nothingToSync": "Rien à synchroniser — les deux coffres sont déjà à jour.",
   "syncMethodTitle": "Comment appliquer cette synchronisation ?",
+  "syncSamePassphraseWarning": "Un même mot de passe principal ne prouve pas que c'est le même coffre.",
   "syncMergeAutomatically": "Fusionner automatiquement",
   "syncReviewAllChanges": "Vérifier toutes les modifications",
   "syncDetailsAction": "Détails",

@@ -726,6 +726,10 @@ class AppLocalizationsEl extends AppLocalizations {
   String get syncMethodTitle => 'Πώς να εφαρμοστεί αυτός ο συγχρονισμός;';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Η ίδια φράση πρόσβασης δεν αποδεικνύει το ίδιο θησαυροφυλάκιο.';
+
+  @override
   String get syncMergeAutomatically => 'Αυτόματη συγχώνευση';
 
   @override

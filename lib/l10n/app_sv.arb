@@ -280,6 +280,7 @@
   "syncFromFileTitle": "Synkronisera från fil",
   "nothingToSync": "Inget att synkronisera — båda valven är redan uppdaterade.",
   "syncMethodTitle": "Hur ska den här synkroniseringen tillämpas?",
+  "syncSamePassphraseWarning": "Samma lösenfras bevisar inte samma valv.",
   "syncMergeAutomatically": "Slå samman automatiskt",
   "syncReviewAllChanges": "Granska alla ändringar",
   "syncDetailsAction": "Detaljer",

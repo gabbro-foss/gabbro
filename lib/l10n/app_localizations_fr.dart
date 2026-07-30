@@ -724,6 +724,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get syncMethodTitle => 'Comment appliquer cette synchronisation ?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Un même mot de passe principal ne prouve pas que c\'est le même coffre.';
+
+  @override
   String get syncMergeAutomatically => 'Fusionner automatiquement';
 
   @override

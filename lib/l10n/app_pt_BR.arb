@@ -280,6 +280,7 @@
   "syncFromFileTitle": "Sincronizar de arquivo",
   "nothingToSync": "Nada a sincronizar — ambos os cofres já estão atualizados.",
   "syncMethodTitle": "Como esta sincronização deve ser aplicada?",
+  "syncSamePassphraseWarning": "A mesma frase secreta não prova que seja o mesmo cofre.",
   "syncMergeAutomatically": "Mesclar automaticamente",
   "syncReviewAllChanges": "Revisar todas as alterações",
   "syncDetailsAction": "Detalhes",

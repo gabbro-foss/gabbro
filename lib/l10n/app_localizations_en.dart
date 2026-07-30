@@ -721,6 +721,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get syncMethodTitle => 'How should this sync apply?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Same passphrase does not prove same vault.';
+
+  @override
   String get syncMergeAutomatically => 'Merge automatically';
 
   @override

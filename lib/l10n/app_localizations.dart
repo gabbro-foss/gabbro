@@ -1525,6 +1525,12 @@ abstract class AppLocalizations {
   /// **'How should this sync apply?'**
   String get syncMethodTitle;
 
+  /// Warning in the apply-choice dialog for passphrase-only files: a passphrase-only save keeps nothing per-vault, so opening proves only that the passphrases match.
+  ///
+  /// In en, this message translates to:
+  /// **'Same passphrase does not prove same vault.'**
+  String get syncSamePassphraseWarning;
+
   /// Button: apply all incoming changes automatically (incoming wins), no review.
   ///
   /// In en, this message translates to:

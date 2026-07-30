@@ -722,6 +722,10 @@ class AppLocalizationsYo extends AppLocalizations {
   String get syncMethodTitle => 'Báwo ni ó ṣe yẹ kí a lo ìṣọ̀kan yìí?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Gbolohun ọrọ igbaniwọle kan naa ko jẹrisi vọọliti kan naa.';
+
+  @override
   String get syncMergeAutomatically => 'Dàpọ̀ láìfọwọ́yi';
 
   @override

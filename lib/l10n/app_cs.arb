@@ -280,6 +280,7 @@
   "syncFromFileTitle": "Synchronizovat ze souboru",
   "nothingToSync": "Není co synchronizovat — oba trezory jsou již aktuální.",
   "syncMethodTitle": "Jak použít tuto synchronizaci?",
+  "syncSamePassphraseWarning": "Stejná přístupová fráze nedokazuje stejný trezor.",
   "syncMergeAutomatically": "Sloučit automaticky",
   "syncReviewAllChanges": "Zkontrolovat všechny změny",
   "syncDetailsAction": "Podrobnosti",

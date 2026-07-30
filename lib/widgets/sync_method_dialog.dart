@@ -7,7 +7,13 @@ import 'package:gabbro/l10n/app_localizations.dart';
 /// the one-by-one review, and `null` when the user backs out — which merges
 /// nothing.
 class SyncMethodDialog extends StatelessWidget {
-  const SyncMethodDialog({super.key});
+  const SyncMethodDialog({super.key, this.showsPassphraseWarning = false});
+
+  /// A passphrase-only save keeps nothing per-vault, so "it opened" proves
+  /// only "same passphrase" — the dialog then warns before anything applies.
+  /// A keyed file that is not the same vault fails to decrypt outright, so
+  /// the keyed path leaves this off.
+  final bool showsPassphraseWarning;
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +31,10 @@ class SyncMethodDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          if (showsPassphraseWarning) ...[
+            Text(l.syncSamePassphraseWarning),
+            const SizedBox(height: 12),
+          ],
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
             child: Text(l.syncMergeAutomatically),

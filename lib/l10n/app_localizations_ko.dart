@@ -713,6 +713,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get syncMethodTitle => '이 동기화를 어떻게 적용하시겠습니까?';
 
   @override
+  String get syncSamePassphraseWarning => '같은 암호 문구가 같은 볼트임을 증명하지 않습니다.';
+
+  @override
   String get syncMergeAutomatically => '자동으로 병합';
 
   @override

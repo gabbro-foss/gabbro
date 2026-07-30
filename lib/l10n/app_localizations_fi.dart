@@ -724,6 +724,10 @@ class AppLocalizationsFi extends AppLocalizations {
   String get syncMethodTitle => 'Miten tämä synkronointi otetaan käyttöön?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Sama salauslause ei todista samaa holvia.';
+
+  @override
   String get syncMergeAutomatically => 'Yhdistä automaattisesti';
 
   @override

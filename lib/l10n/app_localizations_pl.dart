@@ -725,6 +725,10 @@ class AppLocalizationsPl extends AppLocalizations {
   String get syncMethodTitle => 'Jak zastosować tę synchronizację?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'To samo hasło główne nie dowodzi tego samego skarbca.';
+
+  @override
   String get syncMergeAutomatically => 'Scal automatycznie';
 
   @override

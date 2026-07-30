@@ -722,6 +722,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get syncMethodTitle => 'Hogyan legyen alkalmazva ez a szinkronizálás?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Azonos jelmondat nem bizonyít azonos széfet.';
+
+  @override
   String get syncMergeAutomatically => 'Automatikus egyesítés';
 
   @override

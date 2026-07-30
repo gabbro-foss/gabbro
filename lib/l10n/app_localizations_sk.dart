@@ -724,6 +724,10 @@ class AppLocalizationsSk extends AppLocalizations {
   String get syncMethodTitle => 'Ako použiť túto synchronizáciu?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Rovnaká prístupová fráza nedokazuje rovnaký trezor.';
+
+  @override
   String get syncMergeAutomatically => 'Zlúčiť automaticky';
 
   @override

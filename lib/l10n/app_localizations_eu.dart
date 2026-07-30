@@ -723,6 +723,10 @@ class AppLocalizationsEu extends AppLocalizations {
   String get syncMethodTitle => 'Nola aplikatu behar da sinkronizazio hau?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Pasaesaldi bera izateak ez du gandegi bera frogatzen.';
+
+  @override
   String get syncMergeAutomatically => 'Batu automatikoki';
 
   @override

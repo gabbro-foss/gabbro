@@ -41,7 +41,8 @@ Future<Object?> _overflowFor(
   unawaited(
     showDialog<bool>(
       context: navigator.currentContext!,
-      builder: (_) => const SyncMethodDialog(),
+      builder: (_) =>
+          const SyncMethodDialog(showsPassphraseWarning: true),
     ),
   );
   await tester.pumpAndSettle();
@@ -114,7 +115,8 @@ void main() {
       unawaited(
         showDialog<bool>(
           context: navigator.currentContext!,
-          builder: (_) => const SyncMethodDialog(),
+          builder: (_) =>
+              const SyncMethodDialog(showsPassphraseWarning: true),
         ).then((_) => popped = true),
       );
       await tester.pumpAndSettle();

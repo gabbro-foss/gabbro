@@ -723,6 +723,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get syncMethodTitle => '¿Cómo debe aplicarse esta sincronización?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'La misma contraseña maestra no prueba que sea el mismo almacén.';
+
+  @override
   String get syncMergeAutomatically => 'Combinar automáticamente';
 
   @override

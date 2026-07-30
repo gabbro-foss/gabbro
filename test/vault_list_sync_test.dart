@@ -235,6 +235,29 @@ void main() {
       expect(find.text('How should this sync apply?'), findsOneWidget);
     });
 
+    // A passphrase-only save re-seals the whole file with fresh salts, so
+    // nothing per-vault survives: "it opened" proves only "same passphrase".
+    // The apply choice must say so.
+    testWidgets('apply choice warns that passphrase match proves nothing', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _buildScreen(
+          pickedPath: '/tmp/other.gabbro',
+          mergeVault: (_, _) async => _summary(),
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from file'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('How should this sync apply?'), findsOneWidget);
+      expect(
+        find.text('Same passphrase does not prove same vault.'),
+        findsOneWidget,
+      );
+    });
+
     testWidgets('Merge automatically runs the fast merge, no review dialog', (
       tester,
     ) async {
@@ -374,6 +397,46 @@ void main() {
 
       expect(mergeCalled, isFalse);
       expect(find.text('Vault synced'), findsNothing);
+    });
+
+    // Backing out of the apply choice merges nothing: no held-passphrase try,
+    // no typed-passphrase merge, no snackbar. (The test above cancels the
+    // fallback passphrase dialog; this one cancels the chooser itself.)
+    testWidgets('cancelling the apply choice calls no merge at all', (
+      tester,
+    ) async {
+      final called = <String>[];
+      await tester.pumpWidget(
+        _buildScreen(
+          pickedPath: '/tmp/other.gabbro',
+          mergeVault: (_, _) async {
+            called.add('mergeVault');
+            return _summary();
+          },
+          fastMergeVault: (_, _) async {
+            called.add('fastMergeVault');
+            return _summary();
+          },
+          mergeVaultHeld: (_) async {
+            called.add('mergeVaultHeld');
+            return _summary();
+          },
+          fastMergeVaultHeld: (_) async {
+            called.add('fastMergeVaultHeld');
+            return _summary();
+          },
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from file'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('How should this sync apply?'), findsOneWidget);
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+
+      expect(called, isEmpty, reason: 'cancel must reach no merge FFI');
+      expect(find.byType(SnackBar), findsNothing);
     });
 
     testWidgets('identical vaults shows nothing-to-sync snackbar', (
@@ -1321,6 +1384,36 @@ void main() {
       expect(capturedHmac, equals(const [0x42]));
       expect(capturedCred, equals(const [0xAB]));
       expect(find.textContaining('Vault synced'), findsOneWidget);
+    });
+
+    // A keyed file that is not the same vault fails to decrypt outright, so
+    // the same-passphrase warning would be noise here — pin its absence.
+    testWidgets('keyed apply choice carries no same-passphrase warning', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        buildKeyProtectedScreen(
+          mergeVaultWithKey: (_, _, _, _) async => _summary(added: 1),
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from file'));
+      await tester.pumpAndSettle();
+
+      final fields = find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.byType(TextField),
+      );
+      await tester.enterText(fields.at(0), 'sharedpass');
+      await tester.enterText(fields.at(1), '123456');
+      await tester.tap(find.text('Sync'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('How should this sync apply?'), findsOneWidget);
+      expect(
+        find.text('Same passphrase does not prove same vault.'),
+        findsNothing,
+      );
     });
 
     testWidgets('missing PIN blocks the keyed merge', (tester) async {

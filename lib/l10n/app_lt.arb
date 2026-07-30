@@ -280,6 +280,7 @@
   "syncFromFileTitle": "Sinchronizuoti iš failo",
   "nothingToSync": "Nėra ko sinchronizuoti — abi saugyklos jau atnaujintos.",
   "syncMethodTitle": "Kaip taikyti šią sinchronizaciją?",
+  "syncSamePassphraseWarning": "Ta pati slaptafrazė neįrodo, kad tai ta pati saugykla.",
   "syncMergeAutomatically": "Sulieti automatiškai",
   "syncReviewAllChanges": "Peržiūrėti visus pakeitimus",
   "syncDetailsAction": "Išsami informacija",
