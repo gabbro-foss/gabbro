@@ -127,7 +127,7 @@ file and stay keyed).
 | | passphrase | p+yk | notes |
 |---|---|---|---|
 | import entries | done | done | always asks for passphrase + PIN + tap |
-| sync from file | in progress | in progress | merge done; skipping the passphrase prompt is the work. PIN + tap stay for a keyed file |
+| sync from file | done | in progress | passphrase column hardware-passed (T1-T9 + W1-W3). PIN + tap stay for a keyed file; open question: should the held passphrase at least skip the typed passphrase there? |
 | adopt a file | todo | todo | new flow from `onboarding_screen`, `unlock_screen`, `manage_vaults_screen` |
 
 **`sync` / passphrase — progress.** Order flipped: pick file -> apply choice -> merge with the
@@ -137,10 +137,10 @@ held passphrase; the passphrase box is now the fallback. Key-protected files unc
 both `VaultListScreen` call sites (onboarding, unlock; neither overrides the default).
 **Hardware matrix T1-T9 all passed 2026-07-30** (T9 silent-drop-on-lock code-verified:
 lock closes the Rust session and unmounts the screen, so a post-lock pick cannot merge).
-Items 4-8 built and pinned: the apply-choice dialog now warns "Same passphrase does not
+Items 4-8 built and pinned: the apply-choice dialog warns "Same passphrase does not
 prove same vault." on passphrase-only sources (all 37 locales; absent on the keyed path,
 where a wrong vault fails to decrypt outright), and cancel/fallback/keyed-order each have
-a test. Left: the warning's hardware round (`.scratchpad` W1-W3).
+a test. **W1-W3 hardware-passed 2026-07-30 — the cell is done.**
 
 **UNBLOCKED 2026-07-30 — hash mismatch explained and fixed on disk; launch not yet verified.**
 The bridge loader on Linux (`flutter_rust_bridge` 2.12.0, `loader/_io.dart`) opens
