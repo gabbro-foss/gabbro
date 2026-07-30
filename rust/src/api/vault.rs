@@ -865,7 +865,9 @@ pub fn delete_entry(entries: &mut Vec<VaultEntry>, id: &str) -> Result<(), Strin
 pub fn delete_whole_vault(path: &Path) -> Result<(), String> {
     std::fs::remove_file(path).map_err(|e| format!("Failed to delete vault: {e}"))?;
     // R-03: the .bak safety copy must not survive the vault it copies.
-    crate::vault::io::remove_backup(path)
+    crate::vault::io::remove_backup(path)?;
+    // H2: nor may the .pre-restore copy.
+    crate::vault::io::remove_pre_restore(path)
 }
 
 /// Return all entries from the vault, optionally masking sensitive values.
@@ -1401,6 +1403,27 @@ mod tests {
         assert!(
             bak_gone,
             ".bak must be deleted with the vault (no copy may survive)"
+        );
+    }
+
+    // H2 R7: deleting a vault must not leak a copy via the .pre-restore sibling
+    #[test]
+    fn delete_whole_vault_removes_pre_restore_too() {
+        let dir = std::env::temp_dir();
+        let path = dir.join("gabbro_api_delete_prerestore_test.gabbro");
+        let pre = std::path::PathBuf::from(format!("{}.pre-restore", path.display()));
+        std::fs::write(&path, b"vault bytes").unwrap();
+        std::fs::write(&pre, b"pre-restore bytes").unwrap();
+
+        let result = delete_whole_vault(&path);
+        let pre_gone = !pre.exists();
+        let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(&pre);
+
+        result.expect("delete must succeed");
+        assert!(
+            pre_gone,
+            ".pre-restore must be deleted with the vault (no copy may survive)"
         );
     }
 

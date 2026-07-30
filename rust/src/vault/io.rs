@@ -183,6 +183,17 @@ pub(crate) fn remove_backup(path: &Path) -> Result<(), String> {
     }
 }
 
+/// H2: delete the `.pre-restore` copy, if any. Absence is not an error.
+///
+/// Called by vault deletion so no copy of a deleted vault survives.
+pub(crate) fn remove_pre_restore(path: &Path) -> Result<(), String> {
+    match fs::remove_file(pre_restore_path(path)) {
+        Ok(()) => Ok(()),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
+        Err(e) => Err(format!("Failed to delete the pre-restore copy: {e}")),
+    }
+}
+
 /// R-03: does a `.bak` safety copy exist for this vault path?
 ///
 /// Reports `false` for a symlinked `.bak` — restore would refuse it anyway,
@@ -228,6 +239,31 @@ pub fn restore_vault_backup(path: &Path) -> Result<(), String> {
     atomic_write_0600(path, &bytes)
 }
 
+/// H2: the `.pre-restore` sibling path for a vault path.
+fn pre_restore_path(path: &Path) -> PathBuf {
+    let mut name = path.as_os_str().to_owned();
+    name.push(".pre-restore");
+    PathBuf::from(name)
+}
+
+/// H2: before restore-from-file overwrites a vault, preserve the old vault's
+/// best remaining copy as a single `.pre-restore` sibling — the undo for a
+/// mis-picked file. The `.bak` (last good save) is preferred when usable.
+fn preserve_pre_restore(path: &Path) -> Result<(), String> {
+    let pre = pre_restore_path(path);
+    check_not_symlink(&pre).map_err(|e| format!("Pre-restore preservation failed: {e}"))?;
+    let bytes = if backup_usable(path) {
+        fs::read(bak_path(path)).map_err(|e| format!("Pre-restore preservation failed: {e}"))?
+    } else if fs::symlink_metadata(path).is_ok() {
+        // No usable safety copy: keep the old main bytes, however corrupt —
+        // they are the only copy left.
+        fs::read(path).map_err(|e| format!("Pre-restore preservation failed: {e}"))?
+    } else {
+        return Ok(()); // nothing at this path yet: nothing to preserve
+    };
+    atomic_write_0600(&pre, &bytes).map_err(|e| format!("Pre-restore preservation failed: {e}"))
+}
+
 /// R-03: replace the vault file at `path` with an external backup file the user
 /// picked (their own off-device 3-2-1 copy).
 ///
@@ -240,12 +276,17 @@ pub fn restore_vault_backup(path: &Path) -> Result<(), String> {
 /// whatever vault sits at this path, and the file just replaced may be an
 /// entirely different vault. Left alone it would be offered as this vault's
 /// safety copy and hand the user the previous vault back.
+///
+/// H2: before anything is overwritten, the old vault's best remaining copy is
+/// preserved as `.pre-restore` (see [`preserve_pre_restore`]) — without it a
+/// mis-picked file would destroy the old vault with no undo.
 pub fn restore_vault_from_file(path: &Path, source: &Path) -> Result<(), String> {
     check_not_symlink(path)?;
     check_not_symlink(source)?;
     let bytes = fs::read(source).map_err(|e| format!("Could not read the backup file: {e}"))?;
     SealedVault::from_bytes(&bytes)
         .map_err(|e| format!("That file is not a usable Gabbro vault — restore refused: {e}"))?;
+    preserve_pre_restore(path)?;
     atomic_write_0600(path, &bytes)?;
     sync_backup_to_current(path)
 }
@@ -926,6 +967,241 @@ mod tests {
         assert_eq!(
             bak_after, new_bytes,
             "the safety copy must match the vault now at this path"
+        );
+    }
+
+    // H2 R1: a mis-picked restore-from-file must not destroy the old vault.
+    // When the old `.bak` is usable (the last good save), it is preserved as a
+    // `.pre-restore` sibling, still openable with the old credentials.
+    #[test]
+    fn restore_from_file_preserves_usable_bak_as_pre_restore() {
+        let dir = temp_dir();
+        let path = dir.join("gabbro_io_h2_r1.gabbro");
+        let bak = PathBuf::from(format!("{}.bak", path.display()));
+        let pre = PathBuf::from(format!("{}.pre-restore", path.display()));
+        let source = dir.join("gabbro_io_h2_r1_source.gabbro");
+        let source_bak = PathBuf::from(format!("{}.bak", source.display()));
+        for p in [&path, &bak, &pre, &source, &source_bak] {
+            let _ = fs::remove_file(p);
+        }
+
+        let old = seal_vault(b"old pw", b"old body", None).unwrap();
+        write_vault(&old, &path).unwrap(); // .bak = old vault, usable
+        fs::write(&path, b"corrupt garbage").unwrap(); // main rots
+
+        let new = seal_vault(b"new pw", b"new body", None).unwrap();
+        write_vault(&new, &source).unwrap();
+
+        let result = restore_vault_from_file(&path, &source);
+        let recovered = read_vault(&pre).and_then(|s| open_vault(b"old pw", &s));
+        for p in [&path, &bak, &pre, &source, &source_bak] {
+            let _ = fs::remove_file(p);
+        }
+
+        result.expect("restore must succeed");
+        assert_eq!(
+            recovered.expect(".pre-restore must hold a vault openable with the old credentials"),
+            b"old body",
+            ".pre-restore must preserve the old vault's last good save"
+        );
+    }
+
+    // H2 R2: when no usable `.bak` exists, the old main bytes (however corrupt)
+    // are preserved as `.pre-restore` — evidence, and the only copy left.
+    #[test]
+    fn restore_from_file_preserves_old_main_when_no_usable_bak() {
+        let dir = temp_dir();
+        let path = dir.join("gabbro_io_h2_r2.gabbro");
+        let bak = PathBuf::from(format!("{}.bak", path.display()));
+        let pre = PathBuf::from(format!("{}.pre-restore", path.display()));
+        let source = dir.join("gabbro_io_h2_r2_source.gabbro");
+        let source_bak = PathBuf::from(format!("{}.bak", source.display()));
+        for p in [&path, &bak, &pre, &source, &source_bak] {
+            let _ = fs::remove_file(p);
+        }
+
+        fs::write(&path, b"corrupt old main").unwrap();
+        fs::write(&bak, b"garbage bak too").unwrap(); // present but unusable
+
+        let new = seal_vault(b"new pw", b"new body", None).unwrap();
+        write_vault(&new, &source).unwrap();
+
+        let result = restore_vault_from_file(&path, &source);
+        let pre_bytes = fs::read(&pre);
+        for p in [&path, &bak, &pre, &source, &source_bak] {
+            let _ = fs::remove_file(p);
+        }
+
+        result.expect("restore must succeed");
+        assert_eq!(
+            pre_bytes.expect(".pre-restore must exist when no usable .bak remains"),
+            b"corrupt old main",
+            ".pre-restore must hold the old main bytes as the only remaining copy"
+        );
+    }
+
+    // H2 R3: restoring to a path with no vault yet preserves nothing and
+    // leaves no `.pre-restore` behind.
+    #[test]
+    fn restore_from_file_to_empty_path_leaves_no_pre_restore() {
+        let dir = temp_dir();
+        let path = dir.join("gabbro_io_h2_r3.gabbro");
+        let bak = PathBuf::from(format!("{}.bak", path.display()));
+        let pre = PathBuf::from(format!("{}.pre-restore", path.display()));
+        let source = dir.join("gabbro_io_h2_r3_source.gabbro");
+        let source_bak = PathBuf::from(format!("{}.bak", source.display()));
+        for p in [&path, &bak, &pre, &source, &source_bak] {
+            let _ = fs::remove_file(p);
+        }
+
+        let new = seal_vault(b"new pw", b"new body", None).unwrap();
+        write_vault(&new, &source).unwrap();
+
+        let result = restore_vault_from_file(&path, &source);
+        let pre_exists = fs::symlink_metadata(&pre).is_ok();
+        for p in [&path, &bak, &pre, &source, &source_bak] {
+            let _ = fs::remove_file(p);
+        }
+
+        result.expect("restore to an empty path must succeed");
+        assert!(
+            !pre_exists,
+            "no old vault, so no .pre-restore may be created"
+        );
+    }
+
+    // H2 R4: a second restore overwrites the `.pre-restore` — there is only
+    // ever one, holding the vault replaced by the LATEST restore.
+    #[test]
+    fn second_restore_overwrites_the_pre_restore() {
+        let dir = temp_dir();
+        let path = dir.join("gabbro_io_h2_r4.gabbro");
+        let bak = PathBuf::from(format!("{}.bak", path.display()));
+        let pre = PathBuf::from(format!("{}.pre-restore", path.display()));
+        let source_a = dir.join("gabbro_io_h2_r4_a.gabbro");
+        let source_b = dir.join("gabbro_io_h2_r4_b.gabbro");
+        let source_a_bak = PathBuf::from(format!("{}.bak", source_a.display()));
+        let source_b_bak = PathBuf::from(format!("{}.bak", source_b.display()));
+        for p in [
+            &path,
+            &bak,
+            &pre,
+            &source_a,
+            &source_b,
+            &source_a_bak,
+            &source_b_bak,
+        ] {
+            let _ = fs::remove_file(p);
+        }
+
+        let original = seal_vault(b"pw-0", b"original body", None).unwrap();
+        write_vault(&original, &path).unwrap();
+        let vault_a = seal_vault(b"pw-a", b"body A", None).unwrap();
+        write_vault(&vault_a, &source_a).unwrap();
+        let vault_b = seal_vault(b"pw-b", b"body B", None).unwrap();
+        write_vault(&vault_b, &source_b).unwrap();
+
+        restore_vault_from_file(&path, &source_a).expect("first restore");
+        restore_vault_from_file(&path, &source_b).expect("second restore");
+
+        let recovered = read_vault(&pre).and_then(|s| open_vault(b"pw-a", &s));
+        for p in [
+            &path,
+            &bak,
+            &pre,
+            &source_a,
+            &source_b,
+            &source_a_bak,
+            &source_b_bak,
+        ] {
+            let _ = fs::remove_file(p);
+        }
+        assert_eq!(
+            recovered.expect(".pre-restore must hold the vault the second restore replaced"),
+            b"body A",
+            ".pre-restore must be overwritten by each restore, never accumulate"
+        );
+    }
+
+    // H2 R5: a symlink planted at `.pre-restore` aborts the restore fail-closed
+    // — main and `.bak` untouched, the symlink target never written through.
+    #[cfg(unix)]
+    #[test]
+    fn symlinked_pre_restore_aborts_restore_untouched() {
+        use std::os::unix::fs::symlink;
+
+        let dir = temp_dir();
+        let path = dir.join("gabbro_io_h2_r5.gabbro");
+        let bak = PathBuf::from(format!("{}.bak", path.display()));
+        let pre = PathBuf::from(format!("{}.pre-restore", path.display()));
+        let target = dir.join("gabbro_io_h2_r5_target");
+        let source = dir.join("gabbro_io_h2_r5_source.gabbro");
+        let source_bak = PathBuf::from(format!("{}.bak", source.display()));
+        for p in [&path, &bak, &pre, &target, &source, &source_bak] {
+            let _ = fs::remove_file(p);
+        }
+
+        let old = seal_vault(b"old pw", b"old body", None).unwrap();
+        write_vault(&old, &path).unwrap();
+        let main_before = fs::read(&path).unwrap();
+        let bak_before = fs::read(&bak).unwrap();
+        fs::write(&target, b"attacker target").unwrap();
+        symlink(&target, &pre).unwrap();
+
+        let new = seal_vault(b"new pw", b"new body", None).unwrap();
+        write_vault(&new, &source).unwrap();
+
+        let result = restore_vault_from_file(&path, &source);
+        let main_after = fs::read(&path).unwrap();
+        let bak_after = fs::read(&bak).unwrap();
+        let target_after = fs::read(&target).unwrap();
+        for p in [&path, &bak, &pre, &target, &source, &source_bak] {
+            let _ = fs::remove_file(p);
+        }
+
+        assert!(
+            result.is_err(),
+            "a symlinked .pre-restore must abort the restore"
+        );
+        assert_eq!(main_after, main_before, "the vault must be untouched");
+        assert_eq!(bak_after, bak_before, "the .bak must be untouched");
+        assert_eq!(
+            target_after, b"attacker target",
+            "the symlink target must never be written through"
+        );
+    }
+
+    // H2 R6: the .pre-restore is as private as the vault it preserves
+    #[cfg(unix)]
+    #[test]
+    fn pre_restore_file_has_mode_0600() {
+        use std::os::unix::fs::PermissionsExt;
+
+        let dir = temp_dir();
+        let path = dir.join("gabbro_io_h2_r6.gabbro");
+        let bak = PathBuf::from(format!("{}.bak", path.display()));
+        let pre = PathBuf::from(format!("{}.pre-restore", path.display()));
+        let source = dir.join("gabbro_io_h2_r6_source.gabbro");
+        let source_bak = PathBuf::from(format!("{}.bak", source.display()));
+        for p in [&path, &bak, &pre, &source, &source_bak] {
+            let _ = fs::remove_file(p);
+        }
+
+        let old = seal_vault(b"old pw", b"old body", None).unwrap();
+        write_vault(&old, &path).unwrap();
+        let new = seal_vault(b"new pw", b"new body", None).unwrap();
+        write_vault(&new, &source).unwrap();
+
+        restore_vault_from_file(&path, &source).expect("restore must succeed");
+
+        let mode = fs::metadata(&pre).unwrap().permissions().mode() & 0o777;
+        for p in [&path, &bak, &pre, &source, &source_bak] {
+            let _ = fs::remove_file(p);
+        }
+        assert_eq!(
+            mode, 0o600,
+            "expected .pre-restore mode 0600, got {:#o}",
+            mode
         );
     }
 
