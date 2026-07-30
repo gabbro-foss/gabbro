@@ -115,17 +115,37 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-1. Full gate (`gabbro_test`) — the `sync from file` row landed since the last gate. No
-   `--warm` needed (no dep bumps). Expected counts: Rust 667, Flutter 2012.
-2. Then the `adopt` row (both columns, canon-TDD). Start with design, not code:
+Full gate ran ALL GREEN 2026-07-30 (Rust 667, Flutter 2012, ~125m).
+
+**1. H2 fix (in progress) — restore-from-file destroys the old vault.** One mis-pick on
+the corrupt-vault unlock screen overwrites the vault *and* refreshes its `.bak`, so the
+last good copy is gone. Fix: preserve the old vault to a single `<vault>.gabbro.pre-restore`
+(old `.bak` if usable, else old main bytes; 0600; fail-closed) + a confirm dialog before
+writing. Canon-TDD, agreed 2026-07-30 — tick as they go green:
+
+- [ ] R1 usable `.bak` -> `.pre-restore` holds it, opens with old credentials
+- [ ] R2 no usable `.bak` -> `.pre-restore` holds the old main bytes
+- [ ] R3 nothing at path -> no `.pre-restore`, restore succeeds
+- [ ] R4 second restore overwrites `.pre-restore` (only ever one)
+- [ ] R5 symlinked `.pre-restore` -> refused, main + `.bak` untouched
+- [ ] R6 `.pre-restore` mode 0600
+- [ ] R7 vault deletion removes `.pre-restore` alongside `.bak`
+- [ ] F8 confirm dialog after pick, before any write; names vault + safety copy
+- [ ] F9 cancel -> no bridge call, nothing touched
+- [ ] F10 continue -> restore proceeds as today
+- [ ] F11 picker cancelled -> no dialog, no write (pin current)
+- [ ] F12 strings in 37 ARBs + 8x/360px overflow
+- [ ] flutter analyze (touched test files) + clippy; hardware round with mock vaults
+
+**2. H1 fix** — biometric enrolment keyed by path survives a vault swap at that path
+(restore-from-file already unenrols; the exposure is external swaps).
+
+**3. Then the `adopt` row** (both columns, canon-TDD). Start with design, not code:
    - Entry points: `onboarding_screen`, `unlock_screen`, `manage_vaults_screen`.
    - Linux registers the picked path; Android must copy into app storage (its picker
      returns a cache copy). That asymmetry decides whether `restore_vault_from_file` is
      reused — note it now also refreshes the `.bak` and unenrols biometrics via the
      unlock screen, correct for a restore, wrong for adopting a file that IS this vault.
-   - Fix H1/H2 on this branch first (pre-existing, see memory/plan): biometric enrolment
-     keyed by path survives a vault swap at that path; `restore_vault_from_file`
-     (`rust/src/vault/io.rs:221`) rotates no `.bak`, so a mis-pick destroys the old vault.
    - New screen => `test/screen_catalog.dart` + `screenFileCount`; new strings => 37 ARBs.
    - Mock vault inventory for hardware rounds is in `.scratchpad` (A-E kept on disk).
 
@@ -141,36 +161,9 @@ file and stay keyed).
 | sync from file | done | done | hardware-passed 2026-07-30 (T1-T9, W1-W3, K1-K5). Keyed: PIN + tap only; typed passphrase only on fallback, same tap reused (one tap total) |
 | adopt a file | todo | todo | new flow from `onboarding_screen`, `unlock_screen`, `manage_vaults_screen` |
 
-**`sync` / passphrase — progress.** Order flipped: pick file -> apply choice -> merge with the
-held passphrase; the passphrase box is now the fallback. Key-protected files unchanged.
-`merge_vault_from_file_held` / `fast_merge_vault_from_file_held` return
-`Option<MergeSummary>` — `None` = needs credentials, `Err` = unusable file — and are live in
-both `VaultListScreen` call sites (onboarding, unlock; neither overrides the default).
-**Hardware matrix T1-T9 all passed 2026-07-30** (T9 silent-drop-on-lock code-verified:
-lock closes the Rust session and unmounts the screen, so a post-lock pick cannot merge).
-Items 4-8 built and pinned: the apply-choice dialog warns "Same passphrase does not
-prove same vault." on passphrase-only sources (all 37 locales; absent on the keyed path,
-where a wrong vault fails to decrypt outright), and cancel/fallback/keyed-order each have
-a test. **W1-W3 hardware-passed 2026-07-30 — the cell is done.**
-
-**`sync` / p+yk — DONE, hardware-passed 2026-07-30 (K1-K5, incl. wrong-key).** New Rust
-pair `merge_vault_from_file_with_key_held` / `fast_…` (`Option<MergeSummary>`, 5 tests);
-the keyed dialog is PIN-only and says "Use incoming vault's YubiKey" (37 locales — the
-file's key set may differ from this vault's); fallback reuses the tap's hmac, so one tap
-total. The hmac output is deterministic per registration, which makes the reuse sound.
-
-**UNBLOCKED 2026-07-30 — hash mismatch explained and fixed on disk; launch not yet verified.**
-The bridge loader on Linux (`flutter_rust_bridge` 2.12.0, `loader/_io.dart`) opens
-`<cwd>/rust/target/release/librust_lib_gabbro.so` **first** whenever that file exists —
-before `LD_LIBRARY_PATH` or the bundle, which is why both earlier theories changed nothing.
-Launching the bundle from the repo root therefore loaded the dev cdylib, built that morning
-*before* the new bridge functions landed — the only artefact carrying 906954885. Fix:
-`cargo build --release --lib` (byte-verified new hash). Guard: the matrix launch now pins
-the lib via `FRB_DART_LOAD_EXTERNAL_LIBRARY_NATIVE_LIB_DIR`; a stale dev cdylib can no
-longer shadow the bundle. **No hardware testing has happened yet.**
-
-All six Rust functions exist and are green (`merge_vault_from_file`, `fast_merge_…`,
-`import_from_gabbro`, each with a `_with_key` twin). The remaining work is in Flutter.
+Both sync cells are done and hardware-passed (matrix above); details are in the git log.
+All six Rust merge functions exist and are green (`merge_vault_from_file`, `fast_merge_…`,
+`import_from_gabbro`, each with a `_with_key` twin).
 
 **Adopt** = open an exported `.gabbro` as a vault on a second device, without first
 creating an empty vault and importing into it.
