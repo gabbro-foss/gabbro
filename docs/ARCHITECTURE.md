@@ -73,7 +73,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 657 | 17 |
+| Rust (`cargo test -q`) | 662 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 11 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -132,12 +132,10 @@ file and stay keyed).
 
 **`sync` / passphrase — progress.** Order flipped: pick file -> apply choice -> merge with the
 held passphrase; the passphrase box is now the fallback. Key-protected files unchanged.
-Done: the net pin (`fast_merge_keeps_an_entry_only_this_vault_has`) and the no-typing flow
-(`a file the held passphrase opens asks for no passphrase`).
-**Still a placeholder:** `_defaultMergeVaultHeld` / `_defaultFastMergeVaultHeld`
-(`vault_list_screen.dart`) always answer "does not open it", so hardware behaviour is
-unchanged until the Rust calls land. The widget tests inject stand-ins and cannot catch this.
-Left: the warning in the apply-choice dialog, then the Rust calls.
+`merge_vault_from_file_held` / `fast_merge_vault_from_file_held` return
+`Option<MergeSummary>` — `None` = needs credentials, `Err` = unusable file — and are live in
+both `VaultListScreen` call sites (onboarding, unlock; neither overrides the default).
+Left: the warning in the apply-choice dialog (items 4-5), and tests naming items 6-8.
 
 All six Rust functions exist and are green (`merge_vault_from_file`, `fast_merge_…`,
 `import_from_gabbro`, each with a `_with_key` twin). The remaining work is in Flutter.
