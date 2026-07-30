@@ -6278,6 +6278,44 @@ mod merge_tests {
         teardown(&path);
     }
 
+    // Auto-merge does apply an incoming delete (a tombstone), but must never drop
+    // an entry the other side has simply never seen: a device that does not know
+    // `local-only` sends no tombstone for it, so it stays. Without this the fast
+    // path could silently delete entries the user never asked to remove.
+    #[test]
+    #[serial]
+    fn fast_merge_keeps_an_entry_only_this_vault_has() {
+        let pass = b"merge-test-pass";
+        let path = setup(
+            pass,
+            "fast_keeps_local_only",
+            vec![
+                note("shared", "Shared", "2026-01-01T00:00:00Z"),
+                note("local-only", "Only here", "2026-01-01T00:00:00Z"),
+            ],
+        );
+
+        // Incoming knows only `shared`, and records no delete for `local-only`.
+        let incoming = VaultBody {
+            entries: vec![note("shared", "Shared", "2026-01-02T00:00:00Z")],
+            folders: vec![],
+            ..Default::default()
+        };
+
+        unlock_vault(pass, path.clone()).unwrap();
+        let summary = session_fast_merge_from_body(incoming).unwrap();
+
+        assert!(summary.pending_deletes.is_empty(), "no delete reported");
+        let ids: Vec<String> = list_entry_summaries()
+            .unwrap()
+            .into_iter()
+            .map(|s| s.id)
+            .collect();
+        teardown(&path);
+        assert!(ids.contains(&String::from("local-only")), "survives: {ids:?}");
+        assert!(ids.contains(&String::from("shared")), "kept: {ids:?}");
+    }
+
     // Fast auto-merge walk: load A, then fast-merge the other two (no prompts,
     // incoming always wins). Proves (1) every A-vs-C clash resolves to C's value
     // regardless of B/C order, and (2) order still matters via the delete/re-add

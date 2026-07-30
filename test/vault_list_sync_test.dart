@@ -49,6 +49,8 @@ class _Applied {
 Widget _buildScreen({
   required Future<MergeSummary> Function(String, List<int>) mergeVault,
   Future<MergeSummary> Function(String, List<int>)? fastMergeVault,
+  Future<MergeSummary?> Function(String)? mergeVaultHeld,
+  Future<MergeSummary?> Function(String)? fastMergeVaultHeld,
   String? pickedPath,
   Future<String?> Function()? onPickSyncFile,
   _Applied? applied,
@@ -60,6 +62,10 @@ Widget _buildScreen({
     onPickSyncFile: onPickSyncFile ?? () async => pickedPath,
     mergeVault: mergeVault,
     fastMergeVault: fastMergeVault ?? (_, _) async => _summary(),
+    // Default to "the held passphrase does not open it", so every pre-existing
+    // test keeps exercising the ask-for-a-passphrase path it was written for.
+    mergeVaultHeld: mergeVaultHeld ?? (_) async => null,
+    fastMergeVaultHeld: fastMergeVaultHeld ?? (_) async => null,
     // Recording stand-in so tests never reach the real FFI; captures the batch.
     applySyncDecisions:
         ({
@@ -94,12 +100,28 @@ Future<void> _openMenu(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
-// Open the menu, start a file sync, enter the passphrase, and let the merge land
-// (and the review dialog open, if any).
+// Open the menu, start a file sync, and let the merge land (and the review dialog
+// open, if any).
+//
+// Order matters: the apply choice comes first, then the passphrase. A
+// passphrase-only file is merged with the passphrase the session already holds,
+// so the box only appears when that fails — which is what these tests exercise,
+// because `_buildScreen` defaults the held merge to "does not open it".
 Future<void> _startSync(WidgetTester tester) async {
   await _openMenu(tester);
   await tester.tap(find.text('Sync from file'));
   await tester.pumpAndSettle();
+  // Take the granular review path so the existing assertions (review dialog +
+  // per-decision apply) still hold.
+  await tester.tap(find.text('Review all changes'));
+  await tester.pumpAndSettle();
+  await _enterSyncPassphrase(tester);
+  await _settle(tester);
+}
+
+// Fill in the fallback passphrase box and confirm it. Discrete pumps, not
+// pumpAndSettle: the merge's transient spinner never settles.
+Future<void> _enterSyncPassphrase(WidgetTester tester) async {
   await tester.enterText(
     find.descendant(
       of: find.byType(AlertDialog),
@@ -107,11 +129,7 @@ Future<void> _startSync(WidgetTester tester) async {
     ),
     'passphrase',
   );
-  await tester.tap(find.text('Sync'));
-  await tester.pumpAndSettle();
-  // The Quick-vs-Review chooser now appears; take the granular review path so the
-  // existing assertions (review dialog + per-decision apply) still hold.
-  await tester.tap(find.text('Review all changes'));
+  await tester.tap(find.widgetWithText(TextButton, 'Sync'));
   await _settle(tester);
 }
 
@@ -167,7 +185,9 @@ void main() {
       );
     });
 
-    testWidgets('passphrase dialog appears after file is picked', (
+    // The passphrase box is now the fallback: it appears only once the held
+    // passphrase has failed to open the file, after the apply choice is made.
+    testWidgets('passphrase dialog appears when the held passphrase fails', (
       tester,
     ) async {
       await tester.pumpWidget(
@@ -179,11 +199,40 @@ void main() {
       await _openMenu(tester);
       await tester.tap(find.text('Sync from file'));
       await tester.pumpAndSettle();
+      await tester.tap(find.text('Review all changes'));
+      await tester.pumpAndSettle();
 
       expect(find.text('Sync from file'), findsOneWidget);
       expect(find.text('Cancel'), findsOneWidget);
-      expect(find.text('Sync'), findsOneWidget);
+      expect(find.widgetWithText(TextButton, 'Sync'), findsOneWidget);
       expect(find.text('/tmp/other.gabbro'), findsOneWidget);
+    });
+
+    // Silent sync: the session already holds a passphrase that opens the file, so
+    // the user types nothing and lands straight on the apply choice.
+    testWidgets('a file the held passphrase opens asks for no passphrase', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _buildScreen(
+          pickedPath: '/tmp/other.gabbro',
+          mergeVault: (_, _) async => _summary(),
+          mergeVaultHeld: (_) async => _summary(),
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from file'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.byType(TextField),
+        ),
+        findsNothing,
+        reason: 'no passphrase box: the session passphrase opened the file',
+      );
+      expect(find.text('How should this sync apply?'), findsOneWidget);
     });
 
     testWidgets('Merge automatically runs the fast merge, no review dialog', (
@@ -205,19 +254,12 @@ void main() {
       await _openMenu(tester);
       await tester.tap(find.text('Sync from file'));
       await tester.pumpAndSettle();
-      await tester.enterText(
-        find.descendant(
-          of: find.byType(AlertDialog),
-          matching: find.byType(TextField),
-        ),
-        'passphrase',
-      );
-      await tester.tap(find.text('Sync'));
-      await tester.pumpAndSettle();
 
       // The Quick-vs-Review chooser appears.
       expect(find.text('How should this sync apply?'), findsOneWidget);
       await tester.tap(find.text('Merge automatically'));
+      await tester.pumpAndSettle();
+      await _enterSyncPassphrase(tester);
       await _settle(tester);
 
       expect(fastCalled, isTrue, reason: 'fast merge FFI must run');
@@ -245,15 +287,6 @@ void main() {
       await _openMenu(tester);
       await tester.tap(find.text('Sync from file'));
       await tester.pumpAndSettle();
-      await tester.enterText(
-        find.descendant(
-          of: find.byType(AlertDialog),
-          matching: find.byType(TextField),
-        ),
-        'passphrase',
-      );
-      await tester.tap(find.text('Sync'));
-      await tester.pumpAndSettle();
 
       expect(find.text('How should this sync apply?'), findsOneWidget);
       final chooser = tester.widget<AlertDialog>(
@@ -279,6 +312,9 @@ void main() {
       await tester.tap(find.text('Sync from file'));
       await tester.pumpAndSettle();
 
+      await tester.tap(find.text('Review all changes'));
+      await tester.pumpAndSettle();
+
       expect(find.textContaining('run it again'), findsOneWidget);
       // Exposed to screen readers, not just painted.
       expect(find.bySemanticsLabel(RegExp('run it again')), findsOneWidget);
@@ -299,6 +335,9 @@ void main() {
       );
       await _openMenu(tester);
       await tester.tap(find.text('Sync from file'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Review all changes'));
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.visibility), findsOneWidget);
@@ -327,6 +366,8 @@ void main() {
       await _openMenu(tester);
       await tester.tap(find.text('Sync from file'));
       await tester.pumpAndSettle();
+      await tester.tap(find.text('Review all changes'));
+      await tester.pumpAndSettle();
 
       await tester.tap(find.text('Cancel'));
       await tester.pumpAndSettle();
@@ -348,17 +389,9 @@ void main() {
       await tester.tap(find.text('Sync from file'));
       await tester.pumpAndSettle();
 
-      await tester.enterText(
-        find.descendant(
-          of: find.byType(AlertDialog),
-          matching: find.byType(TextField),
-        ),
-        'passphrase',
-      );
-      await tester.tap(find.text('Sync'));
-      await tester.pumpAndSettle();
       await tester.tap(find.text('Review all changes'));
       await tester.pumpAndSettle();
+      await _enterSyncPassphrase(tester);
 
       expect(find.textContaining('Nothing to sync'), findsOneWidget);
     });
@@ -374,17 +407,9 @@ void main() {
       await tester.tap(find.text('Sync from file'));
       await tester.pumpAndSettle();
 
-      await tester.enterText(
-        find.descendant(
-          of: find.byType(AlertDialog),
-          matching: find.byType(TextField),
-        ),
-        'passphrase',
-      );
-      await tester.tap(find.text('Sync'));
-      await tester.pumpAndSettle();
       await tester.tap(find.text('Review all changes'));
       await tester.pumpAndSettle();
+      await _enterSyncPassphrase(tester);
 
       expect(find.textContaining('Vault synced'), findsOneWidget);
       expect(find.textContaining('3 added'), findsOneWidget);
@@ -551,6 +576,8 @@ void main() {
       await _openMenu(tester);
       await tester.tap(find.text('Sync from file'));
       await tester.pumpAndSettle();
+      await tester.tap(find.text('Review all changes'));
+      await tester.pumpAndSettle();
 
       await tester.enterText(
         find.descendant(
@@ -559,9 +586,7 @@ void main() {
         ),
         'mypassword',
       );
-      await tester.tap(find.text('Sync'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Review all changes'));
+      await tester.tap(find.widgetWithText(TextButton, 'Sync'));
       await tester.pumpAndSettle();
 
       expect(capturedPassphrase, equals(utf8.encode('mypassword')));
@@ -579,6 +604,8 @@ void main() {
       await _openMenu(tester);
       await tester.tap(find.text('Sync from file'));
       await tester.pumpAndSettle();
+      await tester.tap(find.text('Review all changes'));
+      await tester.pumpAndSettle();
 
       await tester.enterText(
         find.descendant(
@@ -587,13 +614,11 @@ void main() {
         ),
         'wrongpassword',
       );
-      await tester.tap(find.text('Sync'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Review all changes'));
+      await tester.tap(find.widgetWithText(TextButton, 'Sync'));
       // Use explicit pumps: cursor blink timer prevents pumpAndSettle from
       // settling while the passphrase dialog exit animation is in progress.
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 350)); // chooser exit
+      await tester.pump(const Duration(milliseconds: 350)); // dialog exit
       await tester.pump(
         const Duration(milliseconds: 350),
       ); // error dialog enter
@@ -1067,6 +1092,8 @@ void main() {
       await _openMenu(tester);
       await tester.tap(find.text('Sync from file'));
       await tester.pumpAndSettle();
+      await tester.tap(find.text('Review all changes'));
+      await tester.pumpAndSettle();
 
       await tester.enterText(
         find.descendant(
@@ -1075,7 +1102,7 @@ void main() {
         ),
         'passphrase',
       );
-      await tester.tap(find.text('Sync'));
+      await tester.tap(find.widgetWithText(TextButton, 'Sync'));
       await tester.pump();
 
       expect(find.text('Tap your YubiKey now…'), findsNothing);

@@ -76,6 +76,16 @@ Future<MergeSummary> _defaultFastMergeVaultWithKey(
   credentialId: credentialId,
 );
 
+/// Sync using the passphrase the session already holds. Returns `null` when that
+/// passphrase does not open the file, so the caller asks the user for one.
+///
+/// PLACEHOLDER: returns `null` unconditionally until the Rust calls land, which
+/// keeps production on today's ask-for-a-passphrase behaviour. Wire both to the
+/// real bridge calls; `test/vault_list_sync_test.dart` covers the wired flow via
+/// injected stand-ins, so it cannot catch these two being left unwired.
+Future<MergeSummary?> _defaultMergeVaultHeld(String path) async => null;
+Future<MergeSummary?> _defaultFastMergeVaultHeld(String path) async => null;
+
 /// Cancel an in-progress granular sync: roll the vault back to its pre-sync state.
 Future<void> _defaultCancelSync() => cancelSync();
 
@@ -256,6 +266,12 @@ class VaultListScreen extends StatefulWidget {
   )
   fastMergeVaultWithKey;
 
+  /// Sync using the passphrase the unlocked session already holds, so the user
+  /// types nothing. `null` means that passphrase does not open the file, and the
+  /// flow falls back to asking for one.
+  final Future<MergeSummary?> Function(String path) mergeVaultHeld;
+  final Future<MergeSummary?> Function(String path) fastMergeVaultHeld;
+
   /// Detects whether the chosen `.gabbro` sync source is key-protected.
   final List<YubikeyRecordData> Function(String path) onDetectSyncSourceRecords;
 
@@ -316,6 +332,8 @@ class VaultListScreen extends StatefulWidget {
     this.mergeVaultWithKey = _defaultMergeVaultWithKey,
     this.fastMergeVault = _defaultFastMergeVault,
     this.fastMergeVaultWithKey = _defaultFastMergeVaultWithKey,
+    this.mergeVaultHeld = _defaultMergeVaultHeld,
+    this.fastMergeVaultHeld = _defaultFastMergeVaultHeld,
     this.onDetectSyncSourceRecords = _defaultDetectSyncSourceRecords,
     this.onGetSyncYubikeyHmac = _defaultGetSyncYubikeyHmac,
     this.onPickSyncFile = _defaultPickSyncFile,
@@ -1066,6 +1084,23 @@ class _VaultListScreenState extends State<VaultListScreen>
     _loadEntries();
   }
 
+  /// Asks for the incoming file's passphrase (plus PIN and transport when the
+  /// file is key-protected). `null` if the user backs out.
+  Future<SyncCredentials?> _askSyncCredentials(
+    String path,
+    List<YubikeyRecordData> sourceRecords,
+  ) => showDialog<SyncCredentials>(
+    context: context,
+    barrierDismissible: false,
+    builder: (ctx) => SyncPassphraseDialog(
+      filePath: path,
+      isKeyProtected: sourceRecords.isNotEmpty,
+      isAndroid: widget.isAndroid,
+      sourceRecords: sourceRecords,
+      onGetYubikeyHmac: widget.onGetSyncYubikeyHmac,
+    ),
+  );
+
   Future<void> _syncFromFile() async {
     final String? picked;
     try {
@@ -1093,19 +1128,15 @@ class _VaultListScreenState extends State<VaultListScreen>
     final isKeyProtected = sourceRecords.isNotEmpty;
 
     // SyncPassphraseDialog owns the controllers; returns passphrase (+ PIN and
-    // transport when key-protected), or null on cancel.
-    final creds = await showDialog<SyncCredentials>(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => SyncPassphraseDialog(
-        filePath: path,
-        isKeyProtected: isKeyProtected,
-        isAndroid: widget.isAndroid,
-        sourceRecords: sourceRecords,
-        onGetYubikeyHmac: widget.onGetSyncYubikeyHmac,
-      ),
-    );
-    if (creds == null || !mounted) return;
+    // transport when key-protected), or null on cancel. A key-protected source
+    // needs it up front, because the PIN and the tap cannot be guessed. A
+    // passphrase-only source is tried with the passphrase the session already
+    // holds first, and only asks if that fails.
+    SyncCredentials? creds;
+    if (isKeyProtected) {
+      creds = await _askSyncCredentials(path, sourceRecords);
+      if (creds == null || !mounted) return;
+    }
 
     // Choose how to apply: automatically (incoming wins, no prompts) or a
     // granular one-by-one review.
@@ -1115,19 +1146,41 @@ class _VaultListScreenState extends State<VaultListScreen>
     );
     if (fast == null || !mounted) return;
 
-    final passphraseBytes = utf8.encode(creds.passphrase);
     setState(() => _isSyncing = true);
     try {
+      // Silent sync (passphrase-only source): merge with the session's own
+      // passphrase, so nothing is typed. `null` means it does not open this file
+      // — the passphrase was changed on the other device, or this is not that
+      // vault — so fall back to asking, keeping the apply choice already made.
+      MergeSummary? held;
+      if (!isKeyProtected) {
+        held = fast
+            ? await widget.fastMergeVaultHeld(path)
+            : await widget.mergeVaultHeld(path);
+        if (!mounted) return;
+        if (held == null) {
+          setState(() => _isSyncing = false);
+          creds = await _askSyncCredentials(path, sourceRecords);
+          if (creds == null || !mounted) return;
+          setState(() => _isSyncing = true);
+        }
+      }
+      final passphraseBytes = creds == null
+          ? const <int>[]
+          : utf8.encode(creds.passphrase);
+
       if (fast) {
         // Fast auto-merge: everything applied, incoming wins, no review dialog.
-        final MergeSummary fastSummary = isKeyProtected
-            ? await widget.fastMergeVaultWithKey(
-                path,
-                passphraseBytes,
-                creds.hmac!,
-                creds.credentialId!,
-              )
-            : await widget.fastMergeVault(path, passphraseBytes);
+        final MergeSummary fastSummary =
+            held ??
+            (isKeyProtected
+                ? await widget.fastMergeVaultWithKey(
+                    path,
+                    passphraseBytes,
+                    creds!.hmac!,
+                    creds.credentialId!,
+                  )
+                : await widget.fastMergeVault(path, passphraseBytes));
         if (!mounted) return;
         _loadEntries();
         final nothing =
@@ -1166,13 +1219,15 @@ class _VaultListScreenState extends State<VaultListScreen>
         return;
       }
       final MergeSummary summary;
-      if (isKeyProtected) {
+      if (held != null) {
+        summary = held;
+      } else if (isKeyProtected) {
         // The dialog already tapped the key (showing the inline tap note); use
         // the returned material to open the key-protected source and merge.
         summary = await widget.mergeVaultWithKey(
           path,
           passphraseBytes,
-          creds.hmac!,
+          creds!.hmac!,
           creds.credentialId!,
         );
       } else {
