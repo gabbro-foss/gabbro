@@ -137,6 +137,15 @@ held passphrase; the passphrase box is now the fallback. Key-protected files unc
 both `VaultListScreen` call sites (onboarding, unlock; neither overrides the default).
 Left: the warning in the apply-choice dialog (items 4-5), and tests naming items 6-8.
 
+**BLOCKED — the release build will not start.** `RustLib.init` aborts with "Content hash on
+Dart side (1373736350) is different from Rust side (906954885)", so **no hardware testing has
+happened**. The generated pair on disk both read 1373736350; codegen is stable and re-running
+it leaves the tree clean. Ruled out: the installed `gabbro-bin` library at
+`/usr/lib/gabbro/lib/` (it lacks the new call, and forcing the bundle's own `lib` via
+`LD_LIBRARY_PATH` changed nothing), and a stale build artefact (`cargo clean -p
+rust_lib_gabbro` + full rebuild changed nothing). Next step is to find which file on disk
+carries 906954885 — instrument, do not guess again. Two theories were already wrong.
+
 All six Rust functions exist and are green (`merge_vault_from_file`, `fast_merge_…`,
 `import_from_gabbro`, each with a `_with_key` twin). The remaining work is in Flutter.
 
