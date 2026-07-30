@@ -73,7 +73,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 667 | 17 |
+| Rust (`cargo test -q`) | 674 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 11 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -123,13 +123,13 @@ last good copy is gone. Fix: preserve the old vault to a single `<vault>.gabbro.
 (old `.bak` if usable, else old main bytes; 0600; fail-closed) + a confirm dialog before
 writing. Canon-TDD, agreed 2026-07-30 — tick as they go green:
 
-- [ ] R1 usable `.bak` -> `.pre-restore` holds it, opens with old credentials
-- [ ] R2 no usable `.bak` -> `.pre-restore` holds the old main bytes
-- [ ] R3 nothing at path -> no `.pre-restore`, restore succeeds
-- [ ] R4 second restore overwrites `.pre-restore` (only ever one)
-- [ ] R5 symlinked `.pre-restore` -> refused, main + `.bak` untouched
-- [ ] R6 `.pre-restore` mode 0600
-- [ ] R7 vault deletion removes `.pre-restore` alongside `.bak`
+- [x] R1 usable `.bak` -> `.pre-restore` holds it, opens with old credentials
+- [x] R2 no usable `.bak` -> `.pre-restore` holds the old main bytes
+- [x] R3 nothing at path -> no `.pre-restore`, restore succeeds
+- [x] R4 second restore overwrites `.pre-restore` (only ever one)
+- [x] R5 symlinked `.pre-restore` -> refused, main + `.bak` untouched
+- [x] R6 `.pre-restore` mode 0600
+- [x] R7 vault deletion removes `.pre-restore` alongside `.bak`
 - [ ] F8 confirm dialog after pick, before any write; names vault + safety copy
 - [ ] F9 cancel -> no bridge call, nothing touched
 - [ ] F10 continue -> restore proceeds as today
