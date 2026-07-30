@@ -127,7 +127,7 @@ file and stay keyed).
 | | passphrase | p+yk | notes |
 |---|---|---|---|
 | import entries | done | done | always asks for passphrase + PIN + tap |
-| sync from file | done | built, unit-green | passphrase column hardware-passed (T1-T9 + W1-W3). Keyed: PIN + tap only — the held passphrase is tried after the tap; a typed passphrase appears only on fallback, reusing the same tap (one tap total). Hardware round pending (`.scratchpad` K1-K5) |
+| sync from file | done | done | hardware-passed 2026-07-30 (T1-T9, W1-W3, K1-K5). Keyed: PIN + tap only; typed passphrase only on fallback, same tap reused (one tap total) |
 | adopt a file | todo | todo | new flow from `onboarding_screen`, `unlock_screen`, `manage_vaults_screen` |
 
 **`sync` / passphrase — progress.** Order flipped: pick file -> apply choice -> merge with the
@@ -142,11 +142,11 @@ prove same vault." on passphrase-only sources (all 37 locales; absent on the key
 where a wrong vault fails to decrypt outright), and cancel/fallback/keyed-order each have
 a test. **W1-W3 hardware-passed 2026-07-30 — the cell is done.**
 
-**`sync` / p+yk — built, unit-green, hardware pending.** New Rust pair
-`merge_vault_from_file_with_key_held` / `fast_…` (`Option<MergeSummary>`, 5 tests); the
-keyed dialog is PIN-only and says "Use incoming vault's YubiKey" (37 locales — the file's
-key set may differ from this vault's); fallback reuses the tap's hmac, so one tap total.
-The hmac output is deterministic per registration, which is what makes the reuse sound.
+**`sync` / p+yk — DONE, hardware-passed 2026-07-30 (K1-K5, incl. wrong-key).** New Rust
+pair `merge_vault_from_file_with_key_held` / `fast_…` (`Option<MergeSummary>`, 5 tests);
+the keyed dialog is PIN-only and says "Use incoming vault's YubiKey" (37 locales — the
+file's key set may differ from this vault's); fallback reuses the tap's hmac, so one tap
+total. The hmac output is deterministic per registration, which makes the reuse sound.
 
 **UNBLOCKED 2026-07-30 — hash mismatch explained and fixed on disk; launch not yet verified.**
 The bridge loader on Linux (`flutter_rust_bridge` 2.12.0, `loader/_io.dart`) opens
