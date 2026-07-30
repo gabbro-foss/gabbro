@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2007 | 10 |
+| Flutter (`flutter test`) | 2010 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -135,7 +135,12 @@ held passphrase; the passphrase box is now the fallback. Key-protected files unc
 `merge_vault_from_file_held` / `fast_merge_vault_from_file_held` return
 `Option<MergeSummary>` — `None` = needs credentials, `Err` = unusable file — and are live in
 both `VaultListScreen` call sites (onboarding, unlock; neither overrides the default).
-Left: the warning in the apply-choice dialog (items 4-5), and tests naming items 6-8.
+**Hardware matrix T1-T9 all passed 2026-07-30** (T9 silent-drop-on-lock code-verified:
+lock closes the Rust session and unmounts the screen, so a post-lock pick cannot merge).
+Items 4-8 built and pinned: the apply-choice dialog now warns "Same passphrase does not
+prove same vault." on passphrase-only sources (all 37 locales; absent on the keyed path,
+where a wrong vault fails to decrypt outright), and cancel/fallback/keyed-order each have
+a test. Left: the warning's hardware round (`.scratchpad` W1-W3).
 
 **UNBLOCKED 2026-07-30 — hash mismatch explained and fixed on disk; launch not yet verified.**
 The bridge loader on Linux (`flutter_rust_bridge` 2.12.0, `loader/_io.dart`) opens
