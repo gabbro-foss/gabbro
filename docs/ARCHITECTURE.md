@@ -73,7 +73,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 656 | 17 |
+| Rust (`cargo test -q`) | 657 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 11 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2006 | 10 |
+| Flutter (`flutter test`) | 2007 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -115,14 +115,35 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-Implement the two changes below. The net is green and every defect it surfaced is fixed.
+Work the matrix below in order: `sync` / passphrase, then `sync` / p+yk, then the
+`adopt` row. Canon-TDD each cell. The net is green and every defect it surfaced is fixed.
 
 ### Faster sync, attempt 2 — this branch
 
-**Two changes, both touching the vault:**
-1. **Silent sync** for the same vault; a warning when only the passphrase matched.
-2. **Adopt a vault file** — a new flow from `onboarding_screen`, `unlock_screen` and
-   `manage_vaults_screen` that opens an existing `.gabbro` as a vault on a second device.
+**The matrix.** Rows are user flows, columns are how the *incoming file* was protected
+(not how the receiving vault is protected — a keyed vault can receive a passphrase-only
+file and stay keyed).
+
+| | passphrase | p+yk | notes |
+|---|---|---|---|
+| import entries | done | done | always asks for passphrase + PIN + tap |
+| sync from file | in progress | in progress | merge done; skipping the passphrase prompt is the work. PIN + tap stay for a keyed file |
+| adopt a file | todo | todo | new flow from `onboarding_screen`, `unlock_screen`, `manage_vaults_screen` |
+
+**`sync` / passphrase — progress.** Order flipped: pick file -> apply choice -> merge with the
+held passphrase; the passphrase box is now the fallback. Key-protected files unchanged.
+Done: the net pin (`fast_merge_keeps_an_entry_only_this_vault_has`) and the no-typing flow
+(`a file the held passphrase opens asks for no passphrase`).
+**Still a placeholder:** `_defaultMergeVaultHeld` / `_defaultFastMergeVaultHeld`
+(`vault_list_screen.dart`) always answer "does not open it", so hardware behaviour is
+unchanged until the Rust calls land. The widget tests inject stand-ins and cannot catch this.
+Left: the warning in the apply-choice dialog, then the Rust calls.
+
+All six Rust functions exist and are green (`merge_vault_from_file`, `fast_merge_…`,
+`import_from_gabbro`, each with a `_with_key` twin). The remaining work is in Flutter.
+
+**Adopt** = open an exported `.gabbro` as a vault on a second device, without first
+creating an empty vault and importing into it.
 
 **Agreed split:** `sync from file` is the same vault, only ever. `import entries` is any
 other source, always full credentials — wording only, the guards are already there.
@@ -142,6 +163,11 @@ the `.bak` and (via the unlock screen) unenrols biometrics for that path — cor
 restore, wrong for adopting a file that is already this vault.
 
 **Design notes:**
+- **Silent sync is try-first (decided 2026-07-30).** Pick file -> apply-choice dialog (which
+  carries the warning) -> merge using the passphrase the session already holds. Only if that
+  comes back "needs credentials" does the passphrase box appear. No up-front probe: it would
+  open the file twice and add ~0.7s to every sync. The Rust call returns `Option<MergeSummary>`
+  — `None` means needs-credentials, so Dart never matches on an error string.
 - Linux adoption needs no file copy — register a `VaultRecord` at the picked path. Android's
   picker returns a cache copy, so a copy into app storage is forced there. That asymmetry
   decides whether adoption reuses `restore_vault_from_file`.
@@ -151,6 +177,10 @@ restore, wrong for adopting a file that is already this vault.
 - Any new `#[ignore]` sync test must be added to `gabbro_test`, or it never runs.
 
 **Findings not to be re-litigated:**
+- The menu item stays **`Sync from file`** (decided 2026-07-30). A bare "Sync" promises the
+  background syncing Gabbro deliberately does not do, and "from file" warns the user a file
+  picker is next. It also keeps the menu parallel: Export vault / Import entries / Sync from
+  file. Do not re-propose the rename.
 - A passphrase-only save re-seals the whole file with fresh salts (`session.rs:186`,
   `rust/src/api/vault.rs:1079`). Nothing per-vault survives but the alias, so "it opened"
   proves only *same passphrase* — hence the warning. An entry-UUID-overlap heuristic was
@@ -183,7 +213,15 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
-- in `sync` path, we currently have `auto-merge` and `review all changes`, the `auto-merge` is additive only (check and verify) and therefore never deletes items in the receiving vault: (1) add a message that explains this (or the correct) behaviour to the user, (2) add a third `sync` mechanism that simply takes the incoming vault and clobbers the existing one - discuss this
+- In the `sync` apply-choice dialog: (1) explain what `auto-merge` does. **Verified 2026-07-30
+  — it is not additive only.** It applies the incoming value on a clash, the incoming folder,
+  removes items the other side removed, and deletes an entry the other side deleted
+  (`session.rs:3540`). What it never does is drop an entry the other side has simply never
+  seen (pinned by `fast_merge_keeps_an_entry_only_this_vault_has`). So the copy must say
+  "deletes only what the other device deleted on purpose", not "never deletes".
+  (2) Add a third choice that takes the incoming vault and replaces this one — discuss first.
+  Note the dialog is already three buttons (auto, review, Cancel) in a scrollable column;
+  a fourth is what `test/sync_chooser_l10n_overflow_test.dart` will catch at 8x text.
 
 ### Code Quality
 - **One locale sweep lets an error through, so it could hide an overflow.** The
