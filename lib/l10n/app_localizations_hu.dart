@@ -726,6 +726,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Azonos jelmondat nem bizonyít azonos széfet.';
 
   @override
+  String get syncUseIncomingYubikey =>
+      'Használja a bejövő széf YubiKey kulcsát';
+
+  @override
   String get syncMergeAutomatically => 'Automatikus egyesítés';
 
   @override

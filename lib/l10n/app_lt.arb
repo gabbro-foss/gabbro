@@ -281,6 +281,7 @@
   "nothingToSync": "Nėra ko sinchronizuoti — abi saugyklos jau atnaujintos.",
   "syncMethodTitle": "Kaip taikyti šią sinchronizaciją?",
   "syncSamePassphraseWarning": "Ta pati slaptafrazė neįrodo, kad tai ta pati saugykla.",
+  "syncUseIncomingYubikey": "Naudokite gaunamos saugyklos YubiKey raktą",
   "syncMergeAutomatically": "Sulieti automatiškai",
   "syncReviewAllChanges": "Peržiūrėti visus pakeitimus",
   "syncDetailsAction": "Išsami informacija",

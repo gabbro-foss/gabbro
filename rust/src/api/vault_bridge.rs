@@ -915,6 +915,48 @@ pub async fn fast_merge_vault_from_file_held(
     session::session_fast_merge_from_file_held(&PathBuf::from(path))
 }
 
+/// Merge a **key-protected** `.gabbro` file using the passphrase the unlocked
+/// session already holds plus a tap's hmac output, so only the PIN was typed
+/// (ADR-013). `hmac_secret` must be exactly 32 bytes.
+///
+/// `None` means the held passphrase + credential do not open the file, and the
+/// caller should ask for a typed passphrase, reusing the same tap. `Err` is
+/// reserved for an unusable file and a locked session, as in
+/// [`merge_vault_from_file_held`]. The file at `path` is only ever read.
+pub async fn merge_vault_from_file_with_key_held(
+    path: String,
+    hmac_secret: Vec<u8>,
+    credential_id: Vec<u8>,
+) -> Result<Option<crate::api::vault::MergeSummary>, String> {
+    let secret: [u8; 32] = hmac_secret
+        .try_into()
+        .map_err(|_| "hmac_secret must be exactly 32 bytes".to_string())?;
+    session::session_merge_vault_from_file_with_key_held(
+        &PathBuf::from(path),
+        &secret,
+        &credential_id,
+    )
+}
+
+/// Fast auto-merge of a **key-protected** `.gabbro` file using the held
+/// passphrase plus a tap's hmac output. The analogue of
+/// [`merge_vault_from_file_with_key_held`] for the "Merge automatically" path.
+/// Persists (async — a single vault save).
+pub async fn fast_merge_vault_from_file_with_key_held(
+    path: String,
+    hmac_secret: Vec<u8>,
+    credential_id: Vec<u8>,
+) -> Result<Option<crate::api::vault::MergeSummary>, String> {
+    let secret: [u8; 32] = hmac_secret
+        .try_into()
+        .map_err(|_| "hmac_secret must be exactly 32 bytes".to_string())?;
+    session::session_fast_merge_from_file_with_key_held(
+        &PathBuf::from(path),
+        &secret,
+        &credential_id,
+    )
+}
+
 /// Apply a whole granular-sync review in one call: field resolutions, kept-value
 /// history replacements, item deletes, folder picks, and whole-entry deletes.
 /// Re-seals the vault once for the entire review instead of once per decision.

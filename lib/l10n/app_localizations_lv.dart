@@ -726,6 +726,10 @@ class AppLocalizationsLv extends AppLocalizations {
       'Tāda pati ieejas frāze nepierāda to pašu seifu.';
 
   @override
+  String get syncUseIncomingYubikey =>
+      'Izmantojiet ienākošā seifa YubiKey atslēgu';
+
+  @override
   String get syncMergeAutomatically => 'Apvienot automātiski';
 
   @override

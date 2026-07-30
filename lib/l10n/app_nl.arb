@@ -281,6 +281,7 @@
   "nothingToSync": "Niets te synchroniseren — beide kluizen zijn al up-to-date.",
   "syncMethodTitle": "Hoe moet deze synchronisatie worden toegepast?",
   "syncSamePassphraseWarning": "Dezelfde wachtwoordzin bewijst niet dezelfde kluis.",
+  "syncUseIncomingYubikey": "Gebruik de YubiKey van de inkomende kluis",
   "syncMergeAutomatically": "Automatisch samenvoegen",
   "syncReviewAllChanges": "Alle wijzigingen bekijken",
   "syncDetailsAction": "Details",

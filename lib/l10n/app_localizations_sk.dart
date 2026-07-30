@@ -728,6 +728,10 @@ class AppLocalizationsSk extends AppLocalizations {
       'Rovnaká prístupová fráza nedokazuje rovnaký trezor.';
 
   @override
+  String get syncUseIncomingYubikey =>
+      'Použite YubiKey prichádzajúceho trezora';
+
+  @override
   String get syncMergeAutomatically => 'Zlúčiť automaticky';
 
   @override

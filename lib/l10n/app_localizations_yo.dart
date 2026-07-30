@@ -726,6 +726,9 @@ class AppLocalizationsYo extends AppLocalizations {
       'Gbolohun ọrọ igbaniwọle kan naa ko jẹrisi vọọliti kan naa.';
 
   @override
+  String get syncUseIncomingYubikey => 'Lo YubiKey vọọliti ti n bọ';
+
+  @override
   String get syncMergeAutomatically => 'Dàpọ̀ láìfọwọ́yi';
 
   @override

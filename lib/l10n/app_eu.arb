@@ -281,6 +281,7 @@
   "nothingToSync": "Ez dago sinkronizatzeko ezer — bi gandegiak eguneratuta daude dagoeneko.",
   "syncMethodTitle": "Nola aplikatu behar da sinkronizazio hau?",
   "syncSamePassphraseWarning": "Pasaesaldi bera izateak ez du gandegi bera frogatzen.",
+  "syncUseIncomingYubikey": "Erabili sarrerako gandegiaren YubiKey-a",
   "syncMergeAutomatically": "Batu automatikoki",
   "syncReviewAllChanges": "Berrikusi aldaketa guztiak",
   "syncDetailsAction": "Xehetasunak",

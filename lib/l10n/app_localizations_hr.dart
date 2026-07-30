@@ -727,6 +727,9 @@ class AppLocalizationsHr extends AppLocalizations {
       'Ista pristupna fraza ne dokazuje isti trezor.';
 
   @override
+  String get syncUseIncomingYubikey => 'Upotrijebite YubiKey dolaznog trezora';
+
+  @override
   String get syncMergeAutomatically => 'Automatski spoji';
 
   @override

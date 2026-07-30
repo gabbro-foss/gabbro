@@ -316,6 +316,10 @@
   "@syncSamePassphraseWarning": {
     "description": "Warning in the apply-choice dialog for passphrase-only files: a passphrase-only save keeps nothing per-vault, so opening proves only that the passphrases match."
   },
+  "syncUseIncomingYubikey": "Use incoming vault's YubiKey",
+  "@syncUseIncomingYubikey": {
+    "description": "Note in the keyed sync dialog: the key to tap is one registered in the incoming file, which may differ from this vault's keys."
+  },
   "syncMergeAutomatically": "Merge automatically",
   "@syncMergeAutomatically": {
     "description": "Button: apply all incoming changes automatically (incoming wins), no review."

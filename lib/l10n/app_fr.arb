@@ -281,6 +281,7 @@
   "nothingToSync": "Rien à synchroniser — les deux coffres sont déjà à jour.",
   "syncMethodTitle": "Comment appliquer cette synchronisation ?",
   "syncSamePassphraseWarning": "Un même mot de passe principal ne prouve pas que c'est le même coffre.",
+  "syncUseIncomingYubikey": "Utilisez la YubiKey du coffre entrant",
   "syncMergeAutomatically": "Fusionner automatiquement",
   "syncReviewAllChanges": "Vérifier toutes les modifications",
   "syncDetailsAction": "Détails",

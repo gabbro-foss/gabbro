@@ -281,6 +281,7 @@
   "nothingToSync": "Δεν υπάρχει τίποτα για συγχρονισμό — και τα δύο θησαυροφυλάκια είναι ήδη ενημερωμένα.",
   "syncMethodTitle": "Πώς να εφαρμοστεί αυτός ο συγχρονισμός;",
   "syncSamePassphraseWarning": "Η ίδια φράση πρόσβασης δεν αποδεικνύει το ίδιο θησαυροφυλάκιο.",
+  "syncUseIncomingYubikey": "Χρησιμοποιήστε το YubiKey του εισερχόμενου θησαυροφυλακίου",
   "syncMergeAutomatically": "Αυτόματη συγχώνευση",
   "syncReviewAllChanges": "Έλεγχος όλων των αλλαγών",
   "syncDetailsAction": "Λεπτομέρειες",

@@ -729,6 +729,9 @@ class AppLocalizationsSl extends AppLocalizations {
       'Enako geslo za dostop ne dokazuje enakega trezorja.';
 
   @override
+  String get syncUseIncomingYubikey => 'Uporabite YubiKey dohodnega trezorja';
+
+  @override
   String get syncMergeAutomatically => 'Samodejno združi';
 
   @override

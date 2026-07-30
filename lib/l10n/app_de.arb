@@ -281,6 +281,7 @@
   "nothingToSync": "Nichts zu synchronisieren — beide Tresore sind bereits aktuell.",
   "syncMethodTitle": "Wie soll diese Synchronisierung angewendet werden?",
   "syncSamePassphraseWarning": "Dieselbe Passphrase beweist nicht denselben Tresor.",
+  "syncUseIncomingYubikey": "Verwenden Sie den YubiKey des eingehenden Tresors",
   "syncMergeAutomatically": "Automatisch zusammenführen",
   "syncReviewAllChanges": "Alle Änderungen überprüfen",
   "syncDetailsAction": "Details",

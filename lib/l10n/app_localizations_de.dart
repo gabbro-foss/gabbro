@@ -729,6 +729,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Dieselbe Passphrase beweist nicht denselben Tresor.';
 
   @override
+  String get syncUseIncomingYubikey =>
+      'Verwenden Sie den YubiKey des eingehenden Tresors';
+
+  @override
   String get syncMergeAutomatically => 'Automatisch zusammenführen';
 
   @override

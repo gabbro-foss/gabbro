@@ -729,6 +729,10 @@ class AppLocalizationsUk extends AppLocalizations {
       'Однакова кодова фраза не доводить, що це те саме сховище.';
 
   @override
+  String get syncUseIncomingYubikey =>
+      'Використовуйте YubiKey вхідного сховища';
+
+  @override
   String get syncMergeAutomatically => 'Обʼєднати автоматично';
 
   @override

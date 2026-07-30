@@ -281,6 +281,7 @@
   "nothingToSync": "Нічого синхронізувати — обидва сховища вже актуальні.",
   "syncMethodTitle": "Як застосувати цю синхронізацію?",
   "syncSamePassphraseWarning": "Однакова кодова фраза не доводить, що це те саме сховище.",
+  "syncUseIncomingYubikey": "Використовуйте YubiKey вхідного сховища",
   "syncMergeAutomatically": "Обʼєднати автоматично",
   "syncReviewAllChanges": "Переглянути всі зміни",
   "syncDetailsAction": "Подробиці",

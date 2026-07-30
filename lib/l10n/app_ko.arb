@@ -281,6 +281,7 @@
   "nothingToSync": "동기화할 것이 없습니다 — 두 볼트 모두 이미 최신 상태입니다.",
   "syncMethodTitle": "이 동기화를 어떻게 적용하시겠습니까?",
   "syncSamePassphraseWarning": "같은 암호 문구가 같은 볼트임을 증명하지 않습니다.",
+  "syncUseIncomingYubikey": "들어오는 볼트의 YubiKey를 사용하세요",
   "syncMergeAutomatically": "자동으로 병합",
   "syncReviewAllChanges": "모든 변경 사항 검토",
   "syncDetailsAction": "세부 정보",

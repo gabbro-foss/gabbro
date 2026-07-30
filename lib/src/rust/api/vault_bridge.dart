@@ -387,6 +387,38 @@ Future<MergeSummary?> fastMergeVaultFromFileHeld({required String path}) =>
       path: path,
     );
 
+/// Merge a **key-protected** `.gabbro` file using the passphrase the unlocked
+/// session already holds plus a tap's hmac output, so only the PIN was typed
+/// (ADR-013). `hmac_secret` must be exactly 32 bytes.
+///
+/// `None` means the held passphrase + credential do not open the file, and the
+/// caller should ask for a typed passphrase, reusing the same tap. `Err` is
+/// reserved for an unusable file and a locked session, as in
+/// [`merge_vault_from_file_held`]. The file at `path` is only ever read.
+Future<MergeSummary?> mergeVaultFromFileWithKeyHeld({
+  required String path,
+  required List<int> hmacSecret,
+  required List<int> credentialId,
+}) => RustLib.instance.api.crateApiVaultBridgeMergeVaultFromFileWithKeyHeld(
+  path: path,
+  hmacSecret: hmacSecret,
+  credentialId: credentialId,
+);
+
+/// Fast auto-merge of a **key-protected** `.gabbro` file using the held
+/// passphrase plus a tap's hmac output. The analogue of
+/// [`merge_vault_from_file_with_key_held`] for the "Merge automatically" path.
+/// Persists (async — a single vault save).
+Future<MergeSummary?> fastMergeVaultFromFileWithKeyHeld({
+  required String path,
+  required List<int> hmacSecret,
+  required List<int> credentialId,
+}) => RustLib.instance.api.crateApiVaultBridgeFastMergeVaultFromFileWithKeyHeld(
+  path: path,
+  hmacSecret: hmacSecret,
+  credentialId: credentialId,
+);
+
 /// Apply a whole granular-sync review in one call: field resolutions, kept-value
 /// history replacements, item deletes, folder picks, and whole-entry deletes.
 /// Re-seals the vault once for the entire review instead of once per decision.

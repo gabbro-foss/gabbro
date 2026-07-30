@@ -281,6 +281,7 @@
   "nothingToSync": "Nie je čo synchronizovať — oba trezory sú už aktuálne.",
   "syncMethodTitle": "Ako použiť túto synchronizáciu?",
   "syncSamePassphraseWarning": "Rovnaká prístupová fráza nedokazuje rovnaký trezor.",
+  "syncUseIncomingYubikey": "Použite YubiKey prichádzajúceho trezora",
   "syncMergeAutomatically": "Zlúčiť automaticky",
   "syncReviewAllChanges": "Skontrolovať všetky zmeny",
   "syncDetailsAction": "Podrobnosti",

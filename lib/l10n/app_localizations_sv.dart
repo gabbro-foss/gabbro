@@ -726,6 +726,9 @@ class AppLocalizationsSv extends AppLocalizations {
       'Samma lösenfras bevisar inte samma valv.';
 
   @override
+  String get syncUseIncomingYubikey => 'Använd det inkommande valvets YubiKey';
+
+  @override
   String get syncMergeAutomatically => 'Slå samman automatiskt';
 
   @override

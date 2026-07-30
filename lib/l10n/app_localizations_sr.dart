@@ -728,6 +728,9 @@ class AppLocalizationsSr extends AppLocalizations {
       'Иста приступна фраза не доказује исти трезор.';
 
   @override
+  String get syncUseIncomingYubikey => 'Користите YubiKey долазног трезора';
+
+  @override
   String get syncMergeAutomatically => 'Аутоматски споји';
 
   @override
@@ -2883,6 +2886,9 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   @override
   String get syncSamePassphraseWarning =>
       'Ista pristupna fraza ne dokazuje isti trezor.';
+
+  @override
+  String get syncUseIncomingYubikey => 'Koristite YubiKey dolaznog trezora';
 
   @override
   String get syncMergeAutomatically => 'Automatski spoji';

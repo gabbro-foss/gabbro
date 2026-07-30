@@ -83,6 +83,28 @@ Future<MergeSummary?> _defaultMergeVaultHeld(String path) =>
 Future<MergeSummary?> _defaultFastMergeVaultHeld(String path) =>
     fastMergeVaultFromFileHeld(path: path);
 
+/// Keyed sync using the held passphrase plus a tap's hmac: only the PIN was
+/// typed. `null` = the held passphrase does not open the file; ask for a typed
+/// one, reusing the same tap.
+Future<MergeSummary?> _defaultMergeVaultWithKeyHeld(
+  String path,
+  List<int> hmac,
+  List<int> credentialId,
+) => mergeVaultFromFileWithKeyHeld(
+  path: path,
+  hmacSecret: hmac,
+  credentialId: credentialId,
+);
+Future<MergeSummary?> _defaultFastMergeVaultWithKeyHeld(
+  String path,
+  List<int> hmac,
+  List<int> credentialId,
+) => fastMergeVaultFromFileWithKeyHeld(
+  path: path,
+  hmacSecret: hmac,
+  credentialId: credentialId,
+);
+
 /// Cancel an in-progress granular sync: roll the vault back to its pre-sync state.
 Future<void> _defaultCancelSync() => cancelSync();
 
@@ -269,6 +291,22 @@ class VaultListScreen extends StatefulWidget {
   final Future<MergeSummary?> Function(String path) mergeVaultHeld;
   final Future<MergeSummary?> Function(String path) fastMergeVaultHeld;
 
+  /// Keyed sync with the held passphrase plus the tap's hmac — only the PIN is
+  /// typed. `null` = held passphrase does not open the file; the flow falls
+  /// back to a typed passphrase, reusing the same tap.
+  final Future<MergeSummary?> Function(
+    String path,
+    List<int> hmac,
+    List<int> credentialId,
+  )
+  mergeVaultWithKeyHeld;
+  final Future<MergeSummary?> Function(
+    String path,
+    List<int> hmac,
+    List<int> credentialId,
+  )
+  fastMergeVaultWithKeyHeld;
+
   /// Detects whether the chosen `.gabbro` sync source is key-protected.
   final List<YubikeyRecordData> Function(String path) onDetectSyncSourceRecords;
 
@@ -331,6 +369,8 @@ class VaultListScreen extends StatefulWidget {
     this.fastMergeVaultWithKey = _defaultFastMergeVaultWithKey,
     this.mergeVaultHeld = _defaultMergeVaultHeld,
     this.fastMergeVaultHeld = _defaultFastMergeVaultHeld,
+    this.mergeVaultWithKeyHeld = _defaultMergeVaultWithKeyHeld,
+    this.fastMergeVaultWithKeyHeld = _defaultFastMergeVaultWithKeyHeld,
     this.onDetectSyncSourceRecords = _defaultDetectSyncSourceRecords,
     this.onGetSyncYubikeyHmac = _defaultGetSyncYubikeyHmac,
     this.onPickSyncFile = _defaultPickSyncFile,
@@ -1085,8 +1125,9 @@ class _VaultListScreenState extends State<VaultListScreen>
   /// file is key-protected). `null` if the user backs out.
   Future<SyncCredentials?> _askSyncCredentials(
     String path,
-    List<YubikeyRecordData> sourceRecords,
-  ) => showDialog<SyncCredentials>(
+    List<YubikeyRecordData> sourceRecords, {
+    bool pinOnly = false,
+  }) => showDialog<SyncCredentials>(
     context: context,
     barrierDismissible: false,
     builder: (ctx) => SyncPassphraseDialog(
@@ -1095,6 +1136,7 @@ class _VaultListScreenState extends State<VaultListScreen>
       isAndroid: widget.isAndroid,
       sourceRecords: sourceRecords,
       onGetYubikeyHmac: widget.onGetSyncYubikeyHmac,
+      pinOnly: pinOnly,
     ),
   );
 
@@ -1124,14 +1166,14 @@ class _VaultListScreenState extends State<VaultListScreen>
     }
     final isKeyProtected = sourceRecords.isNotEmpty;
 
-    // SyncPassphraseDialog owns the controllers; returns passphrase (+ PIN and
-    // transport when key-protected), or null on cancel. A key-protected source
-    // needs it up front, because the PIN and the tap cannot be guessed. A
-    // passphrase-only source is tried with the passphrase the session already
-    // holds first, and only asks if that fails.
+    // SyncPassphraseDialog owns the controllers; returns the credentials, or
+    // null on cancel. A key-protected source needs PIN + tap up front (they
+    // cannot be guessed) but no passphrase: the one the session already holds
+    // is tried first, same as the passphrase-only path — a typed passphrase is
+    // only ever asked for after that fails.
     SyncCredentials? creds;
     if (isKeyProtected) {
-      creds = await _askSyncCredentials(path, sourceRecords);
+      creds = await _askSyncCredentials(path, sourceRecords, pinOnly: true);
       if (creds == null || !mounted) return;
     }
 
@@ -1146,10 +1188,11 @@ class _VaultListScreenState extends State<VaultListScreen>
 
     setState(() => _isSyncing = true);
     try {
-      // Silent sync (passphrase-only source): merge with the session's own
-      // passphrase, so nothing is typed. `null` means it does not open this file
-      // — the passphrase was changed on the other device, or this is not that
-      // vault — so fall back to asking, keeping the apply choice already made.
+      // Silent sync: merge with the session's own passphrase, so nothing is
+      // typed. `null` means it does not open this file — the passphrase was
+      // changed on the other device, or this is not that vault — so fall back
+      // to asking for one, keeping the apply choice already made. The keyed
+      // path adds the tap's hmac and, on fallback, reuses it: one tap total.
       MergeSummary? held;
       if (!isKeyProtected) {
         held = fast
@@ -1160,6 +1203,32 @@ class _VaultListScreenState extends State<VaultListScreen>
           setState(() => _isSyncing = false);
           creds = await _askSyncCredentials(path, sourceRecords);
           if (creds == null || !mounted) return;
+          setState(() => _isSyncing = true);
+        }
+      } else {
+        held = fast
+            ? await widget.fastMergeVaultWithKeyHeld(
+                path,
+                creds!.hmac!,
+                creds.credentialId!,
+              )
+            : await widget.mergeVaultWithKeyHeld(
+                path,
+                creds!.hmac!,
+                creds.credentialId!,
+              );
+        if (!mounted) return;
+        if (held == null) {
+          setState(() => _isSyncing = false);
+          final typed = await _askSyncCredentials(path, const []);
+          if (typed == null || !mounted) return;
+          creds = SyncCredentials(
+            passphrase: typed.passphrase,
+            pin: creds.pin,
+            transport: creds.transport,
+            hmac: creds.hmac,
+            credentialId: creds.credentialId,
+          );
           setState(() => _isSyncing = true);
         }
       }
@@ -2496,6 +2565,11 @@ class SyncPassphraseDialog extends StatefulWidget {
     String transport,
   )
   onGetYubikeyHmac;
+
+  /// Key-protected source with the held passphrase still untried: only PIN +
+  /// tap are asked, the passphrase field is hidden. The typed-passphrase
+  /// fallback reopens this dialog with [isKeyProtected] false instead.
+  final bool pinOnly;
   const SyncPassphraseDialog({
     super.key,
     required this.filePath,
@@ -2503,6 +2577,7 @@ class SyncPassphraseDialog extends StatefulWidget {
     required this.onGetYubikeyHmac,
     this.isKeyProtected = false,
     this.isAndroid = false,
+    this.pinOnly = false,
   });
 
   @override
@@ -2591,25 +2666,29 @@ class SyncPassphraseDialogState extends State<SyncPassphraseDialog> {
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 16),
-          TextField(
-            controller: _ctrl,
-            obscureText: !_showPass,
-            // A key-protected source needs a PIN, so advance to it; otherwise
-            // Enter submits.
-            onSubmitted: (_) =>
-                widget.isKeyProtected ? _pinFocus.requestFocus() : _submit(),
-            decoration: InputDecoration(
-              labelText: l.vaultPassphraseLabel,
-              border: const OutlineInputBorder(),
-              suffixIcon: IconButton(
-                iconSize: scaledSuffixIconSize(context),
-                icon: Icon(_showPass ? Icons.visibility_off : Icons.visibility),
-                tooltip: _showPass ? l.tooltipHide : l.tooltipShow,
-                onPressed: () => setState(() => _showPass = !_showPass),
+          if (!widget.pinOnly) ...[
+            TextField(
+              controller: _ctrl,
+              obscureText: !_showPass,
+              // A key-protected source needs a PIN, so advance to it; otherwise
+              // Enter submits.
+              onSubmitted: (_) =>
+                  widget.isKeyProtected ? _pinFocus.requestFocus() : _submit(),
+              decoration: InputDecoration(
+                labelText: l.vaultPassphraseLabel,
+                border: const OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  iconSize: scaledSuffixIconSize(context),
+                  icon: Icon(
+                    _showPass ? Icons.visibility_off : Icons.visibility,
+                  ),
+                  tooltip: _showPass ? l.tooltipHide : l.tooltipShow,
+                  onPressed: () => setState(() => _showPass = !_showPass),
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 12),
+            const SizedBox(height: 12),
+          ],
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -2645,6 +2724,14 @@ class SyncPassphraseDialogState extends State<SyncPassphraseDialog> {
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 12),
+            // The records come from the incoming file's header, so the key to
+            // tap is one registered in that file — this vault's own keys may
+            // not be.
+            Text(
+              l.syncUseIncomingYubikey,
+              style: Theme.of(context).textTheme.bodySmall,
             ),
             const SizedBox(height: 12),
             TextField(

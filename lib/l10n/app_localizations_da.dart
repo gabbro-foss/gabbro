@@ -725,6 +725,9 @@ class AppLocalizationsDa extends AppLocalizations {
       'Samme adgangssætning beviser ikke samme hvælving.';
 
   @override
+  String get syncUseIncomingYubikey => 'Brug den indgående hvælvings YubiKey';
+
+  @override
   String get syncMergeAutomatically => 'Flet automatisk';
 
   @override

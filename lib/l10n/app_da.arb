@@ -281,6 +281,7 @@
   "nothingToSync": "Intet at synkronisere — begge hvælvinger er allerede opdaterede.",
   "syncMethodTitle": "Hvordan skal denne synkronisering anvendes?",
   "syncSamePassphraseWarning": "Samme adgangssætning beviser ikke samme hvælving.",
+  "syncUseIncomingYubikey": "Brug den indgående hvælvings YubiKey",
   "syncMergeAutomatically": "Flet automatisk",
   "syncReviewAllChanges": "Gennemgå alle ændringer",
   "syncDetailsAction": "Detaljer",

@@ -281,6 +281,7 @@
   "nothingToSync": "Nie ma nic do synchronizowania — oba skarbce są już aktualne.",
   "syncMethodTitle": "Jak zastosować tę synchronizację?",
   "syncSamePassphraseWarning": "To samo hasło główne nie dowodzi tego samego skarbca.",
+  "syncUseIncomingYubikey": "Użyj YubiKey przychodzącego skarbca",
   "syncMergeAutomatically": "Scal automatycznie",
   "syncReviewAllChanges": "Przejrzyj wszystkie zmiany",
   "syncDetailsAction": "Szczegóły",

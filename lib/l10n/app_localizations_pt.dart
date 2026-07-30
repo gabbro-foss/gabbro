@@ -727,6 +727,9 @@ class AppLocalizationsPt extends AppLocalizations {
       'A mesma frase secreta não prova que seja o mesmo cofre.';
 
   @override
+  String get syncUseIncomingYubikey => 'Use a YubiKey do cofre recebido';
+
+  @override
   String get syncMergeAutomatically => 'Mesclar automaticamente';
 
   @override
@@ -2888,6 +2891,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
       'A mesma frase secreta não prova que seja o mesmo cofre.';
 
   @override
+  String get syncUseIncomingYubikey => 'Use a YubiKey do cofre recebido';
+
+  @override
   String get syncMergeAutomatically => 'Mesclar automaticamente';
 
   @override
@@ -5044,6 +5050,9 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   @override
   String get syncSamePassphraseWarning =>
       'A mesma frase-passe não prova que seja o mesmo cofre.';
+
+  @override
+  String get syncUseIncomingYubikey => 'Use a YubiKey do cofre recebido';
 
   @override
   String get syncMergeAutomatically => 'Intercalar automaticamente';

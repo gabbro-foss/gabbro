@@ -730,6 +730,10 @@ class AppLocalizationsEl extends AppLocalizations {
       'Η ίδια φράση πρόσβασης δεν αποδεικνύει το ίδιο θησαυροφυλάκιο.';
 
   @override
+  String get syncUseIncomingYubikey =>
+      'Χρησιμοποιήστε το YubiKey του εισερχόμενου θησαυροφυλακίου';
+
+  @override
   String get syncMergeAutomatically => 'Αυτόματη συγχώνευση';
 
   @override

@@ -281,6 +281,7 @@
   "nothingToSync": "Няма какво да се синхронизира — и двата трезора вече са актуализирани.",
   "syncMethodTitle": "Как да се приложи тази синхронизация?",
   "syncSamePassphraseWarning": "Еднаквата паролна фраза не доказва еднакъв трезор.",
+  "syncUseIncomingYubikey": "Използвайте YubiKey на входящия трезор",
   "syncMergeAutomatically": "Обединяване автоматично",
   "syncReviewAllChanges": "Преглед на всички промени",
   "syncDetailsAction": "Подробности",

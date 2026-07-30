@@ -281,6 +281,7 @@
   "nothingToSync": "Niente da sincronizzare — entrambi gli archivi sono già aggiornati.",
   "syncMethodTitle": "Come applicare questa sincronizzazione?",
   "syncSamePassphraseWarning": "La stessa passphrase non prova che sia lo stesso archivio.",
+  "syncUseIncomingYubikey": "Usa la YubiKey dell'archivio in arrivo",
   "syncMergeAutomatically": "Unisci automaticamente",
   "syncReviewAllChanges": "Rivedi tutte le modifiche",
   "syncDetailsAction": "Dettagli",

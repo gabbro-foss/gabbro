@@ -725,6 +725,10 @@ class AppLocalizationsKk extends AppLocalizations {
       'Бірдей кілт фразасы бірдей сейфті дәлелдемейді.';
 
   @override
+  String get syncUseIncomingYubikey =>
+      'Кіріс сейфтің YubiKey кілтін пайдаланыңыз';
+
+  @override
   String get syncMergeAutomatically => 'Автоматты біріктіру';
 
   @override

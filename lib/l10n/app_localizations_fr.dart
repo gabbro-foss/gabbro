@@ -728,6 +728,9 @@ class AppLocalizationsFr extends AppLocalizations {
       'Un même mot de passe principal ne prouve pas que c\'est le même coffre.';
 
   @override
+  String get syncUseIncomingYubikey => 'Utilisez la YubiKey du coffre entrant';
+
+  @override
   String get syncMergeAutomatically => 'Fusionner automatiquement';
 
   @override

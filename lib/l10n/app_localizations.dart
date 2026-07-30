@@ -1531,6 +1531,12 @@ abstract class AppLocalizations {
   /// **'Same passphrase does not prove same vault.'**
   String get syncSamePassphraseWarning;
 
+  /// Note in the keyed sync dialog: the key to tap is one registered in the incoming file, which may differ from this vault's keys.
+  ///
+  /// In en, this message translates to:
+  /// **'Use incoming vault\'s YubiKey'**
+  String get syncUseIncomingYubikey;
+
   /// Button: apply all incoming changes automatically (incoming wins), no review.
   ///
   /// In en, this message translates to:

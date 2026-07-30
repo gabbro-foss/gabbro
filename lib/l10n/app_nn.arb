@@ -281,6 +281,7 @@
   "nothingToSync": "Inkje å synkronisere — begge kvelva er allereie oppdaterte.",
   "syncMethodTitle": "Korleis skal denne synkroniseringa brukast?",
   "syncSamePassphraseWarning": "Same passfrase provar ikkje same kvelv.",
+  "syncUseIncomingYubikey": "Bruk YubiKey-en til det innkomande kvelvet",
   "syncMergeAutomatically": "Slå saman automatisk",
   "syncReviewAllChanges": "Gå gjennom alle endringar",
   "syncDetailsAction": "Detaljar",

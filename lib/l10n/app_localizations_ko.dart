@@ -716,6 +716,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get syncSamePassphraseWarning => '같은 암호 문구가 같은 볼트임을 증명하지 않습니다.';
 
   @override
+  String get syncUseIncomingYubikey => '들어오는 볼트의 YubiKey를 사용하세요';
+
+  @override
   String get syncMergeAutomatically => '자동으로 병합';
 
   @override

@@ -281,6 +281,7 @@
   "nothingToSync": "Nincs szinkronizálnivaló — mindkét széf már naprakész.",
   "syncMethodTitle": "Hogyan legyen alkalmazva ez a szinkronizálás?",
   "syncSamePassphraseWarning": "Azonos jelmondat nem bizonyít azonos széfet.",
+  "syncUseIncomingYubikey": "Használja a bejövő széf YubiKey kulcsát",
   "syncMergeAutomatically": "Automatikus egyesítés",
   "syncReviewAllChanges": "Összes módosítás áttekintése",
   "syncDetailsAction": "Részletek",

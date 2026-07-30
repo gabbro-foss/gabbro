@@ -281,6 +281,7 @@
   "nothingToSync": "Синхрондайтын ештеңе жоқ — екі сейф те жаңартылған.",
   "syncMethodTitle": "Бұл синхрондау қалай қолданылсын?",
   "syncSamePassphraseWarning": "Бірдей кілт фразасы бірдей сейфті дәлелдемейді.",
+  "syncUseIncomingYubikey": "Кіріс сейфтің YubiKey кілтін пайдаланыңыз",
   "syncMergeAutomatically": "Автоматты біріктіру",
   "syncReviewAllChanges": "Барлық өзгерістерді қарау",
   "syncDetailsAction": "Мәліметтер",

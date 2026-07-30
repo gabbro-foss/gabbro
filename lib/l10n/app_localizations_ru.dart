@@ -728,6 +728,10 @@ class AppLocalizationsRu extends AppLocalizations {
       'Одна и та же кодовая фраза не доказывает, что это то же хранилище.';
 
   @override
+  String get syncUseIncomingYubikey =>
+      'Используйте YubiKey входящего хранилища';
+
+  @override
   String get syncMergeAutomatically => 'Объединить автоматически';
 
   @override

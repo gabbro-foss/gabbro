@@ -726,6 +726,10 @@ class AppLocalizationsNb extends AppLocalizations {
       'Samme passfrase beviser ikke samme hvelving.';
 
   @override
+  String get syncUseIncomingYubikey =>
+      'Bruk den innkommende hvelvingens YubiKey';
+
+  @override
   String get syncMergeAutomatically => 'Slå sammen automatisk';
 
   @override

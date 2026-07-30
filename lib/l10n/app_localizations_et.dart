@@ -727,6 +727,10 @@ class AppLocalizationsEt extends AppLocalizations {
       'Sama pääslause ei tõesta sama seifi.';
 
   @override
+  String get syncUseIncomingYubikey =>
+      'Kasutage sissetuleva seifi YubiKey võtit';
+
+  @override
   String get syncMergeAutomatically => 'Ühenda automaatselt';
 
   @override

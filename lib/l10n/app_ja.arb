@@ -281,6 +281,7 @@
   "nothingToSync": "同期するものはありません — 両方のボルトはすでに最新です。",
   "syncMethodTitle": "この同期をどのように適用しますか？",
   "syncSamePassphraseWarning": "同じパスフレーズでも同じボルトとは限りません。",
+  "syncUseIncomingYubikey": "同期元ボルトのYubiKeyを使用してください",
   "syncMergeAutomatically": "自動的にマージ",
   "syncReviewAllChanges": "すべての変更を確認",
   "syncDetailsAction": "詳細",

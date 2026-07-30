@@ -1192,6 +1192,8 @@ void main() {
         List<int>,
       )
       mergeVaultWithKey,
+      Future<MergeSummary?> Function(String, List<int>, List<int>)?
+      mergeVaultWithKeyHeld,
       Future<YubikeyHmacMatch> Function(
         List<YubikeyRecordData>,
         String,
@@ -1214,12 +1216,18 @@ void main() {
             throw StateError('passphrase-only fast merge must not be called'),
         fastMergeVaultWithKey: (_, _, _, _) async =>
             throw StateError('fast keyed merge must not be called'),
+        fastMergeVaultWithKeyHeld: (_, _, _) async =>
+            throw StateError('fast keyed held merge must not be called'),
         onDetectSyncSourceRecords: (_) => sourceRecords,
         onGetSyncYubikeyHmac:
             onGetSyncYubikeyHmac ??
             (records, pin, transport) async =>
                 (hmac: const [0x11], credentialId: const [0xA1]),
         mergeVaultWithKey: mergeVaultWithKey,
+        // Default: held keyed merge reports needs-credentials, so existing
+        // tests exercise the typed-passphrase fallback unchanged.
+        mergeVaultWithKeyHeld:
+            mergeVaultWithKeyHeld ?? (_, _, _) async => null,
         isAndroid: isAndroid,
       ),
     );
@@ -1267,22 +1275,76 @@ void main() {
       await tester.tap(find.text('Sync from file'));
       await tester.pumpAndSettle();
 
-      // Both the passphrase and the YubiKey PIN field must be present.
+      // PIN only: the held passphrase is tried first, so no passphrase field.
       expect(
         find.descendant(
           of: find.byType(AlertDialog),
           matching: find.byType(TextField),
         ),
-        findsNWidgets(2),
+        findsOneWidget,
       );
       expect(find.text('YubiKey PIN'), findsOneWidget);
     });
 
-    // Net-first: pin the PIN eye toggle (key-protected mode adds a second eye
-    // below the passphrase eye). Both start showing Icons.visibility; tapping
-    // the PIN one (last) flips it to visibility_off, leaving the passphrase eye.
-    // ADR-016 reveal-eye: the sync dialog's passphrase + PIN eyes scale
-    // (capped) at large text and the dialog does not overflow.
+    // The records come from the incoming file's header, so the key to tap is
+    // one registered in that file — which may differ from this vault's keys.
+    testWidgets('keyed dialog says to use the incoming vault key', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        buildKeyProtectedScreen(
+          mergeVaultWithKey: (_, _, _, _) async => _summary(added: 1),
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from file'));
+      await tester.pumpAndSettle();
+
+      expect(find.text("Use incoming vault's YubiKey"), findsOneWidget);
+    });
+
+    // Keyed silent path: with the tap done, the held passphrase merges the file
+    // — no passphrase is ever typed and the full-credentials merge never runs.
+    testWidgets('keyed held merge runs on the tap alone', (tester) async {
+      List<int>? heldHmac;
+      List<int>? heldCred;
+      await tester.pumpWidget(
+        buildKeyProtectedScreen(
+          mergeVaultWithKey: (_, _, _, _) async =>
+              throw StateError('typed-passphrase keyed merge must not run'),
+          mergeVaultWithKeyHeld: (path, hmac, cred) async {
+            heldHmac = hmac;
+            heldCred = cred;
+            return _summary(added: 1);
+          },
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from file'));
+      await tester.pumpAndSettle();
+
+      final fields = find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.byType(TextField),
+      );
+      await tester.enterText(fields.last, '123456');
+      await tester.tap(find.text('Sync'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Review all changes'));
+      await tester.pumpAndSettle();
+
+      expect(
+        heldHmac,
+        equals(const [0x11]),
+        reason: 'held merge got the tap hmac',
+      );
+      expect(heldCred, equals(const [0xA1]));
+      expect(find.textContaining('Vault synced'), findsOneWidget);
+    });
+
+    // ADR-016 reveal-eye: the keyed sync dialog's PIN eye scales (capped) at
+    // large text and the dialog does not overflow. (PIN only — the held
+    // passphrase is tried first, so the keyed dialog has no passphrase field.)
     testWidgets('sync dialog eyes scale (capped) at large text', (
       tester,
     ) async {
@@ -1301,7 +1363,7 @@ void main() {
       await tester.tap(find.text('Sync from file'));
       await tester.pumpAndSettle();
 
-      expect(revealEyeButtons(), findsNWidgets(2));
+      expect(revealEyeButtons(), findsOneWidget);
       for (final eye in tester.widgetList<IconButton>(revealEyeButtons())) {
         expect(eye.iconSize, isNotNull);
         expect(eye.iconSize, greaterThan(24));
@@ -1310,9 +1372,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('PIN eye toggle flips independently of the passphrase eye', (
-      tester,
-    ) async {
+    testWidgets('PIN eye toggle flips', (tester) async {
       await tester.pumpWidget(
         buildKeyProtectedScreen(
           mergeVaultWithKey: (_, _, _, _) async => _summary(added: 1),
@@ -1322,12 +1382,12 @@ void main() {
       await tester.tap(find.text('Sync from file'));
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.visibility), findsNWidgets(2));
+      expect(find.byIcon(Icons.visibility), findsOneWidget);
 
-      await tester.tap(find.byIcon(Icons.visibility).last);
+      await tester.tap(find.byIcon(Icons.visibility));
       await tester.pump();
 
-      expect(find.byIcon(Icons.visibility), findsOneWidget);
+      expect(find.byIcon(Icons.visibility), findsNothing);
       expect(find.byIcon(Icons.visibility_off), findsOneWidget);
     });
 
@@ -1349,14 +1409,22 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('keyed merge receives tapped key material', (tester) async {
+    // Fallback: the held passphrase does not open the keyed file, so a typed
+    // passphrase is asked for — reusing the tap already done (no second tap).
+    testWidgets('keyed fallback reuses the tap with a typed passphrase', (
+      tester,
+    ) async {
       List<int>? capturedHmac;
       List<int>? capturedCred;
       List<int>? capturedPassphrase;
+      var tapCount = 0;
       await tester.pumpWidget(
         buildKeyProtectedScreen(
-          onGetSyncYubikeyHmac: (records, pin, transport) async =>
-              (hmac: const [0x42], credentialId: const [0xAB]),
+          onGetSyncYubikeyHmac: (records, pin, transport) async {
+            tapCount++;
+            return (hmac: const [0x42], credentialId: const [0xAB]);
+          },
+          mergeVaultWithKeyHeld: (_, _, _) async => null,
           mergeVaultWithKey: (path, passphrase, hmac, cred) async {
             capturedPassphrase = passphrase;
             capturedHmac = hmac;
@@ -1373,16 +1441,27 @@ void main() {
         of: find.byType(AlertDialog),
         matching: find.byType(TextField),
       );
-      await tester.enterText(fields.at(0), 'sharedpass');
-      await tester.enterText(fields.at(1), '123456');
+      await tester.enterText(fields.last, '123456');
       await tester.tap(find.text('Sync'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Review all changes'));
       await tester.pumpAndSettle();
 
+      // Needs-credentials: the passphrase dialog appears, passphrase only.
+      await tester.enterText(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.byType(TextField),
+        ),
+        'sharedpass',
+      );
+      await tester.tap(find.widgetWithText(TextButton, 'Sync'));
+      await tester.pumpAndSettle();
+
       expect(capturedPassphrase, equals(utf8.encode('sharedpass')));
-      expect(capturedHmac, equals(const [0x42]));
+      expect(capturedHmac, equals(const [0x42]), reason: 'tap hmac reused');
       expect(capturedCred, equals(const [0xAB]));
+      expect(tapCount, 1, reason: 'no second tap on fallback');
       expect(find.textContaining('Vault synced'), findsOneWidget);
     });
 
@@ -1404,8 +1483,7 @@ void main() {
         of: find.byType(AlertDialog),
         matching: find.byType(TextField),
       );
-      await tester.enterText(fields.at(0), 'sharedpass');
-      await tester.enterText(fields.at(1), '123456');
+      await tester.enterText(fields.last, '123456');
       await tester.tap(find.text('Sync'));
       await tester.pumpAndSettle();
 
@@ -1430,16 +1508,7 @@ void main() {
       await tester.tap(find.text('Sync from file'));
       await tester.pumpAndSettle();
 
-      // Enter passphrase but leave the PIN empty, then try to sync.
-      await tester.enterText(
-        find
-            .descendant(
-              of: find.byType(AlertDialog),
-              matching: find.byType(TextField),
-            )
-            .at(0),
-        'sharedpass',
-      );
+      // Leave the PIN empty, then try to sync.
       await tester.tap(find.text('Sync'));
       await tester.pumpAndSettle();
 
@@ -1459,6 +1528,7 @@ void main() {
         buildKeyProtectedScreen(
           onGetSyncYubikeyHmac: (_, _, _) => tapGate.future,
           mergeVaultWithKey: (_, _, _, _) async => _summary(added: 1),
+          mergeVaultWithKeyHeld: (_, _, _) async => _summary(added: 1),
         ),
       );
       await _openMenu(tester);
@@ -1469,8 +1539,7 @@ void main() {
         of: find.byType(AlertDialog),
         matching: find.byType(TextField),
       );
-      await tester.enterText(fields.at(0), 'sharedpass');
-      await tester.enterText(fields.at(1), '123456');
+      await tester.enterText(fields.last, '123456');
       await tester.tap(find.text('Sync'));
       await tester.pump();
 
@@ -1512,8 +1581,7 @@ void main() {
           of: find.byType(AlertDialog),
           matching: find.byType(TextField),
         );
-        await tester.enterText(fields.at(0), 'sharedpass');
-        await tester.enterText(fields.at(1), '123456');
+        await tester.enterText(fields.last, '123456');
         await tester.tap(find.text('Sync'));
         await tester.pumpAndSettle();
 

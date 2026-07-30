@@ -3488,6 +3488,68 @@ pub fn session_fast_merge_from_file_held(
     }
 }
 
+/// Opens a key-protected `path` with the passphrase the live session already
+/// holds plus a tap's hmac output, so only the PIN was typed.
+///
+/// `Ok(None)` covers every open failure — a different passphrase, or a
+/// credential the file does not know (it may have changed on disk since the
+/// header read) — so the caller falls back to the typed-passphrase dialog,
+/// reusing the same tap. `Err` is kept for an unusable file and a locked
+/// session, as in [`open_with_held_passphrase`].
+///
+/// Reads only; the file on disk is never written.
+fn open_with_held_passphrase_and_key(
+    path: &std::path::Path,
+    hmac_secret: &[u8; 32],
+    credential_id: &[u8],
+) -> Result<Option<VaultBody>, String> {
+    let passphrase = {
+        let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+        let session = session.as_ref().ok_or("Vault is locked")?;
+        session.passphrase.clone()
+    }; // ← lock released before the Argon2id derivation below
+    let sealed = crate::vault::io::read_vault(path)?;
+    let plaintext = match crate::crypto::vault_crypto::open_vault_with_key_record(
+        &passphrase,
+        hmac_secret,
+        credential_id,
+        &sealed,
+    ) {
+        Ok((p, _master, _wrapping)) => zeroize::Zeroizing::new(p),
+        Err(_) => return Ok(None),
+    };
+    crate::vault::serialization::deserialize_vault_body(&plaintext).map(Some)
+}
+
+/// Granular sync of a key-protected `path` using the session's own passphrase
+/// and a tap's hmac output. `Ok(None)` when that combination does not open the
+/// file — see [`open_with_held_passphrase_and_key`].
+pub fn session_merge_vault_from_file_with_key_held(
+    path: &std::path::Path,
+    hmac_secret: &[u8; 32],
+    credential_id: &[u8],
+) -> Result<Option<MergeSummary>, String> {
+    match open_with_held_passphrase_and_key(path, hmac_secret, credential_id)? {
+        Some(incoming) => session_merge_vault_from_body(incoming).map(Some),
+        None => Ok(None),
+    }
+}
+
+/// Fast auto-merge of a key-protected `path` using the session's own passphrase
+/// and a tap's hmac output. The analogue of
+/// [`session_merge_vault_from_file_with_key_held`] for the "Merge automatically"
+/// path.
+pub fn session_fast_merge_from_file_with_key_held(
+    path: &std::path::Path,
+    hmac_secret: &[u8; 32],
+    credential_id: &[u8],
+) -> Result<Option<MergeSummary>, String> {
+    match open_with_held_passphrase_and_key(path, hmac_secret, credential_id)? {
+        Some(incoming) => session_fast_merge_from_body(incoming).map(Some),
+        None => Ok(None),
+    }
+}
+
 /// Merge an already-decrypted incoming `VaultBody` into the live session,
 /// then persist the result.
 ///
@@ -6467,6 +6529,183 @@ mod merge_tests {
         assert_eq!(before, after, "the incoming file must be byte-identical");
     }
 
+    // ── keyed sync using the passphrase the session already holds ─────────────
+
+    // A key-protected second vault sealed with `pass` and two fabricated keys,
+    // for the session to open with its own passphrase plus a tap's hmac output.
+    fn keyed_source_file(
+        pass: &[u8],
+        suffix: &str,
+        entries: Vec<VaultEntry>,
+    ) -> std::path::PathBuf {
+        use crate::crypto::vault_crypto::YubiKeyRegistration;
+        let mut path = temp_dir();
+        path.push(format!("gabbro_keyed_held_src_{suffix}.gabbro"));
+        let keys = [
+            YubiKeyRegistration {
+                credential_id: vec![0x0Au8; 64],
+                hmac_secret: [0x55u8; 32],
+                salt: [0x66u8; 32],
+            },
+            YubiKeyRegistration {
+                credential_id: vec![0x0Bu8; 48],
+                hmac_secret: [0x77u8; 32],
+                salt: [0x88u8; 32],
+            },
+        ];
+        crate::api::vault::save_vault_with_keys(
+            &VaultBody {
+                entries,
+                folders: vec![],
+                ..Default::default()
+            },
+            pass,
+            &keys,
+            &path,
+        )
+        .unwrap();
+        path
+    }
+
+    // The keyed file was sealed with the passphrase the session holds, so with
+    // the tap done only the PIN was typed — no passphrase.
+    #[test]
+    #[serial]
+    fn keyed_held_merges_a_file_sealed_with_the_held_passphrase() {
+        let pass = b"merge-test-pass";
+        let path = setup(
+            pass,
+            "keyed_held_ok",
+            vec![note("local-1", "Local", "2026-01-01T00:00:00Z")],
+        );
+        let src = keyed_source_file(
+            pass,
+            "ok",
+            vec![note("remote-1", "Remote", "2026-01-02T00:00:00Z")],
+        );
+
+        unlock_vault(pass, path.clone()).unwrap();
+        let summary =
+            session_merge_vault_from_file_with_key_held(&src, &[0x55u8; 32], &[0x0Au8; 64])
+                .unwrap();
+
+        let ids: Vec<String> = list_entry_summaries()
+            .unwrap()
+            .into_iter()
+            .map(|s| s.id)
+            .collect();
+        teardown(&path);
+        let _ = std::fs::remove_file(&src);
+        assert_eq!(summary.map(|s| s.added), Some(1), "one entry merged in");
+        assert!(ids.contains(&String::from("remote-1")), "arrived: {ids:?}");
+    }
+
+    // A keyed file sealed with a different passphrase reports needs-credentials
+    // so the caller can ask for a typed one, reusing the same tap.
+    #[test]
+    #[serial]
+    fn keyed_held_reports_needs_credentials_when_the_passphrase_differs() {
+        let pass = b"merge-test-pass";
+        let path = setup(
+            pass,
+            "keyed_held_other",
+            vec![note("local-1", "Local", "2026-01-01T00:00:00Z")],
+        );
+        let src = keyed_source_file(
+            b"a-completely-different-pass",
+            "other",
+            vec![note("remote-1", "Remote", "2026-01-02T00:00:00Z")],
+        );
+
+        unlock_vault(pass, path.clone()).unwrap();
+        let result =
+            session_merge_vault_from_file_with_key_held(&src, &[0x55u8; 32], &[0x0Au8; 64]);
+        teardown(&path);
+        let _ = std::fs::remove_file(&src);
+        assert!(
+            matches!(result, Ok(None)),
+            "needs credentials, not Err and not a merge",
+        );
+    }
+
+    // A credential the file does not know is needs-credentials too, not an error:
+    // the file may have changed on disk between the header read and the merge.
+    #[test]
+    #[serial]
+    fn keyed_held_reports_needs_credentials_when_no_record_matches() {
+        let pass = b"merge-test-pass";
+        let path = setup(
+            pass,
+            "keyed_held_norec",
+            vec![note("local-1", "Local", "2026-01-01T00:00:00Z")],
+        );
+        let src = keyed_source_file(
+            pass,
+            "norec",
+            vec![note("remote-1", "Remote", "2026-01-02T00:00:00Z")],
+        );
+
+        unlock_vault(pass, path.clone()).unwrap();
+        let result =
+            session_merge_vault_from_file_with_key_held(&src, &[0x55u8; 32], &[0xEEu8; 16]);
+        teardown(&path);
+        let _ = std::fs::remove_file(&src);
+        assert!(
+            matches!(result, Ok(None)),
+            "unknown credential is needs-credentials, not Err",
+        );
+    }
+
+    // Auto-lock can fire while the tap prompt is up, so the keyed merge must
+    // refuse rather than act on no session.
+    #[test]
+    #[serial]
+    fn keyed_held_refuses_when_the_vault_is_locked() {
+        let pass = b"merge-test-pass";
+        let src = keyed_source_file(
+            pass,
+            "locked",
+            vec![note("remote-1", "Remote", "2026-01-02T00:00:00Z")],
+        );
+        let _ = lock_vault();
+
+        let result =
+            session_merge_vault_from_file_with_key_held(&src, &[0x55u8; 32], &[0x0Au8; 64]);
+        let _ = std::fs::remove_file(&src);
+        assert_eq!(result.err().as_deref(), Some("Vault is locked"));
+    }
+
+    // The fast twin: "Merge automatically" over the same keyed held path.
+    #[test]
+    #[serial]
+    fn keyed_held_fast_merge_merges_a_file_sealed_with_the_held_passphrase() {
+        let pass = b"merge-test-pass";
+        let path = setup(
+            pass,
+            "keyed_held_fast",
+            vec![note("local-1", "Local", "2026-01-01T00:00:00Z")],
+        );
+        let src = keyed_source_file(
+            pass,
+            "fast",
+            vec![note("remote-1", "Remote", "2026-01-02T00:00:00Z")],
+        );
+
+        unlock_vault(pass, path.clone()).unwrap();
+        let summary =
+            session_fast_merge_from_file_with_key_held(&src, &[0x55u8; 32], &[0x0Au8; 64]).unwrap();
+
+        let ids: Vec<String> = list_entry_summaries()
+            .unwrap()
+            .into_iter()
+            .map(|s| s.id)
+            .collect();
+        teardown(&path);
+        let _ = std::fs::remove_file(&src);
+        assert_eq!(summary.map(|s| s.added), Some(1), "one entry merged in");
+        assert!(ids.contains(&String::from("remote-1")), "arrived: {ids:?}");
+    }
+
     // Auto-merge does apply an incoming delete (a tombstone), but must never drop
     // an entry the other side has simply never seen: a device that does not know
     // `local-only` sends no tombstone for it, so it stays. Without this the fast
@@ -6501,7 +6740,10 @@ mod merge_tests {
             .map(|s| s.id)
             .collect();
         teardown(&path);
-        assert!(ids.contains(&String::from("local-only")), "survives: {ids:?}");
+        assert!(
+            ids.contains(&String::from("local-only")),
+            "survives: {ids:?}"
+        );
         assert!(ids.contains(&String::from("shared")), "kept: {ids:?}");
     }
 

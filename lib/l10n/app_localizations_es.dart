@@ -727,6 +727,9 @@ class AppLocalizationsEs extends AppLocalizations {
       'La misma contraseña maestra no prueba que sea el mismo almacén.';
 
   @override
+  String get syncUseIncomingYubikey => 'Use la YubiKey del almacén entrante';
+
+  @override
   String get syncMergeAutomatically => 'Combinar automáticamente';
 
   @override

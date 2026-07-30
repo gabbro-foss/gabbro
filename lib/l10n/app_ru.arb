@@ -281,6 +281,7 @@
   "nothingToSync": "Нечего синхронизировать — оба хранилища уже актуальны.",
   "syncMethodTitle": "Как применить эту синхронизацию?",
   "syncSamePassphraseWarning": "Одна и та же кодовая фраза не доказывает, что это то же хранилище.",
+  "syncUseIncomingYubikey": "Используйте YubiKey входящего хранилища",
   "syncMergeAutomatically": "Объединить автоматически",
   "syncReviewAllChanges": "Просмотреть все изменения",
   "syncDetailsAction": "Подробности",

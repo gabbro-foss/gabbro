@@ -727,6 +727,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'La stessa passphrase non prova che sia lo stesso archivio.';
 
   @override
+  String get syncUseIncomingYubikey =>
+      'Usa la YubiKey dell\'archivio in arrivo';
+
+  @override
   String get syncMergeAutomatically => 'Unisci automaticamente';
 
   @override

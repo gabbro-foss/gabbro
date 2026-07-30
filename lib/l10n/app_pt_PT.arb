@@ -281,6 +281,7 @@
   "nothingToSync": "Nada a sincronizar — ambos os cofres já estão atualizados.",
   "syncMethodTitle": "Como aplicar esta sincronização?",
   "syncSamePassphraseWarning": "A mesma frase-passe não prova que seja o mesmo cofre.",
+  "syncUseIncomingYubikey": "Use a YubiKey do cofre recebido",
   "syncMergeAutomatically": "Intercalar automaticamente",
   "syncReviewAllChanges": "Rever todas as alterações",
   "syncDetailsAction": "Detalhes",

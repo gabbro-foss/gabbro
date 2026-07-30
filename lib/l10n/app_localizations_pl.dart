@@ -729,6 +729,9 @@ class AppLocalizationsPl extends AppLocalizations {
       'To samo hasło główne nie dowodzi tego samego skarbca.';
 
   @override
+  String get syncUseIncomingYubikey => 'Użyj YubiKey przychodzącego skarbca';
+
+  @override
   String get syncMergeAutomatically => 'Scal automatycznie';
 
   @override

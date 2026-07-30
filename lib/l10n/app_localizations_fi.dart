@@ -728,6 +728,9 @@ class AppLocalizationsFi extends AppLocalizations {
       'Sama salauslause ei todista samaa holvia.';
 
   @override
+  String get syncUseIncomingYubikey => 'Käytä saapuvan holvin YubiKey-avainta';
+
+  @override
   String get syncMergeAutomatically => 'Yhdistä automaattisesti';
 
   @override

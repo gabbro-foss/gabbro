@@ -727,6 +727,10 @@ class AppLocalizationsEu extends AppLocalizations {
       'Pasaesaldi bera izateak ez du gandegi bera frogatzen.';
 
   @override
+  String get syncUseIncomingYubikey =>
+      'Erabili sarrerako gandegiaren YubiKey-a';
+
+  @override
   String get syncMergeAutomatically => 'Batu automatikoki';
 
   @override

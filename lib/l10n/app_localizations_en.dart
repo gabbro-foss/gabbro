@@ -725,6 +725,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Same passphrase does not prove same vault.';
 
   @override
+  String get syncUseIncomingYubikey => 'Use incoming vault\'s YubiKey';
+
+  @override
   String get syncMergeAutomatically => 'Merge automatically';
 
   @override

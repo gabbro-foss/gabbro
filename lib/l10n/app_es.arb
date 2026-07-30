@@ -281,6 +281,7 @@
   "nothingToSync": "Nada que sincronizar — ambos almacenes ya están actualizados.",
   "syncMethodTitle": "¿Cómo debe aplicarse esta sincronización?",
   "syncSamePassphraseWarning": "La misma contraseña maestra no prueba que sea el mismo almacén.",
+  "syncUseIncomingYubikey": "Use la YubiKey del almacén entrante",
   "syncMergeAutomatically": "Combinar automáticamente",
   "syncReviewAllChanges": "Revisar todos los cambios",
   "syncDetailsAction": "Detalles",

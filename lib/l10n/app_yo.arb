@@ -281,6 +281,7 @@
   "nothingToSync": "Ko si ohun lati ṣọkan — awọn vọọliti mejeeji ti wa ni imudojuiwọn.",
   "syncMethodTitle": "Báwo ni ó ṣe yẹ kí a lo ìṣọ̀kan yìí?",
   "syncSamePassphraseWarning": "Gbolohun ọrọ igbaniwọle kan naa ko jẹrisi vọọliti kan naa.",
+  "syncUseIncomingYubikey": "Lo YubiKey vọọliti ti n bọ",
   "syncMergeAutomatically": "Dàpọ̀ láìfọwọ́yi",
   "syncReviewAllChanges": "Ṣàyẹ̀wò gbogbo àwọn ìyípadà",
   "syncDetailsAction": "Àwọn àlàyé",

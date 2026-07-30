@@ -728,6 +728,9 @@ class AppLocalizationsBg extends AppLocalizations {
       'Еднаквата паролна фраза не доказва еднакъв трезор.';
 
   @override
+  String get syncUseIncomingYubikey => 'Използвайте YubiKey на входящия трезор';
+
+  @override
   String get syncMergeAutomatically => 'Обединяване автоматично';
 
   @override

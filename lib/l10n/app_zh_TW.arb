@@ -281,6 +281,7 @@
   "nothingToSync": "沒有需要同步的內容 — 兩個保險庫均已是最新狀態。",
   "syncMethodTitle": "此次同步應如何套用？",
   "syncSamePassphraseWarning": "相同的密碼片語不能證明是同一個保險庫。",
+  "syncUseIncomingYubikey": "請使用傳入保險庫的YubiKey",
   "syncMergeAutomatically": "自動合併",
   "syncReviewAllChanges": "查看所有變更",
   "syncDetailsAction": "詳細資料",

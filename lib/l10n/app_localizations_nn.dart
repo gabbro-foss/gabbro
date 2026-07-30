@@ -726,6 +726,10 @@ class AppLocalizationsNn extends AppLocalizations {
       'Same passfrase provar ikkje same kvelv.';
 
   @override
+  String get syncUseIncomingYubikey =>
+      'Bruk YubiKey-en til det innkomande kvelvet';
+
+  @override
   String get syncMergeAutomatically => 'Slå saman automatisk';
 
   @override

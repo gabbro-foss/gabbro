@@ -716,6 +716,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get syncSamePassphraseWarning => '同じパスフレーズでも同じボルトとは限りません。';
 
   @override
+  String get syncUseIncomingYubikey => '同期元ボルトのYubiKeyを使用してください';
+
+  @override
   String get syncMergeAutomatically => '自動的にマージ';
 
   @override

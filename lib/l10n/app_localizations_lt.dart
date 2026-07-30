@@ -728,6 +728,10 @@ class AppLocalizationsLt extends AppLocalizations {
       'Ta pati slaptafrazė neįrodo, kad tai ta pati saugykla.';
 
   @override
+  String get syncUseIncomingYubikey =>
+      'Naudokite gaunamos saugyklos YubiKey raktą';
+
+  @override
   String get syncMergeAutomatically => 'Sulieti automatiškai';
 
   @override

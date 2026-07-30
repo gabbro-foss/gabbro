@@ -281,6 +281,7 @@
   "nothingToSync": "Nema šta da se sinhronizuje — oba trezora su već ažurirana.",
   "syncMethodTitle": "Како применити ову синхронизацију?",
   "syncSamePassphraseWarning": "Иста приступна фраза не доказује исти трезор.",
+  "syncUseIncomingYubikey": "Користите YubiKey долазног трезора",
   "syncMergeAutomatically": "Аутоматски споји",
   "syncReviewAllChanges": "Прегледај све промене",
   "syncDetailsAction": "Детаљи",

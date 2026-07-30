@@ -728,6 +728,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Dezelfde wachtwoordzin bewijst niet dezelfde kluis.';
 
   @override
+  String get syncUseIncomingYubikey =>
+      'Gebruik de YubiKey van de inkomende kluis';
+
+  @override
   String get syncMergeAutomatically => 'Automatisch samenvoegen';
 
   @override
