@@ -115,8 +115,19 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-Work the matrix below in order: `sync` / passphrase, then `sync` / p+yk, then the
-`adopt` row. Canon-TDD each cell. The net is green and every defect it surfaced is fixed.
+1. Full gate (`gabbro_test`) — the `sync from file` row landed since the last gate. No
+   `--warm` needed (no dep bumps). Expected counts: Rust 667, Flutter 2012.
+2. Then the `adopt` row (both columns, canon-TDD). Start with design, not code:
+   - Entry points: `onboarding_screen`, `unlock_screen`, `manage_vaults_screen`.
+   - Linux registers the picked path; Android must copy into app storage (its picker
+     returns a cache copy). That asymmetry decides whether `restore_vault_from_file` is
+     reused — note it now also refreshes the `.bak` and unenrols biometrics via the
+     unlock screen, correct for a restore, wrong for adopting a file that IS this vault.
+   - Fix H1/H2 on this branch first (pre-existing, see memory/plan): biometric enrolment
+     keyed by path survives a vault swap at that path; `restore_vault_from_file`
+     (`rust/src/vault/io.rs:221`) rotates no `.bak`, so a mis-pick destroys the old vault.
+   - New screen => `test/screen_catalog.dart` + `screenFileCount`; new strings => 37 ARBs.
+   - Mock vault inventory for hardware rounds is in `.scratchpad` (A-E kept on disk).
 
 ### Faster sync, attempt 2 — this branch
 
