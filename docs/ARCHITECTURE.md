@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2016 | 10 |
+| Flutter (`flutter test`) | 2023 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -120,10 +120,11 @@ Full gate ran ALL GREEN 2026-07-30 (Rust 667, Flutter 2012, ~125m).
 H2 DONE (hardware-passed 2026-07-31, FH1-FH7): restore-from-file preserves the old
 vault as `.pre-restore` (R1-R7) and confirms before writing (F8-F12).
 
-**1. H1 fix** — biometric enrolment keyed by path survives a vault swap at that path
-(restore-from-file already unenrols; the exposure is external swaps).
+H1 DONE (hardware-passed 2026-07-31, SW1-SW9 on the emulator): a biometric-fed
+decrypt rejection unenrols and names the vault-file change; tap-stage failures
+(wrong PIN) never do. Error contract documented at `_doUnlock` + LEARNINGS.
 
-**2. Then the `adopt` row** (both columns, canon-TDD). Start with design, not code:
+**1. The `adopt` row** (both columns, canon-TDD). Start with design, not code:
    - Entry points: `onboarding_screen`, `unlock_screen`, `manage_vaults_screen`.
    - Linux registers the picked path; Android must copy into app storage (its picker
      returns a cache copy). That asymmetry decides whether `restore_vault_from_file` is
@@ -239,6 +240,10 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   `gabbroLocalizationsDelegates`, which ships fallbacks for both locales — so the
   warning is a test artefact users never meet. Fix `_appShell` to match production and
   the sweep can demand a clean render, as the biometric-notice sweep now does.
+
+- **`sr.arb` has one Latin-script value in a Cyrillic file.** `vaultRestoredBiometricDisabled`
+  is written in Latin (identical to `sr_Latn.arb`), unlike every neighbouring sr string. Found
+  2026-07-31; no test checks script. Fix the value; consider a script-consistency net.
 
 - **Shipped strings are still in English in every locale.** Found 2026-07-29:
   `changePassphraseBiometricDisabled` is the untranslated English sentence in all 37
