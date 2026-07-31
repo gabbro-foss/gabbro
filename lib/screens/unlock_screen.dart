@@ -81,22 +81,22 @@ Future<bool> _defaultBackupUsable(String path) async {
 
 Future<void> _defaultRestoreBackup(String path) => restoreVaultBackup(path: path);
 
-// R-03: let the user pick their own off-device backup `.gabbro` and restore it
-// over the corrupt vault. Returns false if the user cancelled the picker.
-// `file_picker` copies the chosen file to an app-readable path on Android too,
-// so the same path-based restore works on every platform.
-Future<bool> _defaultRestoreFromFile(String vaultPath) async {
+// R-03: let the user pick their own off-device backup `.gabbro`. Returns the
+// picked path, or null if the user cancelled. `file_picker` copies the chosen
+// file to an app-readable path on Android too, so the same path-based restore
+// works on every platform.
+Future<String?> _defaultPickRestoreFile() async {
   final result = await runPicker(
     () => FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['gabbro'],
     ),
   );
-  final source = result?.files.single.path;
-  if (source == null) return false; // cancelled
-  await restoreVaultFromFile(path: vaultPath, source: source);
-  return true;
+  return result?.files.single.path;
 }
+
+Future<void> _defaultRestoreFromPickedFile(String vaultPath, String source) =>
+    restoreVaultFromFile(path: vaultPath, source: source);
 
 EntropyResult _defaultEstimateEntropy(String password) =>
     estimateEntropy(password: password);
@@ -277,10 +277,16 @@ class UnlockScreen extends StatefulWidget {
   /// Explicit user action; the restored vault still demands full credentials.
   final Future<void> Function(String path) onRestoreBackup;
 
-  /// R-03: pick an external backup `.gabbro` and restore it over the corrupt
-  /// vault. Returns true if a file was picked and restored, false if cancelled.
-  /// Throws if the picked file is not a usable vault.
-  final Future<bool> Function(String vaultPath) onRestoreFromFile;
+  /// R-03: pick an external backup `.gabbro`. Returns the picked path, or null
+  /// if the user cancelled. Throws [FilePickerUnavailable] when no file dialog
+  /// can open.
+  final Future<String?> Function() onPickRestoreFile;
+
+  /// R-03: restore [source] over the corrupt vault at [vaultPath]. The bridge
+  /// refuses a file that is not a usable vault, and preserves the old vault as
+  /// a `.pre-restore` safety copy (H2). Throws on refusal.
+  final Future<void> Function(String vaultPath, String source)
+      onRestoreFromPickedFile;
 
   /// H1: turn biometric unlock off for [vaultPath] (unenroll on the native
   /// side). Biometric stores the passphrase of whatever vault was at this path;
@@ -323,7 +329,8 @@ class UnlockScreen extends StatefulWidget {
     this.onVaultFormatTooNew = _defaultVaultFormatTooNew,
     this.onBackupUsable = _defaultBackupUsable,
     this.onRestoreBackup = _defaultRestoreBackup,
-    this.onRestoreFromFile = _defaultRestoreFromFile,
+    this.onPickRestoreFile = _defaultPickRestoreFile,
+    this.onRestoreFromPickedFile = _defaultRestoreFromPickedFile,
     this.onDisableBiometric = _defaultDisableBiometric,
     this.onRemoveVaultFromList,
     this.onDeleteVaultFile,
@@ -472,20 +479,55 @@ class _UnlockScreenState extends State<UnlockScreen>
   // usable vault, so a corrupt vault is never replaced by another bad file.
   Future<void> _restoreFromFile() async {
     final l = AppLocalizations.of(context);
-    final bool restored;
+    final String? source;
     try {
-      restored = await widget.onRestoreFromFile(widget.vaultPath);
+      source = await widget.onPickRestoreFile();
     } on FilePickerUnavailable {
       // The file dialog couldn't open (no portal) - not an invalid vault.
       if (!mounted) return;
       showPickerUnavailable(context, hasManualEntry: false);
       return;
+    }
+    if (!mounted || source == null) return; // user cancelled the picker
+    // F8: last chance to stop. The restore overwrites the vault and refreshes
+    // its .bak; only the .pre-restore safety copy (H2) keeps the old vault.
+    final vaultName = widget.vaultAlias ?? widget.vaultPath.split('/').last;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        // Buttons live in the scrollable content, not `actions`: an
+        // AlertDialog never scrolls its actions, which pushes them off a
+        // 360dp phone at 8x text (same fix as SyncMethodDialog, ADR-016).
+        scrollable: true,
+        title: Text(l.restoreFromFileConfirmTitle),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(l.restoreFromFileConfirmBody(vaultName)),
+            const SizedBox(height: 12),
+            FilledButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: Text(l.continueAction),
+            ),
+            const SizedBox(height: 8),
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: Text(l.cancel),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    try {
+      await widget.onRestoreFromPickedFile(widget.vaultPath, source);
     } catch (_) {
       if (!mounted) return;
       setState(() => _errorMessage = l.restoreFromFileInvalidError);
       return;
     }
-    if (!mounted || !restored) return; // user cancelled the picker
+    if (!mounted) return;
     // H1: the file just written may be a different vault, so the passphrase
     // biometric stored for this path is stale — drop it, exactly as a
     // passphrase change does. Best-effort: the restore already succeeded.

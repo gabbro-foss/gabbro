@@ -2130,6 +2130,14 @@ class AppLocalizationsPl extends AppLocalizations {
   String get restoreFromFileButton => 'Przywróć z pliku kopii zapasowej';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Zastąpić ten sejf?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Wybrany plik zastąpi «$vaultName». Stary plik zostaje zachowany jako kopia awaryjna.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Sejf przywrócony. Odblokuj swoimi danymi.';
 

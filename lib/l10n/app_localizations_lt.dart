@@ -2128,6 +2128,14 @@ class AppLocalizationsLt extends AppLocalizations {
   String get restoreFromFileButton => 'Atkurti iš atsarginės kopijos failo';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Pakeisti šią saugyklą?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Pasirinktas failas pakeis «$vaultName». Senas failas išsaugomas kaip apsauginė kopija.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Saugykla atkurta. Atrakinkite savo prisijungimo duomenimis.';
 

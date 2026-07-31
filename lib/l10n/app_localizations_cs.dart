@@ -2120,6 +2120,14 @@ class AppLocalizationsCs extends AppLocalizations {
   String get restoreFromFileButton => 'Obnovit ze záložního souboru';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Nahradit tento trezor?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Vybraný soubor nahradí «$vaultName». Starý soubor zůstane zachován jako záchranná kopie.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Trezor obnoven. Odemkněte pomocí svých přihlašovacích údajů.';
 

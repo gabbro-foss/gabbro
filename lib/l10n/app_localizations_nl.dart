@@ -2129,6 +2129,14 @@ class AppLocalizationsNl extends AppLocalizations {
   String get restoreFromFileButton => 'Herstellen vanaf een back-upbestand';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Deze kluis vervangen?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Het gekozen bestand vervangt «$vaultName». Het oude bestand blijft bewaard als reservekopie.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Kluis hersteld. Ontgrendel met je gegevens.';
 

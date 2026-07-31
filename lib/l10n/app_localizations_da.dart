@@ -2120,6 +2120,14 @@ class AppLocalizationsDa extends AppLocalizations {
   String get restoreFromFileButton => 'Gendan fra en sikkerhedskopifil';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Erstat denne boks?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Den valgte fil erstatter «$vaultName». Den gamle fil gemmes som reservekopi.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Boks gendannet. Lås op med dine loginoplysninger.';
 

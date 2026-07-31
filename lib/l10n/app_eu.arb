@@ -884,6 +884,8 @@
   "deleteVaultFileConfirmTitle": "Hondatutako kutxa gotorraren fitxategia betiko ezabatu?",
   "deleteVaultFileConfirmBody": "Kutxa gotor hau betiko ezabatu? Fitxategi irakurtezina eta haren segurtasun-kopia gailu honetatik kenduko dira. Ekintza hau ezin da desegin.",
   "restoreFromFileButton": "Berreskuratu babeskopia-fitxategi batetik",
+  "restoreFromFileConfirmTitle": "Kutxa gotor hau ordezkatu?",
+  "restoreFromFileConfirmBody": "Aukeratutako fitxategiak «{vaultName}» ordezkatuko du. Fitxategi zaharra segurtasun-kopia gisa gordeko da.",
   "vaultRestoredBiometricDisabled": "Desblokeo biometrikoa desaktibatu da, leheneratutako fitxategiak beste pasaesaldi bat erabil dezakeelako. Gaitu berriro Segurtasuna atalean.",
   "vaultRestoredMessage":"Kutxa gotorra berreskuratu da. Desblokeatu zure kredentzialekin.",
   "restoreFromFileInvalidError": "Fitxategi hori ez da erabilgarri den Gabbro kutxa gotor bat.",

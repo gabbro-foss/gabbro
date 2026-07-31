@@ -2105,6 +2105,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get restoreFromFileButton => 'Restore from a backup file';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Replace this vault?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'The picked file will replace \'$vaultName\'. The old file is kept as a safety copy.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Vault restored. Unlock with your credentials.';
 

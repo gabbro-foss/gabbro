@@ -2121,6 +2121,14 @@ class AppLocalizationsFi extends AppLocalizations {
   String get restoreFromFileButton => 'Palauta varmuuskopiotiedostosta';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Korvataanko tämä holvi?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Valittu tiedosto korvaa holvin «$vaultName». Vanha tiedosto säilytetään varakopiona.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Holvi palautettu. Avaa lukitus tunnuksillasi.';
 

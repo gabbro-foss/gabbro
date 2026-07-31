@@ -2126,6 +2126,14 @@ class AppLocalizationsPt extends AppLocalizations {
       'Restaurar a partir de um ficheiro de cópia de segurança';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Substituir este cofre?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'O ficheiro escolhido substituirá «$vaultName». O ficheiro antigo é mantido como cópia de recuperação.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Cofre restaurado. Desbloqueie com as suas credenciais.';
 
@@ -4285,6 +4293,14 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get restoreFromFileButton => 'Restaurar de um arquivo de backup';
+
+  @override
+  String get restoreFromFileConfirmTitle => 'Substituir este cofre?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'O arquivo escolhido substituirá «$vaultName». O arquivo antigo é mantido como cópia de recuperação.';
+  }
 
   @override
   String get vaultRestoredMessage =>
@@ -6452,6 +6468,14 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   @override
   String get restoreFromFileButton =>
       'Restaurar a partir de um ficheiro de cópia de segurança';
+
+  @override
+  String get restoreFromFileConfirmTitle => 'Substituir este cofre?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'O ficheiro escolhido substituirá «$vaultName». O ficheiro antigo é mantido como cópia de recuperação.';
+  }
 
   @override
   String get vaultRestoredMessage =>

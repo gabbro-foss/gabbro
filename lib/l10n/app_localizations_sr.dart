@@ -2121,6 +2121,14 @@ class AppLocalizationsSr extends AppLocalizations {
   String get restoreFromFileButton => 'Врати из датотеке резервне копије';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Заменити овај сеф?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Изабрана датотека замениће «$vaultName». Стара датотека остаје сачувана као помоћна копија.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Сеф враћен. Откључајте својим акредитивима.';
 
@@ -4279,6 +4287,14 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get restoreFromFileButton => 'Vrati iz datoteke rezervne kopije';
+
+  @override
+  String get restoreFromFileConfirmTitle => 'Zameniti ovaj sef?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Izabrana datoteka zameniće «$vaultName». Stara datoteka ostaje sačuvana kao pomoćna kopija.';
+  }
 
   @override
   String get vaultRestoredMessage =>

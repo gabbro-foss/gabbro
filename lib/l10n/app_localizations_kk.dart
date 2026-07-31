@@ -2121,6 +2121,14 @@ class AppLocalizationsKk extends AppLocalizations {
   String get restoreFromFileButton => 'Сақтық көшірме файлынан қалпына келтіру';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Бұл қойманы ауыстыру керек пе?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Таңдалған файл «$vaultName» қоймасын ауыстырады. Ескі файл қосалқы көшірме ретінде сақталады.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Қойма қалпына келтірілді. Өз деректеріңізбен ашыңыз.';
 

@@ -884,6 +884,8 @@
   "deleteVaultFileConfirmTitle": "Trajno izbrisati oštećenu datoteku trezora?",
   "deleteVaultFileConfirmBody": "Trajno izbrisati ovaj trezor? Nečitljiva datoteka i njezina pričuvna kopija uklonit će se s ovog uređaja. Ova se radnja ne može poništiti.",
   "restoreFromFileButton": "Vrati iz datoteke sigurnosne kopije",
+  "restoreFromFileConfirmTitle": "Zamijeniti ovaj trezor?",
+  "restoreFromFileConfirmBody": "Odabrana datoteka zamijenit će «{vaultName}». Stara datoteka ostaje sačuvana kao pričuvna kopija.",
   "vaultRestoredBiometricDisabled": "Biometrijsko otključavanje je isključeno jer vraćena datoteka može koristiti drugu pristupnu frazu. Ponovno ga uključite u Sigurnost.",
   "vaultRestoredMessage":"Trezor vraćen. Otključajte svojim vjerodajnicama.",
   "restoreFromFileInvalidError": "Ta datoteka nije upotrebljiv Gabbro trezor.",

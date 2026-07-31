@@ -2029,6 +2029,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get restoreFromFileButton => '从备份文件恢复';
 
   @override
+  String get restoreFromFileConfirmTitle => '替换此保险库？';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return '所选文件将替换«$vaultName»。旧文件将保留为安全副本。';
+  }
+
+  @override
   String get vaultRestoredMessage => '保险库已恢复。请使用你的凭据解锁。';
 
   @override
@@ -4094,6 +4102,14 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get restoreFromFileButton => '从备份文件恢复';
 
   @override
+  String get restoreFromFileConfirmTitle => '替换此保险库？';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return '所选文件将替换«$vaultName»。旧文件将保留为安全副本。';
+  }
+
+  @override
   String get vaultRestoredMessage => '保险库已恢复。请使用你的凭据解锁。';
 
   @override
@@ -6157,6 +6173,14 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get restoreFromFileButton => '從備份檔案復原';
+
+  @override
+  String get restoreFromFileConfirmTitle => '替換此保險庫？';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return '所選檔案將替換«$vaultName»。舊檔案將保留為安全副本。';
+  }
 
   @override
   String get vaultRestoredMessage => '保險庫已復原。請使用你的憑證解鎖。';

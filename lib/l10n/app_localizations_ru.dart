@@ -2128,6 +2128,14 @@ class AppLocalizationsRu extends AppLocalizations {
   String get restoreFromFileButton => 'Восстановить из файла резервной копии';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Заменить это хранилище?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Выбранный файл заменит «$vaultName». Старый файл сохраняется как аварийная копия.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Хранилище восстановлено. Разблокируйте с помощью своих учётных данных.';
 

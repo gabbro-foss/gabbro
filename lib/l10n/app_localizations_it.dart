@@ -2132,6 +2132,14 @@ class AppLocalizationsIt extends AppLocalizations {
   String get restoreFromFileButton => 'Ripristina da un file di backup';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Sostituire questa cassaforte?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Il file scelto sostituirà «$vaultName». Il vecchio file viene conservato come copia di sicurezza.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Cassaforte ripristinata. Sblocca con le tue credenziali.';
 

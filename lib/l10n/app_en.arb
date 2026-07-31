@@ -1066,6 +1066,14 @@
   "deleteVaultFileConfirmTitle": "Delete corrupted vault file permanently?",
   "deleteVaultFileConfirmBody": "Delete this vault permanently? The unreadable file and its safety copy will be removed from this device. This cannot be undone.",
   "restoreFromFileButton": "Restore from a backup file",
+  "restoreFromFileConfirmTitle": "Replace this vault?",
+  "restoreFromFileConfirmBody": "The picked file will replace '{vaultName}'. The old file is kept as a safety copy.",
+  "@restoreFromFileConfirmBody": {
+    "description": "Confirm dialog after the user picks a restore file and before anything is written. A restore overwrites the vault and refreshes its .bak; the old vault survives only as the .pre-restore safety copy this sentence promises.",
+    "placeholders": {
+      "vaultName": {"type": "String"}
+    }
+  },
   "vaultRestoredMessage": "Vault restored. Unlock with your credentials.",
   "vaultRestoredBiometricDisabled": "Biometric unlock was turned off, because the restored file may use a different passphrase. Re-enable it in Security.",
   "@vaultRestoredBiometricDisabled": {

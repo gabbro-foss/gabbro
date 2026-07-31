@@ -2137,6 +2137,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Aus einer Sicherungsdatei wiederherstellen';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Diesen Tresor ersetzen?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Die gewählte Datei ersetzt «$vaultName». Die alte Datei bleibt als Sicherheitskopie erhalten.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Tresor wiederhergestellt. Entsperren Sie mit Ihren Zugangsdaten.';
 

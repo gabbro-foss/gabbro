@@ -2120,6 +2120,14 @@ class AppLocalizationsNn extends AppLocalizations {
   String get restoreFromFileButton => 'Gjenopprett frå ei tryggleikskopifil';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Erstatte dette kvelvet?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Den valde fila erstattar «$vaultName». Den gamle fila vert teken vare på som reservekopi.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Kvelv gjenoppretta. Lås opp med innloggingsinformasjonen din.';
 

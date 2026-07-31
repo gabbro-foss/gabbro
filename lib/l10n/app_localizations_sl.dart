@@ -2123,6 +2123,14 @@ class AppLocalizationsSl extends AppLocalizations {
   String get restoreFromFileButton => 'Obnovi iz datoteke varnostne kopije';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Zamenjati ta trezor?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Izbrana datoteka bo zamenjala «$vaultName». Stara datoteka ostane shranjena kot rešilna kopija.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Trezor obnovljen. Odklenite s svojimi poverilnicami.';
 

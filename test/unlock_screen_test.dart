@@ -66,7 +66,8 @@ Widget _buildScreen({
   Future<bool> Function(String)? onVaultFormatTooNew,
   Future<bool> Function(String)? onBackupUsable,
   Future<void> Function(String)? onRestoreBackup,
-  Future<bool> Function(String)? onRestoreFromFile,
+  Future<String?> Function()? onPickRestoreFile,
+  Future<void> Function(String, String)? onRestoreFromPickedFile,
   Future<void> Function(String)? onDisableBiometric,
   Future<void> Function(String)? onRemoveVaultFromList,
   Future<void> Function(String)? onDeleteVaultFile,
@@ -93,7 +94,8 @@ Widget _buildScreen({
       onVaultFormatTooNew: onVaultFormatTooNew ?? (_) async => false,
       onBackupUsable: onBackupUsable ?? (_) async => false,
       onRestoreBackup: onRestoreBackup ?? (_) async {},
-      onRestoreFromFile: onRestoreFromFile ?? (_) async => false,
+      onPickRestoreFile: onPickRestoreFile ?? () async => null,
+      onRestoreFromPickedFile: onRestoreFromPickedFile ?? (_, _) async {},
       onDisableBiometric: onDisableBiometric ?? (_) async {},
       onRemoveVaultFromList: onRemoveVaultFromList ?? (_) async {},
       onDeleteVaultFile: onDeleteVaultFile ?? (_) async {},
@@ -1649,10 +1651,8 @@ void main() {
     await tester.pumpWidget(_buildScreen(
       onVaultIsReadable: (_) async => readable,
       onBackupUsable: (_) async => false,
-      onRestoreFromFile: (_) async {
-        readable = true;
-        return true;
-      },
+      onPickRestoreFile: () async => '/tmp/backup.gabbro',
+      onRestoreFromPickedFile: (_, _) async => readable = true,
     ));
     await tester.pumpAndSettle();
     expect(find.byType(TextField), findsNothing,
@@ -1660,6 +1660,8 @@ void main() {
 
     await tester.ensureVisible(find.text('Restore from a backup file'));
     await tester.tap(find.text('Restore from a backup file'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Continue'));
     await tester.pumpAndSettle();
 
     expect(find.text('Vault restored. Unlock with your credentials.'),
@@ -1676,13 +1678,16 @@ void main() {
     await tester.pumpWidget(_buildScreen(
       onVaultIsReadable: (_) async => false,
       onBackupUsable: (_) async => false,
-      onRestoreFromFile: (_) async =>
+      onPickRestoreFile: () async => '/tmp/backup.gabbro',
+      onRestoreFromPickedFile: (_, _) async =>
           throw Exception('not a usable Gabbro vault — restore refused'),
     ));
     await tester.pumpAndSettle();
 
     await tester.ensureVisible(find.text('Restore from a backup file'));
     await tester.tap(find.text('Restore from a backup file'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Continue'));
     await tester.pumpAndSettle();
 
     expect(find.text('That file is not a usable Gabbro vault.'), findsOneWidget);
@@ -1699,7 +1704,7 @@ void main() {
     await tester.pumpWidget(_buildScreen(
       onVaultIsReadable: (_) async => false,
       onBackupUsable: (_) async => false,
-      onRestoreFromFile: (_) async =>
+      onPickRestoreFile: () async =>
           throw const FilePickerUnavailable(SocketException('no bus')),
     ));
     await tester.pumpAndSettle();
@@ -1804,21 +1809,118 @@ void main() {
       registry: registry,
       onVaultIsReadable: (_) async => false,
       onBackupUsable: (_) async => false,
-      onRestoreFromFile: (path) async {
-        restoredOver = path;
-        return true;
-      },
+      onPickRestoreFile: () async => '/tmp/backup.gabbro',
+      onRestoreFromPickedFile: (path, _) async => restoredOver = path,
     ));
     await tester.pumpAndSettle();
 
     await tester.ensureVisible(find.text('Restore from a backup file'));
     await tester.tap(find.text('Restore from a backup file'));
     await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Continue'));
+    await tester.pumpAndSettle();
 
     expect(restoredOver, '/tmp/only.gabbro',
         reason: 'the picked file overwrites the vault already registered here');
     expect(registry.records.length, 1,
         reason: 'the picked file is never registered as a second vault');
+  });
+
+  // ── H2 F8-F11: confirm before restore-from-file writes anything ─────────────
+  //
+  // One mis-pick here overwrites the vault AND refreshes its .bak, so this
+  // dialog is the user's last chance to stop it. The Rust side keeps the old
+  // vault as a .pre-restore safety copy; the dialog names both.
+
+  /// Renders a corrupt vault and taps the restore-from-file button.
+  Future<void> openRestoreFlow(
+    WidgetTester tester, {
+    required Future<String?> Function() onPickRestoreFile,
+    required Future<void> Function(String, String) onRestoreFromPickedFile,
+  }) async {
+    await tester.pumpWidget(_buildScreen(
+      vaultAlias: 'My vault',
+      onVaultIsReadable: (_) async => false,
+      onBackupUsable: (_) async => false,
+      onPickRestoreFile: onPickRestoreFile,
+      onRestoreFromPickedFile: onRestoreFromPickedFile,
+    ));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Restore from a backup file'));
+    await tester.tap(find.text('Restore from a backup file'));
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('F8: picking a file raises the confirm dialog before any write',
+      (tester) async {
+    var wrote = false;
+    await openRestoreFlow(
+      tester,
+      onPickRestoreFile: () async => '/tmp/backup.gabbro',
+      onRestoreFromPickedFile: (_, _) async => wrote = true,
+    );
+
+    expect(find.text('Replace this vault?'), findsOneWidget);
+    expect(
+      find.text("The picked file will replace 'My vault'. "
+          'The old file is kept as a safety copy.'),
+      findsOneWidget,
+      reason: 'the dialog must name the vault being replaced and the safety copy',
+    );
+    expect(wrote, isFalse, reason: 'nothing may be written before Continue');
+  });
+
+  testWidgets('F9: Cancel writes nothing and leaves the corrupt state',
+      (tester) async {
+    var wrote = false;
+    await openRestoreFlow(
+      tester,
+      onPickRestoreFile: () async => '/tmp/backup.gabbro',
+      onRestoreFromPickedFile: (_, _) async => wrote = true,
+    );
+
+    await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
+    await tester.pumpAndSettle();
+
+    expect(wrote, isFalse, reason: 'Cancel must reach no bridge call');
+    expect(find.text('Restore from a backup file'), findsOneWidget,
+        reason: 'the vault stays corrupt, the offer stays available');
+    expect(find.textContaining('Vault restored'), findsNothing);
+  });
+
+  testWidgets('F10: Continue restores exactly as before the dialog existed',
+      (tester) async {
+    var wrote = false;
+    await openRestoreFlow(
+      tester,
+      onPickRestoreFile: () async => '/tmp/backup.gabbro',
+      onRestoreFromPickedFile: (_, _) async => wrote = true,
+    );
+
+    await tester.tap(find.widgetWithText(FilledButton, 'Continue'));
+    await tester.pumpAndSettle();
+
+    expect(wrote, isTrue);
+    expect(find.text('Vault restored. Unlock with your credentials.'),
+        findsOneWidget);
+    expect(find.text('Restore from a backup file'), findsNothing,
+        reason: 'the corruption card is gone after the restore');
+  });
+
+  testWidgets('F11: a cancelled picker shows no dialog and writes nothing',
+      (tester) async {
+    var wrote = false;
+    await openRestoreFlow(
+      tester,
+      onPickRestoreFile: () async => null,
+      onRestoreFromPickedFile: (_, _) async => wrote = true,
+    );
+
+    expect(find.text('Replace this vault?'), findsNothing,
+        reason: 'no file was picked, so there is nothing to confirm');
+    expect(wrote, isFalse);
+    expect(find.text('Restore from a backup file'), findsOneWidget,
+        reason: 'the vault stays corrupt');
   });
 
   // ── H1: a restored file makes the stored fingerprint passphrase stale ──────
@@ -1835,14 +1937,16 @@ void main() {
   Future<bool> restoreAndReportUnenrol(
     WidgetTester tester, {
     required bool isAndroid,
-    required Future<bool> Function(String) onRestoreFromFile,
+    Future<String?> Function()? onPickRestoreFile,
+    Future<void> Function(String, String)? onRestoreFromPickedFile,
   }) async {
     var disabled = false;
     await tester.pumpWidget(_buildScreen(
       isAndroid: isAndroid,
       onVaultIsReadable: (_) async => false,
       onBackupUsable: (_) async => false,
-      onRestoreFromFile: onRestoreFromFile,
+      onPickRestoreFile: onPickRestoreFile ?? () async => '/tmp/backup.gabbro',
+      onRestoreFromPickedFile: onRestoreFromPickedFile ?? (_, _) async {},
       onDisableBiometric: (_) async => disabled = true,
     ));
     await tester.pumpAndSettle();
@@ -1850,14 +1954,19 @@ void main() {
     await tester.ensureVisible(find.text('Restore from a backup file'));
     await tester.tap(find.text('Restore from a backup file'));
     await tester.pumpAndSettle();
+    // A cancelled picker raises no dialog; everything else confirms through it.
+    final continueButton = find.widgetWithText(FilledButton, 'Continue');
+    if (continueButton.evaluate().isNotEmpty) {
+      await tester.tap(continueButton);
+      await tester.pumpAndSettle();
+    }
     return disabled;
   }
 
   testWidgets('Android: a successful restore turns biometric unlock off',
       (tester) async {
     expect(
-      await restoreAndReportUnenrol(tester,
-          isAndroid: true, onRestoreFromFile: (_) async => true),
+      await restoreAndReportUnenrol(tester, isAndroid: true),
       isTrue,
       reason: 'the stored passphrase belongs to the vault that was replaced',
     );
@@ -1866,8 +1975,7 @@ void main() {
   testWidgets('Linux: a successful restore touches no biometric enrolment',
       (tester) async {
     expect(
-      await restoreAndReportUnenrol(tester,
-          isAndroid: false, onRestoreFromFile: (_) async => true),
+      await restoreAndReportUnenrol(tester, isAndroid: false),
       isFalse,
       reason: 'there is no biometric unlock off Android',
     );
@@ -1877,7 +1985,7 @@ void main() {
       (tester) async {
     expect(
       await restoreAndReportUnenrol(tester,
-          isAndroid: true, onRestoreFromFile: (_) async => false),
+          isAndroid: true, onPickRestoreFile: () async => null),
       isFalse,
       reason: 'nothing was replaced, so the stored passphrase still fits',
     );
@@ -1887,7 +1995,8 @@ void main() {
     expect(
       await restoreAndReportUnenrol(tester,
           isAndroid: true,
-          onRestoreFromFile: (_) async => throw Exception('not a vault')),
+          onRestoreFromPickedFile: (_, _) async =>
+              throw Exception('not a vault')),
       isFalse,
       reason: 'a refused restore replaced nothing',
     );
@@ -1904,12 +2013,14 @@ void main() {
       onBiometricIsEnrolled: (_) async => enrolled,
       onVaultIsReadable: (_) async => false,
       onBackupUsable: (_) async => false,
-      onRestoreFromFile: (_) async => true,
+      onPickRestoreFile: () async => '/tmp/backup.gabbro',
     ));
     await tester.pumpAndSettle();
 
     await tester.ensureVisible(find.text('Restore from a backup file'));
     await tester.tap(find.text('Restore from a backup file'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Continue'));
     await tester.pumpAndSettle();
   }
 
@@ -1925,15 +2036,16 @@ void main() {
       onBiometricIsEnrolled: (_) async => true,
       onVaultIsReadable: (_) async => readable,
       onBackupUsable: (_) async => false,
-      onRestoreFromFile: (_) async {
-        readable = true; // the file on disk is a good vault again
-        return true;
-      },
+      onPickRestoreFile: () async => '/tmp/backup.gabbro',
+      // the file on disk is a good vault again
+      onRestoreFromPickedFile: (_, _) async => readable = true,
     ));
     await tester.pumpAndSettle();
 
     await tester.ensureVisible(find.text('Restore from a backup file'));
     await tester.tap(find.text('Restore from a backup file'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Continue'));
     // The picker returning wakes the app before the restore's setState lands.
     tester.binding
         .handleAppLifecycleStateChanged(AppLifecycleState.resumed);
@@ -2006,7 +2118,8 @@ void main() {
           onVaultFormatTooOld: (_) async => false,
           onVaultFormatTooNew: (_) async => false,
           onBackupUsable: (_) async => false,
-          onRestoreFromFile: (_) async => true,
+          onPickRestoreFile: () async => '/tmp/backup.gabbro',
+          onRestoreFromPickedFile: (_, _) async {},
           onDisableBiometric: (_) async {},
         ),
       ));
@@ -2026,6 +2139,20 @@ void main() {
       final rect = tester.getRect(restoreButton);
       final y = (rect.top < 0 ? 0.0 : rect.top) + 20;
       await tester.tapAt(Offset(rect.center.dx, y));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull,
+          reason: 'the confirm dialog must render at 8x in $locale, '
+              'never overflow');
+
+      // F12: drive through the confirm dialog, same visible-part tap.
+      final continueButton =
+          find.widgetWithText(FilledButton, l.continueAction).first;
+      await tester.ensureVisible(continueButton);
+      await tester.pumpAndSettle();
+      final cRect = tester.getRect(continueButton);
+      final cy = (cRect.top < 0 ? 0.0 : cRect.top) + 10;
+      await tester.tapAt(Offset(cRect.center.dx, cy));
       await tester.pumpAndSettle();
 
       expect(tester.takeException(), isNull,

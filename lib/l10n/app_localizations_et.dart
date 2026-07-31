@@ -2119,6 +2119,14 @@ class AppLocalizationsEt extends AppLocalizations {
   String get restoreFromFileButton => 'Taasta varukoopia failist';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Kas asendada see hoidla?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Valitud fail asendab hoidla «$vaultName». Vana fail säilitatakse kaitsekoopiana.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Hoidla taastatud. Avage oma mandaatidega.';
 

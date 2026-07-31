@@ -885,6 +885,8 @@
   "deleteVaultFileConfirmTitle": "Excluir permanentemente o arquivo de cofre danificado?",
   "deleteVaultFileConfirmBody": "Excluir permanentemente este cofre? O arquivo ilegível e sua cópia de recuperação serão removidos deste dispositivo. Esta ação não pode ser desfeita.",
   "restoreFromFileButton": "Restaurar de um arquivo de backup",
+  "restoreFromFileConfirmTitle": "Substituir este cofre?",
+  "restoreFromFileConfirmBody": "O arquivo escolhido substituirá «{vaultName}». O arquivo antigo é mantido como cópia de recuperação.",
   "vaultRestoredBiometricDisabled": "O desbloqueio biométrico foi desativado, porque o arquivo restaurado pode usar outra frase secreta. Reative-o em Segurança.",
   "vaultRestoredMessage":"Cofre restaurado. Desbloqueie com suas credenciais.",
   "restoreFromFileInvalidError": "Esse arquivo não é um cofre Gabbro utilizável.",

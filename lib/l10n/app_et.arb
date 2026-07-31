@@ -885,6 +885,8 @@
   "deleteVaultFileConfirmTitle": "Kas kustutada rikutud hoidlafail jäädavalt?",
   "deleteVaultFileConfirmBody": "Kas kustutada see hoidla jäädavalt? Loetamatu fail ja selle kaitsekoopia eemaldatakse sellest seadmest. Seda toimingut ei saa tagasi võtta.",
   "restoreFromFileButton": "Taasta varukoopia failist",
+  "restoreFromFileConfirmTitle": "Kas asendada see hoidla?",
+  "restoreFromFileConfirmBody": "Valitud fail asendab hoidla «{vaultName}». Vana fail säilitatakse kaitsekoopiana.",
   "vaultRestoredBiometricDisabled": "Biomeetriline avamine lülitati välja, sest taastatud fail võib kasutada teist pääslauset. Lülitage see uuesti sisse jaotises Turvalisus.",
   "vaultRestoredMessage":"Hoidla taastatud. Avage oma mandaatidega.",
   "restoreFromFileInvalidError": "See fail ei ole kasutatav Gabbro hoidla.",

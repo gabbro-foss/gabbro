@@ -2119,6 +2119,14 @@ class AppLocalizationsHr extends AppLocalizations {
   String get restoreFromFileButton => 'Vrati iz datoteke sigurnosne kopije';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Zamijeniti ovaj trezor?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Odabrana datoteka zamijenit će «$vaultName». Stara datoteka ostaje sačuvana kao pričuvna kopija.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Trezor vraćen. Otključajte svojim vjerodajnicama.';
 

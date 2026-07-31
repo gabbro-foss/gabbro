@@ -2116,6 +2116,14 @@ class AppLocalizationsSv extends AppLocalizations {
   String get restoreFromFileButton => 'Återställ från en säkerhetskopia';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Ersätta det här valvet?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Den valda filen ersätter «$vaultName». Den gamla filen behålls som reservkopia.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Valv återställt. Lås upp med dina uppgifter.';
 

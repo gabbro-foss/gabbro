@@ -2139,6 +2139,14 @@ class AppLocalizationsEs extends AppLocalizations {
       'Restaurar desde un archivo de copia de seguridad';
 
   @override
+  String get restoreFromFileConfirmTitle => '¿Sustituir esta caja fuerte?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'El archivo elegido sustituirá a «$vaultName». El archivo antiguo se conserva como copia de respaldo.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Caja fuerte restaurada. Desbloquea con tus credenciales.';
 

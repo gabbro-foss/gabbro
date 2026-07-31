@@ -2063,6 +2063,14 @@ class AppLocalizationsKo extends AppLocalizations {
   String get restoreFromFileButton => '백업 파일에서 복원';
 
   @override
+  String get restoreFromFileConfirmTitle => '이 보관함을 교체할까요?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return '선택한 파일이 «$vaultName» 보관함을 교체합니다. 이전 파일은 안전 사본으로 보관됩니다.';
+  }
+
+  @override
   String get vaultRestoredMessage => '보관함이 복원되었습니다. 자격 증명으로 잠금을 해제하세요.';
 
   @override

@@ -2144,6 +2144,15 @@ class AppLocalizationsEl extends AppLocalizations {
       'Επαναφορά από αρχείο αντιγράφου ασφαλείας';
 
   @override
+  String get restoreFromFileConfirmTitle =>
+      'Αντικατάσταση αυτού του θησαυροφυλακίου;';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Το επιλεγμένο αρχείο θα αντικαταστήσει το «$vaultName». Το παλιό αρχείο διατηρείται ως εφεδρικό αντίγραφο.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Το θησαυροφυλάκιο επαναφέρθηκε. Ξεκλειδώστε με τα διαπιστευτήριά σας.';
 

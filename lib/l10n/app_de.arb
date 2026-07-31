@@ -884,6 +884,8 @@
   "deleteVaultFileConfirmTitle": "Beschädigte Tresordatei endgültig löschen?",
   "deleteVaultFileConfirmBody": "Diesen Tresor endgültig löschen? Die unlesbare Datei und ihre Sicherheitskopie werden von diesem Gerät entfernt. Dies kann nicht rückgängig gemacht werden.",
   "restoreFromFileButton": "Aus einer Sicherungsdatei wiederherstellen",
+  "restoreFromFileConfirmTitle": "Diesen Tresor ersetzen?",
+  "restoreFromFileConfirmBody": "Die gewählte Datei ersetzt «{vaultName}». Die alte Datei bleibt als Sicherheitskopie erhalten.",
   "vaultRestoredBiometricDisabled": "Die biometrische Entsperrung wurde deaktiviert, weil die wiederhergestellte Datei eine andere Passphrase verwenden könnte. Aktiviere sie unter Sicherheit erneut.",
   "vaultRestoredMessage":"Tresor wiederhergestellt. Entsperren Sie mit Ihren Zugangsdaten.",
   "restoreFromFileInvalidError": "Diese Datei ist kein verwendbarer Gabbro-Tresor.",

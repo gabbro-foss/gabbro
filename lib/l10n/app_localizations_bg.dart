@@ -2123,6 +2123,14 @@ class AppLocalizationsBg extends AppLocalizations {
   String get restoreFromFileButton => 'Възстановяване от резервен файл';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Да замените този сейф?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Избраният файл ще замени «$vaultName». Старият файл се запазва като аварийно копие.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Сейфът е възстановен. Отключете с вашите данни.';
 

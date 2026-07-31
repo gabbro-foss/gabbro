@@ -2127,6 +2127,14 @@ class AppLocalizationsHu extends AppLocalizations {
       'Helyreállítás biztonsági mentési fájlból';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Lecseréli ezt a széfet?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'A kiválasztott fájl lecseréli a(z) «$vaultName» széfet. A régi fájl vészmásolatként megmarad.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Széf helyreállítva. Oldja fel a hitelesítő adataival.';
 

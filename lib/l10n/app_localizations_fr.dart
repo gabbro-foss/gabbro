@@ -2146,6 +2146,14 @@ class AppLocalizationsFr extends AppLocalizations {
       'Restaurer depuis un fichier de sauvegarde';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Remplacer ce coffre ?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Le fichier choisi remplacera « $vaultName ». L\'ancien fichier est conservé comme copie de secours.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Coffre restauré. Déverrouillez avec vos identifiants.';
 

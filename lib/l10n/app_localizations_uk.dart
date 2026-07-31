@@ -2129,6 +2129,14 @@ class AppLocalizationsUk extends AppLocalizations {
   String get restoreFromFileButton => 'Відновити з файлу резервної копії';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Замінити це сховище?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Вибраний файл замінить «$vaultName». Старий файл зберігається як аварійна копія.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Сховище відновлено. Розблокуйте за допомогою своїх облікових даних.';
 

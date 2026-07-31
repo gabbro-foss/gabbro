@@ -2058,6 +2058,14 @@ class AppLocalizationsJa extends AppLocalizations {
   String get restoreFromFileButton => 'バックアップファイルから復元';
 
   @override
+  String get restoreFromFileConfirmTitle => 'このボールトを置き換えますか？';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return '選択したファイルは「$vaultName」を置き換えます。古いファイルはセーフティコピーとして保存されます。';
+  }
+
+  @override
   String get vaultRestoredMessage => 'ボールトを復元しました。認証情報でロックを解除してください。';
 
   @override

@@ -3913,6 +3913,18 @@ abstract class AppLocalizations {
   /// **'Restore from a backup file'**
   String get restoreFromFileButton;
 
+  /// No description provided for @restoreFromFileConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace this vault?'**
+  String get restoreFromFileConfirmTitle;
+
+  /// Confirm dialog after the user picks a restore file and before anything is written. A restore overwrites the vault and refreshes its .bak; the old vault survives only as the .pre-restore safety copy this sentence promises.
+  ///
+  /// In en, this message translates to:
+  /// **'The picked file will replace \'{vaultName}\'. The old file is kept as a safety copy.'**
+  String restoreFromFileConfirmBody(String vaultName);
+
   /// No description provided for @vaultRestoredMessage.
   ///
   /// In en, this message translates to:

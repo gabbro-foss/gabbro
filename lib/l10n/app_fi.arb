@@ -885,6 +885,8 @@
   "deleteVaultFileConfirmTitle": "Poistetaanko vioittunut holvitiedosto pysyvästi?",
   "deleteVaultFileConfirmBody": "Poistetaanko tämä holvi pysyvästi? Lukukelvoton tiedosto ja sen varakopio poistetaan tästä laitteesta. Tätä ei voi kumota.",
   "restoreFromFileButton": "Palauta varmuuskopiotiedostosta",
+  "restoreFromFileConfirmTitle": "Korvataanko tämä holvi?",
+  "restoreFromFileConfirmBody": "Valittu tiedosto korvaa holvin «{vaultName}». Vanha tiedosto säilytetään varakopiona.",
   "vaultRestoredBiometricDisabled": "Biometrinen avaaminen poistettiin käytöstä, koska palautettu tiedosto voi käyttää eri salauslausetta. Ota se uudelleen käyttöön kohdassa Tietoturva.",
   "vaultRestoredMessage":"Holvi palautettu. Avaa lukitus tunnuksillasi.",
   "restoreFromFileInvalidError": "Tämä tiedosto ei ole käyttökelpoinen Gabbro-holvi.",

@@ -2124,6 +2124,14 @@ class AppLocalizationsLv extends AppLocalizations {
   String get restoreFromFileButton => 'Atjaunot no dublējuma faila';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Vai aizstāt šo seifu?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Izvēlētais fails aizstās «$vaultName». Vecais fails tiek saglabāts kā rezerves kopija.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Seifs atjaunots. Atbloķējiet ar saviem akreditācijas datiem.';
 

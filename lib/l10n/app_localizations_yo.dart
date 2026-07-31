@@ -2119,6 +2119,14 @@ class AppLocalizationsYo extends AppLocalizations {
   String get restoreFromFileButton => 'Dá padà láti fáìlì àfẹyìntì';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Rọ́pò àpótí ìṣúra yìí?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Fáìlì tí o yàn yóò rọ́pò «$vaultName». Fáìlì àtijọ́ ni a ó pa mọ́ gẹ́gẹ́ bí àdàkọ ààbò.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'A ti dá àpótí ìṣúra padà. Ṣí i pẹ̀lú àwọn ìwé-ẹ̀rí rẹ.';
 

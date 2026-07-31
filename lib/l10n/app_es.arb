@@ -884,6 +884,8 @@
   "deleteVaultFileConfirmTitle": "¿Eliminar permanentemente el archivo de caja fuerte dañado?",
   "deleteVaultFileConfirmBody": "¿Eliminar permanentemente esta caja fuerte? El archivo ilegible y su copia de respaldo se eliminarán de este dispositivo. Esta acción no se puede deshacer.",
   "restoreFromFileButton": "Restaurar desde un archivo de copia de seguridad",
+  "restoreFromFileConfirmTitle": "¿Sustituir esta caja fuerte?",
+  "restoreFromFileConfirmBody": "El archivo elegido sustituirá a «{vaultName}». El archivo antiguo se conserva como copia de respaldo.",
   "vaultRestoredBiometricDisabled": "Se desactivó el desbloqueo biométrico, porque el archivo restaurado puede usar otra contraseña. Vuelve a activarlo en Seguridad.",
   "vaultRestoredMessage":"Caja fuerte restaurada. Desbloquea con tus credenciales.",
   "restoreFromFileInvalidError": "Ese archivo no es una caja fuerte de Gabbro utilizable.",

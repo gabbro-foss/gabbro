@@ -2122,6 +2122,14 @@ class AppLocalizationsEu extends AppLocalizations {
       'Berreskuratu babeskopia-fitxategi batetik';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Kutxa gotor hau ordezkatu?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Aukeratutako fitxategiak «$vaultName» ordezkatuko du. Fitxategi zaharra segurtasun-kopia gisa gordeko da.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Kutxa gotorra berreskuratu da. Desblokeatu zure kredentzialekin.';
 
