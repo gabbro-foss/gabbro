@@ -888,6 +888,7 @@
   "restoreFromFileConfirmTitle": "Erstatte dette kvelvet?",
   "restoreFromFileConfirmBody": "Den valde fila erstattar «{vaultName}». Den gamle fila vert teken vare på som reservekopi.",
   "vaultRestoredBiometricDisabled": "Biometrisk opplåsing vart slått av, fordi den gjenoppretta fila kan bruke ein annan passfrase. Slå han på att under Tryggleik.",
+  "biometricStaleDisabled": "Biometrisk opplåsing vart slått av: kvelvfila er endra, og den lagra passfrasen opnar henne ikkje lenger. Slå han på att under Tryggleik.",
   "vaultRestoredMessage":"Kvelv gjenoppretta. Lås opp med innloggingsinformasjonen din.",
   "restoreFromFileInvalidError": "Den fila er ikkje eit brukbart Gabbro-kvelv.",
   "resizeColumns": "Endre kolonnestorleik",

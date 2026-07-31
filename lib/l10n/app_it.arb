@@ -887,6 +887,7 @@
   "restoreFromFileConfirmTitle": "Sostituire questa cassaforte?",
   "restoreFromFileConfirmBody": "Il file scelto sostituirà «{vaultName}». Il vecchio file viene conservato come copia di sicurezza.",
   "vaultRestoredBiometricDisabled": "Lo sblocco biometrico è stato disattivato, perché il file ripristinato potrebbe usare una passphrase diversa. Riattivalo in Sicurezza.",
+  "biometricStaleDisabled": "Lo sblocco biometrico è stato disattivato: il file della cassaforte è cambiato e la passphrase salvata non lo apre più. Riattivalo in Sicurezza.",
   "vaultRestoredMessage":"Cassaforte ripristinata. Sblocca con le tue credenziali.",
   "restoreFromFileInvalidError": "Questo file non è una cassaforte Gabbro utilizzabile.",
   "resizeColumns": "Ridimensiona colonne",

@@ -888,6 +888,7 @@
   "restoreFromFileConfirmTitle": "Lecseréli ezt a széfet?",
   "restoreFromFileConfirmBody": "A kiválasztott fájl lecseréli a(z) «{vaultName}» széfet. A régi fájl vészmásolatként megmarad.",
   "vaultRestoredBiometricDisabled": "A biometrikus feloldás ki lett kapcsolva, mert a visszaállított fájl más jelmondatot használhat. Kapcsolja be újra a Biztonság menüben.",
+  "biometricStaleDisabled": "A biometrikus feloldás ki lett kapcsolva: a széffájl megváltozott, és a mentett jelmondat már nem nyitja ki. Kapcsolja be újra a Biztonság menüben.",
   "vaultRestoredMessage":"Széf helyreállítva. Oldja fel a hitelesítő adataival.",
   "restoreFromFileInvalidError": "Ez a fájl nem használható Gabbro-széf.",
   "resizeColumns": "Oszlopok átméretezése",

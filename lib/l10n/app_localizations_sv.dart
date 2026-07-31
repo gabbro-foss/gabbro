@@ -2132,6 +2132,10 @@ class AppLocalizationsSv extends AppLocalizations {
       'Biometrisk upplåsning stängdes av, eftersom den återställda filen kan använda en annan lösenfras. Slå på den igen under Säkerhet.';
 
   @override
+  String get biometricStaleDisabled =>
+      'Biometrisk upplåsning stängdes av: valvfilen har ändrats och den sparade lösenfrasen öppnar den inte längre. Slå på den igen under Säkerhet.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Den filen är inte ett användbart Gabbro-valv.';
 

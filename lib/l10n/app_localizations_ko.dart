@@ -2078,6 +2078,10 @@ class AppLocalizationsKo extends AppLocalizations {
       '복원한 파일이 다른 암호 문구를 사용할 수 있으므로 생체 인증 잠금 해제를 껐습니다. 보안에서 다시 켜세요.';
 
   @override
+  String get biometricStaleDisabled =>
+      '보관함 파일이 변경되어 저장된 암호 문구로는 더 이상 열 수 없으므로 생체 인증 잠금 해제를 껐습니다. 보안에서 다시 켜세요.';
+
+  @override
   String get restoreFromFileInvalidError => '이 파일은 사용할 수 있는 Gabbro 보관함이 아닙니다.';
 
   @override

@@ -888,6 +888,7 @@
   "restoreFromFileConfirmTitle": "Erstat denne boks?",
   "restoreFromFileConfirmBody": "Den valgte fil erstatter «{vaultName}». Den gamle fil gemmes som reservekopi.",
   "vaultRestoredBiometricDisabled": "Biometrisk oplåsning blev slået fra, fordi den gendannede fil kan bruge en anden adgangssætning. Slå den til igen under Sikkerhed.",
+  "biometricStaleDisabled": "Biometrisk oplåsning blev slået fra: boksfilen er ændret, og den gemte adgangssætning åbner den ikke længere. Slå den til igen under Sikkerhed.",
   "vaultRestoredMessage":"Boks gendannet. Lås op med dine loginoplysninger.",
   "restoreFromFileInvalidError": "Den fil er ikke en brugbar Gabbro-boks.",
   "resizeColumns": "Ændr kolonnestørrelse",

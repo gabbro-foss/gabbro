@@ -2153,6 +2153,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Die biometrische Entsperrung wurde deaktiviert, weil die wiederhergestellte Datei eine andere Passphrase verwenden könnte. Aktiviere sie unter Sicherheit erneut.';
 
   @override
+  String get biometricStaleDisabled =>
+      'Die biometrische Entsperrung wurde deaktiviert: Die Tresordatei hat sich geändert und die gespeicherte Passphrase öffnet sie nicht mehr. Aktiviere sie unter Sicherheit erneut.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Diese Datei ist kein verwendbarer Gabbro-Tresor.';
 

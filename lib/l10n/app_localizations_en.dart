@@ -2121,6 +2121,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Biometric unlock was turned off, because the restored file may use a different passphrase. Re-enable it in Security.';
 
   @override
+  String get biometricStaleDisabled =>
+      'Biometric unlock was turned off: the vault file changed and the saved passphrase no longer opens it. Re-enable it in Security.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'That file is not a usable Gabbro vault.';
 

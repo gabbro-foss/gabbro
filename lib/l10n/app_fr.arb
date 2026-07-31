@@ -887,6 +887,7 @@
   "restoreFromFileConfirmTitle": "Remplacer ce coffre ?",
   "restoreFromFileConfirmBody": "Le fichier choisi remplacera « {vaultName} ». L'ancien fichier est conservé comme copie de secours.",
   "vaultRestoredBiometricDisabled": "Le déverrouillage biométrique a été désactivé, car le fichier restauré peut utiliser un autre mot de passe. Réactivez-le dans Sécurité.",
+  "biometricStaleDisabled": "Le déverrouillage biométrique a été désactivé : le fichier du coffre a changé et la phrase secrète enregistrée ne l'ouvre plus. Réactivez-le dans Sécurité.",
   "vaultRestoredMessage":"Coffre restauré. Déverrouillez avec vos identifiants.",
   "restoreFromFileInvalidError": "Ce fichier n'est pas un coffre Gabbro utilisable.",
   "resizeColumns": "Redimensionner les colonnes",

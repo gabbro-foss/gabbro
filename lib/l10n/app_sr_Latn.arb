@@ -887,6 +887,7 @@
   "restoreFromFileConfirmTitle": "Zameniti ovaj sef?",
   "restoreFromFileConfirmBody": "Izabrana datoteka zameniće «{vaultName}». Stara datoteka ostaje sačuvana kao pomoćna kopija.",
   "vaultRestoredBiometricDisabled": "Biometrijsko otključavanje je isključeno jer vraćena datoteka može koristiti drugu pristupnu frazu. Ponovo ga uključite u odeljku Bezbednost.",
+  "biometricStaleDisabled": "Biometrijsko otključavanje je isključeno: datoteka sefa je promenjena i sačuvana pristupna fraza je više ne otvara. Ponovo ga uključite u odeljku Bezbednost.",
   "vaultRestoredMessage":"Sef vraćen. Otključajte svojim akreditivima.",
   "restoreFromFileInvalidError": "Ta datoteka nije upotrebljiv Gabbro sef.",
   "resizeColumns": "Promeni veličinu kolona",

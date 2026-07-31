@@ -2137,6 +2137,10 @@ class AppLocalizationsSr extends AppLocalizations {
       'Biometrijsko otključavanje je isključeno jer vraćena datoteka može koristiti drugu pristupnu frazu. Ponovo ga uključite u odeljku Bezbednost.';
 
   @override
+  String get biometricStaleDisabled =>
+      'Биометријско откључавање је искључено: датотека сефа је промењена и сачувана приступна фраза је више не отвара. Поново га укључите у одељку Безбедност.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Та датотека није употребљив Gabbro сеф.';
 
@@ -4303,6 +4307,10 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   @override
   String get vaultRestoredBiometricDisabled =>
       'Biometrijsko otključavanje je isključeno jer vraćena datoteka može koristiti drugu pristupnu frazu. Ponovo ga uključite u odeljku Bezbednost.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'Biometrijsko otključavanje je isključeno: datoteka sefa je promenjena i sačuvana pristupna fraza je više ne otvara. Ponovo ga uključite u odeljku Bezbednost.';
 
   @override
   String get restoreFromFileInvalidError =>

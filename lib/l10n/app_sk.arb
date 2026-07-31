@@ -887,6 +887,7 @@
   "restoreFromFileConfirmTitle": "Nahradiť tento trezor?",
   "restoreFromFileConfirmBody": "Vybraný súbor nahradí «{vaultName}». Starý súbor zostane zachovaný ako záchranná kópia.",
   "vaultRestoredBiometricDisabled": "Biometrické odomknutie bolo vypnuté, pretože obnovený súbor môže používať inú prístupovú frázu. Znova ho zapnite v časti Zabezpečenie.",
+  "biometricStaleDisabled": "Biometrické odomknutie bolo vypnuté: súbor trezoru sa zmenil a uložená prístupová fráza ho už neotvorí. Znova ho zapnite v časti Zabezpečenie.",
   "vaultRestoredMessage":"Trezor obnovený. Odomknite pomocou svojich prihlasovacích údajov.",
   "restoreFromFileInvalidError": "Tento súbor nie je použiteľný trezor Gabbro.",
   "resizeColumns": "Zmeniť veľkosť stĺpcov",

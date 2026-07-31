@@ -888,6 +888,7 @@
   "restoreFromFileConfirmTitle": "Korvataanko tämä holvi?",
   "restoreFromFileConfirmBody": "Valittu tiedosto korvaa holvin «{vaultName}». Vanha tiedosto säilytetään varakopiona.",
   "vaultRestoredBiometricDisabled": "Biometrinen avaaminen poistettiin käytöstä, koska palautettu tiedosto voi käyttää eri salauslausetta. Ota se uudelleen käyttöön kohdassa Tietoturva.",
+  "biometricStaleDisabled": "Biometrinen avaaminen poistettiin käytöstä: holvitiedosto on muuttunut, eikä tallennettu salauslause enää avaa sitä. Ota se uudelleen käyttöön kohdassa Tietoturva.",
   "vaultRestoredMessage":"Holvi palautettu. Avaa lukitus tunnuksillasi.",
   "restoreFromFileInvalidError": "Tämä tiedosto ei ole käyttökelpoinen Gabbro-holvi.",
   "resizeColumns": "Muuta sarakkeiden kokoa",

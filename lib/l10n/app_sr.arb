@@ -887,6 +887,7 @@
   "restoreFromFileConfirmTitle": "Заменити овај сеф?",
   "restoreFromFileConfirmBody": "Изабрана датотека замениће «{vaultName}». Стара датотека остаје сачувана као помоћна копија.",
   "vaultRestoredBiometricDisabled": "Biometrijsko otključavanje je isključeno jer vraćena datoteka može koristiti drugu pristupnu frazu. Ponovo ga uključite u odeljku Bezbednost.",
+  "biometricStaleDisabled": "Биометријско откључавање је искључено: датотека сефа је промењена и сачувана приступна фраза је више не отвара. Поново га укључите у одељку Безбедност.",
   "vaultRestoredMessage":"Сеф враћен. Откључајте својим акредитивима.",
   "restoreFromFileInvalidError": "Та датотека није употребљив Gabbro сеф.",
   "resizeColumns": "Промени величину колона",

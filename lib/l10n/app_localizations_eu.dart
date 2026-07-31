@@ -2138,6 +2138,10 @@ class AppLocalizationsEu extends AppLocalizations {
       'Desblokeo biometrikoa desaktibatu da, leheneratutako fitxategiak beste pasaesaldi bat erabil dezakeelako. Gaitu berriro Segurtasuna atalean.';
 
   @override
+  String get biometricStaleDisabled =>
+      'Desblokeo biometrikoa desaktibatu da: kutxa gotorraren fitxategia aldatu da eta gordetako pasaesaldiak ez du gehiago irekitzen. Gaitu berriro Segurtasuna atalean.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Fitxategi hori ez da erabilgarri den Gabbro kutxa gotor bat.';
 

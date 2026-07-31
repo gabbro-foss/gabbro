@@ -888,6 +888,7 @@
   "restoreFromFileConfirmTitle": "Vai aizstāt šo seifu?",
   "restoreFromFileConfirmBody": "Izvēlētais fails aizstās «{vaultName}». Vecais fails tiek saglabāts kā rezerves kopija.",
   "vaultRestoredBiometricDisabled": "Biometriskā atbloķēšana tika izslēgta, jo atjaunotais fails var izmantot citu ieejas frāzi. Ieslēdziet to atkal sadaļā Drošība.",
+  "biometricStaleDisabled": "Biometriskā atbloķēšana tika izslēgta: seifa fails ir mainījies, un saglabātā ieejas frāze to vairs neatver. Ieslēdziet to atkal sadaļā Drošība.",
   "vaultRestoredMessage":"Seifs atjaunots. Atbloķējiet ar saviem akreditācijas datiem.",
   "restoreFromFileInvalidError": "Šis fails nav izmantojams Gabbro seifs.",
   "resizeColumns": "Mainīt kolonnu izmērus",

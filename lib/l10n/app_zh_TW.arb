@@ -887,6 +887,7 @@
   "restoreFromFileConfirmTitle": "替換此保險庫？",
   "restoreFromFileConfirmBody": "所選檔案將替換«{vaultName}»。舊檔案將保留為安全副本。",
   "vaultRestoredBiometricDisabled": "已關閉生物特徵解鎖，因為還原的檔案可能使用不同的密碼片語。請在「安全性」中重新啟用。",
+  "biometricStaleDisabled": "已關閉生物特徵解鎖：保險庫檔案已變更，儲存的密碼片語無法再開啟它。請在「安全性」中重新啟用。",
   "vaultRestoredMessage":"保險庫已復原。請使用你的憑證解鎖。",
   "restoreFromFileInvalidError": "該檔案不是可用的 Gabbro 保險庫。",
   "resizeColumns": "調整欄寬",

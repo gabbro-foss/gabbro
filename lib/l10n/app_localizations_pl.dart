@@ -2146,6 +2146,10 @@ class AppLocalizationsPl extends AppLocalizations {
       'Odblokowywanie biometryczne zostało wyłączone, ponieważ przywrócony plik może używać innego hasła głównego. Włącz je ponownie w sekcji Bezpieczeństwo.';
 
   @override
+  String get biometricStaleDisabled =>
+      'Odblokowywanie biometryczne zostało wyłączone: plik sejfu się zmienił i zapisane hasło główne już go nie otwiera. Włącz je ponownie w sekcji Bezpieczeństwo.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Ten plik nie jest prawidłowym sejfem Gabbro.';
 

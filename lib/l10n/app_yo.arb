@@ -887,6 +887,7 @@
   "restoreFromFileConfirmTitle": "Rọ́pò àpótí ìṣúra yìí?",
   "restoreFromFileConfirmBody": "Fáìlì tí o yàn yóò rọ́pò «{vaultName}». Fáìlì àtijọ́ ni a ó pa mọ́ gẹ́gẹ́ bí àdàkọ ààbò.",
   "vaultRestoredBiometricDisabled": "A ti pa ṣiṣi ẹya ara, nítorí pé fáìlì tí a mú padà lè lo gbolohun ọrọ igbaniwọle mìíràn. Tún un ṣí ní Aabo.",
+  "biometricStaleDisabled": "A ti pa ṣiṣi ẹya ara: fáìlì àpótí ìṣúra ti yí padà, gbolohun ọrọ igbaniwọle tí a fi pamọ́ kò sì lè ṣí i mọ́. Tún un ṣí ní Aabo.",
   "vaultRestoredMessage":"A ti dá àpótí ìṣúra padà. Ṣí i pẹ̀lú àwọn ìwé-ẹ̀rí rẹ.",
   "restoreFromFileInvalidError": "Fáìlì yẹn kì í ṣe àpótí ìṣúra Gabbro tó ṣeé lò.",
   "resizeColumns": "Ṣàtúnṣe ìwọ̀n àwọn ọ̀wọ́n",

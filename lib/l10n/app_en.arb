@@ -1079,6 +1079,10 @@
   "@vaultRestoredBiometricDisabled": {
     "description": "Shown after a restore-from-file when biometric unlock was enrolled for this vault: the stored passphrase belongs to the replaced vault, so the enrolment was dropped."
   },
+  "biometricStaleDisabled": "Biometric unlock was turned off: the vault file changed and the saved passphrase no longer opens it. Re-enable it in Security.",
+  "@biometricStaleDisabled": {
+    "description": "Shown when a biometric unlock fails because the vault file at this path was replaced outside the app (e.g. file sync): the stored passphrase no longer opens the new file, so the enrolment was dropped (H1)."
+  },
   "restoreFromFileInvalidError": "That file is not a usable Gabbro vault.",
   "resizeColumns": "Resize columns",
 

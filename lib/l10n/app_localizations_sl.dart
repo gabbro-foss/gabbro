@@ -2139,6 +2139,10 @@ class AppLocalizationsSl extends AppLocalizations {
       'Biometrično odklepanje je bilo izklopljeno, ker obnovljena datoteka morda uporablja drugo geslo. Znova ga vklopite v razdelku Varnost.';
 
   @override
+  String get biometricStaleDisabled =>
+      'Biometrično odklepanje je bilo izklopljeno: datoteka trezorja se je spremenila in shranjeno geslo je ne odpre več. Znova ga vklopite v razdelku Varnost.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Ta datoteka ni uporaben trezor Gabbro.';
 

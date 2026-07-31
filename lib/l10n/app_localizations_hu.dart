@@ -2143,6 +2143,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'A biometrikus feloldás ki lett kapcsolva, mert a visszaállított fájl más jelmondatot használhat. Kapcsolja be újra a Biztonság menüben.';
 
   @override
+  String get biometricStaleDisabled =>
+      'A biometrikus feloldás ki lett kapcsolva: a széffájl megváltozott, és a mentett jelmondat már nem nyitja ki. Kapcsolja be újra a Biztonság menüben.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Ez a fájl nem használható Gabbro-széf.';
 

@@ -1009,6 +1009,212 @@ void main() {
     });
   });
 
+  // ── H1: an externally swapped vault file makes the stored passphrase stale ──
+  //
+  // Error contract (pinned here, used by the H1 fix): tap-stage failures —
+  // wrong PIN (HMAC_FAILED / HMAC_MULTI_FAILED), timeout, transport — are
+  // PlatformExceptions thrown by the tap call, before the passphrase is ever
+  // tried. A wrong passphrase is a plain exception from the Rust decrypt call.
+  // Only the decrypt stage may ever conclude "stored passphrase is stale".
+  group('H1: external vault swap vs biometric', () {
+    testWidgets('N1: a typed wrong passphrase never touches biometric enrolment',
+        (tester) async {
+      var unenrolled = false;
+      await tester.pumpWidget(_buildScreen(
+        onBiometricIsEnrolled: (_) async => true,
+        onDisableBiometric: (_) async => unenrolled = true,
+        onUnlock: (_, _) async => throw Exception('wrong passphrase'),
+      ));
+      await tester.pump();
+      await tester.enterText(find.byType(TextField).first, 'typed-wrong');
+      await tester.ensureVisible(find.text('Unlock'));
+      await tester.tap(find.text('Unlock'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Could not unlock vault. Check your passphrase.'),
+          findsOneWidget);
+      expect(unenrolled, isFalse,
+          reason: 'a typed mistake proves nothing about the stored passphrase');
+      expect(find.text('Use biometrics'), findsOneWidget);
+    });
+
+    testWidgets(
+        'N2: a tap-stage failure (wrong PIN) never touches biometric enrolment',
+        (tester) async {
+      for (final code in ['HMAC_FAILED', 'HMAC_MULTI_FAILED']) {
+        var unenrolled = false;
+        await tester.pumpWidget(_buildScreen(
+          yubikeyRecords: [_fakeRecord()],
+          onBiometricIsEnrolled: (_) async => true,
+          onDisableBiometric: (_) async => unenrolled = true,
+          onUnlockWithYubikey: (a, b, c, d, e, f) async =>
+              throw PlatformException(code: code),
+        ));
+        await tester.pump();
+        await tester.enterText(find.byType(TextField).first, 'anypassphrase');
+        await tester.ensureVisible(find.text('Unlock'));
+        await tester.tap(find.text('Unlock'));
+        await tester.pumpAndSettle();
+
+        expect(
+            find.text(
+                'Could not unlock vault. Check your passphrase and YubiKey PIN.'),
+            findsOneWidget,
+            reason: '$code is a tap-stage failure: generic message');
+        expect(unenrolled, isFalse,
+            reason: '$code says nothing about the stored passphrase');
+      }
+    });
+
+    const staleMessage = 'Biometric unlock was turned off: the vault file '
+        'changed and the saved passphrase no longer opens it. '
+        'Re-enable it in Security.';
+
+    testWidgets(
+        'H1a: biometric-fed decrypt rejection unenrols and says the file changed',
+        (tester) async {
+      var unenrolCalls = 0;
+      await tester.pumpWidget(_buildScreen(
+        onBiometricIsEnrolled: (_) async => true,
+        onBiometricAuthenticate: (_) async => [1, 2, 3],
+        onDisableBiometric: (_) async => unenrolCalls++,
+        onUnlock: (_, _) async => throw Exception('decryption failed'),
+      ));
+      await tester.pump();
+      await tester.tap(find.text('Use biometrics'));
+      await tester.pumpAndSettle();
+
+      expect(unenrolCalls, 1,
+          reason: 'the stored passphrase is provably stale: unenrol once');
+      expect(find.text('Use biometrics'), findsNothing,
+          reason: 'the button must go with the enrolment');
+      expect(find.text(staleMessage), findsOneWidget,
+          reason: 'the message must name the cause, not blame the passphrase');
+    });
+
+    testWidgets('H1b: same on a keyed vault (decrypt stage rejects)',
+        (tester) async {
+      var unenrolCalls = 0;
+      await tester.pumpWidget(_buildScreen(
+        yubikeyRecords: [_fakeRecord()],
+        onBiometricIsEnrolled: (_) async => true,
+        onBiometricAuthenticate: (_) async => [1, 2, 3],
+        onDisableBiometric: (_) async => unenrolCalls++,
+        onUnlockWithYubikey: (a, b, c, d, e, f) async =>
+            throw Exception('decryption failed'),
+      ));
+      await tester.pump();
+      await tester.tap(find.text('Use biometrics'));
+      await tester.pumpAndSettle();
+
+      expect(unenrolCalls, 1);
+      expect(find.text('Use biometrics'), findsNothing);
+      expect(find.text(staleMessage), findsOneWidget);
+    });
+
+    testWidgets(
+        'H1c: keyed, biometric-fed, tap-stage wrong PIN leaves enrolment alone',
+        (tester) async {
+      var unenrolled = false;
+      await tester.pumpWidget(_buildScreen(
+        yubikeyRecords: [_fakeRecord()],
+        onBiometricIsEnrolled: (_) async => true,
+        onBiometricAuthenticate: (_) async => [1, 2, 3],
+        onDisableBiometric: (_) async => unenrolled = true,
+        onUnlockWithYubikey: (a, b, c, d, e, f) async =>
+            throw PlatformException(code: 'HMAC_FAILED'),
+      ));
+      await tester.pump();
+      await tester.tap(find.text('Use biometrics'));
+      await tester.pumpAndSettle();
+
+      expect(unenrolled, isFalse,
+          reason: 'a wrong PIN must never switch the fingerprint off');
+      expect(
+          find.text(
+              'Could not unlock vault. Check your passphrase and YubiKey PIN.'),
+          findsOneWidget);
+      expect(find.text('Use biometrics'), findsOneWidget);
+    });
+
+    testWidgets(
+        'H1d: biometric-fed failure on an unreadable file shows the corruption '
+        'banner and leaves enrolment alone', (tester) async {
+      var unenrolled = false;
+      var readable = true;
+      await tester.pumpWidget(_buildScreen(
+        onBiometricIsEnrolled: (_) async => true,
+        onBiometricAuthenticate: (_) async => [1, 2, 3],
+        onDisableBiometric: (_) async => unenrolled = true,
+        onVaultIsReadable: (_) async => readable,
+        onBackupUsable: (_) async => true,
+        onUnlock: (_, _) async {
+          readable = false; // corrupted while this screen was mounted
+          throw Exception('parse failed');
+        },
+      ));
+      await tester.pump();
+      await tester.tap(find.text('Use biometrics'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Restore from safety copy'), findsOneWidget,
+          reason: 'an unreadable file is corruption, not a swap verdict');
+      expect(unenrolled, isFalse);
+    });
+
+    testWidgets(
+        'H1e: the stale-biometric message survives every locale at 8x on a '
+        '360dp phone', (tester) async {
+      tester.view.physicalSize = const Size(360, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() => tester.view.reset());
+
+      for (final locale in AppLocalizations.supportedLocales) {
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.pumpAndSettle();
+
+        await tester.pumpWidget(MaterialApp(
+          locale: locale,
+          localizationsDelegates: gabbroLocalizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: const TextScaler.linear(8.0)),
+            child: child!,
+          ),
+          home: UnlockScreen(
+            vaultPath: '/tmp/test.gabbro',
+            onEstimateEntropy: _fakeEntropy,
+            yubikeyRecords: const [],
+            isAndroid: true,
+            onBiometricIsEnrolled: (_) async => true,
+            onBiometricAuthenticate: (_) async => [1, 2, 3],
+            onDisableBiometric: (_) async {},
+            onUnlock: (_, _) async => throw Exception('decryption failed'),
+            onVaultIsReadable: (_) async => true,
+            onVaultFormatTooOld: (_) async => false,
+            onVaultFormatTooNew: (_) async => false,
+            onBackupUsable: (_) async => false,
+          ),
+        ));
+        await tester.pumpAndSettle();
+
+        // Past 1.5x the biometric button is icon-only.
+        final biometric = find.byIcon(Icons.fingerprint);
+        await tester.ensureVisible(biometric);
+        await tester.pumpAndSettle();
+        await tester.tap(biometric, warnIfMissed: false);
+        await tester.pumpAndSettle();
+
+        expect(tester.takeException(), isNull,
+            reason: 'the message must scroll at 8x in $locale, never overflow');
+        final l = lookupAppLocalizations(locale);
+        expect(find.text(l.biometricStaleDisabled), findsOneWidget,
+            reason: 'the message must be on screen for $locale to mean anything');
+      }
+    });
+  });
+
   group('vault dropdown', () {
     final twoVaultRegistry = VaultRegistry([
       _vaultRecord(path: '/tmp/a.gabbro', alias: 'Alpha'),
@@ -1492,7 +1698,10 @@ void main() {
       'yubikey auth failures (wrong PIN, wrong key, timeout, cancel) never offer restore',
       (tester) async {
     final failures = <Object>[
-      PlatformException(code: 'CTAP_ERROR', message: 'Wrong PIN'),
+      // The real wrong-PIN code (GabbroUnlockHostActivity registers HMAC_FAILED
+      // for the single-key tap); an invented CTAP_ERROR passed here for the
+      // same reason any unknown code does — keep the pin on the real contract.
+      PlatformException(code: 'HMAC_FAILED', message: 'Wrong PIN'),
       Exception('decryption failed'),
       PlatformException(code: 'TAP_TIMEOUT'),
       PlatformException(code: 'TAP_CANCELLED'),

@@ -2140,6 +2140,10 @@ class AppLocalizationsLv extends AppLocalizations {
       'Biometriskā atbloķēšana tika izslēgta, jo atjaunotais fails var izmantot citu ieejas frāzi. Ieslēdziet to atkal sadaļā Drošība.';
 
   @override
+  String get biometricStaleDisabled =>
+      'Biometriskā atbloķēšana tika izslēgta: seifa fails ir mainījies, un saglabātā ieejas frāze to vairs neatver. Ieslēdziet to atkal sadaļā Drošība.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Šis fails nav izmantojams Gabbro seifs.';
 

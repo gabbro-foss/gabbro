@@ -888,6 +888,7 @@
   "restoreFromFileConfirmTitle": "Substituir este cofre?",
   "restoreFromFileConfirmBody": "O ficheiro escolhido substituirá «{vaultName}». O ficheiro antigo é mantido como cópia de recuperação.",
   "vaultRestoredBiometricDisabled": "O desbloqueio biométrico foi desativado, porque o ficheiro restaurado pode usar outra frase secreta. Reative-o em Segurança.",
+  "biometricStaleDisabled": "O desbloqueio biométrico foi desativado: o ficheiro do cofre mudou e a frase secreta guardada já não o abre. Reative-o em Segurança.",
   "vaultRestoredMessage":"Cofre restaurado. Desbloqueie com as suas credenciais.",
   "restoreFromFileInvalidError": "Esse ficheiro não é um cofre Gabbro utilizável.",
   "resizeColumns": "Redimensionar colunas",

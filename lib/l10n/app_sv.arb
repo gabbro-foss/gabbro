@@ -888,6 +888,7 @@
   "restoreFromFileConfirmTitle": "Ersätta det här valvet?",
   "restoreFromFileConfirmBody": "Den valda filen ersätter «{vaultName}». Den gamla filen behålls som reservkopia.",
   "vaultRestoredBiometricDisabled": "Biometrisk upplåsning stängdes av, eftersom den återställda filen kan använda en annan lösenfras. Slå på den igen under Säkerhet.",
+  "biometricStaleDisabled": "Biometrisk upplåsning stängdes av: valvfilen har ändrats och den sparade lösenfrasen öppnar den inte längre. Slå på den igen under Säkerhet.",
   "vaultRestoredMessage":"Valv återställt. Lås upp med dina uppgifter.",
   "restoreFromFileInvalidError": "Den filen är inte ett användbart Gabbro-valv.",
   "resizeColumns": "Ändra kolumnstorlek",

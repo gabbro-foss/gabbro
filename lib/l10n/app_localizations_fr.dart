@@ -2162,6 +2162,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Le déverrouillage biométrique a été désactivé, car le fichier restauré peut utiliser un autre mot de passe. Réactivez-le dans Sécurité.';
 
   @override
+  String get biometricStaleDisabled =>
+      'Le déverrouillage biométrique a été désactivé : le fichier du coffre a changé et la phrase secrète enregistrée ne l\'ouvre plus. Réactivez-le dans Sécurité.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Ce fichier n\'est pas un coffre Gabbro utilisable.';
 

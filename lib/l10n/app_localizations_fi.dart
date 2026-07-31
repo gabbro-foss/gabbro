@@ -2137,6 +2137,10 @@ class AppLocalizationsFi extends AppLocalizations {
       'Biometrinen avaaminen poistettiin käytöstä, koska palautettu tiedosto voi käyttää eri salauslausetta. Ota se uudelleen käyttöön kohdassa Tietoturva.';
 
   @override
+  String get biometricStaleDisabled =>
+      'Biometrinen avaaminen poistettiin käytöstä: holvitiedosto on muuttunut, eikä tallennettu salauslause enää avaa sitä. Ota se uudelleen käyttöön kohdassa Tietoturva.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Tämä tiedosto ei ole käyttökelpoinen Gabbro-holvi.';
 

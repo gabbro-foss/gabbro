@@ -2135,6 +2135,10 @@ class AppLocalizationsEt extends AppLocalizations {
       'Biomeetriline avamine lülitati välja, sest taastatud fail võib kasutada teist pääslauset. Lülitage see uuesti sisse jaotises Turvalisus.';
 
   @override
+  String get biometricStaleDisabled =>
+      'Biomeetriline avamine lülitati välja: hoidlafail on muutunud ja salvestatud pääslause seda enam ei ava. Lülitage see uuesti sisse jaotises Turvalisus.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'See fail ei ole kasutatav Gabbro hoidla.';
 

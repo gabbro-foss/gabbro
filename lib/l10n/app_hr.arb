@@ -887,6 +887,7 @@
   "restoreFromFileConfirmTitle": "Zamijeniti ovaj trezor?",
   "restoreFromFileConfirmBody": "Odabrana datoteka zamijenit će «{vaultName}». Stara datoteka ostaje sačuvana kao pričuvna kopija.",
   "vaultRestoredBiometricDisabled": "Biometrijsko otključavanje je isključeno jer vraćena datoteka može koristiti drugu pristupnu frazu. Ponovno ga uključite u Sigurnost.",
+  "biometricStaleDisabled": "Biometrijsko otključavanje je isključeno: datoteka trezora je promijenjena i spremljena pristupna fraza više je ne otvara. Ponovno ga uključite u Sigurnost.",
   "vaultRestoredMessage":"Trezor vraćen. Otključajte svojim vjerodajnicama.",
   "restoreFromFileInvalidError": "Ta datoteka nije upotrebljiv Gabbro trezor.",
   "resizeColumns": "Promijeni veličinu stupaca",

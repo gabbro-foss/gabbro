@@ -2155,6 +2155,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Se desactivó el desbloqueo biométrico, porque el archivo restaurado puede usar otra contraseña. Vuelve a activarlo en Seguridad.';
 
   @override
+  String get biometricStaleDisabled =>
+      'Se desactivó el desbloqueo biométrico: el archivo de la caja fuerte cambió y la contraseña guardada ya no lo abre. Vuelve a activarlo en Seguridad.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Ese archivo no es una caja fuerte de Gabbro utilizable.';
 

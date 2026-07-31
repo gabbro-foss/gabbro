@@ -2135,6 +2135,10 @@ class AppLocalizationsHr extends AppLocalizations {
       'Biometrijsko otključavanje je isključeno jer vraćena datoteka može koristiti drugu pristupnu frazu. Ponovno ga uključite u Sigurnost.';
 
   @override
+  String get biometricStaleDisabled =>
+      'Biometrijsko otključavanje je isključeno: datoteka trezora je promijenjena i spremljena pristupna fraza više je ne otvara. Ponovno ga uključite u Sigurnost.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Ta datoteka nije upotrebljiv Gabbro trezor.';
 

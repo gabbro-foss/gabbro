@@ -2044,6 +2044,10 @@ class AppLocalizationsZh extends AppLocalizations {
       '已关闭生物特征解锁，因为恢复的文件可能使用不同的密码短语。请在“安全”中重新启用。';
 
   @override
+  String get biometricStaleDisabled =>
+      '已关闭生物特征解锁：保险库文件已更改，保存的密码短语无法再打开它。请在“安全”中重新启用。';
+
+  @override
   String get restoreFromFileInvalidError => '该文件不是可用的 Gabbro 保险库。';
 
   @override
@@ -4117,6 +4121,10 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
       '已关闭生物特征解锁，因为恢复的文件可能使用不同的密码短语。请在“安全”中重新启用。';
 
   @override
+  String get biometricStaleDisabled =>
+      '已关闭生物特征解锁：保险库文件已更改，保存的密码短语无法再打开它。请在“安全”中重新启用。';
+
+  @override
   String get restoreFromFileInvalidError => '该文件不是可用的 Gabbro 保险库。';
 
   @override
@@ -6188,6 +6196,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String get vaultRestoredBiometricDisabled =>
       '已關閉生物特徵解鎖，因為還原的檔案可能使用不同的密碼片語。請在「安全性」中重新啟用。';
+
+  @override
+  String get biometricStaleDisabled =>
+      '已關閉生物特徵解鎖：保險庫檔案已變更，儲存的密碼片語無法再開啟它。請在「安全性」中重新啟用。';
 
   @override
   String get restoreFromFileInvalidError => '該檔案不是可用的 Gabbro 保險庫。';

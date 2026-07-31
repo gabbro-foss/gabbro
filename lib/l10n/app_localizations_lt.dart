@@ -2144,6 +2144,10 @@ class AppLocalizationsLt extends AppLocalizations {
       'Biometrinis atrakinimas išjungtas, nes atkurtas failas gali naudoti kitą slaptafrazę. Vėl jį įjunkite skiltyje Saugumas.';
 
   @override
+  String get biometricStaleDisabled =>
+      'Biometrinis atrakinimas išjungtas: saugyklos failas pasikeitė ir išsaugota slaptafrazė jo nebeatrakina. Vėl jį įjunkite skiltyje Saugumas.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Šis failas nėra tinkama Gabbro saugykla.';
 

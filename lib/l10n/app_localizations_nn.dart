@@ -2136,6 +2136,10 @@ class AppLocalizationsNn extends AppLocalizations {
       'Biometrisk opplåsing vart slått av, fordi den gjenoppretta fila kan bruke ein annan passfrase. Slå han på att under Tryggleik.';
 
   @override
+  String get biometricStaleDisabled =>
+      'Biometrisk opplåsing vart slått av: kvelvfila er endra, og den lagra passfrasen opnar henne ikkje lenger. Slå han på att under Tryggleik.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Den fila er ikkje eit brukbart Gabbro-kvelv.';
 

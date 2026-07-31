@@ -2136,6 +2136,10 @@ class AppLocalizationsDa extends AppLocalizations {
       'Biometrisk oplåsning blev slået fra, fordi den gendannede fil kan bruge en anden adgangssætning. Slå den til igen under Sikkerhed.';
 
   @override
+  String get biometricStaleDisabled =>
+      'Biometrisk oplåsning blev slået fra: boksfilen er ændret, og den gemte adgangssætning åbner den ikke længere. Slå den til igen under Sikkerhed.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Den fil er ikke en brugbar Gabbro-boks.';
 

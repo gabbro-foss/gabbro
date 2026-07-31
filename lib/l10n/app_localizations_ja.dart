@@ -2073,6 +2073,10 @@ class AppLocalizationsJa extends AppLocalizations {
       '復元したファイルが別のパスフレーズを使用している可能性があるため、生体認証ロック解除を無効にしました。セキュリティで再度有効にしてください。';
 
   @override
+  String get biometricStaleDisabled =>
+      'ボールトファイルが変更され、保存されたパスフレーズでは開けなくなったため、生体認証ロック解除を無効にしました。セキュリティで再度有効にしてください。';
+
+  @override
   String get restoreFromFileInvalidError => 'このファイルは使用可能な Gabbro ボールトではありません。';
 
   @override

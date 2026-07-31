@@ -887,6 +887,7 @@
   "restoreFromFileConfirmTitle": "¿Sustituir esta caja fuerte?",
   "restoreFromFileConfirmBody": "El archivo elegido sustituirá a «{vaultName}». El archivo antiguo se conserva como copia de respaldo.",
   "vaultRestoredBiometricDisabled": "Se desactivó el desbloqueo biométrico, porque el archivo restaurado puede usar otra contraseña. Vuelve a activarlo en Seguridad.",
+  "biometricStaleDisabled": "Se desactivó el desbloqueo biométrico: el archivo de la caja fuerte cambió y la contraseña guardada ya no lo abre. Vuelve a activarlo en Seguridad.",
   "vaultRestoredMessage":"Caja fuerte restaurada. Desbloquea con tus credenciales.",
   "restoreFromFileInvalidError": "Ese archivo no es una caja fuerte de Gabbro utilizable.",
   "resizeColumns": "Ajustar columnas",

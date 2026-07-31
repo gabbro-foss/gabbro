@@ -887,6 +887,7 @@
   "restoreFromFileConfirmTitle": "替换此保险库？",
   "restoreFromFileConfirmBody": "所选文件将替换«{vaultName}»。旧文件将保留为安全副本。",
   "vaultRestoredBiometricDisabled": "已关闭生物特征解锁，因为恢复的文件可能使用不同的密码短语。请在“安全”中重新启用。",
+  "biometricStaleDisabled": "已关闭生物特征解锁：保险库文件已更改，保存的密码短语无法再打开它。请在“安全”中重新启用。",
   "vaultRestoredMessage":"保险库已恢复。请使用你的凭据解锁。",
   "restoreFromFileInvalidError": "该文件不是可用的 Gabbro 保险库。",
   "resizeColumns": "调整列宽",

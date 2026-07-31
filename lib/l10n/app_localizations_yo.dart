@@ -2135,6 +2135,10 @@ class AppLocalizationsYo extends AppLocalizations {
       'A ti pa ṣiṣi ẹya ara, nítorí pé fáìlì tí a mú padà lè lo gbolohun ọrọ igbaniwọle mìíràn. Tún un ṣí ní Aabo.';
 
   @override
+  String get biometricStaleDisabled =>
+      'A ti pa ṣiṣi ẹya ara: fáìlì àpótí ìṣúra ti yí padà, gbolohun ọrọ igbaniwọle tí a fi pamọ́ kò sì lè ṣí i mọ́. Tún un ṣí ní Aabo.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Fáìlì yẹn kì í ṣe àpótí ìṣúra Gabbro tó ṣeé lò.';
 

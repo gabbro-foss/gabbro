@@ -672,7 +672,21 @@ class _UnlockScreenState extends State<UnlockScreen>
         setState(() => _errorMessage = l.biometricCancelled);
         return;
       }
-      await _doUnlock(passphrase);
+      final stale = await _doUnlock(passphrase);
+      if (stale) {
+        // H1: this passphrase came from the store, not the keyboard, so a
+        // decrypt-stage rejection proves the stored copy is stale — the file
+        // at this path was swapped outside the app. Same action as a restore:
+        // unenrol (best-effort) and name the cause.
+        try {
+          await widget.onDisableBiometric(widget.vaultPath);
+        } catch (_) {}
+        if (!mounted) return;
+        setState(() {
+          _biometricEnrolled = false;
+          _errorMessage = l.biometricStaleDisabled;
+        });
+      }
     } on PlatformException catch (e) {
       if (!mounted) return;
       if (e.code == 'BIOMETRIC_INVALIDATED') {
@@ -691,7 +705,16 @@ class _UnlockScreenState extends State<UnlockScreen>
     }
   }
 
-  Future<void> _doUnlock(List<int> passphrase) async {
+  // Error contract (H1, pinned by the 'H1: external vault swap' tests):
+  // tap-stage failures — wrong PIN (HMAC_FAILED / HMAC_MULTI_FAILED), timeout,
+  // transport, cancel — arrive as PlatformExceptions from the tap call, before
+  // the passphrase is ever tried; a wrong passphrase is a plain exception from
+  // the Rust decrypt call. Returns true only for that decrypt-stage rejection
+  // with the file still readable — the one case that proves a fed-in
+  // passphrase wrong. (Only biometric feeds a non-typed passphrase, and only
+  // on Android; on Linux a fido failure is also a plain exception, but no
+  // caller acts on the return there.)
+  Future<bool> _doUnlock(List<int> passphrase) async {
     final l = AppLocalizations.of(context);
     try {
       if (_isYubikeyMode) {
@@ -720,9 +743,9 @@ class _UnlockScreenState extends State<UnlockScreen>
         await widget.onUnlock(passphrase, widget.vaultPath);
       }
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted) return false;
       // The user cancelled the tap: just drop back to the unlock form, no error.
-      if (e is PlatformException && e.code == 'TAP_CANCELLED') return;
+      if (e is PlatformException && e.code == 'TAP_CANCELLED') return false;
       // R-03 P2: re-probe before showing a generic auth error. If the vault
       // file itself became unreadable (e.g. corrupted while this screen was
       // mounted), surface the corruption banner instead of "check your
@@ -730,34 +753,34 @@ class _UnlockScreenState extends State<UnlockScreen>
       // passphrase / PIN / key leaves the file readable, so the probe returns
       // readable and the generic error still shows (auth-failure invariant).
       final stillReadable = await widget.onVaultIsReadable(widget.vaultPath);
-      if (!mounted) return;
+      if (!mounted) return false;
       if (!stillReadable) {
         // RT-3: an intact but pre-v11 vault also fails to parse. It is not
         // corrupt, so explain the format rather than offering restore/delete.
         if (await widget.onVaultFormatTooOld(widget.vaultPath)) {
-          if (!mounted) return;
+          if (!mounted) return false;
           setState(() {
             _vaultFormatTooOld = true;
             _errorMessage = null;
           });
-          return;
+          return false;
         }
         if (await widget.onVaultFormatTooNew(widget.vaultPath)) {
-          if (!mounted) return;
+          if (!mounted) return false;
           setState(() {
             _vaultFormatTooNew = true;
             _errorMessage = null;
           });
-          return;
+          return false;
         }
         final usable = await widget.onBackupUsable(widget.vaultPath);
-        if (!mounted) return;
+        if (!mounted) return false;
         setState(() {
           _vaultCorrupt = true;
           _backupAvailable = usable;
           _errorMessage = null;
         });
-        return;
+        return false;
       }
       setState(() {
         _errorMessage = switch (e) {
@@ -772,13 +795,15 @@ class _UnlockScreenState extends State<UnlockScreen>
               : l.unlockErrorPassphrase,
         };
       });
-      return;
+      // Decrypt-stage rejection: the passphrase itself was refused (contract
+      // above). Every tap-stage failure is a PlatformException.
+      return e is! PlatformException;
     }
     // ── Unlock succeeded ── The post-success work below is NOT inside the auth
     // try/catch, so a failure here can never be reported as an authentication
     // error (e.g. the autofill onUnlocked signaling failing must not read as a
     // wrong passphrase).
-    if (!mounted) return;
+    if (!mounted) return false;
     GabbroApp.maybeOf(context)?.touchVaultLastUsed(widget.vaultPath);
     if (widget.onUnlocked != null) {
       // Autofill activity supplies onUnlocked to signal the native side (build
@@ -800,6 +825,7 @@ class _UnlockScreenState extends State<UnlockScreen>
         ),
       );
     }
+    return false;
   }
 
   Color _tierColor(StrengthTier tier) => switch (tier) {

@@ -2148,6 +2148,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Lo sblocco biometrico è stato disattivato, perché il file ripristinato potrebbe usare una passphrase diversa. Riattivalo in Sicurezza.';
 
   @override
+  String get biometricStaleDisabled =>
+      'Lo sblocco biometrico è stato disattivato: il file della cassaforte è cambiato e la passphrase salvata non lo apre più. Riattivalo in Sicurezza.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Questo file non è una cassaforte Gabbro utilizzabile.';
 

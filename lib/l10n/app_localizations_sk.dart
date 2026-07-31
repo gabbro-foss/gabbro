@@ -2138,6 +2138,10 @@ class AppLocalizationsSk extends AppLocalizations {
       'Biometrické odomknutie bolo vypnuté, pretože obnovený súbor môže používať inú prístupovú frázu. Znova ho zapnite v časti Zabezpečenie.';
 
   @override
+  String get biometricStaleDisabled =>
+      'Biometrické odomknutie bolo vypnuté: súbor trezoru sa zmenil a uložená prístupová fráza ho už neotvorí. Znova ho zapnite v časti Zabezpečenie.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Tento súbor nie je použiteľný trezor Gabbro.';
 

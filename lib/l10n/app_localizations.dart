@@ -3937,6 +3937,12 @@ abstract class AppLocalizations {
   /// **'Biometric unlock was turned off, because the restored file may use a different passphrase. Re-enable it in Security.'**
   String get vaultRestoredBiometricDisabled;
 
+  /// Shown when a biometric unlock fails because the vault file at this path was replaced outside the app (e.g. file sync): the stored passphrase no longer opens the new file, so the enrolment was dropped (H1).
+  ///
+  /// In en, this message translates to:
+  /// **'Biometric unlock was turned off: the vault file changed and the saved passphrase no longer opens it. Re-enable it in Security.'**
+  String get biometricStaleDisabled;
+
   /// No description provided for @restoreFromFileInvalidError.
   ///
   /// In en, this message translates to:
