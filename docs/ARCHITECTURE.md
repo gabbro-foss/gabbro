@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2012 | 10 |
+| Flutter (`flutter test`) | 2016 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -117,30 +117,13 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 Full gate ran ALL GREEN 2026-07-30 (Rust 667, Flutter 2012, ~125m).
 
-**1. H2 fix (in progress) — restore-from-file destroys the old vault.** One mis-pick on
-the corrupt-vault unlock screen overwrites the vault *and* refreshes its `.bak`, so the
-last good copy is gone. Fix: preserve the old vault to a single `<vault>.gabbro.pre-restore`
-(old `.bak` if usable, else old main bytes; 0600; fail-closed) + a confirm dialog before
-writing. Canon-TDD, agreed 2026-07-30 — tick as they go green:
+H2 DONE (hardware-passed 2026-07-31, FH1-FH7): restore-from-file preserves the old
+vault as `.pre-restore` (R1-R7) and confirms before writing (F8-F12).
 
-- [x] R1 usable `.bak` -> `.pre-restore` holds it, opens with old credentials
-- [x] R2 no usable `.bak` -> `.pre-restore` holds the old main bytes
-- [x] R3 nothing at path -> no `.pre-restore`, restore succeeds
-- [x] R4 second restore overwrites `.pre-restore` (only ever one)
-- [x] R5 symlinked `.pre-restore` -> refused, main + `.bak` untouched
-- [x] R6 `.pre-restore` mode 0600
-- [x] R7 vault deletion removes `.pre-restore` alongside `.bak`
-- [ ] F8 confirm dialog after pick, before any write; names vault + safety copy
-- [ ] F9 cancel -> no bridge call, nothing touched
-- [ ] F10 continue -> restore proceeds as today
-- [ ] F11 picker cancelled -> no dialog, no write (pin current)
-- [ ] F12 strings in 37 ARBs + 8x/360px overflow
-- [ ] flutter analyze (touched test files) + clippy; hardware round with mock vaults
-
-**2. H1 fix** — biometric enrolment keyed by path survives a vault swap at that path
+**1. H1 fix** — biometric enrolment keyed by path survives a vault swap at that path
 (restore-from-file already unenrols; the exposure is external swaps).
 
-**3. Then the `adopt` row** (both columns, canon-TDD). Start with design, not code:
+**2. Then the `adopt` row** (both columns, canon-TDD). Start with design, not code:
    - Entry points: `onboarding_screen`, `unlock_screen`, `manage_vaults_screen`.
    - Linux registers the picked path; Android must copy into app storage (its picker
      returns a cache copy). That asymmetry decides whether `restore_vault_from_file` is
