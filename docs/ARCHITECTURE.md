@@ -151,9 +151,10 @@ Flutter `AdoptVaultScreen`:
 - [x] F4 already-registered path refused (Linux)
 - [x] F5 Linux confirm -> registers picked path, no copy
 - [x] F6 Android confirm (seam) -> copy to app storage under a free name, dest registered
-- [ ] F7 keyed file -> record type `yubikey`
-- [ ] F8 picker cancel no-op; `FilePickerUnavailable` -> manual path (Linux)
-- [ ] F9 after adopt -> unlock screen, no auto-unlock
+- [ ] F7 keyed file -> shows key-protected in the list — HARDWARE ONLY (adopt vault D; no seam can see the real decision)
+- [x] F8 PathField: typed path + browse; cancel no-op; portal-unavailable SnackBar
+      (PathField gained `onPathPicked`/`onSubmitted`, pinned in path_field_test)
+- [ ] F9 after adopt -> unlock screen, no auto-unlock (wiring-level, test with E-group)
 
 Entry points:
 - [ ] E1 onboarding "Open an existing vault file" -> AdoptVaultScreen
