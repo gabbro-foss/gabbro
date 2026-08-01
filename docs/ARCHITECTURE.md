@@ -142,7 +142,7 @@ Rust `adopt_vault_file` (`vault/io.rs` + bridge):
 - [x] R4 symlink source/dest refused
 - [x] R5 pre-v11 source refused (floor pin)
 - [x] RB bridge roundtrip (`vault_bridge.rs`) — all 6 green 2026-08-01
-- [ ] codegen + `cargo build --release --lib` (needed before any Dart call)
+- [x] codegen + `cargo build --release --lib`; real-FFI suites 12/12 on the new cdylib
 
 Flutter `AdoptVaultScreen`:
 - [x] F1 valid file -> alias prefilled, editable
@@ -163,13 +163,15 @@ Entry points:
 - [x] E3 2-vault dropdown: switch unregressed + adopt item
 
 A11y & l10n net:
-- [ ] N1 screen_catalog + screenFileCount (enrols 2x overflow, a11y, keyboard nets)
-- [ ] N2 8x text, 360dp, all 37 locales, driven through the whole flow
-- [ ] N3 icon-only controls named; Linux label composes name + action
-- [ ] N4 triage errors + adopt success announced (no-focus-change rule)
-- [ ] N5 keyboard-only operability (Linux)
-- [ ] N6 real translations, 37 ARBs; «» vault names, 「」 ja
-- [ ] N7 dialog buttons in scrollable content, never `actions` (ADR-016)
+- [x] N1 screen_catalog + screenFileCount=28 (probe 119, a11y 237, keyboard 44 all green)
+- [x] N2 8x text, 360dp, all 37 locales, all 5 states (valid/collision/invalid/too-old/registered)
+- [x] N3 browse icon named via PathField's existing semanticLabel; a11y net sweeps it
+- [x] N4 triage + collision errors announced, Linux only (success = navigation,
+      the unlock screen names itself)
+- [x] N5 keyboard-only: typed path, Enter, Tab, Enter adopts
+- [x] N6 4 new keys ({`adoptTitle`,`adoptConfirm`,`adoptAlreadyRegistered`,`unlockAdoptItem`})
+      translated in 37 ARBs; alias label/collision/path-hint reuse existing keys
+- [x] N7 n/a — the flow has no dialog (the upgrade link reuses showUrlDialog)
 
 Hardware:
 - [ ] Linux matrix (mock vaults A-E)
