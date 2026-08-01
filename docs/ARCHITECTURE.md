@@ -159,8 +159,8 @@ Flutter `AdoptVaultScreen`:
 Entry points:
 - [x] E1 onboarding "Open an existing vault file" -> `openAdoptVault()`; wired at all
       4 onboarding sites (covers manage-vaults' add path)
-- [ ] E2 unlock dropdown from 1 vault, "Open a vault file…" item (flips 1-vault pin)
-- [ ] E3 2-vault dropdown: switch unregressed + adopt item
+- [x] E2 unlock dropdown from 1 vault, "Open a vault file…" item (flips 1-vault pin)
+- [x] E3 2-vault dropdown: switch unregressed + adopt item
 
 A11y & l10n net:
 - [ ] N1 screen_catalog + screenFileCount (enrols 2x overflow, a11y, keyboard nets)
