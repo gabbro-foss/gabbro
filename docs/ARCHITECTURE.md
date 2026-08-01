@@ -131,10 +131,14 @@ AA1-AA6 emulator). Tick-lists, design decisions and findings: git log.
 Also on this branch: the flutter-test sandbox held only during declaration —
 fixed + pinned by `test/sandbox_net_test.dart` (2026-08-01).
 
-Attempt 1 (`sync_without_second_unlock`): unmerged — **do not merge, do not
-delete until picked clean**. Note: it was kept partly for adoption's sake
-(cached-master path), and adoption shipped WITHOUT needing it — review what is
-still worth salvaging before any deletion.
+Attempt 1 (`sync_without_second_unlock`): unmerged, diff-reviewed 2026-08-01.
+One salvage left, then delete the branch — both AFTER a green gate:
+port `916cbc0` (415 test-only lines pinning the vault-identity facts sync/adopt
+rely on: fresh salts per passphrase-only save, reseal_body keeps the master,
+independent vaults never share a master, keyed CRUD leaves the header alone —
+none of these pins exist on this branch; the facts are prose-only today).
+Everything else is salvaged (chooser + 8x test) or superseded (probe,
+cached-master, skip-credential-screen).
 
 Mock vaults for future rounds: `.scratchpad` (A, B, D; C and E deleted 2026-08-01).
 
