@@ -153,6 +153,19 @@ Future<void> restoreVaultFromFile({
   source: source,
 );
 
+/// Adopt: copy a picked `.gabbro` file to a fresh destination so it can be
+/// registered as a vault (Android — the picker only hands out a cache copy;
+/// Linux registers the picked path in place and never calls this).
+///
+/// Refuses an occupied destination (adopt never overwrites) and a source that
+/// is not a usable Gabbro vault. Opening the adopted vault still requires full
+/// credentials — adopting grants no access.
+Future<void> adoptVaultFile({required String source, required String dest}) =>
+    RustLib.instance.api.crateApiVaultBridgeAdoptVaultFile(
+      source: source,
+      dest: dest,
+    );
+
 /// Assign a folder to a set of entries by UUID and persist.
 ///
 /// Pass `folder: ""` to move entries to unfoldered.

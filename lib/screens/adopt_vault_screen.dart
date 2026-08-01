@@ -1,0 +1,254 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
+import 'package:gabbro/screens/unlock_screen.dart' show vaultUpgradePathUrl;
+import 'package:gabbro/src/rust/api/vault_bridge.dart';
+import 'package:gabbro/vault_registry.dart';
+import 'package:gabbro/widgets/url_link.dart';
+
+/// Adopt: register an exported `.gabbro` file as a vault on this device,
+/// without creating an empty vault and importing into it. Adopting grants no
+/// access — the vault still asks for full credentials at unlock.
+///
+/// NOTE: some labels are interim hardcoded English until the string set
+/// stabilises; the 37-ARB batch (tick-list N6) replaces them before this
+/// screen is wired into any entry point. Triage strings reuse the existing
+/// translated unlock-screen keys.
+class AdoptVaultScreen extends StatefulWidget {
+  final VaultRegistry registry;
+
+  /// Returns the picked file's path, or null when the user cancelled.
+  final Future<String?> Function() onPickFile;
+
+  /// Full-parses the picked file and returns its header (alias + YubiKey
+  /// records). Throws when the file is not a usable vault.
+  final Future<VaultHeaderData> Function(String path) onReadHeader;
+
+  /// Asked only after the header read fails, to tell an intact-but-old or
+  /// intact-but-newer vault apart from a corrupt file (same triage order as
+  /// the unlock screen).
+  final Future<bool> Function(String path) onFormatTooOld;
+  final Future<bool> Function(String path) onFormatTooNew;
+
+  /// Called once the file is accepted: registers `path` as a vault under
+  /// `alias` (main.dart wires `_onVaultCreated`, which also detects the
+  /// YubiKey type from the header).
+  final Future<void> Function(String path, String alias) onRegistered;
+
+  /// Android only: copy the picker's cache file into app storage (the Rust
+  /// `adopt_vault_file` — validates, refuses an occupied dest, creates the
+  /// `.bak`). Linux registers the picked path in place and never calls this.
+  final Future<void> Function(String source, String dest) onAdoptCopy;
+
+  /// Android only: the app-storage directory adopted vaults are copied into.
+  final Future<String> Function() onDefaultVaultDir;
+
+  /// Test seam; null → [Platform.isAndroid].
+  final bool? isAndroid;
+
+  const AdoptVaultScreen({
+    super.key,
+    required this.registry,
+    required this.onPickFile,
+    required this.onReadHeader,
+    required this.onFormatTooOld,
+    required this.onFormatTooNew,
+    required this.onRegistered,
+    required this.onAdoptCopy,
+    required this.onDefaultVaultDir,
+    this.isAndroid,
+  });
+
+  @override
+  State<AdoptVaultScreen> createState() => _AdoptVaultScreenState();
+}
+
+enum _AdoptError { invalid, tooOld, tooNew, alreadyRegistered }
+
+class _AdoptVaultScreenState extends State<AdoptVaultScreen> {
+  final _aliasController = TextEditingController();
+  String? _pickedPath;
+  _AdoptError? _error;
+  bool _aliasCollision = false;
+
+  /// A free path in `dir` for `basename`, suffixing `-2`, `-3`, … before the
+  /// extension when the plain name is taken — the Rust copy refuses an
+  /// occupied destination, so the free name must be found here.
+  static String _freeDestPath(String dir, String basename) {
+    var candidate = '$dir/$basename';
+    if (!File(candidate).existsSync()) return candidate;
+    final dot = basename.lastIndexOf('.');
+    final stem = dot > 0 ? basename.substring(0, dot) : basename;
+    final ext = dot > 0 ? basename.substring(dot) : '';
+    var n = 2;
+    while (true) {
+      candidate = '$dir/$stem-$n$ext';
+      if (!File(candidate).existsSync()) return candidate;
+      n++;
+    }
+  }
+
+  Future<void> _confirm() async {
+    final alias = _aliasController.text.trim();
+    if (widget.registry.records.any((r) => r.alias == alias)) {
+      setState(() => _aliasCollision = true);
+      return;
+    }
+    setState(() => _aliasCollision = false);
+    var path = _pickedPath!;
+    final onAndroid = widget.isAndroid ?? Platform.isAndroid;
+    if (onAndroid) {
+      // The picker only handed out a cache copy: move it into app storage
+      // under its own name (or the nearest free one).
+      final dir = await widget.onDefaultVaultDir();
+      final dest = _freeDestPath(dir, path.split('/').last);
+      await widget.onAdoptCopy(path, dest);
+      path = dest;
+    }
+    await widget.onRegistered(path, alias);
+  }
+
+  Future<void> _pick() async {
+    final path = await widget.onPickFile();
+    if (path == null || !mounted) return;
+    // Refuse before touching the file: this vault is already in the list, and
+    // adopting it again would only produce a second entry for the same file.
+    if (widget.registry.records.any((r) => r.path == path)) {
+      setState(() {
+        _pickedPath = null;
+        _error = _AdoptError.alreadyRegistered;
+      });
+      return;
+    }
+    try {
+      final header = await widget.onReadHeader(path);
+      if (!mounted) return;
+      setState(() {
+        _pickedPath = path;
+        _error = null;
+        _aliasController.text = header.alias ?? '';
+      });
+    } catch (_) {
+      // Same triage order as the unlock screen: an intact old or newer vault
+      // must be explained, not reported as damaged.
+      var error = _AdoptError.invalid;
+      try {
+        if (await widget.onFormatTooOld(path)) {
+          error = _AdoptError.tooOld;
+        } else if (await widget.onFormatTooNew(path)) {
+          error = _AdoptError.tooNew;
+        }
+      } catch (_) {}
+      if (!mounted) return;
+      setState(() {
+        _pickedPath = null;
+        _error = error;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _aliasController.dispose();
+    super.dispose();
+  }
+
+  Widget _errorCard(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final (key, text, linkLabel) = switch (_error!) {
+      _AdoptError.invalid => (
+        const Key('adopt_error_invalid'),
+        l.restoreFromFileInvalidError,
+        null,
+      ),
+      _AdoptError.tooOld => (
+        const Key('adopt_error_too_old'),
+        l.vaultFormatTooOld,
+        l.vaultFormatUpgradeLink,
+      ),
+      _AdoptError.tooNew => (
+        const Key('adopt_error_too_new'),
+        l.vaultFormatTooNew,
+        l.vaultFormatTooNewLink,
+      ),
+      _AdoptError.alreadyRegistered => (
+        const Key('adopt_error_already_registered'),
+        'This vault is already in your list',
+        null,
+      ),
+    };
+    return Card(
+      key: key,
+      color: theme.colorScheme.errorContainer,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              text,
+              style: TextStyle(color: theme.colorScheme.onErrorContainer),
+            ),
+            if (linkLabel != null) ...[
+              const SizedBox(height: 8),
+              TextButton.icon(
+                key: const Key('adopt_upgrade_link'),
+                icon: const Icon(Icons.open_in_new, size: 16),
+                label: Text(linkLabel),
+                onPressed: () => showUrlDialog(
+                  context,
+                  title: linkLabel,
+                  url: vaultUpgradePathUrl,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('Open an existing vault file')),
+    body: ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        FilledButton(
+          key: const Key('adopt_pick_button'),
+          onPressed: _pick,
+          child: const Text('Pick a vault file'),
+        ),
+        if (_error != null) ...[
+          const SizedBox(height: 16),
+          _errorCard(context),
+        ],
+        if (_pickedPath != null) ...[
+          const SizedBox(height: 16),
+          TextField(
+            key: const Key('adopt_alias_field'),
+            controller: _aliasController,
+            decoration: InputDecoration(
+              labelText: 'Vault name',
+              errorText: _aliasCollision
+                  ? 'A vault with this name is already in the list'
+                  : null,
+              errorMaxLines: 3,
+            ),
+          ),
+          if (_aliasCollision)
+            // Key target only: the visible message is the errorText above.
+            const SizedBox.shrink(key: Key('adopt_alias_collision')),
+          const SizedBox(height: 16),
+          FilledButton(
+            key: const Key('adopt_confirm_button'),
+            onPressed: _confirm,
+            child: const Text('Add vault'),
+          ),
+        ],
+      ],
+    ),
+  );
+}
