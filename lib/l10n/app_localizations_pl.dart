@@ -725,6 +725,13 @@ class AppLocalizationsPl extends AppLocalizations {
   String get syncMethodTitle => 'Jak zastosować tę synchronizację?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'To samo hasło główne nie dowodzi tego samego skarbca.';
+
+  @override
+  String get syncUseIncomingYubikey => 'Użyj YubiKey przychodzącego skarbca';
+
+  @override
   String get syncMergeAutomatically => 'Scal automatycznie';
 
   @override
@@ -1784,6 +1791,10 @@ class AppLocalizationsPl extends AppLocalizations {
   String get onboardingPathRequired => 'Ścieżka jest wymagana';
 
   @override
+  String get onboardingPathTaken =>
+      'Tutaj już istnieje plik. Wybierz inną nazwę — utworzenie skarbca zastąpiłoby go.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Wybierz nowe hasło główne lub ponownie użyj poprzedniego.';
 
@@ -2119,12 +2130,40 @@ class AppLocalizationsPl extends AppLocalizations {
   String get restoreFromFileButton => 'Przywróć z pliku kopii zapasowej';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Zastąpić ten sejf?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Wybrany plik zastąpi «$vaultName». Stary plik zostaje zachowany jako kopia awaryjna.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Sejf przywrócony. Odblokuj swoimi danymi.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Odblokowywanie biometryczne zostało wyłączone, ponieważ przywrócony plik może używać innego hasła głównego. Włącz je ponownie w sekcji Bezpieczeństwo.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'Odblokowywanie biometryczne zostało wyłączone: plik sejfu się zmienił i zapisane hasło główne już go nie otwiera. Włącz je ponownie w sekcji Bezpieczeństwo.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Ten plik nie jest prawidłowym sejfem Gabbro.';
+
+  @override
+  String get adoptTitle => 'Otwórz istniejący plik skarbca';
+
+  @override
+  String get adoptConfirm => 'Dodaj skarbiec';
+
+  @override
+  String get adoptAlreadyRegistered => 'Ten skarbiec jest już na liście';
+
+  @override
+  String get unlockAdoptItem => 'Otwórz plik skarbca…';
 
   @override
   String get resizeColumns => 'Zmień rozmiar kolumn';

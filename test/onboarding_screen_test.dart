@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -45,6 +46,7 @@ Widget _buildScreen({
   Future<String> Function()? resolveDataDir,
   EntropyResult Function(String)? onEstimateEntropy,
   VoidCallback? onQuit,
+  VoidCallback? onAdoptRequested,
 }) =>
     testApp(OnboardingScreen(
       initialPath: initialPath,
@@ -58,6 +60,7 @@ Widget _buildScreen({
       onVaultCreated: onVaultCreated,
       resolveDataDir: resolveDataDir ?? GabbroPaths.dataDir,
       onQuit: onQuit,
+      onAdoptRequested: onAdoptRequested,
     ));
 
 // Wraps OnboardingScreen in a GabbroApp so the accessibility toggle's
@@ -90,6 +93,28 @@ void main() {
 
     expect(find.byType(GabbroLogo), findsOneWidget);
     expect(find.text('Create vault'), findsOneWidget);
+  });
+
+  // ── E1: adopt entry point ───────────────────────────────────────────────────
+  group('adopt entry point', () {
+    testWidgets('shows the open-existing button and fires the callback', (
+      tester,
+    ) async {
+      var requested = 0;
+      await tester.pumpWidget(
+        _buildScreen(onAdoptRequested: () => requested++),
+      );
+      final button = find.byKey(const Key('onboarding_adopt_button'));
+      await tester.ensureVisible(button);
+      await tester.pumpAndSettle();
+      await tester.tap(button);
+      expect(requested, 1);
+    });
+
+    testWidgets('no callback -> no button', (tester) async {
+      await tester.pumpWidget(_buildScreen());
+      expect(find.byKey(const Key('onboarding_adopt_button')), findsNothing);
+    });
   });
 
   // ── Accessibility toggle: text scale + slider reveal + logo hide (ADR-016) ──
@@ -1064,6 +1089,46 @@ void main() {
     // ("disk full") is appended rather than shown alone.
     expect(find.textContaining('Setup failed:'), findsOneWidget);
     expect(find.textContaining('disk full'), findsOneWidget);
+  });
+
+  // H3: the Rust guard refuses an occupied path, but its message is English and
+  // reaches the user wrapped in "Setup failed:". Someone pointing Create at their
+  // existing vault — the mistake this guard exists for — deserves their own
+  // language and no talk of failure.
+  testWidgets('an existing file at the chosen path is refused in the users language',
+      (tester) async {
+    final taken = File(
+        '${Directory.systemTemp.path}/gabbro_taken_${DateTime.now().microsecondsSinceEpoch}.gabbro')
+      ..writeAsStringSync('an existing vault');
+    addTearDown(() {
+      if (taken.existsSync()) taken.deleteSync();
+    });
+    var created = false;
+
+    await tester.pumpWidget(_buildScreen(
+      initialPath: taken.path,
+      onInitVault: (_, _, _) async => created = true,
+    ));
+
+    await tester.enterText(
+        find.widgetWithText(TextFormField, 'Alias'), 'TestVault');
+    await tester.pump();
+    const passphrase = 'correct horse battery staple one two three four';
+    await tester.enterText(
+        find.widgetWithText(TextFormField, 'Master passphrase'), passphrase);
+    await tester.pump();
+    await tester.enterText(
+        find.widgetWithText(TextFormField, 'Confirm passphrase'), passphrase);
+    await tester.pump();
+
+    await tester.ensureVisible(find.text('Create vault'));
+    await tester.tap(find.text('Create vault'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('A file already exists'), findsOneWidget);
+    expect(find.textContaining('Setup failed'), findsNothing,
+        reason: 'a path that is taken is not a failure to explain in English');
+    expect(created, isFalse, reason: 'creating must not be attempted at all');
   });
 
   testWidgets('PlatformException from onInitVault shows e.message',

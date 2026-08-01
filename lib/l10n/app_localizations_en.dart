@@ -721,6 +721,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get syncMethodTitle => 'How should this sync apply?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Same passphrase does not prove same vault.';
+
+  @override
+  String get syncUseIncomingYubikey => 'Use incoming vault\'s YubiKey';
+
+  @override
   String get syncMergeAutomatically => 'Merge automatically';
 
   @override
@@ -1763,6 +1770,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingPathRequired => 'Path is required';
 
   @override
+  String get onboardingPathTaken =>
+      'A file already exists here. Choose a different name — creating a vault would replace it.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Choose a new master passphrase, or re-use your previous one if you prefer.';
 
@@ -2094,12 +2105,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String get restoreFromFileButton => 'Restore from a backup file';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Replace this vault?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'The picked file will replace \'$vaultName\'. The old file is kept as a safety copy.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Vault restored. Unlock with your credentials.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Biometric unlock was turned off, because the restored file may use a different passphrase. Re-enable it in Security.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'Biometric unlock was turned off: the vault file changed and the saved passphrase no longer opens it. Re-enable it in Security.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'That file is not a usable Gabbro vault.';
+
+  @override
+  String get adoptTitle => 'Open an existing vault file';
+
+  @override
+  String get adoptConfirm => 'Add vault';
+
+  @override
+  String get adoptAlreadyRegistered => 'This vault is already in your list';
+
+  @override
+  String get unlockAdoptItem => 'Open a vault file…';
 
   @override
   String get resizeColumns => 'Resize columns';

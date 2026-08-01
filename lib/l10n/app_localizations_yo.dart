@@ -722,6 +722,13 @@ class AppLocalizationsYo extends AppLocalizations {
   String get syncMethodTitle => 'Báwo ni ó ṣe yẹ kí a lo ìṣọ̀kan yìí?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Gbolohun ọrọ igbaniwọle kan naa ko jẹrisi vọọliti kan naa.';
+
+  @override
+  String get syncUseIncomingYubikey => 'Lo YubiKey vọọliti ti n bọ';
+
+  @override
   String get syncMergeAutomatically => 'Dàpọ̀ láìfọwọ́yi';
 
   @override
@@ -1771,6 +1778,10 @@ class AppLocalizationsYo extends AppLocalizations {
   String get onboardingPathRequired => 'Ipa ọna jẹ dandan';
 
   @override
+  String get onboardingPathTaken =>
+      'Fáìlì kan ti wà níbí tẹ́lẹ̀. Yan orúkọ mìíràn — dídá vọ́ọ̀lítì sílẹ̀ yóò rọ́pò rẹ̀.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Yan gbolohun ọrọ igbaniwọle akọkọ tuntun tabi lo atijọ lẹẹkansi.';
 
@@ -2108,12 +2119,40 @@ class AppLocalizationsYo extends AppLocalizations {
   String get restoreFromFileButton => 'Dá padà láti fáìlì àfẹyìntì';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Rọ́pò àpótí ìṣúra yìí?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Fáìlì tí o yàn yóò rọ́pò «$vaultName». Fáìlì àtijọ́ ni a ó pa mọ́ gẹ́gẹ́ bí àdàkọ ààbò.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'A ti dá àpótí ìṣúra padà. Ṣí i pẹ̀lú àwọn ìwé-ẹ̀rí rẹ.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'A ti pa ṣiṣi ẹya ara, nítorí pé fáìlì tí a mú padà lè lo gbolohun ọrọ igbaniwọle mìíràn. Tún un ṣí ní Aabo.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'A ti pa ṣiṣi ẹya ara: fáìlì àpótí ìṣúra ti yí padà, gbolohun ọrọ igbaniwọle tí a fi pamọ́ kò sì lè ṣí i mọ́. Tún un ṣí ní Aabo.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Fáìlì yẹn kì í ṣe àpótí ìṣúra Gabbro tó ṣeé lò.';
+
+  @override
+  String get adoptTitle => 'Ṣí fáìlì vọọliti tó ti wà';
+
+  @override
+  String get adoptConfirm => 'Fi vọọliti kún un';
+
+  @override
+  String get adoptAlreadyRegistered => 'Vọọliti yìí ti wà nínú àkójọ rẹ';
+
+  @override
+  String get unlockAdoptItem => 'Ṣí fáìlì vọọliti…';
 
   @override
   String get resizeColumns => 'Ṣàtúnṣe ìwọ̀n àwọn ọ̀wọ́n';

@@ -722,6 +722,14 @@ class AppLocalizationsHu extends AppLocalizations {
   String get syncMethodTitle => 'Hogyan legyen alkalmazva ez a szinkronizálás?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Azonos jelmondat nem bizonyít azonos széfet.';
+
+  @override
+  String get syncUseIncomingYubikey =>
+      'Használja a bejövő széf YubiKey kulcsát';
+
+  @override
   String get syncMergeAutomatically => 'Automatikus egyesítés';
 
   @override
@@ -1777,6 +1785,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get onboardingPathRequired => 'Az útvonal kötelező';
 
   @override
+  String get onboardingPathTaken =>
+      'Itt már van egy fájl. Válasszon másik nevet — a széf létrehozása felülírná.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Válassz új fő jelmondatot, vagy használd újra az előzőt, ha preferálod.';
 
@@ -2115,12 +2127,40 @@ class AppLocalizationsHu extends AppLocalizations {
       'Helyreállítás biztonsági mentési fájlból';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Lecseréli ezt a széfet?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'A kiválasztott fájl lecseréli a(z) «$vaultName» széfet. A régi fájl vészmásolatként megmarad.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Széf helyreállítva. Oldja fel a hitelesítő adataival.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'A biometrikus feloldás ki lett kapcsolva, mert a visszaállított fájl más jelmondatot használhat. Kapcsolja be újra a Biztonság menüben.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'A biometrikus feloldás ki lett kapcsolva: a széffájl megváltozott, és a mentett jelmondat már nem nyitja ki. Kapcsolja be újra a Biztonság menüben.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Ez a fájl nem használható Gabbro-széf.';
+
+  @override
+  String get adoptTitle => 'Meglévő széffájl megnyitása';
+
+  @override
+  String get adoptConfirm => 'Széf hozzáadása';
+
+  @override
+  String get adoptAlreadyRegistered => 'Ez a széf már szerepel a listában';
+
+  @override
+  String get unlockAdoptItem => 'Széffájl megnyitása…';
 
   @override
   String get resizeColumns => 'Oszlopok átméretezése';

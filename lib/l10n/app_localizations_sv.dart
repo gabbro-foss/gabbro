@@ -722,6 +722,13 @@ class AppLocalizationsSv extends AppLocalizations {
   String get syncMethodTitle => 'Hur ska den här synkroniseringen tillämpas?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Samma lösenfras bevisar inte samma valv.';
+
+  @override
+  String get syncUseIncomingYubikey => 'Använd det inkommande valvets YubiKey';
+
+  @override
   String get syncMergeAutomatically => 'Slå samman automatiskt';
 
   @override
@@ -1771,6 +1778,10 @@ class AppLocalizationsSv extends AppLocalizations {
   String get onboardingPathRequired => 'Sökväg krävs';
 
   @override
+  String get onboardingPathTaken =>
+      'Det finns redan en fil här. Välj ett annat namn — att skapa ett valv skulle ersätta den.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Välj en ny huvud­lösenfras, eller återanvänd din tidigare om du föredrar det.';
 
@@ -2105,12 +2116,40 @@ class AppLocalizationsSv extends AppLocalizations {
   String get restoreFromFileButton => 'Återställ från en säkerhetskopia';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Ersätta det här valvet?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Den valda filen ersätter «$vaultName». Den gamla filen behålls som reservkopia.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Valv återställt. Lås upp med dina uppgifter.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Biometrisk upplåsning stängdes av, eftersom den återställda filen kan använda en annan lösenfras. Slå på den igen under Säkerhet.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'Biometrisk upplåsning stängdes av: valvfilen har ändrats och den sparade lösenfrasen öppnar den inte längre. Slå på den igen under Säkerhet.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Den filen är inte ett användbart Gabbro-valv.';
+
+  @override
+  String get adoptTitle => 'Öppna en befintlig valvfil';
+
+  @override
+  String get adoptConfirm => 'Lägg till valv';
+
+  @override
+  String get adoptAlreadyRegistered => 'Det här valvet finns redan i din lista';
+
+  @override
+  String get unlockAdoptItem => 'Öppna en valvfil…';
 
   @override
   String get resizeColumns => 'Ändra kolumnstorlek';

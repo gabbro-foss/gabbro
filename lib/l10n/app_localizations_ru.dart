@@ -724,6 +724,14 @@ class AppLocalizationsRu extends AppLocalizations {
   String get syncMethodTitle => 'Как применить эту синхронизацию?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Одна и та же кодовая фраза не доказывает, что это то же хранилище.';
+
+  @override
+  String get syncUseIncomingYubikey =>
+      'Используйте YubiKey входящего хранилища';
+
+  @override
   String get syncMergeAutomatically => 'Объединить автоматически';
 
   @override
@@ -1779,6 +1787,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get onboardingPathRequired => 'Путь обязателен';
 
   @override
+  String get onboardingPathTaken =>
+      'Здесь уже есть файл. Выберите другое имя — создание хранилища заменило бы его.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Выберите новую главную кодовую фразу или повторно используйте предыдущую.';
 
@@ -2116,12 +2128,40 @@ class AppLocalizationsRu extends AppLocalizations {
   String get restoreFromFileButton => 'Восстановить из файла резервной копии';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Заменить это хранилище?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Выбранный файл заменит «$vaultName». Старый файл сохраняется как аварийная копия.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Хранилище восстановлено. Разблокируйте с помощью своих учётных данных.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Биометрическая разблокировка отключена, так как восстановленный файл может использовать другую кодовую фразу. Включите её снова в разделе «Безопасность».';
+
+  @override
+  String get biometricStaleDisabled =>
+      'Биометрическая разблокировка отключена: файл хранилища изменился, и сохранённая кодовая фраза больше его не открывает. Включите её снова в разделе «Безопасность».';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Этот файл не является пригодным хранилищем Gabbro.';
+
+  @override
+  String get adoptTitle => 'Открыть существующий файл хранилища';
+
+  @override
+  String get adoptConfirm => 'Добавить хранилище';
+
+  @override
+  String get adoptAlreadyRegistered => 'Это хранилище уже есть в списке';
+
+  @override
+  String get unlockAdoptItem => 'Открыть файл хранилища…';
 
   @override
   String get resizeColumns => 'Изменить размер столбцов';

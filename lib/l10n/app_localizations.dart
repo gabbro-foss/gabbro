@@ -1525,6 +1525,18 @@ abstract class AppLocalizations {
   /// **'How should this sync apply?'**
   String get syncMethodTitle;
 
+  /// Warning in the apply-choice dialog for passphrase-only files: a passphrase-only save keeps nothing per-vault, so opening proves only that the passphrases match.
+  ///
+  /// In en, this message translates to:
+  /// **'Same passphrase does not prove same vault.'**
+  String get syncSamePassphraseWarning;
+
+  /// Note in the keyed sync dialog: the key to tap is one registered in the incoming file, which may differ from this vault's keys.
+  ///
+  /// In en, this message translates to:
+  /// **'Use incoming vault\'s YubiKey'**
+  String get syncUseIncomingYubikey;
+
   /// Button: apply all incoming changes automatically (incoming wins), no review.
   ///
   /// In en, this message translates to:
@@ -3319,6 +3331,12 @@ abstract class AppLocalizations {
   /// **'Path is required'**
   String get onboardingPathRequired;
 
+  /// Shown when the chosen vault path already holds a file. Creating seals an empty vault, so it would replace whatever is there.
+  ///
+  /// In en, this message translates to:
+  /// **'A file already exists here. Choose a different name — creating a vault would replace it.'**
+  String get onboardingPathTaken;
+
   /// No description provided for @onboardingReusePassphraseHint.
   ///
   /// In en, this message translates to:
@@ -3895,17 +3913,65 @@ abstract class AppLocalizations {
   /// **'Restore from a backup file'**
   String get restoreFromFileButton;
 
+  /// No description provided for @restoreFromFileConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace this vault?'**
+  String get restoreFromFileConfirmTitle;
+
+  /// Confirm dialog after the user picks a restore file and before anything is written. A restore overwrites the vault and refreshes its .bak; the old vault survives only as the .pre-restore safety copy this sentence promises.
+  ///
+  /// In en, this message translates to:
+  /// **'The picked file will replace \'{vaultName}\'. The old file is kept as a safety copy.'**
+  String restoreFromFileConfirmBody(String vaultName);
+
   /// No description provided for @vaultRestoredMessage.
   ///
   /// In en, this message translates to:
   /// **'Vault restored. Unlock with your credentials.'**
   String get vaultRestoredMessage;
 
+  /// Shown after a restore-from-file when biometric unlock was enrolled for this vault: the stored passphrase belongs to the replaced vault, so the enrolment was dropped.
+  ///
+  /// In en, this message translates to:
+  /// **'Biometric unlock was turned off, because the restored file may use a different passphrase. Re-enable it in Security.'**
+  String get vaultRestoredBiometricDisabled;
+
+  /// Shown when a biometric unlock fails because the vault file at this path was replaced outside the app (e.g. file sync): the stored passphrase no longer opens the new file, so the enrolment was dropped (H1).
+  ///
+  /// In en, this message translates to:
+  /// **'Biometric unlock was turned off: the vault file changed and the saved passphrase no longer opens it. Re-enable it in Security.'**
+  String get biometricStaleDisabled;
+
   /// No description provided for @restoreFromFileInvalidError.
   ///
   /// In en, this message translates to:
   /// **'That file is not a usable Gabbro vault.'**
   String get restoreFromFileInvalidError;
+
+  /// Adopt screen title and the onboarding button that opens it (register an exported .gabbro from another device as a vault on this one).
+  ///
+  /// In en, this message translates to:
+  /// **'Open an existing vault file'**
+  String get adoptTitle;
+
+  /// Adopt screen confirm button: registers the picked file as a vault.
+  ///
+  /// In en, this message translates to:
+  /// **'Add vault'**
+  String get adoptConfirm;
+
+  /// Adopt screen error when the picked path is already a registered vault.
+  ///
+  /// In en, this message translates to:
+  /// **'This vault is already in your list'**
+  String get adoptAlreadyRegistered;
+
+  /// Unlock-screen vault dropdown entry that opens the adopt flow.
+  ///
+  /// In en, this message translates to:
+  /// **'Open a vault file…'**
+  String get unlockAdoptItem;
 
   /// No description provided for @resizeColumns.
   ///

@@ -711,6 +711,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get syncMethodTitle => '此次同步应如何应用？';
 
   @override
+  String get syncSamePassphraseWarning => '相同的密码短语不能证明是同一个保险库。';
+
+  @override
+  String get syncUseIncomingYubikey => '请使用传入保险库的YubiKey';
+
+  @override
   String get syncMergeAutomatically => '自动合并';
 
   @override
@@ -1718,6 +1724,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onboardingPathRequired => '路径为必填项';
 
   @override
+  String get onboardingPathTaken => '此处已存在文件。请选择其他名称——创建保险库会将其替换。';
+
+  @override
   String get onboardingReusePassphraseHint => '选择新的主密码短语或重复使用以前的。';
 
   @override
@@ -2020,10 +2029,38 @@ class AppLocalizationsZh extends AppLocalizations {
   String get restoreFromFileButton => '从备份文件恢复';
 
   @override
+  String get restoreFromFileConfirmTitle => '替换此保险库？';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return '所选文件将替换«$vaultName»。旧文件将保留为安全副本。';
+  }
+
+  @override
   String get vaultRestoredMessage => '保险库已恢复。请使用你的凭据解锁。';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      '已关闭生物特征解锁，因为恢复的文件可能使用不同的密码短语。请在“安全”中重新启用。';
+
+  @override
+  String get biometricStaleDisabled =>
+      '已关闭生物特征解锁：保险库文件已更改，保存的密码短语无法再打开它。请在“安全”中重新启用。';
+
+  @override
   String get restoreFromFileInvalidError => '该文件不是可用的 Gabbro 保险库。';
+
+  @override
+  String get adoptTitle => '打开现有保险库文件';
+
+  @override
+  String get adoptConfirm => '添加保险库';
+
+  @override
+  String get adoptAlreadyRegistered => '此保险库已在列表中';
+
+  @override
+  String get unlockAdoptItem => '打开保险库文件…';
 
   @override
   String get resizeColumns => '调整列宽';
@@ -2763,6 +2800,12 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get syncMethodTitle => '此次同步应如何应用？';
 
   @override
+  String get syncSamePassphraseWarning => '相同的密码短语不能证明是同一个保险库。';
+
+  @override
+  String get syncUseIncomingYubikey => '请使用传入保险库的YubiKey';
+
+  @override
   String get syncMergeAutomatically => '自动合并';
 
   @override
@@ -3770,6 +3813,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get onboardingPathRequired => '路径为必填项';
 
   @override
+  String get onboardingPathTaken => '此处已存在文件。请选择其他名称——创建保险库会将其替换。';
+
+  @override
   String get onboardingReusePassphraseHint => '选择新的主密码短语或重复使用以前的。';
 
   @override
@@ -4072,10 +4118,38 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get restoreFromFileButton => '从备份文件恢复';
 
   @override
+  String get restoreFromFileConfirmTitle => '替换此保险库？';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return '所选文件将替换«$vaultName»。旧文件将保留为安全副本。';
+  }
+
+  @override
   String get vaultRestoredMessage => '保险库已恢复。请使用你的凭据解锁。';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      '已关闭生物特征解锁，因为恢复的文件可能使用不同的密码短语。请在“安全”中重新启用。';
+
+  @override
+  String get biometricStaleDisabled =>
+      '已关闭生物特征解锁：保险库文件已更改，保存的密码短语无法再打开它。请在“安全”中重新启用。';
+
+  @override
   String get restoreFromFileInvalidError => '该文件不是可用的 Gabbro 保险库。';
+
+  @override
+  String get adoptTitle => '打开现有保险库文件';
+
+  @override
+  String get adoptConfirm => '添加保险库';
+
+  @override
+  String get adoptAlreadyRegistered => '此保险库已在列表中';
+
+  @override
+  String get unlockAdoptItem => '打开保险库文件…';
 
   @override
   String get resizeColumns => '调整列宽';
@@ -4813,6 +4887,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get syncMethodTitle => '此次同步應如何套用？';
+
+  @override
+  String get syncSamePassphraseWarning => '相同的密碼片語不能證明是同一個保險庫。';
+
+  @override
+  String get syncUseIncomingYubikey => '請使用傳入保險庫的YubiKey';
 
   @override
   String get syncMergeAutomatically => '自動合併';
@@ -5822,6 +5902,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get onboardingPathRequired => '路徑為必填項';
 
   @override
+  String get onboardingPathTaken => '此處已有檔案。請選擇其他名稱——建立保險庫會將其取代。';
+
+  @override
   String get onboardingReusePassphraseHint => '選擇新的主要密碼片語或重複使用之前的。';
 
   @override
@@ -6124,10 +6207,38 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get restoreFromFileButton => '從備份檔案復原';
 
   @override
+  String get restoreFromFileConfirmTitle => '替換此保險庫？';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return '所選檔案將替換«$vaultName»。舊檔案將保留為安全副本。';
+  }
+
+  @override
   String get vaultRestoredMessage => '保險庫已復原。請使用你的憑證解鎖。';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      '已關閉生物特徵解鎖，因為還原的檔案可能使用不同的密碼片語。請在「安全性」中重新啟用。';
+
+  @override
+  String get biometricStaleDisabled =>
+      '已關閉生物特徵解鎖：保險庫檔案已變更，儲存的密碼片語無法再開啟它。請在「安全性」中重新啟用。';
+
+  @override
   String get restoreFromFileInvalidError => '該檔案不是可用的 Gabbro 保險庫。';
+
+  @override
+  String get adoptTitle => '開啟現有保險庫檔案';
+
+  @override
+  String get adoptConfirm => '新增保險庫';
+
+  @override
+  String get adoptAlreadyRegistered => '此保險庫已在清單中';
+
+  @override
+  String get unlockAdoptItem => '開啟保險庫檔案…';
 
   @override
   String get resizeColumns => '調整欄寬';

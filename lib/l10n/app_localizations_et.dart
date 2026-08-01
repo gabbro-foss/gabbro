@@ -723,6 +723,14 @@ class AppLocalizationsEt extends AppLocalizations {
   String get syncMethodTitle => 'Kuidas seda sünkroonimist rakendada?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Sama pääslause ei tõesta sama seifi.';
+
+  @override
+  String get syncUseIncomingYubikey =>
+      'Kasutage sissetuleva seifi YubiKey võtit';
+
+  @override
   String get syncMergeAutomatically => 'Ühenda automaatselt';
 
   @override
@@ -1774,6 +1782,10 @@ class AppLocalizationsEt extends AppLocalizations {
   String get onboardingPathRequired => 'Tee on nõutav';
 
   @override
+  String get onboardingPathTaken =>
+      'Siin on juba fail. Valige teine nimi — seifi loomine asendaks selle.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Vali uus peamine pääslause või kasuta eelmist uuesti, kui eelistad.';
 
@@ -2107,12 +2119,40 @@ class AppLocalizationsEt extends AppLocalizations {
   String get restoreFromFileButton => 'Taasta varukoopia failist';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Kas asendada see hoidla?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Valitud fail asendab hoidla «$vaultName». Vana fail säilitatakse kaitsekoopiana.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Hoidla taastatud. Avage oma mandaatidega.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Biomeetriline avamine lülitati välja, sest taastatud fail võib kasutada teist pääslauset. Lülitage see uuesti sisse jaotises Turvalisus.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'Biomeetriline avamine lülitati välja: hoidlafail on muutunud ja salvestatud pääslause seda enam ei ava. Lülitage see uuesti sisse jaotises Turvalisus.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'See fail ei ole kasutatav Gabbro hoidla.';
+
+  @override
+  String get adoptTitle => 'Ava olemasolev seififail';
+
+  @override
+  String get adoptConfirm => 'Lisa seif';
+
+  @override
+  String get adoptAlreadyRegistered => 'See seif on juba loendis';
+
+  @override
+  String get unlockAdoptItem => 'Ava seififail…';
 
   @override
   String get resizeColumns => 'Muuda veergude suurust';

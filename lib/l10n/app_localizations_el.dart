@@ -726,6 +726,14 @@ class AppLocalizationsEl extends AppLocalizations {
   String get syncMethodTitle => 'Πώς να εφαρμοστεί αυτός ο συγχρονισμός;';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Η ίδια φράση πρόσβασης δεν αποδεικνύει το ίδιο θησαυροφυλάκιο.';
+
+  @override
+  String get syncUseIncomingYubikey =>
+      'Χρησιμοποιήστε το YubiKey του εισερχόμενου θησαυροφυλακίου';
+
+  @override
   String get syncMergeAutomatically => 'Αυτόματη συγχώνευση';
 
   @override
@@ -1789,6 +1797,10 @@ class AppLocalizationsEl extends AppLocalizations {
   String get onboardingPathRequired => 'Η διαδρομή είναι υποχρεωτική';
 
   @override
+  String get onboardingPathTaken =>
+      'Υπάρχει ήδη αρχείο εδώ. Επιλέξτε άλλο όνομα — η δημιουργία θησαυροφυλακίου θα το αντικαθιστούσε.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Επιλέξτε νέα κύρια φράση πρόσβασης ή επαναχρησιμοποιήστε την προηγούμενη.';
 
@@ -2132,12 +2144,42 @@ class AppLocalizationsEl extends AppLocalizations {
       'Επαναφορά από αρχείο αντιγράφου ασφαλείας';
 
   @override
+  String get restoreFromFileConfirmTitle =>
+      'Αντικατάσταση αυτού του θησαυροφυλακίου;';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Το επιλεγμένο αρχείο θα αντικαταστήσει το «$vaultName». Το παλιό αρχείο διατηρείται ως εφεδρικό αντίγραφο.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Το θησαυροφυλάκιο επαναφέρθηκε. Ξεκλειδώστε με τα διαπιστευτήριά σας.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Το βιομετρικό ξεκλείδωμα απενεργοποιήθηκε, επειδή το αρχείο που επαναφέρθηκε μπορεί να χρησιμοποιεί διαφορετική φράση πρόσβασης. Ενεργοποιήστε το ξανά στην Ασφάλεια.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'Το βιομετρικό ξεκλείδωμα απενεργοποιήθηκε: το αρχείο του θησαυροφυλακίου άλλαξε και η αποθηκευμένη φράση πρόσβασης δεν το ανοίγει πια. Ενεργοποιήστε το ξανά στην Ασφάλεια.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Αυτό το αρχείο δεν είναι χρησιμοποιήσιμο θησαυροφυλάκιο Gabbro.';
+
+  @override
+  String get adoptTitle => 'Άνοιγμα υπάρχοντος αρχείου θησαυροφυλακίου';
+
+  @override
+  String get adoptConfirm => 'Προσθήκη θησαυροφυλακίου';
+
+  @override
+  String get adoptAlreadyRegistered =>
+      'Αυτό το θησαυροφυλάκιο βρίσκεται ήδη στη λίστα σας';
+
+  @override
+  String get unlockAdoptItem => 'Άνοιγμα αρχείου θησαυροφυλακίου…';
 
   @override
   String get resizeColumns => 'Αλλαγή μεγέθους στηλών';

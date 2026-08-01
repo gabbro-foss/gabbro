@@ -713,6 +713,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get syncMethodTitle => '이 동기화를 어떻게 적용하시겠습니까?';
 
   @override
+  String get syncSamePassphraseWarning => '같은 암호 문구가 같은 볼트임을 증명하지 않습니다.';
+
+  @override
+  String get syncUseIncomingYubikey => '들어오는 볼트의 YubiKey를 사용하세요';
+
+  @override
   String get syncMergeAutomatically => '자동으로 병합';
 
   @override
@@ -1735,6 +1741,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get onboardingPathRequired => '경로는 필수입니다';
 
   @override
+  String get onboardingPathTaken =>
+      '여기에 이미 파일이 있습니다. 다른 이름을 선택하세요. 볼트를 만들면 대체됩니다.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       '새 마스터 암호 문구를 선택하거나 이전 것을 재사용하세요.';
 
@@ -2053,10 +2063,38 @@ class AppLocalizationsKo extends AppLocalizations {
   String get restoreFromFileButton => '백업 파일에서 복원';
 
   @override
+  String get restoreFromFileConfirmTitle => '이 보관함을 교체할까요?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return '선택한 파일이 «$vaultName» 보관함을 교체합니다. 이전 파일은 안전 사본으로 보관됩니다.';
+  }
+
+  @override
   String get vaultRestoredMessage => '보관함이 복원되었습니다. 자격 증명으로 잠금을 해제하세요.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      '복원한 파일이 다른 암호 문구를 사용할 수 있으므로 생체 인증 잠금 해제를 껐습니다. 보안에서 다시 켜세요.';
+
+  @override
+  String get biometricStaleDisabled =>
+      '보관함 파일이 변경되어 저장된 암호 문구로는 더 이상 열 수 없으므로 생체 인증 잠금 해제를 껐습니다. 보안에서 다시 켜세요.';
+
+  @override
   String get restoreFromFileInvalidError => '이 파일은 사용할 수 있는 Gabbro 보관함이 아닙니다.';
+
+  @override
+  String get adoptTitle => '기존 볼트 파일 열기';
+
+  @override
+  String get adoptConfirm => '볼트 추가';
+
+  @override
+  String get adoptAlreadyRegistered => '이 볼트는 이미 목록에 있습니다';
+
+  @override
+  String get unlockAdoptItem => '볼트 파일 열기…';
 
   @override
   String get resizeColumns => '열 크기 조정';

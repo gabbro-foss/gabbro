@@ -724,6 +724,13 @@ class AppLocalizationsFi extends AppLocalizations {
   String get syncMethodTitle => 'Miten tämä synkronointi otetaan käyttöön?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Sama salauslause ei todista samaa holvia.';
+
+  @override
+  String get syncUseIncomingYubikey => 'Käytä saapuvan holvin YubiKey-avainta';
+
+  @override
   String get syncMergeAutomatically => 'Yhdistä automaattisesti';
 
   @override
@@ -1776,6 +1783,10 @@ class AppLocalizationsFi extends AppLocalizations {
   String get onboardingPathRequired => 'Polku vaaditaan';
 
   @override
+  String get onboardingPathTaken =>
+      'Täällä on jo tiedosto. Valitse toinen nimi — holvin luominen korvaisi sen.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Valitse uusi pääsalauslause tai käytä edellistä uudelleen.';
 
@@ -2110,12 +2121,40 @@ class AppLocalizationsFi extends AppLocalizations {
   String get restoreFromFileButton => 'Palauta varmuuskopiotiedostosta';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Korvataanko tämä holvi?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Valittu tiedosto korvaa holvin «$vaultName». Vanha tiedosto säilytetään varakopiona.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Holvi palautettu. Avaa lukitus tunnuksillasi.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Biometrinen avaaminen poistettiin käytöstä, koska palautettu tiedosto voi käyttää eri salauslausetta. Ota se uudelleen käyttöön kohdassa Tietoturva.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'Biometrinen avaaminen poistettiin käytöstä: holvitiedosto on muuttunut, eikä tallennettu salauslause enää avaa sitä. Ota se uudelleen käyttöön kohdassa Tietoturva.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Tämä tiedosto ei ole käyttökelpoinen Gabbro-holvi.';
+
+  @override
+  String get adoptTitle => 'Avaa olemassa oleva holvitiedosto';
+
+  @override
+  String get adoptConfirm => 'Lisää holvi';
+
+  @override
+  String get adoptAlreadyRegistered => 'Tämä holvi on jo luettelossasi';
+
+  @override
+  String get unlockAdoptItem => 'Avaa holvitiedosto…';
 
   @override
   String get resizeColumns => 'Muuta sarakkeiden kokoa';

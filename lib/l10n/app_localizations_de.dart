@@ -725,6 +725,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wie soll diese Synchronisierung angewendet werden?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Dieselbe Passphrase beweist nicht denselben Tresor.';
+
+  @override
+  String get syncUseIncomingYubikey =>
+      'Verwenden Sie den YubiKey des eingehenden Tresors';
+
+  @override
   String get syncMergeAutomatically => 'Automatisch zusammenführen';
 
   @override
@@ -1785,6 +1793,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get onboardingPathRequired => 'Pfad ist erforderlich';
 
   @override
+  String get onboardingPathTaken =>
+      'Hier existiert bereits eine Datei. Wähle einen anderen Namen — das Anlegen eines Tresors würde sie ersetzen.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Wählen Sie eine neue Hauptpassphrase oder verwenden Sie die vorherige wieder.';
 
@@ -2125,12 +2137,40 @@ class AppLocalizationsDe extends AppLocalizations {
       'Aus einer Sicherungsdatei wiederherstellen';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Diesen Tresor ersetzen?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Die gewählte Datei ersetzt «$vaultName». Die alte Datei bleibt als Sicherheitskopie erhalten.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Tresor wiederhergestellt. Entsperren Sie mit Ihren Zugangsdaten.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Die biometrische Entsperrung wurde deaktiviert, weil die wiederhergestellte Datei eine andere Passphrase verwenden könnte. Aktiviere sie unter Sicherheit erneut.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'Die biometrische Entsperrung wurde deaktiviert: Die Tresordatei hat sich geändert und die gespeicherte Passphrase öffnet sie nicht mehr. Aktiviere sie unter Sicherheit erneut.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Diese Datei ist kein verwendbarer Gabbro-Tresor.';
+
+  @override
+  String get adoptTitle => 'Vorhandene Tresordatei öffnen';
+
+  @override
+  String get adoptConfirm => 'Tresor hinzufügen';
+
+  @override
+  String get adoptAlreadyRegistered => 'Dieser Tresor ist bereits in der Liste';
+
+  @override
+  String get unlockAdoptItem => 'Tresordatei öffnen…';
 
   @override
   String get resizeColumns => 'Spalten anpassen';

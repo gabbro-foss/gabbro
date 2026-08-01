@@ -724,6 +724,14 @@ class AppLocalizationsLt extends AppLocalizations {
   String get syncMethodTitle => 'Kaip taikyti šią sinchronizaciją?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Ta pati slaptafrazė neįrodo, kad tai ta pati saugykla.';
+
+  @override
+  String get syncUseIncomingYubikey =>
+      'Naudokite gaunamos saugyklos YubiKey raktą';
+
+  @override
   String get syncMergeAutomatically => 'Sulieti automatiškai';
 
   @override
@@ -1778,6 +1786,10 @@ class AppLocalizationsLt extends AppLocalizations {
   String get onboardingPathRequired => 'Kelias yra privalomas';
 
   @override
+  String get onboardingPathTaken =>
+      'Čia jau yra failas. Pasirinkite kitą pavadinimą — sukūrus saugyklą jis būtų pakeistas.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Pasirinkite naują pagrindinę slaptafrazę arba pakartotinai naudokite ankstesnę, jei norite.';
 
@@ -2116,12 +2128,40 @@ class AppLocalizationsLt extends AppLocalizations {
   String get restoreFromFileButton => 'Atkurti iš atsarginės kopijos failo';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Pakeisti šią saugyklą?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Pasirinktas failas pakeis «$vaultName». Senas failas išsaugomas kaip apsauginė kopija.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Saugykla atkurta. Atrakinkite savo prisijungimo duomenimis.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Biometrinis atrakinimas išjungtas, nes atkurtas failas gali naudoti kitą slaptafrazę. Vėl jį įjunkite skiltyje Saugumas.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'Biometrinis atrakinimas išjungtas: saugyklos failas pasikeitė ir išsaugota slaptafrazė jo nebeatrakina. Vėl jį įjunkite skiltyje Saugumas.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Šis failas nėra tinkama Gabbro saugykla.';
+
+  @override
+  String get adoptTitle => 'Atverti esamą saugyklos failą';
+
+  @override
+  String get adoptConfirm => 'Pridėti saugyklą';
+
+  @override
+  String get adoptAlreadyRegistered => 'Ši saugykla jau yra sąraše';
+
+  @override
+  String get unlockAdoptItem => 'Atverti saugyklos failą…';
 
   @override
   String get resizeColumns => 'Keisti stulpelių dydį';

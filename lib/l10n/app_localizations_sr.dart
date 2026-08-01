@@ -724,6 +724,13 @@ class AppLocalizationsSr extends AppLocalizations {
   String get syncMethodTitle => 'Како применити ову синхронизацију?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Иста приступна фраза не доказује исти трезор.';
+
+  @override
+  String get syncUseIncomingYubikey => 'Користите YubiKey долазног трезора';
+
+  @override
   String get syncMergeAutomatically => 'Аутоматски споји';
 
   @override
@@ -1778,6 +1785,10 @@ class AppLocalizationsSr extends AppLocalizations {
   String get onboardingPathRequired => 'Putanja je obavezna';
 
   @override
+  String get onboardingPathTaken =>
+      'Ovde već postoji datoteka. Izaberite drugo ime — kreiranje trezora bi je zamenilo.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Izaberite novu glavnu pristupnu frazu ili ponovo koristite prethodnu.';
 
@@ -2110,12 +2121,40 @@ class AppLocalizationsSr extends AppLocalizations {
   String get restoreFromFileButton => 'Врати из датотеке резервне копије';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Заменити овај сеф?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Изабрана датотека замениће «$vaultName». Стара датотека остаје сачувана као помоћна копија.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Сеф враћен. Откључајте својим акредитивима.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Biometrijsko otključavanje je isključeno jer vraćena datoteka može koristiti drugu pristupnu frazu. Ponovo ga uključite u odeljku Bezbednost.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'Биометријско откључавање је искључено: датотека сефа је промењена и сачувана приступна фраза је више не отвара. Поново га укључите у одељку Безбедност.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Та датотека није употребљив Gabbro сеф.';
+
+  @override
+  String get adoptTitle => 'Otvori postojeću datoteku trezora';
+
+  @override
+  String get adoptConfirm => 'Dodaj trezor';
+
+  @override
+  String get adoptAlreadyRegistered => 'Ovaj trezor je već na vašoj listi';
+
+  @override
+  String get unlockAdoptItem => 'Otvori datoteku trezora…';
 
   @override
   String get resizeColumns => 'Промени величину колона';
@@ -2867,6 +2906,13 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get syncMethodTitle => 'Kako primeniti ovu sinhronizaciju?';
+
+  @override
+  String get syncSamePassphraseWarning =>
+      'Ista pristupna fraza ne dokazuje isti trezor.';
+
+  @override
+  String get syncUseIncomingYubikey => 'Koristite YubiKey dolaznog trezora';
 
   @override
   String get syncMergeAutomatically => 'Automatski spoji';
@@ -3923,6 +3969,10 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   String get onboardingPathRequired => 'Putanja je obavezna';
 
   @override
+  String get onboardingPathTaken =>
+      'Ovde već postoji datoteka. Izaberite drugo ime — kreiranje trezora bi je zamenilo.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Izaberite novu glavnu pristupnu frazu ili ponovo koristite prethodnu.';
 
@@ -4255,12 +4305,40 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   String get restoreFromFileButton => 'Vrati iz datoteke rezervne kopije';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Zameniti ovaj sef?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Izabrana datoteka zameniće «$vaultName». Stara datoteka ostaje sačuvana kao pomoćna kopija.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Sef vraćen. Otključajte svojim akreditivima.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Biometrijsko otključavanje je isključeno jer vraćena datoteka može koristiti drugu pristupnu frazu. Ponovo ga uključite u odeljku Bezbednost.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'Biometrijsko otključavanje je isključeno: datoteka sefa je promenjena i sačuvana pristupna fraza je više ne otvara. Ponovo ga uključite u odeljku Bezbednost.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Ta datoteka nije upotrebljiv Gabbro sef.';
+
+  @override
+  String get adoptTitle => 'Otvori postojeću datoteku trezora';
+
+  @override
+  String get adoptConfirm => 'Dodaj trezor';
+
+  @override
+  String get adoptAlreadyRegistered => 'Ovaj trezor je već na vašoj listi';
+
+  @override
+  String get unlockAdoptItem => 'Otvori datoteku trezora…';
 
   @override
   String get resizeColumns => 'Promeni veličinu kolona';

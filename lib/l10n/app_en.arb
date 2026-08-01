@@ -312,6 +312,14 @@
   "@syncMethodTitle": {
     "description": "Title of the dialog asking whether to auto-merge or review each change."
   },
+  "syncSamePassphraseWarning": "Same passphrase does not prove same vault.",
+  "@syncSamePassphraseWarning": {
+    "description": "Warning in the apply-choice dialog for passphrase-only files: a passphrase-only save keeps nothing per-vault, so opening proves only that the passphrases match."
+  },
+  "syncUseIncomingYubikey": "Use incoming vault's YubiKey",
+  "@syncUseIncomingYubikey": {
+    "description": "Note in the keyed sync dialog: the key to tap is one registered in the incoming file, which may differ from this vault's keys."
+  },
   "syncMergeAutomatically": "Merge automatically",
   "@syncMergeAutomatically": {
     "description": "Button: apply all incoming changes automatically (incoming wins), no review."
@@ -931,6 +939,10 @@
   "onboardingLoadingPath": "Loading…",
   "onboardingPathHint": "Path to vault file",
   "onboardingPathRequired": "Path is required",
+  "onboardingPathTaken": "A file already exists here. Choose a different name — creating a vault would replace it.",
+  "@onboardingPathTaken": {
+    "description": "Shown when the chosen vault path already holds a file. Creating seals an empty vault, so it would replace whatever is there."
+  },
   "onboardingReusePassphraseHint": "Choose a new master passphrase, or re-use your previous one if you prefer.",
   "onboardingPassphraseRequired": "Passphrase is required",
   "onboardingConfirmRequired": "Please confirm your passphrase",
@@ -1054,8 +1066,40 @@
   "deleteVaultFileConfirmTitle": "Delete corrupted vault file permanently?",
   "deleteVaultFileConfirmBody": "Delete this vault permanently? The unreadable file and its safety copy will be removed from this device. This cannot be undone.",
   "restoreFromFileButton": "Restore from a backup file",
+  "restoreFromFileConfirmTitle": "Replace this vault?",
+  "restoreFromFileConfirmBody": "The picked file will replace '{vaultName}'. The old file is kept as a safety copy.",
+  "@restoreFromFileConfirmBody": {
+    "description": "Confirm dialog after the user picks a restore file and before anything is written. A restore overwrites the vault and refreshes its .bak; the old vault survives only as the .pre-restore safety copy this sentence promises.",
+    "placeholders": {
+      "vaultName": {"type": "String"}
+    }
+  },
   "vaultRestoredMessage": "Vault restored. Unlock with your credentials.",
+  "vaultRestoredBiometricDisabled": "Biometric unlock was turned off, because the restored file may use a different passphrase. Re-enable it in Security.",
+  "@vaultRestoredBiometricDisabled": {
+    "description": "Shown after a restore-from-file when biometric unlock was enrolled for this vault: the stored passphrase belongs to the replaced vault, so the enrolment was dropped."
+  },
+  "biometricStaleDisabled": "Biometric unlock was turned off: the vault file changed and the saved passphrase no longer opens it. Re-enable it in Security.",
+  "@biometricStaleDisabled": {
+    "description": "Shown when a biometric unlock fails because the vault file at this path was replaced outside the app (e.g. file sync): the stored passphrase no longer opens the new file, so the enrolment was dropped (H1)."
+  },
   "restoreFromFileInvalidError": "That file is not a usable Gabbro vault.",
+  "adoptTitle": "Open an existing vault file",
+  "@adoptTitle": {
+    "description": "Adopt screen title and the onboarding button that opens it (register an exported .gabbro from another device as a vault on this one)."
+  },
+  "adoptConfirm": "Add vault",
+  "@adoptConfirm": {
+    "description": "Adopt screen confirm button: registers the picked file as a vault."
+  },
+  "adoptAlreadyRegistered": "This vault is already in your list",
+  "@adoptAlreadyRegistered": {
+    "description": "Adopt screen error when the picked path is already a registered vault."
+  },
+  "unlockAdoptItem": "Open a vault file…",
+  "@unlockAdoptItem": {
+    "description": "Unlock-screen vault dropdown entry that opens the adopt flow."
+  },
   "resizeColumns": "Resize columns",
 
   "regionSearch": "Search",

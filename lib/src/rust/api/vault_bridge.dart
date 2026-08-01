@@ -153,6 +153,19 @@ Future<void> restoreVaultFromFile({
   source: source,
 );
 
+/// Adopt: copy a picked `.gabbro` file to a fresh destination so it can be
+/// registered as a vault (Android — the picker only hands out a cache copy;
+/// Linux registers the picked path in place and never calls this).
+///
+/// Refuses an occupied destination (adopt never overwrites) and a source that
+/// is not a usable Gabbro vault. Opening the adopted vault still requires full
+/// credentials — adopting grants no access.
+Future<void> adoptVaultFile({required String source, required String dest}) =>
+    RustLib.instance.api.crateApiVaultBridgeAdoptVaultFile(
+      source: source,
+      dest: dest,
+    );
+
 /// Assign a folder to a set of entries by UUID and persist.
 ///
 /// Pass `folder: ""` to move entries to unfoldered.
@@ -364,6 +377,59 @@ Future<MergeSummary> mergeVaultFromFile({
 }) => RustLib.instance.api.crateApiVaultBridgeMergeVaultFromFile(
   path: path,
   passphrase: passphrase,
+);
+
+/// Merge a `.gabbro` file using the passphrase the unlocked session already holds,
+/// so the user types nothing to sync their own vault.
+///
+/// `None` means that passphrase does not open the file — a different vault, a
+/// key-protected file, or a passphrase changed on the other device — and the caller
+/// should ask for credentials. `Err` is reserved for a file that cannot be used at
+/// all (missing, not a Gabbro vault, a refused old format), which is a different
+/// message to the user. The file at `path` is only ever read.
+///
+/// The vault must be unlocked — returns `Err` if auto-lock fired meanwhile.
+Future<MergeSummary?> mergeVaultFromFileHeld({required String path}) =>
+    RustLib.instance.api.crateApiVaultBridgeMergeVaultFromFileHeld(path: path);
+
+/// Fast auto-merge (incoming wins, no prompts) using the passphrase the session
+/// already holds. The analogue of [`merge_vault_from_file_held`] for the "Merge
+/// automatically" path. Persists (async — a single vault save).
+Future<MergeSummary?> fastMergeVaultFromFileHeld({required String path}) =>
+    RustLib.instance.api.crateApiVaultBridgeFastMergeVaultFromFileHeld(
+      path: path,
+    );
+
+/// Merge a **key-protected** `.gabbro` file using the passphrase the unlocked
+/// session already holds plus a tap's hmac output, so only the PIN was typed
+/// (ADR-013). `hmac_secret` must be exactly 32 bytes.
+///
+/// `None` means the held passphrase + credential do not open the file, and the
+/// caller should ask for a typed passphrase, reusing the same tap. `Err` is
+/// reserved for an unusable file and a locked session, as in
+/// [`merge_vault_from_file_held`]. The file at `path` is only ever read.
+Future<MergeSummary?> mergeVaultFromFileWithKeyHeld({
+  required String path,
+  required List<int> hmacSecret,
+  required List<int> credentialId,
+}) => RustLib.instance.api.crateApiVaultBridgeMergeVaultFromFileWithKeyHeld(
+  path: path,
+  hmacSecret: hmacSecret,
+  credentialId: credentialId,
+);
+
+/// Fast auto-merge of a **key-protected** `.gabbro` file using the held
+/// passphrase plus a tap's hmac output. The analogue of
+/// [`merge_vault_from_file_with_key_held`] for the "Merge automatically" path.
+/// Persists (async — a single vault save).
+Future<MergeSummary?> fastMergeVaultFromFileWithKeyHeld({
+  required String path,
+  required List<int> hmacSecret,
+  required List<int> credentialId,
+}) => RustLib.instance.api.crateApiVaultBridgeFastMergeVaultFromFileWithKeyHeld(
+  path: path,
+  hmacSecret: hmacSecret,
+  credentialId: credentialId,
 );
 
 /// Apply a whole granular-sync review in one call: field resolutions, kept-value

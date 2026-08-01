@@ -259,6 +259,83 @@ void main() {
     });
   });
 
+  // ── R4: the registry accepts duplicates ─────────────────────────────────────
+  //
+  // `add` is the single choke point for registering a vault (`main.dart:946`,
+  // reached from all four creation sites) and it appends blind. Adoption will
+  // reuse it, so these pin what registering an already-known file does TODAY:
+  // the vault appears twice, and every path-keyed operation then hits both.
+
+  group('VaultRegistry.add accepts duplicates (R4)', () {
+    test('the same path can be registered twice', () {
+      final reg = VaultRegistry([])
+          .add(_record(path: '/a', alias: 'First'))
+          .add(_record(path: '/a', alias: 'Second'));
+      expect(reg.records.length, 2, reason: 'no path dedup today');
+      expect(reg.records.map((r) => r.path), ['/a', '/a']);
+    });
+
+    test('two different paths can share one alias', () {
+      final reg = VaultRegistry([])
+          .add(_record(path: '/a', alias: 'Same'))
+          .add(_record(path: '/b', alias: 'Same'));
+      expect(reg.records.length, 2, reason: 'no alias collision check today');
+      expect(reg.records.map((r) => r.alias), ['Same', 'Same']);
+    });
+
+    test('removing a duplicated path drops both records', () {
+      final reg = VaultRegistry([
+        _record(path: '/a', alias: 'First'),
+        _record(path: '/a', alias: 'Second'),
+        _record(path: '/b', alias: 'Other'),
+      ]);
+      final updated = reg.remove('/a');
+      expect(updated.records.length, 1);
+      expect(updated.records.single.path, '/b');
+    });
+
+    test('renaming a duplicated path renames both records', () {
+      final reg = VaultRegistry([
+        _record(path: '/a', alias: 'First'),
+        _record(path: '/a', alias: 'Second'),
+      ]);
+      final updated = reg.updateAlias('/a', 'Renamed');
+      expect(updated.records.map((r) => r.alias), ['Renamed', 'Renamed']);
+    });
+
+    test('touching a duplicated path touches both records', () {
+      final before = DateTime.parse('2020-01-01T00:00:00.000');
+      final reg = VaultRegistry([
+        _record(path: '/a', alias: 'First', lastUsedAt: before),
+        _record(path: '/a', alias: 'Second', lastUsedAt: before),
+      ]);
+      final updated = reg.touchLastUsed('/a');
+      expect(
+        updated.records.every((r) => r.lastUsedAt.isAfter(before)),
+        isTrue,
+        reason: 'both duplicates are stamped, neither identifies the vault',
+      );
+    });
+
+    test('lastUsed returns the later record on an exact tie', () {
+      final tied = DateTime.parse('2020-01-01T00:00:00.000');
+      final reg = VaultRegistry([
+        _record(path: '/a', alias: 'First', lastUsedAt: tied),
+        _record(path: '/a', alias: 'Second', lastUsedAt: tied),
+      ]);
+      expect(reg.lastUsed!.alias, 'Second');
+    });
+
+    test('duplicates survive a round-trip, so they outlive a restart', () {
+      final reg = VaultRegistry([])
+          .add(_record(path: '/a', alias: 'First'))
+          .add(_record(path: '/a', alias: 'Second'));
+      final restored = VaultRegistry.fromJson(reg.toJson());
+      expect(restored.records.length, 2);
+      expect(restored.records.map((r) => r.path), ['/a', '/a']);
+    });
+  });
+
   // ── VaultRegistry serialisation ─────────────────────────────────────────────
 
   group('VaultRegistry serialisation', () {

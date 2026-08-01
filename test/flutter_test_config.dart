@@ -14,10 +14,12 @@ import 'package:gabbro/app_paths.dart';
 Future<void> testExecutable(FutureOr<void> Function() testMain) async {
   final sandbox = await Directory.systemTemp.createTemp('gabbro_test_sandbox_');
   GabbroPaths.sandboxRoot = sandbox.path;
-  try {
-    await testMain();
-  } finally {
-    GabbroPaths.sandboxRoot = null;
-    if (sandbox.existsSync()) sandbox.deleteSync(recursive: true);
-  }
+  // NEVER reset the root or delete the dir here. `testMain()` completes when
+  // the tests are DECLARED, not when they have run — a `finally` that nulled
+  // the root here executed before the first test body did, so the "global
+  // net" protected nothing, and the first test to drive a real production
+  // save wrote the user's real ~/.config/gabbro/vaults.jsonc (2026-08-01).
+  // The dir sits in the system temp and is reclaimed by the OS; leaking it
+  // is the price of the guarantee. Pinned by test/sandbox_net_test.dart.
+  await testMain();
 }

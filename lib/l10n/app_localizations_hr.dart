@@ -723,6 +723,13 @@ class AppLocalizationsHr extends AppLocalizations {
   String get syncMethodTitle => 'Kako primijeniti ovu sinkronizaciju?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Ista pristupna fraza ne dokazuje isti trezor.';
+
+  @override
+  String get syncUseIncomingYubikey => 'Upotrijebite YubiKey dolaznog trezora';
+
+  @override
   String get syncMergeAutomatically => 'Automatski spoji';
 
   @override
@@ -1774,6 +1781,10 @@ class AppLocalizationsHr extends AppLocalizations {
   String get onboardingPathRequired => 'Put je obavezan';
 
   @override
+  String get onboardingPathTaken =>
+      'Ovdje već postoji datoteka. Odaberite drugo ime — stvaranje trezora zamijenilo bi je.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Odaberite novu glavnu pristupnu frazu ili ponovno koristite prethodnu.';
 
@@ -2108,12 +2119,40 @@ class AppLocalizationsHr extends AppLocalizations {
   String get restoreFromFileButton => 'Vrati iz datoteke sigurnosne kopije';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Zamijeniti ovaj trezor?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Odabrana datoteka zamijenit će «$vaultName». Stara datoteka ostaje sačuvana kao pričuvna kopija.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Trezor vraćen. Otključajte svojim vjerodajnicama.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Biometrijsko otključavanje je isključeno jer vraćena datoteka može koristiti drugu pristupnu frazu. Ponovno ga uključite u Sigurnost.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'Biometrijsko otključavanje je isključeno: datoteka trezora je promijenjena i spremljena pristupna fraza više je ne otvara. Ponovno ga uključite u Sigurnost.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Ta datoteka nije upotrebljiv Gabbro trezor.';
+
+  @override
+  String get adoptTitle => 'Otvori postojeću datoteku trezora';
+
+  @override
+  String get adoptConfirm => 'Dodaj trezor';
+
+  @override
+  String get adoptAlreadyRegistered => 'Ovaj trezor je već na vašem popisu';
+
+  @override
+  String get unlockAdoptItem => 'Otvori datoteku trezora…';
 
   @override
   String get resizeColumns => 'Promijeni veličinu stupaca';

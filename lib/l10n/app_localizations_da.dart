@@ -721,6 +721,13 @@ class AppLocalizationsDa extends AppLocalizations {
   String get syncMethodTitle => 'Hvordan skal denne synkronisering anvendes?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Samme adgangssætning beviser ikke samme hvælving.';
+
+  @override
+  String get syncUseIncomingYubikey => 'Brug den indgående hvælvings YubiKey';
+
+  @override
   String get syncMergeAutomatically => 'Flet automatisk';
 
   @override
@@ -1776,6 +1783,10 @@ class AppLocalizationsDa extends AppLocalizations {
   String get onboardingPathRequired => 'Sti er påkrævet';
 
   @override
+  String get onboardingPathTaken =>
+      'Der findes allerede en fil her. Vælg et andet navn — oprettelse af en hvælving ville erstatte den.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Vælg en ny hovedadgangssætning, eller genbruge din tidligere, hvis du foretrækker det.';
 
@@ -2109,12 +2120,41 @@ class AppLocalizationsDa extends AppLocalizations {
   String get restoreFromFileButton => 'Gendan fra en sikkerhedskopifil';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Erstat denne boks?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Den valgte fil erstatter «$vaultName». Den gamle fil gemmes som reservekopi.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Boks gendannet. Lås op med dine loginoplysninger.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Biometrisk oplåsning blev slået fra, fordi den gendannede fil kan bruge en anden adgangssætning. Slå den til igen under Sikkerhed.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'Biometrisk oplåsning blev slået fra: boksfilen er ændret, og den gemte adgangssætning åbner den ikke længere. Slå den til igen under Sikkerhed.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Den fil er ikke en brugbar Gabbro-boks.';
+
+  @override
+  String get adoptTitle => 'Åbn en eksisterende hvælvingsfil';
+
+  @override
+  String get adoptConfirm => 'Tilføj hvælving';
+
+  @override
+  String get adoptAlreadyRegistered =>
+      'Denne hvælving er allerede på din liste';
+
+  @override
+  String get unlockAdoptItem => 'Åbn en hvælvingsfil…';
 
   @override
   String get resizeColumns => 'Ændr kolonnestørrelse';

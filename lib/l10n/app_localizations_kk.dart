@@ -721,6 +721,14 @@ class AppLocalizationsKk extends AppLocalizations {
   String get syncMethodTitle => 'Бұл синхрондау қалай қолданылсын?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Бірдей кілт фразасы бірдей сейфті дәлелдемейді.';
+
+  @override
+  String get syncUseIncomingYubikey =>
+      'Кіріс сейфтің YubiKey кілтін пайдаланыңыз';
+
+  @override
   String get syncMergeAutomatically => 'Автоматты біріктіру';
 
   @override
@@ -1773,6 +1781,10 @@ class AppLocalizationsKk extends AppLocalizations {
   String get onboardingPathRequired => 'Жол міндетті';
 
   @override
+  String get onboardingPathTaken =>
+      'Мұнда файл бұрыннан бар. Басқа атау таңдаңыз — сейф жасау оны ауыстырады.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Жаңа негізгі кілт фразасын таңдаңыз немесе бұрынғысын қайта пайдаланыңыз.';
 
@@ -2109,12 +2121,40 @@ class AppLocalizationsKk extends AppLocalizations {
   String get restoreFromFileButton => 'Сақтық көшірме файлынан қалпына келтіру';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Бұл қойманы ауыстыру керек пе?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Таңдалған файл «$vaultName» қоймасын ауыстырады. Ескі файл қосалқы көшірме ретінде сақталады.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Қойма қалпына келтірілді. Өз деректеріңізбен ашыңыз.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Биометриялық бекітуді ашу өшірілді, себебі қалпына келтірілген файл басқа кілт фразасын пайдалануы мүмкін. Оны Қауіпсіздік бөлімінде қайта қосыңыз.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'Биометриялық бекітуді ашу өшірілді: қойма файлы өзгерді, сақталған кілт фразасы оны енді ашпайды. Оны Қауіпсіздік бөлімінде қайта қосыңыз.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Бұл файл жарамды Gabbro қоймасы емес.';
+
+  @override
+  String get adoptTitle => 'Бар сейф файлын ашу';
+
+  @override
+  String get adoptConfirm => 'Сейф қосу';
+
+  @override
+  String get adoptAlreadyRegistered => 'Бұл сейф тізімде бұрыннан бар';
+
+  @override
+  String get unlockAdoptItem => 'Сейф файлын ашу…';
 
   @override
   String get resizeColumns => 'Бағандар өлшемін өзгерту';

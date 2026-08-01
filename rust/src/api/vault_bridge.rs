@@ -536,6 +536,17 @@ pub async fn restore_vault_from_file(path: String, source: String) -> Result<(),
     )
 }
 
+/// Adopt: copy a picked `.gabbro` file to a fresh destination so it can be
+/// registered as a vault (Android — the picker only hands out a cache copy;
+/// Linux registers the picked path in place and never calls this).
+///
+/// Refuses an occupied destination (adopt never overwrites) and a source that
+/// is not a usable Gabbro vault. Opening the adopted vault still requires full
+/// credentials — adopting grants no access.
+pub async fn adopt_vault_file(source: String, dest: String) -> Result<(), String> {
+    crate::vault::io::adopt_vault_file(std::path::Path::new(&source), std::path::Path::new(&dest))
+}
+
 /// Assign a folder to a set of entries by UUID and persist.
 ///
 /// Pass `folder: ""` to move entries to unfoldered.
@@ -734,6 +745,9 @@ pub async fn init_vault(
     use crate::vault::io::write_vault;
     use crate::vault::serialization::{serialize_vault_body, VaultBody};
     let vault_path = PathBuf::from(&path);
+    // Refuse before Argon2id: creating over an existing vault would replace it
+    // with an empty one.
+    crate::vault::io::refuse_if_path_taken(&vault_path)?;
     let plaintext = serialize_vault_body(&VaultBody::empty())?;
     let sealed = seal_vault(&passphrase, &plaintext, alias)?;
     write_vault(&sealed, &vault_path)?;
@@ -789,6 +803,9 @@ pub async fn init_vault_with_keys(
         .collect::<Result<Vec<_>, String>>()?;
 
     let vault_path = PathBuf::from(&path);
+    // Refuse before Argon2id: creating over an existing vault would replace it
+    // with an empty one.
+    crate::vault::io::refuse_if_path_taken(&vault_path)?;
     let plaintext = serialize_vault_body(&VaultBody::empty())?;
     let sealed = seal_vault_with_keys(&passphrase, &registrations, &plaintext, alias)?;
     write_vault(&sealed, &vault_path)?;
@@ -882,6 +899,73 @@ pub async fn merge_vault_from_file(
     let file_path = PathBuf::from(path);
     let incoming_body = crate::api::vault::load_vault(&passphrase, &file_path)?;
     session::session_merge_vault_from_body(incoming_body)
+}
+
+/// Merge a `.gabbro` file using the passphrase the unlocked session already holds,
+/// so the user types nothing to sync their own vault.
+///
+/// `None` means that passphrase does not open the file — a different vault, a
+/// key-protected file, or a passphrase changed on the other device — and the caller
+/// should ask for credentials. `Err` is reserved for a file that cannot be used at
+/// all (missing, not a Gabbro vault, a refused old format), which is a different
+/// message to the user. The file at `path` is only ever read.
+///
+/// The vault must be unlocked — returns `Err` if auto-lock fired meanwhile.
+pub async fn merge_vault_from_file_held(
+    path: String,
+) -> Result<Option<crate::api::vault::MergeSummary>, String> {
+    session::session_merge_vault_from_file_held(&PathBuf::from(path))
+}
+
+/// Fast auto-merge (incoming wins, no prompts) using the passphrase the session
+/// already holds. The analogue of [`merge_vault_from_file_held`] for the "Merge
+/// automatically" path. Persists (async — a single vault save).
+pub async fn fast_merge_vault_from_file_held(
+    path: String,
+) -> Result<Option<crate::api::vault::MergeSummary>, String> {
+    session::session_fast_merge_from_file_held(&PathBuf::from(path))
+}
+
+/// Merge a **key-protected** `.gabbro` file using the passphrase the unlocked
+/// session already holds plus a tap's hmac output, so only the PIN was typed
+/// (ADR-013). `hmac_secret` must be exactly 32 bytes.
+///
+/// `None` means the held passphrase + credential do not open the file, and the
+/// caller should ask for a typed passphrase, reusing the same tap. `Err` is
+/// reserved for an unusable file and a locked session, as in
+/// [`merge_vault_from_file_held`]. The file at `path` is only ever read.
+pub async fn merge_vault_from_file_with_key_held(
+    path: String,
+    hmac_secret: Vec<u8>,
+    credential_id: Vec<u8>,
+) -> Result<Option<crate::api::vault::MergeSummary>, String> {
+    let secret: [u8; 32] = hmac_secret
+        .try_into()
+        .map_err(|_| "hmac_secret must be exactly 32 bytes".to_string())?;
+    session::session_merge_vault_from_file_with_key_held(
+        &PathBuf::from(path),
+        &secret,
+        &credential_id,
+    )
+}
+
+/// Fast auto-merge of a **key-protected** `.gabbro` file using the held
+/// passphrase plus a tap's hmac output. The analogue of
+/// [`merge_vault_from_file_with_key_held`] for the "Merge automatically" path.
+/// Persists (async — a single vault save).
+pub async fn fast_merge_vault_from_file_with_key_held(
+    path: String,
+    hmac_secret: Vec<u8>,
+    credential_id: Vec<u8>,
+) -> Result<Option<crate::api::vault::MergeSummary>, String> {
+    let secret: [u8; 32] = hmac_secret
+        .try_into()
+        .map_err(|_| "hmac_secret must be exactly 32 bytes".to_string())?;
+    session::session_fast_merge_from_file_with_key_held(
+        &PathBuf::from(path),
+        &secret,
+        &credential_id,
+    )
 }
 
 /// Apply a whole granular-sync review in one call: field resolutions, kept-value
@@ -1096,6 +1180,131 @@ mod tests {
         assert_eq!(
             after_refuse, b"still corrupt",
             "a refused restore leaves the vault untouched"
+        );
+    }
+
+    // Adopt: bridge adopt copies a picked vault file to a fresh destination
+    // (Android app storage) and refuses an occupied one.
+    #[test]
+    #[serial]
+    fn adopt_vault_file_bridge_roundtrip() {
+        use crate::crypto::vault_crypto::seal_vault;
+        use crate::vault::io::write_vault;
+        use std::env::temp_dir;
+
+        let source = temp_dir().join("gabbro_bridge_adopt_source.gabbro");
+        let dest = temp_dir().join("gabbro_bridge_adopt_dest.gabbro");
+        let dest_bak = std::path::PathBuf::from(format!("{}.bak", dest.display()));
+        for p in [&source, &dest, &dest_bak] {
+            let _ = std::fs::remove_file(p);
+        }
+        let source_s = source.to_string_lossy().to_string();
+        let dest_s = dest.to_string_lossy().to_string();
+
+        let sealed = seal_vault(b"pw", b"body", None).unwrap();
+        write_vault(&sealed, &source).unwrap();
+        let source_bytes = std::fs::read(&source).unwrap();
+
+        run(adopt_vault_file(source_s.clone(), dest_s.clone()))
+            .expect("adopting a valid vault file must succeed");
+        let adopted = std::fs::read(&dest).unwrap();
+
+        // Adopting onto the now-occupied destination must be refused.
+        let refused = run(adopt_vault_file(source_s, dest_s));
+
+        for p in [&source, &dest, &dest_bak] {
+            let _ = std::fs::remove_file(p);
+        }
+        assert_eq!(
+            adopted, source_bytes,
+            "adopt must write the source vault bytes"
+        );
+        assert!(refused.is_err(), "an occupied destination must be refused");
+    }
+
+    // ── R6: creating a vault must never destroy one ───────────────────────────
+    //
+    // The create screen auto-picks a free filename, so this fires only when the
+    // user deliberately types or picks an existing `.gabbro` — which is exactly
+    // what someone tries when they mean to open their vault on a second device.
+    // Today the file is replaced by an empty vault and the old bytes survive only
+    // as the rotated `.bak`, which the app offers only for a *corrupt* vault.
+    // Export, restore and save all overwrite by design and are untouched.
+
+    /// Existing bytes at `path`, plus the paths to clean up afterwards.
+    fn occupied_vault_path(suffix: &str) -> (PathBuf, &'static [u8]) {
+        const EXISTING: &[u8] = b"an existing vault the user relies on";
+        let mut path = std::env::temp_dir();
+        path.push(format!("gabbro_bridge_no_overwrite_{suffix}.gabbro"));
+        let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
+        std::fs::write(&path, EXISTING).unwrap();
+        (path, EXISTING)
+    }
+
+    #[test]
+    #[serial]
+    fn init_vault_refuses_to_overwrite_an_existing_file() {
+        let (path, existing) = occupied_vault_path("passphrase");
+
+        let result = run(init_vault(
+            b"create over an existing vault".to_vec(),
+            path.to_str().unwrap().to_string(),
+            None,
+        ));
+
+        let after = std::fs::read(&path).unwrap();
+        if result.is_ok() {
+            let _ = lock_vault(); // do not poison the next serial test
+        }
+        sync_cleanup(&[&path]);
+
+        assert!(
+            result.is_err(),
+            "creating a vault must refuse a path that already holds a file"
+        );
+        assert_eq!(
+            after, existing,
+            "a refused create must leave the existing file untouched"
+        );
+    }
+
+    #[test]
+    #[serial]
+    fn init_vault_with_keys_refuses_to_overwrite_an_existing_file() {
+        let (path, existing) = occupied_vault_path("keyed");
+
+        let result = run(init_vault_with_keys(
+            b"create over an existing vault".to_vec(),
+            vec![
+                YubiKeyInitData {
+                    credential_id: vec![0xA1u8; 64],
+                    hmac_secret: vec![0x11u8; 32],
+                    hkdf_salt: vec![0x12u8; 32],
+                },
+                YubiKeyInitData {
+                    credential_id: vec![0xA2u8; 48],
+                    hmac_secret: vec![0x21u8; 32],
+                    hkdf_salt: vec![0x22u8; 32],
+                },
+            ],
+            path.to_str().unwrap().to_string(),
+            None,
+        ));
+
+        let after = std::fs::read(&path).unwrap();
+        if result.is_ok() {
+            let _ = lock_vault();
+        }
+        sync_cleanup(&[&path]);
+
+        assert!(
+            result.is_err(),
+            "creating a keyed vault must refuse a path that already holds a file"
+        );
+        assert_eq!(
+            after, existing,
+            "a refused create must leave the existing file untouched"
         );
     }
 
@@ -1731,6 +1940,9 @@ mod tests {
 
         let mut path = temp_dir();
         path.push("gabbro_bridge_init_alias_test.gabbro");
+        // Creating now refuses an occupied path: clear a leftover from an
+        // aborted run so this test does not inherit one.
+        let _ = std::fs::remove_file(&path);
         let pass = b"init-alias-pass";
 
         run(init_vault(
@@ -2153,6 +2365,7 @@ mod tests {
 
         let mut path = temp_dir();
         path.push("gabbro_bridge_init_keys_min_test.gabbro");
+        let _ = std::fs::remove_file(&path);
 
         // Single key — must fail (ADR-010: minimum 2 keys at creation).
         let result = run(init_vault_with_keys(
@@ -2405,6 +2618,441 @@ mod tests {
         let _ = std::fs::remove_file(artifact.with_extension("gabbro.sha256"));
     }
 
+    // ── R1-R3: the sync net (faster sync, attempt 2) ──────────────────────────
+    //
+    // R1: a passphrase-only sync from a DIFFERENT vault file succeeds. Only the
+    //     refusal was pinned before, so the path silent sync will rely on was
+    //     untested.
+    // R2: the fast-merge bridge pair had no test at all.
+    // R3: a merge never changes the RECEIVING vault's own protection — both merge
+    //     paths re-seal with the session's own passphrase and keys
+    //     (`session.rs:3472`, `:3563`).
+
+    /// A Note entry. `content_edited_ms` sets the per-field edit stamp
+    /// (`field_times["content"]`); both sides stamped with different values is a
+    /// true field clash (`decide_field`, `session.rs:1268`).
+    fn sync_note(
+        id: &str,
+        title: &str,
+        content: &str,
+        content_edited_ms: Option<u64>,
+    ) -> crate::vault::entry::VaultEntry {
+        use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+
+        let mut field_times = std::collections::BTreeMap::new();
+        if let Some(ms) = content_edited_ms {
+            field_times.insert(String::from("content"), ms);
+        }
+        VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                field_times,
+                history: Vec::new(),
+                id: id.to_string(),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::new(),
+            },
+            title: title.to_string(),
+            content: content.to_string(),
+            custom_fields: vec![],
+            attachments: vec![],
+        })
+    }
+
+    fn sync_body(entries: Vec<crate::vault::entry::VaultEntry>) -> VaultBody {
+        VaultBody {
+            folders: vec![],
+            entries,
+            ..Default::default()
+        }
+    }
+
+    /// Write a passphrase-only vault holding `entries` — the incoming file.
+    fn sync_source_file(
+        pass: &[u8],
+        suffix: &str,
+        entries: Vec<crate::vault::entry::VaultEntry>,
+    ) -> PathBuf {
+        let mut path = std::env::temp_dir();
+        path.push(format!("gabbro_bridge_sync_src_{suffix}.gabbro"));
+        crate::api::vault::save_vault(&sync_body(entries), pass, &path).unwrap();
+        path
+    }
+
+    /// Create and unlock a passphrase-only session holding `entries` — the
+    /// receiving vault.
+    fn sync_session(
+        pass: &[u8],
+        suffix: &str,
+        entries: Vec<crate::vault::entry::VaultEntry>,
+    ) -> PathBuf {
+        let mut path = std::env::temp_dir();
+        path.push(format!("gabbro_bridge_sync_recv_{suffix}.gabbro"));
+        crate::api::vault::save_vault(&sync_body(entries), pass, &path).unwrap();
+        run(unlock_vault(
+            pass.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
+        path
+    }
+
+    fn sync_cleanup(paths: &[&PathBuf]) {
+        for p in paths {
+            let _ = std::fs::remove_file(p);
+            let _ = std::fs::remove_file(format!("{}.bak", p.display()));
+            let _ = std::fs::remove_file(p.with_extension("gabbro.sha256"));
+        }
+    }
+
+    fn entry_ids() -> Vec<String> {
+        list_entry_summaries()
+            .unwrap()
+            .into_iter()
+            .map(|s| s.id)
+            .collect()
+    }
+
+    /// Ids of the Note entries in a decrypted body — every entry these tests
+    /// build is a Note.
+    fn note_ids(body: &VaultBody) -> Vec<String> {
+        body.entries
+            .iter()
+            .filter_map(|e| match e {
+                crate::vault::entry::VaultEntry::Note(n) => Some(n.meta.id.clone()),
+                _ => None,
+            })
+            .collect()
+    }
+
+    // R1 (1): the case silent sync depends on — two independently created vaults
+    // that share a passphrase. The merge succeeds on the passphrase alone and the
+    // result reaches disk.
+    #[test]
+    #[serial]
+    fn merge_vault_from_file_syncs_a_different_vault_on_passphrase_alone() {
+        let pass: &[u8] = b"shared passphrase -- two devices, two vault files";
+        let src = sync_source_file(
+            pass,
+            "r1_ok",
+            vec![sync_note("from-a-001", "From A", "a content", None)],
+        );
+        let recv = sync_session(
+            pass,
+            "r1_ok",
+            vec![sync_note("b-own-001", "B own", "b content", None)],
+        );
+
+        let summary = run(merge_vault_from_file(
+            src.to_str().unwrap().to_string(),
+            pass.to_vec(),
+        ))
+        .expect("a passphrase-only source must sync on the passphrase alone");
+
+        assert_eq!(summary.added, 1, "A's entry must sync into B");
+        let ids = entry_ids();
+        assert_eq!(ids.len(), 2, "B's own entry + A's synced entry");
+        assert!(ids.iter().any(|id| id == "from-a-001"));
+
+        lock_vault().unwrap();
+
+        // The merge persisted: B's file on disk holds the synced entry.
+        let on_disk = crate::api::vault::load_vault(pass, &recv).unwrap();
+        assert!(
+            note_ids(&on_disk).iter().any(|id| id == "from-a-001"),
+            "the merge must be written to the receiving vault file"
+        );
+
+        sync_cleanup(&[&src, &recv]);
+    }
+
+    // R1 (2): a wrong passphrase is refused and nothing enters the session.
+    #[test]
+    #[serial]
+    fn merge_vault_from_file_refuses_a_wrong_passphrase() {
+        let pass_a: &[u8] = b"source vault passphrase -- device A";
+        let pass_b: &[u8] = b"receiving vault passphrase -- device B";
+        let src = sync_source_file(
+            pass_a,
+            "r1_wrong",
+            vec![sync_note("from-a-001", "From A", "a content", None)],
+        );
+        let recv = sync_session(
+            pass_b,
+            "r1_wrong",
+            vec![sync_note("b-own-001", "B own", "b content", None)],
+        );
+
+        let result = run(merge_vault_from_file(
+            src.to_str().unwrap().to_string(),
+            pass_b.to_vec(),
+        ));
+
+        assert!(
+            result.is_err(),
+            "a wrong passphrase must not open the source"
+        );
+        assert_eq!(
+            entry_ids().len(),
+            1,
+            "session untouched -- nothing leaked in"
+        );
+
+        lock_vault().unwrap();
+        sync_cleanup(&[&src, &recv]);
+    }
+
+    // R2 (3): the fast path resolves a true field clash in favour of the incoming
+    // value and keeps the losing local value in history.
+    #[test]
+    #[serial]
+    fn fast_merge_vault_from_file_takes_incoming_and_keeps_local_in_history() {
+        let pass: &[u8] = b"shared passphrase -- fast merge clash";
+        let src = sync_source_file(
+            pass,
+            "r2_clash",
+            vec![sync_note(
+                "clash-001",
+                "Clashing note",
+                "incoming value",
+                Some(2_000),
+            )],
+        );
+        let recv = sync_session(
+            pass,
+            "r2_clash",
+            vec![sync_note(
+                "clash-001",
+                "Clashing note",
+                "local value",
+                Some(1_000),
+            )],
+        );
+
+        let summary = run(fast_merge_vault_from_file(
+            src.to_str().unwrap().to_string(),
+            pass.to_vec(),
+        ))
+        .expect("fast merge of a passphrase-only source must succeed");
+
+        assert_eq!(summary.added, 0, "same UUID on both sides -- nothing added");
+        assert_eq!(
+            summary.field_conflicts.len(),
+            1,
+            "both sides edited `content` -- one true clash"
+        );
+
+        match get_entry("clash-001".to_string()).unwrap() {
+            VaultEntryData::Note(n) => {
+                assert_eq!(n.content, "incoming value", "fast merge is incoming-wins")
+            }
+            _ => panic!("expected Note variant"),
+        }
+        let history = run(get_entry_history("clash-001".to_string())).unwrap();
+        assert!(
+            history
+                .iter()
+                .any(|h| h.field == "content" && h.value == "local value"),
+            "the losing local value must be recoverable from history"
+        );
+
+        lock_vault().unwrap();
+        sync_cleanup(&[&src, &recv]);
+    }
+
+    // R2 (4): the fast path opens a key-protected source with passphrase + key.
+    #[test]
+    #[serial]
+    fn fast_merge_vault_from_file_with_key_syncs_keyprotected_source() {
+        let pass_a: &[u8] = b"vault A passphrase -- hardware protected";
+        let (artifact, source) = export_keyprotected_artifact(pass_a, "fast_ok");
+        let pass_b = b"vault B passphrase -- yubikeyless";
+        let path_b = setup_session_b(pass_b, "fast_ok");
+
+        let summary = run(fast_merge_vault_from_file_with_key(
+            artifact.to_str().unwrap().to_string(),
+            pass_a.to_vec(),
+            vec![0x11u8; 32], // YK1 hmac-secret output
+            vec![0xA1u8; 64], // YK1 credential id
+        ))
+        .expect("passphrase + a registered key must authorise the fast sync");
+
+        assert_eq!(summary.added, 1, "A's entry must sync into B");
+        let ids = entry_ids();
+        assert_eq!(ids.len(), 2, "B's own entry + A's synced entry");
+        assert!(ids.iter().any(|id| id == "from-vault-a-001"));
+
+        lock_vault().unwrap();
+        sync_cleanup(&[&artifact, &source, &path_b]);
+    }
+
+    // R2 (5): the fast path refuses a key-protected source on the passphrase alone,
+    // exactly as the reviewed path does (`:2348`).
+    #[test]
+    #[serial]
+    fn fast_merge_vault_from_file_refuses_keyprotected_source_with_passphrase_alone() {
+        let pass_a: &[u8] = b"vault A passphrase -- hardware protected";
+        let (artifact, source) = export_keyprotected_artifact(pass_a, "fast_refuse");
+        let pass_b = b"vault B passphrase -- yubikeyless";
+        let path_b = setup_session_b(pass_b, "fast_refuse");
+
+        let result = run(fast_merge_vault_from_file(
+            artifact.to_str().unwrap().to_string(),
+            pass_a.to_vec(),
+        ));
+
+        assert!(
+            result.is_err(),
+            "fast-syncing a key-protected export with passphrase alone must be refused"
+        );
+        assert_eq!(
+            entry_ids().len(),
+            1,
+            "session untouched -- nothing leaked in"
+        );
+
+        lock_vault().unwrap();
+        sync_cleanup(&[&artifact, &source, &path_b]);
+    }
+
+    // R2 (6): both keyed bridge entrypoints reject an hmac-secret that is not the
+    // 32 bytes the crypto requires, before touching the file or the session.
+    #[test]
+    fn keyed_merge_bridges_reject_a_wrong_length_hmac_secret() {
+        for len in [0usize, 31, 33, 64] {
+            let reviewed = run(merge_vault_from_file_with_key(
+                String::from("/nonexistent/gabbro-never-read.gabbro"),
+                b"pass".to_vec(),
+                vec![0x11u8; len],
+                vec![0xA1u8; 64],
+            ));
+            let fast = run(fast_merge_vault_from_file_with_key(
+                String::from("/nonexistent/gabbro-never-read.gabbro"),
+                b"pass".to_vec(),
+                vec![0x11u8; len],
+                vec![0xA1u8; 64],
+            ));
+            for (label, result) in [("reviewed", reviewed), ("fast", fast)] {
+                // `MergeSummary` is not Debug, so unwrap the error side by match.
+                let err = match result {
+                    Ok(_) => panic!("{label} merge accepted a {len}-byte hmac secret"),
+                    Err(e) => e,
+                };
+                assert!(
+                    err.contains("32 bytes"),
+                    "{label} merge must name the 32-byte requirement, got: {err}"
+                );
+            }
+        }
+    }
+
+    // R3 (7): a keyed receiving vault stays keyed across a merge -- the sync must
+    // never downgrade the protection the user chose for THIS device's vault.
+    #[test]
+    #[serial]
+    fn merge_leaves_a_keyed_receiving_vault_keyed() {
+        use crate::api::vault::{load_vault, load_vault_with_key_record};
+        use crate::vault::io::read_vault;
+
+        let pass_a: &[u8] = b"source vault passphrase -- passphrase only";
+        let pass_b: &[u8] = b"receiving vault passphrase -- key protected";
+        let src = sync_source_file(
+            pass_a,
+            "r3_keyed",
+            vec![sync_note("from-a-001", "From A", "a content", None)],
+        );
+
+        let mut recv = std::env::temp_dir();
+        recv.push("gabbro_bridge_sync_recv_r3_keyed.gabbro");
+        let _ = std::fs::remove_file(&recv);
+        run(init_vault_with_keys(
+            pass_b.to_vec(),
+            vec![
+                YubiKeyInitData {
+                    credential_id: vec![0xA1u8; 64],
+                    hmac_secret: vec![0x11u8; 32],
+                    hkdf_salt: vec![0x12u8; 32],
+                },
+                YubiKeyInitData {
+                    credential_id: vec![0xA2u8; 48],
+                    hmac_secret: vec![0x21u8; 32],
+                    hkdf_salt: vec![0x22u8; 32],
+                },
+            ],
+            recv.to_str().unwrap().to_string(),
+            None,
+        ))
+        .unwrap();
+
+        run(merge_vault_from_file(
+            src.to_str().unwrap().to_string(),
+            pass_a.to_vec(),
+        ))
+        .expect("a passphrase-only source must sync into a keyed vault");
+
+        lock_vault().unwrap();
+
+        assert_eq!(
+            read_vault(&recv).unwrap().yubikey_records.len(),
+            2,
+            "the merge must not drop the receiving vault's keyslots"
+        );
+        assert!(
+            load_vault(pass_b, &recv).is_err(),
+            "after the merge the receiving vault must still refuse passphrase alone"
+        );
+        let (body, _master, _wrapping) =
+            load_vault_with_key_record(pass_b, &[0x11u8; 32], &[0xA1u8; 64], &recv)
+                .expect("passphrase + a registered key must still open the receiving vault");
+        assert!(
+            note_ids(&body).iter().any(|id| id == "from-a-001"),
+            "the merged entry must be inside the still-keyed vault"
+        );
+
+        sync_cleanup(&[&src, &recv]);
+    }
+
+    // R3 (8): the mirror -- a passphrase-only receiving vault is NOT upgraded to
+    // key protection by merging a key-protected source.
+    #[test]
+    #[serial]
+    fn merge_leaves_a_passphrase_only_receiving_vault_unkeyed() {
+        use crate::api::vault::load_vault;
+        use crate::vault::io::read_vault;
+
+        let pass_a: &[u8] = b"vault A passphrase -- hardware protected";
+        let (artifact, source) = export_keyprotected_artifact(pass_a, "r3_unkeyed");
+        let pass_b: &[u8] = b"receiving vault passphrase -- passphrase only";
+        let recv = sync_session(
+            pass_b,
+            "r3_unkeyed",
+            vec![sync_note("b-own-001", "B own", "b content", None)],
+        );
+
+        run(merge_vault_from_file_with_key(
+            artifact.to_str().unwrap().to_string(),
+            pass_a.to_vec(),
+            vec![0x11u8; 32],
+            vec![0xA1u8; 64],
+        ))
+        .expect("passphrase + a registered key must open the key-protected source");
+
+        lock_vault().unwrap();
+
+        assert!(
+            read_vault(&recv).unwrap().yubikey_records.is_empty(),
+            "the merge must not add keyslots to a passphrase-only vault"
+        );
+        let body = load_vault(pass_b, &recv)
+            .expect("the receiving vault must still open with its passphrase alone");
+        assert!(
+            note_ids(&body).iter().any(|id| id == "from-vault-a-001"),
+            "the merged entry must be inside the still-unkeyed vault"
+        );
+
+        sync_cleanup(&[&artifact, &source, &recv]);
+    }
+
     // ── Android SAF export: build-bytes path (the file write happens in Kotlin) ─
 
     #[test]
@@ -2451,6 +3099,7 @@ mod tests {
         let pass = b"export-bytes-downgrade-pass";
         let mut path = temp_dir();
         path.push("gabbro_bridge_export_bytes_downgrade.gabbro");
+        let _ = std::fs::remove_file(&path);
 
         // Key-protected session: passphrase + 2 keys (ADR-010 minimum).
         run(init_vault_with_keys(

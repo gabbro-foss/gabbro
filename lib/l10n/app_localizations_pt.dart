@@ -723,6 +723,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get syncMethodTitle => 'Como aplicar esta sincronização?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'A mesma frase secreta não prova que seja o mesmo cofre.';
+
+  @override
+  String get syncUseIncomingYubikey => 'Use a YubiKey do cofre recebido';
+
+  @override
   String get syncMergeAutomatically => 'Mesclar automaticamente';
 
   @override
@@ -1778,6 +1785,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get onboardingPathRequired => 'O caminho é obrigatório';
 
   @override
+  String get onboardingPathTaken =>
+      'Já existe um ficheiro aqui. Escolha outro nome — criar um cofre substituí-lo-ia.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Escolha uma nova frase secreta principal, ou reutilize a anterior se preferir.';
 
@@ -2115,12 +2126,40 @@ class AppLocalizationsPt extends AppLocalizations {
       'Restaurar a partir de um ficheiro de cópia de segurança';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Substituir este cofre?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'O ficheiro escolhido substituirá «$vaultName». O ficheiro antigo é mantido como cópia de recuperação.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Cofre restaurado. Desbloqueie com as suas credenciais.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'O desbloqueio biométrico foi desativado, porque o ficheiro restaurado pode usar outra frase secreta. Reative-o em Segurança.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'O desbloqueio biométrico foi desativado: o ficheiro do cofre mudou e a frase secreta guardada já não o abre. Reative-o em Segurança.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Esse ficheiro não é um cofre Gabbro utilizável.';
+
+  @override
+  String get adoptTitle => 'Abrir um ficheiro de cofre existente';
+
+  @override
+  String get adoptConfirm => 'Adicionar cofre';
+
+  @override
+  String get adoptAlreadyRegistered => 'Este cofre já está na sua lista';
+
+  @override
+  String get unlockAdoptItem => 'Abrir um ficheiro de cofre…';
 
   @override
   String get resizeColumns => 'Redimensionar colunas';
@@ -2870,6 +2909,13 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get syncMethodTitle => 'Como esta sincronização deve ser aplicada?';
+
+  @override
+  String get syncSamePassphraseWarning =>
+      'A mesma frase secreta não prova que seja o mesmo cofre.';
+
+  @override
+  String get syncUseIncomingYubikey => 'Use a YubiKey do cofre recebido';
 
   @override
   String get syncMergeAutomatically => 'Mesclar automaticamente';
@@ -3926,6 +3972,10 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get onboardingPathRequired => 'O caminho é obrigatório';
 
   @override
+  String get onboardingPathTaken =>
+      'Já existe um arquivo aqui. Escolha outro nome — criar um cofre o substituiria.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Escolha uma nova frase secreta principal, ou reutilize a anterior se preferir.';
 
@@ -4261,12 +4311,40 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get restoreFromFileButton => 'Restaurar de um arquivo de backup';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Substituir este cofre?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'O arquivo escolhido substituirá «$vaultName». O arquivo antigo é mantido como cópia de recuperação.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Cofre restaurado. Desbloqueie com suas credenciais.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'O desbloqueio biométrico foi desativado, porque o arquivo restaurado pode usar outra frase secreta. Reative-o em Segurança.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'O desbloqueio biométrico foi desativado: o arquivo do cofre mudou e a frase secreta salva não o abre mais. Reative-o em Segurança.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Esse arquivo não é um cofre Gabbro utilizável.';
+
+  @override
+  String get adoptTitle => 'Abrir um arquivo de cofre existente';
+
+  @override
+  String get adoptConfirm => 'Adicionar cofre';
+
+  @override
+  String get adoptAlreadyRegistered => 'Este cofre já está na sua lista';
+
+  @override
+  String get unlockAdoptItem => 'Abrir um arquivo de cofre…';
 
   @override
   String get resizeColumns => 'Redimensionar colunas';
@@ -5016,6 +5094,13 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get syncMethodTitle => 'Como aplicar esta sincronização?';
+
+  @override
+  String get syncSamePassphraseWarning =>
+      'A mesma frase-passe não prova que seja o mesmo cofre.';
+
+  @override
+  String get syncUseIncomingYubikey => 'Use a YubiKey do cofre recebido';
 
   @override
   String get syncMergeAutomatically => 'Intercalar automaticamente';
@@ -6075,6 +6160,10 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   String get onboardingPathRequired => 'O caminho é obrigatório';
 
   @override
+  String get onboardingPathTaken =>
+      'Já existe um ficheiro aqui. Escolha outro nome — criar um cofre substituí-lo-ia.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Escolha uma nova frase-passe principal, ou reutilize a anterior se preferir.';
 
@@ -6413,12 +6502,40 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
       'Restaurar a partir de um ficheiro de cópia de segurança';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Substituir este cofre?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'O ficheiro escolhido substituirá «$vaultName». O ficheiro antigo é mantido como cópia de recuperação.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Cofre restaurado. Desbloqueie com as suas credenciais.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'O desbloqueio biométrico foi desativado, porque o ficheiro restaurado pode usar outra frase-passe. Reative-o em Segurança.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'O desbloqueio biométrico foi desativado: o ficheiro do cofre mudou e a frase-passe guardada já não o abre. Reative-o em Segurança.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Esse ficheiro não é um cofre Gabbro utilizável.';
+
+  @override
+  String get adoptTitle => 'Abrir um ficheiro de cofre existente';
+
+  @override
+  String get adoptConfirm => 'Adicionar cofre';
+
+  @override
+  String get adoptAlreadyRegistered => 'Este cofre já está na sua lista';
+
+  @override
+  String get unlockAdoptItem => 'Abrir um ficheiro de cofre…';
 
   @override
   String get resizeColumns => 'Redimensionar colunas';

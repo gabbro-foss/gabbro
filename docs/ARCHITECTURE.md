@@ -41,8 +41,8 @@ Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
 ```
 gabbro/
 ├── lib/                  # Flutter app
-│   ├── screens/          # unlock, vault list, export, import, generator, keyboard shortcuts, settings, manage vaults/folders, …
-│   ├── widgets/          # path_field, generator_widget, yubikey_tap, password_breakdown_sheet, sync_review, text_size_slider, url_link, …
+│   ├── screens/          # unlock, vault list, adopt vault, export, import, generator, keyboard shortcuts, settings, manage vaults/folders, …
+│   ├── widgets/          # path_field, generator_widget, yubikey_tap, password_breakdown_sheet, sync_review, sync_method_dialog, text_size_slider, url_link, …
 │   ├── src/rust/         # Auto-generated bridge (do not edit)
 │   └── *.dart            # main, app_paths (GabbroPaths), settings, text_scale, control_scale, gabbro_contrast (high-contrast theme flag), vault_registry, safe_file_picker, autotype_listener, autotype_target, clipboard_clear
 ├── rust/src/
@@ -73,7 +73,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 641 | 17 |
+| Rust (`cargo test -q`) | 680 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 11 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1972 | 10 |
+| Flutter (`flutter test`) | 2066 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -95,6 +95,10 @@ each other). Under `flutter drive` they were blind (a failure exited 0) and cras
 config/data resolves through `GabbroPaths` (`lib/app_paths.dart`); `test/flutter_test_config.dart`
 roots every `flutter test` in a throwaway temp sandbox, so even a non-isolating test reads
 an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`.
+The sandbox is never torn down mid-run (`testMain()` returns at declaration, not completion —
+a teardown there once nulled it before any test ran and a production save overwrote the real
+registry, 2026-08-01). Pinned by `test/sandbox_net_test.dart`, including a self-restoring
+canary that drives the real save paths and byte-compares the real config/vault locations.
 
 **Known warnings — triaged 2026-07-16, no action. Gate stays green; don't re-diagnose.**
 
@@ -115,46 +119,28 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Sync without a second unlock.** `sync from file` (`lib/screens/vault_list_screen.dart:1068`)
-always asks for the source passphrase, plus PIN and tap when the source is key-protected —
-4 prompts to sync a three-device setup. Investigated 2026-07-27; every scenario reviewed
-and the plan below approved.
+`gabbro_test` RUNNING on the branch tip (started 2026-08-01) — the last ALL-GREEN
+gate (2026-07-30) predates H1's Flutter side, all of adopt, and the sandbox fix.
+If green: merge + release decision with maintainer (alpha.17 was held for this work).
 
-> **Rule: sync silently when the incoming file's alias matches the open vault's AND the
-> credentials already in the session open it. Anything else falls back to today's
-> credential screen.**
+### Faster sync, attempt 2 — this branch
 
-The session already holds `passphrase` always (`rust/src/vault/session.rs:55`) and
-`vault_key_master` when key-protected (`session.rs:36`), so the whole check stays in Rust
-and no new secret crosses the bridge.
+ALL THREE ROWS DONE and hardware-passed: import entries; sync from file
+(2026-07-30, T1-T9/W1-W3/K1-K5); adopt a file (2026-08-01, AL1-AL12 Linux +
+AA1-AA6 emulator). Tick-lists, design decisions and findings: git log.
+Also on this branch: the flutter-test sandbox held only during declaration —
+fixed + pinned by `test/sandbox_net_test.dart` (2026-08-01).
 
-| Incoming file, vs the open vault | Outcome |
-|---|---|
-| Same vault, key-protected (incl. a diverged YubiKey set) | silent |
-| Same vault, passphrase-only | silent **+ warning** |
-| Different vault sharing passphrase + alias, passphrase-only | silent **+ warning** — indistinguishable from the row above |
-| Alias differs (incl. a passphrase-only downgrade export, which carries none) | credential screen |
-| Anything the held credentials do not open | credential screen |
+Attempt 1 (`sync_without_second_unlock`): unmerged, diff-reviewed 2026-08-01.
+One salvage left, then delete the branch — both AFTER a green gate:
+port `916cbc0` (415 test-only lines pinning the vault-identity facts sync/adopt
+rely on: fresh salts per passphrase-only save, reseal_body keeps the master,
+independent vaults never share a master, keyed CRUD leaves the header alone —
+none of these pins exist on this branch; the facts are prose-only today).
+Everything else is salvaged (chooser + 8x test) or superseded (probe,
+cached-master, skip-credential-screen).
 
-- A key-protected save re-seals the body only (`reseal_vault_body`,
-  `rust/src/crypto/vault_crypto.rs:335`), so the header and the random per-vault master key
-  survive every save, alias change and key add/remove. The cached master opening a file
-  therefore *proves* it is the same vault — no passphrase, no tap, no Argon2.
-- A passphrase-only save re-seals the whole file (`do_save` -> `save_vault` -> `seal_vault`,
-  `session.rs:186`, `rust/src/api/vault.rs:1079`), minting fresh salts each time. Nothing
-  per-vault survives but the alias, so "it opened" proves only *same passphrase* — hence the
-  warning on every passphrase-only silent sync. An entry-UUID-overlap heuristic was
-  considered and **rejected** (cries wolf on an empty or fully-replaced vault); do not
-  re-propose it.
-- The AES-GCM Additional Authenticated Data (AAD) binds a header to its own body only and is
-  computed from the file being opened (`header_aad`, `rust/src/vault/file_format.rs:163`) —
-  it is **not** a cross-file check, so the alias comparison is explicit policy, not crypto.
-- A YubiKey set that differs per device is fine and must **not** be compared: add/remove
-  rewraps the same master. The hmac-secret salt is random per registration
-  (`rust/src/fido/device.rs:123`), so a genuinely different vault always needs a tap.
-
-**Net-first: current sync behaviour is not pinned by tests yet — no production change until
-it is.**
+Mock vaults for future rounds: `.scratchpad` (A, B, D; C and E deleted 2026-08-01).
 
 ---
 
@@ -173,9 +159,48 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
-- in `sync` path, we currently have `auto-merge` and `review all changes`, the `auto-merge` is additive only (check and verify) and therefore never deletes items in the receiving vault: (1) add a message that explains this (or the correct) behaviour to the user, (2) add a third `sync` mechanism that simply takes the incoming vault and clobbers the existing one - discuss this
+- In the `sync` apply-choice dialog: (1) explain what `auto-merge` does. **Verified 2026-07-30
+  — it is not additive only.** It applies the incoming value on a clash, the incoming folder,
+  removes items the other side removed, and deletes an entry the other side deleted
+  (`session.rs:3540`). What it never does is drop an entry the other side has simply never
+  seen (pinned by `fast_merge_keeps_an_entry_only_this_vault_has`). So the copy must say
+  "deletes only what the other device deleted on purpose", not "never deletes".
+  (2) Add a third choice that takes the incoming vault and replaces this one — discuss first.
+  Note the dialog is already three buttons (auto, review, Cancel) in a scrollable column;
+  a fourth is what `test/sync_chooser_l10n_overflow_test.dart` will catch at 8x text.
 
 ### Code Quality
+- **`VaultRecord.type` is stored but never rendered.** Set on registration
+  (`main.dart`), read by nothing — keyed-ness shown to the user always comes from a
+  live header read (unlock screen, delete dialog). Either surface it (key badge in
+  Manage vaults) or drop the field. Found 2026-08-01 verifying the adopt matrix.
+- **One locale sweep lets an error through, so it could hide an overflow.** The
+  format-too-old sweep (`test/unlock_screen_test.dart:633`) tolerates the "locale not
+  supported by all delegates" warning for nn and yo. If a real overflow lands in the
+  same frame the two collapse into an opaque "Multiple exceptions" wrapper and the
+  tolerance swallows it. Cause: the shared `_appShell` helper uses
+  `AppLocalizations.localizationsDelegates`, while production uses
+  `gabbroLocalizationsDelegates`, which ships fallbacks for both locales — so the
+  warning is a test artefact users never meet. Fix `_appShell` to match production and
+  the sweep can demand a clean render, as the biometric-notice sweep now does.
+
+- **`sr.arb` has one Latin-script value in a Cyrillic file.** `vaultRestoredBiometricDisabled`
+  is written in Latin (identical to `sr_Latn.arb`), unlike every neighbouring sr string. Found
+  2026-07-31; no test checks script. Fix the value; consider a script-consistency net.
+
+- **Shipped strings are still in English in every locale.** Found 2026-07-29:
+  `changePassphraseBiometricDisabled` is the untranslated English sentence in all 37
+  ARBs and in the generated Dart (`app_localizations_fr.dart:1113`). `l10n_test.dart`
+  enforces the key set, not that a value was ever translated. Size the problem first
+  (how many keys, which locales — `jq`/`grep`, never python), then decide. A net that
+  fails on "value identical to English" would stop the next one.
+
+- **The vault list body overflows at 8x text on a 360dp phone.** A `Column` in
+  `vault_list_screen.dart`, ~232-814 px over. The overflow probe sweeps at 2x, which is why
+  it never saw this. Related: an `AlertDialog`'s `actions` never scroll, so any button left
+  there is unreachable at the maximum text scale — audit every dialog that still puts one
+  there. Found during the sync-without-a-second-unlock investigation.
+
 - **Can the auto-type fill error carry secret material to stdout?** `lib/main.dart:478`
   prints the exception text from `autotypeFill`, and `debugPrint` writes in release builds
   too — visible to anyone who launched Gabbro from a terminal. The fill runs in Rust, so the
@@ -191,17 +216,17 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   sync-without-a-second-unlock investigation.
 
 ### Security (pre-v1)
-- Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
+- **Human expert cryptography review** of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
 
 ### V2+ / Defer
 - **Linux biometric unlock** (laptop fingerprint readers, e.g. libfido2/PAM or `fprintd`). Fits the current per-device model unchanged: Linux would just get its own local per-vault secret store; the vault file carries no biometric state, so nothing else changes.
-- Passkey provider: store website passkeys (WebAuthn discoverable credentials) in
+- **Passkey provider**: store website passkeys (WebAuthn discoverable credentials) in
   the vault so they sync/back up. Distinct from the YubiKey (which unlocks the app);
   tradeoff — website private keys would live in the vault, not in hardware.
-- Custom and hideable filter chips (post-v1 user feedback gate).
-- Windows support.
-- Yubico partnership.
-- Donation/sustainability model: GitHub Sponsors is live; Monero possible later (a large, dedicated effort). Liberapay ruled out (2026-07-22 — Stripe forces business-type onboarding for individuals and has suspended Liberapay-linked accounts; no PayPal). Don't re-propose Liberapay.
-- No-telemetry verification guide (ripgrep scan, Wireshark, NetGuard).
-- Support model (GitHub Issues + SUPPORT.md for v1; revisit when user base exists).
-- Import: content-hash deduplication and entry-level merge.
+- **Custom and hideable filter chips** (post-v1 user feedback gate).
+- **Windows support.**
+- **Yubico partnership.**
+- **Donation/sustainability model**: GitHub Sponsors is live; Monero possible later (a large, dedicated effort). Liberapay ruled out (2026-07-22 — Stripe forces business-type onboarding for individuals and has suspended Liberapay-linked accounts; no PayPal). Don't re-propose Liberapay.
+- **No-telemetry verification guide** (ripgrep scan, Wireshark, NetGuard).
+- **Support model** (GitHub Issues + SUPPORT.md for v1; revisit when user base exists).
+- **Import**: content-hash deduplication and entry-level merge.

@@ -725,6 +725,14 @@ class AppLocalizationsUk extends AppLocalizations {
   String get syncMethodTitle => 'Як застосувати цю синхронізацію?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Однакова кодова фраза не доводить, що це те саме сховище.';
+
+  @override
+  String get syncUseIncomingYubikey =>
+      'Використовуйте YubiKey вхідного сховища';
+
+  @override
   String get syncMergeAutomatically => 'Обʼєднати автоматично';
 
   @override
@@ -1780,6 +1788,10 @@ class AppLocalizationsUk extends AppLocalizations {
   String get onboardingPathRequired => 'Шлях обов\'язковий';
 
   @override
+  String get onboardingPathTaken =>
+      'Тут уже є файл. Виберіть іншу назву — створення сховища замінило б його.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Виберіть нову головну кодову фразу або повторно використайте попередню.';
 
@@ -2117,12 +2129,40 @@ class AppLocalizationsUk extends AppLocalizations {
   String get restoreFromFileButton => 'Відновити з файлу резервної копії';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Замінити це сховище?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Вибраний файл замінить «$vaultName». Старий файл зберігається як аварійна копія.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Сховище відновлено. Розблокуйте за допомогою своїх облікових даних.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Біометричне розблокування вимкнено, оскільки відновлений файл може використовувати іншу кодову фразу. Увімкніть його знову в розділі «Безпека».';
+
+  @override
+  String get biometricStaleDisabled =>
+      'Біометричне розблокування вимкнено: файл сховища змінився, і збережена кодова фраза більше його не відкриває. Увімкніть його знову в розділі «Безпека».';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Цей файл не є придатним сховищем Gabbro.';
+
+  @override
+  String get adoptTitle => 'Відкрити наявний файл сховища';
+
+  @override
+  String get adoptConfirm => 'Додати сховище';
+
+  @override
+  String get adoptAlreadyRegistered => 'Це сховище вже є у списку';
+
+  @override
+  String get unlockAdoptItem => 'Відкрити файл сховища…';
 
   @override
   String get resizeColumns => 'Змінити розмір стовпців';

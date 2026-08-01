@@ -723,6 +723,14 @@ class AppLocalizationsEu extends AppLocalizations {
   String get syncMethodTitle => 'Nola aplikatu behar da sinkronizazio hau?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Pasaesaldi bera izateak ez du gandegi bera frogatzen.';
+
+  @override
+  String get syncUseIncomingYubikey =>
+      'Erabili sarrerako gandegiaren YubiKey-a';
+
+  @override
   String get syncMergeAutomatically => 'Batu automatikoki';
 
   @override
@@ -1773,6 +1781,10 @@ class AppLocalizationsEu extends AppLocalizations {
   String get onboardingPathRequired => 'Bidea nahitaezkoa da';
 
   @override
+  String get onboardingPathTaken =>
+      'Hemen fitxategi bat dago jada. Aukeratu beste izen bat — gandegi bat sortzeak ordezkatuko luke.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Aukeratu pasaesaldi nagusi berria edo berrerabili aurrekoa.';
 
@@ -2110,12 +2122,41 @@ class AppLocalizationsEu extends AppLocalizations {
       'Berreskuratu babeskopia-fitxategi batetik';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Kutxa gotor hau ordezkatu?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Aukeratutako fitxategiak «$vaultName» ordezkatuko du. Fitxategi zaharra segurtasun-kopia gisa gordeko da.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Kutxa gotorra berreskuratu da. Desblokeatu zure kredentzialekin.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Desblokeo biometrikoa desaktibatu da, leheneratutako fitxategiak beste pasaesaldi bat erabil dezakeelako. Gaitu berriro Segurtasuna atalean.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'Desblokeo biometrikoa desaktibatu da: kutxa gotorraren fitxategia aldatu da eta gordetako pasaesaldiak ez du gehiago irekitzen. Gaitu berriro Segurtasuna atalean.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Fitxategi hori ez da erabilgarri den Gabbro kutxa gotor bat.';
+
+  @override
+  String get adoptTitle => 'Ireki lehendik dagoen gandegi-fitxategi bat';
+
+  @override
+  String get adoptConfirm => 'Gehitu gandegia';
+
+  @override
+  String get adoptAlreadyRegistered =>
+      'Gandegi hau dagoeneko zure zerrendan dago';
+
+  @override
+  String get unlockAdoptItem => 'Ireki gandegi-fitxategi bat…';
 
   @override
   String get resizeColumns => 'Aldatu zutabeen tamaina';

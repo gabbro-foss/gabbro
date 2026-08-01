@@ -722,6 +722,14 @@ class AppLocalizationsNn extends AppLocalizations {
   String get syncMethodTitle => 'Korleis skal denne synkroniseringa brukast?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Same passfrase provar ikkje same kvelv.';
+
+  @override
+  String get syncUseIncomingYubikey =>
+      'Bruk YubiKey-en til det innkomande kvelvet';
+
+  @override
   String get syncMergeAutomatically => 'Slå saman automatisk';
 
   @override
@@ -1772,6 +1780,10 @@ class AppLocalizationsNn extends AppLocalizations {
   String get onboardingPathRequired => 'Sti er påkravd';
 
   @override
+  String get onboardingPathTaken =>
+      'Det finst allereie ei fil her. Vel eit anna namn — å opprette eit kvelv ville erstatta ho.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Vel ei ny hovud­passfrase, eller bruk den førre på nytt om du vil.';
 
@@ -2108,12 +2120,40 @@ class AppLocalizationsNn extends AppLocalizations {
   String get restoreFromFileButton => 'Gjenopprett frå ei tryggleikskopifil';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Erstatte dette kvelvet?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Den valde fila erstattar «$vaultName». Den gamle fila vert teken vare på som reservekopi.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Kvelv gjenoppretta. Lås opp med innloggingsinformasjonen din.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Biometrisk opplåsing vart slått av, fordi den gjenoppretta fila kan bruke ein annan passfrase. Slå han på att under Tryggleik.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'Biometrisk opplåsing vart slått av: kvelvfila er endra, og den lagra passfrasen opnar henne ikkje lenger. Slå han på att under Tryggleik.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Den fila er ikkje eit brukbart Gabbro-kvelv.';
+
+  @override
+  String get adoptTitle => 'Opne ei eksisterande kvelvfil';
+
+  @override
+  String get adoptConfirm => 'Legg til kvelv';
+
+  @override
+  String get adoptAlreadyRegistered => 'Dette kvelvet er allereie i lista';
+
+  @override
+  String get unlockAdoptItem => 'Opne ei kvelvfil…';
 
   @override
   String get resizeColumns => 'Endre kolonnestorleik';

@@ -713,6 +713,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get syncMethodTitle => 'この同期をどのように適用しますか？';
 
   @override
+  String get syncSamePassphraseWarning => '同じパスフレーズでも同じボルトとは限りません。';
+
+  @override
+  String get syncUseIncomingYubikey => '同期元ボルトのYubiKeyを使用してください';
+
+  @override
   String get syncMergeAutomatically => '自動的にマージ';
 
   @override
@@ -1732,6 +1738,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get onboardingPathRequired => 'パスは必須です';
 
   @override
+  String get onboardingPathTaken =>
+      'ここにはすでにファイルがあります。別の名前を選んでください。ボールトを作成すると置き換えられます。';
+
+  @override
   String get onboardingReusePassphraseHint =>
       '新しいマスターパスフレーズを選択するか、以前のものを再使用してください。';
 
@@ -2048,10 +2058,38 @@ class AppLocalizationsJa extends AppLocalizations {
   String get restoreFromFileButton => 'バックアップファイルから復元';
 
   @override
+  String get restoreFromFileConfirmTitle => 'このボールトを置き換えますか？';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return '選択したファイルは「$vaultName」を置き換えます。古いファイルはセーフティコピーとして保存されます。';
+  }
+
+  @override
   String get vaultRestoredMessage => 'ボールトを復元しました。認証情報でロックを解除してください。';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      '復元したファイルが別のパスフレーズを使用している可能性があるため、生体認証ロック解除を無効にしました。セキュリティで再度有効にしてください。';
+
+  @override
+  String get biometricStaleDisabled =>
+      'ボールトファイルが変更され、保存されたパスフレーズでは開けなくなったため、生体認証ロック解除を無効にしました。セキュリティで再度有効にしてください。';
+
+  @override
   String get restoreFromFileInvalidError => 'このファイルは使用可能な Gabbro ボールトではありません。';
+
+  @override
+  String get adoptTitle => '既存のボルトファイルを開く';
+
+  @override
+  String get adoptConfirm => 'ボルトを追加';
+
+  @override
+  String get adoptAlreadyRegistered => 'このボルトはすでにリストにあります';
+
+  @override
+  String get unlockAdoptItem => 'ボルトファイルを開く…';
 
   @override
   String get resizeColumns => '列のサイズを変更';

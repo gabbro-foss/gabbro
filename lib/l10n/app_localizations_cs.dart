@@ -724,6 +724,13 @@ class AppLocalizationsCs extends AppLocalizations {
   String get syncMethodTitle => 'Jak použít tuto synchronizaci?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Stejná přístupová fráze nedokazuje stejný trezor.';
+
+  @override
+  String get syncUseIncomingYubikey => 'Použijte YubiKey příchozího trezoru';
+
+  @override
   String get syncMergeAutomatically => 'Sloučit automaticky';
 
   @override
@@ -1776,6 +1783,10 @@ class AppLocalizationsCs extends AppLocalizations {
   String get onboardingPathRequired => 'Cesta je povinná';
 
   @override
+  String get onboardingPathTaken =>
+      'Zde už soubor existuje. Zvolte jiný název — vytvoření trezoru by jej nahradilo.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Zvolte novou hlavní přístupovou frázi nebo znovu použijte předchozí.';
 
@@ -2109,12 +2120,40 @@ class AppLocalizationsCs extends AppLocalizations {
   String get restoreFromFileButton => 'Obnovit ze záložního souboru';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Nahradit tento trezor?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Vybraný soubor nahradí «$vaultName». Starý soubor zůstane zachován jako záchranná kopie.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Trezor obnoven. Odemkněte pomocí svých přihlašovacích údajů.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Biometrické odemknutí bylo vypnuto, protože obnovený soubor může používat jinou přístupovou frázi. Znovu jej zapněte v Zabezpečení.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'Biometrické odemknutí bylo vypnuto: soubor trezoru se změnil a uložená přístupová fráze jej už neotevře. Znovu jej zapněte v Zabezpečení.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Tento soubor není použitelný trezor Gabbro.';
+
+  @override
+  String get adoptTitle => 'Otevřít existující soubor trezoru';
+
+  @override
+  String get adoptConfirm => 'Přidat trezor';
+
+  @override
+  String get adoptAlreadyRegistered => 'Tento trezor už je ve vašem seznamu';
+
+  @override
+  String get unlockAdoptItem => 'Otevřít soubor trezoru…';
 
   @override
   String get resizeColumns => 'Změnit velikost sloupců';

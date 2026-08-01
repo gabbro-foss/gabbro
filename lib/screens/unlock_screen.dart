@@ -81,22 +81,22 @@ Future<bool> _defaultBackupUsable(String path) async {
 
 Future<void> _defaultRestoreBackup(String path) => restoreVaultBackup(path: path);
 
-// R-03: let the user pick their own off-device backup `.gabbro` and restore it
-// over the corrupt vault. Returns false if the user cancelled the picker.
-// `file_picker` copies the chosen file to an app-readable path on Android too,
-// so the same path-based restore works on every platform.
-Future<bool> _defaultRestoreFromFile(String vaultPath) async {
+// R-03: let the user pick their own off-device backup `.gabbro`. Returns the
+// picked path, or null if the user cancelled. `file_picker` copies the chosen
+// file to an app-readable path on Android too, so the same path-based restore
+// works on every platform.
+Future<String?> _defaultPickRestoreFile() async {
   final result = await runPicker(
     () => FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['gabbro'],
     ),
   );
-  final source = result?.files.single.path;
-  if (source == null) return false; // cancelled
-  await restoreVaultFromFile(path: vaultPath, source: source);
-  return true;
+  return result?.files.single.path;
 }
+
+Future<void> _defaultRestoreFromPickedFile(String vaultPath, String source) =>
+    restoreVaultFromFile(path: vaultPath, source: source);
 
 EntropyResult _defaultEstimateEntropy(String password) =>
     estimateEntropy(password: password);
@@ -104,6 +104,17 @@ EntropyResult _defaultEstimateEntropy(String password) =>
 const _biometricChannel = MethodChannel('app.gabbro.gabbro/biometric');
 
 Future<void> _defaultCancelTap() => cancelYubikeyTap();
+
+// H1: drop this vault's biometric enrolment. Android-only; elsewhere there is
+// nothing enrolled to drop.
+Future<void> _defaultDisableBiometric(String vaultPath) async {
+  if (!Platform.isAndroid) return;
+  try {
+    await _biometricChannel.invokeMethod<void>('unenroll', {
+      'vaultPath': vaultPath,
+    });
+  } catch (_) {}
+}
 
 Future<bool> _defaultBiometricIsEnrolled(String vaultPath) async {
   if (!Platform.isAndroid) return false;
@@ -213,14 +224,19 @@ class UnlockScreen extends StatefulWidget {
   /// Vault alias shown below the app title. Null = no alias displayed.
   final String? vaultAlias;
 
-  /// Registry used to populate the vault dropdown. When it holds 2+ vaults the
+  /// Registry used to populate the vault dropdown. When it holds any vault the
   /// login screen shows an inline switcher above the passphrase field (ADR-014:
-  /// the login screen always lists registered vaults).
+  /// the login screen always lists registered vaults). The dropdown also
+  /// carries the adopt entry, so a single vault shows it too.
   final VaultRegistry? registry;
 
   /// Called when the user selects a different vault from the dropdown.
   /// Null → falls back to GabbroApp.maybeOf(context)?.switchToVault(…).
   final void Function(String path, String alias)? onVaultSwitch;
+
+  /// Called when the user picks "Open a vault file…" in the dropdown (adopt).
+  /// Null → falls back to GabbroApp.maybeOf(context)?.openAdoptVault().
+  final VoidCallback? onAdoptRequested;
 
   /// Returns true if a biometric credential is stored for [vaultPath].
   /// Per-vault and device-local: false on non-Android and for any vault this
@@ -266,10 +282,22 @@ class UnlockScreen extends StatefulWidget {
   /// Explicit user action; the restored vault still demands full credentials.
   final Future<void> Function(String path) onRestoreBackup;
 
-  /// R-03: pick an external backup `.gabbro` and restore it over the corrupt
-  /// vault. Returns true if a file was picked and restored, false if cancelled.
-  /// Throws if the picked file is not a usable vault.
-  final Future<bool> Function(String vaultPath) onRestoreFromFile;
+  /// R-03: pick an external backup `.gabbro`. Returns the picked path, or null
+  /// if the user cancelled. Throws [FilePickerUnavailable] when no file dialog
+  /// can open.
+  final Future<String?> Function() onPickRestoreFile;
+
+  /// R-03: restore [source] over the corrupt vault at [vaultPath]. The bridge
+  /// refuses a file that is not a usable vault, and preserves the old vault as
+  /// a `.pre-restore` safety copy (H2). Throws on refusal.
+  final Future<void> Function(String vaultPath, String source)
+      onRestoreFromPickedFile;
+
+  /// H1: turn biometric unlock off for [vaultPath] (unenroll on the native
+  /// side). Biometric stores the passphrase of whatever vault was at this path;
+  /// restoring a different file makes that copy stale, exactly as a passphrase
+  /// change does. Best-effort — the restore itself has already succeeded.
+  final Future<void> Function(String vaultPath) onDisableBiometric;
 
   /// R-03 P5: remove an unrecoverable vault from the list, leaving the bytes on
   /// disk. Null → routes through GabbroApp.removeVault(deleteFiles: false).
@@ -297,6 +325,7 @@ class UnlockScreen extends StatefulWidget {
     this.vaultAlias,
     this.registry,
     this.onVaultSwitch,
+    this.onAdoptRequested,
     this.onBiometricIsEnrolled = _defaultBiometricIsEnrolled,
     this.onBiometricAuthenticate = _defaultBiometricAuthenticate,
     this.onCancelTap = _defaultCancelTap,
@@ -306,7 +335,9 @@ class UnlockScreen extends StatefulWidget {
     this.onVaultFormatTooNew = _defaultVaultFormatTooNew,
     this.onBackupUsable = _defaultBackupUsable,
     this.onRestoreBackup = _defaultRestoreBackup,
-    this.onRestoreFromFile = _defaultRestoreFromFile,
+    this.onPickRestoreFile = _defaultPickRestoreFile,
+    this.onRestoreFromPickedFile = _defaultRestoreFromPickedFile,
+    this.onDisableBiometric = _defaultDisableBiometric,
     this.onRemoveVaultFromList,
     this.onDeleteVaultFile,
     this.onQuit,
@@ -330,6 +361,11 @@ class _UnlockScreenState extends State<UnlockScreen>
   late List<YubikeyRecordData> _yubikeyRecords;
   late String _selectedPath;
   bool _biometricEnrolled = false;
+
+  /// H1: set when a restore-from-file turned biometric unlock off, so the
+  /// post-restore message can tell the user to switch it back on. Only for a
+  /// user who actually had it enrolled — the rest have nothing to re-enable.
+  bool _biometricDisabledByRestore = false;
   // R-03 restore flow: set only by the parse probe, never by auth failures.
   bool _vaultCorrupt = false;
   /// RT-3: the file is an intact vault in a format older than this build reads.
@@ -344,8 +380,10 @@ class _UnlockScreenState extends State<UnlockScreen>
 
   bool get _isYubikeyMode => _yubikeyRecords.isNotEmpty;
 
+  // Any registered vault: the dropdown always carries the adopt entry, so a
+  // one-vault registry shows it too (pre-adopt it needed 2+).
   bool get _showDropdown =>
-      widget.registry != null && widget.registry!.records.length > 1;
+      widget.registry != null && widget.registry!.records.isNotEmpty;
 
   @override
   void initState() {
@@ -449,24 +487,72 @@ class _UnlockScreenState extends State<UnlockScreen>
   // usable vault, so a corrupt vault is never replaced by another bad file.
   Future<void> _restoreFromFile() async {
     final l = AppLocalizations.of(context);
-    final bool restored;
+    final String? source;
     try {
-      restored = await widget.onRestoreFromFile(widget.vaultPath);
+      source = await widget.onPickRestoreFile();
     } on FilePickerUnavailable {
       // The file dialog couldn't open (no portal) - not an invalid vault.
       if (!mounted) return;
       showPickerUnavailable(context, hasManualEntry: false);
       return;
+    }
+    if (!mounted || source == null) return; // user cancelled the picker
+    // F8: last chance to stop. The restore overwrites the vault and refreshes
+    // its .bak; only the .pre-restore safety copy (H2) keeps the old vault.
+    final vaultName = widget.vaultAlias ?? widget.vaultPath.split('/').last;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        // Buttons live in the scrollable content, not `actions`: an
+        // AlertDialog never scrolls its actions, which pushes them off a
+        // 360dp phone at 8x text (same fix as SyncMethodDialog, ADR-016).
+        scrollable: true,
+        title: Text(l.restoreFromFileConfirmTitle),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(l.restoreFromFileConfirmBody(vaultName)),
+            const SizedBox(height: 12),
+            FilledButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: Text(l.continueAction),
+            ),
+            const SizedBox(height: 8),
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: Text(l.cancel),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    try {
+      await widget.onRestoreFromPickedFile(widget.vaultPath, source);
     } catch (_) {
       if (!mounted) return;
       setState(() => _errorMessage = l.restoreFromFileInvalidError);
       return;
     }
-    if (!mounted || !restored) return; // user cancelled the picker
+    if (!mounted) return;
+    // H1: the file just written may be a different vault, so the passphrase
+    // biometric stored for this path is stale — drop it, exactly as a
+    // passphrase change does. Best-effort: the restore already succeeded.
+    final onAndroid = widget.isAndroid ?? Platform.isAndroid;
+    final wasEnrolled = _biometricEnrolled;
+    if (onAndroid) {
+      try {
+        await widget.onDisableBiometric(widget.vaultPath);
+      } catch (_) {}
+    }
+    if (!mounted) return;
     setState(() {
       _vaultCorrupt = false;
       _backupAvailable = false;
       _vaultRestoredFromFile = true;
+      _biometricDisabledByRestore = onAndroid && wasEnrolled;
+      if (onAndroid) _biometricEnrolled = false;
       _errorMessage = null;
       // The restored file may carry a different credential set: re-detect.
       if (widget.yubikeyRecords == null) {
@@ -558,8 +644,19 @@ class _UnlockScreenState extends State<UnlockScreen>
     }
   }
 
+  /// Dropdown value for the adopt entry — NUL can never begin a real path.
+  static const adoptDropdownValue = '\u0000adopt';
+
   void _onDropdownChanged(String? path) {
     if (path == null || path == _selectedPath) return;
+    if (path == adoptDropdownValue) {
+      if (widget.onAdoptRequested != null) {
+        widget.onAdoptRequested!();
+      } else {
+        GabbroApp.maybeOf(context)?.openAdoptVault();
+      }
+      return;
+    }
     final record =
         widget.registry!.records.firstWhere((r) => r.path == path);
     // Biometric is enrolled for the original vault's passphrase only.
@@ -594,7 +691,21 @@ class _UnlockScreenState extends State<UnlockScreen>
         setState(() => _errorMessage = l.biometricCancelled);
         return;
       }
-      await _doUnlock(passphrase);
+      final stale = await _doUnlock(passphrase);
+      if (stale) {
+        // H1: this passphrase came from the store, not the keyboard, so a
+        // decrypt-stage rejection proves the stored copy is stale — the file
+        // at this path was swapped outside the app. Same action as a restore:
+        // unenrol (best-effort) and name the cause.
+        try {
+          await widget.onDisableBiometric(widget.vaultPath);
+        } catch (_) {}
+        if (!mounted) return;
+        setState(() {
+          _biometricEnrolled = false;
+          _errorMessage = l.biometricStaleDisabled;
+        });
+      }
     } on PlatformException catch (e) {
       if (!mounted) return;
       if (e.code == 'BIOMETRIC_INVALIDATED') {
@@ -613,7 +724,16 @@ class _UnlockScreenState extends State<UnlockScreen>
     }
   }
 
-  Future<void> _doUnlock(List<int> passphrase) async {
+  // Error contract (H1, pinned by the 'H1: external vault swap' tests):
+  // tap-stage failures — wrong PIN (HMAC_FAILED / HMAC_MULTI_FAILED), timeout,
+  // transport, cancel — arrive as PlatformExceptions from the tap call, before
+  // the passphrase is ever tried; a wrong passphrase is a plain exception from
+  // the Rust decrypt call. Returns true only for that decrypt-stage rejection
+  // with the file still readable — the one case that proves a fed-in
+  // passphrase wrong. (Only biometric feeds a non-typed passphrase, and only
+  // on Android; on Linux a fido failure is also a plain exception, but no
+  // caller acts on the return there.)
+  Future<bool> _doUnlock(List<int> passphrase) async {
     final l = AppLocalizations.of(context);
     try {
       if (_isYubikeyMode) {
@@ -642,9 +762,9 @@ class _UnlockScreenState extends State<UnlockScreen>
         await widget.onUnlock(passphrase, widget.vaultPath);
       }
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted) return false;
       // The user cancelled the tap: just drop back to the unlock form, no error.
-      if (e is PlatformException && e.code == 'TAP_CANCELLED') return;
+      if (e is PlatformException && e.code == 'TAP_CANCELLED') return false;
       // R-03 P2: re-probe before showing a generic auth error. If the vault
       // file itself became unreadable (e.g. corrupted while this screen was
       // mounted), surface the corruption banner instead of "check your
@@ -652,34 +772,34 @@ class _UnlockScreenState extends State<UnlockScreen>
       // passphrase / PIN / key leaves the file readable, so the probe returns
       // readable and the generic error still shows (auth-failure invariant).
       final stillReadable = await widget.onVaultIsReadable(widget.vaultPath);
-      if (!mounted) return;
+      if (!mounted) return false;
       if (!stillReadable) {
         // RT-3: an intact but pre-v11 vault also fails to parse. It is not
         // corrupt, so explain the format rather than offering restore/delete.
         if (await widget.onVaultFormatTooOld(widget.vaultPath)) {
-          if (!mounted) return;
+          if (!mounted) return false;
           setState(() {
             _vaultFormatTooOld = true;
             _errorMessage = null;
           });
-          return;
+          return false;
         }
         if (await widget.onVaultFormatTooNew(widget.vaultPath)) {
-          if (!mounted) return;
+          if (!mounted) return false;
           setState(() {
             _vaultFormatTooNew = true;
             _errorMessage = null;
           });
-          return;
+          return false;
         }
         final usable = await widget.onBackupUsable(widget.vaultPath);
-        if (!mounted) return;
+        if (!mounted) return false;
         setState(() {
           _vaultCorrupt = true;
           _backupAvailable = usable;
           _errorMessage = null;
         });
-        return;
+        return false;
       }
       setState(() {
         _errorMessage = switch (e) {
@@ -694,13 +814,15 @@ class _UnlockScreenState extends State<UnlockScreen>
               : l.unlockErrorPassphrase,
         };
       });
-      return;
+      // Decrypt-stage rejection: the passphrase itself was refused (contract
+      // above). Every tap-stage failure is a PlatformException.
+      return e is! PlatformException;
     }
     // ── Unlock succeeded ── The post-success work below is NOT inside the auth
     // try/catch, so a failure here can never be reported as an authentication
     // error (e.g. the autofill onUnlocked signaling failing must not read as a
     // wrong passphrase).
-    if (!mounted) return;
+    if (!mounted) return false;
     GabbroApp.maybeOf(context)?.touchVaultLastUsed(widget.vaultPath);
     if (widget.onUnlocked != null) {
       // Autofill activity supplies onUnlocked to signal the native side (build
@@ -722,6 +844,7 @@ class _UnlockScreenState extends State<UnlockScreen>
         ),
       );
     }
+    return false;
   }
 
   Color _tierColor(StrengthTier tier) => switch (tier) {
@@ -1007,6 +1130,17 @@ class _UnlockScreenState extends State<UnlockScreen>
                         style: Theme.of(context).textTheme.bodySmall,
                         textAlign: TextAlign.center,
                       ),
+                      // H1: the fingerprint held the replaced vault's
+                      // passphrase, so it was dropped — say so, or the user is
+                      // left with an unlock that silently stopped working.
+                      if (_biometricDisabledByRestore) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          l.vaultRestoredBiometricDisabled,
+                          style: Theme.of(context).textTheme.bodySmall,
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                       const SizedBox(height: 16),
                     ],
                     if (_showDropdown) ...[
@@ -1015,18 +1149,26 @@ class _UnlockScreenState extends State<UnlockScreen>
                         itemHeight: null, // menu items grow to wrapped height at large text
                         value: _selectedPath,
                         // Collapsed selection ellipsizes instead of hard-clipping (ADR-016).
-                        selectedItemBuilder: (context) => widget.registry!.records
-                            .map((r) => Text(r.alias,
-                                maxLines: 1, overflow: TextOverflow.ellipsis))
-                            .toList(),
-                        items: widget.registry!.records
-                            .map(
-                              (r) => DropdownMenuItem(
-                                value: r.path,
-                                child: Text(r.alias),
-                              ),
-                            )
-                            .toList(),
+                        // Must stay as long as `items` (adopt entry included),
+                        // though the adopt entry is never the collapsed value.
+                        selectedItemBuilder: (context) => [
+                          ...widget.registry!.records.map((r) => Text(r.alias,
+                              maxLines: 1, overflow: TextOverflow.ellipsis)),
+                          const SizedBox.shrink(),
+                        ],
+                        items: [
+                          ...widget.registry!.records.map(
+                            (r) => DropdownMenuItem(
+                              value: r.path,
+                              child: Text(r.alias),
+                            ),
+                          ),
+                          DropdownMenuItem(
+                            key: const Key('unlock_adopt_item'),
+                            value: _UnlockScreenState.adoptDropdownValue,
+                            child: Text(l.unlockAdoptItem),
+                          ),
+                        ],
                         onChanged: _onDropdownChanged,
                       ),
                       const SizedBox(height: 16),

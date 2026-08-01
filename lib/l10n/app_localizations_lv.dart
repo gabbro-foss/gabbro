@@ -722,6 +722,14 @@ class AppLocalizationsLv extends AppLocalizations {
   String get syncMethodTitle => 'Kā piemērot šo sinhronizāciju?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Tāda pati ieejas frāze nepierāda to pašu seifu.';
+
+  @override
+  String get syncUseIncomingYubikey =>
+      'Izmantojiet ienākošā seifa YubiKey atslēgu';
+
+  @override
   String get syncMergeAutomatically => 'Apvienot automātiski';
 
   @override
@@ -1777,6 +1785,10 @@ class AppLocalizationsLv extends AppLocalizations {
   String get onboardingPathRequired => 'Ceļš ir nepieciešams';
 
   @override
+  String get onboardingPathTaken =>
+      'Šeit jau ir fails. Izvēlieties citu nosaukumu — seifa izveide to aizstātu.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Izvēlieties jaunu galveno ieejas frāzi vai atkārtoti izmantojiet iepriekšējo, ja vēlaties.';
 
@@ -2112,12 +2124,40 @@ class AppLocalizationsLv extends AppLocalizations {
   String get restoreFromFileButton => 'Atjaunot no dublējuma faila';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Vai aizstāt šo seifu?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Izvēlētais fails aizstās «$vaultName». Vecais fails tiek saglabāts kā rezerves kopija.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Seifs atjaunots. Atbloķējiet ar saviem akreditācijas datiem.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Biometriskā atbloķēšana tika izslēgta, jo atjaunotais fails var izmantot citu ieejas frāzi. Ieslēdziet to atkal sadaļā Drošība.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'Biometriskā atbloķēšana tika izslēgta: seifa fails ir mainījies, un saglabātā ieejas frāze to vairs neatver. Ieslēdziet to atkal sadaļā Drošība.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Šis fails nav izmantojams Gabbro seifs.';
+
+  @override
+  String get adoptTitle => 'Atvērt esošu seifa failu';
+
+  @override
+  String get adoptConfirm => 'Pievienot seifu';
+
+  @override
+  String get adoptAlreadyRegistered => 'Šis seifs jau ir sarakstā';
+
+  @override
+  String get unlockAdoptItem => 'Atvērt seifa failu…';
 
   @override
   String get resizeColumns => 'Mainīt kolonnu izmērus';

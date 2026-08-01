@@ -724,6 +724,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get syncMethodTitle => 'Comment appliquer cette synchronisation ?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Un même mot de passe principal ne prouve pas que c\'est le même coffre.';
+
+  @override
+  String get syncUseIncomingYubikey => 'Utilisez la YubiKey du coffre entrant';
+
+  @override
   String get syncMergeAutomatically => 'Fusionner automatiquement';
 
   @override
@@ -1795,6 +1802,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get onboardingPathRequired => 'Le chemin est requis';
 
   @override
+  String get onboardingPathTaken =>
+      'Un fichier existe déjà ici. Choisissez un autre nom : créer un coffre le remplacerait.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Choisissez une nouvelle phrase secrète principale, ou réutilisez l\'ancienne si vous préférez.';
 
@@ -2135,12 +2146,40 @@ class AppLocalizationsFr extends AppLocalizations {
       'Restaurer depuis un fichier de sauvegarde';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Remplacer ce coffre ?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Le fichier choisi remplacera « $vaultName ». L\'ancien fichier est conservé comme copie de secours.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Coffre restauré. Déverrouillez avec vos identifiants.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Le déverrouillage biométrique a été désactivé, car le fichier restauré peut utiliser un autre mot de passe. Réactivez-le dans Sécurité.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'Le déverrouillage biométrique a été désactivé : le fichier du coffre a changé et la phrase secrète enregistrée ne l\'ouvre plus. Réactivez-le dans Sécurité.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Ce fichier n\'est pas un coffre Gabbro utilisable.';
+
+  @override
+  String get adoptTitle => 'Ouvrir un fichier de coffre existant';
+
+  @override
+  String get adoptConfirm => 'Ajouter le coffre';
+
+  @override
+  String get adoptAlreadyRegistered => 'Ce coffre est déjà dans votre liste';
+
+  @override
+  String get unlockAdoptItem => 'Ouvrir un fichier de coffre…';
 
   @override
   String get resizeColumns => 'Redimensionner les colonnes';

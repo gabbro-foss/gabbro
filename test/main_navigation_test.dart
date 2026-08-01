@@ -15,7 +15,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/main.dart';
+import 'package:gabbro/screens/adopt_vault_screen.dart';
 import 'package:gabbro/screens/manage_vaults_screen.dart';
+import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/vault_registry.dart';
 
@@ -85,5 +87,48 @@ void main() {
         reason: 'must not be able to return to the pre-switch route');
     expect(find.byType(ManageVaultsScreen), findsNothing,
         reason: 'the prior manage-vaults route must not survive the switch');
+  });
+
+  testWidgets('openAdoptVault pushes AdoptVaultScreen with the live registry',
+      (tester) async {
+    await tester.pumpWidget(_app(_registryWith(['Alpha'])));
+    await tester.pumpAndSettle();
+
+    final state = tester.state(find.byType(GabbroApp)) as GabbroAppState;
+    state.openAdoptVault();
+    await tester.pumpAndSettle();
+
+    final screen = tester.widget<AdoptVaultScreen>(find.byType(AdoptVaultScreen));
+    expect(screen.registry.records.map((r) => r.alias), ['Alpha'],
+        reason: 'the screen must see the real registry (alias collisions)');
+  });
+
+  // F9: registering an adopted vault must land on its unlock screen, locked,
+  // with the back stack cleared — adopting grants no access.
+  testWidgets('F9: adopt registration lands on the unlock screen for the vault',
+      (tester) async {
+    await tester.pumpWidget(_app(_registryWith(['Alpha'])));
+    await tester.pumpAndSettle();
+    final state = tester.state(find.byType(GabbroApp)) as GabbroAppState;
+    state.openAdoptVault();
+    await tester.pumpAndSettle();
+
+    // Drive production's registration callback exactly as the screen would.
+    // runAsync: the callback saves the registry with real (sandboxed) file
+    // I/O, which the fake-clock test zone would otherwise never complete —
+    // see LEARNINGS "Async dart:io inside testWidgets".
+    final screen = tester.widget<AdoptVaultScreen>(find.byType(AdoptVaultScreen));
+    await tester.runAsync(
+      () => screen.onRegistered('/nonexistent-sandbox/adopted.gabbro', 'Adopted'),
+    );
+    await tester.pumpAndSettle();
+
+    final unlock = tester.widget<UnlockScreen>(find.byType(UnlockScreen));
+    expect(unlock.vaultPath, '/nonexistent-sandbox/adopted.gabbro');
+    expect(unlock.vaultAlias, 'Adopted');
+
+    final nav = tester.firstState<NavigatorState>(find.byType(Navigator));
+    expect(await nav.maybePop(), isFalse,
+        reason: 'adopt must clear the back stack like any vault switch');
   });
 }

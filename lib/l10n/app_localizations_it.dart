@@ -723,6 +723,14 @@ class AppLocalizationsIt extends AppLocalizations {
   String get syncMethodTitle => 'Come applicare questa sincronizzazione?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'La stessa passphrase non prova che sia lo stesso archivio.';
+
+  @override
+  String get syncUseIncomingYubikey =>
+      'Usa la YubiKey dell\'archivio in arrivo';
+
+  @override
   String get syncMergeAutomatically => 'Unisci automaticamente';
 
   @override
@@ -1780,6 +1788,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get onboardingPathRequired => 'Il percorso è richiesto';
 
   @override
+  String get onboardingPathTaken =>
+      'Qui esiste già un file. Scegli un altro nome: creare un archivio lo sostituirebbe.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Scegli una nuova passphrase principale, o riutilizza quella precedente se preferisci.';
 
@@ -2120,12 +2132,40 @@ class AppLocalizationsIt extends AppLocalizations {
   String get restoreFromFileButton => 'Ripristina da un file di backup';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Sostituire questa cassaforte?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Il file scelto sostituirà «$vaultName». Il vecchio file viene conservato come copia di sicurezza.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Cassaforte ripristinata. Sblocca con le tue credenziali.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Lo sblocco biometrico è stato disattivato, perché il file ripristinato potrebbe usare una passphrase diversa. Riattivalo in Sicurezza.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'Lo sblocco biometrico è stato disattivato: il file della cassaforte è cambiato e la passphrase salvata non lo apre più. Riattivalo in Sicurezza.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Questo file non è una cassaforte Gabbro utilizzabile.';
+
+  @override
+  String get adoptTitle => 'Apri un file di archivio esistente';
+
+  @override
+  String get adoptConfirm => 'Aggiungi archivio';
+
+  @override
+  String get adoptAlreadyRegistered => 'Questo archivio è già nel tuo elenco';
+
+  @override
+  String get unlockAdoptItem => 'Apri un file di archivio…';
 
   @override
   String get resizeColumns => 'Ridimensiona colonne';

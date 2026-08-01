@@ -66,10 +66,13 @@ Widget _buildScreen({
   Future<bool> Function(String)? onVaultFormatTooNew,
   Future<bool> Function(String)? onBackupUsable,
   Future<void> Function(String)? onRestoreBackup,
-  Future<bool> Function(String)? onRestoreFromFile,
+  Future<String?> Function()? onPickRestoreFile,
+  Future<void> Function(String, String)? onRestoreFromPickedFile,
+  Future<void> Function(String)? onDisableBiometric,
   Future<void> Function(String)? onRemoveVaultFromList,
   Future<void> Function(String)? onDeleteVaultFile,
   VoidCallback? onQuit,
+  VoidCallback? onAdoptRequested,
 }) =>
     testApp(UnlockScreen(
       vaultPath: vaultPath,
@@ -92,10 +95,13 @@ Widget _buildScreen({
       onVaultFormatTooNew: onVaultFormatTooNew ?? (_) async => false,
       onBackupUsable: onBackupUsable ?? (_) async => false,
       onRestoreBackup: onRestoreBackup ?? (_) async {},
-      onRestoreFromFile: onRestoreFromFile ?? (_) async => false,
+      onPickRestoreFile: onPickRestoreFile ?? () async => null,
+      onRestoreFromPickedFile: onRestoreFromPickedFile ?? (_, _) async {},
+      onDisableBiometric: onDisableBiometric ?? (_) async {},
       onRemoveVaultFromList: onRemoveVaultFromList ?? (_) async {},
       onDeleteVaultFile: onDeleteVaultFile ?? (_) async {},
       onQuit: onQuit,
+      onAdoptRequested: onAdoptRequested,
     ));
 
 // ── Net B appearance shell (top-level per test-helper convention) ──────────────
@@ -1005,6 +1011,212 @@ void main() {
     });
   });
 
+  // ── H1: an externally swapped vault file makes the stored passphrase stale ──
+  //
+  // Error contract (pinned here, used by the H1 fix): tap-stage failures —
+  // wrong PIN (HMAC_FAILED / HMAC_MULTI_FAILED), timeout, transport — are
+  // PlatformExceptions thrown by the tap call, before the passphrase is ever
+  // tried. A wrong passphrase is a plain exception from the Rust decrypt call.
+  // Only the decrypt stage may ever conclude "stored passphrase is stale".
+  group('H1: external vault swap vs biometric', () {
+    testWidgets('N1: a typed wrong passphrase never touches biometric enrolment',
+        (tester) async {
+      var unenrolled = false;
+      await tester.pumpWidget(_buildScreen(
+        onBiometricIsEnrolled: (_) async => true,
+        onDisableBiometric: (_) async => unenrolled = true,
+        onUnlock: (_, _) async => throw Exception('wrong passphrase'),
+      ));
+      await tester.pump();
+      await tester.enterText(find.byType(TextField).first, 'typed-wrong');
+      await tester.ensureVisible(find.text('Unlock'));
+      await tester.tap(find.text('Unlock'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Could not unlock vault. Check your passphrase.'),
+          findsOneWidget);
+      expect(unenrolled, isFalse,
+          reason: 'a typed mistake proves nothing about the stored passphrase');
+      expect(find.text('Use biometrics'), findsOneWidget);
+    });
+
+    testWidgets(
+        'N2: a tap-stage failure (wrong PIN) never touches biometric enrolment',
+        (tester) async {
+      for (final code in ['HMAC_FAILED', 'HMAC_MULTI_FAILED']) {
+        var unenrolled = false;
+        await tester.pumpWidget(_buildScreen(
+          yubikeyRecords: [_fakeRecord()],
+          onBiometricIsEnrolled: (_) async => true,
+          onDisableBiometric: (_) async => unenrolled = true,
+          onUnlockWithYubikey: (a, b, c, d, e, f) async =>
+              throw PlatformException(code: code),
+        ));
+        await tester.pump();
+        await tester.enterText(find.byType(TextField).first, 'anypassphrase');
+        await tester.ensureVisible(find.text('Unlock'));
+        await tester.tap(find.text('Unlock'));
+        await tester.pumpAndSettle();
+
+        expect(
+            find.text(
+                'Could not unlock vault. Check your passphrase and YubiKey PIN.'),
+            findsOneWidget,
+            reason: '$code is a tap-stage failure: generic message');
+        expect(unenrolled, isFalse,
+            reason: '$code says nothing about the stored passphrase');
+      }
+    });
+
+    const staleMessage = 'Biometric unlock was turned off: the vault file '
+        'changed and the saved passphrase no longer opens it. '
+        'Re-enable it in Security.';
+
+    testWidgets(
+        'H1a: biometric-fed decrypt rejection unenrols and says the file changed',
+        (tester) async {
+      var unenrolCalls = 0;
+      await tester.pumpWidget(_buildScreen(
+        onBiometricIsEnrolled: (_) async => true,
+        onBiometricAuthenticate: (_) async => [1, 2, 3],
+        onDisableBiometric: (_) async => unenrolCalls++,
+        onUnlock: (_, _) async => throw Exception('decryption failed'),
+      ));
+      await tester.pump();
+      await tester.tap(find.text('Use biometrics'));
+      await tester.pumpAndSettle();
+
+      expect(unenrolCalls, 1,
+          reason: 'the stored passphrase is provably stale: unenrol once');
+      expect(find.text('Use biometrics'), findsNothing,
+          reason: 'the button must go with the enrolment');
+      expect(find.text(staleMessage), findsOneWidget,
+          reason: 'the message must name the cause, not blame the passphrase');
+    });
+
+    testWidgets('H1b: same on a keyed vault (decrypt stage rejects)',
+        (tester) async {
+      var unenrolCalls = 0;
+      await tester.pumpWidget(_buildScreen(
+        yubikeyRecords: [_fakeRecord()],
+        onBiometricIsEnrolled: (_) async => true,
+        onBiometricAuthenticate: (_) async => [1, 2, 3],
+        onDisableBiometric: (_) async => unenrolCalls++,
+        onUnlockWithYubikey: (a, b, c, d, e, f) async =>
+            throw Exception('decryption failed'),
+      ));
+      await tester.pump();
+      await tester.tap(find.text('Use biometrics'));
+      await tester.pumpAndSettle();
+
+      expect(unenrolCalls, 1);
+      expect(find.text('Use biometrics'), findsNothing);
+      expect(find.text(staleMessage), findsOneWidget);
+    });
+
+    testWidgets(
+        'H1c: keyed, biometric-fed, tap-stage wrong PIN leaves enrolment alone',
+        (tester) async {
+      var unenrolled = false;
+      await tester.pumpWidget(_buildScreen(
+        yubikeyRecords: [_fakeRecord()],
+        onBiometricIsEnrolled: (_) async => true,
+        onBiometricAuthenticate: (_) async => [1, 2, 3],
+        onDisableBiometric: (_) async => unenrolled = true,
+        onUnlockWithYubikey: (a, b, c, d, e, f) async =>
+            throw PlatformException(code: 'HMAC_FAILED'),
+      ));
+      await tester.pump();
+      await tester.tap(find.text('Use biometrics'));
+      await tester.pumpAndSettle();
+
+      expect(unenrolled, isFalse,
+          reason: 'a wrong PIN must never switch the fingerprint off');
+      expect(
+          find.text(
+              'Could not unlock vault. Check your passphrase and YubiKey PIN.'),
+          findsOneWidget);
+      expect(find.text('Use biometrics'), findsOneWidget);
+    });
+
+    testWidgets(
+        'H1d: biometric-fed failure on an unreadable file shows the corruption '
+        'banner and leaves enrolment alone', (tester) async {
+      var unenrolled = false;
+      var readable = true;
+      await tester.pumpWidget(_buildScreen(
+        onBiometricIsEnrolled: (_) async => true,
+        onBiometricAuthenticate: (_) async => [1, 2, 3],
+        onDisableBiometric: (_) async => unenrolled = true,
+        onVaultIsReadable: (_) async => readable,
+        onBackupUsable: (_) async => true,
+        onUnlock: (_, _) async {
+          readable = false; // corrupted while this screen was mounted
+          throw Exception('parse failed');
+        },
+      ));
+      await tester.pump();
+      await tester.tap(find.text('Use biometrics'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Restore from safety copy'), findsOneWidget,
+          reason: 'an unreadable file is corruption, not a swap verdict');
+      expect(unenrolled, isFalse);
+    });
+
+    testWidgets(
+        'H1e: the stale-biometric message survives every locale at 8x on a '
+        '360dp phone', (tester) async {
+      tester.view.physicalSize = const Size(360, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() => tester.view.reset());
+
+      for (final locale in AppLocalizations.supportedLocales) {
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.pumpAndSettle();
+
+        await tester.pumpWidget(MaterialApp(
+          locale: locale,
+          localizationsDelegates: gabbroLocalizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: const TextScaler.linear(8.0)),
+            child: child!,
+          ),
+          home: UnlockScreen(
+            vaultPath: '/tmp/test.gabbro',
+            onEstimateEntropy: _fakeEntropy,
+            yubikeyRecords: const [],
+            isAndroid: true,
+            onBiometricIsEnrolled: (_) async => true,
+            onBiometricAuthenticate: (_) async => [1, 2, 3],
+            onDisableBiometric: (_) async {},
+            onUnlock: (_, _) async => throw Exception('decryption failed'),
+            onVaultIsReadable: (_) async => true,
+            onVaultFormatTooOld: (_) async => false,
+            onVaultFormatTooNew: (_) async => false,
+            onBackupUsable: (_) async => false,
+          ),
+        ));
+        await tester.pumpAndSettle();
+
+        // Past 1.5x the biometric button is icon-only.
+        final biometric = find.byIcon(Icons.fingerprint);
+        await tester.ensureVisible(biometric);
+        await tester.pumpAndSettle();
+        await tester.tap(biometric, warnIfMissed: false);
+        await tester.pumpAndSettle();
+
+        expect(tester.takeException(), isNull,
+            reason: 'the message must scroll at 8x in $locale, never overflow');
+        final l = lookupAppLocalizations(locale);
+        expect(find.text(l.biometricStaleDisabled), findsOneWidget,
+            reason: 'the message must be on screen for $locale to mean anything');
+      }
+    });
+  });
+
   group('vault dropdown', () {
     final twoVaultRegistry = VaultRegistry([
       _vaultRecord(path: '/tmp/a.gabbro', alias: 'Alpha'),
@@ -1020,20 +1232,51 @@ void main() {
       expect(find.byType(DropdownButton<String>), findsOneWidget);
     });
 
-    testWidgets('no dropdown when registry has only one vault', (tester) async {
+    // E2 (adopt): a single registered vault still gets the dropdown — it now
+    // carries the "Open a vault file…" entry, the unlock screen's route to
+    // adopting a second device's export. Flips the pre-adopt one-vault pin.
+    testWidgets('shows dropdown with one vault (it carries the adopt entry)',
+        (tester) async {
       final singleRegistry = VaultRegistry([
         _vaultRecord(path: '/tmp/a.gabbro', alias: 'Alpha'),
       ]);
       await tester.pumpWidget(_buildScreen(
         vaultPath: '/tmp/a.gabbro',
+        vaultAlias: 'Alpha',
         registry: singleRegistry,
       ));
-      expect(find.byType(DropdownButton<String>), findsNothing);
+      expect(find.byType(DropdownButton<String>), findsOneWidget);
     });
 
     testWidgets('no dropdown when registry is null', (tester) async {
       await tester.pumpWidget(_buildScreen(registry: null));
       expect(find.byType(DropdownButton<String>), findsNothing);
+    });
+
+    testWidgets('no dropdown when the registry is empty', (tester) async {
+      await tester.pumpWidget(_buildScreen(registry: VaultRegistry([])));
+      expect(find.byType(DropdownButton<String>), findsNothing);
+    });
+
+    testWidgets('the adopt entry fires onAdoptRequested and switches nothing',
+        (tester) async {
+      var requested = 0;
+      String? switchedPath;
+      await tester.pumpWidget(_buildScreen(
+        vaultPath: '/tmp/a.gabbro',
+        vaultAlias: 'Alpha',
+        registry: twoVaultRegistry,
+        onVaultSwitch: (p, _) => switchedPath = p,
+        onAdoptRequested: () => requested++,
+      ));
+      await tester.tap(find.byType(DropdownButton<String>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('unlock_adopt_item')).last);
+      await tester.pumpAndSettle();
+
+      expect(requested, 1);
+      expect(switchedPath, isNull,
+          reason: 'adopt is not a vault switch and must not navigate to one');
     });
 
     testWidgets('dropdown shows all vault aliases', (tester) async {
@@ -1064,6 +1307,21 @@ void main() {
       await tester.pumpAndSettle();
       expect(switchedPath, '/tmp/b.gabbro');
       expect(switchedAlias, 'Beta');
+    });
+
+    // E3: the adopt entry rides along without regressing vault switching.
+    testWidgets('two vaults: both aliases and the adopt entry are offered',
+        (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        vaultPath: '/tmp/a.gabbro',
+        vaultAlias: 'Alpha',
+        registry: twoVaultRegistry,
+      ));
+      await tester.tap(find.byType(DropdownButton<String>));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Beta'), findsWidgets);
+      expect(find.byKey(const Key('unlock_adopt_item')), findsWidgets);
     });
   });
 
@@ -1488,7 +1746,10 @@ void main() {
       'yubikey auth failures (wrong PIN, wrong key, timeout, cancel) never offer restore',
       (tester) async {
     final failures = <Object>[
-      PlatformException(code: 'CTAP_ERROR', message: 'Wrong PIN'),
+      // The real wrong-PIN code (GabbroUnlockHostActivity registers HMAC_FAILED
+      // for the single-key tap); an invented CTAP_ERROR passed here for the
+      // same reason any unknown code does — keep the pin on the real contract.
+      PlatformException(code: 'HMAC_FAILED', message: 'Wrong PIN'),
       Exception('decryption failed'),
       PlatformException(code: 'TAP_TIMEOUT'),
       PlatformException(code: 'TAP_CANCELLED'),
@@ -1647,10 +1908,8 @@ void main() {
     await tester.pumpWidget(_buildScreen(
       onVaultIsReadable: (_) async => readable,
       onBackupUsable: (_) async => false,
-      onRestoreFromFile: (_) async {
-        readable = true;
-        return true;
-      },
+      onPickRestoreFile: () async => '/tmp/backup.gabbro',
+      onRestoreFromPickedFile: (_, _) async => readable = true,
     ));
     await tester.pumpAndSettle();
     expect(find.byType(TextField), findsNothing,
@@ -1658,6 +1917,8 @@ void main() {
 
     await tester.ensureVisible(find.text('Restore from a backup file'));
     await tester.tap(find.text('Restore from a backup file'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Continue'));
     await tester.pumpAndSettle();
 
     expect(find.text('Vault restored. Unlock with your credentials.'),
@@ -1674,13 +1935,16 @@ void main() {
     await tester.pumpWidget(_buildScreen(
       onVaultIsReadable: (_) async => false,
       onBackupUsable: (_) async => false,
-      onRestoreFromFile: (_) async =>
+      onPickRestoreFile: () async => '/tmp/backup.gabbro',
+      onRestoreFromPickedFile: (_, _) async =>
           throw Exception('not a usable Gabbro vault — restore refused'),
     ));
     await tester.pumpAndSettle();
 
     await tester.ensureVisible(find.text('Restore from a backup file'));
     await tester.tap(find.text('Restore from a backup file'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Continue'));
     await tester.pumpAndSettle();
 
     expect(find.text('That file is not a usable Gabbro vault.'), findsOneWidget);
@@ -1697,7 +1961,7 @@ void main() {
     await tester.pumpWidget(_buildScreen(
       onVaultIsReadable: (_) async => false,
       onBackupUsable: (_) async => false,
-      onRestoreFromFile: (_) async =>
+      onPickRestoreFile: () async =>
           throw const FilePickerUnavailable(SocketException('no bus')),
     ));
     await tester.pumpAndSettle();
@@ -1776,5 +2040,386 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.textContaining('stays on disk'), findsOneWidget);
     expect(find.textContaining("app's private storage"), findsNothing);
+  });
+
+  // ── R6: the unlock screen never adopts a vault ─────────────────────────────
+  //
+  // Picking a `.gabbro` here is a repair for a vault that cannot be read, not a
+  // way to add one: it replaces the bytes at the path already in the list.
+
+  testWidgets('a healthy vault offers no restore-from-file', (tester) async {
+    await tester.pumpWidget(_buildScreen());
+    await tester.pumpAndSettle();
+
+    expect(find.text('Restore from a backup file'), findsNothing);
+  });
+
+  testWidgets('restore-from-file replaces the registered vault and adds no new one',
+      (tester) async {
+    final registry = VaultRegistry([
+      _vaultRecord(path: '/tmp/only.gabbro', alias: 'Only'),
+    ]);
+    String? restoredOver;
+
+    await tester.pumpWidget(_buildScreen(
+      vaultPath: '/tmp/only.gabbro',
+      registry: registry,
+      onVaultIsReadable: (_) async => false,
+      onBackupUsable: (_) async => false,
+      onPickRestoreFile: () async => '/tmp/backup.gabbro',
+      onRestoreFromPickedFile: (path, _) async => restoredOver = path,
+    ));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('Restore from a backup file'));
+    await tester.tap(find.text('Restore from a backup file'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Continue'));
+    await tester.pumpAndSettle();
+
+    expect(restoredOver, '/tmp/only.gabbro',
+        reason: 'the picked file overwrites the vault already registered here');
+    expect(registry.records.length, 1,
+        reason: 'the picked file is never registered as a second vault');
+  });
+
+  // ── H2 F8-F11: confirm before restore-from-file writes anything ─────────────
+  //
+  // One mis-pick here overwrites the vault AND refreshes its .bak, so this
+  // dialog is the user's last chance to stop it. The Rust side keeps the old
+  // vault as a .pre-restore safety copy; the dialog names both.
+
+  /// Renders a corrupt vault and taps the restore-from-file button.
+  Future<void> openRestoreFlow(
+    WidgetTester tester, {
+    required Future<String?> Function() onPickRestoreFile,
+    required Future<void> Function(String, String) onRestoreFromPickedFile,
+  }) async {
+    await tester.pumpWidget(_buildScreen(
+      vaultAlias: 'My vault',
+      onVaultIsReadable: (_) async => false,
+      onBackupUsable: (_) async => false,
+      onPickRestoreFile: onPickRestoreFile,
+      onRestoreFromPickedFile: onRestoreFromPickedFile,
+    ));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Restore from a backup file'));
+    await tester.tap(find.text('Restore from a backup file'));
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('F8: picking a file raises the confirm dialog before any write',
+      (tester) async {
+    var wrote = false;
+    await openRestoreFlow(
+      tester,
+      onPickRestoreFile: () async => '/tmp/backup.gabbro',
+      onRestoreFromPickedFile: (_, _) async => wrote = true,
+    );
+
+    expect(find.text('Replace this vault?'), findsOneWidget);
+    expect(
+      find.text("The picked file will replace 'My vault'. "
+          'The old file is kept as a safety copy.'),
+      findsOneWidget,
+      reason: 'the dialog must name the vault being replaced and the safety copy',
+    );
+    expect(wrote, isFalse, reason: 'nothing may be written before Continue');
+  });
+
+  testWidgets('F9: Cancel writes nothing and leaves the corrupt state',
+      (tester) async {
+    var wrote = false;
+    await openRestoreFlow(
+      tester,
+      onPickRestoreFile: () async => '/tmp/backup.gabbro',
+      onRestoreFromPickedFile: (_, _) async => wrote = true,
+    );
+
+    await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
+    await tester.pumpAndSettle();
+
+    expect(wrote, isFalse, reason: 'Cancel must reach no bridge call');
+    expect(find.text('Restore from a backup file'), findsOneWidget,
+        reason: 'the vault stays corrupt, the offer stays available');
+    expect(find.textContaining('Vault restored'), findsNothing);
+  });
+
+  testWidgets('F10: Continue restores exactly as before the dialog existed',
+      (tester) async {
+    var wrote = false;
+    await openRestoreFlow(
+      tester,
+      onPickRestoreFile: () async => '/tmp/backup.gabbro',
+      onRestoreFromPickedFile: (_, _) async => wrote = true,
+    );
+
+    await tester.tap(find.widgetWithText(FilledButton, 'Continue'));
+    await tester.pumpAndSettle();
+
+    expect(wrote, isTrue);
+    expect(find.text('Vault restored. Unlock with your credentials.'),
+        findsOneWidget);
+    expect(find.text('Restore from a backup file'), findsNothing,
+        reason: 'the corruption card is gone after the restore');
+  });
+
+  testWidgets('F11: a cancelled picker shows no dialog and writes nothing',
+      (tester) async {
+    var wrote = false;
+    await openRestoreFlow(
+      tester,
+      onPickRestoreFile: () async => null,
+      onRestoreFromPickedFile: (_, _) async => wrote = true,
+    );
+
+    expect(find.text('Replace this vault?'), findsNothing,
+        reason: 'no file was picked, so there is nothing to confirm');
+    expect(wrote, isFalse);
+    expect(find.text('Restore from a backup file'), findsOneWidget,
+        reason: 'the vault stays corrupt');
+  });
+
+  // ── H1: a restored file makes the stored fingerprint passphrase stale ──────
+  //
+  // Biometric keeps a copy of the passphrase of whatever vault sat at this path
+  // (`BiometricStore.kt:21`). Restoring a different file leaves that copy
+  // behind, so the fingerprint hands the vault a passphrase it no longer
+  // accepts and unlock fails with nothing to explain it. A passphrase change
+  // already unenrols for exactly this reason; so does a device fingerprint
+  // change. Restoring is the third case.
+
+  /// Drives a corrupt vault through restore-from-file and reports whether the
+  /// biometric enrolment was dropped.
+  Future<bool> restoreAndReportUnenrol(
+    WidgetTester tester, {
+    required bool isAndroid,
+    Future<String?> Function()? onPickRestoreFile,
+    Future<void> Function(String, String)? onRestoreFromPickedFile,
+  }) async {
+    var disabled = false;
+    await tester.pumpWidget(_buildScreen(
+      isAndroid: isAndroid,
+      onVaultIsReadable: (_) async => false,
+      onBackupUsable: (_) async => false,
+      onPickRestoreFile: onPickRestoreFile ?? () async => '/tmp/backup.gabbro',
+      onRestoreFromPickedFile: onRestoreFromPickedFile ?? (_, _) async {},
+      onDisableBiometric: (_) async => disabled = true,
+    ));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('Restore from a backup file'));
+    await tester.tap(find.text('Restore from a backup file'));
+    await tester.pumpAndSettle();
+    // A cancelled picker raises no dialog; everything else confirms through it.
+    final continueButton = find.widgetWithText(FilledButton, 'Continue');
+    if (continueButton.evaluate().isNotEmpty) {
+      await tester.tap(continueButton);
+      await tester.pumpAndSettle();
+    }
+    return disabled;
+  }
+
+  testWidgets('Android: a successful restore turns biometric unlock off',
+      (tester) async {
+    expect(
+      await restoreAndReportUnenrol(tester, isAndroid: true),
+      isTrue,
+      reason: 'the stored passphrase belongs to the vault that was replaced',
+    );
+  });
+
+  testWidgets('Linux: a successful restore touches no biometric enrolment',
+      (tester) async {
+    expect(
+      await restoreAndReportUnenrol(tester, isAndroid: false),
+      isFalse,
+      reason: 'there is no biometric unlock off Android',
+    );
+  });
+
+  testWidgets('a cancelled picker leaves biometric unlock alone',
+      (tester) async {
+    expect(
+      await restoreAndReportUnenrol(tester,
+          isAndroid: true, onPickRestoreFile: () async => null),
+      isFalse,
+      reason: 'nothing was replaced, so the stored passphrase still fits',
+    );
+  });
+
+  testWidgets('a refused restore leaves biometric unlock alone', (tester) async {
+    expect(
+      await restoreAndReportUnenrol(tester,
+          isAndroid: true,
+          onRestoreFromPickedFile: (_, _) async =>
+              throw Exception('not a vault')),
+      isFalse,
+      reason: 'a refused restore replaced nothing',
+    );
+  });
+
+  /// Drives a corrupt vault through a successful restore-from-file, with
+  /// biometric [enrolled] beforehand.
+  Future<void> restoreWithBiometric(
+    WidgetTester tester, {
+    required bool enrolled,
+  }) async {
+    await tester.pumpWidget(_buildScreen(
+      isAndroid: true,
+      onBiometricIsEnrolled: (_) async => enrolled,
+      onVaultIsReadable: (_) async => false,
+      onBackupUsable: (_) async => false,
+      onPickRestoreFile: () async => '/tmp/backup.gabbro',
+    ));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('Restore from a backup file'));
+    await tester.tap(find.text('Restore from a backup file'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Continue'));
+    await tester.pumpAndSettle();
+  }
+
+  // On Android the file picker backgrounds the app, so the screen re-probes the
+  // vault on the way back (didChangeAppLifecycleState). The restore's own
+  // setState and that probe race, and the emulator run showed neither message
+  // afterwards.
+  testWidgets('the messages survive the resume the file picker causes',
+      (tester) async {
+    var readable = false;
+    await tester.pumpWidget(_buildScreen(
+      isAndroid: true,
+      onBiometricIsEnrolled: (_) async => true,
+      onVaultIsReadable: (_) async => readable,
+      onBackupUsable: (_) async => false,
+      onPickRestoreFile: () async => '/tmp/backup.gabbro',
+      // the file on disk is a good vault again
+      onRestoreFromPickedFile: (_, _) async => readable = true,
+    ));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('Restore from a backup file'));
+    await tester.tap(find.text('Restore from a backup file'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Continue'));
+    // The picker returning wakes the app before the restore's setState lands.
+    tester.binding
+        .handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Vault restored'), findsOneWidget);
+    expect(
+        find.textContaining('Biometric unlock was turned off'), findsOneWidget);
+  });
+
+  testWidgets('the user is told biometric unlock was turned off',
+      (tester) async {
+    await restoreWithBiometric(tester, enrolled: true);
+
+    expect(
+      find.textContaining('Biometric unlock was turned off'),
+      findsOneWidget,
+      reason: 'silently losing the fingerprint is what left the user stuck',
+    );
+  });
+
+  testWidgets('no biometric notice for a user who never enabled it',
+      (tester) async {
+    await restoreWithBiometric(tester, enrolled: false);
+
+    expect(find.textContaining('Biometric unlock was turned off'), findsNothing);
+    expect(find.textContaining('Vault restored'), findsOneWidget);
+  });
+
+  // A new string is not done until the longest translation survives the largest
+  // text on the narrowest phone. Testing scale and locale apart never meets that
+  // case — the sync chooser overflowed in 32 of 37 languages while its English
+  // check passed.
+  testWidgets('the biometric notice survives every locale at 8x on a 360dp phone',
+      (tester) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() => tester.view.reset());
+
+    for (final locale in AppLocalizations.supportedLocales) {
+      // Tear the previous tree down first. Without this the UnlockScreen State
+      // is reused across iterations, so the second locale opens on a screen
+      // already restored — no corrupt block, no button, and nothing swept.
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+
+      await tester.pumpWidget(MaterialApp(
+        locale: locale,
+        // Production's delegate list, which ships fallbacks for nn and yo. The
+        // shared _appShell uses the bare AppLocalizations list, whose missing
+        // Material/Cupertino delegates warn for those two — a test-helper
+        // artefact users never meet.
+        localizationsDelegates: gabbroLocalizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context)
+              .copyWith(textScaler: const TextScaler.linear(8.0)),
+          child: child!,
+        ),
+        home: UnlockScreen(
+          vaultPath: '/tmp/test.gabbro',
+          onEstimateEntropy: _fakeEntropy,
+          yubikeyRecords: const [],
+          isAndroid: true,
+          onBiometricIsEnrolled: (_) async => true,
+          onVaultIsReadable: (_) async => false,
+          // Stubbed like _buildScreen does: left at their defaults these call
+          // the real bridge, the probe never settles and the corrupt block —
+          // which holds the restore button — never renders.
+          onVaultFormatTooOld: (_) async => false,
+          onVaultFormatTooNew: (_) async => false,
+          onBackupUsable: (_) async => false,
+          onPickRestoreFile: () async => '/tmp/backup.gabbro',
+          onRestoreFromPickedFile: (_, _) async {},
+          onDisableBiometric: (_) async {},
+        ),
+      ));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull,
+          reason: '$locale must render the corrupt screen cleanly at 8x');
+
+      // Drive the restore, or the notice never renders and this sweep passes
+      // without ever laying the new string out.
+      final l = lookupAppLocalizations(locale);
+      final restoreButton = find.text(l.restoreFromFileButton).first;
+      await tester.ensureVisible(restoreButton);
+      await tester.pumpAndSettle();
+      // At 8x the wrapped label is taller than the screen, so its centre (what
+      // tap aims at) is off the bottom while the control is reachable. Hit a
+      // point inside its visible part, as a finger would.
+      final rect = tester.getRect(restoreButton);
+      final y = (rect.top < 0 ? 0.0 : rect.top) + 20;
+      await tester.tapAt(Offset(rect.center.dx, y));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull,
+          reason: 'the confirm dialog must render at 8x in $locale, '
+              'never overflow');
+
+      // F12: drive through the confirm dialog, same visible-part tap.
+      final continueButton =
+          find.widgetWithText(FilledButton, l.continueAction).first;
+      await tester.ensureVisible(continueButton);
+      await tester.pumpAndSettle();
+      final cRect = tester.getRect(continueButton);
+      final cy = (cRect.top < 0 ? 0.0 : cRect.top) + 10;
+      await tester.tapAt(Offset(cRect.center.dx, cy));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull,
+          reason: 'the notice must scroll at 8x in $locale, never overflow');
+
+      expect(
+        find.text(l.vaultRestoredBiometricDisabled),
+        findsOneWidget,
+        reason: 'the notice must be on screen for $locale to mean anything',
+      );
+    }
   });
 }

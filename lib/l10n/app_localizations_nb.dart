@@ -722,6 +722,14 @@ class AppLocalizationsNb extends AppLocalizations {
   String get syncMethodTitle => 'Hvordan skal denne synkroniseringen brukes?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Samme passfrase beviser ikke samme hvelving.';
+
+  @override
+  String get syncUseIncomingYubikey =>
+      'Bruk den innkommende hvelvingens YubiKey';
+
+  @override
   String get syncMergeAutomatically => 'Slå sammen automatisk';
 
   @override
@@ -1771,6 +1779,10 @@ class AppLocalizationsNb extends AppLocalizations {
   String get onboardingPathRequired => 'Sti er påkrevd';
 
   @override
+  String get onboardingPathTaken =>
+      'Det finnes allerede en fil her. Velg et annet navn — å opprette et hvelv ville erstattet den.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Velg en ny hoved­passfrase, eller gjenbruk din forrige hvis du foretrekker det.';
 
@@ -2106,12 +2118,40 @@ class AppLocalizationsNb extends AppLocalizations {
   String get restoreFromFileButton => 'Gjenopprett fra en sikkerhetskopifil';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Erstatte dette hvelvet?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Den valgte filen erstatter «$vaultName». Den gamle filen beholdes som reservekopi.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Hvelv gjenopprettet. Lås opp med påloggingsinformasjonen din.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Biometrisk opplåsing ble slått av, fordi den gjenopprettede filen kan bruke en annen passfrase. Slå den på igjen under Sikkerhet.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'Biometrisk opplåsing ble slått av: hvelvfilen er endret, og den lagrede passfrasen åpner den ikke lenger. Slå den på igjen under Sikkerhet.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Den filen er ikke et brukbart Gabbro-hvelv.';
+
+  @override
+  String get adoptTitle => 'Åpne en eksisterende hvelvfil';
+
+  @override
+  String get adoptConfirm => 'Legg til hvelv';
+
+  @override
+  String get adoptAlreadyRegistered => 'Dette hvelvet er allerede i listen';
+
+  @override
+  String get unlockAdoptItem => 'Åpne en hvelvfil…';
 
   @override
   String get resizeColumns => 'Endre kolonnestørrelse';

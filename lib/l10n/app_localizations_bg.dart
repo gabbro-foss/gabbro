@@ -724,6 +724,13 @@ class AppLocalizationsBg extends AppLocalizations {
   String get syncMethodTitle => 'Как да се приложи тази синхронизация?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Еднаквата паролна фраза не доказва еднакъв трезор.';
+
+  @override
+  String get syncUseIncomingYubikey => 'Използвайте YubiKey на входящия трезор';
+
+  @override
   String get syncMergeAutomatically => 'Обединяване автоматично';
 
   @override
@@ -1774,6 +1781,10 @@ class AppLocalizationsBg extends AppLocalizations {
   String get onboardingPathRequired => 'Пътят е задължителен';
 
   @override
+  String get onboardingPathTaken =>
+      'Тук вече съществува файл. Изберете друго име — създаването на трезор би го заменило.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Избери нова главна паролна фраза или повторно използвай предишната.';
 
@@ -2112,12 +2123,40 @@ class AppLocalizationsBg extends AppLocalizations {
   String get restoreFromFileButton => 'Възстановяване от резервен файл';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Да замените този сейф?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Избраният файл ще замени «$vaultName». Старият файл се запазва като аварийно копие.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Сейфът е възстановен. Отключете с вашите данни.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Биометричното отключване беше изключено, защото възстановеният файл може да използва различна паролна фраза. Включете го отново в Сигурност.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'Биометричното отключване беше изключено: файлът на сейфа е променен и запазената паролна фраза вече не го отваря. Включете го отново в Сигурност.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Този файл не е използваем сейф на Gabbro.';
+
+  @override
+  String get adoptTitle => 'Отваряне на съществуващ файл на трезор';
+
+  @override
+  String get adoptConfirm => 'Добавяне на трезор';
+
+  @override
+  String get adoptAlreadyRegistered => 'Този трезор вече е в списъка ви';
+
+  @override
+  String get unlockAdoptItem => 'Отваряне на файл на трезор…';
 
   @override
   String get resizeColumns => 'Преоразмеряване на колоните';

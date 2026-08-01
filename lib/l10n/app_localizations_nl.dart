@@ -724,6 +724,14 @@ class AppLocalizationsNl extends AppLocalizations {
       'Hoe moet deze synchronisatie worden toegepast?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'Dezelfde wachtwoordzin bewijst niet dezelfde kluis.';
+
+  @override
+  String get syncUseIncomingYubikey =>
+      'Gebruik de YubiKey van de inkomende kluis';
+
+  @override
   String get syncMergeAutomatically => 'Automatisch samenvoegen';
 
   @override
@@ -1782,6 +1790,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get onboardingPathRequired => 'Pad is vereist';
 
   @override
+  String get onboardingPathTaken =>
+      'Hier bestaat al een bestand. Kies een andere naam — een kluis aanmaken zou het vervangen.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Kies een nieuwe hoofdwachtwoordzin, of hergebruik uw vorige als u dat liever heeft.';
 
@@ -2117,12 +2129,40 @@ class AppLocalizationsNl extends AppLocalizations {
   String get restoreFromFileButton => 'Herstellen vanaf een back-upbestand';
 
   @override
+  String get restoreFromFileConfirmTitle => 'Deze kluis vervangen?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'Het gekozen bestand vervangt «$vaultName». Het oude bestand blijft bewaard als reservekopie.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Kluis hersteld. Ontgrendel met je gegevens.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Biometrisch ontgrendelen is uitgeschakeld, omdat het herstelde bestand een andere wachtwoordzin kan gebruiken. Schakel het weer in bij Beveiliging.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'Biometrisch ontgrendelen is uitgeschakeld: het kluisbestand is gewijzigd en de opgeslagen wachtwoordzin opent het niet meer. Schakel het weer in bij Beveiliging.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Dat bestand is geen bruikbare Gabbro-kluis.';
+
+  @override
+  String get adoptTitle => 'Bestaand kluisbestand openen';
+
+  @override
+  String get adoptConfirm => 'Kluis toevoegen';
+
+  @override
+  String get adoptAlreadyRegistered => 'Deze kluis staat al in de lijst';
+
+  @override
+  String get unlockAdoptItem => 'Kluisbestand openen…';
 
   @override
   String get resizeColumns => 'Kolommen aanpassen';

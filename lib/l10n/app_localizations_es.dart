@@ -723,6 +723,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get syncMethodTitle => '¿Cómo debe aplicarse esta sincronización?';
 
   @override
+  String get syncSamePassphraseWarning =>
+      'La misma contraseña maestra no prueba que sea el mismo almacén.';
+
+  @override
+  String get syncUseIncomingYubikey => 'Use la YubiKey del almacén entrante';
+
+  @override
   String get syncMergeAutomatically => 'Combinar automáticamente';
 
   @override
@@ -1784,6 +1791,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get onboardingPathRequired => 'La ruta es obligatoria';
 
   @override
+  String get onboardingPathTaken =>
+      'Ya existe un archivo aquí. Elige otro nombre: crear un almacén lo reemplazaría.';
+
+  @override
   String get onboardingReusePassphraseHint =>
       'Elija una nueva frase de contraseña maestra, o reutilice la anterior si lo prefiere.';
 
@@ -2128,12 +2139,40 @@ class AppLocalizationsEs extends AppLocalizations {
       'Restaurar desde un archivo de copia de seguridad';
 
   @override
+  String get restoreFromFileConfirmTitle => '¿Sustituir esta caja fuerte?';
+
+  @override
+  String restoreFromFileConfirmBody(String vaultName) {
+    return 'El archivo elegido sustituirá a «$vaultName». El archivo antiguo se conserva como copia de respaldo.';
+  }
+
+  @override
   String get vaultRestoredMessage =>
       'Caja fuerte restaurada. Desbloquea con tus credenciales.';
 
   @override
+  String get vaultRestoredBiometricDisabled =>
+      'Se desactivó el desbloqueo biométrico, porque el archivo restaurado puede usar otra contraseña. Vuelve a activarlo en Seguridad.';
+
+  @override
+  String get biometricStaleDisabled =>
+      'Se desactivó el desbloqueo biométrico: el archivo de la caja fuerte cambió y la contraseña guardada ya no lo abre. Vuelve a activarlo en Seguridad.';
+
+  @override
   String get restoreFromFileInvalidError =>
       'Ese archivo no es una caja fuerte de Gabbro utilizable.';
+
+  @override
+  String get adoptTitle => 'Abrir un archivo de almacén existente';
+
+  @override
+  String get adoptConfirm => 'Añadir almacén';
+
+  @override
+  String get adoptAlreadyRegistered => 'Este almacén ya está en la lista';
+
+  @override
+  String get unlockAdoptItem => 'Abrir un archivo de almacén…';
 
   @override
   String get resizeColumns => 'Ajustar columnas';
