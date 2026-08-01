@@ -41,7 +41,7 @@ Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
 ```
 gabbro/
 ├── lib/                  # Flutter app
-│   ├── screens/          # unlock, vault list, export, import, generator, keyboard shortcuts, settings, manage vaults/folders, …
+│   ├── screens/          # unlock, vault list, adopt vault, export, import, generator, keyboard shortcuts, settings, manage vaults/folders, …
 │   ├── widgets/          # path_field, generator_widget, yubikey_tap, password_breakdown_sheet, sync_review, sync_method_dialog, text_size_slider, url_link, …
 │   ├── src/rust/         # Auto-generated bridge (do not edit)
 │   └── *.dart            # main, app_paths (GabbroPaths), settings, text_scale, control_scale, gabbro_contrast (high-contrast theme flag), vault_registry, safe_file_picker, autotype_listener, autotype_target, clipboard_clear
@@ -119,140 +119,24 @@ canary that drives the real save paths and byte-compares the real config/vault l
 
 ### Next task
 
-Full gate ran ALL GREEN 2026-07-30 (Rust 667, Flutter 2012, ~125m).
-
-H2 DONE (hardware-passed 2026-07-31, FH1-FH7): restore-from-file preserves the old
-vault as `.pre-restore` (R1-R7) and confirms before writing (F8-F12).
-
-H1 DONE (hardware-passed 2026-07-31, SW1-SW9 on the emulator): a biometric-fed
-decrypt rejection unenrols and names the vault-file change; tap-stage failures
-(wrong PIN) never do. Error contract documented at `_doUnlock` + LEARNINGS.
-
-**1. The `adopt` row** (both columns, canon-TDD). Design AGREED 2026-08-01:
-one new `AdoptVaultScreen` shared by all entry points. Pick file -> validate via
-`readVaultHeader` (full parse, no credentials) -> alias from header, editable ->
-Linux registers the picked path in place / Android copies via new Rust
-`adopt_vault_file(source, dest)` (never overwrites) -> unlock screen, full
-credentials. Registration reuses `_onVaultCreated` (type auto-detect). Keyed
-files need nothing extra. Duplicate adopt of one source on Android: WONTFIX.
-Mock vaults A-E in `.scratchpad`.
-
-Tick-list (mark as they go green; nothing below is done until hardware passes):
-
-Rust `adopt_vault_file` (`vault/io.rs` + bridge):
-- [x] R1 valid source -> dest 0600, byte-identical, own `.bak`
-- [x] R2 occupied dest refused, untouched
-- [x] R3 unparseable source refused, no dest created
-- [x] R4 symlink source/dest refused
-- [x] R5 pre-v11 source refused (floor pin)
-- [x] RB bridge roundtrip (`vault_bridge.rs`) — all 6 green 2026-08-01
-- [x] codegen + `cargo build --release --lib`; real-FFI suites 12/12 on the new cdylib
-
-Flutter `AdoptVaultScreen`:
-- [x] F1 valid file -> alias prefilled, editable
-- [x] F2 not-a-vault / too-old (+ upgrade URL) / too-new triage (reuses unlock's translated keys)
-- [x] F3 alias collision -> validation error
-- [x] F4 already-registered path refused (Linux)
-- [x] F5 Linux confirm -> registers picked path, no copy
-- [x] F6 Android confirm (seam) -> copy to app storage under a free name, dest registered
-- [x] F7 keyed file -> keyed-ness detected — hardware-passed 2026-08-01 (AL10 full
-      keyed unlock; AL11 delete-dialog wording; AA6 PIN field on the adopted vault)
-- [x] F8 PathField: typed path + browse; cancel no-op; portal-unavailable SnackBar
-      (PathField gained `onPathPicked`/`onSubmitted`, pinned in path_field_test)
-- [x] F9 after adopt -> unlock screen, back stack cleared (`main_navigation_test`)
-
-Entry points:
-- [x] E1 onboarding "Open an existing vault file" -> `openAdoptVault()`; wired at all
-      4 onboarding sites (covers manage-vaults' add path)
-- [x] E2 unlock dropdown from 1 vault, "Open a vault file…" item (flips 1-vault pin)
-- [x] E3 2-vault dropdown: switch unregressed + adopt item
-
-A11y & l10n net:
-- [x] N1 screen_catalog + screenFileCount=28 (probe 119, a11y 237, keyboard 44 all green)
-- [x] N2 8x text, 360dp, all 37 locales, all 5 states (valid/collision/invalid/too-old/registered)
-- [x] N3 browse icon named via PathField's existing semanticLabel; a11y net sweeps it
-- [x] N4 triage + collision errors announced, Linux only (success = navigation,
-      the unlock screen names itself)
-- [x] N5 keyboard-only: typed path, Enter, Tab, Enter adopts
-- [x] N6 4 new keys ({`adoptTitle`,`adoptConfirm`,`adoptAlreadyRegistered`,`unlockAdoptItem`})
-      translated in 37 ARBs; alias label/collision/path-hint reuse existing keys
-- [x] N7 n/a — the flow has no dialog (the upgrade link reuses showUrlDialog)
-
-Hardware:
-- [x] Linux matrix AL1-AL12 hardware-passed 2026-08-01 (AL4: vault A holds Test
-      login 1 only — old inventory note was stale; AL9 passed via pasted path)
-- [x] Android matrix AA1-AA6 hardware-passed 2026-08-01 (AA6 re-run after a mistaken
-      wipe; keyed delete needs a tap BY DESIGN — emulator repair is `pm clear`)
+`gabbro_test` RUNNING on the branch tip (started 2026-08-01) — the last ALL-GREEN
+gate (2026-07-30) predates H1's Flutter side, all of adopt, and the sandbox fix.
+If green: merge + release decision with maintainer (alpha.17 was held for this work).
 
 ### Faster sync, attempt 2 — this branch
 
-**The matrix.** Rows are user flows, columns are how the *incoming file* was protected
-(not how the receiving vault is protected — a keyed vault can receive a passphrase-only
-file and stay keyed).
+ALL THREE ROWS DONE and hardware-passed: import entries; sync from file
+(2026-07-30, T1-T9/W1-W3/K1-K5); adopt a file (2026-08-01, AL1-AL12 Linux +
+AA1-AA6 emulator). Tick-lists, design decisions and findings: git log.
+Also on this branch: the flutter-test sandbox held only during declaration —
+fixed + pinned by `test/sandbox_net_test.dart` (2026-08-01).
 
-| | passphrase | p+yk | notes |
-|---|---|---|---|
-| import entries | done | done | always asks for passphrase + PIN + tap |
-| sync from file | done | done | hardware-passed 2026-07-30 (T1-T9, W1-W3, K1-K5). Keyed: PIN + tap only; typed passphrase only on fallback, same tap reused (one tap total) |
-| adopt a file | todo | todo | new flow from `onboarding_screen`, `unlock_screen`, `manage_vaults_screen` |
+Attempt 1 (`sync_without_second_unlock`): unmerged — **do not merge, do not
+delete until picked clean**. Note: it was kept partly for adoption's sake
+(cached-master path), and adoption shipped WITHOUT needing it — review what is
+still worth salvaging before any deletion.
 
-Both sync cells are done and hardware-passed (matrix above); details are in the git log.
-All six Rust merge functions exist and are green (`merge_vault_from_file`, `fast_merge_…`,
-`import_from_gabbro`, each with a `_with_key` twin).
-
-**Adopt** = open an exported `.gabbro` as a vault on a second device, without first
-creating an empty vault and importing into it.
-
-**Agreed split:** `sync from file` is the same vault, only ever. `import entries` is any
-other source, always full credentials — wording only, the guards are already there.
-
-Attempt 1 (`sync_without_second_unlock`) is unmerged and never hardware-tested; its
-key-protected silent path is unreachable for independently created vaults. **Do not merge,
-do not delete until picked clean.** Its chooser extraction is already salvaged; rebuild
-silent sync without the cached-master branch, so the probe collapses to one bool and the
-warning becomes unconditional. Keep the cached-master path and `open_vault_body_with_master`
-until adoption is designed — adoption is what needs them.
-
-No adoption flow exists today: every route to "add a vault" ends at the create screen
-(`onAddVault`, `lib/main.dart:1109`), and `_restoreFromFile`
-(`lib/screens/unlock_screen.dart:450`) is gated on a corrupt vault and overwrites a
-registered path. If adoption reuses `restore_vault_from_file`, note it now also refreshes
-the `.bak` and (via the unlock screen) unenrols biometrics for that path — correct for a
-restore, wrong for adopting a file that is already this vault.
-
-**Design notes:**
-- **Silent sync is try-first (decided 2026-07-30).** Pick file -> apply-choice dialog (which
-  carries the warning) -> merge using the passphrase the session already holds. Only if that
-  comes back "needs credentials" does the passphrase box appear. No up-front probe: it would
-  open the file twice and add ~0.7s to every sync. The Rust call returns `Option<MergeSummary>`
-  — `None` means needs-credentials, so Dart never matches on an error string.
-- Linux adoption needs no file copy — register a `VaultRecord` at the picked path. Android's
-  picker returns a cache copy, so a copy into app storage is forced there. That asymmetry
-  decides whether adoption reuses `restore_vault_from_file`.
-- A new screen must enter `test/screen_catalog.dart` and bump `screenFileCount`; that enrols
-  it in the overflow probe, three a11y nets, three keyboard nets and the traversal baseline.
-  New strings need all 37 ARBs (`test/l10n_test.dart` enforces the key set).
-- Any new `#[ignore]` sync test must be added to `gabbro_test`, or it never runs.
-
-**Findings not to be re-litigated:**
-- The menu item stays **`Sync from file`** (decided 2026-07-30). A bare "Sync" promises the
-  background syncing Gabbro deliberately does not do, and "from file" warns the user a file
-  picker is next. It also keeps the menu parallel: Export vault / Import entries / Sync from
-  file. Do not re-propose the rename.
-- A passphrase-only save re-seals the whole file with fresh salts (`session.rs:186`,
-  `rust/src/api/vault.rs:1079`). Nothing per-vault survives but the alias, so "it opened"
-  proves only *same passphrase* — hence the warning. An entry-UUID-overlap heuristic was
-  **rejected** (cries wolf on an empty or fully-replaced vault); do not re-propose it.
-- A key-protected save re-seals the body only (`reseal_vault_body`,
-  `rust/src/crypto/vault_crypto.rs:335`), so the random per-vault master survives every save,
-  alias change and key add/remove. Two files sharing a master are provably the same vault.
-- The AES-GCM AAD binds a header to its own body only (`rust/src/vault/file_format.rs:163`).
-  Not a cross-file check — the alias comparison is policy, not crypto.
-- A YubiKey set that differs per device is expected and must **not** be compared: add/remove
-  rewraps the same master. The hmac-secret salt is random per registration
-  (`rust/src/fido/device.rs:123`), so a genuinely different vault always needs a tap.
-- The credential screen stays the fallback for every case not proven silent.
-- Nothing here is done until it runs on hardware with mock vaults.
+Mock vaults for future rounds: `.scratchpad` (A, B, D; C and E deleted 2026-08-01).
 
 ---
 
