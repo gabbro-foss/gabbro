@@ -273,17 +273,17 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   sync-without-a-second-unlock investigation.
 
 ### Security (pre-v1)
-- Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
+- **Human expert cryptography review** of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
 
 ### V2+ / Defer
 - **Linux biometric unlock** (laptop fingerprint readers, e.g. libfido2/PAM or `fprintd`). Fits the current per-device model unchanged: Linux would just get its own local per-vault secret store; the vault file carries no biometric state, so nothing else changes.
-- Passkey provider: store website passkeys (WebAuthn discoverable credentials) in
+- **Passkey provider**: store website passkeys (WebAuthn discoverable credentials) in
   the vault so they sync/back up. Distinct from the YubiKey (which unlocks the app);
   tradeoff — website private keys would live in the vault, not in hardware.
-- Custom and hideable filter chips (post-v1 user feedback gate).
-- Windows support.
-- Yubico partnership.
-- Donation/sustainability model: GitHub Sponsors is live; Monero possible later (a large, dedicated effort). Liberapay ruled out (2026-07-22 — Stripe forces business-type onboarding for individuals and has suspended Liberapay-linked accounts; no PayPal). Don't re-propose Liberapay.
-- No-telemetry verification guide (ripgrep scan, Wireshark, NetGuard).
-- Support model (GitHub Issues + SUPPORT.md for v1; revisit when user base exists).
-- Import: content-hash deduplication and entry-level merge.
+- **Custom and hideable filter chips** (post-v1 user feedback gate).
+- **Windows support.**
+- **Yubico partnership.**
+- **Donation/sustainability model**: GitHub Sponsors is live; Monero possible later (a large, dedicated effort). Liberapay ruled out (2026-07-22 — Stripe forces business-type onboarding for individuals and has suspended Liberapay-linked accounts; no PayPal). Don't re-propose Liberapay.
+- **No-telemetry verification guide** (ripgrep scan, Wireshark, NetGuard).
+- **Support model** (GitHub Issues + SUPPORT.md for v1; revisit when user base exists).
+- **Import**: content-hash deduplication and entry-level merge.
