@@ -119,26 +119,20 @@ canary that drives the real save paths and byte-compares the real config/vault l
 
 ### Next task
 
-`gabbro_test` RUNNING on the branch tip (started 2026-08-01) — the last ALL-GREEN
-gate (2026-07-30) predates H1's Flutter side, all of adopt, and the sandbox fix.
-If green: merge + release decision with maintainer (alpha.17 was held for this work).
+Port `916cbc0` from `sync_without_second_unlock` into master: 415 test-only
+lines pinning the vault-identity facts sync/adopt rely on (fresh salts per
+passphrase-only save, reseal_body keeps the master, independent vaults never
+share a master, keyed CRUD leaves the header alone — prose-only on master
+today). Expect conflicts: attempt 2 rewrote the touched files; review +
+reduce/expand, pins must land green (net-first). Then delete that branch.
+Then one full gate = alpha.17 pre-flight; release decision with maintainer.
 
-### Faster sync, attempt 2 — this branch
+### Faster sync
 
-ALL THREE ROWS DONE and hardware-passed: import entries; sync from file
-(2026-07-30, T1-T9/W1-W3/K1-K5); adopt a file (2026-08-01, AL1-AL12 Linux +
-AA1-AA6 emulator). Tick-lists, design decisions and findings: git log.
-Also on this branch: the flutter-test sandbox held only during declaration —
-fixed + pinned by `test/sandbox_net_test.dart` (2026-08-01).
-
-Attempt 1 (`sync_without_second_unlock`): unmerged, diff-reviewed 2026-08-01.
-One salvage left, then delete the branch — both AFTER a green gate:
-port `916cbc0` (415 test-only lines pinning the vault-identity facts sync/adopt
-rely on: fresh salts per passphrase-only save, reseal_body keeps the master,
-independent vaults never share a master, keyed CRUD leaves the header alone —
-none of these pins exist on this branch; the facts are prose-only today).
-Everything else is salvaged (chooser + 8x test) or superseded (probe,
-cached-master, skip-credential-screen).
+Attempt 2 merged to master 2026-08-01 (`93aeaac`; gate ALL GREEN on `94bcf19`),
+branch deleted local + remote. All three rows hardware-passed; tick-lists and
+findings in git log. Attempt 1 (`sync_without_second_unlock`): only the
+`916cbc0` port remains (see Next task).
 
 Mock vaults for future rounds: `.scratchpad` (A, B, D; C and E deleted 2026-08-01).
 
