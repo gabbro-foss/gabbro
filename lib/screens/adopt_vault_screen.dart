@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:gabbro/app_paths.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/safe_file_picker.dart' show FilePickerUnavailable;
@@ -120,6 +121,7 @@ class _AdoptVaultScreenState extends State<AdoptVaultScreen> {
     final alias = _aliasController.text.trim();
     if (widget.registry.records.any((r) => r.alias == alias)) {
       setState(() => _collisionAlias = alias);
+      _announce(AppLocalizations.of(context).vaultNameAlreadyExists(alias));
       return;
     }
     setState(() => _collisionAlias = null);
@@ -136,6 +138,27 @@ class _AdoptVaultScreenState extends State<AdoptVaultScreen> {
     await widget.onRegistered(path, alias);
   }
 
+  /// N4: an error card appears without any focus move, so on Linux the reader
+  /// is otherwise silent about it. Linux-only, same gate as everywhere else
+  /// (Android's announcement events are deprecated; TalkBack reads the card).
+  void _announce(String message) {
+    final onAndroid = widget.isAndroid ?? Platform.isAndroid;
+    if (onAndroid || !mounted) return;
+    SemanticsService.sendAnnouncement(
+      View.of(context),
+      message,
+      Directionality.of(context),
+    );
+  }
+
+  String _errorMessage(AppLocalizations l, _AdoptError error) =>
+      switch (error) {
+        _AdoptError.invalid => l.restoreFromFileInvalidError,
+        _AdoptError.tooOld => l.vaultFormatTooOld,
+        _AdoptError.tooNew => l.vaultFormatTooNew,
+        _AdoptError.alreadyRegistered => l.adoptAlreadyRegistered,
+      };
+
   // Triage a definite choice: a picker result or a submitted typed path —
   // never a keystroke (the header read parses the whole file).
   Future<void> _triage(String path) async {
@@ -147,6 +170,9 @@ class _AdoptVaultScreenState extends State<AdoptVaultScreen> {
         _pickedPath = null;
         _error = _AdoptError.alreadyRegistered;
       });
+      _announce(
+        _errorMessage(AppLocalizations.of(context), _AdoptError.alreadyRegistered),
+      );
       return;
     }
     try {
@@ -173,6 +199,7 @@ class _AdoptVaultScreenState extends State<AdoptVaultScreen> {
         _pickedPath = null;
         _error = error;
       });
+      _announce(_errorMessage(AppLocalizations.of(context), error));
     }
   }
 
@@ -185,28 +212,22 @@ class _AdoptVaultScreenState extends State<AdoptVaultScreen> {
   Widget _errorCard(BuildContext context) {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final (key, text, linkLabel) = switch (_error!) {
-      _AdoptError.invalid => (
-        const Key('adopt_error_invalid'),
-        l.restoreFromFileInvalidError,
-        null,
-      ),
+    final (key, linkLabel) = switch (_error!) {
+      _AdoptError.invalid => (const Key('adopt_error_invalid'), null),
       _AdoptError.tooOld => (
         const Key('adopt_error_too_old'),
-        l.vaultFormatTooOld,
         l.vaultFormatUpgradeLink,
       ),
       _AdoptError.tooNew => (
         const Key('adopt_error_too_new'),
-        l.vaultFormatTooNew,
         l.vaultFormatTooNewLink,
       ),
       _AdoptError.alreadyRegistered => (
         const Key('adopt_error_already_registered'),
-        l.adoptAlreadyRegistered,
         null,
       ),
     };
+    final text = _errorMessage(l, _error!);
     return Card(
       key: key,
       color: theme.colorScheme.errorContainer,

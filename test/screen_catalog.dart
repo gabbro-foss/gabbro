@@ -7,6 +7,7 @@ import 'package:gabbro/main.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/vault_registry.dart';
 import 'package:gabbro/screens/about_screen.dart';
+import 'package:gabbro/screens/adopt_vault_screen.dart';
 import 'package:gabbro/screens/alphabet_index_bar.dart';
 import 'package:gabbro/screens/csv_mapping_screen.dart';
 import 'package:gabbro/screens/import_screen.dart';
@@ -349,6 +350,18 @@ final Map<String, Widget Function()> screens = {
     onVaultFormatTooOld: (_) async => false,
     onBackupUsable: (_) async => false,
   ),
+  // Initial state only (path field): the picked/error states need interaction
+  // and are swept at 8x/37 locales by the flow test in
+  // adopt_vault_screen_test.dart.
+  'adopt_vault': () => AdoptVaultScreen(
+    registry: VaultRegistry([]),
+    isAndroid: false,
+    onPickFile: () async => null,
+    onReadHeader: (_) async => const VaultHeaderData(yubikeyRecords: []),
+    onFormatTooOld: (_) async => false,
+    onFormatTooNew: (_) async => false,
+    onRegistered: (_, _) async {},
+  ),
   'csv_mapping': () => CsvMappingScreen(
     csvContent: 'title,url,username\nMail,https://example.com,user',
     preview: const CsvPreviewData(
@@ -536,6 +549,7 @@ const Map<String, String> covers = {
   'review_changes': 'review_changes_screen',
   'import': 'import_screen',
   'unlock': 'unlock_screen',
+  'adopt_vault': 'adopt_vault_screen',
   'vault_list': 'vault_list_screen',
   'vault_list (wide)': 'vault_list_screen',
   'tablet_vault_layout': 'tablet_vault_layout',
@@ -575,5 +589,5 @@ List<String> uiSources() =>
 // renamed folder) would otherwise leave `missing` empty and pass while checking
 // nothing. Adding a screen or widget fails here first: the new file must be
 // swept or waived deliberately.
-const screenFileCount = 27;
+const screenFileCount = 28;
 const widgetFileCount = 11;

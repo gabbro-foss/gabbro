@@ -1,7 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
+import 'package:gabbro/main.dart' show gabbroLocalizationsDelegates;
 import 'package:gabbro/safe_file_picker.dart' show FilePickerUnavailable;
 import 'package:gabbro/screens/adopt_vault_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -318,6 +321,220 @@ void main() {
       await pickAndConfirm(tester);
 
       expect(copies, [('/cache/B.gabbro', '${dir.path}/B-2.gabbro')]);
+    });
+  });
+
+  // N5 (Linux desktop): the whole flow must complete without a pointer —
+  // typed path, Enter to triage, Tab to the Add button, Enter to adopt.
+  group('N5: keyboard only', () {
+    testWidgets('typed path -> Enter -> Tab -> Enter adopts', (tester) async {
+      final calls = <(String, String)>[];
+      await tester.pumpWidget(
+        _buildScreen(
+          onReadHeader: (_) async =>
+              const VaultHeaderData(alias: 'Personal', yubikeyRecords: []),
+          onRegistered: (path, alias) async => calls.add((path, alias)),
+        ),
+      );
+      await tester.enterText(
+        find.byKey(const Key('adopt_path_field')),
+        '/tmp/typed.gabbro',
+      );
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('adopt_alias_field')), findsOneWidget);
+
+      bool confirmFocused() {
+        final f = FocusManager.instance.primaryFocus;
+        if (f?.context == null) return false;
+        var found = false;
+        f!.context!.visitAncestorElements((e) {
+          if (e.widget.key == const Key('adopt_confirm_button')) {
+            found = true;
+            return false;
+          }
+          return true;
+        });
+        return found;
+      }
+
+      var reached = false;
+      for (var i = 0; i < 8 && !reached; i++) {
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pumpAndSettle();
+        reached = confirmFocused();
+      }
+      expect(reached, isTrue, reason: 'Tab must reach the Add button');
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(calls, [('/tmp/typed.gabbro', 'Personal')]);
+    });
+  });
+
+  // N4: an error card appearing moves no focus, so on Linux the reader would
+  // say nothing — announce it. Android is gated off (deprecated events;
+  // TalkBack reads the widgets themselves).
+  group('N4: errors are announced on Linux', () {
+    testWidgets('triage error is spoken', (tester) async {
+      final said = recordAnnouncements(tester);
+      await tester.pumpWidget(
+        _buildScreen(
+          onPickFile: () async => '/tmp/junk.bin',
+          onReadHeader: _throwingHeader,
+        ),
+      );
+      await _tapBrowse(tester);
+      await tester.pumpAndSettle();
+
+      final l = await AppLocalizations.delegate.load(const Locale('en'));
+      expect(said, contains(l.restoreFromFileInvalidError));
+    });
+
+    testWidgets('collision is spoken', (tester) async {
+      final said = recordAnnouncements(tester);
+      await tester.pumpWidget(
+        _buildScreen(
+          registry: VaultRegistry([_record('/tmp/a.gabbro', 'Personal')]),
+          onPickFile: () async => '/tmp/picked.gabbro',
+          onReadHeader: (_) async =>
+              const VaultHeaderData(alias: 'Personal', yubikeyRecords: []),
+        ),
+      );
+      await _tapBrowse(tester);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('adopt_confirm_button')));
+      await tester.pumpAndSettle();
+
+      final l = await AppLocalizations.delegate.load(const Locale('en'));
+      expect(said, contains(l.vaultNameAlreadyExists('Personal')));
+    });
+
+    testWidgets('Android stays silent', (tester) async {
+      final said = recordAnnouncements(tester);
+      await tester.pumpWidget(
+        _buildScreen(
+          isAndroid: true,
+          onPickFile: () async => '/tmp/junk.bin',
+          onReadHeader: _throwingHeader,
+        ),
+      );
+      await _tapBrowse(tester);
+      await tester.pumpAndSettle();
+
+      expect(said, isEmpty);
+    });
+  });
+
+  // N2: longest strings x largest text x narrowest phone, together, through
+  // every state of the flow — the catalog probe only sweeps the initial state
+  // at 2x.
+  group('N2: every locale at 8x on a 360dp phone', () {
+    testWidgets('all five states render without overflow', (tester) async {
+      tester.view.physicalSize = const Size(360, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() => tester.view.reset());
+
+      for (final locale in AppLocalizations.supportedLocales) {
+        // Pick sequence: valid -> unparseable -> too-old -> registered path.
+        final picks = [
+          '/tmp/ok.gabbro',
+          '/tmp/junk.bin',
+          '/tmp/old.gabbro',
+          '/tmp/mine.gabbro',
+        ];
+        var pick = 0;
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.pumpAndSettle();
+        await tester.pumpWidget(MaterialApp(
+          locale: locale,
+          localizationsDelegates: gabbroLocalizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: const TextScaler.linear(8.0)),
+            child: child!,
+          ),
+          home: AdoptVaultScreen(
+            registry: VaultRegistry([
+              _record('/tmp/mine.gabbro', 'Personal'),
+            ]),
+            isAndroid: false,
+            onPickFile: () async => picks[pick++],
+            onReadHeader: (path) async => path == '/tmp/ok.gabbro'
+                ? const VaultHeaderData(
+                    alias: 'Personal', yubikeyRecords: [])
+                : throw Exception('not a vault'),
+            onFormatTooOld: (path) async => path == '/tmp/old.gabbro',
+            onFormatTooNew: (_) async => false,
+            onRegistered: (_, _) async {},
+          ),
+        ));
+        await tester.pumpAndSettle();
+        final l = lookupAppLocalizations(locale);
+
+        // The screen's own list, not a TextField's inner scrollable — at 8x a
+        // huge field can own the list's centre, so centre-drags are unsafe.
+        final list = find
+            .descendant(
+              of: find.byType(ListView),
+              matching: find.byType(Scrollable),
+            )
+            .first;
+        Future<void> show(Finder f, double delta) async {
+          await tester.scrollUntilVisible(f, delta, scrollable: list);
+          await tester.pumpAndSettle();
+        }
+
+        Future<void> browse() async {
+          // Back to the top: at 8x the lazy ListView disposes the path field
+          // once later steps scroll it away.
+          await show(find.byKey(const Key('adopt_path_field')), -400);
+          await _tapBrowse(tester);
+          await tester.pumpAndSettle();
+          expect(tester.takeException(), isNull,
+              reason: 'state after pick ${picks[pick - 1]} must scroll at 8x '
+                  'in $locale, never overflow');
+        }
+
+        // 1. valid pick -> alias + confirm visible.
+        await browse();
+        expect(find.text(l.adoptConfirm), findsOneWidget,
+            reason: 'confirm must be on screen for $locale');
+
+        // 2. confirm with the colliding alias -> collision error. Invoked
+        // directly: at 8x the button can be taller than the viewport, so a
+        // centre-tap misses — a harness artifact. Tappability is pinned at
+        // 1x by F3; this sweep asserts layout.
+        await show(find.byKey(const Key('adopt_confirm_button')), 400);
+        tester
+            .widget<FilledButton>(find.byKey(const Key('adopt_confirm_button')))
+            .onPressed!();
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull,
+            reason: 'collision error must scroll at 8x in $locale');
+        // The zero-size collision marker can sit outside the lazy list's
+        // build range at 8x — assert the user-visible signal instead: the
+        // localized collision message on the alias field.
+        await show(find.byKey(const Key('adopt_alias_field')), -400);
+        expect(
+          tester
+              .widget<TextField>(find.byKey(const Key('adopt_alias_field')))
+              .decoration
+              ?.errorText,
+          lookupAppLocalizations(locale).vaultNameAlreadyExists('Personal'),
+          reason: 'the collision must be reported, localized, for $locale',
+        );
+
+        // 3-5. unparseable, too-old (with its link), registered path.
+        await browse();
+        expect(find.byKey(const Key('adopt_error_invalid')), findsOneWidget);
+        await browse();
+        expect(find.byKey(const Key('adopt_error_too_old')), findsOneWidget);
+        await browse();
+        expect(find.byKey(const Key('adopt_error_already_registered')),
+            findsOneWidget);
+      }
     });
   });
 
