@@ -224,14 +224,19 @@ class UnlockScreen extends StatefulWidget {
   /// Vault alias shown below the app title. Null = no alias displayed.
   final String? vaultAlias;
 
-  /// Registry used to populate the vault dropdown. When it holds 2+ vaults the
+  /// Registry used to populate the vault dropdown. When it holds any vault the
   /// login screen shows an inline switcher above the passphrase field (ADR-014:
-  /// the login screen always lists registered vaults).
+  /// the login screen always lists registered vaults). The dropdown also
+  /// carries the adopt entry, so a single vault shows it too.
   final VaultRegistry? registry;
 
   /// Called when the user selects a different vault from the dropdown.
   /// Null → falls back to GabbroApp.maybeOf(context)?.switchToVault(…).
   final void Function(String path, String alias)? onVaultSwitch;
+
+  /// Called when the user picks "Open a vault file…" in the dropdown (adopt).
+  /// Null → falls back to GabbroApp.maybeOf(context)?.openAdoptVault().
+  final VoidCallback? onAdoptRequested;
 
   /// Returns true if a biometric credential is stored for [vaultPath].
   /// Per-vault and device-local: false on non-Android and for any vault this
@@ -320,6 +325,7 @@ class UnlockScreen extends StatefulWidget {
     this.vaultAlias,
     this.registry,
     this.onVaultSwitch,
+    this.onAdoptRequested,
     this.onBiometricIsEnrolled = _defaultBiometricIsEnrolled,
     this.onBiometricAuthenticate = _defaultBiometricAuthenticate,
     this.onCancelTap = _defaultCancelTap,
@@ -374,8 +380,10 @@ class _UnlockScreenState extends State<UnlockScreen>
 
   bool get _isYubikeyMode => _yubikeyRecords.isNotEmpty;
 
+  // Any registered vault: the dropdown always carries the adopt entry, so a
+  // one-vault registry shows it too (pre-adopt it needed 2+).
   bool get _showDropdown =>
-      widget.registry != null && widget.registry!.records.length > 1;
+      widget.registry != null && widget.registry!.records.isNotEmpty;
 
   @override
   void initState() {
@@ -636,8 +644,19 @@ class _UnlockScreenState extends State<UnlockScreen>
     }
   }
 
+  /// Dropdown value for the adopt entry — NUL can never begin a real path.
+  static const adoptDropdownValue = '\u0000adopt';
+
   void _onDropdownChanged(String? path) {
     if (path == null || path == _selectedPath) return;
+    if (path == adoptDropdownValue) {
+      if (widget.onAdoptRequested != null) {
+        widget.onAdoptRequested!();
+      } else {
+        GabbroApp.maybeOf(context)?.openAdoptVault();
+      }
+      return;
+    }
     final record =
         widget.registry!.records.firstWhere((r) => r.path == path);
     // Biometric is enrolled for the original vault's passphrase only.
@@ -1130,18 +1149,28 @@ class _UnlockScreenState extends State<UnlockScreen>
                         itemHeight: null, // menu items grow to wrapped height at large text
                         value: _selectedPath,
                         // Collapsed selection ellipsizes instead of hard-clipping (ADR-016).
-                        selectedItemBuilder: (context) => widget.registry!.records
-                            .map((r) => Text(r.alias,
-                                maxLines: 1, overflow: TextOverflow.ellipsis))
-                            .toList(),
-                        items: widget.registry!.records
-                            .map(
-                              (r) => DropdownMenuItem(
-                                value: r.path,
-                                child: Text(r.alias),
-                              ),
-                            )
-                            .toList(),
+                        // Must stay as long as `items` (adopt entry included),
+                        // though the adopt entry is never the collapsed value.
+                        selectedItemBuilder: (context) => [
+                          ...widget.registry!.records.map((r) => Text(r.alias,
+                              maxLines: 1, overflow: TextOverflow.ellipsis)),
+                          const SizedBox.shrink(),
+                        ],
+                        items: [
+                          ...widget.registry!.records.map(
+                            (r) => DropdownMenuItem(
+                              value: r.path,
+                              child: Text(r.alias),
+                            ),
+                          ),
+                          // Adopt (interim English label; adopt string batch
+                          // N6 replaces it).
+                          const DropdownMenuItem(
+                            key: Key('unlock_adopt_item'),
+                            value: _UnlockScreenState.adoptDropdownValue,
+                            child: Text('Open a vault file…'),
+                          ),
+                        ],
                         onChanged: _onDropdownChanged,
                       ),
                       const SizedBox(height: 16),

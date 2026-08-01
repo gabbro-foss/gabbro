@@ -72,6 +72,7 @@ Widget _buildScreen({
   Future<void> Function(String)? onRemoveVaultFromList,
   Future<void> Function(String)? onDeleteVaultFile,
   VoidCallback? onQuit,
+  VoidCallback? onAdoptRequested,
 }) =>
     testApp(UnlockScreen(
       vaultPath: vaultPath,
@@ -100,6 +101,7 @@ Widget _buildScreen({
       onRemoveVaultFromList: onRemoveVaultFromList ?? (_) async {},
       onDeleteVaultFile: onDeleteVaultFile ?? (_) async {},
       onQuit: onQuit,
+      onAdoptRequested: onAdoptRequested,
     ));
 
 // ── Net B appearance shell (top-level per test-helper convention) ──────────────
@@ -1230,20 +1232,51 @@ void main() {
       expect(find.byType(DropdownButton<String>), findsOneWidget);
     });
 
-    testWidgets('no dropdown when registry has only one vault', (tester) async {
+    // E2 (adopt): a single registered vault still gets the dropdown — it now
+    // carries the "Open a vault file…" entry, the unlock screen's route to
+    // adopting a second device's export. Flips the pre-adopt one-vault pin.
+    testWidgets('shows dropdown with one vault (it carries the adopt entry)',
+        (tester) async {
       final singleRegistry = VaultRegistry([
         _vaultRecord(path: '/tmp/a.gabbro', alias: 'Alpha'),
       ]);
       await tester.pumpWidget(_buildScreen(
         vaultPath: '/tmp/a.gabbro',
+        vaultAlias: 'Alpha',
         registry: singleRegistry,
       ));
-      expect(find.byType(DropdownButton<String>), findsNothing);
+      expect(find.byType(DropdownButton<String>), findsOneWidget);
     });
 
     testWidgets('no dropdown when registry is null', (tester) async {
       await tester.pumpWidget(_buildScreen(registry: null));
       expect(find.byType(DropdownButton<String>), findsNothing);
+    });
+
+    testWidgets('no dropdown when the registry is empty', (tester) async {
+      await tester.pumpWidget(_buildScreen(registry: VaultRegistry([])));
+      expect(find.byType(DropdownButton<String>), findsNothing);
+    });
+
+    testWidgets('the adopt entry fires onAdoptRequested and switches nothing',
+        (tester) async {
+      var requested = 0;
+      String? switchedPath;
+      await tester.pumpWidget(_buildScreen(
+        vaultPath: '/tmp/a.gabbro',
+        vaultAlias: 'Alpha',
+        registry: twoVaultRegistry,
+        onVaultSwitch: (p, _) => switchedPath = p,
+        onAdoptRequested: () => requested++,
+      ));
+      await tester.tap(find.byType(DropdownButton<String>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('unlock_adopt_item')).last);
+      await tester.pumpAndSettle();
+
+      expect(requested, 1);
+      expect(switchedPath, isNull,
+          reason: 'adopt is not a vault switch and must not navigate to one');
     });
 
     testWidgets('dropdown shows all vault aliases', (tester) async {
@@ -1274,6 +1307,21 @@ void main() {
       await tester.pumpAndSettle();
       expect(switchedPath, '/tmp/b.gabbro');
       expect(switchedAlias, 'Beta');
+    });
+
+    // E3: the adopt entry rides along without regressing vault switching.
+    testWidgets('two vaults: both aliases and the adopt entry are offered',
+        (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        vaultPath: '/tmp/a.gabbro',
+        vaultAlias: 'Alpha',
+        registry: twoVaultRegistry,
+      ));
+      await tester.tap(find.byType(DropdownButton<String>));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Beta'), findsWidgets);
+      expect(find.byKey(const Key('unlock_adopt_item')), findsWidgets);
     });
   });
 
