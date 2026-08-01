@@ -154,10 +154,11 @@ Flutter `AdoptVaultScreen`:
 - [ ] F7 keyed file -> shows key-protected in the list — HARDWARE ONLY (adopt vault D; no seam can see the real decision)
 - [x] F8 PathField: typed path + browse; cancel no-op; portal-unavailable SnackBar
       (PathField gained `onPathPicked`/`onSubmitted`, pinned in path_field_test)
-- [ ] F9 after adopt -> unlock screen, no auto-unlock (wiring-level, test with E-group)
+- [x] F9 after adopt -> unlock screen, back stack cleared (`main_navigation_test`)
 
 Entry points:
-- [ ] E1 onboarding "Open an existing vault file" -> AdoptVaultScreen
+- [x] E1 onboarding "Open an existing vault file" -> `openAdoptVault()`; wired at all
+      4 onboarding sites (covers manage-vaults' add path)
 - [ ] E2 unlock dropdown from 1 vault, "Open a vault file…" item (flips 1-vault pin)
 - [ ] E3 2-vault dropdown: switch unregressed + adopt item
 
