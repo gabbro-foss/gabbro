@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:gabbro/app_paths.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/safe_file_picker.dart' show FilePickerUnavailable;
 import 'package:gabbro/screens/unlock_screen.dart' show vaultUpgradePathUrl;
@@ -17,13 +18,38 @@ import 'package:gabbro/widgets/url_link.dart';
 /// stabilises; the 37-ARB batch (tick-list N6) replaces them before this
 /// screen is wired into any entry point. Triage strings reuse the existing
 /// translated unlock-screen keys.
+// Production defaults: the real bridge. The format probes mirror the unlock
+// screen's defaults — a probe that cannot run must never masquerade as a
+// diagnosis, so they report false and the generic invalid message stands.
+Future<VaultHeaderData> _defaultReadHeader(String path) async =>
+    readVaultHeader(path: path);
+
+Future<bool> _defaultFormatTooOld(String path) async {
+  try {
+    return await vaultFormatTooOld(path: path);
+  } catch (_) {
+    return false;
+  }
+}
+
+Future<bool> _defaultFormatTooNew(String path) async {
+  try {
+    return await vaultFormatTooNew(path: path);
+  } catch (_) {
+    return false;
+  }
+}
+
+Future<void> _defaultAdoptCopy(String source, String dest) =>
+    adoptVaultFile(source: source, dest: dest);
+
 class AdoptVaultScreen extends StatefulWidget {
   final VaultRegistry registry;
 
   /// The native open dialog (PathField's `openPicker` seam): a path, null on
   /// cancel, or throws [FilePickerUnavailable] — PathField handles the latter
-  /// two itself.
-  final Future<String?> Function() onPickFile;
+  /// two itself. Null → PathField's real file dialog.
+  final Future<String?> Function()? onPickFile;
 
   /// Full-parses the picked file and returns its header (alias + YubiKey
   /// records). Throws when the file is not a usable vault.
@@ -54,13 +80,13 @@ class AdoptVaultScreen extends StatefulWidget {
   const AdoptVaultScreen({
     super.key,
     required this.registry,
-    required this.onPickFile,
-    required this.onReadHeader,
-    required this.onFormatTooOld,
-    required this.onFormatTooNew,
     required this.onRegistered,
-    required this.onAdoptCopy,
-    required this.onDefaultVaultDir,
+    this.onPickFile,
+    this.onReadHeader = _defaultReadHeader,
+    this.onFormatTooOld = _defaultFormatTooOld,
+    this.onFormatTooNew = _defaultFormatTooNew,
+    this.onAdoptCopy = _defaultAdoptCopy,
+    this.onDefaultVaultDir = GabbroPaths.dataDir,
     this.isAndroid,
   });
 

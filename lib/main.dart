@@ -11,6 +11,7 @@ import 'package:gabbro/autotype_target.dart';
 import 'package:gabbro/gabbro_contrast.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/nfc_capability.dart';
+import 'package:gabbro/screens/adopt_vault_screen.dart';
 import 'package:gabbro/screens/manage_vaults_screen.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/screens/save_confirm_screen.dart';
@@ -513,6 +514,8 @@ abstract class GabbroAppState {
   void switchToVault(String path, String alias);
   /// Push the ManageVaultsScreen onto the root navigator.
   void navigateToManageVaults();
+  /// Push the AdoptVaultScreen (register an existing `.gabbro` file).
+  void openAdoptVault();
   /// R-03 P5: remove a vault whose file is unreadable, from the unlock screen.
   /// When [deleteFiles] is true the vault file and its `.bak` are deleted from
   /// disk; otherwise only the registry entry is removed (the bytes stay so the
@@ -968,6 +971,7 @@ class _GabbroAppState extends State<GabbroApp>
         blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
         onVaultCreated: _onVaultCreated,
         onQuit: _quitApp,
+        onAdoptRequested: openAdoptVault,
       );
     }
     return _buildUnlockScreen(lastUsed.path, lastUsed.alias);
@@ -1009,6 +1013,24 @@ class _GabbroAppState extends State<GabbroApp>
   }
 
   @override
+  void openAdoptVault() {
+    _navigatorKey.currentState?.push(
+      MaterialPageRoute(
+        builder: (_) => AdoptVaultScreen(
+          registry: _registry,
+          onRegistered: (path, alias) async {
+            // Same registration the create flow uses (type auto-detect), then
+            // the unlock screen with a cleared back stack — adopting grants
+            // no access.
+            await _onVaultCreated(path, alias);
+            switchToVault(path, alias);
+          },
+        ),
+      ),
+    );
+  }
+
+  @override
   Future<void> removeVault(String path, {required bool deleteFiles}) async {
     if (deleteFiles) {
       // R-03: removes the vault AND its .bak safety copy.
@@ -1034,6 +1056,7 @@ class _GabbroAppState extends State<GabbroApp>
                 blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
                 onVaultCreated: _onVaultCreated,
                 onQuit: _quitApp,
+                onAdoptRequested: openAdoptVault,
               )
             : _buildUnlockScreen(remaining.path, remaining.alias),
       ),
@@ -1073,6 +1096,7 @@ class _GabbroAppState extends State<GabbroApp>
               blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
               onVaultCreated: _onVaultCreated,
               onQuit: _quitApp,
+              onAdoptRequested: openAdoptVault,
             ),
           ),
           (_) => false,
@@ -1114,6 +1138,7 @@ class _GabbroAppState extends State<GabbroApp>
             onVaultCreated: _onVaultCreated,
             existingAliases: _registry.records.map((r) => r.alias).toSet(),
             onQuit: _quitApp,
+            onAdoptRequested: openAdoptVault,
           ),
         ),
       );

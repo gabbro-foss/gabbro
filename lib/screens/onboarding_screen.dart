@@ -282,6 +282,10 @@ class OnboardingScreen extends StatefulWidget {
   /// disabled (tests that don't drive Quit); production wires it to exit.
   final VoidCallback? onQuit;
 
+  /// Adopt an existing `.gabbro` file instead of creating a vault (someone
+  /// setting up their second device). Null → the button is absent.
+  final VoidCallback? onAdoptRequested;
+
   OnboardingScreen({
     super.key,
     this.initialPath,
@@ -296,6 +300,7 @@ class OnboardingScreen extends StatefulWidget {
     this.existingAliases = const {},
     this.resolveDataDir = GabbroPaths.dataDir,
     this.onQuit,
+    this.onAdoptRequested,
   }) : showYubikey = showYubikey ?? (Platform.isAndroid || Platform.isLinux),
        isAndroid = isAndroid ?? Platform.isAndroid;
 
@@ -1265,6 +1270,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                     AppLocalizations.of(context).createVault,
                                   ),
                           ),
+                          if (widget.onAdoptRequested != null) ...[
+                            const SizedBox(height: 8),
+                            // Adopt (second device): interim English label,
+                            // replaced by the adopt string batch (N6).
+                            OutlinedButton(
+                              key: const Key('onboarding_adopt_button'),
+                              onPressed: _isCreating
+                                  ? null
+                                  : widget.onAdoptRequested,
+                              child: const Text('Open an existing vault file'),
+                            ),
+                          ],
                         ],
                       ),
                     ),

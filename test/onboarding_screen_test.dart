@@ -46,6 +46,7 @@ Widget _buildScreen({
   Future<String> Function()? resolveDataDir,
   EntropyResult Function(String)? onEstimateEntropy,
   VoidCallback? onQuit,
+  VoidCallback? onAdoptRequested,
 }) =>
     testApp(OnboardingScreen(
       initialPath: initialPath,
@@ -59,6 +60,7 @@ Widget _buildScreen({
       onVaultCreated: onVaultCreated,
       resolveDataDir: resolveDataDir ?? GabbroPaths.dataDir,
       onQuit: onQuit,
+      onAdoptRequested: onAdoptRequested,
     ));
 
 // Wraps OnboardingScreen in a GabbroApp so the accessibility toggle's
@@ -91,6 +93,28 @@ void main() {
 
     expect(find.byType(GabbroLogo), findsOneWidget);
     expect(find.text('Create vault'), findsOneWidget);
+  });
+
+  // ── E1: adopt entry point ───────────────────────────────────────────────────
+  group('adopt entry point', () {
+    testWidgets('shows the open-existing button and fires the callback', (
+      tester,
+    ) async {
+      var requested = 0;
+      await tester.pumpWidget(
+        _buildScreen(onAdoptRequested: () => requested++),
+      );
+      final button = find.byKey(const Key('onboarding_adopt_button'));
+      await tester.ensureVisible(button);
+      await tester.pumpAndSettle();
+      await tester.tap(button);
+      expect(requested, 1);
+    });
+
+    testWidgets('no callback -> no button', (tester) async {
+      await tester.pumpWidget(_buildScreen());
+      expect(find.byKey(const Key('onboarding_adopt_button')), findsNothing);
+    });
   });
 
   // ── Accessibility toggle: text scale + slider reveal + logo hide (ADR-016) ──
