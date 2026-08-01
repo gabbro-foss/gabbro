@@ -155,7 +155,8 @@ Flutter `AdoptVaultScreen`:
 - [x] F4 already-registered path refused (Linux)
 - [x] F5 Linux confirm -> registers picked path, no copy
 - [x] F6 Android confirm (seam) -> copy to app storage under a free name, dest registered
-- [ ] F7 keyed file -> shows key-protected in the list — HARDWARE ONLY (adopt vault D; no seam can see the real decision)
+- [ ] F7 keyed file -> keyed-ness detected — HARDWARE ONLY (AL10/AL11/AA6: PIN+tap unlock
+      + delete-dialog wording; there is NO list badge — `type` is inert, see Bikeshed)
 - [x] F8 PathField: typed path + browse; cancel no-op; portal-unavailable SnackBar
       (PathField gained `onPathPicked`/`onSubmitted`, pinned in path_field_test)
 - [x] F9 after adopt -> unlock screen, back stack cleared (`main_navigation_test`)
@@ -279,6 +280,10 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   a fourth is what `test/sync_chooser_l10n_overflow_test.dart` will catch at 8x text.
 
 ### Code Quality
+- **`VaultRecord.type` is stored but never rendered.** Set on registration
+  (`main.dart`), read by nothing — keyed-ness shown to the user always comes from a
+  live header read (unlock screen, delete dialog). Either surface it (key badge in
+  Manage vaults) or drop the field. Found 2026-08-01 verifying the adopt matrix.
 - **One locale sweep lets an error through, so it could hide an overflow.** The
   format-too-old sweep (`test/unlock_screen_test.dart:633`) tolerates the "locale not
   supported by all delegates" warning for nn and yo. If a real overflow lands in the
