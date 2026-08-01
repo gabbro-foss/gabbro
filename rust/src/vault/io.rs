@@ -291,6 +291,23 @@ pub fn restore_vault_from_file(path: &Path, source: &Path) -> Result<(), String>
     sync_backup_to_current(path)
 }
 
+/// Adopt: copy a picked `.gabbro` file to a fresh destination inside app
+/// storage (Android — the picker only hands out a cache copy) so it can be
+/// registered as a vault. Unlike a restore, adopt must never overwrite:
+/// the destination has no previous vault to preserve. The copy gets its own
+/// `.bak` immediately, and opening it still requires full credentials.
+pub fn adopt_vault_file(source: &Path, dest: &Path) -> Result<(), String> {
+    check_not_symlink(source)?;
+    if fs::symlink_metadata(dest).is_ok() {
+        return Err("A vault already exists at the destination — adopt refused".to_string());
+    }
+    let bytes = fs::read(source).map_err(|e| format!("Could not read the picked file: {e}"))?;
+    SealedVault::from_bytes(&bytes)
+        .map_err(|e| format!("That file is not a usable Gabbro vault — adopt refused: {e}"))?;
+    atomic_write_0600(dest, &bytes)?;
+    sync_backup_to_current(dest)
+}
+
 /// Read a `.gabbro` file from disk and deserialize it into a `SealedVault`.
 ///
 /// Refuses symlinks. Returns `Err` if the file cannot be read or if the bytes
@@ -1416,5 +1433,178 @@ mod tests {
             err.contains("symlink"),
             "expected symlink error, got: {err}"
         );
+    }
+
+    // Adopt R1: adopting a picked vault file copies it to a fresh destination
+    // (0600, byte-identical) and gives it its own `.bak` safety copy, so the
+    // adopted vault is protected from its first save onwards.
+    #[cfg(unix)]
+    #[test]
+    fn adopt_vault_file_copies_source_to_fresh_dest_with_backup() {
+        use std::os::unix::fs::PermissionsExt;
+
+        let dir = temp_dir();
+        let source = dir.join("gabbro_io_adopt_r1_source.gabbro");
+        let dest = dir.join("gabbro_io_adopt_r1_dest.gabbro");
+        let dest_bak = PathBuf::from(format!("{}.bak", dest.display()));
+        for p in [&source, &dest, &dest_bak] {
+            let _ = fs::remove_file(p);
+        }
+
+        let sealed = seal_vault(b"adopt pw", b"adopt body", None).unwrap();
+        write_vault(&sealed, &source).unwrap();
+        let source_bytes = fs::read(&source).unwrap();
+
+        let result = adopt_vault_file(&source, &dest);
+        let dest_bytes = fs::read(&dest).unwrap_or_default();
+        let bak_bytes = fs::read(&dest_bak).unwrap_or_default();
+        let mode = fs::metadata(&dest).map(|m| m.permissions().mode() & 0o777);
+        for p in [&source, &dest, &dest_bak] {
+            let _ = fs::remove_file(p);
+        }
+
+        result.expect("adopting a valid vault file must succeed");
+        assert_eq!(dest_bytes, source_bytes, "dest must equal the picked file");
+        assert_eq!(bak_bytes, source_bytes, "the adopted vault must get a .bak");
+        assert_eq!(mode.unwrap(), 0o600, "adopted vault must be 0600");
+    }
+
+    // Adopt R2: a destination that already exists is refused and left
+    // untouched — adopt registers new vaults, it never overwrites one.
+    #[test]
+    fn adopt_vault_file_refuses_existing_dest() {
+        let dir = temp_dir();
+        let source = dir.join("gabbro_io_adopt_r2_source.gabbro");
+        let dest = dir.join("gabbro_io_adopt_r2_dest.gabbro");
+        let dest_bak = PathBuf::from(format!("{}.bak", dest.display()));
+        for p in [&source, &dest, &dest_bak] {
+            let _ = fs::remove_file(p);
+        }
+
+        let incoming = seal_vault(b"incoming pw", b"incoming body", None).unwrap();
+        write_vault(&incoming, &source).unwrap();
+        let existing = seal_vault(b"existing pw", b"existing body", None).unwrap();
+        write_vault(&existing, &dest).unwrap();
+        let existing_bytes = fs::read(&dest).unwrap();
+
+        let result = adopt_vault_file(&source, &dest);
+        let dest_after = fs::read(&dest).unwrap_or_default();
+        for p in [&source, &dest, &dest_bak] {
+            let _ = fs::remove_file(p);
+        }
+
+        let err = result.expect_err("adopting onto an existing vault must be refused");
+        assert!(
+            err.to_lowercase().contains("exists"),
+            "error must say the destination already exists: {err}"
+        );
+        assert_eq!(
+            dest_after, existing_bytes,
+            "the existing vault must be untouched"
+        );
+    }
+
+    // Adopt R3: a picked file that is not a usable vault is refused and no
+    // destination is created — a broken file must never become a registered
+    // vault the unlock screen then reports as corrupt.
+    #[test]
+    fn adopt_vault_file_refuses_unparseable_source() {
+        let dir = temp_dir();
+        let source = dir.join("gabbro_io_adopt_r3_source.gabbro");
+        let dest = dir.join("gabbro_io_adopt_r3_dest.gabbro");
+        let dest_bak = PathBuf::from(format!("{}.bak", dest.display()));
+        for p in [&source, &dest, &dest_bak] {
+            let _ = fs::remove_file(p);
+        }
+
+        fs::write(&source, b"not a gabbro vault").unwrap();
+
+        let result = adopt_vault_file(&source, &dest);
+        let dest_created = fs::symlink_metadata(&dest).is_ok();
+        let bak_created = fs::symlink_metadata(&dest_bak).is_ok();
+        for p in [&source, &dest, &dest_bak] {
+            let _ = fs::remove_file(p);
+        }
+
+        let err = result.expect_err("adopting a non-vault file must be refused");
+        assert!(
+            err.to_lowercase().contains("usable") || err.to_lowercase().contains("refused"),
+            "error must explain the file is not a usable vault: {err}"
+        );
+        assert!(!dest_created, "no destination file may be created");
+        assert!(!bak_created, "no .bak may be created");
+    }
+
+    // Adopt R4: symlinks are refused on both sides, as everywhere else in
+    // vault I/O (F-09) — a symlinked source could smuggle in a file the picker
+    // never showed, a symlinked dest counts as occupied.
+    #[cfg(unix)]
+    #[test]
+    fn adopt_vault_file_refuses_symlinks() {
+        use std::os::unix::fs::symlink;
+
+        let dir = temp_dir();
+        let real_src = dir.join("gabbro_io_adopt_r4_real_src.gabbro");
+        let link_src = dir.join("gabbro_io_adopt_r4_link_src.gabbro");
+        let dest = dir.join("gabbro_io_adopt_r4_dest.gabbro");
+        let link_dest = dir.join("gabbro_io_adopt_r4_link_dest.gabbro");
+        let victim = dir.join("gabbro_io_adopt_r4_victim.gabbro");
+        for p in [&real_src, &link_src, &dest, &link_dest, &victim] {
+            let _ = fs::remove_file(p);
+        }
+
+        let sealed = seal_vault(b"symlink pw", b"symlink body", None).unwrap();
+        write_vault(&sealed, &real_src).unwrap();
+        symlink(&real_src, &link_src).unwrap();
+        fs::write(&victim, b"victim").unwrap();
+        symlink(&victim, &link_dest).unwrap();
+
+        let src_result = adopt_vault_file(&link_src, &dest);
+        let dest_created = fs::symlink_metadata(&dest).is_ok();
+        let dest_result = adopt_vault_file(&real_src, &link_dest);
+        let victim_after = fs::read(&victim).unwrap_or_default();
+        for p in [&real_src, &link_src, &dest, &link_dest, &victim] {
+            let _ = fs::remove_file(p);
+        }
+
+        let src_err = src_result.expect_err("a symlinked source must be refused");
+        assert!(
+            src_err.contains("symlink"),
+            "expected symlink error, got: {src_err}"
+        );
+        assert!(!dest_created, "no destination file may be created");
+        dest_result.expect_err("a symlinked destination must be refused");
+        assert_eq!(
+            victim_after, b"victim",
+            "the symlink target must be untouched"
+        );
+    }
+
+    // Adopt R5: the v11 readable floor holds through adopt — a pre-v11 file is
+    // refused (it must go through the upgrade path first), not registered as a
+    // vault that can never open.
+    #[test]
+    fn adopt_vault_file_refuses_pre_floor_version() {
+        let dir = temp_dir();
+        let source = dir.join("gabbro_io_adopt_r5_source.gabbro");
+        let dest = dir.join("gabbro_io_adopt_r5_dest.gabbro");
+        for p in [&source, &dest] {
+            let _ = fs::remove_file(p);
+        }
+
+        // Well-formed vault bytes with the version byte (offset 6, after the
+        // magic) patched below the floor — from_bytes refuses on version alone.
+        let mut bytes = seal_vault(b"old pw", b"old body", None).unwrap().to_bytes();
+        bytes[6] = 10;
+        fs::write(&source, &bytes).unwrap();
+
+        let result = adopt_vault_file(&source, &dest);
+        let dest_created = fs::symlink_metadata(&dest).is_ok();
+        for p in [&source, &dest] {
+            let _ = fs::remove_file(p);
+        }
+
+        result.expect_err("a pre-v11 vault file must be refused");
+        assert!(!dest_created, "no destination file may be created");
     }
 }

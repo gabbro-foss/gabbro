@@ -536,6 +536,17 @@ pub async fn restore_vault_from_file(path: String, source: String) -> Result<(),
     )
 }
 
+/// Adopt: copy a picked `.gabbro` file to a fresh destination so it can be
+/// registered as a vault (Android — the picker only hands out a cache copy;
+/// Linux registers the picked path in place and never calls this).
+///
+/// Refuses an occupied destination (adopt never overwrites) and a source that
+/// is not a usable Gabbro vault. Opening the adopted vault still requires full
+/// credentials — adopting grants no access.
+pub async fn adopt_vault_file(source: String, dest: String) -> Result<(), String> {
+    crate::vault::io::adopt_vault_file(std::path::Path::new(&source), std::path::Path::new(&dest))
+}
+
 /// Assign a folder to a set of entries by UUID and persist.
 ///
 /// Pass `folder: ""` to move entries to unfoldered.
@@ -1170,6 +1181,45 @@ mod tests {
             after_refuse, b"still corrupt",
             "a refused restore leaves the vault untouched"
         );
+    }
+
+    // Adopt: bridge adopt copies a picked vault file to a fresh destination
+    // (Android app storage) and refuses an occupied one.
+    #[test]
+    #[serial]
+    fn adopt_vault_file_bridge_roundtrip() {
+        use crate::crypto::vault_crypto::seal_vault;
+        use crate::vault::io::write_vault;
+        use std::env::temp_dir;
+
+        let source = temp_dir().join("gabbro_bridge_adopt_source.gabbro");
+        let dest = temp_dir().join("gabbro_bridge_adopt_dest.gabbro");
+        let dest_bak = std::path::PathBuf::from(format!("{}.bak", dest.display()));
+        for p in [&source, &dest, &dest_bak] {
+            let _ = std::fs::remove_file(p);
+        }
+        let source_s = source.to_string_lossy().to_string();
+        let dest_s = dest.to_string_lossy().to_string();
+
+        let sealed = seal_vault(b"pw", b"body", None).unwrap();
+        write_vault(&sealed, &source).unwrap();
+        let source_bytes = std::fs::read(&source).unwrap();
+
+        run(adopt_vault_file(source_s.clone(), dest_s.clone()))
+            .expect("adopting a valid vault file must succeed");
+        let adopted = std::fs::read(&dest).unwrap();
+
+        // Adopting onto the now-occupied destination must be refused.
+        let refused = run(adopt_vault_file(source_s, dest_s));
+
+        for p in [&source, &dest, &dest_bak] {
+            let _ = std::fs::remove_file(p);
+        }
+        assert_eq!(
+            adopted, source_bytes,
+            "adopt must write the source vault bytes"
+        );
+        assert!(refused.is_err(), "an occupied destination must be refused");
     }
 
     // ── R6: creating a vault must never destroy one ───────────────────────────
