@@ -145,12 +145,12 @@ Rust `adopt_vault_file` (`vault/io.rs` + bridge):
 - [ ] codegen + `cargo build --release --lib` (needed before any Dart call)
 
 Flutter `AdoptVaultScreen`:
-- [ ] F1 valid file -> alias prefilled, editable
-- [ ] F2 not-a-vault / too-old (+ upgrade URL) / too-new triage
-- [ ] F3 alias collision -> validation error
-- [ ] F4 already-registered path refused (Linux)
-- [ ] F5 Linux confirm -> registers picked path, no copy
-- [ ] F6 Android confirm (seam) -> `adopt_vault_file` to app storage, dest registered
+- [x] F1 valid file -> alias prefilled, editable
+- [x] F2 not-a-vault / too-old (+ upgrade URL) / too-new triage (reuses unlock's translated keys)
+- [x] F3 alias collision -> validation error
+- [x] F4 already-registered path refused (Linux)
+- [x] F5 Linux confirm -> registers picked path, no copy
+- [x] F6 Android confirm (seam) -> copy to app storage under a free name, dest registered
 - [ ] F7 keyed file -> record type `yubikey`
 - [ ] F8 picker cancel no-op; `FilePickerUnavailable` -> manual path (Linux)
 - [ ] F9 after adopt -> unlock screen, no auto-unlock
