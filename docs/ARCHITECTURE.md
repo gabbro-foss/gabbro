@@ -155,8 +155,8 @@ Flutter `AdoptVaultScreen`:
 - [x] F4 already-registered path refused (Linux)
 - [x] F5 Linux confirm -> registers picked path, no copy
 - [x] F6 Android confirm (seam) -> copy to app storage under a free name, dest registered
-- [ ] F7 keyed file -> keyed-ness detected — HARDWARE ONLY (AL10/AL11/AA6: PIN+tap unlock
-      + delete-dialog wording; there is NO list badge — `type` is inert, see Bikeshed)
+- [x] F7 keyed file -> keyed-ness detected — hardware-passed 2026-08-01 (AL10 full
+      keyed unlock; AL11 delete-dialog wording; AA6 PIN field on the adopted vault)
 - [x] F8 PathField: typed path + browse; cancel no-op; portal-unavailable SnackBar
       (PathField gained `onPathPicked`/`onSubmitted`, pinned in path_field_test)
 - [x] F9 after adopt -> unlock screen, back stack cleared (`main_navigation_test`)
@@ -179,8 +179,10 @@ A11y & l10n net:
 - [x] N7 n/a — the flow has no dialog (the upgrade link reuses showUrlDialog)
 
 Hardware:
-- [ ] Linux matrix (mock vaults A-E)
-- [ ] Android matrix (emulator ok; keyed adopt needs USB-C key)
+- [x] Linux matrix AL1-AL12 hardware-passed 2026-08-01 (AL4: vault A holds Test
+      login 1 only — old inventory note was stale; AL9 passed via pasted path)
+- [x] Android matrix AA1-AA6 hardware-passed 2026-08-01 (AA6 re-run after a mistaken
+      wipe; keyed delete needs a tap BY DESIGN — emulator repair is `pm clear`)
 
 ### Faster sync, attempt 2 — this branch
 
