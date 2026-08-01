@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2062 | 10 |
+| Flutter (`flutter test`) | 2066 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -95,6 +95,10 @@ each other). Under `flutter drive` they were blind (a failure exited 0) and cras
 config/data resolves through `GabbroPaths` (`lib/app_paths.dart`); `test/flutter_test_config.dart`
 roots every `flutter test` in a throwaway temp sandbox, so even a non-isolating test reads
 an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`.
+The sandbox is never torn down mid-run (`testMain()` returns at declaration, not completion —
+a teardown there once nulled it before any test ran and a production save overwrote the real
+registry, 2026-08-01). Pinned by `test/sandbox_net_test.dart`, including a self-restoring
+canary that drives the real save paths and byte-compares the real config/vault locations.
 
 **Known warnings — triaged 2026-07-16, no action. Gate stays green; don't re-diagnose.**
 
