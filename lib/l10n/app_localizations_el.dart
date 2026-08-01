@@ -2169,6 +2169,19 @@ class AppLocalizationsEl extends AppLocalizations {
       'Αυτό το αρχείο δεν είναι χρησιμοποιήσιμο θησαυροφυλάκιο Gabbro.';
 
   @override
+  String get adoptTitle => 'Άνοιγμα υπάρχοντος αρχείου θησαυροφυλακίου';
+
+  @override
+  String get adoptConfirm => 'Προσθήκη θησαυροφυλακίου';
+
+  @override
+  String get adoptAlreadyRegistered =>
+      'Αυτό το θησαυροφυλάκιο βρίσκεται ήδη στη λίστα σας';
+
+  @override
+  String get unlockAdoptItem => 'Άνοιγμα αρχείου θησαυροφυλακίου…';
+
+  @override
   String get resizeColumns => 'Αλλαγή μεγέθους στηλών';
 
   @override

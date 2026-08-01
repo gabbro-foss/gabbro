@@ -891,6 +891,10 @@
   "biometricStaleDisabled": "Biometrické odemknutí bylo vypnuto: soubor trezoru se změnil a uložená přístupová fráze jej už neotevře. Znovu jej zapněte v Zabezpečení.",
   "vaultRestoredMessage":"Trezor obnoven. Odemkněte pomocí svých přihlašovacích údajů.",
   "restoreFromFileInvalidError": "Tento soubor není použitelný trezor Gabbro.",
+  "adoptTitle": "Otevřít existující soubor trezoru",
+  "adoptConfirm": "Přidat trezor",
+  "adoptAlreadyRegistered": "Tento trezor už je ve vašem seznamu",
+  "unlockAdoptItem": "Otevřít soubor trezoru…",
   "resizeColumns": "Změnit velikost sloupců",
 
   "regionSearch": "Hledání",

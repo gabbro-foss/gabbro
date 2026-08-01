@@ -890,6 +890,10 @@
   "biometricStaleDisabled": "Se desactivó el desbloqueo biométrico: el archivo de la caja fuerte cambió y la contraseña guardada ya no lo abre. Vuelve a activarlo en Seguridad.",
   "vaultRestoredMessage":"Caja fuerte restaurada. Desbloquea con tus credenciales.",
   "restoreFromFileInvalidError": "Ese archivo no es una caja fuerte de Gabbro utilizable.",
+  "adoptTitle": "Abrir un archivo de almacén existente",
+  "adoptConfirm": "Añadir almacén",
+  "adoptAlreadyRegistered": "Este almacén ya está en la lista",
+  "unlockAdoptItem": "Abrir un archivo de almacén…",
   "resizeColumns": "Ajustar columnas",
 
   "regionSearch": "Búsqueda",

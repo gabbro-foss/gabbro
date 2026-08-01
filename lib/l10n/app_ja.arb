@@ -890,6 +890,10 @@
   "biometricStaleDisabled": "ボールトファイルが変更され、保存されたパスフレーズでは開けなくなったため、生体認証ロック解除を無効にしました。セキュリティで再度有効にしてください。",
   "vaultRestoredMessage":"ボールトを復元しました。認証情報でロックを解除してください。",
   "restoreFromFileInvalidError": "このファイルは使用可能な Gabbro ボールトではありません。",
+  "adoptTitle": "既存のボルトファイルを開く",
+  "adoptConfirm": "ボルトを追加",
+  "adoptAlreadyRegistered": "このボルトはすでにリストにあります",
+  "unlockAdoptItem": "ボルトファイルを開く…",
   "resizeColumns": "列のサイズを変更",
 
   "regionSearch": "検索",

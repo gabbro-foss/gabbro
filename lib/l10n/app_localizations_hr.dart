@@ -2143,6 +2143,18 @@ class AppLocalizationsHr extends AppLocalizations {
       'Ta datoteka nije upotrebljiv Gabbro trezor.';
 
   @override
+  String get adoptTitle => 'Otvori postojeću datoteku trezora';
+
+  @override
+  String get adoptConfirm => 'Dodaj trezor';
+
+  @override
+  String get adoptAlreadyRegistered => 'Ovaj trezor je već na vašem popisu';
+
+  @override
+  String get unlockAdoptItem => 'Otvori datoteku trezora…';
+
+  @override
   String get resizeColumns => 'Promijeni veličinu stupaca';
 
   @override

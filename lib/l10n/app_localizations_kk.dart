@@ -2145,6 +2145,18 @@ class AppLocalizationsKk extends AppLocalizations {
       'Бұл файл жарамды Gabbro қоймасы емес.';
 
   @override
+  String get adoptTitle => 'Бар сейф файлын ашу';
+
+  @override
+  String get adoptConfirm => 'Сейф қосу';
+
+  @override
+  String get adoptAlreadyRegistered => 'Бұл сейф тізімде бұрыннан бар';
+
+  @override
+  String get unlockAdoptItem => 'Сейф файлын ашу…';
+
+  @override
   String get resizeColumns => 'Бағандар өлшемін өзгерту';
 
   @override

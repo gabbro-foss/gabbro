@@ -891,6 +891,10 @@
   "biometricStaleDisabled": "Biometrisch ontgrendelen is uitgeschakeld: het kluisbestand is gewijzigd en de opgeslagen wachtwoordzin opent het niet meer. Schakel het weer in bij Beveiliging.",
   "vaultRestoredMessage":"Kluis hersteld. Ontgrendel met je gegevens.",
   "restoreFromFileInvalidError": "Dat bestand is geen bruikbare Gabbro-kluis.",
+  "adoptTitle": "Bestaand kluisbestand openen",
+  "adoptConfirm": "Kluis toevoegen",
+  "adoptAlreadyRegistered": "Deze kluis staat al in de lijst",
+  "unlockAdoptItem": "Kluisbestand openen…",
   "resizeColumns": "Kolommen aanpassen",
 
   "regionSearch": "Zoeken",

@@ -2146,6 +2146,19 @@ class AppLocalizationsEu extends AppLocalizations {
       'Fitxategi hori ez da erabilgarri den Gabbro kutxa gotor bat.';
 
   @override
+  String get adoptTitle => 'Ireki lehendik dagoen gandegi-fitxategi bat';
+
+  @override
+  String get adoptConfirm => 'Gehitu gandegia';
+
+  @override
+  String get adoptAlreadyRegistered =>
+      'Gandegi hau dagoeneko zure zerrendan dago';
+
+  @override
+  String get unlockAdoptItem => 'Ireki gandegi-fitxategi bat…';
+
+  @override
   String get resizeColumns => 'Aldatu zutabeen tamaina';
 
   @override

@@ -890,6 +890,10 @@
   "biometricStaleDisabled": "A ti pa ṣiṣi ẹya ara: fáìlì àpótí ìṣúra ti yí padà, gbolohun ọrọ igbaniwọle tí a fi pamọ́ kò sì lè ṣí i mọ́. Tún un ṣí ní Aabo.",
   "vaultRestoredMessage":"A ti dá àpótí ìṣúra padà. Ṣí i pẹ̀lú àwọn ìwé-ẹ̀rí rẹ.",
   "restoreFromFileInvalidError": "Fáìlì yẹn kì í ṣe àpótí ìṣúra Gabbro tó ṣeé lò.",
+  "adoptTitle": "Ṣí fáìlì vọọliti tó ti wà",
+  "adoptConfirm": "Fi vọọliti kún un",
+  "adoptAlreadyRegistered": "Vọọliti yìí ti wà nínú àkójọ rẹ",
+  "unlockAdoptItem": "Ṣí fáìlì vọọliti…",
   "resizeColumns": "Ṣàtúnṣe ìwọ̀n àwọn ọ̀wọ́n",
 
   "regionSearch": "Ṣawari",

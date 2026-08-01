@@ -2129,6 +2129,18 @@ class AppLocalizationsEn extends AppLocalizations {
       'That file is not a usable Gabbro vault.';
 
   @override
+  String get adoptTitle => 'Open an existing vault file';
+
+  @override
+  String get adoptConfirm => 'Add vault';
+
+  @override
+  String get adoptAlreadyRegistered => 'This vault is already in your list';
+
+  @override
+  String get unlockAdoptItem => 'Open a vault file…';
+
+  @override
   String get resizeColumns => 'Resize columns';
 
   @override

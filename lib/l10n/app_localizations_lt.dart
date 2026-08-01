@@ -2152,6 +2152,18 @@ class AppLocalizationsLt extends AppLocalizations {
       'Šis failas nėra tinkama Gabbro saugykla.';
 
   @override
+  String get adoptTitle => 'Atverti esamą saugyklos failą';
+
+  @override
+  String get adoptConfirm => 'Pridėti saugyklą';
+
+  @override
+  String get adoptAlreadyRegistered => 'Ši saugykla jau yra sąraše';
+
+  @override
+  String get unlockAdoptItem => 'Atverti saugyklos failą…';
+
+  @override
   String get resizeColumns => 'Keisti stulpelių dydį';
 
   @override

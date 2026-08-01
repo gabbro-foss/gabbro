@@ -2146,6 +2146,18 @@ class AppLocalizationsSk extends AppLocalizations {
       'Tento súbor nie je použiteľný trezor Gabbro.';
 
   @override
+  String get adoptTitle => 'Otvoriť existujúci súbor trezora';
+
+  @override
+  String get adoptConfirm => 'Pridať trezor';
+
+  @override
+  String get adoptAlreadyRegistered => 'Tento trezor už je vo vašom zozname';
+
+  @override
+  String get unlockAdoptItem => 'Otvoriť súbor trezora…';
+
+  @override
   String get resizeColumns => 'Zmeniť veľkosť stĺpcov';
 
   @override

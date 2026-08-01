@@ -890,6 +890,10 @@
   "biometricStaleDisabled": "Биометриялық бекітуді ашу өшірілді: қойма файлы өзгерді, сақталған кілт фразасы оны енді ашпайды. Оны Қауіпсіздік бөлімінде қайта қосыңыз.",
   "vaultRestoredMessage":"Қойма қалпына келтірілді. Өз деректеріңізбен ашыңыз.",
   "restoreFromFileInvalidError": "Бұл файл жарамды Gabbro қоймасы емес.",
+  "adoptTitle": "Бар сейф файлын ашу",
+  "adoptConfirm": "Сейф қосу",
+  "adoptAlreadyRegistered": "Бұл сейф тізімде бұрыннан бар",
+  "unlockAdoptItem": "Сейф файлын ашу…",
   "resizeColumns": "Бағандар өлшемін өзгерту",
 
   "regionSearch": "Іздеу",

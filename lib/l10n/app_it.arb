@@ -890,6 +890,10 @@
   "biometricStaleDisabled": "Lo sblocco biometrico è stato disattivato: il file della cassaforte è cambiato e la passphrase salvata non lo apre più. Riattivalo in Sicurezza.",
   "vaultRestoredMessage":"Cassaforte ripristinata. Sblocca con le tue credenziali.",
   "restoreFromFileInvalidError": "Questo file non è una cassaforte Gabbro utilizzabile.",
+  "adoptTitle": "Apri un file di archivio esistente",
+  "adoptConfirm": "Aggiungi archivio",
+  "adoptAlreadyRegistered": "Questo archivio è già nel tuo elenco",
+  "unlockAdoptItem": "Apri un file di archivio…",
   "resizeColumns": "Ridimensiona colonne",
 
   "regionSearch": "Ricerca",

@@ -2142,6 +2142,18 @@ class AppLocalizationsNb extends AppLocalizations {
       'Den filen er ikke et brukbart Gabbro-hvelv.';
 
   @override
+  String get adoptTitle => 'Åpne en eksisterende hvelvfil';
+
+  @override
+  String get adoptConfirm => 'Legg til hvelv';
+
+  @override
+  String get adoptAlreadyRegistered => 'Dette hvelvet er allerede i listen';
+
+  @override
+  String get unlockAdoptItem => 'Åpne en hvelvfil…';
+
+  @override
   String get resizeColumns => 'Endre kolonnestørrelse';
 
   @override

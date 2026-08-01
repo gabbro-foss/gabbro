@@ -2144,6 +2144,19 @@ class AppLocalizationsDa extends AppLocalizations {
       'Den fil er ikke en brugbar Gabbro-boks.';
 
   @override
+  String get adoptTitle => 'Åbn en eksisterende hvælvingsfil';
+
+  @override
+  String get adoptConfirm => 'Tilføj hvælving';
+
+  @override
+  String get adoptAlreadyRegistered =>
+      'Denne hvælving er allerede på din liste';
+
+  @override
+  String get unlockAdoptItem => 'Åbn en hvælvingsfil…';
+
+  @override
   String get resizeColumns => 'Ændr kolonnestørrelse';
 
   @override

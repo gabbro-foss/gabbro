@@ -2163,6 +2163,18 @@ class AppLocalizationsEs extends AppLocalizations {
       'Ese archivo no es una caja fuerte de Gabbro utilizable.';
 
   @override
+  String get adoptTitle => 'Abrir un archivo de almacén existente';
+
+  @override
+  String get adoptConfirm => 'Añadir almacén';
+
+  @override
+  String get adoptAlreadyRegistered => 'Este almacén ya está en la lista';
+
+  @override
+  String get unlockAdoptItem => 'Abrir un archivo de almacén…';
+
+  @override
   String get resizeColumns => 'Ajustar columnas';
 
   @override

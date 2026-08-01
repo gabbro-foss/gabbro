@@ -2080,6 +2080,18 @@ class AppLocalizationsJa extends AppLocalizations {
   String get restoreFromFileInvalidError => 'このファイルは使用可能な Gabbro ボールトではありません。';
 
   @override
+  String get adoptTitle => '既存のボルトファイルを開く';
+
+  @override
+  String get adoptConfirm => 'ボルトを追加';
+
+  @override
+  String get adoptAlreadyRegistered => 'このボルトはすでにリストにあります';
+
+  @override
+  String get unlockAdoptItem => 'ボルトファイルを開く…';
+
+  @override
   String get resizeColumns => '列のサイズを変更';
 
   @override

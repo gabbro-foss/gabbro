@@ -2147,6 +2147,18 @@ class AppLocalizationsBg extends AppLocalizations {
       'Този файл не е използваем сейф на Gabbro.';
 
   @override
+  String get adoptTitle => 'Отваряне на съществуващ файл на трезор';
+
+  @override
+  String get adoptConfirm => 'Добавяне на трезор';
+
+  @override
+  String get adoptAlreadyRegistered => 'Този трезор вече е в списъка ви';
+
+  @override
+  String get unlockAdoptItem => 'Отваряне на файл на трезор…';
+
+  @override
   String get resizeColumns => 'Преоразмеряване на колоните';
 
   @override

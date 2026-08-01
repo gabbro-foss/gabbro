@@ -2151,6 +2151,18 @@ class AppLocalizationsHu extends AppLocalizations {
       'Ez a fájl nem használható Gabbro-széf.';
 
   @override
+  String get adoptTitle => 'Meglévő széffájl megnyitása';
+
+  @override
+  String get adoptConfirm => 'Széf hozzáadása';
+
+  @override
+  String get adoptAlreadyRegistered => 'Ez a széf már szerepel a listában';
+
+  @override
+  String get unlockAdoptItem => 'Széffájl megnyitása…';
+
+  @override
   String get resizeColumns => 'Oszlopok átméretezése';
 
   @override

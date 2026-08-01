@@ -2145,6 +2145,18 @@ class AppLocalizationsSr extends AppLocalizations {
       'Та датотека није употребљив Gabbro сеф.';
 
   @override
+  String get adoptTitle => 'Otvori postojeću datoteku trezora';
+
+  @override
+  String get adoptConfirm => 'Dodaj trezor';
+
+  @override
+  String get adoptAlreadyRegistered => 'Ovaj trezor je već na vašoj listi';
+
+  @override
+  String get unlockAdoptItem => 'Otvori datoteku trezora…';
+
+  @override
   String get resizeColumns => 'Промени величину колона';
 
   @override
@@ -4315,6 +4327,18 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   @override
   String get restoreFromFileInvalidError =>
       'Ta datoteka nije upotrebljiv Gabbro sef.';
+
+  @override
+  String get adoptTitle => 'Otvori postojeću datoteku trezora';
+
+  @override
+  String get adoptConfirm => 'Dodaj trezor';
+
+  @override
+  String get adoptAlreadyRegistered => 'Ovaj trezor je već na vašoj listi';
+
+  @override
+  String get unlockAdoptItem => 'Otvori datoteku trezora…';
 
   @override
   String get resizeColumns => 'Promeni veličinu kolona';

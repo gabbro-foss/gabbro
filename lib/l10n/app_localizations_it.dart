@@ -2156,6 +2156,18 @@ class AppLocalizationsIt extends AppLocalizations {
       'Questo file non è una cassaforte Gabbro utilizzabile.';
 
   @override
+  String get adoptTitle => 'Apri un file di archivio esistente';
+
+  @override
+  String get adoptConfirm => 'Aggiungi archivio';
+
+  @override
+  String get adoptAlreadyRegistered => 'Questo archivio è già nel tuo elenco';
+
+  @override
+  String get unlockAdoptItem => 'Apri un file di archivio…';
+
+  @override
   String get resizeColumns => 'Ridimensiona colonne';
 
   @override

@@ -2143,6 +2143,18 @@ class AppLocalizationsEt extends AppLocalizations {
       'See fail ei ole kasutatav Gabbro hoidla.';
 
   @override
+  String get adoptTitle => 'Ava olemasolev seififail';
+
+  @override
+  String get adoptConfirm => 'Lisa seif';
+
+  @override
+  String get adoptAlreadyRegistered => 'See seif on juba loendis';
+
+  @override
+  String get unlockAdoptItem => 'Ava seififail…';
+
+  @override
   String get resizeColumns => 'Muuda veergude suurust';
 
   @override

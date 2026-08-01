@@ -2144,6 +2144,18 @@ class AppLocalizationsCs extends AppLocalizations {
       'Tento soubor není použitelný trezor Gabbro.';
 
   @override
+  String get adoptTitle => 'Otevřít existující soubor trezoru';
+
+  @override
+  String get adoptConfirm => 'Přidat trezor';
+
+  @override
+  String get adoptAlreadyRegistered => 'Tento trezor už je ve vašem seznamu';
+
+  @override
+  String get unlockAdoptItem => 'Otevřít soubor trezoru…';
+
+  @override
   String get resizeColumns => 'Změnit velikost sloupců';
 
   @override

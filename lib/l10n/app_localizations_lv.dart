@@ -2148,6 +2148,18 @@ class AppLocalizationsLv extends AppLocalizations {
       'Šis fails nav izmantojams Gabbro seifs.';
 
   @override
+  String get adoptTitle => 'Atvērt esošu seifa failu';
+
+  @override
+  String get adoptConfirm => 'Pievienot seifu';
+
+  @override
+  String get adoptAlreadyRegistered => 'Šis seifs jau ir sarakstā';
+
+  @override
+  String get unlockAdoptItem => 'Atvērt seifa failu…';
+
+  @override
   String get resizeColumns => 'Mainīt kolonnu izmērus';
 
   @override

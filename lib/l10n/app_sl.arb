@@ -890,6 +890,10 @@
   "biometricStaleDisabled": "Biometrično odklepanje je bilo izklopljeno: datoteka trezorja se je spremenila in shranjeno geslo je ne odpre več. Znova ga vklopite v razdelku Varnost.",
   "vaultRestoredMessage":"Trezor obnovljen. Odklenite s svojimi poverilnicami.",
   "restoreFromFileInvalidError": "Ta datoteka ni uporaben trezor Gabbro.",
+  "adoptTitle": "Odpri obstoječo datoteko trezorja",
+  "adoptConfirm": "Dodaj trezor",
+  "adoptAlreadyRegistered": "Ta trezor je že na seznamu",
+  "unlockAdoptItem": "Odpri datoteko trezorja…",
   "resizeColumns": "Spremeni velikost stolpcev",
 
   "regionSearch": "Iskanje",

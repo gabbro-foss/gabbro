@@ -891,6 +891,10 @@
   "biometricStaleDisabled": "O desbloqueio biométrico foi desativado: o ficheiro do cofre mudou e a frase secreta guardada já não o abre. Reative-o em Segurança.",
   "vaultRestoredMessage":"Cofre restaurado. Desbloqueie com as suas credenciais.",
   "restoreFromFileInvalidError": "Esse ficheiro não é um cofre Gabbro utilizável.",
+  "adoptTitle": "Abrir um ficheiro de cofre existente",
+  "adoptConfirm": "Adicionar cofre",
+  "adoptAlreadyRegistered": "Este cofre já está na sua lista",
+  "unlockAdoptItem": "Abrir um ficheiro de cofre…",
   "resizeColumns": "Redimensionar colunas",
 
   "regionSearch": "Pesquisa",

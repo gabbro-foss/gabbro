@@ -2161,6 +2161,18 @@ class AppLocalizationsDe extends AppLocalizations {
       'Diese Datei ist kein verwendbarer Gabbro-Tresor.';
 
   @override
+  String get adoptTitle => 'Vorhandene Tresordatei öffnen';
+
+  @override
+  String get adoptConfirm => 'Tresor hinzufügen';
+
+  @override
+  String get adoptAlreadyRegistered => 'Dieser Tresor ist bereits in der Liste';
+
+  @override
+  String get unlockAdoptItem => 'Tresordatei öffnen…';
+
+  @override
   String get resizeColumns => 'Spalten anpassen';
 
   @override

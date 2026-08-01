@@ -890,6 +890,10 @@
   "biometricStaleDisabled": "Desblokeo biometrikoa desaktibatu da: kutxa gotorraren fitxategia aldatu da eta gordetako pasaesaldiak ez du gehiago irekitzen. Gaitu berriro Segurtasuna atalean.",
   "vaultRestoredMessage":"Kutxa gotorra berreskuratu da. Desblokeatu zure kredentzialekin.",
   "restoreFromFileInvalidError": "Fitxategi hori ez da erabilgarri den Gabbro kutxa gotor bat.",
+  "adoptTitle": "Ireki lehendik dagoen gandegi-fitxategi bat",
+  "adoptConfirm": "Gehitu gandegia",
+  "adoptAlreadyRegistered": "Gandegi hau dagoeneko zure zerrendan dago",
+  "unlockAdoptItem": "Ireki gandegi-fitxategi bat…",
   "resizeColumns": "Aldatu zutabeen tamaina",
 
   "regionSearch": "Bilaketa",

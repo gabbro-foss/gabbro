@@ -13,11 +13,6 @@ import 'package:gabbro/widgets/url_link.dart';
 /// Adopt: register an exported `.gabbro` file as a vault on this device,
 /// without creating an empty vault and importing into it. Adopting grants no
 /// access — the vault still asks for full credentials at unlock.
-///
-/// NOTE: some labels are interim hardcoded English until the string set
-/// stabilises; the 37-ARB batch (tick-list N6) replaces them before this
-/// screen is wired into any entry point. Triage strings reuse the existing
-/// translated unlock-screen keys.
 // Production defaults: the real bridge. The format probes mirror the unlock
 // screen's defaults — a probe that cannot run must never masquerade as a
 // diagnosis, so they report false and the generic invalid message stands.
@@ -100,7 +95,9 @@ class _AdoptVaultScreenState extends State<AdoptVaultScreen> {
   final _aliasController = TextEditingController();
   String? _pickedPath;
   _AdoptError? _error;
-  bool _aliasCollision = false;
+
+  /// The alias a confirm was refused for (already registered); null = none.
+  String? _collisionAlias;
 
   /// A free path in `dir` for `basename`, suffixing `-2`, `-3`, … before the
   /// extension when the plain name is taken — the Rust copy refuses an
@@ -122,10 +119,10 @@ class _AdoptVaultScreenState extends State<AdoptVaultScreen> {
   Future<void> _confirm() async {
     final alias = _aliasController.text.trim();
     if (widget.registry.records.any((r) => r.alias == alias)) {
-      setState(() => _aliasCollision = true);
+      setState(() => _collisionAlias = alias);
       return;
     }
-    setState(() => _aliasCollision = false);
+    setState(() => _collisionAlias = null);
     var path = _pickedPath!;
     final onAndroid = widget.isAndroid ?? Platform.isAndroid;
     if (onAndroid) {
@@ -206,7 +203,7 @@ class _AdoptVaultScreenState extends State<AdoptVaultScreen> {
       ),
       _AdoptError.alreadyRegistered => (
         const Key('adopt_error_already_registered'),
-        'This vault is already in your list',
+        l.adoptAlreadyRegistered,
         null,
       ),
     };
@@ -242,52 +239,55 @@ class _AdoptVaultScreenState extends State<AdoptVaultScreen> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Open an existing vault file')),
-    body: ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        // Editable + browse: a typed or pasted path keeps working where the
-        // native dialog cannot open (portal-less WM); PathField itself
-        // surfaces the cancel/unavailable cases.
-        PathField(
-          key: const Key('adopt_path_field'),
-          mode: PathFieldMode.open,
-          hint: 'Path to a .gabbro vault file',
-          allowedExtensions: const ['gabbro'],
-          openPicker: widget.onPickFile,
-          onPathSelected: (_) {},
-          onPathPicked: _triage,
-          onSubmitted: _triage,
-        ),
-        if (_error != null) ...[
-          const SizedBox(height: 16),
-          _errorCard(context),
-        ],
-        if (_pickedPath != null) ...[
-          const SizedBox(height: 16),
-          TextField(
-            key: const Key('adopt_alias_field'),
-            controller: _aliasController,
-            decoration: InputDecoration(
-              labelText: 'Vault name',
-              errorText: _aliasCollision
-                  ? 'A vault with this name is already in the list'
-                  : null,
-              errorMaxLines: 3,
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return Scaffold(
+      appBar: AppBar(title: Text(l.adoptTitle)),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          // Editable + browse: a typed or pasted path keeps working where the
+          // native dialog cannot open (portal-less WM); PathField itself
+          // surfaces the cancel/unavailable cases.
+          PathField(
+            key: const Key('adopt_path_field'),
+            mode: PathFieldMode.open,
+            hint: l.onboardingPathHint,
+            allowedExtensions: const ['gabbro'],
+            openPicker: widget.onPickFile,
+            onPathSelected: (_) {},
+            onPathPicked: _triage,
+            onSubmitted: _triage,
+          ),
+          if (_error != null) ...[
+            const SizedBox(height: 16),
+            _errorCard(context),
+          ],
+          if (_pickedPath != null) ...[
+            const SizedBox(height: 16),
+            TextField(
+              key: const Key('adopt_alias_field'),
+              controller: _aliasController,
+              decoration: InputDecoration(
+                labelText: l.onboardingVaultName,
+                errorText: _collisionAlias != null
+                    ? l.vaultNameAlreadyExists(_collisionAlias!)
+                    : null,
+                errorMaxLines: 3,
+              ),
             ),
-          ),
-          if (_aliasCollision)
-            // Key target only: the visible message is the errorText above.
-            const SizedBox.shrink(key: Key('adopt_alias_collision')),
-          const SizedBox(height: 16),
-          FilledButton(
-            key: const Key('adopt_confirm_button'),
-            onPressed: _confirm,
-            child: const Text('Add vault'),
-          ),
+            if (_collisionAlias != null)
+              // Key target only: the visible message is the errorText above.
+              const SizedBox.shrink(key: Key('adopt_alias_collision')),
+            const SizedBox(height: 16),
+            FilledButton(
+              key: const Key('adopt_confirm_button'),
+              onPressed: _confirm,
+              child: Text(l.adoptConfirm),
+            ),
+          ],
         ],
-      ],
-    ),
-  );
+      ),
+    );
+  }
 }

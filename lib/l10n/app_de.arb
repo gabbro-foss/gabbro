@@ -890,6 +890,10 @@
   "biometricStaleDisabled": "Die biometrische Entsperrung wurde deaktiviert: Die Tresordatei hat sich geändert und die gespeicherte Passphrase öffnet sie nicht mehr. Aktiviere sie unter Sicherheit erneut.",
   "vaultRestoredMessage":"Tresor wiederhergestellt. Entsperren Sie mit Ihren Zugangsdaten.",
   "restoreFromFileInvalidError": "Diese Datei ist kein verwendbarer Gabbro-Tresor.",
+  "adoptTitle": "Vorhandene Tresordatei öffnen",
+  "adoptConfirm": "Tresor hinzufügen",
+  "adoptAlreadyRegistered": "Dieser Tresor ist bereits in der Liste",
+  "unlockAdoptItem": "Tresordatei öffnen…",
   "resizeColumns": "Spalten anpassen",
 
   "regionSearch": "Suche",

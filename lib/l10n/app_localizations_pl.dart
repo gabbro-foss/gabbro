@@ -2154,6 +2154,18 @@ class AppLocalizationsPl extends AppLocalizations {
       'Ten plik nie jest prawidłowym sejfem Gabbro.';
 
   @override
+  String get adoptTitle => 'Otwórz istniejący plik skarbca';
+
+  @override
+  String get adoptConfirm => 'Dodaj skarbiec';
+
+  @override
+  String get adoptAlreadyRegistered => 'Ten skarbiec jest już na liście';
+
+  @override
+  String get unlockAdoptItem => 'Otwórz plik skarbca…';
+
+  @override
   String get resizeColumns => 'Zmień rozmiar kolumn';
 
   @override

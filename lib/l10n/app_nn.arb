@@ -891,6 +891,10 @@
   "biometricStaleDisabled": "Biometrisk opplåsing vart slått av: kvelvfila er endra, og den lagra passfrasen opnar henne ikkje lenger. Slå han på att under Tryggleik.",
   "vaultRestoredMessage":"Kvelv gjenoppretta. Lås opp med innloggingsinformasjonen din.",
   "restoreFromFileInvalidError": "Den fila er ikkje eit brukbart Gabbro-kvelv.",
+  "adoptTitle": "Opne ei eksisterande kvelvfil",
+  "adoptConfirm": "Legg til kvelv",
+  "adoptAlreadyRegistered": "Dette kvelvet er allereie i lista",
+  "unlockAdoptItem": "Opne ei kvelvfil…",
   "resizeColumns": "Endre kolonnestorleik",
 
   "regionSearch": "Søk",

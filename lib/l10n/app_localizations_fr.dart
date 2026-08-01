@@ -2170,6 +2170,18 @@ class AppLocalizationsFr extends AppLocalizations {
       'Ce fichier n\'est pas un coffre Gabbro utilisable.';
 
   @override
+  String get adoptTitle => 'Ouvrir un fichier de coffre existant';
+
+  @override
+  String get adoptConfirm => 'Ajouter le coffre';
+
+  @override
+  String get adoptAlreadyRegistered => 'Ce coffre est déjà dans votre liste';
+
+  @override
+  String get unlockAdoptItem => 'Ouvrir un fichier de coffre…';
+
+  @override
   String get resizeColumns => 'Redimensionner les colonnes';
 
   @override

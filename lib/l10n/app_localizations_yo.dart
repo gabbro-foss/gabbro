@@ -2143,6 +2143,18 @@ class AppLocalizationsYo extends AppLocalizations {
       'Fáìlì yẹn kì í ṣe àpótí ìṣúra Gabbro tó ṣeé lò.';
 
   @override
+  String get adoptTitle => 'Ṣí fáìlì vọọliti tó ti wà';
+
+  @override
+  String get adoptConfirm => 'Fi vọọliti kún un';
+
+  @override
+  String get adoptAlreadyRegistered => 'Vọọliti yìí ti wà nínú àkójọ rẹ';
+
+  @override
+  String get unlockAdoptItem => 'Ṣí fáìlì vọọliti…';
+
+  @override
   String get resizeColumns => 'Ṣàtúnṣe ìwọ̀n àwọn ọ̀wọ́n';
 
   @override

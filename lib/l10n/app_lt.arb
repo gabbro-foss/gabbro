@@ -891,6 +891,10 @@
   "biometricStaleDisabled": "Biometrinis atrakinimas išjungtas: saugyklos failas pasikeitė ir išsaugota slaptafrazė jo nebeatrakina. Vėl jį įjunkite skiltyje Saugumas.",
   "vaultRestoredMessage":"Saugykla atkurta. Atrakinkite savo prisijungimo duomenimis.",
   "restoreFromFileInvalidError": "Šis failas nėra tinkama Gabbro saugykla.",
+  "adoptTitle": "Atverti esamą saugyklos failą",
+  "adoptConfirm": "Pridėti saugyklą",
+  "adoptAlreadyRegistered": "Ši saugykla jau yra sąraše",
+  "unlockAdoptItem": "Atverti saugyklos failą…",
   "resizeColumns": "Keisti stulpelių dydį",
 
   "regionSearch": "Paieška",

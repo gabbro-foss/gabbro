@@ -2144,6 +2144,18 @@ class AppLocalizationsNn extends AppLocalizations {
       'Den fila er ikkje eit brukbart Gabbro-kvelv.';
 
   @override
+  String get adoptTitle => 'Opne ei eksisterande kvelvfil';
+
+  @override
+  String get adoptConfirm => 'Legg til kvelv';
+
+  @override
+  String get adoptAlreadyRegistered => 'Dette kvelvet er allereie i lista';
+
+  @override
+  String get unlockAdoptItem => 'Opne ei kvelvfil…';
+
+  @override
   String get resizeColumns => 'Endre kolonnestorleik';
 
   @override

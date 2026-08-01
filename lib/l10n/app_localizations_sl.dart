@@ -2147,6 +2147,18 @@ class AppLocalizationsSl extends AppLocalizations {
       'Ta datoteka ni uporaben trezor Gabbro.';
 
   @override
+  String get adoptTitle => 'Odpri obstoječo datoteko trezorja';
+
+  @override
+  String get adoptConfirm => 'Dodaj trezor';
+
+  @override
+  String get adoptAlreadyRegistered => 'Ta trezor je že na seznamu';
+
+  @override
+  String get unlockAdoptItem => 'Odpri datoteko trezorja…';
+
+  @override
   String get resizeColumns => 'Spremeni velikost stolpcev';
 
   @override

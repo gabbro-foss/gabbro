@@ -2152,6 +2152,18 @@ class AppLocalizationsRu extends AppLocalizations {
       'Этот файл не является пригодным хранилищем Gabbro.';
 
   @override
+  String get adoptTitle => 'Открыть существующий файл хранилища';
+
+  @override
+  String get adoptConfirm => 'Добавить хранилище';
+
+  @override
+  String get adoptAlreadyRegistered => 'Это хранилище уже есть в списке';
+
+  @override
+  String get unlockAdoptItem => 'Открыть файл хранилища…';
+
+  @override
   String get resizeColumns => 'Изменить размер столбцов';
 
   @override

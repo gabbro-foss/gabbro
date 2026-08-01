@@ -2150,6 +2150,18 @@ class AppLocalizationsPt extends AppLocalizations {
       'Esse ficheiro não é um cofre Gabbro utilizável.';
 
   @override
+  String get adoptTitle => 'Abrir um ficheiro de cofre existente';
+
+  @override
+  String get adoptConfirm => 'Adicionar cofre';
+
+  @override
+  String get adoptAlreadyRegistered => 'Este cofre já está na sua lista';
+
+  @override
+  String get unlockAdoptItem => 'Abrir um ficheiro de cofre…';
+
+  @override
   String get resizeColumns => 'Redimensionar colunas';
 
   @override
@@ -4321,6 +4333,18 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   @override
   String get restoreFromFileInvalidError =>
       'Esse arquivo não é um cofre Gabbro utilizável.';
+
+  @override
+  String get adoptTitle => 'Abrir um arquivo de cofre existente';
+
+  @override
+  String get adoptConfirm => 'Adicionar cofre';
+
+  @override
+  String get adoptAlreadyRegistered => 'Este cofre já está na sua lista';
+
+  @override
+  String get unlockAdoptItem => 'Abrir um arquivo de cofre…';
 
   @override
   String get resizeColumns => 'Redimensionar colunas';
@@ -6500,6 +6524,18 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   @override
   String get restoreFromFileInvalidError =>
       'Esse ficheiro não é um cofre Gabbro utilizável.';
+
+  @override
+  String get adoptTitle => 'Abrir um ficheiro de cofre existente';
+
+  @override
+  String get adoptConfirm => 'Adicionar cofre';
+
+  @override
+  String get adoptAlreadyRegistered => 'Este cofre já está na sua lista';
+
+  @override
+  String get unlockAdoptItem => 'Abrir um ficheiro de cofre…';
 
   @override
   String get resizeColumns => 'Redimensionar colunas';

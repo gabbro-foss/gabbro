@@ -2145,6 +2145,18 @@ class AppLocalizationsFi extends AppLocalizations {
       'Tämä tiedosto ei ole käyttökelpoinen Gabbro-holvi.';
 
   @override
+  String get adoptTitle => 'Avaa olemassa oleva holvitiedosto';
+
+  @override
+  String get adoptConfirm => 'Lisää holvi';
+
+  @override
+  String get adoptAlreadyRegistered => 'Tämä holvi on jo luettelossasi';
+
+  @override
+  String get unlockAdoptItem => 'Avaa holvitiedosto…';
+
+  @override
   String get resizeColumns => 'Muuta sarakkeiden kokoa';
 
   @override

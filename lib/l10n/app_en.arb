@@ -1084,6 +1084,22 @@
     "description": "Shown when a biometric unlock fails because the vault file at this path was replaced outside the app (e.g. file sync): the stored passphrase no longer opens the new file, so the enrolment was dropped (H1)."
   },
   "restoreFromFileInvalidError": "That file is not a usable Gabbro vault.",
+  "adoptTitle": "Open an existing vault file",
+  "@adoptTitle": {
+    "description": "Adopt screen title and the onboarding button that opens it (register an exported .gabbro from another device as a vault on this one)."
+  },
+  "adoptConfirm": "Add vault",
+  "@adoptConfirm": {
+    "description": "Adopt screen confirm button: registers the picked file as a vault."
+  },
+  "adoptAlreadyRegistered": "This vault is already in your list",
+  "@adoptAlreadyRegistered": {
+    "description": "Adopt screen error when the picked path is already a registered vault."
+  },
+  "unlockAdoptItem": "Open a vault file…",
+  "@unlockAdoptItem": {
+    "description": "Unlock-screen vault dropdown entry that opens the adopt flow."
+  },
   "resizeColumns": "Resize columns",
 
   "regionSearch": "Search",

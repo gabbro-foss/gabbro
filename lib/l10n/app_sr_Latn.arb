@@ -890,6 +890,10 @@
   "biometricStaleDisabled": "Biometrijsko otključavanje je isključeno: datoteka sefa je promenjena i sačuvana pristupna fraza je više ne otvara. Ponovo ga uključite u odeljku Bezbednost.",
   "vaultRestoredMessage":"Sef vraćen. Otključajte svojim akreditivima.",
   "restoreFromFileInvalidError": "Ta datoteka nije upotrebljiv Gabbro sef.",
+  "adoptTitle": "Otvori postojeću datoteku trezora",
+  "adoptConfirm": "Dodaj trezor",
+  "adoptAlreadyRegistered": "Ovaj trezor je već na vašoj listi",
+  "unlockAdoptItem": "Otvori datoteku trezora…",
   "resizeColumns": "Promeni veličinu kolona",
 
   "regionSearch": "Pretraga",

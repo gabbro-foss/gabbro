@@ -2153,6 +2153,18 @@ class AppLocalizationsUk extends AppLocalizations {
       'Цей файл не є придатним сховищем Gabbro.';
 
   @override
+  String get adoptTitle => 'Відкрити наявний файл сховища';
+
+  @override
+  String get adoptConfirm => 'Додати сховище';
+
+  @override
+  String get adoptAlreadyRegistered => 'Це сховище вже є у списку';
+
+  @override
+  String get unlockAdoptItem => 'Відкрити файл сховища…';
+
+  @override
   String get resizeColumns => 'Змінити розмір стовпців';
 
   @override

@@ -891,6 +891,10 @@
   "biometricStaleDisabled": "Biometrisk upplåsning stängdes av: valvfilen har ändrats och den sparade lösenfrasen öppnar den inte längre. Slå på den igen under Säkerhet.",
   "vaultRestoredMessage":"Valv återställt. Lås upp med dina uppgifter.",
   "restoreFromFileInvalidError": "Den filen är inte ett användbart Gabbro-valv.",
+  "adoptTitle": "Öppna en befintlig valvfil",
+  "adoptConfirm": "Lägg till valv",
+  "adoptAlreadyRegistered": "Det här valvet finns redan i din lista",
+  "unlockAdoptItem": "Öppna en valvfil…",
   "resizeColumns": "Ändra kolumnstorlek",
 
   "regionSearch": "Sökning",

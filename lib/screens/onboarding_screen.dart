@@ -1272,14 +1272,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ),
                           if (widget.onAdoptRequested != null) ...[
                             const SizedBox(height: 8),
-                            // Adopt (second device): interim English label,
-                            // replaced by the adopt string batch (N6).
                             OutlinedButton(
                               key: const Key('onboarding_adopt_button'),
                               onPressed: _isCreating
                                   ? null
                                   : widget.onAdoptRequested,
-                              child: const Text('Open an existing vault file'),
+                              child: Text(
+                                AppLocalizations.of(context).adoptTitle,
+                              ),
                             ),
                           ],
                         ],

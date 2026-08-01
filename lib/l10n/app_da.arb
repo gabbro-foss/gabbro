@@ -891,6 +891,10 @@
   "biometricStaleDisabled": "Biometrisk oplåsning blev slået fra: boksfilen er ændret, og den gemte adgangssætning åbner den ikke længere. Slå den til igen under Sikkerhed.",
   "vaultRestoredMessage":"Boks gendannet. Lås op med dine loginoplysninger.",
   "restoreFromFileInvalidError": "Den fil er ikke en brugbar Gabbro-boks.",
+  "adoptTitle": "Åbn en eksisterende hvælvingsfil",
+  "adoptConfirm": "Tilføj hvælving",
+  "adoptAlreadyRegistered": "Denne hvælving er allerede på din liste",
+  "unlockAdoptItem": "Åbn en hvælvingsfil…",
   "resizeColumns": "Ændr kolonnestørrelse",
 
   "regionSearch": "Søgning",

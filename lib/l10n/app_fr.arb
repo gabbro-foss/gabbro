@@ -890,6 +890,10 @@
   "biometricStaleDisabled": "Le déverrouillage biométrique a été désactivé : le fichier du coffre a changé et la phrase secrète enregistrée ne l'ouvre plus. Réactivez-le dans Sécurité.",
   "vaultRestoredMessage":"Coffre restauré. Déverrouillez avec vos identifiants.",
   "restoreFromFileInvalidError": "Ce fichier n'est pas un coffre Gabbro utilisable.",
+  "adoptTitle": "Ouvrir un fichier de coffre existant",
+  "adoptConfirm": "Ajouter le coffre",
+  "adoptAlreadyRegistered": "Ce coffre est déjà dans votre liste",
+  "unlockAdoptItem": "Ouvrir un fichier de coffre…",
   "resizeColumns": "Redimensionner les colonnes",
 
   "regionSearch": "Recherche",

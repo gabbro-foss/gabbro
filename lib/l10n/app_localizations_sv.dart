@@ -2140,6 +2140,18 @@ class AppLocalizationsSv extends AppLocalizations {
       'Den filen är inte ett användbart Gabbro-valv.';
 
   @override
+  String get adoptTitle => 'Öppna en befintlig valvfil';
+
+  @override
+  String get adoptConfirm => 'Lägg till valv';
+
+  @override
+  String get adoptAlreadyRegistered => 'Det här valvet finns redan i din lista';
+
+  @override
+  String get unlockAdoptItem => 'Öppna en valvfil…';
+
+  @override
   String get resizeColumns => 'Ändra kolumnstorlek';
 
   @override

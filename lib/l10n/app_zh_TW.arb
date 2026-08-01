@@ -890,6 +890,10 @@
   "biometricStaleDisabled": "已關閉生物特徵解鎖：保險庫檔案已變更，儲存的密碼片語無法再開啟它。請在「安全性」中重新啟用。",
   "vaultRestoredMessage":"保險庫已復原。請使用你的憑證解鎖。",
   "restoreFromFileInvalidError": "該檔案不是可用的 Gabbro 保險庫。",
+  "adoptTitle": "開啟現有保險庫檔案",
+  "adoptConfirm": "新增保險庫",
+  "adoptAlreadyRegistered": "此保險庫已在清單中",
+  "unlockAdoptItem": "開啟保險庫檔案…",
   "resizeColumns": "調整欄寬",
 
   "regionSearch": "搜尋",

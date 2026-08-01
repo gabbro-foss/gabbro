@@ -2051,6 +2051,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get restoreFromFileInvalidError => '该文件不是可用的 Gabbro 保险库。';
 
   @override
+  String get adoptTitle => '打开现有保险库文件';
+
+  @override
+  String get adoptConfirm => '添加保险库';
+
+  @override
+  String get adoptAlreadyRegistered => '此保险库已在列表中';
+
+  @override
+  String get unlockAdoptItem => '打开保险库文件…';
+
+  @override
   String get resizeColumns => '调整列宽';
 
   @override
@@ -4128,6 +4140,18 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get restoreFromFileInvalidError => '该文件不是可用的 Gabbro 保险库。';
 
   @override
+  String get adoptTitle => '打开现有保险库文件';
+
+  @override
+  String get adoptConfirm => '添加保险库';
+
+  @override
+  String get adoptAlreadyRegistered => '此保险库已在列表中';
+
+  @override
+  String get unlockAdoptItem => '打开保险库文件…';
+
+  @override
   String get resizeColumns => '调整列宽';
 
   @override
@@ -6203,6 +6227,18 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get restoreFromFileInvalidError => '該檔案不是可用的 Gabbro 保險庫。';
+
+  @override
+  String get adoptTitle => '開啟現有保險庫檔案';
+
+  @override
+  String get adoptConfirm => '新增保險庫';
+
+  @override
+  String get adoptAlreadyRegistered => '此保險庫已在清單中';
+
+  @override
+  String get unlockAdoptItem => '開啟保險庫檔案…';
 
   @override
   String get resizeColumns => '調整欄寬';

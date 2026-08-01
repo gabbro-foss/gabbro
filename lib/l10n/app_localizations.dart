@@ -3949,6 +3949,30 @@ abstract class AppLocalizations {
   /// **'That file is not a usable Gabbro vault.'**
   String get restoreFromFileInvalidError;
 
+  /// Adopt screen title and the onboarding button that opens it (register an exported .gabbro from another device as a vault on this one).
+  ///
+  /// In en, this message translates to:
+  /// **'Open an existing vault file'**
+  String get adoptTitle;
+
+  /// Adopt screen confirm button: registers the picked file as a vault.
+  ///
+  /// In en, this message translates to:
+  /// **'Add vault'**
+  String get adoptConfirm;
+
+  /// Adopt screen error when the picked path is already a registered vault.
+  ///
+  /// In en, this message translates to:
+  /// **'This vault is already in your list'**
+  String get adoptAlreadyRegistered;
+
+  /// Unlock-screen vault dropdown entry that opens the adopt flow.
+  ///
+  /// In en, this message translates to:
+  /// **'Open a vault file…'**
+  String get unlockAdoptItem;
+
   /// No description provided for @resizeColumns.
   ///
   /// In en, this message translates to:

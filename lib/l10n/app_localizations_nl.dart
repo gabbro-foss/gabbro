@@ -2153,6 +2153,18 @@ class AppLocalizationsNl extends AppLocalizations {
       'Dat bestand is geen bruikbare Gabbro-kluis.';
 
   @override
+  String get adoptTitle => 'Bestaand kluisbestand openen';
+
+  @override
+  String get adoptConfirm => 'Kluis toevoegen';
+
+  @override
+  String get adoptAlreadyRegistered => 'Deze kluis staat al in de lijst';
+
+  @override
+  String get unlockAdoptItem => 'Kluisbestand openen…';
+
+  @override
   String get resizeColumns => 'Kolommen aanpassen';
 
   @override

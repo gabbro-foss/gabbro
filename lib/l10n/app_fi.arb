@@ -891,6 +891,10 @@
   "biometricStaleDisabled": "Biometrinen avaaminen poistettiin käytöstä: holvitiedosto on muuttunut, eikä tallennettu salauslause enää avaa sitä. Ota se uudelleen käyttöön kohdassa Tietoturva.",
   "vaultRestoredMessage":"Holvi palautettu. Avaa lukitus tunnuksillasi.",
   "restoreFromFileInvalidError": "Tämä tiedosto ei ole käyttökelpoinen Gabbro-holvi.",
+  "adoptTitle": "Avaa olemassa oleva holvitiedosto",
+  "adoptConfirm": "Lisää holvi",
+  "adoptAlreadyRegistered": "Tämä holvi on jo luettelossasi",
+  "unlockAdoptItem": "Avaa holvitiedosto…",
   "resizeColumns": "Muuta sarakkeiden kokoa",
 
   "regionSearch": "Haku",

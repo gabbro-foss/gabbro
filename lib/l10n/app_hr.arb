@@ -890,6 +890,10 @@
   "biometricStaleDisabled": "Biometrijsko otključavanje je isključeno: datoteka trezora je promijenjena i spremljena pristupna fraza više je ne otvara. Ponovno ga uključite u Sigurnost.",
   "vaultRestoredMessage":"Trezor vraćen. Otključajte svojim vjerodajnicama.",
   "restoreFromFileInvalidError": "Ta datoteka nije upotrebljiv Gabbro trezor.",
+  "adoptTitle": "Otvori postojeću datoteku trezora",
+  "adoptConfirm": "Dodaj trezor",
+  "adoptAlreadyRegistered": "Ovaj trezor je već na vašem popisu",
+  "unlockAdoptItem": "Otvori datoteku trezora…",
   "resizeColumns": "Promijeni veličinu stupaca",
 
   "regionSearch": "Pretraga",

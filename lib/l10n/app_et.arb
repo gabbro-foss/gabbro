@@ -891,6 +891,10 @@
   "biometricStaleDisabled": "Biomeetriline avamine lülitati välja: hoidlafail on muutunud ja salvestatud pääslause seda enam ei ava. Lülitage see uuesti sisse jaotises Turvalisus.",
   "vaultRestoredMessage":"Hoidla taastatud. Avage oma mandaatidega.",
   "restoreFromFileInvalidError": "See fail ei ole kasutatav Gabbro hoidla.",
+  "adoptTitle": "Ava olemasolev seififail",
+  "adoptConfirm": "Lisa seif",
+  "adoptAlreadyRegistered": "See seif on juba loendis",
+  "unlockAdoptItem": "Ava seififail…",
   "resizeColumns": "Muuda veergude suurust",
 
   "regionSearch": "Otsing",

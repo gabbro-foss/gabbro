@@ -2085,6 +2085,18 @@ class AppLocalizationsKo extends AppLocalizations {
   String get restoreFromFileInvalidError => '이 파일은 사용할 수 있는 Gabbro 보관함이 아닙니다.';
 
   @override
+  String get adoptTitle => '기존 볼트 파일 열기';
+
+  @override
+  String get adoptConfirm => '볼트 추가';
+
+  @override
+  String get adoptAlreadyRegistered => '이 볼트는 이미 목록에 있습니다';
+
+  @override
+  String get unlockAdoptItem => '볼트 파일 열기…';
+
+  @override
   String get resizeColumns => '열 크기 조정';
 
   @override

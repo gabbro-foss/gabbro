@@ -891,6 +891,10 @@
   "biometricStaleDisabled": "Odblokowywanie biometryczne zostało wyłączone: plik sejfu się zmienił i zapisane hasło główne już go nie otwiera. Włącz je ponownie w sekcji Bezpieczeństwo.",
   "vaultRestoredMessage":"Sejf przywrócony. Odblokuj swoimi danymi.",
   "restoreFromFileInvalidError": "Ten plik nie jest prawidłowym sejfem Gabbro.",
+  "adoptTitle": "Otwórz istniejący plik skarbca",
+  "adoptConfirm": "Dodaj skarbiec",
+  "adoptAlreadyRegistered": "Ten skarbiec jest już na liście",
+  "unlockAdoptItem": "Otwórz plik skarbca…",
   "resizeColumns": "Zmień rozmiar kolumn",
 
   "regionSearch": "Wyszukiwanie",

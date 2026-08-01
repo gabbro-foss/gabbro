@@ -1163,12 +1163,10 @@ class _UnlockScreenState extends State<UnlockScreen>
                               child: Text(r.alias),
                             ),
                           ),
-                          // Adopt (interim English label; adopt string batch
-                          // N6 replaces it).
-                          const DropdownMenuItem(
-                            key: Key('unlock_adopt_item'),
+                          DropdownMenuItem(
+                            key: const Key('unlock_adopt_item'),
                             value: _UnlockScreenState.adoptDropdownValue,
-                            child: Text('Open a vault file…'),
+                            child: Text(l.unlockAdoptItem),
                           ),
                         ],
                         onChanged: _onDropdownChanged,

@@ -890,6 +890,10 @@
   "biometricStaleDisabled": "已关闭生物特征解锁：保险库文件已更改，保存的密码短语无法再打开它。请在“安全”中重新启用。",
   "vaultRestoredMessage":"保险库已恢复。请使用你的凭据解锁。",
   "restoreFromFileInvalidError": "该文件不是可用的 Gabbro 保险库。",
+  "adoptTitle": "打开现有保险库文件",
+  "adoptConfirm": "添加保险库",
+  "adoptAlreadyRegistered": "此保险库已在列表中",
+  "unlockAdoptItem": "打开保险库文件…",
   "resizeColumns": "调整列宽",
 
   "regionSearch": "搜索",

@@ -891,6 +891,10 @@
   "biometricStaleDisabled": "Biometrisk opplåsing ble slått av: hvelvfilen er endret, og den lagrede passfrasen åpner den ikke lenger. Slå den på igjen under Sikkerhet.",
   "vaultRestoredMessage":"Hvelv gjenopprettet. Lås opp med påloggingsinformasjonen din.",
   "restoreFromFileInvalidError": "Den filen er ikke et brukbart Gabbro-hvelv.",
+  "adoptTitle": "Åpne en eksisterende hvelvfil",
+  "adoptConfirm": "Legg til hvelv",
+  "adoptAlreadyRegistered": "Dette hvelvet er allerede i listen",
+  "unlockAdoptItem": "Åpne en hvelvfil…",
   "resizeColumns": "Endre kolonnestørrelse",
 
   "regionSearch": "Søk",

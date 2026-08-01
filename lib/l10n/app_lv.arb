@@ -891,6 +891,10 @@
   "biometricStaleDisabled": "Biometriskā atbloķēšana tika izslēgta: seifa fails ir mainījies, un saglabātā ieejas frāze to vairs neatver. Ieslēdziet to atkal sadaļā Drošība.",
   "vaultRestoredMessage":"Seifs atjaunots. Atbloķējiet ar saviem akreditācijas datiem.",
   "restoreFromFileInvalidError": "Šis fails nav izmantojams Gabbro seifs.",
+  "adoptTitle": "Atvērt esošu seifa failu",
+  "adoptConfirm": "Pievienot seifu",
+  "adoptAlreadyRegistered": "Šis seifs jau ir sarakstā",
+  "unlockAdoptItem": "Atvērt seifa failu…",
   "resizeColumns": "Mainīt kolonnu izmērus",
 
   "regionSearch": "Meklēšana",
