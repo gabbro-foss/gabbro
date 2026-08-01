@@ -73,7 +73,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 674 | 17 |
+| Rust (`cargo test -q`) | 680 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 11 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -124,14 +124,54 @@ H1 DONE (hardware-passed 2026-07-31, SW1-SW9 on the emulator): a biometric-fed
 decrypt rejection unenrols and names the vault-file change; tap-stage failures
 (wrong PIN) never do. Error contract documented at `_doUnlock` + LEARNINGS.
 
-**1. The `adopt` row** (both columns, canon-TDD). Start with design, not code:
-   - Entry points: `onboarding_screen`, `unlock_screen`, `manage_vaults_screen`.
-   - Linux registers the picked path; Android must copy into app storage (its picker
-     returns a cache copy). That asymmetry decides whether `restore_vault_from_file` is
-     reused — note it now also refreshes the `.bak` and unenrols biometrics via the
-     unlock screen, correct for a restore, wrong for adopting a file that IS this vault.
-   - New screen => `test/screen_catalog.dart` + `screenFileCount`; new strings => 37 ARBs.
-   - Mock vault inventory for hardware rounds is in `.scratchpad` (A-E kept on disk).
+**1. The `adopt` row** (both columns, canon-TDD). Design AGREED 2026-08-01:
+one new `AdoptVaultScreen` shared by all entry points. Pick file -> validate via
+`readVaultHeader` (full parse, no credentials) -> alias from header, editable ->
+Linux registers the picked path in place / Android copies via new Rust
+`adopt_vault_file(source, dest)` (never overwrites) -> unlock screen, full
+credentials. Registration reuses `_onVaultCreated` (type auto-detect). Keyed
+files need nothing extra. Duplicate adopt of one source on Android: WONTFIX.
+Mock vaults A-E in `.scratchpad`.
+
+Tick-list (mark as they go green; nothing below is done until hardware passes):
+
+Rust `adopt_vault_file` (`vault/io.rs` + bridge):
+- [x] R1 valid source -> dest 0600, byte-identical, own `.bak`
+- [x] R2 occupied dest refused, untouched
+- [x] R3 unparseable source refused, no dest created
+- [x] R4 symlink source/dest refused
+- [x] R5 pre-v11 source refused (floor pin)
+- [x] RB bridge roundtrip (`vault_bridge.rs`) — all 6 green 2026-08-01
+- [ ] codegen + `cargo build --release --lib` (needed before any Dart call)
+
+Flutter `AdoptVaultScreen`:
+- [ ] F1 valid file -> alias prefilled, editable
+- [ ] F2 not-a-vault / too-old (+ upgrade URL) / too-new triage
+- [ ] F3 alias collision -> validation error
+- [ ] F4 already-registered path refused (Linux)
+- [ ] F5 Linux confirm -> registers picked path, no copy
+- [ ] F6 Android confirm (seam) -> `adopt_vault_file` to app storage, dest registered
+- [ ] F7 keyed file -> record type `yubikey`
+- [ ] F8 picker cancel no-op; `FilePickerUnavailable` -> manual path (Linux)
+- [ ] F9 after adopt -> unlock screen, no auto-unlock
+
+Entry points:
+- [ ] E1 onboarding "Open an existing vault file" -> AdoptVaultScreen
+- [ ] E2 unlock dropdown from 1 vault, "Open a vault file…" item (flips 1-vault pin)
+- [ ] E3 2-vault dropdown: switch unregressed + adopt item
+
+A11y & l10n net:
+- [ ] N1 screen_catalog + screenFileCount (enrols 2x overflow, a11y, keyboard nets)
+- [ ] N2 8x text, 360dp, all 37 locales, driven through the whole flow
+- [ ] N3 icon-only controls named; Linux label composes name + action
+- [ ] N4 triage errors + adopt success announced (no-focus-change rule)
+- [ ] N5 keyboard-only operability (Linux)
+- [ ] N6 real translations, 37 ARBs; «» vault names, 「」 ja
+- [ ] N7 dialog buttons in scrollable content, never `actions` (ADR-016)
+
+Hardware:
+- [ ] Linux matrix (mock vaults A-E)
+- [ ] Android matrix (emulator ok; keyed adopt needs USB-C key)
 
 ### Faster sync, attempt 2 — this branch
 
