@@ -16,6 +16,14 @@ class PathField extends StatefulWidget {
   final String? Function(String?)? validator;
   final bool readOnly;
 
+  /// Fires only when the native picker returns a path — never while typing.
+  /// Lets a caller act on a definite choice (adopt triages the file here)
+  /// without reacting to every keystroke.
+  final void Function(String path)? onPathPicked;
+
+  /// Fires when the user submits the typed path (Enter / IME done).
+  final void Function(String path)? onSubmitted;
+
   /// Test seams: override the native dialogs to return a path, `null` (cancel),
   /// or throw (portal unavailable). Default to the real `file_picker`.
   final Future<String?> Function()? openPicker;
@@ -31,6 +39,8 @@ class PathField extends StatefulWidget {
     this.saveFileName,
     this.validator,
     this.readOnly = false,
+    this.onPathPicked,
+    this.onSubmitted,
     this.openPicker,
     this.savePicker,
   });
@@ -95,6 +105,7 @@ class _PathFieldState extends State<PathField> {
     if (picked != null) {
       setState(() => _controller.text = picked!);
       widget.onPathSelected(picked);
+      widget.onPathPicked?.call(picked);
     }
   }
 
@@ -107,6 +118,7 @@ class _PathFieldState extends State<PathField> {
       // Only a caller-requested display field stays read-only.
       readOnly: widget.readOnly,
       onChanged: widget.onPathSelected,
+      onFieldSubmitted: (v) => widget.onSubmitted?.call(v),
       validator: widget.validator,
       decoration: InputDecoration(
         border: const OutlineInputBorder(),

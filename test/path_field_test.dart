@@ -95,6 +95,52 @@ void main() {
       expect(captured, '/home/user/myvault.gabbro');
     });
 
+    // The adopt flow triages a file the moment the picker returns it, but a
+    // typed path only when the user submits — never per keystroke. That needs
+    // the widget to tell the two apart.
+    testWidgets('onPathPicked fires on a picker result, never on typing',
+        (tester) async {
+      final picked = <String>[];
+      await tester.pumpWidget(
+        testApp(Scaffold(
+          body: PathField(
+            mode: PathFieldMode.open,
+            hint: 'Path',
+            onPathSelected: (_) {},
+            onPathPicked: picked.add,
+            openPicker: () async => '/tmp/from_picker.gabbro',
+          ),
+        )),
+      );
+      await tester.enterText(find.byType(TextFormField), '/tmp/typed.gabbro');
+      await tester.pump();
+      expect(picked, isEmpty, reason: 'typing must not count as picking');
+
+      await tester.tap(find.byType(IconButton));
+      await tester.pump();
+      expect(picked, ['/tmp/from_picker.gabbro']);
+    });
+
+    testWidgets('onSubmitted fires when the typed path is submitted',
+        (tester) async {
+      final submitted = <String>[];
+      await tester.pumpWidget(
+        testApp(Scaffold(
+          body: PathField(
+            mode: PathFieldMode.open,
+            hint: 'Path',
+            onPathSelected: (_) {},
+            onSubmitted: submitted.add,
+          ),
+        )),
+      );
+      await tester.enterText(find.byType(TextFormField), '/tmp/typed.gabbro');
+      expect(submitted, isEmpty);
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+      expect(submitted, ['/tmp/typed.gabbro']);
+    });
+
     // Onboarding drives the path from the alias field (type "Work" -> the path
     // preview becomes work_gabbro.gabbro). That arrives as an external
     // initialPath change and must be reflected without recreating the widget.

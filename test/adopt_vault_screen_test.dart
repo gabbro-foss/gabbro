@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gabbro/safe_file_picker.dart' show FilePickerUnavailable;
 import 'package:gabbro/screens/adopt_vault_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/vault_registry.dart';
@@ -44,6 +45,14 @@ VaultRecord _record(String path, String alias) => VaultRecord(
 Future<VaultHeaderData> _throwingHeader(String _) async =>
     throw Exception('not a vault');
 
+// Taps the PathField's browse button (the picker affordance).
+Future<void> _tapBrowse(WidgetTester tester) => tester.tap(
+  find.descendant(
+    of: find.byKey(const Key('adopt_path_field')),
+    matching: find.byType(IconButton),
+  ),
+);
+
 void main() {
   group('F1: picked valid file', () {
     testWidgets('prefills the alias from the header, editable', (tester) async {
@@ -54,7 +63,7 @@ void main() {
               const VaultHeaderData(alias: 'Personal', yubikeyRecords: []),
         ),
       );
-      await tester.tap(find.byKey(const Key('adopt_pick_button')));
+      await _tapBrowse(tester);
       await tester.pumpAndSettle();
 
       // Alias prefilled from the vault file's header…
@@ -79,7 +88,7 @@ void main() {
               const VaultHeaderData(yubikeyRecords: []),
         ),
       );
-      await tester.tap(find.byKey(const Key('adopt_pick_button')));
+      await _tapBrowse(tester);
       await tester.pumpAndSettle();
 
       final aliasField = find.byKey(const Key('adopt_alias_field'));
@@ -96,7 +105,7 @@ void main() {
           onReadHeader: _throwingHeader,
         ),
       );
-      await tester.tap(find.byKey(const Key('adopt_pick_button')));
+      await _tapBrowse(tester);
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('adopt_error_invalid')), findsOneWidget);
@@ -113,7 +122,7 @@ void main() {
           onFormatTooOld: (_) async => true,
         ),
       );
-      await tester.tap(find.byKey(const Key('adopt_pick_button')));
+      await _tapBrowse(tester);
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('adopt_error_too_old')), findsOneWidget);
@@ -129,7 +138,7 @@ void main() {
           onFormatTooNew: (_) async => true,
         ),
       );
-      await tester.tap(find.byKey(const Key('adopt_pick_button')));
+      await _tapBrowse(tester);
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('adopt_error_too_new')), findsOneWidget);
@@ -148,11 +157,11 @@ void main() {
               : const VaultHeaderData(alias: 'Personal', yubikeyRecords: []),
         ),
       );
-      await tester.tap(find.byKey(const Key('adopt_pick_button')));
+      await _tapBrowse(tester);
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('adopt_error_invalid')), findsOneWidget);
 
-      await tester.tap(find.byKey(const Key('adopt_pick_button')));
+      await _tapBrowse(tester);
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('adopt_error_invalid')), findsNothing);
       expect(find.byKey(const Key('adopt_alias_field')), findsOneWidget);
@@ -173,7 +182,7 @@ void main() {
           onRegistered: (_, _) async => registered++,
         ),
       );
-      await tester.tap(find.byKey(const Key('adopt_pick_button')));
+      await _tapBrowse(tester);
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('adopt_confirm_button')));
       await tester.pumpAndSettle();
@@ -195,7 +204,7 @@ void main() {
           onRegistered: (path, alias) async => calls.add((path, alias)),
         ),
       );
-      await tester.tap(find.byKey(const Key('adopt_pick_button')));
+      await _tapBrowse(tester);
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('adopt_confirm_button')));
       await tester.pumpAndSettle();
@@ -228,7 +237,7 @@ void main() {
           },
         ),
       );
-      await tester.tap(find.byKey(const Key('adopt_pick_button')));
+      await _tapBrowse(tester);
       await tester.pumpAndSettle();
 
       expect(
@@ -242,7 +251,7 @@ void main() {
 
   group('F5/F6: platform split on confirm', () {
     Future<void> pickAndConfirm(WidgetTester tester) async {
-      await tester.tap(find.byKey(const Key('adopt_pick_button')));
+      await _tapBrowse(tester);
       await tester.pumpAndSettle();
       await tester.enterText(
         find.byKey(const Key('adopt_alias_field')),
@@ -309,6 +318,63 @@ void main() {
       await pickAndConfirm(tester);
 
       expect(copies, [('/cache/B.gabbro', '${dir.path}/B-2.gabbro')]);
+    });
+  });
+
+  group('F8: picker edge cases', () {
+    testWidgets('cancelling the picker changes nothing', (tester) async {
+      var headerReads = 0;
+      await tester.pumpWidget(
+        _buildScreen(
+          onPickFile: () async => null,
+          onReadHeader: (_) async {
+            headerReads++;
+            return const VaultHeaderData(yubikeyRecords: []);
+          },
+        ),
+      );
+      await _tapBrowse(tester);
+      await tester.pumpAndSettle();
+
+      expect(headerReads, 0);
+      expect(find.byKey(const Key('adopt_alias_field')), findsNothing);
+      expect(find.byType(SnackBar), findsNothing);
+    });
+
+    testWidgets('portal unavailable -> SnackBar inviting a typed path', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _buildScreen(
+          onPickFile: () async => throw const FilePickerUnavailable('no portal'),
+        ),
+      );
+      await _tapBrowse(tester);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SnackBar), findsOneWidget);
+    });
+
+    testWidgets('a typed path submitted with Enter is triaged', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _buildScreen(
+          onReadHeader: (path) async => path == '/tmp/typed.gabbro'
+              ? const VaultHeaderData(alias: 'Typed', yubikeyRecords: [])
+              : throw Exception('wrong path'),
+        ),
+      );
+      await tester.enterText(
+        find.byKey(const Key('adopt_path_field')),
+        '/tmp/typed.gabbro',
+      );
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pumpAndSettle();
+
+      final aliasField = find.byKey(const Key('adopt_alias_field'));
+      expect(aliasField, findsOneWidget);
+      expect(tester.widget<TextField>(aliasField).controller?.text, 'Typed');
     });
   });
 }

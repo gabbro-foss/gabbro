@@ -2,9 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
+import 'package:gabbro/safe_file_picker.dart' show FilePickerUnavailable;
 import 'package:gabbro/screens/unlock_screen.dart' show vaultUpgradePathUrl;
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/vault_registry.dart';
+import 'package:gabbro/widgets/path_field.dart';
 import 'package:gabbro/widgets/url_link.dart';
 
 /// Adopt: register an exported `.gabbro` file as a vault on this device,
@@ -18,7 +20,9 @@ import 'package:gabbro/widgets/url_link.dart';
 class AdoptVaultScreen extends StatefulWidget {
   final VaultRegistry registry;
 
-  /// Returns the picked file's path, or null when the user cancelled.
+  /// The native open dialog (PathField's `openPicker` seam): a path, null on
+  /// cancel, or throws [FilePickerUnavailable] — PathField handles the latter
+  /// two itself.
   final Future<String?> Function() onPickFile;
 
   /// Full-parses the picked file and returns its header (alias + YubiKey
@@ -109,9 +113,10 @@ class _AdoptVaultScreenState extends State<AdoptVaultScreen> {
     await widget.onRegistered(path, alias);
   }
 
-  Future<void> _pick() async {
-    final path = await widget.onPickFile();
-    if (path == null || !mounted) return;
+  // Triage a definite choice: a picker result or a submitted typed path —
+  // never a keystroke (the header read parses the whole file).
+  Future<void> _triage(String path) async {
+    if (path.isEmpty || !mounted) return;
     // Refuse before touching the file: this vault is already in the list, and
     // adopting it again would only produce a second entry for the same file.
     if (widget.registry.records.any((r) => r.path == path)) {
@@ -216,10 +221,18 @@ class _AdoptVaultScreenState extends State<AdoptVaultScreen> {
     body: ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        FilledButton(
-          key: const Key('adopt_pick_button'),
-          onPressed: _pick,
-          child: const Text('Pick a vault file'),
+        // Editable + browse: a typed or pasted path keeps working where the
+        // native dialog cannot open (portal-less WM); PathField itself
+        // surfaces the cancel/unavailable cases.
+        PathField(
+          key: const Key('adopt_path_field'),
+          mode: PathFieldMode.open,
+          hint: 'Path to a .gabbro vault file',
+          allowedExtensions: const ['gabbro'],
+          openPicker: widget.onPickFile,
+          onPathSelected: (_) {},
+          onPathPicked: _triage,
+          onSubmitted: _triage,
         ),
         if (_error != null) ...[
           const SizedBox(height: 16),
