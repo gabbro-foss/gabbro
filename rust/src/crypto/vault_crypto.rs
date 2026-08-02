@@ -535,6 +535,171 @@ mod tests {
         );
     }
 
+    // ── Net for "sync without a second unlock" ───────────────────────────────
+    //
+    // The shipped held-merge sync skips re-entering credentials when the
+    // session's cached vault_key_master opens the incoming file. That is only
+    // sound while the four facts below hold.
+
+    /// A key-protected save re-seals the body only: every header field a later
+    /// open depends on survives untouched. This is what lets a vault synced from
+    /// another device still open under the master key already in the session.
+    #[test]
+    fn reseal_body_leaves_every_header_field_untouched() {
+        let keys = two_test_keys();
+        let mut sealed = seal_vault_with_keys(
+            b"passphrase",
+            &keys,
+            b"before",
+            Some(String::from("Personal")),
+        )
+        .unwrap();
+        let (_, master, _) = open_vault_with_key_record(
+            b"passphrase",
+            &keys[0].hmac_secret,
+            &keys[0].credential_id,
+            &sealed,
+        )
+        .unwrap();
+
+        let argon2_salt = sealed.argon2_salt;
+        let hkdf_salt = sealed.hkdf_salt;
+        let m_cost = sealed.params.m_cost;
+        let t_cost = sealed.params.t_cost;
+        let p_cost = sealed.params.p_cost;
+        let alias = sealed.alias.clone();
+        let passphrase_blob = sealed.passphrase_blob.clone();
+        let records: Vec<(Vec<u8>, [u8; 32], Vec<u8>)> = sealed
+            .yubikey_records
+            .iter()
+            .map(|r| (r.credential_id.clone(), r.salt, r.key_blob.clone()))
+            .collect();
+
+        reseal_vault_body(&mut sealed, &master, b"after a CRUD save").unwrap();
+
+        assert_eq!(sealed.argon2_salt, argon2_salt, "argon2 salt must not move");
+        assert_eq!(sealed.hkdf_salt, hkdf_salt, "hkdf salt must not move");
+        assert_eq!(sealed.params.m_cost, m_cost, "m_cost must not move");
+        assert_eq!(sealed.params.t_cost, t_cost, "t_cost must not move");
+        assert_eq!(sealed.params.p_cost, p_cost, "p_cost must not move");
+        assert_eq!(sealed.alias, alias, "alias must not move");
+        assert_eq!(
+            sealed.passphrase_blob, passphrase_blob,
+            "passphrase blob must not move"
+        );
+        let after: Vec<(Vec<u8>, [u8; 32], Vec<u8>)> = sealed
+            .yubikey_records
+            .iter()
+            .map(|r| (r.credential_id.clone(), r.salt, r.key_blob.clone()))
+            .collect();
+        assert_eq!(
+            after, records,
+            "every key record must survive a body re-seal"
+        );
+    }
+
+    /// The master key recovered after a body re-seal is the same one, so a
+    /// session that cached it can still open the file the other device wrote.
+    #[test]
+    fn reseal_body_keeps_the_same_master_key() {
+        let keys = two_test_keys();
+        let mut sealed = seal_vault_with_keys(b"passphrase", &keys, b"before", None).unwrap();
+        let (_, before, _) = open_vault_with_key_record(
+            b"passphrase",
+            &keys[0].hmac_secret,
+            &keys[0].credential_id,
+            &sealed,
+        )
+        .unwrap();
+
+        reseal_vault_body(&mut sealed, &before, b"after").unwrap();
+
+        let (_, after, _) = open_vault_with_key_record(
+            b"passphrase",
+            &keys[0].hmac_secret,
+            &keys[0].credential_id,
+            &sealed,
+        )
+        .unwrap();
+        assert_eq!(
+            *before, *after,
+            "a body re-seal must not rotate the master key"
+        );
+    }
+
+    /// Two vaults created independently never share a master key, even given the
+    /// same passphrase and the same registered keys. That is what makes "the
+    /// cached master opened it" a proof of same-vault rather than a coincidence.
+    #[test]
+    fn two_independently_created_vaults_never_share_a_master_key() {
+        let keys = two_test_keys();
+        let alias = Some(String::from("Personal"));
+        let first = seal_vault_with_keys(b"passphrase", &keys, b"first", alias.clone()).unwrap();
+        let second = seal_vault_with_keys(b"passphrase", &keys, b"second", alias).unwrap();
+
+        let (_, first_master, _) = open_vault_with_key_record(
+            b"passphrase",
+            &keys[0].hmac_secret,
+            &keys[0].credential_id,
+            &first,
+        )
+        .unwrap();
+        let (_, second_master, _) = open_vault_with_key_record(
+            b"passphrase",
+            &keys[0].hmac_secret,
+            &keys[0].credential_id,
+            &second,
+        )
+        .unwrap();
+
+        assert_ne!(
+            *first_master, *second_master,
+            "identical passphrase and keys must still produce independent master keys"
+        );
+    }
+
+    /// The alias is NOT a cryptographic gate across files: the AAD binds a header
+    /// to its own body, and is computed from whichever file is being opened. A
+    /// copy whose alias was changed still opens under the same master key — so the
+    /// alias comparison the feature relies on has to be written as explicit policy.
+    #[test]
+    fn the_same_master_opens_a_copy_whose_alias_changed() {
+        let keys = two_test_keys();
+        let plaintext = b"body that outlives a rename";
+        let mut sealed = seal_vault_with_keys(
+            b"passphrase",
+            &keys,
+            plaintext,
+            Some(String::from("Personal")),
+        )
+        .unwrap();
+        let (_, master, _) = open_vault_with_key_record(
+            b"passphrase",
+            &keys[0].hmac_secret,
+            &keys[0].credential_id,
+            &sealed,
+        )
+        .unwrap();
+
+        // Rename, then re-seal the body under the SAME master — what set_vault_alias
+        // does for a key-protected vault.
+        sealed.alias = Some(String::from("Work"));
+        reseal_vault_body(&mut sealed, &master, plaintext).unwrap();
+
+        let (recovered, after, _) = open_vault_with_key_record(
+            b"passphrase",
+            &keys[0].hmac_secret,
+            &keys[0].credential_id,
+            &sealed,
+        )
+        .unwrap();
+        assert_eq!(recovered, plaintext, "the renamed copy still opens");
+        assert_eq!(
+            *master, *after,
+            "renaming a vault does not change its master key"
+        );
+    }
+
     #[test]
     fn seal_with_zero_keys_fails() {
         let result = seal_vault_with_keys(b"pass", &[], b"data", None);

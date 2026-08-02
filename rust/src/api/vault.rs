@@ -1638,6 +1638,94 @@ mod tests {
         let _ = std::fs::remove_file(&path);
     }
 
+    // ── Net for "sync without a second unlock" ───────────────────────────────
+    //
+    // A passphrase-only vault is re-sealed whole on every save, so it carries no
+    // stable per-vault fingerprint. That is why a passphrase-only sync can only
+    // ever prove "same passphrase", never "same vault", and must warn every time.
+
+    /// Every passphrase-only save mints fresh salts, so two saved copies of the
+    /// *same* vault differ in the header exactly as much as two unrelated vaults.
+    #[test]
+    fn two_passphrase_only_saves_produce_different_argon2_salts() {
+        use crate::vault::io::read_vault;
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_salt_churn_test.gabbro");
+        let _ = std::fs::remove_file(&path);
+
+        let passphrase = b"same passphrase both times";
+        let body = VaultBody::default();
+
+        save_vault(&body, passphrase, &path).unwrap();
+        let first = read_vault(&path).unwrap();
+        save_vault(&body, passphrase, &path).unwrap();
+        let second = read_vault(&path).unwrap();
+
+        assert_ne!(
+            first.argon2_salt, second.argon2_salt,
+            "a passphrase-only save re-seals the whole file with a fresh argon2 salt"
+        );
+        assert_ne!(
+            first.hkdf_salt, second.hkdf_salt,
+            "a passphrase-only save re-seals the whole file with a fresh hkdf salt"
+        );
+
+        let _ = std::fs::remove_file(&path);
+    }
+
+    /// The alias is the ONLY per-vault field that survives a passphrase-only save.
+    /// The silent-sync gate leans on it, so a save must never drop it.
+    #[test]
+    fn a_passphrase_only_save_preserves_the_alias() {
+        use crate::vault::io::{read_vault, write_vault};
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_alias_survives_save_test.gabbro");
+        let _ = std::fs::remove_file(&path);
+
+        let passphrase = b"alias survival passphrase";
+        let plaintext = serialize_vault_body(&VaultBody::default()).unwrap();
+        let sealed = crate::crypto::vault_crypto::seal_vault(
+            passphrase,
+            &plaintext,
+            Some(String::from("Personal")),
+        )
+        .unwrap();
+        write_vault(&sealed, &path).unwrap();
+
+        save_vault(&VaultBody::default(), passphrase, &path).unwrap();
+
+        let reread = read_vault(&path).unwrap();
+        assert_eq!(
+            reread.alias.as_deref(),
+            Some("Personal"),
+            "a CRUD save must carry the alias across the re-seal"
+        );
+
+        let _ = std::fs::remove_file(&path);
+    }
+
+    /// The passphrase-only downgrade export carries no alias at all, so it can
+    /// never match the open vault's alias and always falls back to the credential
+    /// screen. (Whether dropping the name is intended is a separate open question
+    /// in the Bikeshed.)
+    #[test]
+    fn passphrase_only_export_carries_no_alias() {
+        use crate::vault::file_format::SealedVault;
+
+        let bytes = build_passphrase_only_bytes(&VaultBody::default(), b"export passphrase")
+            .expect("build passphrase-only export bytes");
+        let sealed = SealedVault::from_bytes(&bytes).expect("parse exported bytes");
+
+        assert_eq!(
+            sealed.alias, None,
+            "the downgrade export is sealed with no alias"
+        );
+    }
+
     #[test]
     fn load_vault_wrong_passphrase_fails() {
         use std::env::temp_dir;

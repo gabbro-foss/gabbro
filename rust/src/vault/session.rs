@@ -4751,6 +4751,50 @@ mod tests {
         );
     }
 
+    // Pin for the held-merge sync, passphrase-only half: `do_save` re-seals the
+    // WHOLE file, so nothing that identifies the vault survives a save except the
+    // alias. This is why a passphrase-only sync can only ever prove "same
+    // passphrase", never "same vault".
+    #[test]
+    #[serial]
+    fn a_crud_save_on_a_passphrase_only_vault_rerolls_the_header() {
+        use crate::vault::io::read_vault;
+
+        let pass = b"passphrase only header churn";
+        let path = setup_vault(pass);
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let before = read_vault(&path).unwrap();
+
+        session_create_entry(VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                field_times: Default::default(),
+                history: Vec::new(),
+                id: String::from("passphrase-header-probe"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::new(),
+            },
+            title: String::from("Header churn probe"),
+            content: String::from("probe"),
+            custom_fields: vec![],
+            attachments: vec![],
+        }))
+        .unwrap();
+
+        let after = read_vault(&path).unwrap();
+        teardown(&path);
+
+        assert_ne!(
+            before.argon2_salt, after.argon2_salt,
+            "a passphrase-only CRUD save re-seals the whole file with a fresh argon2 salt"
+        );
+        assert_ne!(
+            before.hkdf_salt, after.hkdf_salt,
+            "a passphrase-only CRUD save re-seals the whole file with a fresh hkdf salt"
+        );
+    }
+
     // R-03: after a passphrase change the .bak must open with the NEW
     // passphrase (the user may not remember the old one), never the old.
     // Credential-changing saves refresh the .bak instead of rotating it.
@@ -5247,6 +5291,70 @@ mod yubikey_session_tests {
         teardown(&path);
         let _ = std::fs::remove_file(&export_path);
         let _ = std::fs::remove_file(export_path.with_extension("gabbro.sha256"));
+    }
+
+    // Pin for the held-merge sync, keyed half: `do_save` sends a key-protected
+    // session down the body-only re-seal branch, so the header — and with it the
+    // random per-vault master key — survives every CRUD save. That is what lets a
+    // vault synced from another device open under the master already in the
+    // session.
+    #[test]
+    #[serial]
+    fn a_crud_save_on_a_keyprotected_vault_leaves_the_header_untouched() {
+        use crate::vault::io::read_vault;
+
+        let pass = b"keyed header stability pass";
+        let path = setup_multi_key_vault(pass);
+        unlock_vault_with_key_record(pass, &[0x11u8; 32], vec![0x01u8; 64], path.clone()).unwrap();
+
+        let before = read_vault(&path).unwrap();
+
+        session_create_entry(VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                field_times: Default::default(),
+                history: Vec::new(),
+                id: String::from("keyed-header-probe"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::new(),
+            },
+            title: String::from("Header stability probe"),
+            content: String::from("probe"),
+            custom_fields: vec![],
+            attachments: vec![],
+        }))
+        .unwrap();
+
+        let after = read_vault(&path).unwrap();
+        teardown(&path);
+
+        assert_eq!(
+            before.argon2_salt, after.argon2_salt,
+            "a keyed CRUD save must not move the argon2 salt"
+        );
+        assert_eq!(
+            before.hkdf_salt, after.hkdf_salt,
+            "a keyed CRUD save must not move the hkdf salt"
+        );
+        assert_eq!(
+            before.passphrase_blob, after.passphrase_blob,
+            "a keyed CRUD save must not rewrap the passphrase blob"
+        );
+        let key_blobs = |v: &crate::vault::file_format::SealedVault| -> Vec<Vec<u8>> {
+            v.yubikey_records
+                .iter()
+                .map(|r| r.key_blob.clone())
+                .collect()
+        };
+        assert_eq!(
+            key_blobs(&before),
+            key_blobs(&after),
+            "a keyed CRUD save must not rewrap any key blob"
+        );
+        assert_ne!(
+            before.ciphertext, after.ciphertext,
+            "the body must actually have been re-sealed"
+        );
     }
 }
 
