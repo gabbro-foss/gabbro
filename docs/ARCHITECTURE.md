@@ -73,7 +73,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 680 | 17 |
+| Rust (`cargo test -q`) | 689 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 11 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -119,20 +119,15 @@ canary that drives the real save paths and byte-compares the real config/vault l
 
 ### Next task
 
-Port `916cbc0` from `sync_without_second_unlock` into master: 415 test-only
-lines pinning the vault-identity facts sync/adopt rely on (fresh salts per
-passphrase-only save, reseal_body keeps the master, independent vaults never
-share a master, keyed CRUD leaves the header alone — prose-only on master
-today). Expect conflicts: attempt 2 rewrote the touched files; review +
-reduce/expand, pins must land green (net-first). Then delete that branch.
-Then one full gate = alpha.17 pre-flight; release decision with maintainer.
+(empty — set with maintainer)
 
 ### Faster sync
 
 Attempt 2 merged to master 2026-08-01 (`93aeaac`; gate ALL GREEN on `94bcf19`),
 branch deleted local + remote. All three rows hardware-passed; tick-lists and
-findings in git log. Attempt 1 (`sync_without_second_unlock`): only the
-`916cbc0` port remains (see Next task).
+findings in git log. Attempt 1: the `916cbc0` port landed 2026-08-02 (9 Rust
+pins, obsolete Dart pin dropped); `sync_without_second_unlock` branch deletion
++ full gate (= alpha.17 pre-flight) pending.
 
 Mock vaults for future rounds: `.scratchpad` (A, B, D; C and E deleted 2026-08-01).
 
