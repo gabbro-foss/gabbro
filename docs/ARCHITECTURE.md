@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2072 | 10 |
+| Flutter (`flutter test`) | 2073 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -163,10 +163,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   a fourth is what `test/sync_chooser_l10n_overflow_test.dart` will catch at 8x text.
 
 ### Code Quality
-- **`VaultRecord.type` is stored but never rendered.** Set on registration
-  (`main.dart`), read by nothing — keyed-ness shown to the user always comes from a
-  live header read (unlock screen, delete dialog). Either surface it (key badge in
-  Manage vaults) or drop the field. Found 2026-08-01 verifying the adopt matrix.
 - **One locale sweep lets an error through, so it could hide an overflow.** The
   format-too-old sweep (`test/unlock_screen_test.dart:633`) tolerates the "locale not
   supported by all delegates" warning for nn and yo. If a real overflow lands in the
