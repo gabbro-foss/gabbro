@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2066 | 10 |
+| Flutter (`flutter test`) | 2072 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -119,9 +119,16 @@ canary that drives the real save paths and byte-compares the real config/vault l
 
 ### Next task
 
-**Release v0.1.0-alpha.17.** Pre-flight gate ALL GREEN on `e2b1743` (2026-08-03).
-Version + CHANGELOG bumped. Remaining: build artifacts, verify embedded version,
-tag last, publish by hand. Steps: [BUILD_AND_RELEASE.md](BUILD_AND_RELEASE.md).
+**Release v0.1.0-alpha.17.** Version + CHANGELOG bumped. Smoke test found a
+vault-switch defect (fixed below), so the gate must be re-run before building.
+Then: build artifacts, verify embedded version, tag last, publish by hand.
+Steps: [BUILD_AND_RELEASE.md](BUILD_AND_RELEASE.md).
+
+**Vault-switch route stack (fixed).** Unlocking a vault now clears the back
+stack (`unlock_screen.dart`, `onboarding_screen.dart`), so the vault you switch
+away from cannot be revealed by Esc. Cancelling before the unlock still falls
+back to the open vault. Pinned by `test/vault_switch_routing_test.dart`.
+Present since alpha.1; only reachable by keyboard once Esc landed.
 
 Faster sync is done: attempt 2 merged (`93aeaac`), attempt-1 `916cbc0` port
 landed (`43ef398`), both branches deleted.
@@ -142,6 +149,11 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Features and UI/UX
+- **The unlock screen has no visible Cancel.** Starting a vault switch and changing
+  your mind needs Esc (Linux) or the system back gesture (Android) — nothing on
+  screen says so, and Esc takes two presses when the passphrase field has focus.
+  Found 2026-08-03. Consider a Cancel control when the screen was pushed over an
+  open vault (`Navigator.canPop`), as onboarding already does.
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
@@ -202,6 +214,11 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   sync-without-a-second-unlock investigation.
 
 ### Security (pre-v1)
+- **Audits scoped "can an attacker pivot between vaults" as a crypto question only.**
+  `red_team_test.md` Aim 3 answers it at the key layer (session singleton, per-vault
+  keys, per-vault biometric keys) — all sound. Nothing asked the UI-lifetime version:
+  can a screen still render a vault the app has closed? That gap hid the vault-switch
+  defect from alpha.1 to 2026-08-03. Add a UI-lifetime aim to the next audit pass.
 - **Human expert cryptography review** of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
 
 ### V2+ / Defer
