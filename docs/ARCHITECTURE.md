@@ -73,7 +73,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 689 | 17 |
+| Rust (`cargo test -q`) | 700 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 11 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -119,14 +119,6 @@ canary that drives the real save paths and byte-compares the real config/vault l
 
 ### Next task
 
-**Outstanding: the AUR push.** `gabbro-bin` is bumped to `0.1.0_alpha.17` and
-committed in the AUR clone, but the push failed — the AUR was in SSH maintenance
-on 2026-08-03. Until it lands, Arch users still install alpha.16. Retry with
-`git -C ../gabbro-bin-aur push` from `gabbro/`.
-
-v0.1.0-alpha.17 released 2026-08-03: full gate green, artifacts built and signed,
-embedded version and APK certificate verified, tag pushed, release published.
-
 Mock vaults for future rounds: `.scratchpad` (A, B, D; C and E deleted 2026-08-01).
 
 ---
@@ -141,6 +133,15 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 ## Bikeshed / Backlog
 
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
+
+### Release
+- **Outstanding: the AUR push.** `gabbro-bin` is bumped to `0.1.0_alpha.17` and
+  committed in the AUR clone, but the push failed — the AUR was in SSH maintenance
+  on 2026-08-03. Until it lands, Arch users still install alpha.16. Retry with
+  `git -C ../gabbro-bin-aur push` from `gabbro/`.
+
+  v0.1.0-alpha.17 released 2026-08-03: full gate green, artifacts built and signed,
+  embedded version and APK certificate verified, tag pushed, release published.
 
 ### Features and UI/UX
 - **The unlock screen has no visible Cancel.** Starting a vault switch and changing
@@ -192,14 +193,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   it never saw this. Related: an `AlertDialog`'s `actions` never scroll, so any button left
   there is unreachable at the maximum text scale — audit every dialog that still puts one
   there. Found during the sync-without-a-second-unlock investigation.
-
-- **Can the auto-type fill error carry secret material to stdout?** `lib/main.dart:478`
-  prints the exception text from `autotypeFill`, and `debugPrint` writes in release builds
-  too — visible to anyone who launched Gabbro from a terminal. The fill runs in Rust, so the
-  error is expected to be something like "window not found", but that is untraced. If it can
-  never carry secret material, leave all three auto-type prints (`main.dart:459, 462, 478`)
-  as useful diagnostics for a feature that talks to X11; if it can, silence that one in
-  release. Answer the question before changing anything.
 
 - **Does a passphrase-only downgrade export mean to drop the vault's name?**
   `build_passphrase_only_bytes` (`rust/src/api/vault.rs:1013`) passes `None` as the alias,

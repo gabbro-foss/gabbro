@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+- **A failed auto-type could print one character of a password to the terminal (Linux).** When the X server rejected a keystroke, Gabbro printed the whole error, including the value the server objected to — which for that request came from the password. The message now names the failure and the request that failed, never the value.
+
 ## [0.1.0-alpha.17] – 2026-08-03
 
 ### Added
