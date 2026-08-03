@@ -233,6 +233,26 @@ the release by hand on github.com:
 If a stale draft release already exists for this version, delete it first and create
 the release fresh from the tag.
 
+**AUR (`gabbro-bin`) — after publishing.** The PKGBUILD pins the release tarball's
+sha256, so Arch users stay on the previous version until it is bumped. In `gabbro/`,
+set `pkgver` (underscore form, e.g. `0.1.0_alpha.17`) and the first `sha256sums` entry
+from `sha256sum gabbro-<ver>-linux-x86_64.tar.gz`; the LICENSE hash changes only if
+LICENSE did. Commit, then in the AUR clone:
+
+```bash
+cp linux/packaging/aur/PKGBUILD <aur-clone>/PKGBUILD
+cd <aur-clone>
+makepkg --verifysource                  # downloads the published tarball, checks the sha
+makepkg --printsrcinfo > .SRCINFO
+git add PKGBUILD .SRCINFO && git commit -m "Update to <ver>" && git push
+```
+
+`--verifysource` is what proves the uploaded asset matches what was built — no manual
+download needed. `.SRCINFO` is generated and lives only in the AUR clone. Delete the
+downloaded tarball and LICENSE from the clone afterwards. The AUR takes SSH pushes only
+and prints a maintenance banner over SSH while the web site still serves — that failure
+is theirs, not a key problem; retry later.
+
 **Releases are immutable.** The repo has GitHub immutable releases enabled: once a
 release is published, its tag and attached assets are locked — you cannot replace an
 asset or move the tag afterwards. So verify every artifact (signature, APK certs, About

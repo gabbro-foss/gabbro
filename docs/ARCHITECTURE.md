@@ -56,7 +56,7 @@ gabbro/
 │   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics, crash_writer, autotype_{spike,window,trigger} (diagnostics), gabbro-autotype (shipped trigger client); wordlist gen; gen_fixtures
 ├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + crash-safety (kill mid-write) + frozen golden fixtures (FIXTURES.md)
 ├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, BiometricHelper + BiometricStore (per-vault; + Robolectric tests)
-├── linux/packaging/      # Desktop integration: render_icons.sh (icon tree); aur/ (AUR gabbro-bin PKGBUILD + .SRCINFO), deb/ (build-deb.sh -> binary .deb)
+├── linux/packaging/      # Desktop integration: render_icons.sh (icon tree); aur/ (AUR gabbro-bin PKGBUILD; .SRCINFO is generated in the AUR clone), deb/ (build-deb.sh -> binary .deb)
 ├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, VAULT_SYNC, AUTOTYPE_AND_AUTOFILL, AI_*; decisions/ (ADRs); artefacts/
 ├── test/  integration_test/          # Flutter widget/unit + Linux real-FFI suites (dart test)
 ├── test_data/            # Sample import files + migration_vaults/ (refusal corpus at floor v11, one vault per VERSION + MIGRATION_TESTS.md + test_matrix.md)
@@ -119,19 +119,13 @@ canary that drives the real save paths and byte-compares the real config/vault l
 
 ### Next task
 
-**Release v0.1.0-alpha.17.** Version + CHANGELOG bumped. Smoke test found a
-vault-switch defect (fixed below), so the gate must be re-run before building.
-Then: build artifacts, verify embedded version, tag last, publish by hand.
-Steps: [BUILD_AND_RELEASE.md](BUILD_AND_RELEASE.md).
+**Outstanding: the AUR push.** `gabbro-bin` is bumped to `0.1.0_alpha.17` and
+committed in the AUR clone, but the push failed — the AUR was in SSH maintenance
+on 2026-08-03. Until it lands, Arch users still install alpha.16. Retry with
+`git -C <aur-clone> push`.
 
-**Vault-switch route stack (fixed).** Unlocking a vault now clears the back
-stack (`unlock_screen.dart`, `onboarding_screen.dart`), so the vault you switch
-away from cannot be revealed by Esc. Cancelling before the unlock still falls
-back to the open vault. Pinned by `test/vault_switch_routing_test.dart`.
-Present since alpha.1; only reachable by keyboard once Esc landed.
-
-Faster sync is done: attempt 2 merged (`93aeaac`), attempt-1 `916cbc0` port
-landed (`43ef398`), both branches deleted.
+v0.1.0-alpha.17 released 2026-08-03: full gate green, artifacts built and signed,
+embedded version and APK certificate verified, tag pushed, release published.
 
 Mock vaults for future rounds: `.scratchpad` (A, B, D; C and E deleted 2026-08-01).
 
