@@ -944,13 +944,10 @@ class _GabbroAppState extends State<GabbroApp>
   // ── Registry helpers ───────────────────────────────────────────────────────
 
   Future<void> _onVaultCreated(String path, String alias) async {
-    List<YubikeyRecordData> ykRecords = [];
-    try { ykRecords = listVaultYubikeyRecords(path: path); } catch (_) {}
     final updated = _registry.add(VaultRecord(
       path: path,
       alias: alias,
       lastUsedAt: DateTime.now(),
-      type: ykRecords.isEmpty ? VaultType.passphrase : VaultType.yubikey,
     ));
     await updated.save();
     setState(() => _registry = updated);

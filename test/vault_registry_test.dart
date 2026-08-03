@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gabbro/app_paths.dart';
 import 'package:gabbro/vault_registry.dart';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -42,20 +43,6 @@ void main() {
       expect(r.lastUsedAt, DateTime.fromMillisecondsSinceEpoch(0));
     });
 
-    test('parses yubikey type', () {
-      final r = VaultRecord.fromJson({'path': '/tmp/a.gabbro', 'type': 'yubikey'});
-      expect(r.type, VaultType.yubikey);
-    });
-
-    test('defaults type to passphrase when missing', () {
-      final r = VaultRecord.fromJson({'path': '/tmp/a.gabbro'});
-      expect(r.type, VaultType.passphrase);
-    });
-
-    test('defaults type to passphrase for unknown value', () {
-      final r = VaultRecord.fromJson({'path': '/tmp/a.gabbro', 'type': 'unknown'});
-      expect(r.type, VaultType.passphrase);
-    });
   });
 
   // ── VaultRecord.toJson ──────────────────────────────────────────────────────
@@ -74,13 +61,11 @@ void main() {
         path: '/p',
         alias: 'A',
         lastUsedAt: DateTime.parse('2026-05-01T10:00:00.000'),
-        type: VaultType.yubikey,
       );
       final restored = VaultRecord.fromJson(original.toJson());
       expect(restored.path, original.path);
       expect(restored.alias, original.alias);
       expect(restored.lastUsedAt, original.lastUsedAt);
-      expect(restored.type, VaultType.yubikey);
     });
   });
 
@@ -400,6 +385,50 @@ void main() {
       final dir = await Directory.systemTemp.createTemp('gabbro_del_test_');
       await deleteVaultFiles('${dir.path}/absent.gabbro');
       await dir.delete(recursive: true);
+    });
+  });
+
+  // ── The legacy "type" key ───────────────────────────────────────────────────
+  //
+  // `VaultRecord.type` recorded whether a vault needed a YubiKey. Nothing ever
+  // read it, and a plaintext registry naming the passphrase-only vaults just
+  // marks the softer targets on a shared machine, so the field is gone. Every
+  // existing user's file still has the key: it must load, and must not come back.
+
+  group('legacy "type" key', () {
+    test('a record carrying it still loads its other fields', () {
+      final r = VaultRecord.fromJson({
+        'path': '/tmp/a.gabbro',
+        'alias': 'Alpha',
+        'last_used_at': '2026-01-01T00:00:00.000000',
+        'type': 'yubikey',
+      });
+      expect(r.path, '/tmp/a.gabbro');
+      expect(r.alias, 'Alpha');
+      expect(r.lastUsedAt, DateTime.parse('2026-01-01T00:00:00.000000'));
+    });
+
+    test('a whole registry carrying it loads every record', () {
+      final restored = VaultRegistry.fromJson([
+        {'path': '/a', 'alias': 'A', 'type': 'yubikey'},
+        {'path': '/b', 'alias': 'B', 'type': 'passphrase'},
+      ]);
+      expect(restored.records.length, 2);
+      expect(restored.records.map((r) => r.path), ['/a', '/b']);
+      expect(restored.records.map((r) => r.alias), ['A', 'B']);
+    });
+
+    test('a record no longer serialises it', () {
+      expect(_record().toJson().containsKey('type'), isFalse);
+    });
+
+    test('the saved registry file no longer contains it', () async {
+      await VaultRegistry([_record(path: '/a', alias: 'A')]).save();
+      final text = await File(
+        '${await GabbroPaths.configDir()}/vaults.jsonc',
+      ).readAsString();
+      expect(text, contains('"path"'), reason: 'the file was written');
+      expect(text, isNot(contains('"type"')));
     });
   });
 

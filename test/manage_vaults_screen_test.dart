@@ -11,13 +11,11 @@ import 'package:gabbro/vault_registry.dart';
 VaultRecord _record({
   String path = '/tmp/test.gabbro',
   String alias = 'Test',
-  VaultType type = VaultType.passphrase,
 }) =>
     VaultRecord(
       path: path,
       alias: alias,
       lastUsedAt: DateTime.fromMillisecondsSinceEpoch(0),
-      type: type,
     );
 
 YubikeyRecordData _fakeYkRecord() => YubikeyRecordData(
@@ -357,7 +355,7 @@ void main() {
 
   group('YubiKey delete step 3', () {
     final ykRegistry = VaultRegistry([
-      _record(path: '/tmp/a.gabbro', alias: 'Alpha', type: VaultType.yubikey),
+      _record(path: '/tmp/a.gabbro', alias: 'Alpha'),
       _record(path: '/tmp/b.gabbro', alias: 'Beta'),
     ]);
 
