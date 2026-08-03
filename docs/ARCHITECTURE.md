@@ -122,7 +122,7 @@ canary that drives the real save paths and byte-compares the real config/vault l
 **Outstanding: the AUR push.** `gabbro-bin` is bumped to `0.1.0_alpha.17` and
 committed in the AUR clone, but the push failed — the AUR was in SSH maintenance
 on 2026-08-03. Until it lands, Arch users still install alpha.16. Retry with
-`git -C <aur-clone> push`.
+`git -C ../gabbro-bin-aur push` from `gabbro/`.
 
 v0.1.0-alpha.17 released 2026-08-03: full gate green, artifacts built and signed,
 embedded version and APK certificate verified, tag pushed, release published.
