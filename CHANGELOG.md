@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.17] – 2026-08-03
+
 ### Added
 - **Open an exported vault as a vault — no more create-then-import on a second device.** Onboarding and the unlock screen's vault list now offer "Open an existing vault file": pick (or type the path of) a `.gabbro` export, name it, and it appears as a vault of its own, locked until its usual credentials open it. On Android the file is copied into the app's storage; on Linux it is used where it is. A file that is already registered, not a vault, or too old/new for this build is refused with the reason.
 - **Sync from file no longer asks for a passphrase when your own opens the file.** The passphrase the vault was unlocked with is tried first; typing returns only when it does not open the file. A key-protected file asks only for its PIN and a tap of the incoming vault's YubiKey — a typed passphrase returns on fallback, without a second tap. Because a matching passphrase cannot prove the file is the same vault, the apply-choice dialog now says so.
@@ -33,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **On a wide window a deleted entry could stay in the list** until the window was refocused.
 - **The APK fingerprint in the README could not be pasted into AppVerifier** — the `Package:` and `SHA-256:` labels were rejected; it now shows the two bare lines AppVerifier expects.
 
+*Built with Flutter 3.44.8, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21.*
 
 ## [0.1.0-alpha.16] – 2026-07-22
 

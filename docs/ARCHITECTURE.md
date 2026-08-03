@@ -119,15 +119,12 @@ canary that drives the real save paths and byte-compares the real config/vault l
 
 ### Next task
 
-(empty — set with maintainer)
+**Release v0.1.0-alpha.17.** Pre-flight gate ALL GREEN on `e2b1743` (2026-08-03).
+Version + CHANGELOG bumped. Remaining: build artifacts, verify embedded version,
+tag last, publish by hand. Steps: [BUILD_AND_RELEASE.md](BUILD_AND_RELEASE.md).
 
-### Faster sync
-
-Attempt 2 merged to master 2026-08-01 (`93aeaac`; gate ALL GREEN on `94bcf19`),
-branch deleted local + remote. All three rows hardware-passed; tick-lists and
-findings in git log. Attempt 1: the `916cbc0` port landed 2026-08-02 (9 Rust
-pins, obsolete Dart pin dropped); `sync_without_second_unlock` branch deletion
-+ full gate (= alpha.17 pre-flight) pending.
+Faster sync is done: attempt 2 merged (`93aeaac`), attempt-1 `916cbc0` port
+landed (`43ef398`), both branches deleted.
 
 Mock vaults for future rounds: `.scratchpad` (A, B, D; C and E deleted 2026-08-01).
 
