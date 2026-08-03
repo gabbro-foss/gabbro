@@ -38,7 +38,9 @@ pub enum FillError {
     Connect(#[from] x11rb::errors::ConnectError),
     #[error("X11 request failed: {0}")]
     Connection(#[from] x11rb::errors::ConnectionError),
-    #[error("X11 reply error: {0}")]
+    // Rendered via `redact_reply` so the value the server objected to never
+    // reaches stdout -- it can come from the password (see that fn).
+    #[error("{}", super::redact_reply(.0))]
     Reply(#[from] x11rb::errors::ReplyError),
     #[error(transparent)]
     Window(#[from] WindowError),
@@ -155,5 +157,123 @@ mod tests {
     #[test]
     fn identifier_is_empty_when_username_and_email_both_empty() {
         assert_eq!(login_identifier("", Some("")), "");
+    }
+
+    // ── No fill error may carry secret material to stdout ────────────────────
+    // `lib/main.dart` debugPrints this text, in release builds too, so every
+    // variant's rendering is pinned here.
+
+    #[test]
+    fn locked_renders_fixed_text() {
+        assert_eq!(FillError::Locked.to_string(), "vault is locked");
+    }
+
+    #[test]
+    fn not_login_renders_fixed_text() {
+        assert_eq!(FillError::NotLogin.to_string(), "entry is not a login");
+    }
+
+    #[test]
+    fn focus_moved_renders_fixed_text() {
+        assert_eq!(
+            FillError::FocusMoved.to_string(),
+            "focus did not return to the target window; aborted before typing",
+        );
+    }
+
+    #[test]
+    fn session_carries_only_the_entry_id() {
+        let id = "3f2b1c7e-0a4d-4c8f-9b21-5e6d7a8c9f01";
+        let rendered = FillError::Session(format!("No entry found with id: {id}")).to_string();
+        assert_eq!(
+            rendered,
+            format!("session error: No entry found with id: {id}")
+        );
+    }
+
+    /// What a rendered [`FillError`] can expose, worst case. Every variant must
+    /// be classified: adding one without a classification fails to compile,
+    /// which is the point -- the text reaches a terminal.
+    #[derive(Debug, PartialEq)]
+    enum Exposure {
+        /// Fixed text only.
+        Fixed,
+        /// The entry UUID -- an internal identifier, never secret material.
+        EntryId,
+        /// X11 transport text (connect/parse/IO), no Gabbro data.
+        X11Transport,
+        /// A server-rejected request, redacted to kind + request name.
+        X11Rejection,
+    }
+
+    fn exposure(e: &FillError) -> Exposure {
+        match e {
+            FillError::Locked | FillError::NotLogin | FillError::FocusMoved => Exposure::Fixed,
+            FillError::Session(_) => Exposure::EntryId,
+            FillError::Connect(_) | FillError::Connection(_) => Exposure::X11Transport,
+            FillError::Reply(_) => Exposure::X11Rejection,
+            FillError::Window(_) => Exposure::X11Rejection,
+            FillError::Inject(_) => Exposure::X11Rejection,
+        }
+    }
+
+    /// A server rejection of `ChangeKeyboardMapping` -- the one checked request
+    /// whose payload is derived from the password (`inject.rs`) -- objecting to
+    /// `bad_value`.
+    fn rejected(bad_value: u32) -> x11rb::errors::ReplyError {
+        x11rb::errors::ReplyError::X11Error(x11rb::x11_utils::X11Error {
+            error_kind: x11rb::protocol::ErrorKind::Value,
+            error_code: 2,
+            sequence: 42,
+            bad_value,
+            minor_opcode: 0,
+            major_opcode: 100,
+            extension_name: None,
+            request_name: Some("ChangeKeyboardMapping"),
+        })
+    }
+
+    /// 0x79 is the keysym for `y`. x11rb's own Display Debug-prints the whole
+    /// `X11Error`, so the value the server objected to would reach stdout --
+    /// and for this request that value came from the password.
+    fn assert_redacted(rendered: &str) {
+        assert!(
+            !rendered.contains("121"),
+            "rendered the rejected value: {rendered}"
+        );
+        assert!(
+            rendered.contains("Value"),
+            "lost the error kind: {rendered}"
+        );
+        assert!(
+            rendered.contains("ChangeKeyboardMapping"),
+            "lost the request name: {rendered}",
+        );
+    }
+
+    #[test]
+    fn a_rejected_request_never_renders_the_rejected_value() {
+        assert_redacted(&FillError::Reply(rejected(0x79)).to_string());
+    }
+
+    #[test]
+    fn a_rejection_through_the_window_layer_is_redacted_too() {
+        assert_redacted(&FillError::Window(WindowError::Reply(rejected(0x79))).to_string());
+    }
+
+    #[test]
+    fn a_rejection_through_the_inject_layer_is_redacted_too() {
+        assert_redacted(&FillError::Inject(inject::InjectError::Reply(rejected(0x79))).to_string());
+    }
+
+    #[test]
+    fn every_constructible_variant_is_classified() {
+        assert_eq!(exposure(&FillError::Locked), Exposure::Fixed);
+        assert_eq!(exposure(&FillError::NotLogin), Exposure::Fixed);
+        assert_eq!(exposure(&FillError::FocusMoved), Exposure::Fixed);
+        assert_eq!(
+            exposure(&FillError::Session(String::new())),
+            Exposure::EntryId
+        );
     }
 }

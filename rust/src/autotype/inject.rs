@@ -37,7 +37,9 @@ pub enum InjectError {
     Connect(#[from] x11rb::errors::ConnectError),
     #[error("X11 request failed: {0}")]
     Connection(#[from] x11rb::errors::ConnectionError),
-    #[error("X11 reply error: {0}")]
+    // See `super::redact_reply`: this layer's requests carry the password's
+    // keysyms, so the rejected value must never be rendered.
+    #[error("{}", super::redact_reply(.0))]
     Reply(#[from] x11rb::errors::ReplyError),
     #[error("the keyboard mapping reports zero levels per keycode")]
     NoKeyboardLevels,

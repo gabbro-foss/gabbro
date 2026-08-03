@@ -16,7 +16,9 @@ use x11rb::protocol::xproto::{AtomEnum, ConnectionExt as _, Window};
 pub enum WindowError {
     #[error("X11 request failed: {0}")]
     Connection(#[from] x11rb::errors::ConnectionError),
-    #[error("X11 reply error: {0}")]
+    // Redacted for consistency with the other two auto-type error types, so no
+    // auto-type error can render a server-supplied value (`super::redact_reply`).
+    #[error("{}", super::redact_reply(.0))]
     Reply(#[from] x11rb::errors::ReplyError),
 }
 
