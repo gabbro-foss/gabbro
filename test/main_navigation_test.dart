@@ -6,8 +6,8 @@
 // Vault-deletion routing (`deleteVaultFromManager`, ADR-014) is NOT covered here:
 // its post-delete navigation builds real FFI-backed screens (UnlockScreen's
 // readability probe, etc.) which cannot run under `flutter test` (no Rust
-// isolate). It is covered against real FFI in
-// integration_test/vault_delete_routing_test.dart.
+// isolate). Its routing decision is unit-tested as a pure function
+// (`postDeleteRoute`, see 5c49c19).
 //
 // All file I/O is sandboxed globally by test/flutter_test_config.dart, so nothing
 // here can reach the user's real settings or vault folders.

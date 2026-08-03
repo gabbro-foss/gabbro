@@ -506,7 +506,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         _aliasController.text.trim(),
       );
       if (mounted) {
-        Navigator.of(context).pushReplacement(
+        // pushAndRemoveUntil for the same reason as the unlock screen: creating
+        // a vault from Manage vaults opens it, which closes the vault that was
+        // open, so no earlier screen may survive to render its entries. On
+        // first run this is already the only route.
+        Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
             builder: (context) => VaultListScreen(
               vaultPath: _vaultPath,
@@ -514,6 +518,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               onQuit: widget.onQuit,
             ),
           ),
+          (_) => false,
         );
       }
     } catch (e) {

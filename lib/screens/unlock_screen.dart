@@ -834,7 +834,14 @@ class _UnlockScreenState extends State<UnlockScreen>
         // Post-unlock signaling failed; nothing to surface as an auth error.
       }
     } else {
-      Navigator.of(context).pushReplacement(
+      // pushAndRemoveUntil, not pushReplacement: unlocking THIS vault closed
+      // whichever vault was open before (session.rs replaces the session and
+      // zeroizes its keys), so no earlier screen may survive to render the
+      // closed vault's entries. Reached from a vault switch the stack still
+      // holds the previous vault's list; on a normal unlock it is already the
+      // only route, so this is identical there. Cancelling the switch never
+      // gets here — Esc pops back to the still-open vault, by design.
+      Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
           builder: (context) => VaultListScreen(
             vaultPath: widget.vaultPath,
@@ -842,6 +849,7 @@ class _UnlockScreenState extends State<UnlockScreen>
             onQuit: widget.onQuit,
           ),
         ),
+        (_) => false,
       );
     }
     return false;
