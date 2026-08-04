@@ -119,6 +119,20 @@ canary that drives the real save paths and byte-compares the real config/vault l
 
 ### Next task
 
+**Three shipped strings are English in all 36 locales.** Sized 2026-08-04: the
+rest of the "identical to English" values are legitimate — endonyms (enforced
+identical), the product name, acronyms (USB/NFC/CVV/URL/PIN) and format strings
+that are almost all placeholder. The real three:
+`filePickerUnavailable`, `filePickerNoPortal`, `changePassphraseBiometricDisabled`.
+
+A tiling-WM user with no desktop portal, or anyone changing a passphrase with
+biometrics on, meets an English sentence in an otherwise translated app — at the
+moment something failed or a security setting changed under them.
+
+- [ ] red: a net failing any value identical to English (skipping endonyms and
+      values that are only placeholders/acronyms once stripped)
+- [ ] translate the three across 36 locales (108 strings)
+
 Mock vaults for future rounds: `.scratchpad` (A, B, D; C and E deleted 2026-08-01).
 
 ---
@@ -158,13 +172,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   a fourth is what `test/sync_chooser_l10n_overflow_test.dart` will catch at 8x text.
 
 ### Code Quality
-- **Shipped strings are still in English in every locale.** Found 2026-07-29:
-  `changePassphraseBiometricDisabled` is the untranslated English sentence in all 37
-  ARBs and in the generated Dart (`app_localizations_fr.dart:1113`). `l10n_test.dart`
-  enforces the key set, not that a value was ever translated. Size the problem first
-  (how many keys, which locales — `jq`/`grep`, never python), then decide. A net that
-  fails on "value identical to English" would stop the next one.
-
 - **The vault list body overflows at 8x text on a 360dp phone.** A `Column` in
   `vault_list_screen.dart`, ~232-814 px over. The overflow probe sweeps at 2x, which is why
   it never saw this. Related: an `AlertDialog`'s `actions` never scroll, so any button left
