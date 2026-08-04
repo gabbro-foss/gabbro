@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Starting a vault switch and changing your mind is now one tap.** Picking another vault in Manage vaults opens its unlock screen over the vault you already had open; a Cancel button in the top-left goes back to it. That corner offered Quit before, which was never the action you wanted there — Quit stays in the vault menu, on `Ctrl+Q`, and on the first-run and locked screens.
+
 ### Security
 - **The vault registry no longer records which vaults need a YubiKey.** `vaults.jsonc` is plain text, so on a shared computer it showed anyone with file access which vaults were passphrase-only. Nothing in the app ever used the value; the line disappears from the file the next time you unlock a vault.
 - **A failed auto-type could print one character of a password to the terminal (Linux).** When the X server rejected a keystroke, Gabbro printed the whole error, including the value the server objected to — which for that request came from the password. The message now names the failure and the request that failed, never the value.

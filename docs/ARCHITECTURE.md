@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2073 | 10 |
+| Flutter (`flutter test`) | 2079 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -129,14 +129,19 @@ Quit's other three surfaces are unchanged. Esc stays two presses
 (`vault_switch_routing_test.dart:138` pins it). `tooltipCancel` already exists,
 translated, in all 37 ARBs.
 
-- [ ] N1 net: row 5 today shows Quit and no Cancel
-- [ ] R1 can-pop: Cancel shown, Quit absent
-- [ ] R2 tapping Cancel returns to the previous vault, still unlocked
-- [ ] R3 the other six routes: Quit shown, no Cancel
-- [ ] R4 Cancel carries the localized accessible name (`semanticLabel`, not just
+- [x] N1 net: row 5 today shows Quit and no Cancel (inverted once R1 landed)
+- [x] R1 can-pop: Cancel shown, Quit absent
+- [x] R2 tapping Cancel returns to the previous vault, still unlocked
+- [x] R3 the other six routes: Quit shown, no Cancel
+- [x] R4 Cancel carries the localized accessible name (`semanticLabel`, not just
       tooltip — Linux reads only the name) + `labeledTapTargetGuideline` in the
       can-pop state
-- [ ] R5 no overflow at 8x text on a 360px phone
+- [x] R5 no overflow at 8x text on a 360px phone
+- [ ] hardware: Linux desktop + Android
+
+`flutter test` green (2079). The new can-pop harness uses production's
+`gabbroLocalizationsDelegates`, so its locale sweep demands a clean render —
+`_appShell` still does not (Bikeshed, Code Quality).
 
 Mock vaults for future rounds: `.scratchpad` (A, B, D; C and E deleted 2026-08-01).
 
