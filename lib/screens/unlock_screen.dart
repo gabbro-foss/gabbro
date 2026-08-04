@@ -1338,9 +1338,26 @@ class _UnlockScreenState extends State<UnlockScreen>
           ),
         ),
       ),
+      // Top-left, one button. Cancel when this screen sits over a vault that is
+      // still open (only the Manage vaults -> switch route; every other way in
+      // cleared the stack on purpose), otherwise Quit. Cancel REPLACES Quit
+      // there: you arrived mid-task from an open vault, so going back is the
+      // action, and Ctrl+Q is already inert on a non-current route
+      // (vault_list_screen.dart:602). Quit keeps its other three surfaces.
+      if (Navigator.canPop(context))
+        Align(
+          alignment: Alignment.topLeft,
+          child: IconButton(
+            // semanticLabel, not just the tooltip: a Linux screen reader reads
+            // only the accessible name (LEARNINGS.md).
+            icon: Icon(Icons.close, semanticLabel: l.tooltipCancel),
+            tooltip: l.tooltipCancel,
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        )
       // Quit is wired only on Linux (a tiling WM may have no title-bar close);
       // elsewhere onQuit is null and the button is absent, not just disabled.
-      if (widget.onQuit != null)
+      else if (widget.onQuit != null)
         Align(
           alignment: Alignment.topLeft,
           child: IconButton(

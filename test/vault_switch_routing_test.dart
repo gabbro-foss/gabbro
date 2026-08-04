@@ -185,6 +185,39 @@ void main() {
     expect(find.text('Alpha entry'), findsOneWidget);
   });
 
+  // The top-left corner on this route: Cancel, not Quit. Was the reverse until
+  // the Cancel control landed — the net that pinned the old corner lives in the
+  // git history, and this is the same assertion inverted.
+  testWidgets('the switch unlock screen shows Cancel and no Quit',
+      (tester) async {
+    setDesktop(tester);
+    await tester.pumpWidget(app());
+    await tester.pumpAndSettle();
+    await startSwitchToBeta(tester);
+
+    expect(find.byTooltip('Cancel'), findsOneWidget,
+        reason: 'the way back to the still-open vault is on screen');
+    expect(find.byIcon(Icons.power_settings_new), findsNothing,
+        reason: 'Quit keeps its other three surfaces, not this one');
+  });
+
+  // R2: the button path to what Esc already does, on the real production route.
+  testWidgets('tapping Cancel returns to the vault that is still unlocked',
+      (tester) async {
+    setDesktop(tester);
+    await tester.pumpWidget(app());
+    await tester.pumpAndSettle();
+    await startSwitchToBeta(tester);
+
+    await tester.tap(find.byTooltip('Cancel'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(UnlockScreen), findsNothing,
+        reason: 'Cancel leaves the switch');
+    expect(find.text('Alpha entry'), findsOneWidget,
+        reason: 'Alpha was never locked, so cancelling lands back in it');
+  });
+
   // ── Red: the previous vault must be gone once the new one is open ────────
 
   testWidgets('a successful switch closes the previous vault screen',

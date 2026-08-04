@@ -181,6 +181,39 @@ Widget _biometricAtScale(
       ),
     ));
 
+// The unlock screen as the vault-switch route builds it: a second route on the
+// stack, so Navigator.canPop is true and the vault below is still unlocked.
+// Only that route can be cancelled — every other way in clears the stack on
+// purpose, which _bareUnlock (a lone route) stands for.
+Widget _nestedUnlock({
+  VoidCallback? onQuit,
+  Locale? locale,
+  TextScaler textScaler = TextScaler.noScaling,
+}) =>
+    MaterialApp(
+      // Production's delegates, not AppLocalizations' — they ship the nn and yo
+      // fallbacks, so the locale sweep below can demand a clean render instead
+      // of tolerating a warning that no user ever meets.
+      localizationsDelegates: gabbroLocalizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: locale,
+      theme: gabbroLightTheme(highContrast: false),
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context).copyWith(textScaler: textScaler),
+        child: child!,
+      ),
+      home: Navigator(
+        onGenerateInitialRoutes: (_, _) => [
+          MaterialPageRoute<void>(
+            builder: (_) => const Scaffold(body: Text('the open vault')),
+          ),
+          MaterialPageRoute<void>(
+            builder: (_) => _bareUnlock(onQuit: onQuit),
+          ),
+        ],
+      ),
+    );
+
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 void main() {
@@ -233,6 +266,75 @@ void main() {
 
     expect(quitCalls, 1);
     expect(find.byType(AlertDialog), findsNothing);
+  });
+
+  // ── Cancel (canon-TDD) ────────────────────────────────────────────────────
+  // Reached from Manage vaults -> switch, the vault you came from is still open
+  // behind this screen, but nothing on screen says how to get back to it. Esc
+  // does it in two presses and says so nowhere.
+
+  // R1: Cancel replaces Quit on that route. Quitting the app from a screen you
+  // arrived at mid-task is not what you meant, and Ctrl+Q is already inert here
+  // (vault_list_screen.dart:602 gates on the current route).
+  testWidgets('shows Cancel and hides Quit when the screen can pop',
+      (tester) async {
+    await tester.pumpWidget(_nestedUnlock(onQuit: () {}));
+    await tester.pumpAndSettle();
+
+    expect(find.byTooltip('Cancel'), findsOneWidget);
+    expect(find.byIcon(Icons.power_settings_new), findsNothing,
+        reason: 'Quit keeps its other three surfaces, not this one');
+  });
+
+  // R2 (route-level) lives in vault_switch_routing_test.dart, where the real
+  // production route is what puts the unlock screen over the open vault.
+
+  // R3: every other way to the unlock screen cleared the stack, so there is
+  // nothing to cancel back to and Quit stays.
+  testWidgets('shows Quit and no Cancel when the screen cannot pop',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(onQuit: () {}));
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.power_settings_new), findsOneWidget);
+    expect(find.byTooltip('Cancel'), findsNothing);
+  });
+
+  // R4: a tooltip is not an accessible name — on Linux a screen reader reads
+  // only the name (LEARNINGS.md), so the icon carries a semanticLabel too.
+  testWidgets('Cancel carries a localized accessible name', (tester) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpWidget(_nestedUnlock(onQuit: () {}));
+    await tester.pumpAndSettle();
+
+    expect(find.bySemanticsLabel('Cancel'), findsOneWidget);
+    await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+    await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+    handle.dispose();
+  });
+
+  // R5: the label is longer in most languages than in English, and the worst
+  // case is the longest translation at the largest scale on the narrowest
+  // screen — all three together (ADR-016).
+  testWidgets('Cancel survives every locale at 8x text on a 360dp phone',
+      (tester) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() => tester.view.reset());
+
+    for (final locale in AppLocalizations.supportedLocales) {
+      await tester.pumpWidget(_nestedUnlock(
+        onQuit: () {},
+        locale: locale,
+        textScaler: const TextScaler.linear(8.0),
+      ));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(IconButton), findsWidgets,
+          reason: 'precondition: the Cancel control is rendered in $locale');
+      expect(tester.takeException(), isNull,
+          reason: 'Cancel must not overflow at 8x text in $locale');
+    }
   });
 
   testWidgets('error message shown when unlock throws', (tester) async {
