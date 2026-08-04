@@ -119,34 +119,6 @@ canary that drives the real save paths and byte-compares the real config/vault l
 
 ### Next task
 
-**Audit aim 4 — UI lifetime: can a screen still render a vault the app has
-closed?** `red_team_test.md` Aim 3 answered the pivot question at the key layer
-only (one session, per-vault keys, per-vault biometric slots — all sound, none
-of it about the UI). That gap hid the vault-switch defect from alpha.1 to
-2026-08-03. Audit first, triage after; no fixes until the surface is known.
-
-Out of scope: Dart heap retention until GC (SECURITY.md F-12, no Dart API can
-scrub a String). The aim is "can it be RENDERED", not "is the memory clean".
-
-- [x] enumerate every Dart holder of vault-derived data
-- [x] enumerate every session-close event
-- [x] cross them: for each holder, what drops it on each close
-- [x] findings list -> triage with maintainer
-
-Audit done, both findings fixed and hardware-verified. Six holders sound. Detail
-in `docs/red_team_test.md` (private, gitignored).
-
-- **RT-4 DONE** (Linux 8/8). `ClipboardClearMixin` replaced by the app-level
-  `clipboardWiper`, so the wipe outlives the screen that scheduled it (mirrors
-  `autotypeTarget`). `_lock({automatic})` splits the two locks: timers wipe,
-  Ctrl+L / menu / `detached` do not. Quit does not wipe (WONTFIX — clipboard
-  managers are not ours). `never` still wipes nothing.
-- **RT-5 DONE** (S23 14/14). A vault autofill unlocked is locked again when the
-  flow ends; a session the main app owns is left alone (`alreadyUnlocked`).
-  `UnlockActivity`'s `unlock` no longer finishes — Dart locks, then calls the new
-  `finish`, so the lock cannot race the engine teardown. A timer was not an option:
-  the activity's Dart isolate dies with it while the Rust session lives on.
-
 Mock vaults for future rounds: `.scratchpad` (A, B, D; C and E deleted 2026-08-01).
 
 ---
