@@ -119,6 +119,25 @@ canary that drives the real save paths and byte-compares the real config/vault l
 
 ### Next task
 
+**The unlock screen has no visible Cancel.** Reached from Manage vaults -> switch
+(`main.dart:1143`, `pushReplacement`), the previous vault stays unlocked underneath
+but nothing on screen says how to go back. Only that one of the seven routes to
+`UnlockScreen` can be cancelled; the rest clear the stack on purpose. Gate on
+`Navigator.canPop`, mirroring `onboarding_screen.dart:781`. Cancel **replaces**
+Quit there (Ctrl+Q is already inert on that route, `vault_list_screen.dart:602`);
+Quit's other three surfaces are unchanged. Esc stays two presses
+(`vault_switch_routing_test.dart:138` pins it). `tooltipCancel` already exists,
+translated, in all 37 ARBs.
+
+- [ ] N1 net: row 5 today shows Quit and no Cancel
+- [ ] R1 can-pop: Cancel shown, Quit absent
+- [ ] R2 tapping Cancel returns to the previous vault, still unlocked
+- [ ] R3 the other six routes: Quit shown, no Cancel
+- [ ] R4 Cancel carries the localized accessible name (`semanticLabel`, not just
+      tooltip — Linux reads only the name) + `labeledTapTargetGuideline` in the
+      can-pop state
+- [ ] R5 no overflow at 8x text on a 360px phone
+
 Mock vaults for future rounds: `.scratchpad` (A, B, D; C and E deleted 2026-08-01).
 
 ---
@@ -144,11 +163,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   embedded version and APK certificate verified, tag pushed, release published.
 
 ### Features and UI/UX
-- **The unlock screen has no visible Cancel.** Starting a vault switch and changing
-  your mind needs Esc (Linux) or the system back gesture (Android) — nothing on
-  screen says so, and Esc takes two presses when the passphrase field has focus.
-  Found 2026-08-03. Consider a Cancel control when the screen was pushed over an
-  open vault (`Navigator.canPop`), as onboarding already does.
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
