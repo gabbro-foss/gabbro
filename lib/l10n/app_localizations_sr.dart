@@ -9,38 +9,38 @@ class AppLocalizationsSr extends AppLocalizations {
   AppLocalizationsSr([String locale = 'sr']) : super(locale);
 
   @override
-  String get keyboardShortcutsTitle => 'Prečice na tastaturi';
+  String get keyboardShortcutsTitle => 'Пречице на тастатури';
 
   @override
-  String get kbSectionGeneral => 'Opšte';
+  String get kbSectionGeneral => 'Опште';
 
   @override
-  String get kbSectionSearch => 'Pretraga';
+  String get kbSectionSearch => 'Претрага';
 
   @override
-  String get kbSectionNavigation => 'Navigacija';
+  String get kbSectionNavigation => 'Навигација';
 
   @override
-  String get kbLockVault => 'Zaključaj trezor';
+  String get kbLockVault => 'Закључај трезор';
 
   @override
-  String get kbFocusSearch => 'Fokusiraj pretragu';
+  String get kbFocusSearch => 'Фокусирај претрагу';
 
   @override
-  String get kbSearchAllFields => 'Pretraži sva polja';
+  String get kbSearchAllFields => 'Претражи сва поља';
 
   @override
-  String get kbMoveBetweenControls => 'Kretanje između kontrola';
+  String get kbMoveBetweenControls => 'Кретање између контрола';
 
   @override
-  String get kbActivateControl => 'Aktiviraj fokusiranu kontrolu';
+  String get kbActivateControl => 'Активирај фокусирану контролу';
 
   @override
-  String get kbCloseDialog => 'Zatvori dijalog ili otkaži';
+  String get kbCloseDialog => 'Затвори дијалог или откажи';
 
   @override
   String get kbNoCopyNote =>
-      'Ne postoji prečica za kopiranje: kopiranje tajne je namerna radnja koja se automatski briše.';
+      'Не постоји пречица за копирање: копирање тајне је намерна радња која се аутоматски брише.';
 
   @override
   String get appName => 'Gabbro';
@@ -54,7 +54,7 @@ class AppLocalizationsSr extends AppLocalizations {
       'File dialog unavailable here. The system file portal isn\'t reachable.';
 
   @override
-  String get cancel => 'Otkaži';
+  String get cancel => 'Откажи';
 
   @override
   String get quit => 'Изађи';
@@ -63,246 +63,245 @@ class AppLocalizationsSr extends AppLocalizations {
   String get quitConfirmTitle => 'Закључати и изаћи из Gabbro-а?';
 
   @override
-  String get delete => 'Obriši';
+  String get delete => 'Обриши';
 
   @override
-  String get save => 'Sačuvaj';
+  String get save => 'Сачувај';
 
   @override
-  String get close => 'Zatvori';
+  String get close => 'Затвори';
 
   @override
   String get ok => 'OK';
 
   @override
-  String get edit => 'Uredi';
+  String get edit => 'Уреди';
 
   @override
-  String get saveConfirmTitle => 'Sačuvaj u Gabbro';
+  String get saveConfirmTitle => 'Сачувај у Gabbro';
 
   @override
-  String get saveConfirmUpdate => 'Ažuriraj ovu prijavu';
+  String get saveConfirmUpdate => 'Ажурирај ову пријаву';
 
   @override
-  String get saveConfirmAsNew => 'Sačuvaj kao novu prijavu';
+  String get saveConfirmAsNew => 'Сачувај као нову пријаву';
 
   @override
-  String get saveConfirmChooseAnother => 'Izaberi drugu prijavu';
+  String get saveConfirmChooseAnother => 'Изабери другу пријаву';
 
   @override
-  String get saveConfirmAlreadySaved => 'Već sačuvano sa ovom lozinkom.';
+  String get saveConfirmAlreadySaved => 'Већ сачувано са овом лозинком.';
 
   @override
   String get saveConfirmSwitchVaultHint =>
-      'Da sačuvate u drugi trezor, prvo zaključajte ovaj.';
+      'Да сачувате у други трезор, прво закључајте овај.';
 
   @override
-  String get autofillNoMatchTitle => 'Nisu pronađeni akreditivi';
+  String get autofillNoMatchTitle => 'Нису пронађени акредитиви';
 
   @override
   String get autofillNoMatchBody =>
       'Ниједна сачувана пријава не одговара овој апликацији или сајту.';
 
   @override
-  String get add => 'Dodaj';
+  String get add => 'Додај';
 
   @override
-  String get remove => 'Ukloni';
+  String get remove => 'Уклони';
 
   @override
-  String get rename => 'Preimenuj';
+  String get rename => 'Преименуј';
 
   @override
-  String get confirm => 'Potvrdi';
+  String get confirm => 'Потврди';
 
   @override
-  String get continueAction => 'Nastavi';
+  String get continueAction => 'Настави';
 
   @override
-  String get dismiss => 'Zatvori';
+  String get dismiss => 'Затвори';
 
   @override
-  String get authorize => 'Autorizuj';
+  String get authorize => 'Ауторизуј';
 
   @override
-  String get register => 'Registruj';
+  String get register => 'Региструј';
 
   @override
-  String get sync => 'Sinhronizuj';
+  String get sync => 'Синхронизуј';
 
   @override
-  String get assign => 'Dodeli';
+  String get assign => 'Додели';
 
   @override
-  String get unlock => 'Otključaj';
+  String get unlock => 'Откључај';
 
   @override
-  String get generate => 'Generiši';
+  String get generate => 'Генериши';
 
   @override
-  String get import => 'Uvezi';
+  String get import => 'Увези';
 
   @override
-  String get export => 'Izvezi';
+  String get export => 'Извези';
 
   @override
-  String get openInBrowser => 'Otvori u pregledaču';
+  String get openInBrowser => 'Отвори у прегледачу';
 
   @override
-  String get useThisPassword => 'Koristi ovu lozinku';
+  String get useThisPassword => 'Користи ову лозинку';
 
   @override
-  String get reviewArrow => 'Pregled →';
+  String get reviewArrow => 'Преглед →';
 
   @override
-  String get skip => 'Preskoči';
+  String get skip => 'Прескочи';
 
   @override
-  String get keep => 'Zadrži';
+  String get keep => 'Задржи';
 
   @override
-  String get revert => 'Vrati';
+  String get revert => 'Врати';
 
   @override
-  String get next => 'Dalje: mapiraj kolone';
+  String get next => 'Даље: мапирај колоне';
 
   @override
-  String get syncFromVault => 'Sinhronizuj iz trezora';
+  String get syncFromVault => 'Синхронизуј из трезора';
 
   @override
-  String get createVault => 'Napravi trezor';
+  String get createVault => 'Направи трезор';
 
   @override
-  String get pickFile => 'Izaberi datoteku';
+  String get pickFile => 'Изабери датотеку';
 
   @override
-  String get noFileSelected => 'Nije izabrana nijedna datoteka';
+  String get noFileSelected => 'Није изабрана ниједна датотека';
 
   @override
-  String get chooseFolder => 'Izaberi mapu';
+  String get chooseFolder => 'Изабери мапу';
 
   @override
-  String get addCustomField => 'Dodaj prilagođeno polje';
+  String get addCustomField => 'Додај прилагођено поље';
 
   @override
-  String get exportFile => 'Izvezi datoteku';
+  String get exportFile => 'Извези датотеку';
 
   @override
-  String get addVault => 'Dodaj trezor';
+  String get addVault => 'Додај трезор';
 
   @override
-  String get addYubiKey => 'Dodaj YubiKey';
+  String get addYubiKey => 'Додај YubiKey';
 
   @override
-  String get noChangesToSave => 'Nema promena za čuvanje.';
+  String get noChangesToSave => 'Нема промена за чување.';
 
   @override
-  String get appearanceTitle => 'Izgled';
+  String get appearanceTitle => 'Изглед';
 
   @override
-  String get securityTitle => 'Bezbednost';
+  String get securityTitle => 'Безбедност';
 
   @override
-  String get aboutTitle => 'O aplikaciji Gabbro';
+  String get aboutTitle => 'О апликацији Gabbro';
 
   @override
-  String get generatorTitle => 'Generator lozinki';
+  String get generatorTitle => 'Генератор лозинки';
 
   @override
-  String get importTitle => 'Uvezi unose';
+  String get importTitle => 'Увези уносе';
 
   @override
-  String get exportTitle => 'Izvezi trezor';
+  String get exportTitle => 'Извези трезор';
 
   @override
-  String get changePassphraseTitle => 'Promeni pristupnu frazu';
+  String get changePassphraseTitle => 'Промени приступну фразу';
 
   @override
-  String get csvMappingTitle => 'Mapiranje CSV kolona';
+  String get csvMappingTitle => 'Мапирање CSV колона';
 
   @override
-  String get manageFoldersTitle => 'Upravljanje mapama';
+  String get manageFoldersTitle => 'Управљање мапама';
 
   @override
-  String get manageVaultsTitle => 'Upravljanje trezorima';
+  String get manageVaultsTitle => 'Управљање трезорима';
 
   @override
-  String get manageYubiKeysTitle => 'Upravljanje YubiKey ključevima';
+  String get manageYubiKeysTitle => 'Управљање YubiKey кључевима';
 
   @override
-  String get reviewChangesTitle => 'Pregled promena';
+  String get reviewChangesTitle => 'Преглед промена';
 
   @override
-  String get unlockGabbroTitle => 'Otključaj Gabbro';
+  String get unlockGabbroTitle => 'Откључај Gabbro';
 
   @override
-  String get sectionTheme => 'Tema';
+  String get sectionTheme => 'Тема';
 
   @override
-  String get sectionTextSize => 'Veličina teksta';
+  String get sectionTextSize => 'Величина текста';
 
   @override
-  String get sectionAlphabetBar => 'Položaj azbučne trake';
+  String get sectionAlphabetBar => 'Положај азбучне траке';
 
   @override
-  String get sectionAccessibility => 'Pristupačnost';
+  String get sectionAccessibility => 'Приступачност';
 
   @override
-  String get sectionLanguage => 'Jezik';
+  String get sectionLanguage => 'Језик';
 
   @override
-  String get sectionForegroundLock => 'Zaključavanje u prvom planu';
+  String get sectionForegroundLock => 'Закључавање у првом плану';
 
   @override
-  String get sectionBackgroundLock => 'Zaključavanje u pozadini';
+  String get sectionBackgroundLock => 'Закључавање у позадини';
 
   @override
-  String get sectionPasswordHistory => 'Istorija lozinki';
+  String get sectionPasswordHistory => 'Историја лозинки';
 
   @override
-  String get sectionPassphraseCopyPaste =>
-      'Kopiranje/lepljenje pristupne fraze';
+  String get sectionPassphraseCopyPaste => 'Копирање/лепљење приступне фразе';
 
   @override
-  String get sectionClipboardClear => 'Brisanje privremene memorije';
+  String get sectionClipboardClear => 'Брисање привремене меморије';
 
   @override
-  String get sectionCharacterSets => 'Skupovi znakova';
+  String get sectionCharacterSets => 'Скупови знакова';
 
   @override
-  String get sectionGeneratorLanguage => 'Jezik';
+  String get sectionGeneratorLanguage => 'Језик';
 
   @override
-  String get themeSystem => 'Sistemska';
+  String get themeSystem => 'Системска';
 
   @override
-  String get themeLight => 'Svetla';
+  String get themeLight => 'Светла';
 
   @override
-  String get themeDark => 'Tamna';
+  String get themeDark => 'Тамна';
 
   @override
   String get alphabetBarNote =>
-      'Samo na telefonu — tablet uvek koristi levu stranu.';
+      'Само на телефону — таблет увек користи леву страну.';
 
   @override
-  String get alphabetBarLeft => 'Levo';
+  String get alphabetBarLeft => 'Лево';
 
   @override
-  String get alphabetBarRight => 'Desno';
+  String get alphabetBarRight => 'Десно';
 
   @override
-  String get highContrastTitle => 'Visoki kontrast';
+  String get highContrastTitle => 'Високи контраст';
 
   @override
-  String get highContrastSubtitle => 'Povećava kontrast za bolju čitljivost';
+  String get highContrastSubtitle => 'Повећава контраст за бољу читљивост';
 
   @override
   String get languageNote =>
-      'Nadjačava sistemski jezik. «Sistemski» prati regionalna podešavanja uređaja.';
+      'Надјачава системски језик. «Системски» прати регионална подешавања уређаја.';
 
   @override
-  String get langSystem => 'Sistemski';
+  String get langSystem => 'Системски';
 
   @override
   String get langEnglish => 'English';
@@ -408,11 +407,11 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get foregroundLockDescription =>
-      'Zaključaj nakon ovog vremena neaktivnosti dok je aplikacija otvorena.';
+      'Закључај након овог времена неактивности док је апликација отворена.';
 
   @override
   String get backgroundLockDescription =>
-      'Zaključaj nakon što aplikacija bude u pozadini toliko dugo.';
+      'Закључај након што апликација буде у позадини толико дуго.';
 
   @override
   String get passwordHistoryDescription =>
@@ -420,21 +419,21 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get passphraseCopyPasteDescription =>
-      'Blokiraj kopiranje i lepljenje u poljima pristupne fraze. Preporučeno: sprečava curenje fraze kroz privremenu memoriju.';
+      'Блокирај копирање и лепљење у пољима приступне фразе. Препоручено: спречава цурење фразе кроз привремену меморију.';
 
   @override
   String get passphraseCopyPasteNote =>
-      'Napomena: ovo blokira kontekstni meni pri dugom pritisku i izbor teksta. Ugrađeno dugme za lepljenje tastature možda će i dalje raditi — to je ograničenje platforme.';
+      'Напомена: ово блокира контекстни мени при дугом притиску и избор текста. Уграђено дугме за лепљење тастатуре можда ће и даље радити — то је ограничење платформе.';
 
   @override
-  String get blockCopyPasteTitle => 'Blokiraj kopiranje/lepljenje';
+  String get blockCopyPasteTitle => 'Блокирај копирање/лепљење';
 
   @override
   String get clipboardClearDescription =>
-      'Obriši privremenu memoriju nakon kopiranja tajnih podataka. Napomena: menadžeri privremene memorije mogu čuvati kopiju.';
+      'Обриши привремену меморију након копирања тајних података. Напомена: менаџери привремене меморије могу чувати копију.';
 
   @override
-  String get duration30s => '30 s';
+  String get duration30s => '30 с';
 
   @override
   String get duration1min => '1 min';
@@ -446,91 +445,91 @@ class AppLocalizationsSr extends AppLocalizations {
   String get duration15min => '15 min';
 
   @override
-  String get duration60s => '60 s';
+  String get duration60s => '60 с';
 
   @override
   String get duration2min => '2 min';
 
   @override
-  String get durationNever => 'Nikad';
+  String get durationNever => 'Никад';
 
   @override
-  String get duration7days => '7 dana';
+  String get duration7days => '7 дана';
 
   @override
-  String get duration30days => '30 dana';
+  String get duration30days => '30 дана';
 
   @override
-  String get duration90days => '90 dana';
+  String get duration90days => '90 дана';
 
   @override
-  String get durationKeepForever => 'Čuvaj uvek';
+  String get durationKeepForever => 'Чувај увек';
 
   @override
-  String get menuExportVault => 'Izvezi trezor';
+  String get menuExportVault => 'Извези трезор';
 
   @override
-  String get menuImportEntries => 'Uvezi unose';
+  String get menuImportEntries => 'Увези уносе';
 
   @override
-  String get menuSyncFromFile => 'Sinhronizuj iz datoteke';
+  String get menuSyncFromFile => 'Синхронизуј из датотеке';
 
   @override
-  String get menuManageVaults => 'Upravljanje trezorima';
+  String get menuManageVaults => 'Управљање трезорима';
 
   @override
-  String get menuChangePassphrase => 'Promeni pristupnu frazu';
+  String get menuChangePassphrase => 'Промени приступну фразу';
 
   @override
-  String get menuManageYubiKeys => 'Upravljanje YubiKey ključevima';
+  String get menuManageYubiKeys => 'Управљање YubiKey кључевима';
 
   @override
-  String get menuAppearance => 'Izgled';
+  String get menuAppearance => 'Изглед';
 
   @override
-  String get menuSecurity => 'Bezbednost';
+  String get menuSecurity => 'Безбедност';
 
   @override
-  String get menuManageFolders => 'Upravljanje mapama';
+  String get menuManageFolders => 'Управљање мапама';
 
   @override
-  String get menuPasswordGenerator => 'Generator lozinki';
+  String get menuPasswordGenerator => 'Генератор лозинки';
 
   @override
-  String get menuAbout => 'O aplikaciji';
+  String get menuAbout => 'О апликацији';
 
   @override
-  String get tooltipSelectEntries => 'Izaberi unose';
+  String get tooltipSelectEntries => 'Изабери уносе';
 
   @override
-  String get tooltipLockVault => 'Zaključaj trezor';
+  String get tooltipLockVault => 'Закључај трезор';
 
   @override
-  String get tooltipSelectAll => 'Izaberi sve';
+  String get tooltipSelectAll => 'Изабери све';
 
   @override
-  String get tooltipDeselectAll => 'Poništi izbor';
+  String get tooltipDeselectAll => 'Поништи избор';
 
   @override
-  String get tooltipClearSearch => 'Obriši pretragu';
+  String get tooltipClearSearch => 'Обриши претрагу';
 
   @override
-  String get tooltipMenu => 'Meni';
+  String get tooltipMenu => 'Мени';
 
   @override
-  String get tooltipCopy => 'Kopiraj';
+  String get tooltipCopy => 'Копирај';
 
   @override
-  String get tooltipCopied => 'Kopirano!';
+  String get tooltipCopied => 'Копирано!';
 
   @override
-  String get tooltipShow => 'Prikaži';
+  String get tooltipShow => 'Прикажи';
 
   @override
-  String get tooltipHide => 'Sakrij';
+  String get tooltipHide => 'Сакриј';
 
   @override
-  String get tooltipBrowse => 'Pretraži';
+  String get tooltipBrowse => 'Претражи';
 
   @override
   String get tooltipPreviousPage => 'Претходна страница';
@@ -542,83 +541,83 @@ class AppLocalizationsSr extends AppLocalizations {
   String get helpEnlargeImage => 'Увећај слику';
 
   @override
-  String get tooltipEditAlias => 'Uredi alias';
+  String get tooltipEditAlias => 'Уреди алиас';
 
   @override
-  String get tooltipRemoveField => 'Ukloni polje';
+  String get tooltipRemoveField => 'Уклони поље';
 
   @override
-  String get tooltipRename => 'Preimenuj';
+  String get tooltipRename => 'Преименуј';
 
   @override
-  String get tooltipDeleteVault => 'Obriši trezor';
+  String get tooltipDeleteVault => 'Обриши трезор';
 
   @override
-  String get tooltipAssignToFolder => 'Dodeli mapi';
+  String get tooltipAssignToFolder => 'Додели мапи';
 
   @override
-  String get tooltipShowPin => 'Prikaži PIN';
+  String get tooltipShowPin => 'Прикажи PIN';
 
   @override
-  String get tooltipHidePin => 'Sakrij PIN';
+  String get tooltipHidePin => 'Сакриј PIN';
 
   @override
-  String get tooltipShowValue => 'Prikaži vrednost';
+  String get tooltipShowValue => 'Прикажи вредност';
 
   @override
-  String get tooltipHideValue => 'Sakrij';
+  String get tooltipHideValue => 'Сакриј';
 
   @override
-  String get tooltipCancel => 'Otkaži';
+  String get tooltipCancel => 'Откажи';
 
   @override
-  String get tooltipOpenInBrowser => 'Otvori u pregledaču';
+  String get tooltipOpenInBrowser => 'Отвори у прегледачу';
 
   @override
-  String get allFolders => 'Sve mape';
+  String get allFolders => 'Све мапе';
 
   @override
-  String get noFolder => 'Nema';
+  String get noFolder => 'Нема';
 
   @override
-  String get selectFolder => 'Izaberi mapu';
+  String get selectFolder => 'Изабери мапу';
 
   @override
-  String get folderName => 'Naziv mape';
+  String get folderName => 'Назив мапе';
 
   @override
-  String get noEntriesMatch => 'Nema unosa koji odgovaraju pretrazi.';
+  String get noEntriesMatch => 'Нема уноса који одговарају претрази.';
 
   @override
-  String get noVaultsRegistered => 'Nema registrovanih trezora.';
+  String get noVaultsRegistered => 'Нема регистрованих трезора.';
 
   @override
-  String get noYubiKeysRegistered => 'Nema registrovanih YubiKey ključeva';
+  String get noYubiKeysRegistered => 'Нема регистрованих YubiKey кључева';
 
   @override
-  String get selectEntry => 'Izaberi unos';
+  String get selectEntry => 'Изабери унос';
 
   @override
-  String get newEntryTitle => 'Novi unos';
+  String get newEntryTitle => 'Нови унос';
 
   @override
   String createEntryTitle(String type) {
-    return 'Novi(-a) $type';
+    return 'Нови(-а) $type';
   }
 
   @override
   String editEntryTitle(String type) {
-    return 'Uredi: $type';
+    return 'Уреди: $type';
   }
 
   @override
-  String get noUrlFallback => '(bez URL-a)';
+  String get noUrlFallback => '(без URL-а)';
 
   @override
-  String get noNameFallback => '(bez naziva)';
+  String get noNameFallback => '(без назива)';
 
   @override
-  String get untitledFallback => '(bez naslova)';
+  String get untitledFallback => '(без наслова)';
 
   @override
   String get gabbroTitle => 'Gabbro';
@@ -630,95 +629,95 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String selectedCount(int count) {
-    return 'Izabrano: $count';
+    return 'Изабрано: $count';
   }
 
   @override
-  String get searchAllFieldsHint => 'Pretraži sva polja…';
+  String get searchAllFieldsHint => 'Претражи сва поља…';
 
   @override
-  String get searchEntriesHint => 'Pretraži unose…';
+  String get searchEntriesHint => 'Претражи уносе…';
 
   @override
-  String get searchAllFieldsTooltip => 'Pretražuje sva polja';
+  String get searchAllFieldsTooltip => 'Претражује сва поља';
 
   @override
-  String get searchByTitleTooltip => 'Pretražuje po naslovu';
+  String get searchByTitleTooltip => 'Претражује по наслову';
 
   @override
-  String get entryTypeAll => 'Sve';
+  String get entryTypeAll => 'Све';
 
   @override
-  String get entryTypePassword => 'Lozinka';
+  String get entryTypePassword => 'Лозинка';
 
   @override
-  String get entryTypeNote => 'Beleška';
+  String get entryTypeNote => 'Белешка';
 
   @override
-  String get entryTypeCard => 'Kartica';
+  String get entryTypeCard => 'Картица';
 
   @override
-  String get entryTypeIdentity => 'Identitet';
+  String get entryTypeIdentity => 'Идентитет';
 
   @override
-  String get entryTypeFile => 'Datoteka';
+  String get entryTypeFile => 'Датотека';
 
   @override
-  String get entryTypeCustom => 'Prilagođeno';
+  String get entryTypeCustom => 'Прилагођено';
 
   @override
   String errorPrefix(String error) {
-    return 'Greška: $error';
+    return 'Грешка: $error';
   }
 
   @override
-  String get navVault => 'Trezor';
+  String get navVault => 'Трезор';
 
   @override
-  String get navAppearance => 'Izgled';
+  String get navAppearance => 'Изглед';
 
   @override
-  String get navSecurity => 'Bezbednost';
+  String get navSecurity => 'Безбедност';
 
   @override
-  String get navAbout => 'O aplikaciji';
+  String get navAbout => 'О апликацији';
 
   @override
-  String get deleteEntryTitle => 'Obriši unos?';
+  String get deleteEntryTitle => 'Обриши унос?';
 
   @override
-  String get cannotBeUndone => 'Ova radnja se ne može poništiti.';
+  String get cannotBeUndone => 'Ова радња се не може поништити.';
 
   @override
-  String get deleteEntryDialogTitle => 'Obriši unos?';
+  String get deleteEntryDialogTitle => 'Обриши унос?';
 
   @override
   String deleteEntriesTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Obriši $count unosa?',
-      few: 'Obriši $count unosa?',
-      one: 'Obriši 1 unos?',
+      other: 'Обриши $count уноса?',
+      few: 'Обриши $count уноса?',
+      one: 'Обриши 1 унос?',
     );
     return '$_temp0';
   }
 
   @override
-  String get assignToFolderTitle => 'Dodeli mapi';
+  String get assignToFolderTitle => 'Додели мапи';
 
   @override
-  String get folderConflictTitle => 'Sukob mapa';
+  String get folderConflictTitle => 'Сукоб мапа';
 
   @override
-  String get syncFailedTitle => 'Sinhronizacija nije uspela';
+  String get syncFailedTitle => 'Синхронизација није успела';
 
   @override
-  String get syncFromFileTitle => 'Sinhronizuj iz datoteke';
+  String get syncFromFileTitle => 'Синхронизуј из датотеке';
 
   @override
   String get nothingToSync =>
-      'Nema šta da se sinhronizuje — oba trezora su već ažurirana.';
+      'Нема шта да се синхронизује — оба трезора су већ ажурирана.';
 
   @override
   String get syncMethodTitle => 'Како применити ову синхронизацију?';
@@ -771,121 +770,121 @@ class AppLocalizationsSr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Uvezeno $count unosa.',
-      few: 'Uvezena $count unosa.',
-      one: 'Uvezen 1 unos.',
+      other: 'Увезено $count уноса.',
+      few: 'Увезена $count уноса.',
+      one: 'Увезен 1 унос.',
     );
     return '$_temp0';
   }
 
   @override
-  String get exportFileTitle => 'Izvezi datoteku';
+  String get exportFileTitle => 'Извези датотеку';
 
   @override
-  String get saveDecryptedFileTo => 'Sačuvaj dešifrovanu datoteku u:';
+  String get saveDecryptedFileTo => 'Сачувај дешифровану датотеку у:';
 
   @override
-  String get exportPathLabel => 'Putanja izvoza';
+  String get exportPathLabel => 'Путања извоза';
 
   @override
   String exportedToPath(String path) {
-    return 'Izvezeno u $path';
+    return 'Извезено у $path';
   }
 
   @override
   String exportFailed(String error) {
-    return 'Izvoz nije uspeo: $error';
+    return 'Извоз није успео: $error';
   }
 
   @override
   String importFailed(String error) {
-    return 'Uvoz nije uspeo: $error';
+    return 'Увоз није успео: $error';
   }
 
   @override
   String folderActionFailed(String error) {
-    return 'Radnja sa mapom nije uspela: $error';
+    return 'Радња са мапом није успела: $error';
   }
 
   @override
   String vaultLoadFailed(String error) {
-    return 'Učitavanje trezora nije uspelo: $error';
+    return 'Учитавање трезора није успело: $error';
   }
 
   @override
   String syncFailed(String error) {
-    return 'Sinhronizacija nije uspela: $error';
+    return 'Синхронизација није успела: $error';
   }
 
   @override
   String saveEntryFailed(String error) {
-    return 'Čuvanje unosa nije uspelo: $error';
+    return 'Чување уноса није успело: $error';
   }
 
   @override
   String changePassphraseFailed(String error) {
-    return 'Promena pristupne fraze nije uspela: $error';
+    return 'Промена приступне фразе није успела: $error';
   }
 
   @override
   String recoveryActionFailed(String error) {
-    return 'Radnja oporavka nije uspela: $error';
+    return 'Радња опоравка није успела: $error';
   }
 
   @override
   String setupFailed(String error) {
-    return 'Podešavanje nije uspelo: $error';
+    return 'Подешавање није успело: $error';
   }
 
   @override
   String biometricEnrollFailed(String error) {
-    return 'Omogućavanje biometrijskog otključavanja nije uspelo: $error';
+    return 'Омогућавање биометријског откључавања није успело: $error';
   }
 
   @override
   String restoreBackupFailed(String error) {
-    return 'Vraćanje iz pomoćne kopije nije uspelo: $error';
+    return 'Враћање из помоћне копије није успело: $error';
   }
 
   @override
-  String get openInBrowserTitle => 'Otvori u pregledaču?';
+  String get openInBrowserTitle => 'Отвори у прегледачу?';
 
   @override
   String couldNotOpen(String url) {
-    return 'Ne mogu da otvorim $url';
+    return 'Не могу да отворим $url';
   }
 
   @override
-  String get deleteEntryFromHistoryLabel => 'Obriši prethodni unos';
+  String get deleteEntryFromHistoryLabel => 'Обриши претходни унос';
 
   @override
-  String get renameFolderTitle => 'Preimenuj mapu';
+  String get renameFolderTitle => 'Преименуј мапу';
 
   @override
-  String get addFolderTitle => 'Dodaj mapu';
+  String get addFolderTitle => 'Додај мапу';
 
   @override
-  String get deleteFolderTitle => 'Obriši mapu';
+  String get deleteFolderTitle => 'Обриши мапу';
 
   @override
   String deleteFolderConfirm(String folder) {
-    return 'Obriši «$folder»?';
+    return 'Обриши «$folder»?';
   }
 
   @override
-  String get reassignEntriesTo => 'Premesti unose u';
+  String get reassignEntriesTo => 'Премести уносе у';
 
   @override
-  String get clearToNone => 'Premesti u «Nema»';
+  String get clearToNone => 'Премести у «Нема»';
 
   @override
-  String get renameVaultTitle => 'Preimenuj trezor';
+  String get renameVaultTitle => 'Преименуј трезор';
 
   @override
-  String get deleteVaultTitle => 'Obriši trezor?';
+  String get deleteVaultTitle => 'Обриши трезор?';
 
   @override
-  String get deleteVaultConfirmTitle => 'Da li ste sigurni?';
+  String get deleteVaultConfirmTitle => 'Да ли сте сигурни?';
 
   @override
   String deleteVaultUnderstand(String alias) {
@@ -910,55 +909,55 @@ class AppLocalizationsSr extends AppLocalizations {
   String get pickAFile => 'Изаберите датотеку.';
 
   @override
-  String get touchYourYubiKey => 'Dodirnite vaš YubiKey';
+  String get touchYourYubiKey => 'Додирните ваш YubiKey';
 
   @override
-  String get noVaultsRegisteredText => 'Nema registrovanih trezora.';
+  String get noVaultsRegisteredText => 'Нема регистрованих трезора.';
 
   @override
-  String get addYubiKeyTitle => 'Dodaj YubiKey';
+  String get addYubiKeyTitle => 'Додај YubiKey';
 
   @override
-  String get enterYubiKeyPinTitle => 'Unesi YubiKey PIN';
+  String get enterYubiKeyPinTitle => 'Унеси YubiKey PIN';
 
   @override
   String editAliasForKey(int index) {
-    return 'Uredi alias ključa $index';
+    return 'Уреди алиас кључа $index';
   }
 
   @override
-  String get lastKeyWarning => 'Ostaće samo jedan registrovani YubiKey ključ.';
+  String get lastKeyWarning => 'Остаће само један регистровани YubiKey кључ.';
 
   @override
-  String get removeKeyConfirm => 'Da li zaista želite da uklonite ovaj ključ?';
+  String get removeKeyConfirm => 'Да ли заиста желите да уклоните овај кључ?';
 
   @override
-  String get removeKeyVaultConfirm => 'Ukloniti ovaj YubiKey ključ iz trezora?';
+  String get removeKeyVaultConfirm => 'Уклонити овај YubiKey кључ из трезора?';
 
   @override
-  String get yubiKeyRemoved => 'YubiKey uklonjen';
+  String get yubiKeyRemoved => 'YubiKey уклоњен';
 
   @override
   String failedToRemoveKey(String error) {
-    return 'Uklanjanje ključa nije uspelo: $error';
+    return 'Уклањање кључа није успело: $error';
   }
 
   @override
-  String get yubiKeyAdded => 'YubiKey dodat';
+  String get yubiKeyAdded => 'YubiKey додат';
 
   @override
   String failedToAddKey(String error) {
-    return 'Dodavanje ključa nije uspelo: $error';
+    return 'Додавање кључа није успело: $error';
   }
 
   @override
   String failedToSaveAlias(String error) {
-    return 'Čuvanje aliasa nije uspelo: $error';
+    return 'Чување алиаса није успело: $error';
   }
 
   @override
   String get noFidoDeviceFound =>
-      'Nije pronađen nijedan FIDO2 uređaj. Umetnite YubiKey i pokušajte ponovo.';
+      'Није пронађен ниједан FIDO2 уређај. Уметните YubiKey и покушајте поново.';
 
   @override
   String get transportLabel => 'Transport:';
@@ -970,7 +969,7 @@ class AppLocalizationsSr extends AppLocalizations {
   String get transportNfc => 'NFC';
 
   @override
-  String get passphraseLabel => 'Pristupna fraza';
+  String get passphraseLabel => 'Приступна фраза';
 
   @override
   String get yubiKeyPinLabel => 'YubiKey PIN';
@@ -979,189 +978,189 @@ class AppLocalizationsSr extends AppLocalizations {
   String get pinLabel => 'PIN';
 
   @override
-  String get currentPassphraseLabel => 'Trenutna pristupna fraza';
+  String get currentPassphraseLabel => 'Тренутна приступна фраза';
 
   @override
-  String get newPassphraseLabel => 'Nova pristupna fraza';
+  String get newPassphraseLabel => 'Нова приступна фраза';
 
   @override
-  String get confirmPassphraseLabel => 'Potvrdi novu pristupnu frazu';
+  String get confirmPassphraseLabel => 'Потврди нову приступну фразу';
 
   @override
-  String get vaultPassphraseLabel => 'Pristupna fraza trezora';
+  String get vaultPassphraseLabel => 'Приступна фраза трезора';
 
   @override
   String get aliasLabel => 'Alias';
 
   @override
-  String get aliasHint => 'npr. Glavni, Radni ključ…';
+  String get aliasHint => 'нпр. Главни, Радни кључ…';
 
   @override
-  String get masterPassphraseLabel => 'Glavna pristupna fraza';
+  String get masterPassphraseLabel => 'Главна приступна фраза';
 
   @override
-  String get confirmPassphraseLabelShort => 'Potvrdi pristupnu frazu';
+  String get confirmPassphraseLabelShort => 'Потврди приступну фразу';
 
   @override
-  String get fieldTitle => 'Naziv';
+  String get fieldTitle => 'Назив';
 
   @override
-  String get fieldContent => 'Sadržaj';
+  String get fieldContent => 'Садржај';
 
   @override
-  String get fieldFirstName => 'Ime';
+  String get fieldFirstName => 'Име';
 
   @override
-  String get fieldLastName => 'Prezime';
+  String get fieldLastName => 'Презиме';
 
   @override
-  String get fieldEmail => 'E-pošta (neobavezno)';
+  String get fieldEmail => 'Е-пошта (необавезно)';
 
   @override
-  String get fieldPhone => 'Telefon (neobavezno)';
+  String get fieldPhone => 'Телефон (необавезно)';
 
   @override
-  String get fieldAddress => 'Adresa (neobavezno)';
+  String get fieldAddress => 'Адреса (необавезно)';
 
   @override
-  String get fieldCardLabel => 'Naziv kartice (npr. «Visa Platinum»)';
+  String get fieldCardLabel => 'Назив картице (нпр. «Visa Platinum»)';
 
   @override
-  String get fieldCardholderName => 'Ime vlasnika kartice';
+  String get fieldCardholderName => 'Име власника картице';
 
   @override
-  String get fieldCardNumber => 'Broj kartice';
+  String get fieldCardNumber => 'Број картице';
 
   @override
-  String get fieldExpiry => 'Važi do (MM/GG)';
+  String get fieldExpiry => 'Важи до (ММ/ГГ)';
 
   @override
-  String get fieldCvv => 'CVV (neobavezno)';
+  String get fieldCvv => 'CVV (необавезно)';
 
   @override
-  String get fieldCardPin => 'PIN (neobavezno)';
+  String get fieldCardPin => 'PIN (необавезно)';
 
   @override
-  String get fieldCreditLimit => 'Kreditni limit (neobavezno)';
+  String get fieldCreditLimit => 'Кредитни лимит (необавезно)';
 
   @override
-  String get fieldAccountNumber => 'Broj računa (neobavezno)';
+  String get fieldAccountNumber => 'Број рачуна (необавезно)';
 
   @override
-  String get fieldNotes => 'Beleške (neobavezno)';
+  String get fieldNotes => 'Белешке (необавезно)';
 
   @override
-  String get fieldUrl => 'URL (neobavezno)';
+  String get fieldUrl => 'URL (необавезно)';
 
   @override
   String get fieldAndroidAppId => 'ИД Android апликације (опционо)';
 
   @override
   String get fieldAndroidAppIdHelper =>
-      'Попуњава ову пријаву у Android апликацији. Ради само тачно подударање. ИД пронађите у вези апликације на Play Store-у, након id= (нпр. id=com.company.app).';
+      'Попуњава ову пријаву у Android апликацији. Ради само тачно подударање. ИД пронађите у вези апликације на Play Store-у, након ид= (нпр. ид=com.company.app).';
 
   @override
   String get recentlyUsedApps => 'Недавно коришћене апликације';
 
   @override
-  String get fieldUsername => 'Korisničko ime (neobavezno)';
+  String get fieldUsername => 'Корисничко име (необавезно)';
 
   @override
-  String get fieldPassword => 'Lozinka';
+  String get fieldPassword => 'Лозинка';
 
   @override
   String get fieldSeparator => 'Separator';
 
   @override
-  String get fieldFolder => 'Mapa';
+  String get fieldFolder => 'Мапа';
 
   @override
-  String get fieldLabel => 'Oznaka';
+  String get fieldLabel => 'Ознака';
 
   @override
-  String get fieldValue => 'Vrednost';
+  String get fieldValue => 'Вредност';
 
   @override
-  String get fieldCustomFields => 'Prilagođena polja';
+  String get fieldCustomFields => 'Прилагођена поља';
 
   @override
   String fieldLabelOptional(String label) {
-    return '$label (neobavezno)';
+    return '$label (необавезно)';
   }
 
   @override
-  String get entryTypeNotSupported => 'Ovaj tip unosa još nije podržan.';
+  String get entryTypeNotSupported => 'Овај тип уноса још није подржан.';
 
   @override
-  String get csvColumnNone => '(ništa)';
+  String get csvColumnNone => '(ништа)';
 
   @override
-  String get csvPreviewLabel => 'Pregled';
+  String get csvPreviewLabel => 'Преглед';
 
   @override
-  String get csvImportButton => 'Uvezi';
+  String get csvImportButton => 'Увези';
 
   @override
-  String get gabbroVaultSection => 'Gabbro trezor';
+  String get gabbroVaultSection => 'Gabbro трезор';
 
   @override
-  String get genericCsvSection => 'Generički CSV';
+  String get genericCsvSection => 'Генерички CSV';
 
   @override
-  String get changePassphraseSuccess => 'Pristupna fraza promenjena';
+  String get changePassphraseSuccess => 'Приступна фраза промењена';
 
   @override
   String get changePassphraseBiometricDisabled =>
       'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
 
   @override
-  String get changePassphraseButton => 'Promeni pristupnu frazu';
+  String get changePassphraseButton => 'Промени приступну фразу';
 
   @override
-  String get continueLabel => 'Nastavi';
+  String get continueLabel => 'Настави';
 
   @override
-  String get protectWithYubiKey => 'Zaštiti YubiKey ključem';
+  String get protectWithYubiKey => 'Заштити YubiKey кључем';
 
   @override
-  String get yubiKeySubtitle => 'Hardverski bezbednosni ključ (preporučeno)';
+  String get yubiKeySubtitle => 'Хардверски безбедносни кључ (препоручено)';
 
   @override
-  String get accessibilityButton => 'Pristupačnost';
+  String get accessibilityButton => 'Приступачност';
 
   @override
-  String get aboutProjectSection => 'Projekat';
+  String get aboutProjectSection => 'Пројекат';
 
   @override
-  String get aboutLicenceSection => 'Licenca';
+  String get aboutLicenceSection => 'Лиценца';
 
   @override
-  String get aboutOpenSourceSection => 'Komponente otvorenog koda';
+  String get aboutOpenSourceSection => 'Компоненте отвореног кода';
 
   @override
-  String get aboutAttributionSection => 'Zahvalnice';
+  String get aboutAttributionSection => 'Захвалнице';
 
   @override
-  String get lengthLabel => 'Dužina';
+  String get lengthLabel => 'Дужина';
 
   @override
-  String get wordsLabel => 'Reči';
+  String get wordsLabel => 'Речи';
 
   @override
-  String get generateButton => 'Generiši';
+  String get generateButton => 'Генериши';
 
   @override
-  String get usePasswordButton => 'Koristi ovu lozinku';
+  String get usePasswordButton => 'Користи ову лозинку';
 
   @override
-  String get showHidePassword => 'Prikaži';
+  String get showHidePassword => 'Прикажи';
 
   @override
   String get deleteVaultPostDeletion =>
-      'Vaš trezor je obrisan. Napravite novi za nastavak.';
+      'Ваш трезор је обрисан. Направите нови за наставак.';
 
   @override
-  String get syncFilePassphraseLabel => 'Pristupna fraza trezora';
+  String get syncFilePassphraseLabel => 'Приступна фраза трезора';
 
   @override
   String get syncSafeToRetry =>
@@ -1178,52 +1177,52 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String historySavedOn(String date) {
-    return 'Sačuvano $date';
+    return 'Сачувано $date';
   }
 
   @override
   String historyExpiresAppend(String saved, String expires) {
-    return '$saved · ističe $expires';
+    return '$saved · истиче $expires';
   }
 
   @override
   String importIssueTitle(int index, int total) {
-    return 'Problem sa uvozom ($index od $total)';
+    return 'Проблем са увозом ($index од $total)';
   }
 
   @override
   String importIssueType(String category) {
-    return 'Tip: $category';
+    return 'Тип: $category';
   }
 
   @override
   String get importIssueHelp =>
-      'Uredite, ispravite i sačuvajte ovaj unos, ili preskočite kako biste ga odbili.';
+      'Уредите, исправите и сачувајте овај унос, или прескочите како бисте га одбили.';
 
   @override
   String entriesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count unosa preskočeno',
-      few: '$count unosa preskočena',
-      one: '1 unos preskočen',
+      other: '$count уноса прескочено',
+      few: '$count уноса прескочена',
+      one: '1 унос прескочен',
     );
     return '$_temp0';
   }
 
   @override
   String get skippedEntriesNote =>
-      'Ovi unosi već postoje u vašem trezoru i nisu prepisani:';
+      'Ови уноси већ постоје у вашем трезору и нису преписани:';
 
   @override
   String syncDeleteEntryContent(String title) {
-    return 'Drugi uređaj je obrisao «$title».\n\nObrisati i ovde, ili zadržati?';
+    return 'Други уређај је обрисао «$title».\n\nОбрисати и овде, или задржати?';
   }
 
   @override
   String folderConflictContent(String title, String local, String incoming) {
-    return '«$title» je u različitim mapama na dva uređaja.\n\nOvaj uređaj: $local\nDrugi uređaj: $incoming';
+    return '«$title» је у различитим мапама на два уређаја.\n\nОвај уређај: $local\nДруги уређај: $incoming';
   }
 
   @override
@@ -1235,192 +1234,192 @@ class AppLocalizationsSr extends AppLocalizations {
   String get syncFieldConflictUseIncoming => 'Користи вредност другог уређаја';
 
   @override
-  String get folderConflictKeepUnfoldered => 'Zadrži bez mape';
+  String get folderConflictKeepUnfoldered => 'Задржи без мапе';
 
   @override
   String folderConflictKeepLocal(String folder) {
-    return 'Zadrži «$folder»';
+    return 'Задржи «$folder»';
   }
 
   @override
-  String get folderConflictMoveUnfoldered => 'Premesti bez mape';
+  String get folderConflictMoveUnfoldered => 'Премести без мапе';
 
   @override
   String folderConflictMoveIncoming(String folder) {
-    return 'Premesti u «$folder»';
+    return 'Премести у «$folder»';
   }
 
   @override
   String vaultSynced(int added, int updated, int deleted) {
-    return 'Trezor sinhronizovan — dodato: $added, ažurirano: $updated, obrisano: $deleted.';
+    return 'Трезор синхронизован — додато: $added, ажурирано: $updated, обрисано: $deleted.';
   }
 
   @override
   String get syncPassphraseMismatch =>
-      'Ova datoteka trezora koristi drugu pristupnu frazu. Sinhronizacija je podržana samo između trezora sa istom pristupnom frazom.';
+      'Ова датотека трезора користи другу приступну фразу. Синхронизација је подржана само између трезора са истом приступном фразом.';
 
   @override
-  String get reviewSensitiveFields => 'Osetljiva polja';
+  String get reviewSensitiveFields => 'Осетљива поља';
 
   @override
-  String get reviewOtherFields => 'Ostala polja';
+  String get reviewOtherFields => 'Остала поља';
 
   @override
-  String get reviewPasswordChanged => 'Lozinka promenjena';
+  String get reviewPasswordChanged => 'Лозинка промењена';
 
   @override
-  String get reviewCvvChanged => 'CVV promenjen';
+  String get reviewCvvChanged => 'CVV промењен';
 
   @override
-  String get reviewPinChanged => 'PIN promenjen';
+  String get reviewPinChanged => 'PIN промењен';
 
   @override
   String get reviewTransactionPasswordChanged =>
-      'Transakciona lozinka promenjena';
+      'Трансакциона лозинка промењена';
 
   @override
-  String get tooltipShowValues => 'Prikaži vrednosti';
+  String get tooltipShowValues => 'Прикажи вредности';
 
   @override
-  String get reviewOld => 'Staro';
+  String get reviewOld => 'Старо';
 
   @override
-  String get reviewNew => 'Novo';
+  String get reviewNew => 'Ново';
 
   @override
-  String get reviewEmpty => '(prazno)';
+  String get reviewEmpty => '(празно)';
 
   @override
   String get reviewFieldUrl => 'URL';
 
   @override
-  String get reviewFieldNotes => 'Beleške';
+  String get reviewFieldNotes => 'Белешке';
 
   @override
-  String get reviewFieldContent => 'Sadržaj';
+  String get reviewFieldContent => 'Садржај';
 
   @override
-  String get reviewFieldEmail => 'E-pošta';
+  String get reviewFieldEmail => 'Е-пошта';
 
   @override
-  String get reviewFieldPhone => 'Telefon';
+  String get reviewFieldPhone => 'Телефон';
 
   @override
-  String get reviewFieldAddress => 'Adresa';
+  String get reviewFieldAddress => 'Адреса';
 
   @override
-  String get reviewFieldCardLabel => 'Naziv kartice';
+  String get reviewFieldCardLabel => 'Назив картице';
 
   @override
   String get reviewFieldStatus => 'Status';
 
   @override
-  String get reviewFieldCardholder => 'Vlasnik kartice';
+  String get reviewFieldCardholder => 'Власник картице';
 
   @override
-  String get reviewFieldExpiry => 'Važi do';
+  String get reviewFieldExpiry => 'Важи до';
 
   @override
-  String get reviewFieldCreditLimit => 'Kreditni limit';
+  String get reviewFieldCreditLimit => 'Кредитни лимит';
 
   @override
-  String get reviewFieldAccountNumber => 'Broj računa';
+  String get reviewFieldAccountNumber => 'Број рачуна';
 
   @override
-  String get reviewFieldNetwork => 'Mreža';
+  String get reviewFieldNetwork => 'Мрежа';
 
   @override
-  String get reviewFieldBank => 'Banka';
+  String get reviewFieldBank => 'Банка';
 
   @override
-  String get reviewFieldFilename => 'Naziv datoteke';
+  String get reviewFieldFilename => 'Назив датотеке';
 
   @override
-  String get reviewFieldSize => 'Veličina';
+  String get reviewFieldSize => 'Величина';
 
   @override
-  String get reviewFieldCardNumber => 'Broj';
+  String get reviewFieldCardNumber => 'Број';
 
   @override
   String get reviewFieldCVV => 'CVV';
 
   @override
-  String get reviewFieldTransactionPassword => 'Transakciona lozinka';
+  String get reviewFieldTransactionPassword => 'Трансакциона лозинка';
 
   @override
-  String get timestampCreated => 'Napravljeno';
+  String get timestampCreated => 'Направљено';
 
   @override
-  String get timestampUpdated => 'Ažurirano';
+  String get timestampUpdated => 'Ажурирано';
 
   @override
-  String get timestampUnknown => 'Nepoznato';
+  String get timestampUnknown => 'Непознато';
 
   @override
-  String get noTitleFallback => '(bez naziva)';
+  String get noTitleFallback => '(без назива)';
 
   @override
-  String get tooltipExportFile => 'Izvezi datoteku';
+  String get tooltipExportFile => 'Извези датотеку';
 
   @override
-  String get tooltipEditEntry => 'Uredi unos';
+  String get tooltipEditEntry => 'Уреди унос';
 
   @override
-  String get tooltipDeleteEntry => 'Obriši unos';
+  String get tooltipDeleteEntry => 'Обриши унос';
 
   @override
-  String get exportLabel => 'Izvoz';
+  String get exportLabel => 'Извоз';
 
   @override
-  String get customEntryFieldsHeader => 'Polja';
+  String get customEntryFieldsHeader => 'Поља';
 
   @override
   String get copiedNeverClears =>
-      'Kopirano — privremena memorija se nikad automatski ne briše';
+      'Копирано — привремена меморија се никад аутоматски не брише';
 
   @override
   String get copiedClears30s =>
-      'Kopirano — privremena memorija se briše za 30 s';
+      'Копирано — привремена меморија се брише за 30 с';
 
   @override
   String get copiedClears60s =>
-      'Kopirano — privremena memorija se briše za 60 s';
+      'Копирано — привремена меморија се брише за 60 с';
 
   @override
   String get copiedClears2min =>
-      'Kopirano — privremena memorija se briše za 2 min';
+      'Копирано — привремена меморија се брише за 2 мин';
 
   @override
-  String get passwordBreakdownTitle => 'Analiza lozinke';
+  String get passwordBreakdownTitle => 'Анализа лозинке';
 
   @override
-  String get charTypeUppercase => 'Velika slova';
+  String get charTypeUppercase => 'Велика слова';
 
   @override
-  String get charTypeLowercase => 'Mala slova';
+  String get charTypeLowercase => 'Мала слова';
 
   @override
-  String get charTypeDigit => 'Cifre';
+  String get charTypeDigit => 'Цифре';
 
   @override
-  String get charTypeSymbol => 'Simbol';
+  String get charTypeSymbol => 'Симбол';
 
   @override
-  String get charTypeLetter => 'Slovo';
+  String get charTypeLetter => 'Слово';
 
   @override
-  String get exportIncludeDate => 'Uključi datum u naziv datoteke';
+  String get exportIncludeDate => 'Укључи датум у назив датотеке';
 
   @override
-  String get exportChooseFormat => 'Izaberite format izvoza.';
+  String get exportChooseFormat => 'Изаберите формат извоза.';
 
   @override
   String get exportUnencryptedWarning =>
-      'Potpuno nešifrovano — sve tajne biće zapisane kao običan tekst. Sačuvajte datoteku bezbedno i obrišite je nakon korišćenja.';
+      'Потпуно нешифровано — све тајне биће записане као обичан текст. Сачувајте датотеку безбедно и обришите је након коришћења.';
 
   @override
   String get exportPassphraseOnlyNote =>
-      'Zaštićeno samo pristupnom frazom. YubiKey nije potreban za uvoz.';
+      'Заштићено само приступном фразом. YubiKey није потребан за увоз.';
 
   @override
   String get exportProtectionKeyProtected =>
@@ -1436,149 +1435,148 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get exportChooseDestinationJson =>
-      'Izaberite odredište za izvezenu JSON datoteku.';
+      'Изаберите одредиште за извезену JSON датотеку.';
 
   @override
   String get exportChooseDestinationVault =>
-      'Izaberite odredište za izvezenu datoteku trezora.';
+      'Изаберите одредиште за извезену датотеку трезора.';
 
   @override
   String get exportTwoFilesNote =>
-      'Biće napravljene dve datoteke: vault.gabbro i vault.gabbro.sha256';
+      'Биће направљене две датотеке: vault.gabbro и vault.gabbro.sha256';
 
   @override
-  String get exportSelectDestination => 'Izaberite odredište.';
+  String get exportSelectDestination => 'Изаберите одредиште.';
 
   @override
   String aboutVersion(String version) {
-    return 'Verzija $version';
+    return 'Верзија $version';
   }
 
   @override
-  String get aboutTagline => 'Kvantno otporan menadžer lozinki';
+  String get aboutTagline => 'Квантно отпоран менаџер лозинки';
 
   @override
-  String get aboutSourceCode => 'Izvorni kod';
+  String get aboutSourceCode => 'Изворни код';
 
   @override
-  String get aboutReportIssue => 'Prijavi problem';
+  String get aboutReportIssue => 'Пријави проблем';
 
   @override
-  String get aboutSupportGabbro => 'Podržite Gabbro';
+  String get aboutSupportGabbro => 'Подржите Gabbro';
 
   @override
   String get aboutLicenceBody =>
-      'Gabbro je slobodan softver otvorenog koda, licenciran pod GNU General Public License v3.0 only (GPL-3.0-only).\n\nImate slobodu da koristite, proučavate i distribuirate ovu aplikaciju prema uslovima navedene licence.';
+      'Gabbro је слободан софтвер отвореног кода, лиценциран под GNU Генерал Public License в3.0 онлy (GPL-3.0-онлy).\n\nИмате слободу да користите, проучавате и дистрибуирате ову апликацију према условима наведене лиценце.';
 
   @override
-  String get aboutOwnerRole => 'Vlasnik projekta, arhitekt i glavni programer:';
+  String get aboutOwnerRole => 'Власник пројекта, архитект и главни програмер:';
 
   @override
-  String get aboutAiPartner => 'AI razvojni partner:';
+  String get aboutAiPartner => 'АИ развојни партнер:';
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro ne uspostavlja nikakve odlazne mrežne veze. Nema telemetrije, analitike ni naloga.';
+      'Gabbro не успоставља никакве одлазне мрежне везе. Нема телеметрије, аналитике ни налога.';
 
   @override
-  String get strengthTierTerrible => 'Užasno';
+  String get strengthTierTerrible => 'Ужасно';
 
   @override
-  String get strengthTierWeak => 'Slabo';
+  String get strengthTierWeak => 'Слабо';
 
   @override
-  String get strengthTierFair => 'Prihvatljivo';
+  String get strengthTierFair => 'Прихватљиво';
 
   @override
-  String get strengthTierStrong => 'Jako';
+  String get strengthTierStrong => 'Јако';
 
   @override
-  String get strengthTierVeryStrong => 'Veoma jako';
+  String get strengthTierVeryStrong => 'Веома јако';
 
   @override
-  String get strengthTierExcellent => 'Odlično';
+  String get strengthTierExcellent => 'Одлично';
 
   @override
   String get yubiKeyProtectedNote =>
-      'Trezor zaštićen YubiKey-em — veza sa ključem biće sačuvana.';
+      'Трезор заштићен YubiKey-ем — веза са кључем биће сачувана.';
 
   @override
-  String get yubiKeyPinRequired => 'Potreban je YubiKey PIN';
+  String get yubiKeyPinRequired => 'Потребан је YubiKey PIN';
 
   @override
-  String get tapYubiKeyNow => 'Sada dodirnite vaš YubiKey…';
+  String get tapYubiKeyNow => 'Сада додирните ваш YubiKey…';
 
   @override
   String get touchYubiKeyToAuthorize =>
-      'Dodirnite YubiKey za autorizaciju ove promene.';
+      'Додирните YubiKey за ауторизацију ове промене.';
 
   @override
   String get currentPassphraseRequired =>
-      'Potrebna je trenutna pristupna fraza';
+      'Потребна је тренутна приступна фраза';
 
   @override
-  String get newPassphraseRequired => 'Potrebna je nova pristupna fraza';
+  String get newPassphraseRequired => 'Потребна је нова приступна фраза';
 
   @override
-  String get passphraseTooWeak => 'Pristupna fraza je preslaba';
+  String get passphraseTooWeak => 'Приступна фраза је преслаба';
 
   @override
-  String get confirmPassphraseRequired => 'Potvrdite novu pristupnu frazu';
+  String get confirmPassphraseRequired => 'Потврдите нову приступну фразу';
 
   @override
-  String get passphrasesDoNotMatch => 'Pristupne fraze se ne podudaraju';
+  String get passphrasesDoNotMatch => 'Приступне фразе се не подударају';
 
   @override
-  String get passphrasesMatch => '✓ Pristupne fraze se podudaraju';
+  String get passphrasesMatch => '✓ Приступне фразе се подударају';
 
   @override
-  String get passphrasesNoMatch => '✗ Pristupne fraze se ne podudaraju';
+  String get passphrasesNoMatch => '✗ Приступне фразе се не подударају';
 
   @override
   String entropyDisplay(String tier, String bits) {
-    return '$tier · $bits bita';
+    return '$tier · $bits бита';
   }
 
   @override
-  String get transportError => 'Greška transporta.';
+  String get transportError => 'Грешка транспорта.';
 
   @override
   String get authorizationFailed =>
-      'Autorizacija nije uspela — proverite PIN i pokušajte ponovo.';
+      'Ауторизација није успела — проверите PIN и покушајте поново.';
 
   @override
   String get unlockEnterPassphraseAndPin =>
-      'Unesite pristupnu frazu i YubiKey PIN za otključavanje';
+      'Унесите приступну фразу и YubiKey PIN за откључавање';
 
   @override
-  String get unlockEnterPassphrase =>
-      'Unesite pristupnu frazu za otključavanje';
+  String get unlockEnterPassphrase => 'Унесите приступну фразу за откључавање';
 
   @override
   String unlockEntropyDisplay(String tier, String bits) {
-    return '$tier · $bits bita entropije';
+    return '$tier · $bits бита ентропије';
   }
 
   @override
   String get insertYubiKeyAndTap =>
-      'Umetnite YubiKey i dodirnite ga kad zatreperi';
+      'Уметните YubiKey и додирните га кад затрепери';
 
   @override
   String get unlockErrorPassphrase =>
-      'Trezor nije moguće otključati. Proverite pristupnu frazu.';
+      'Трезор није могуће откључати. Проверите приступну фразу.';
 
   @override
   String get unlockErrorPassphraseAndPin =>
-      'Trezor nije moguće otključati. Proverite pristupnu frazu i YubiKey PIN.';
+      'Трезор није могуће откључати. Проверите приступну фразу и YubiKey PIN.';
 
   @override
-  String get importSelectFile => 'Izaberite datoteku.';
+  String get importSelectFile => 'Изаберите датотеку.';
 
   @override
-  String get importFileNotFound => 'Datoteka nije pronađena.';
+  String get importFileNotFound => 'Датотека није пронађена.';
 
   @override
-  String get importEnterPassphrase => 'Unesite pristupnu frazu za ovaj trezor.';
+  String get importEnterPassphrase => 'Унесите приступну фразу за овај трезор.';
 
   @override
   String get importSourceKeyProtected =>
@@ -1586,25 +1584,25 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Unosi čiji UUID već postoji u vašem trezoru biće automatski preskočeni. Prikazaće se pregled.';
+      'Уноси чији UUID већ постоји у вашем трезору биће аутоматски прескочени. Приказаће се преглед.';
 
   @override
   String get importGabbroSubtitle =>
-      'Sinhronizuj unose iz drugog Gabbro trezora (datoteka .gabbro)';
+      'Синхронизуј уносе из другог Gabbro трезора (датотека .габбро)';
 
   @override
-  String get importEnpassSubtitle => 'JSON izvoz iz Enpass (Alati → Izvezi)';
+  String get importEnpassSubtitle => 'JSON извоз из Enpass (Алати → Извези)';
 
   @override
   String get importBitwardenSubtitle =>
-      'Nešifrovani JSON izvoz iz Bitwarden (Alati → Izvezi trezor)';
+      'Нешифровани JSON извоз из Bitwarden (Алати → Извези трезор)';
 
   @override
-  String get importCsvSubtitle => 'CSV izvoz iz bilo kog menadžera lozinki';
+  String get importCsvSubtitle => 'CSV извоз из било ког менаџера лозинки';
 
   @override
   String get importGooglePmSubtitle =>
-      'CSV извоз из Google Password Manager (passwords.google.com → Преузми)';
+      'CSV извоз из Google Пассwорд Manager (passwords.google.com → Преузми)';
 
   @override
   String get importDashlaneSubtitle =>
@@ -1622,25 +1620,25 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String vaultNameAlreadyExists(String alias) {
-    return 'Trezor sa nazivom «$alias» već postoji.';
+    return 'Трезор са називом «$alias» већ постоји.';
   }
 
   @override
   String deleteVaultContent(String alias, String path) {
-    return 'Ovo će trajno obrisati «$alias» i sve njegove podatke.\n\nDatoteka: $path\n\nOva radnja se ne može poništiti.';
+    return 'Ово ће трајно обрисати «$alias» и све његове податке.\n\nДатотека: $path\n\nОва радња се не може поништити.';
   }
 
   @override
   String deleteVaultYubikeyContent(String alias, String path) {
-    return 'Ovo će trajno obrisati «$alias» i ukloniti njegovu vezu sa YubiKey-em.\n\nDatoteka: $path\n\nOva radnja se ne može poništiti.';
+    return 'Ово ће трајно обрисати «$alias» и уклонити његову везу са YubiKey-ем.\n\nДатотека: $path\n\nОва радња се не може поништити.';
   }
 
   @override
   String get yubiKeyAuthorizeDeletion =>
-      'Unesite PIN i dodirnite YubiKey za autorizaciju brisanja.';
+      'Унесите PIN и додирните YubiKey за ауторизацију брисања.';
 
   @override
-  String get deleteVaultTooltip => 'Obriši trezor';
+  String get deleteVaultTooltip => 'Обриши трезор';
 
   @override
   String get backupEmergencyHeading => 'Резервне копије и хитно брисање';
@@ -1658,377 +1656,377 @@ class AppLocalizationsSr extends AppLocalizations {
       'Да бисте одмах уништили све Gabbro податке на уређају — без аутентификације, неповратно — обришите ове фасцикле у терминалу. Сефови сачувани на другим локацијама нису у овим фасциклама и морате их обрисати засебно.';
 
   @override
-  String get yubiKeySecurityWarning => 'Bezbednosno upozorenje';
+  String get yubiKeySecurityWarning => 'Безбедносно упозорење';
 
   @override
-  String get removeYubiKeyTitle => 'Ukloni YubiKey';
+  String get removeYubiKeyTitle => 'Уклони YubiKey';
 
   @override
   String get yubiKeyLastKeyRiskWarning =>
-      'UPOZORENJE: ako preostali ključ bude izgubljen, oštećen ili ukraden, pristup trezoru biće trajno onemogućen. Ne postoji mogućnost oporavka.';
+      'УПОЗОРЕЊЕ: ако преостали кључ буде изгубљен, оштећен или украден, приступ трезору биће трајно онемогућен. Не постоји могућност опоравка.';
 
   @override
   String get onlyOneKeyRegisteredWarning =>
-      'Registrovan je samo jedan ključ. Ako ovaj ključ bude izgubljen, pristup trezoru biće trajno onemogućen.';
+      'Регистрован је само један кључ. Ако овај кључ буде изгубљен, приступ трезору биће трајно онемогућен.';
 
   @override
-  String get tapRegisterNfc => 'Prislonite ključ uz telefon za registraciju';
+  String get tapRegisterNfc => 'Прислоните кључ уз телефон за регистрацију';
 
   @override
   String get tapRegisterUsb =>
-      'Nakon priključenja dodirnite ključ za registraciju';
+      'Након прикључења додирните кључ за регистрацију';
 
   @override
   String get tapActivateNfc =>
-      'Ponovo prislonite ključ uz telefon za aktivaciju';
+      'Поново прислоните кључ уз телефон за активацију';
 
   @override
   String get tapActivateUsb =>
-      'Nakon priključenja ponovo dodirnite ključ za aktivaciju';
+      'Након прикључења поново додирните кључ за активацију';
 
   @override
   String failedToRegisterKey(String error) {
-    return 'Registracija ključa nije uspela: $error';
+    return 'Регистрација кључа није успела: $error';
   }
 
   @override
   String failedToActivateKey(String error) {
-    return 'Aktivacija ključa nije uspela: $error';
+    return 'Активација кључа није успела: $error';
   }
 
   @override
   String keyDefaultTitle(int index) {
-    return 'Ključ $index';
+    return 'Кључ $index';
   }
 
   @override
-  String get tapYubiKeyToRegister => 'Dodirnite novi YubiKey za registraciju…';
+  String get tapYubiKeyToRegister => 'Додирните нови YubiKey за регистрацију…';
 
   @override
   String get tapYubiKeyToActivate =>
-      'Ponovo dodirnite novi YubiKey za aktivaciju…';
+      'Поново додирните нови YubiKey за активацију…';
 
   @override
-  String get editAliasTooltip => 'Uredi alias';
+  String get editAliasTooltip => 'Уреди алиас';
 
   @override
-  String get cannotRemoveLastKey => 'Poslednji ključ se ne može ukloniti';
+  String get cannotRemoveLastKey => 'Последњи кључ се не може уклонити';
 
   @override
-  String get removeKeyTooltip => 'Ukloni ključ';
+  String get removeKeyTooltip => 'Уклони кључ';
 
   @override
   String manageYubiKeysError(String error) {
-    return 'Učitavanje YubiKey ključeva nije uspelo: $error';
+    return 'Учитавање YubiKey кључева није успело: $error';
   }
 
   @override
-  String get generatorModeClassic => 'Klasično';
+  String get generatorModeClassic => 'Класично';
 
   @override
-  String get generatorModePassphrase => 'Pristupna fraza';
+  String get generatorModePassphrase => 'Приступна фраза';
 
   @override
-  String get charSetsHeader => 'Skupovi znakova';
+  String get charSetsHeader => 'Скупови знакова';
 
   @override
-  String get languageHeader => 'Jezik';
+  String get languageHeader => 'Језик';
 
   @override
   String get separatorLabel => 'Separator';
 
   @override
-  String get capitaliseWords => 'Velika slova u rečima';
+  String get capitaliseWords => 'Велика слова у речима';
 
   @override
-  String get appendDigit => 'Dodaj cifru';
+  String get appendDigit => 'Додај цифру';
 
   @override
   String entropyBitsDisplay(String bits) {
-    return '~$bits bita entropije';
+    return '~$bits бита ентропије';
   }
 
   @override
-  String get selectAtLeastOneCharSet => 'Izaberite barem jedan skup znakova';
+  String get selectAtLeastOneCharSet => 'Изаберите барем један скуп знакова';
 
   @override
   String get passwordMinLengthNote =>
-      'Lozinke imaju najmanje 12 znaka. Ako sajt ima kraće ograničenje, kopirajte potreban broj prvih znakova.';
+      'Лозинке имају најмање 12 знака. Ако сајт има краће ограничење, копирајте потребан број првих знакова.';
 
   @override
   String get excludeAmbiguousChars =>
-      'Isključi dvosmislene znakove (0, O, l, 1, I)';
+      'Искључи двосмислене знакове (0, О, л, 1, И)';
 
   @override
-  String get onboardingGetStarted => 'Napravite vaš trezor za početak.';
+  String get onboardingGetStarted => 'Направите ваш трезор за почетак.';
 
   @override
-  String get onboardingVaultName => 'Naziv trezora';
+  String get onboardingVaultName => 'Назив трезора';
 
   @override
-  String get onboardingAliasRequired => 'Alias je obavezan';
+  String get onboardingAliasRequired => 'Алиас је обавезан';
 
   @override
   String get onboardingNewVaultLocation =>
-      'Lokacija novog trezora (ista kao ranije)';
+      'Локација новог трезора (иста као раније)';
 
   @override
-  String get onboardingVaultLocation => 'Lokacija trezora';
+  String get onboardingVaultLocation => 'Локација трезора';
 
   @override
-  String get onboardingLoadingPath => 'Učitavanje…';
+  String get onboardingLoadingPath => 'Учитавање…';
 
   @override
-  String get onboardingPathHint => 'Putanja do datoteke trezora';
+  String get onboardingPathHint => 'Путања до датотеке трезора';
 
   @override
-  String get onboardingPathRequired => 'Putanja je obavezna';
+  String get onboardingPathRequired => 'Путања је обавезна';
 
   @override
   String get onboardingPathTaken =>
-      'Ovde već postoji datoteka. Izaberite drugo ime — kreiranje trezora bi je zamenilo.';
+      'Овде већ постоји датотека. Изаберите друго име — креирање трезора би је заменило.';
 
   @override
   String get onboardingReusePassphraseHint =>
-      'Izaberite novu glavnu pristupnu frazu ili ponovo koristite prethodnu.';
+      'Изаберите нову главну приступну фразу или поново користите претходну.';
 
   @override
-  String get onboardingPassphraseRequired => 'Pristupna fraza je obavezna';
+  String get onboardingPassphraseRequired => 'Приступна фраза је обавезна';
 
   @override
-  String get onboardingConfirmRequired => 'Potvrdite pristupnu frazu';
+  String get onboardingConfirmRequired => 'Потврдите приступну фразу';
 
   @override
-  String get onboardingPrimaryKeyPin => 'PIN primarnog ključa';
+  String get onboardingPrimaryKeyPin => 'PIN примарног кључа';
 
   @override
-  String get onboardingBackupKeyPin => 'PIN rezervnog ključa';
+  String get onboardingBackupKeyPin => 'PIN резервног кључа';
 
   @override
   String onboardingKeyNPin(int n) {
-    return 'PIN ključa $n';
+    return 'PIN кључа $n';
   }
 
   @override
   String get onboardingYubikeyTapInstruction =>
-      'Svaki YubiKey ćete dodirnuti dva puta (ukupno 4 dodira). Između oba ključa bićete zamoljeni da ih zamenite.';
+      'Сваки YubiKey ћете додирнути два пута (укупно 4 додира). Између оба кључа бићете замољени да их замените.';
 
   @override
   String get onboardingYubikeySlowNote =>
-      'Pravljenje trezora sa YubiKey ključem traje 20–30 sekundi. Aplikacija može izgledati kao da ne reaguje — to je normalno.';
+      'Прављење трезора са YubiKey кључем траје 20–30 секунди. Апликација може изгледати као да не реагује — то је нормално.';
 
   @override
-  String get onboardingStep1Label => 'Registruj primarni ključ';
+  String get onboardingStep1Label => 'Региструј примарни кључ';
 
   @override
-  String get onboardingStep1Hint => 'Sada dodirnite YubiKey';
+  String get onboardingStep1Hint => 'Сада додирните YubiKey';
 
   @override
-  String get onboardingStep2Label => 'Aktiviraj primarni ključ';
+  String get onboardingStep2Label => 'Активирај примарни кључ';
 
   @override
-  String get onboardingStep2Hint => 'Ponovo dodirnite YubiKey';
+  String get onboardingStep2Hint => 'Поново додирните YubiKey';
 
   @override
-  String get onboardingStep3Label => 'Prebaci na rezervni ključ';
+  String get onboardingStep3Label => 'Пребаци на резервни кључ';
 
   @override
   String get onboardingStep3Hint =>
-      'Izvadite primarni ključ pa umetnite rezervni YubiKey';
+      'Извадите примарни кључ па уметните резервни YubiKey';
 
   @override
-  String get onboardingStep4Label => 'Registruj rezervni ključ';
+  String get onboardingStep4Label => 'Региструј резервни кључ';
 
   @override
-  String get onboardingStep4Hint => 'Dodirnite rezervni YubiKey';
+  String get onboardingStep4Hint => 'Додирните резервни YubiKey';
 
   @override
-  String get onboardingStep5Label => 'Aktiviraj rezervni ključ';
+  String get onboardingStep5Label => 'Активирај резервни кључ';
 
   @override
-  String get onboardingStep5Hint => 'Poslednji put dodirnite rezervni YubiKey';
+  String get onboardingStep5Hint => 'Последњи пут додирните резервни YubiKey';
 
   @override
   String get textSizePreview =>
-      'Gabro je intruzivna magmatska stena bogata Mg i Fe sa krupnozrnom strukturom.';
+      'Габро је интрузивна магматска стена богата Мг и Фе са крупнозрном структуром.';
 
   @override
   String get fieldCardStatus => 'Status';
 
   @override
-  String get fieldPaymentNetwork => 'Platna mreža';
+  String get fieldPaymentNetwork => 'Платна мрежа';
 
   @override
-  String get cardStatusActive => 'Aktivna';
+  String get cardStatusActive => 'Активна';
 
   @override
-  String get cardStatusLapsed => 'Istekla';
+  String get cardStatusLapsed => 'Истекла';
 
   @override
-  String get cardStatusInactive => 'Neaktivna';
+  String get cardStatusInactive => 'Неактивна';
 
   @override
-  String get validatorTitleRequired => 'Naziv je obavezan';
+  String get validatorTitleRequired => 'Назив је обавезан';
 
   @override
-  String get validatorUsernameRequired => 'Korisničko ime je obavezno';
+  String get validatorUsernameRequired => 'Корисничко име је обавезно';
 
   @override
-  String get validatorPasswordRequired => 'Lozinka je obavezna';
+  String get validatorPasswordRequired => 'Лозинка је обавезна';
 
   @override
-  String get validatorContentRequired => 'Sadržaj je obavezan';
+  String get validatorContentRequired => 'Садржај је обавезан';
 
   @override
-  String get validatorFirstNameRequired => 'Ime je obavezno';
+  String get validatorFirstNameRequired => 'Име је обавезно';
 
   @override
-  String get validatorLastNameRequired => 'Prezime je obavezno';
+  String get validatorLastNameRequired => 'Презиме је обавезно';
 
   @override
-  String get validatorCardLabelRequired => 'Naziv kartice je obavezan';
+  String get validatorCardLabelRequired => 'Назив картице је обавезан';
 
   @override
-  String get validatorCardholderRequired => 'Ime vlasnika kartice je obavezno';
+  String get validatorCardholderRequired => 'Име власника картице је обавезно';
 
   @override
-  String get validatorCardNumberRequired => 'Broj kartice je obavezan';
+  String get validatorCardNumberRequired => 'Број картице је обавезан';
 
   @override
-  String get validatorCardNumberLength => 'Broj kartice mora imati 6–19 cifara';
+  String get validatorCardNumberLength => 'Број картице мора имати 6–19 цифара';
 
   @override
-  String get validatorExpiryRequired => 'Datum isteka je obavezan';
+  String get validatorExpiryRequired => 'Датум истека је обавезан';
 
   @override
-  String get validatorExpiryFormat => 'Koristite format MM/GG';
+  String get validatorExpiryFormat => 'Користите формат ММ/ГГ';
 
   @override
-  String get validatorExpiryMonth => 'Mesec mora biti 01–12';
+  String get validatorExpiryMonth => 'Месец мора бити 01–12';
 
   @override
-  String get validatorCvvLength => 'CVV mora imati 3 ili 4 cifre';
+  String get validatorCvvLength => 'CVV мора имати 3 или 4 цифре';
 
   @override
-  String get validatorLabelRequired => 'Oznaka je obavezna';
+  String get validatorLabelRequired => 'Ознака је обавезна';
 
   @override
-  String get validatorLabelDuplicate => 'Oznaka mora biti jedinstvena';
+  String get validatorLabelDuplicate => 'Ознака мора бити јединствена';
 
   @override
-  String get validatorStatusRequired => 'Status je obavezan';
+  String get validatorStatusRequired => 'Статус је обавезан';
 
   @override
-  String get sectionBiometricUnlock => 'Biometrijsko otključavanje';
+  String get sectionBiometricUnlock => 'Биометријско откључавање';
 
   @override
   String get biometricUnlockDescription =>
-      'Koristite otisak prsta ili lice za otključavanje trezora umesto unosa pristupne fraze.';
+      'Користите отисак прста или лице за откључавање трезора уместо уноса приступне фразе.';
 
   @override
-  String get biometricUnlockTitle => 'Omogući biometrijsko otključavanje';
+  String get biometricUnlockTitle => 'Омогући биометријско откључавање';
 
   @override
   String get biometricUnlockNote =>
-      'Svi biometrijski podaci registrovani na ovom uređaju mogu otključati — ne samo oni korišćeni pri registraciji.';
+      'Сви биометријски подаци регистровани на овом уређају могу откључати — не само они коришћени при регистрацији.';
 
   @override
   String get biometricUnavailable =>
-      'Biometrijsko otključavanje nije dostupno na ovom uređaju. Nije pronađen biometrijski senzor ili u sistemskim podešavanjima nisu registrovani nikakvi biometrijski podaci.';
+      'Биометријско откључавање није доступно на овом уређају. Није пронађен биометријски сензор или у системским подешавањима нису регистровани никакви биометријски подаци.';
 
   @override
-  String get biometricDialogTitle => 'O biometrijskom otključavanju';
+  String get biometricDialogTitle => 'О биометријском откључавању';
 
   @override
   String get biometricDialogBody =>
-      'Kad je omogućeno, Gabbro šifruje glavnu pristupnu frazu i čuva je na ovom uređaju, zaštićenu vašim biometrijskim podacima. Fraza se dešifruje samo pri otključavanju.\n\nGabbro nikad ne čuva podatke vaših otisaka prstiju ni lica — ostaju u bezbednom čipu telefona.';
+      'Кад је омогућено, Gabbro шифрује главну приступну фразу и чува је на овом уређају, заштићену вашим биометријским подацима. Фраза се дешифрује само при откључавању.\n\nGabbro никад не чува податке ваших отисака прстију ни лица — остају у безбедном чипу телефона.';
 
   @override
   String get biometricDialogAllBiometrics =>
-      'Svi biometrijski podaci registrovani na ovom uređaju moći će da otključaju Gabbro — nije moguće ograničiti na određeni otisak prsta.';
+      'Сви биометријски подаци регистровани на овом уређају моћи ће да откључају Gabbro — није могуће ограничити на одређени отисак прста.';
 
   @override
   String get biometricDialogInvalidation =>
-      'Ako se ovom telefonu dodaju novi biometrijski podaci (uključujući drugi otisak prsta), ovo podešavanje će se automatski deaktivirati i trebaće ga ponovo konfigurisati.';
+      'Ако се овом телефону додају нови биометријски подаци (укључујући други отисак прста), ово подешавање ће се аутоматски деактивирати и требаће га поново конфигурисати.';
 
   @override
   String get biometricDialogRecommendation =>
-      'Preporuka: ostavite deaktivirano ako imate visoki model pretnji ili delite ovaj uređaj.';
+      'Препорука: оставите деактивирано ако имате високи модел претњи или делите овај уређај.';
 
   @override
   String get biometricInvalidated =>
-      'Biometrijsko otključavanje je deaktivirano jer su se biometrijski podaci na ovom uređaju promenili (u sistemskim podešavanjima dodat je novi otisak prsta ili lice). Ovo je bezbednosna mera. Ponovo unesite pristupnu frazu i ponovo aktivirajte biometrijsko otključavanje.';
+      'Биометријско откључавање је деактивирано јер су се биометријски подаци на овом уређају променили (у системским подешавањима додат је нови отисак прста или лице). Ово је безбедносна мера. Поново унесите приступну фразу и поново активирајте биометријско откључавање.';
 
   @override
-  String get useBiometrics => 'Koristi biometriju';
+  String get useBiometrics => 'Користи биометрију';
 
   @override
   String get biometricCancelled =>
-      'Biometrijsko proveravanje nije završeno. Unesite pristupnu frazu za otključavanje.';
+      'Биометријско проверавање није завршено. Унесите приступну фразу за откључавање.';
 
   @override
-  String get biometricEnrollTitle => 'Unesi pristupnu frazu';
+  String get biometricEnrollTitle => 'Унеси приступну фразу';
 
   @override
   String get biometricEnrollDescription =>
-      'Unesite glavnu pristupnu frazu za omogućavanje biometrijskog otključavanja.';
+      'Унесите главну приступну фразу за омогућавање биометријског откључавања.';
 
   @override
   String get biometricYubikeyHint =>
-      'Ispod unesite YubiKey PIN, zatim kliknite «Koristi biometriju», zatim dodirnite YubiKey.';
+      'Испод унесите YubiKey PIN, затим кликните «Користи биометрију», затим додирните YubiKey.';
 
   @override
-  String get helpTitle => 'Pomoć';
+  String get helpTitle => 'Помоћ';
 
   @override
-  String get menuHelp => 'Pomoć';
+  String get menuHelp => 'Помоћ';
 
   @override
   String get helpCaptionCreate =>
-      'Napravite trezor: unesite naziv, pristupnu frazu i opciono zaštitite YubiKey ključem';
+      'Направите трезор: унесите назив, приступну фразу и опционо заштитите YubiKey кључем';
 
   @override
-  String get helpCaptionEmpty => 'Kliknite + za dodavanje prvog unosa';
+  String get helpCaptionEmpty => 'Кликните + за додавање првог уноса';
 
   @override
   String get helpCaptionDetail =>
-      'Kliknite ikonu oka za prikaz lozinke, zatim zadržite za prikaz detaljne analize znakova';
+      'Кликните икону ока за приказ лозинке, затим задржите за приказ детаљне анализе знакова';
 
   @override
   String get helpCaptionTitleSearch =>
-      'Podrazumevano: traka za pretragu pretražuje samo naslove unosa';
+      'Подразумевано: трака за претрагу претражује само наслове уноса';
 
   @override
   String get helpCaptionFullSearch =>
-      'Kliknite lupu za prebacivanje na pretragu svih polja; kliknite ponovo za povratak na pretragu po naslovu';
+      'Кликните лупу за пребацивање на претрагу свих поља; кликните поново за повратак на претрагу по наслову';
 
   @override
   String get helpCaptionFilter =>
-      'Koristite dugmad za filtriranje za prikaz samo unosa određenog tipa';
+      'Користите дугмад за филтрирање за приказ само уноса одређеног типа';
 
   @override
   String get helpCaptionFolders =>
-      'Koristite izbor mape za filtriranje unosa po mapi';
+      'Користите избор мапе за филтрирање уноса по мапи';
 
   @override
   String get helpCaptionSelect =>
-      'Dugim pritiskom na unos ulazite u režim izbora; dodajte više stavki, zatim dodelite mapi ili obrišite. Kliknite X za izlaz.';
+      'Дугим притиском на унос улазите у режим избора; додајте више ставки, затим доделите мапи или обришите. Кликните X за излаз.';
 
   @override
   String get helpCaptionJumpToLetter =>
-      'Kliknite slovo u indeksnoj traci za skok na tu sekciju';
+      'Кликните слово у индексној траци за скок на ту секцију';
 
   @override
   String get helpCaptionBreakdown =>
-      'Kliknite ikonu oka za prikaz lozinke, zatim zadržite za prikaz detaljne analize znakova';
+      'Кликните икону ока за приказ лозинке, затим задржите за приказ детаљне анализе знакова';
 
   @override
   String get helpCaptionManageVaults =>
-      'U «Upravljanju trezorima» možete preimenovati ili obrisati trezore, ili dodati novi';
+      'У «Управљању трезорима» можете преименовати или обрисати трезоре, или додати нови';
 
   @override
   String get helpCaptionUnlock =>
-      'Unesite pristupnu frazu za otključavanje trezora';
+      'Унесите приступну фразу за откључавање трезора';
 
   @override
   String get helpCaptionVaultSync => 'Процес синхронизације шифрованог трезора';
@@ -2134,7 +2132,7 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get vaultRestoredBiometricDisabled =>
-      'Biometrijsko otključavanje je isključeno jer vraćena datoteka može koristiti drugu pristupnu frazu. Ponovo ga uključite u odeljku Bezbednost.';
+      'Биометријско откључавање је искључено јер враћена датотека може користити другу приступну фразу. Поново га укључите у одељку Безбедност.';
 
   @override
   String get biometricStaleDisabled =>
@@ -2145,47 +2143,46 @@ class AppLocalizationsSr extends AppLocalizations {
       'Та датотека није употребљив Gabbro сеф.';
 
   @override
-  String get adoptTitle => 'Otvori postojeću datoteku trezora';
+  String get adoptTitle => 'Отвори постојећу датотеку трезора';
 
   @override
-  String get adoptConfirm => 'Dodaj trezor';
+  String get adoptConfirm => 'Додај трезор';
 
   @override
-  String get adoptAlreadyRegistered => 'Ovaj trezor je već na vašoj listi';
+  String get adoptAlreadyRegistered => 'Овај трезор је већ на вашој листи';
 
   @override
-  String get unlockAdoptItem => 'Otvori datoteku trezora…';
+  String get unlockAdoptItem => 'Отвори датотеку трезора…';
 
   @override
   String get resizeColumns => 'Промени величину колона';
 
   @override
-  String get regionSearch => 'Pretraga';
+  String get regionSearch => 'Претрага';
 
   @override
-  String get regionFolders => 'Mape';
+  String get regionFolders => 'Мапе';
 
   @override
-  String get regionFilters => 'Kategorije unosa';
+  String get regionFilters => 'Категорије уноса';
 
   @override
-  String get regionEntries => 'Spisak unosa';
+  String get regionEntries => 'Списак уноса';
 
   @override
-  String get regionDetails => 'Detalji unosa';
+  String get regionDetails => 'Детаљи уноса';
 
   @override
-  String get hintSearch => 'Filtrira unose dok kucate';
+  String get hintSearch => 'Филтрира уносе док куцате';
 
   @override
-  String get hintFolderSelector => 'Filtrira unose po mapi';
+  String get hintFolderSelector => 'Филтрира уносе по мапи';
 
   @override
-  String get hintFilterChip =>
-      'Uključuje ili isključuje ovaj filter kategorije';
+  String get hintFilterChip => 'Укључује или искључује овај филтер категорије';
 
   @override
-  String get hintEntryRow => 'Otvara ovaj unos';
+  String get hintEntryRow => 'Отвара овај унос';
 }
 
 /// The translations for Serbian, using the Latin script (`sr_Latn`).

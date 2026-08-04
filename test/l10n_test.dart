@@ -186,6 +186,51 @@ void main() {
     }
   });
 
+  // A Cyrillic reader met one Latin sentence among their Cyrillic ones
+  // (`vaultRestoredBiometricDisabled` in sr, 2026-07-31): the sr_Latn value had
+  // been copied into sr. Nothing checked script, so nothing caught it.
+  group('Cyrillic locales are written in Cyrillic', () {
+    // sr_Latn is deliberately Latin; it is not in this list.
+    const cyrillic = ['bg', 'kk', 'ru', 'sr', 'uk'];
+    // Product and format names stay Latin in every locale, so a value built only
+    // from them ("Gabbro — {alias}", "YubiKey PIN") has nothing to transliterate.
+    const properNouns = [
+      'Gabbro', 'YubiKey', 'Bitwarden', 'Dashlane', 'Enpass', 'Google',
+      'Android', 'FIDO2', 'JSON', 'CSV', 'CVV', 'PIN', 'URL', 'USB', 'UUID',
+      'NFC', 'GNU', 'GPL',
+    ];
+    final cyrillicChar = RegExp(r'[Ѐ-ӿ]');
+    final latinChar = RegExp(r'[A-Za-z]');
+
+    for (final code in cyrillic) {
+      test('$code has no Latin-script prose', () {
+        final base = _readArb(File('lib/l10n/app_en.arb'));
+        final arb = _readArb(File('lib/l10n/app_$code.arb'));
+        final latinOnly = <String>[];
+
+        for (final e in arb.entries) {
+          // Endonyms are Latin by design and enforced identical everywhere.
+          if (_isEndonymKey(e.key)) continue;
+          // A value left identical to English is a separate problem
+          // (untranslated strings, Bikeshed) — not a script error.
+          if (base[e.key] == e.value) continue;
+          if (cyrillicChar.hasMatch(e.value)) continue;
+
+          // No Cyrillic: fine only if nothing here was translatable to begin
+          // with — strip placeholders and product names and see what is left.
+          var rest = e.value.replaceAll(RegExp(r'\{[^}]*\}'), '');
+          for (final noun in properNouns) {
+            rest = rest.replaceAll(noun, '');
+          }
+          if (latinChar.hasMatch(rest)) latinOnly.add(e.key);
+        }
+
+        expect(latinOnly, isEmpty,
+            reason: 'translated but written in Latin script: $latinOnly');
+      });
+    }
+  });
+
   group('every listed language is present in every locale', () {
     // The in-app language menu lists N languages; each must have its endonym in
     // every ARB file, or a user in locale X sees a blank / English name for

@@ -116,7 +116,11 @@ Widget _appShell(
   TextScaler textScaler = TextScaler.noScaling,
 }) =>
     MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      // Production's delegates, not AppLocalizations' bare list: they ship the
+      // nn and yo fallbacks, so no sweep below has to tolerate a warning no user
+      // ever meets — and a tolerance cannot swallow a real overflow raised in
+      // the same frame.
+      localizationsDelegates: gabbroLocalizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: locale,
       themeMode: mode,
@@ -728,17 +732,13 @@ void main() {
         ));
         await tester.pumpAndSettle();
 
-        final thrown = tester.takeException();
-        if (thrown == null) continue;
-        // nn and yo are not shipped by Flutter's own Material/Cupertino/Widgets
-        // delegates, so rendering them warns. That is app-wide and predates this
-        // banner (see ARCHITECTURE known warnings) — tolerate exactly that text
-        // and nothing else, so a real overflow here still fails.
-        expect(
-          thrown.toString(),
-          contains('is not supported by all of its localization delegates'),
-          reason: '$locale at 8x must scroll, never overflow',
-        );
+        // No tolerance: _appShell now uses production's delegates, so nn and yo
+        // render as cleanly as every other locale. A tolerance here could not
+        // tell a delegate warning from an overflow raised in the same frame —
+        // Flutter folds both into one opaque "Multiple exceptions" wrapper, and
+        // a `contains` check on it passes either way.
+        expect(tester.takeException(), isNull,
+            reason: '$locale at 8x must scroll, never overflow');
       }
     });
 
