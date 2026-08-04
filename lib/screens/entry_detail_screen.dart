@@ -128,8 +128,7 @@ class EntryDetailScreen extends StatefulWidget {
   State<EntryDetailScreen> createState() => _EntryDetailScreenState();
 }
 
-class _EntryDetailScreenState extends State<EntryDetailScreen>
-    with ClipboardClearMixin<EntryDetailScreen> {
+class _EntryDetailScreenState extends State<EntryDetailScreen> {
   late VaultEntryData _entry;
 
   bool _passwordObscured = true;
@@ -161,8 +160,8 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
   @override
   void dispose() {
     // Stop targeting this Login once its screen closes, unless a newer screen
-    // has already claimed the target (clearIf guards that). The pending
-    // clipboard wipe is cancelled by ClipboardClearMixin.dispose via super.
+    // has already claimed the target (clearIf guards that). A pending clipboard
+    // wipe deliberately survives this screen (RT-4) — clipboardWiper owns it.
     if (_entry is VaultEntryData_Login) autotypeTarget.clearIf(_entryId());
     super.dispose();
   }
@@ -723,7 +722,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen>
   }
 
   Future<void> _copyToClipboard(String value) async {
-    await copyThenClear(value, widget.clipboardClearTimeout);
+    await clipboardWiper.copyThenClear(value, widget.clipboardClearTimeout);
 
     if (mounted) {
       final l = AppLocalizations.of(context);

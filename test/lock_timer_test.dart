@@ -14,10 +14,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gabbro/clipboard_clear.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/vault_registry.dart';
+import 'test_helpers.dart';
 
 // Sentinel widget shown before the vault locks.
 class _InitialScreen extends StatelessWidget {
@@ -81,6 +83,60 @@ void main() {
 
       expect(find.text('InitialScreen'), findsNothing);
       expect(find.byType(UnlockScreen), findsOneWidget);
+    });
+
+    // RT-4: an automatic lock means the user walked away, so a secret they
+    // copied goes with the session rather than waiting out its own delay.
+    testWidgets('auto-lock wipes a pending clipboard', (tester) async {
+      final writes = recordClipboardWrites(tester);
+      await tester.pumpWidget(_buildApp(
+        vaultPath: vaultPath,
+        settings: const AppSettings(
+          foregroundLockTimeout: ForegroundLockTimeout.thirtySeconds,
+        ),
+      ));
+      await clipboardWiper.copyThenClear(
+          'secret', ClipboardClearTimeout.twoMinutes);
+      await tester.pump();
+      expect(writes, ['secret']);
+
+      await tester.pump(const Duration(seconds: 31));
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byType(UnlockScreen), findsOneWidget,
+          reason: 'precondition: the auto-lock fired');
+      expect(writes, ['secret', ''],
+          reason: 'walking away takes the clipboard with the session');
+    });
+
+    // Ctrl+L is the keyboard twin of the menu item: the user is present and
+    // deliberate, and may be about to paste what they just copied.
+    testWidgets('Ctrl+L leaves a pending clipboard alone', (tester) async {
+      final writes = recordClipboardWrites(tester);
+      await tester.pumpWidget(_buildApp(
+        vaultPath: vaultPath,
+        settings: const AppSettings(
+          foregroundLockTimeout: ForegroundLockTimeout.thirtySeconds,
+        ),
+      ));
+      await clipboardWiper.copyThenClear(
+          'secret', ClipboardClearTimeout.twoMinutes);
+      await tester.pump();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyL);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byType(UnlockScreen), findsOneWidget,
+          reason: 'precondition: Ctrl+L locked the vault');
+      expect(writes, ['secret'],
+          reason: 'a deliberate lock must not take the clipboard early');
+
+      // The wipe the user configured still arrives on its own schedule.
+      await tester.pump(const Duration(minutes: 2));
+      expect(writes, ['secret', '']);
     });
 
     testWidgets('key press resets foreground timer', (tester) async {

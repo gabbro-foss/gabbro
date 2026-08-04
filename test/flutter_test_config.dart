@@ -9,11 +9,18 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/app_paths.dart';
+import 'package:gabbro/clipboard_clear.dart';
 
 Future<void> testExecutable(FutureOr<void> Function() testMain) async {
   final sandbox = await Directory.systemTemp.createTemp('gabbro_test_sandbox_');
   GabbroPaths.sandboxRoot = sandbox.path;
+  // The clipboard wipe deliberately outlives the screen that scheduled it
+  // (RT-4), so any test that copies a secret without advancing time ends with a
+  // pending timer — which the framework fails on. Drop it after every test.
+  // Registered here (not a `finally`) so it applies to the whole run.
+  tearDown(clipboardWiper.cancelPending);
   // NEVER reset the root or delete the dir here. `testMain()` completes when
   // the tests are DECLARED, not when they have run — a `finally` that nulled
   // the root here executed before the first test body did, so the "global

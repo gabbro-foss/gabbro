@@ -10,6 +10,7 @@ import 'test_helpers.dart';
 import 'package:gabbro/autotype_target.dart';
 import 'package:gabbro/screens/entry_detail_screen.dart';
 import 'package:gabbro/widgets/password_breakdown_sheet.dart';
+import 'package:gabbro/clipboard_clear.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -235,6 +236,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.textContaining('Copied'), findsOneWidget);
+    clipboardWiper.cancelPending(); // this test is about the snackbar, not the wipe
   });
 
   // Round 26 (Orca): copying from the detail pane said nothing — the snackbar
@@ -256,6 +258,7 @@ void main() {
       hasLength(1),
       reason: 'nothing tells a screen-reader user the copy happened: $said',
     );
+    clipboardWiper.cancelPending(); // about the announcement, not the wipe
   });
 
   testWidgets('Android: copying announces nothing', (tester) async {
@@ -274,6 +277,7 @@ void main() {
       reason: 'TalkBack reads the snackbar itself and drops its queue for an '
           'announcement: $said',
     );
+    clipboardWiper.cancelPending(); // about the announcement, not the wipe
   });
 
   testWidgets('delete icon shows confirmation dialog', (tester) async {
@@ -301,6 +305,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.textContaining('30s'), findsOneWidget);
+    clipboardWiper.cancelPending(); // about the snackbar text, not the wipe
   });
 
   testWidgets('copy snackbar says "never clears" when timeout is never',

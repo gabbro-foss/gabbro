@@ -8,6 +8,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:gabbro/app_paths.dart';
 import 'package:gabbro/autotype_listener.dart';
 import 'package:gabbro/autotype_target.dart';
+import 'package:gabbro/clipboard_clear.dart';
 import 'package:gabbro/gabbro_contrast.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/nfc_capability.dart';
@@ -836,7 +837,7 @@ class _GabbroAppState extends State<GabbroApp>
     if (_foregroundSuspended) return;
     final duration = _foregroundDuration;
     if (duration == null) return;
-    _foregroundTimer = Timer(duration, _lock);
+    _foregroundTimer = Timer(duration, () => _lock(automatic: true));
   }
 
   bool _foregroundSuspended = false;
@@ -874,7 +875,7 @@ class _GabbroAppState extends State<GabbroApp>
     _backgroundTimer?.cancel();
     final duration = _backgroundDuration;
     if (duration == null) return;
-    _backgroundTimer = Timer(duration, _lock);
+    _backgroundTimer = Timer(duration, () => _lock(automatic: true));
   }
 
   @override
@@ -923,11 +924,18 @@ class _GabbroAppState extends State<GabbroApp>
 
   // ── Lock ──────────────────────────────────────────────────────────────────
 
-  void _lock() {
+  /// [automatic] marks a lock the user did not ask for — a timeout expiring,
+  /// meaning they walked away. Those take the clipboard with them (RT-4). A
+  /// deliberate lock (Ctrl+L, the menu item) leaves a pending wipe to run out
+  /// its configured delay: the user is right there and may be about to paste.
+  /// `detached` is the process dying, so it counts as deliberate — nothing is
+  /// left running to honour a wipe either way.
+  void _lock({bool automatic = false}) {
     _foregroundTimer?.cancel();
     _backgroundTimer?.cancel();
     _backgroundedAt = null;
     autotypeTarget.clear(); // a locked vault has no auto-type target
+    if (automatic) clipboardWiper.wipeNow();
     try {
       lockVault();
     } catch (_) {}

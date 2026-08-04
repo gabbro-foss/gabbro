@@ -166,7 +166,7 @@ class GeneratorWidget extends StatefulWidget {
   final void Function(String value)? onUsePassword;
 
   /// How long before the copied value is wiped from the clipboard. Defaults to
-  /// 60 seconds. Threaded to the shared [ClipboardClearMixin].
+  /// 60 seconds. Threaded to the shared [clipboardWiper].
   final ClipboardClearTimeout clipboardClearTimeout;
 
   // Injectable for testing — defaults call Rust FFI.
@@ -197,8 +197,7 @@ class GeneratorWidget extends StatefulWidget {
   State<GeneratorWidget> createState() => _GeneratorWidgetState();
 }
 
-class _GeneratorWidgetState extends State<GeneratorWidget>
-    with ClipboardClearMixin<GeneratorWidget> {
+class _GeneratorWidgetState extends State<GeneratorWidget> {
   // ── Mode ─────────────────────────────────────────────────────────────────
   _GeneratorMode _mode = _GeneratorMode.classic;
 
@@ -369,7 +368,7 @@ class _GeneratorWidgetState extends State<GeneratorWidget>
 
   Future<void> _copy() async {
     if (_generated.isEmpty) return;
-    await copyThenClear(_generated, widget.clipboardClearTimeout);
+    await clipboardWiper.copyThenClear(_generated, widget.clipboardClearTimeout);
     setState(() => _copied = true);
     // The button renames itself to "Copied", but the name changed under a
     // control that already held focus and a Linux screen reader is never told
