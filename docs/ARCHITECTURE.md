@@ -119,6 +119,11 @@ canary that drives the real save paths and byte-compares the real config/vault l
 
 ### Next task
 
+**Does a passphrase-only downgrade export mean to drop the vault's name?**
+`build_passphrase_only_bytes` (`rust/src/api/vault.rs:1013`) passes `None` as the
+alias, so the exported copy has no name and opens as an unnamed vault. May be
+deliberate (ADR-013) or an oversight — decide before changing anything.
+
 Mock vaults for future rounds: `.scratchpad` (A, B, D; C and E deleted 2026-08-01).
 
 ---
@@ -163,12 +168,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   it never saw this. Related: an `AlertDialog`'s `actions` never scroll, so any button left
   there is unreachable at the maximum text scale — audit every dialog that still puts one
   there. Found during the sync-without-a-second-unlock investigation.
-
-- **Does a passphrase-only downgrade export mean to drop the vault's name?**
-  `build_passphrase_only_bytes` (`rust/src/api/vault.rs:1013`) passes `None` as the alias,
-  so the exported copy has no name and opens as an unnamed vault. May be deliberate
-  (ADR-013) or an oversight — decide before changing anything. Found during the
-  sync-without-a-second-unlock investigation.
 
 ### Security (pre-v1)
 - **Human expert cryptography review** of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
