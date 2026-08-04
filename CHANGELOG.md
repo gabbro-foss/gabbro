@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Three messages appeared in English whatever your language.** The two file-dialog warnings and the notice that changing your passphrase turned biometric unlock off were never translated, so they arrived in English — at the moment something had just failed or a security setting had changed under you. All three are now translated into every language, and a test refuses any string that ships as English everywhere.
 - **Serbian (Cyrillic) was almost entirely written in Latin script.** Choosing Српски gave you the same Latin text as Српски (latinica) — only 85 of 645 strings were actually Cyrillic. All of them are now, so the two Serbian options finally differ. A test refuses any Cyrillic locale that ships Latin-script prose, so this cannot come back.
 
 ### Changed

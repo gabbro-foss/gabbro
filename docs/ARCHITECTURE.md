@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2094 | 10 |
+| Flutter (`flutter test`) | 2095 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -118,20 +118,6 @@ canary that drives the real save paths and byte-compares the real config/vault l
 > Update at the end of each session. First thing to read at the start of the next.
 
 ### Next task
-
-**Three shipped strings are English in all 36 locales.** Sized 2026-08-04: the
-rest of the "identical to English" values are legitimate — endonyms (enforced
-identical), the product name, acronyms (USB/NFC/CVV/URL/PIN) and format strings
-that are almost all placeholder. The real three:
-`filePickerUnavailable`, `filePickerNoPortal`, `changePassphraseBiometricDisabled`.
-
-A tiling-WM user with no desktop portal, or anyone changing a passphrase with
-biometrics on, meets an English sentence in an otherwise translated app — at the
-moment something failed or a security setting changed under them.
-
-- [ ] red: a net failing any value identical to English (skipping endonyms and
-      values that are only placeholders/acronyms once stripped)
-- [ ] translate the three across 36 locales (108 strings)
 
 Mock vaults for future rounds: `.scratchpad` (A, B, D; C and E deleted 2026-08-01).
 
