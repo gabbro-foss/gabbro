@@ -119,6 +119,24 @@ canary that drives the real save paths and byte-compares the real config/vault l
 
 ### Next task
 
+**Two l10n code-quality items, taken together.**
+
+1. **`sr.arb` has one Latin-script value in a Cyrillic file.**
+   `vaultRestoredBiometricDisabled` is byte-identical in `app_sr.arb` and
+   `app_sr_Latn.arb`, so a Cyrillic reader meets one Latin sentence. Fix the
+   value; consider a script-consistency net.
+2. **One locale sweep tolerates an error, so it could hide an overflow.** The
+   format-too-old sweep (`test/unlock_screen_test.dart:633`) allows the "locale
+   not supported by all delegates" warning for nn and yo, so a real overflow in
+   the same frame collapses into an opaque "Multiple exceptions" wrapper and is
+   swallowed. Cause: `_appShell` uses `AppLocalizations.localizationsDelegates`
+   while production uses `gabbroLocalizationsDelegates`, which ships fallbacks
+   for both. Point `_appShell` at production (as the can-pop harness already
+   does) and demand a clean render.
+
+Item 2 may expose overflows the tolerance was hiding — that is the point, but it
+is why it is not a fixed-size job.
+
 Mock vaults for future rounds: `.scratchpad` (A, B, D; C and E deleted 2026-08-01).
 
 ---
@@ -158,20 +176,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   a fourth is what `test/sync_chooser_l10n_overflow_test.dart` will catch at 8x text.
 
 ### Code Quality
-- **One locale sweep lets an error through, so it could hide an overflow.** The
-  format-too-old sweep (`test/unlock_screen_test.dart:633`) tolerates the "locale not
-  supported by all delegates" warning for nn and yo. If a real overflow lands in the
-  same frame the two collapse into an opaque "Multiple exceptions" wrapper and the
-  tolerance swallows it. Cause: the shared `_appShell` helper uses
-  `AppLocalizations.localizationsDelegates`, while production uses
-  `gabbroLocalizationsDelegates`, which ships fallbacks for both locales — so the
-  warning is a test artefact users never meet. Fix `_appShell` to match production and
-  the sweep can demand a clean render, as the biometric-notice sweep now does.
-
-- **`sr.arb` has one Latin-script value in a Cyrillic file.** `vaultRestoredBiometricDisabled`
-  is written in Latin (identical to `sr_Latn.arb`), unlike every neighbouring sr string. Found
-  2026-07-31; no test checks script. Fix the value; consider a script-consistency net.
-
 - **Shipped strings are still in English in every locale.** Found 2026-07-29:
   `changePassphraseBiometricDisabled` is the untranslated English sentence in all 37
   ARBs and in the generated Dart (`app_localizations_fr.dart:1113`). `l10n_test.dart`
