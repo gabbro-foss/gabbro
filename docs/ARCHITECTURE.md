@@ -119,22 +119,6 @@ canary that drives the real save paths and byte-compares the real config/vault l
 
 ### Next task
 
-Both l10n code-quality items DONE (2026-08-04).
-
-- **Serbian Cyrillic was Latin.** The Bikeshed called it one stray value; the net
-  found 560 — only 85 of 645 `app_sr.arb` values were Cyrillic, so picking Српски
-  gave the same text as Српски (latinica). Transliterated (Serbian is a strict 1:1
-  script pair, digraphs included); values still identical to English were left
-  alone, as that is the separate untranslated-strings item. New net in
-  `l10n_test.dart` fails any Cyrillic locale shipping Latin-script prose.
-  **Residual:** machine transliteration cannot tell a true digraph from `d`+`ž`
-  across a morpheme boundary. Nothing matching those patterns was found, but a
-  native-speaker read is still the honest confirmation.
-- **The tolerant locale sweep is gone.** `_appShell` now uses production's
-  `gabbroLocalizationsDelegates`, so no sweep tolerates a delegate warning that
-  could mask an overflow raised in the same frame. Demanding a clean render found
-  no hidden overflows.
-
 Mock vaults for future rounds: `.scratchpad` (A, B, D; C and E deleted 2026-08-01).
 
 ---
