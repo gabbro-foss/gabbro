@@ -119,6 +119,20 @@ canary that drives the real save paths and byte-compares the real config/vault l
 
 ### Next task
 
+**Audit aim 4 — UI lifetime: can a screen still render a vault the app has
+closed?** `red_team_test.md` Aim 3 answered the pivot question at the key layer
+only (one session, per-vault keys, per-vault biometric slots — all sound, none
+of it about the UI). That gap hid the vault-switch defect from alpha.1 to
+2026-08-03. Audit first, triage after; no fixes until the surface is known.
+
+Out of scope: Dart heap retention until GC (SECURITY.md F-12, no Dart API can
+scrub a String). The aim is "can it be RENDERED", not "is the memory clean".
+
+- [ ] enumerate every Dart holder of vault-derived data
+- [ ] enumerate every session-close event
+- [ ] cross them: for each holder, what drops it on each close
+- [ ] findings list -> triage with maintainer
+
 Mock vaults for future rounds: `.scratchpad` (A, B, D; C and E deleted 2026-08-01).
 
 ---
@@ -192,11 +206,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   sync-without-a-second-unlock investigation.
 
 ### Security (pre-v1)
-- **Audits scoped "can an attacker pivot between vaults" as a crypto question only.**
-  `red_team_test.md` Aim 3 answers it at the key layer (session singleton, per-vault
-  keys, per-vault biometric keys) — all sound. Nothing asked the UI-lifetime version:
-  can a screen still render a vault the app has closed? That gap hid the vault-switch
-  defect from alpha.1 to 2026-08-03. Add a UI-lifetime aim to the next audit pass.
 - **Human expert cryptography review** of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
 
 ### V2+ / Defer
