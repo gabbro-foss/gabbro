@@ -42,7 +42,7 @@ Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
 gabbro/
 ├── lib/                  # Flutter app
 │   ├── screens/          # unlock, vault list, adopt vault, export, import, generator, keyboard shortcuts, settings, manage vaults/folders, …
-│   ├── widgets/          # path_field, generator_widget, yubikey_tap, password_breakdown_sheet, sync_review, sync_method_dialog, text_size_slider, url_link, …
+│   ├── widgets/          # path_field, generator_widget, yubikey_tap, password_breakdown_sheet, sync_review, sync_method_dialog, gabbro_dialog (every dialog goes through it), text_size_slider, url_link, …
 │   ├── src/rust/         # Auto-generated bridge (do not edit)
 │   └── *.dart            # main, app_paths (GabbroPaths), settings, text_scale, control_scale, gabbro_contrast (high-contrast theme flag), vault_registry, safe_file_picker, autotype_listener, autotype_target, clipboard_clear
 ├── rust/src/
@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2095 | 10 |
+| Flutter (`flutter test`) | 2125 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -118,6 +118,32 @@ canary that drives the real save paths and byte-compares the real config/vault l
 > Update at the end of each session. First thing to read at the start of the next.
 
 ### Next task
+
+**Vault list body overflows at 8x text on a 360dp phone.** Two causes, both fixed:
+the search placeholder wrapped unbounded (field 1364 px at 8x, list squeezed to
+zero) — now capped to one line on both branches; and the alphabet index bar drew
+its 180 px minimum into a 142 px slot — now stands down below that. Pinned in
+`vault_list_overflow_test.dart` + `alphabet_index_bar_test.dart`.
+
+Dialog audit — code done. Every dialog goes through `showGabbroDialog`
+(`lib/widgets/gabbro_dialog.dart`), which scrolls the whole dialog: unchanged at
+1x, message readable and buttons reachable above it. `scrollable: true` never
+helped — it scrolls title+content, never `actions`; the comments claiming
+otherwise are corrected. `test/gabbro_dialog_test.dart` pins the layout, the
+barrier tap, and that no `lib/` file calls `showDialog` directly.
+
+Note the overflow probe sweeps at 2x only, which is why none of this showed up.
+
+**Committed 2026-08-04, not pushed, not hardware-tested.** `flutter test` 2125
+green; Rust/Kotlin untouched. No release until the hardware run passes.
+
+Next: hardware-verify on Linux and the Android emulator (no YubiKey needed).
+A matrix must be written first — the one written this session was rejected as
+unreadable and deleted. **Ask the maintainer for the format before writing it.**
+The checks it has to cover, in order per platform: text size 1x, 2x, 8x; the
+vault list (entries visible, search box one line, A-Z bar gone at 8x); a confirm
+dialog (message readable in full, buttons reachable by scrolling, tapping beside
+it still dismisses). Android has its own search-box code path.
 
 Mock vaults for future rounds: `.scratchpad` (A, B, D; C and E deleted 2026-08-01).
 
@@ -156,13 +182,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   (2) Add a third choice that takes the incoming vault and replaces this one — discuss first.
   Note the dialog is already three buttons (auto, review, Cancel) in a scrollable column;
   a fourth is what `test/sync_chooser_l10n_overflow_test.dart` will catch at 8x text.
-
-### Code Quality
-- **The vault list body overflows at 8x text on a 360dp phone.** A `Column` in
-  `vault_list_screen.dart`, ~232-814 px over. The overflow probe sweeps at 2x, which is why
-  it never saw this. Related: an `AlertDialog`'s `actions` never scroll, so any button left
-  there is unreachable at the maximum text scale — audit every dialog that still puts one
-  there. Found during the sync-without-a-second-unlock investigation.
 
 ### Security (pre-v1)
 - **Human expert cryptography review** of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).

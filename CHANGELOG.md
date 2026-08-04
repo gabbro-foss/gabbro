@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Dialogs cut their question short, then put their buttons off the screen.** A dialog gives its buttons a fixed strip and lets the message shrink into whatever is left. On a phone at double text size the message was quietly truncated; at four times it vanished altogether and both buttons sat below the bottom of the screen, so a confirmation could be neither read nor answered. Every dialog now scrolls as a whole, unchanged at normal text size.
+- **The vault list showed no entries at all at the largest text sizes.** On a narrow phone the search box grew with its placeholder until it had taken the whole screen, and the A-Z bar drew itself into a space too small to hold it. The placeholder now stays on one line and the A-Z bar steps aside when it cannot fit, so the entries keep their room.
 - **Three messages appeared in English whatever your language.** The two file-dialog warnings and the notice that changing your passphrase turned biometric unlock off were never translated, so they arrived in English — at the moment something had just failed or a security setting had changed under you. All three are now translated into every language, and a test refuses any string that ships as English everywhere.
 - **Serbian (Cyrillic) was almost entirely written in Latin script.** Choosing Српски gave you the same Latin text as Српски (latinica) — only 85 of 645 strings were actually Cyrillic. All of them are now, so the two Serbian options finally differ. A test refuses any Cyrillic locale that ships Latin-script prose, so this cannot come back.
 
