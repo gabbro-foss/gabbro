@@ -128,10 +128,20 @@ of it about the UI). That gap hid the vault-switch defect from alpha.1 to
 Out of scope: Dart heap retention until GC (SECURITY.md F-12, no Dart API can
 scrub a String). The aim is "can it be RENDERED", not "is the memory clean".
 
-- [ ] enumerate every Dart holder of vault-derived data
-- [ ] enumerate every session-close event
-- [ ] cross them: for each holder, what drops it on each close
-- [ ] findings list -> triage with maintainer
+- [x] enumerate every Dart holder of vault-derived data
+- [x] enumerate every session-close event
+- [x] cross them: for each holder, what drops it on each close
+- [x] findings list -> triage with maintainer
+
+Audit done. Six holders sound. Two confirmed findings, both "the app does not do
+what its own settings promise", both agreed for fixing:
+- **RT-4** the clipboard wipe never fires once you leave the screen (`dispose()`
+  cancels it), and lock wipes nothing.
+- **RT-5** the auto-lock timeout is ignored when the vault is unlocked through
+  Android autofill — neither autofill shell arms a timer.
+
+Detail in `docs/red_team_test.md` (private, gitignored). Both are changes to
+existing behaviour with tests pinning the current shape, so net-first applies.
 
 Mock vaults for future rounds: `.scratchpad` (A, B, D; C and E deleted 2026-08-01).
 
