@@ -3014,6 +3014,22 @@ mod tests {
     }
 
     #[test]
+    fn build_passphrase_only_bytes_carries_no_alias() {
+        // ADR-013: the downgraded copy is standalone and heads for weaker storage,
+        // where the plaintext-header alias would name the vault to anyone who can
+        // read the directory. The default export keeps the alias; this one must not.
+        use crate::vault::file_format::SealedVault;
+
+        let bytes = build_passphrase_only_bytes(&VaultBody::default(), b"export passphrase")
+            .expect("build passphrase-only export bytes");
+        let sealed = SealedVault::from_bytes(&bytes).expect("parse exported bytes");
+        assert!(
+            sealed.alias.is_none(),
+            "passphrase-only export must not name the vault it came from"
+        );
+    }
+
+    #[test]
     fn build_passphrase_only_bytes_opens_with_passphrase_alone() {
         // The downgraded copy must be a real, openable vault: round-trip its bytes
         // through the passphrase-only open path (no YubiKey) and confirm contents.
