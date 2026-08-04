@@ -76,6 +76,11 @@ without an explicit, informed user action.** Concretely:
    deliberate, convenient copy (e.g. for unattended sync) without ever mutating
    the original vault, which stays key-protected exactly as created.
 
+   **This copy carries no alias** (unlike the default export in §1). It is bound
+   for weaker storage, and the alias sits in the plaintext header, where it would
+   name the vault to anyone who can read the directory. Adopting the copy asks
+   for a name instead of pre-filling one.
+
 ### Toggle behaviour (secure by default)
 
 - **Key-protected vault:** the "export passphrase-only" toggle is shown and

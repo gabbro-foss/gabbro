@@ -73,7 +73,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 700 | 17 |
+| Rust (`cargo test -q`) | 701 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 11 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -118,11 +118,6 @@ canary that drives the real save paths and byte-compares the real config/vault l
 > Update at the end of each session. First thing to read at the start of the next.
 
 ### Next task
-
-**Does a passphrase-only downgrade export mean to drop the vault's name?**
-`build_passphrase_only_bytes` (`rust/src/api/vault.rs:1013`) passes `None` as the
-alias, so the exported copy has no name and opens as an unnamed vault. May be
-deliberate (ADR-013) or an oversight — decide before changing anything.
 
 Mock vaults for future rounds: `.scratchpad` (A, B, D; C and E deleted 2026-08-01).
 
