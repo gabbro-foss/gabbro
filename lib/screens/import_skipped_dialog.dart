@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gabbro/widgets/gabbro_dialog.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/src/rust/api/import.dart';
 
@@ -6,7 +7,7 @@ Future<void> showSkippedEntriesDialog(
   BuildContext context,
   List<SkippedEntryData> skipped,
 ) async {
-  await showDialog<void>(
+  await showGabbroDialog<void>(
     context: context,
     builder: (ctx) => _SkippedEntriesDialog(skipped: skipped),
   );

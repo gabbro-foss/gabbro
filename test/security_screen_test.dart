@@ -265,6 +265,10 @@ void main() {
       await tester.tap(
         find.widgetWithText(SwitchListTile, 'Enable biometric unlock'));
       await tester.pumpAndSettle();
+      // At 2x the dialog is taller than the screen, so its buttons sit below
+      // the fold and scroll into reach (see gabbro_dialog_test.dart).
+      await tester.ensureVisible(find.text('Continue'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Continue'));
       await tester.pumpAndSettle();
 

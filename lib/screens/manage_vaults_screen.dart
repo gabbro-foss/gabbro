@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:gabbro/widgets/gabbro_dialog.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
@@ -142,7 +143,7 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
         .where((r) => r.path != record.path)
         .map((r) => r.alias)
         .toSet();
-    final String? newAlias = await showDialog<String>(
+    final String? newAlias = await showGabbroDialog<String>(
       context: context,
       builder: (_) =>
           _RenameDialog(initialAlias: record.alias, takenAliases: takenAliases),
@@ -158,10 +159,10 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
   /// commands are shown verbatim (selectable, not translated) because they are
   /// literal shell; the prose around them is localized.
   Future<void> _showBackupInfoDialog(AppLocalizations l) async {
-    await showDialog<void>(
+    await showGabbroDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        scrollable: true, // scroll title+content+actions together (ADR-016)
+        scrollable: true, // scrolls title+content only; showGabbroDialog scrolls the rest
         title: Text(l.backupEmergencyHeading),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -218,7 +219,7 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
     final isYubikey = ykRecords.isNotEmpty;
 
     // Step 1 — warning
-    final step1 = await showDialog<bool>(
+    final step1 = await showGabbroDialog<bool>(
       context: context,
       builder: (ctx) {
         final l = AppLocalizations.of(ctx);
@@ -254,7 +255,7 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
     // normalisation and full/half-width input. A checkbox is reliable in every
     // script and needs only one translatable sentence.
     bool understood = false;
-    final step2 = await showDialog<bool>(
+    final step2 = await showGabbroDialog<bool>(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) {
@@ -299,7 +300,7 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
       String? authError;
       String dialogTransport = _transport;
 
-      final step3 = await showDialog<bool>(
+      final step3 = await showGabbroDialog<bool>(
         context: context,
         barrierDismissible: false,
         builder: (ctx) => StatefulBuilder(
@@ -344,8 +345,8 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
             }
 
             return AlertDialog(
-              scrollable:
-                  true, // scroll title+content+actions together (ADR-016)
+              // scrolls title+content only; showGabbroDialog scrolls the rest
+              scrollable: true,
               title: Text(l.touchYourYubiKey),
               content: Column(
                 mainAxisSize: MainAxisSize.min,

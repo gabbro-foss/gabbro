@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:gabbro/widgets/gabbro_dialog.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/control_scale.dart';
@@ -164,7 +165,7 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
     final hex = _toHex(record.credentialId);
     final controller = TextEditingController(text: _aliases[hex] ?? '');
     final l = AppLocalizations.of(context);
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showGabbroDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(l.editAliasForKey(index + 1)),
@@ -235,10 +236,10 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
           )
         : Text(l.removeKeyVaultConfirm);
 
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showGabbroDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        scrollable: true, // scroll title+content+actions together (ADR-016)
+        scrollable: true, // scrolls title+content only; showGabbroDialog scrolls the rest
         title: Text(
           isSecondToLast ? l.yubiKeySecurityWarning : l.removeYubiKeyTitle,
         ),
@@ -373,7 +374,7 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
     String? credIdHex;
 
     _progressShown = true;
-    showDialog(
+    showGabbroDialog(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => ValueListenableBuilder<int>(
@@ -381,7 +382,7 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
         builder: (ctx, step, _) {
           final dl = AppLocalizations.of(ctx);
           return AlertDialog(
-            scrollable: true, // scroll title+content+actions together (ADR-016)
+            scrollable: true, // scrolls title+content only; showGabbroDialog scrolls the rest
             title: Text(dl.addYubiKeyTitle),
             content: Column(
               mainAxisSize: MainAxisSize.min,
@@ -552,7 +553,7 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
 
   // Non-cancellable progress dialog used on Linux (operations are prompt).
   void _showLinuxProgress(String message) {
-    showDialog(
+    showGabbroDialog(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
@@ -570,7 +571,7 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
   Future<String?> _promptPin() async {
     bool obscure = true;
     final controller = TextEditingController();
-    final pin = await showDialog<String>(
+    final pin = await showGabbroDialog<String>(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setLocal) {
@@ -614,13 +615,13 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
     bool obscure = true;
     final controller = TextEditingController();
     String selectedTransport = widget.transport;
-    final result = await showDialog<Map<String, String>>(
+    final result = await showGabbroDialog<Map<String, String>>(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setLocal) {
           final l = AppLocalizations.of(ctx);
           return AlertDialog(
-            scrollable: true, // scroll title+content+actions together (ADR-016)
+            scrollable: true, // scrolls title+content only; showGabbroDialog scrolls the rest
             title: Text(l.addYubiKeyTitle),
             content: Column(
               mainAxisSize: MainAxisSize.min,

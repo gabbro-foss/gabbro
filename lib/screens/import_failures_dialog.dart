@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gabbro/widgets/gabbro_dialog.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/screens/create_entry_screen.dart';
@@ -14,7 +15,7 @@ Future<int> showImportFailuresDialog(
     if (!context.mounted) break;
     final failure = failures[i];
 
-    final resolved = await showDialog<_FailureAction>(
+    final resolved = await showGabbroDialog<_FailureAction>(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => _ImportFailureDialog(
@@ -85,7 +86,7 @@ class _ImportFailureDialog extends StatelessWidget {
         autofocus: true,
         skipTraversal: true,
         child: AlertDialog(
-      scrollable: true, // scroll title+content+actions together (ADR-016)
+      scrollable: true, // scrolls title+content only; showGabbroDialog scrolls the rest
       title: Row(
         children: [
           Icon(Icons.warning_amber_rounded, color: colorScheme.error),

@@ -596,4 +596,30 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.text('М'), findsOneWidget); // window still centres on present
   });
+
+  // ── Too little height to work in ──────────────────────────────────────────
+  //
+  // Windowed mode cannot go below two chevrons, two ellipsis slots and one
+  // letter. Given less than that it used to draw all of it anyway and overflow
+  // the bottom — on a 360dp phone at 8x text the list area is ~142px, so the
+  // bar spilled 38px over the entries. Below its minimum the bar stands down
+  // and the list keeps the space.
+
+  testWidgets('short but usable height: still renders, no overflow',
+      (tester) async {
+    await pumpBar(tester, height: 200, presentLetters: {'A', 'M', 'Z'});
+
+    expect(find.byType(AlphabetIndexBar), findsOneWidget);
+    expect(find.text('Scroll up'), findsNothing); // label is a tooltip only
+    expect(upChevronSize(tester), 18);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('below the minimum height: draws nothing instead of overflowing',
+      (tester) async {
+    await pumpBar(tester, height: 140, presentLetters: {'A', 'M', 'Z'});
+
+    expect(find.text('A'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
 }

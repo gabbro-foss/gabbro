@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gabbro/widgets/gabbro_dialog.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
@@ -244,7 +245,7 @@ Future<SyncReviewDecisions?> showSyncReview({
   required List<SyncReviewStep> steps,
 }) {
   if (steps.isEmpty) return Future.value(null);
-  return showDialog<SyncReviewDecisions>(
+  return showGabbroDialog<SyncReviewDecisions>(
     context: context,
     barrierDismissible: false,
     builder: (_) => _SyncReviewSheet(steps: steps),
@@ -489,7 +490,7 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
   /// just dismisses the chooser.
   Future<void> _bail() async {
     final l = AppLocalizations.of(context);
-    await showDialog<void>(
+    await showGabbroDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
         // Scroll the whole dialog so the three choices stay reachable at large

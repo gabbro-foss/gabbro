@@ -349,6 +349,15 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
             );
           }
 
+          // ── Too small to work in ───────────────────────────────────────────────
+          // Windowed mode's floor: two chevrons, two reserved ellipsis slots and
+          // one letter. Below that the bar used to draw all of it anyway and
+          // spill over the entry list (360dp phone at 8x text). Stand down
+          // instead — the list scrolls perfectly well without the bar.
+          if (availableHeight < 2 * chevronHeight + 3 * _kMinSlotHeight) {
+            return const SizedBox.shrink();
+          }
+
           // ── Windowed mode ──────────────────────────────────────────────────────
           final winSize = _windowSize(availableHeight, chevronHeight);
 

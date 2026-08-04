@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:gabbro/widgets/gabbro_dialog.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
@@ -1040,7 +1041,7 @@ class _VaultListScreenState extends State<VaultListScreen>
   Future<void> _confirmAssignFolder(Set<String> ids) async {
     if (_folders.isEmpty) return;
     String? selected;
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showGabbroDialog<bool>(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setLocal) {
@@ -1088,7 +1089,7 @@ class _VaultListScreenState extends State<VaultListScreen>
 
   Future<void> _confirmDelete(Set<String> ids) async {
     final count = ids.length;
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showGabbroDialog<bool>(
       context: context,
       builder: (ctx) {
         final l = AppLocalizations.of(ctx);
@@ -1127,7 +1128,7 @@ class _VaultListScreenState extends State<VaultListScreen>
     String path,
     List<YubikeyRecordData> sourceRecords, {
     bool pinOnly = false,
-  }) => showDialog<SyncCredentials>(
+  }) => showGabbroDialog<SyncCredentials>(
     context: context,
     barrierDismissible: false,
     builder: (ctx) => SyncPassphraseDialog(
@@ -1179,7 +1180,7 @@ class _VaultListScreenState extends State<VaultListScreen>
 
     // Choose how to apply: automatically (incoming wins, no prompts) or a
     // granular one-by-one review.
-    final fast = await showDialog<bool>(
+    final fast = await showGabbroDialog<bool>(
       context: context,
       builder: (_) =>
           SyncMethodDialog(showsPassphraseWarning: !isKeyProtected),
@@ -1431,7 +1432,7 @@ class _VaultListScreenState extends State<VaultListScreen>
       // wrong key/PIN, so the "different passphrase" message would mislead.
       final isPassphraseMismatch =
           !isKeyProtected && msg.contains('decryption failed');
-      await showDialog<void>(
+      await showGabbroDialog<void>(
         context: context,
         builder: (ctx) {
           final l = AppLocalizations.of(ctx);
@@ -1486,10 +1487,10 @@ class _VaultListScreenState extends State<VaultListScreen>
       );
     }
 
-    return showDialog<void>(
+    return showGabbroDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        scrollable: true, // scroll title+content+actions together (ADR-016)
+        scrollable: true, // scrolls title+content only; showGabbroDialog scrolls the rest
         title: Text(l.syncSummaryTitle),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -1612,7 +1613,7 @@ class _VaultListScreenState extends State<VaultListScreen>
   // then exits. Cancel is the default focus, so a stray Enter is harmless.
   Future<void> _confirmQuit() async {
     final l = AppLocalizations.of(context);
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showGabbroDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         // Flutter only supplies a default dialog name on Android, so on Linux
@@ -1737,11 +1738,17 @@ class _VaultListScreenState extends State<VaultListScreen>
           // grey is restated here. Pinned against Android in
           // a11y_region_net_test.dart.
           hintText: widget.isAndroid ? placeholder : null,
+          // One line, both branches. Left to wrap, the placeholder grew the
+          // field to 1364 px at 8x text on a 360dp phone and the entry list
+          // was squeezed to nothing (vault_list_overflow_test.dart).
+          hintMaxLines: 1,
           hint: widget.isAndroid
               ? null
               : Text(
                   placeholder,
                   semanticsLabel: '',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodyLarge!.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),

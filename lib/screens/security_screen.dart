@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:gabbro/widgets/gabbro_dialog.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
@@ -130,7 +131,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
       return;
     }
 
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showGabbroDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         // scrollable scrolls title + content + actions together, so nothing is
@@ -195,7 +196,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
     final controller = _enrollPassController..clear();
     // obscured lives outside the StatefulBuilder so it survives rebuilds.
     bool obscured = true;
-    final result = await showDialog<List<int>>(
+    final result = await showGabbroDialog<List<int>>(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx2, setDialogState) => AlertDialog(

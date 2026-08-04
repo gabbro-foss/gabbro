@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gabbro/widgets/gabbro_dialog.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/control_scale.dart';
 
@@ -44,7 +45,7 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
     String? reassignTarget;
     bool clearToNone = true;
 
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showGabbroDialog<bool>(
       context: context,
       builder: (context) {
         final l = AppLocalizations.of(context);
@@ -136,7 +137,7 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
 
   Future<void> _showRenameDialog(String folder) async {
     String newName = folder;
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showGabbroDialog<bool>(
       context: context,
       builder: (context) {
         final l = AppLocalizations.of(context);
@@ -183,7 +184,7 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
 
   Future<void> _showAddDialog() async {
     String newName = '';
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showGabbroDialog<bool>(
       context: context,
       builder: (context) {
         final l = AppLocalizations.of(context);

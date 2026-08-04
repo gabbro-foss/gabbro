@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
 
 import 'package:flutter/material.dart';
+import 'package:gabbro/widgets/gabbro_dialog.dart';
 import 'package:flutter/semantics.dart';
 import 'package:gabbro/autotype_target.dart';
 import 'package:gabbro/clipboard_clear.dart';
@@ -176,7 +177,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
   };
 
   Future<void> _confirmDelete(BuildContext context) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showGabbroDialog<bool>(
       context: context,
       builder: (ctx) {
         final l = AppLocalizations.of(ctx);
@@ -220,12 +221,12 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     final pathController = TextEditingController(
       text: '${Platform.environment['HOME'] ?? '/tmp'}/${e.filename}',
     );
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showGabbroDialog<bool>(
       context: context,
       builder: (ctx) {
         final dl = AppLocalizations.of(ctx);
         return AlertDialog(
-          scrollable: true, // scroll title+content+actions together (ADR-016)
+          scrollable: true, // scrolls title+content only; showGabbroDialog scrolls the rest
           title: Text(dl.exportFileTitle),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -664,7 +665,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
   Future<void> _launchUrl(BuildContext context, String url) async {
     final uri = Uri.tryParse(url);
     if (uri == null || url.isEmpty) return;
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showGabbroDialog<bool>(
       context: context,
       builder: (ctx) {
         final l = AppLocalizations.of(ctx);

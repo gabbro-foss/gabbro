@@ -36,6 +36,7 @@ import 'package:gabbro/widgets/gabbro_logo.dart';
 import 'package:gabbro/widgets/generator_widget.dart';
 import 'package:gabbro/widgets/password_breakdown_sheet.dart';
 import 'package:gabbro/widgets/sync_review.dart';
+import 'package:gabbro/widgets/gabbro_dialog.dart';
 import 'package:gabbro/widgets/sync_method_dialog.dart';
 import 'package:gabbro/widgets/url_link.dart';
 import 'package:gabbro/screens/import_failures_dialog.dart';
@@ -484,6 +485,22 @@ final Map<String, Future<void> Function(BuildContext)> dialogs = {
       ),
     ),
   ),
+  // The wrapper every dialog is shown through: a plain confirm, long enough to
+  // need the scrolling it exists to provide.
+  'gabbro_dialog': (ctx) => showGabbroDialog<void>(
+    context: ctx,
+    builder: (_) => AlertDialog(
+      title: const Text('A dialog title long enough to wrap at max text scale'),
+      content: const Text(
+        'A dialog message long enough to need more room than a phone screen '
+        'has once the text is scaled up.',
+      ),
+      actions: [
+        TextButton(onPressed: () {}, child: const Text('Cancel')),
+        TextButton(onPressed: () {}, child: const Text('Confirm')),
+      ],
+    ),
+  ),
   'sync_method_dialog': (ctx) async => showDialog<bool>(
     context: ctx,
     builder: (_) => const SyncMethodDialog(),
@@ -541,6 +558,7 @@ const Map<String, String> covers = {
   'generator_widget': 'generator_widget',
   'url_link': 'url_link',
   'sync_review': 'sync_review',
+  'gabbro_dialog': 'gabbro_dialog',
   'sync_method_dialog': 'sync_method_dialog',
   'import_skipped_dialog': 'import_skipped_dialog',
   'import_failures_dialog': 'import_failures_dialog',
@@ -590,4 +608,4 @@ List<String> uiSources() =>
 // nothing. Adding a screen or widget fails here first: the new file must be
 // swept or waived deliberately.
 const screenFileCount = 28;
-const widgetFileCount = 11;
+const widgetFileCount = 12;

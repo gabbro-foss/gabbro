@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gabbro/widgets/gabbro_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/app_localizations.dart';
@@ -17,7 +18,7 @@ Future<void> showUrlDialog(
   required String title,
   required String url,
 }) {
-  return showDialog<void>(
+  return showGabbroDialog<void>(
     context: context,
     builder: (context) {
       final l = AppLocalizations.of(context);

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gabbro/widgets/gabbro_dialog.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/settings.dart';
@@ -196,7 +197,7 @@ class _SaveConfirmScreenState extends State<SaveConfirmScreen> {
   Future<void> _pickAnother() async {
     if (_submitting) return;
     final l = AppLocalizations.of(context);
-    final chosen = await showDialog<String>(
+    final chosen = await showGabbroDialog<String>(
       context: context,
       builder: (ctx) => SimpleDialog(
         title: Text(l.saveConfirmChooseAnother),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'test_helpers.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/settings.dart';
@@ -71,6 +72,7 @@ Future<void> _pumpAtTextScale(
   required double w,
   required double h,
   required double textScale,
+  bool isAndroid = false,
 }) async {
   tester.view.physicalSize = Size(w, h);
   tester.view.devicePixelRatio = 1.0;
@@ -83,9 +85,15 @@ Future<void> _pumpAtTextScale(
     vaultPath: '/tmp/test.gabbro',
     listEntries: _entries,
     listFolders: () => ['Work', 'Personal'],
+    isAndroid: isAndroid,
   )));
   await tester.pumpAndSettle();
 }
+
+/// Height of the entry list itself. Zero means the header ate the screen and
+/// the user can see no entries at all — the failure this file guards.
+double _listHeight(WidgetTester tester) =>
+    tester.getSize(find.byType(ScrollablePositionedList).first).height;
 
 void main() {
   // Two-pane layout at large text, no keyboard. Pins the current geometry so a
@@ -94,6 +102,46 @@ void main() {
     testWidgets('two-pane at ${scale}x text: no overflow', (tester) async {
       await _pumpAtTextScale(tester, w: 900, h: 700, textScale: scale);
       expect(tester.takeException(), isNull);
+    });
+  }
+
+  // Phone width at large text. The header (search, folder, chips) is fixed
+  // height and the list takes what is left, so a header that grows without
+  // bound leaves the list nothing: at 8x the entry list was 0 px tall and the
+  // body overflowed by 1010 px. The placeholder inside the search box was the
+  // whole of it — it wrapped to as many lines as it liked (1344 px of a
+  // 1364 px field).
+  for (final scale in <double>[1.0, 2.0, 4.0, 8.0]) {
+    testWidgets('phone 360dp at ${scale}x text: list still has room',
+        (tester) async {
+      await _pumpAtTextScale(tester, w: 360, h: 800, textScale: scale);
+      expect(tester.takeException(), isNull);
+      expect(_listHeight(tester), greaterThan(0));
+    });
+  }
+
+  // Both branches: Android keeps Flutter's own placeholder (hintText), Linux
+  // passes it as a widget so its name can be excluded from the semantics
+  // (a11y_region_net_test.dart). Capping one and not the other would fix the
+  // overflow on one platform only.
+  for (final android in <bool>[false, true]) {
+    testWidgets(
+        'search box stays one line at 8x text (isAndroid: $android)',
+        (tester) async {
+      await _pumpAtTextScale(
+        tester,
+        w: 360,
+        h: 800,
+        textScale: 8.0,
+        isAndroid: android,
+      );
+      // One 8x line plus the field's own padding measures 212; a second line
+      // would put it near 400. The unbounded placeholder made it 1364.
+      expect(
+        tester.getSize(find.byType(TextField).first).height,
+        lessThan(300),
+        reason: 'the search placeholder is wrapping instead of ellipsizing',
+      );
     });
   }
 

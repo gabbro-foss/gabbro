@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gabbro/widgets/gabbro_dialog.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:gabbro/app_paths.dart';
@@ -277,7 +278,7 @@ Future<void> showAutofillNoMatchDialog(
   void Function()? onLock,
 }) async {
   final l = AppLocalizations.of(context);
-  await showDialog<void>(
+  await showGabbroDialog<void>(
     context: context,
     barrierDismissible: false,
     builder: (ctx) => AlertDialog(

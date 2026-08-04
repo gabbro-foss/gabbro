@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:gabbro/widgets/gabbro_dialog.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/nfc_capability.dart';
@@ -436,7 +437,7 @@ class _UnlockScreenState extends State<UnlockScreen>
 
   Future<void> _confirmRestoreBackup() async {
     final l = AppLocalizations.of(context);
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showGabbroDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(l.restoreBackupConfirmTitle),
@@ -500,7 +501,7 @@ class _UnlockScreenState extends State<UnlockScreen>
     // F8: last chance to stop. The restore overwrites the vault and refreshes
     // its .bak; only the .pre-restore safety copy (H2) keeps the old vault.
     final vaultName = widget.vaultAlias ?? widget.vaultPath.split('/').last;
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showGabbroDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         // Buttons live in the scrollable content, not `actions`: an
@@ -568,7 +569,7 @@ class _UnlockScreenState extends State<UnlockScreen>
     // Capture the app before the dialog await so no BuildContext is used across
     // the async gap.
     final app = GabbroApp.maybeOf(context);
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showGabbroDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(l.removeVaultFromListConfirmTitle),
@@ -599,7 +600,7 @@ class _UnlockScreenState extends State<UnlockScreen>
     final l = AppLocalizations.of(context);
     // Capture the app before the dialog await (no BuildContext across the gap).
     final app = GabbroApp.maybeOf(context);
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showGabbroDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(l.deleteVaultFileConfirmTitle),

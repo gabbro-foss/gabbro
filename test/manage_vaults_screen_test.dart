@@ -342,15 +342,24 @@ void main() {
 
   // ── YubiKey delete flow ───────────────────────────────────────────────────
 
+  // At large text these dialogs are taller than the screen, so their controls
+  // sit below the fold and scroll into reach (see gabbro_dialog_test.dart).
+  Future<void> tapAfterScroll(WidgetTester tester, Finder target) async {
+    await tester.ensureVisible(target);
+    await tester.pumpAndSettle();
+    await tester.tap(target);
+    await tester.pumpAndSettle();
+  }
+
   Future<void> throughStep2(WidgetTester tester) async {
     await tester.tap(find.byIcon(Icons.delete_outlined).first);
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Continue'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('delete_vault_confirm_checkbox')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Confirm'));
-    await tester.pumpAndSettle();
+    await tapAfterScroll(tester, find.text('Continue'));
+    await tapAfterScroll(
+      tester,
+      find.byKey(const Key('delete_vault_confirm_checkbox')),
+    );
+    await tapAfterScroll(tester, find.text('Confirm'));
   }
 
   group('YubiKey delete step 3', () {
