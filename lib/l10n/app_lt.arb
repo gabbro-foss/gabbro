@@ -24,8 +24,8 @@
   "autofillNoMatchBody": "Nėra išsaugoto prisijungimo, atitinkančio šią programą ar svetainę.",
 
   "appName": "Gabbro",
-  "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
-  "filePickerNoPortal": "File dialog unavailable here. The system file portal isn't reachable.",
+  "filePickerUnavailable": "Failų dialogas čia nepasiekiamas. Įveskite arba įklijuokite kelią.",
+  "filePickerNoPortal": "Failų dialogas čia nepasiekiamas. Sistemos failų portalas nepasiekiamas.",
 
   "cancel": "Atšaukti",
   "quit": "Išeiti",
@@ -453,7 +453,7 @@
   "genericCsvSection": "Bendrasis CSV",
 
   "changePassphraseSuccess": "Slaptafrazė pakeista",
-  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
+  "changePassphraseBiometricDisabled": "Slaptafrazė pakeista. Biometrinis atrakinimas išjungtas; vėl įjunkite jį skiltyje «Saugumas».",
   "changePassphraseButton": "Keisti slaptafrazę",
 
   "continueLabel": "Tęsti",

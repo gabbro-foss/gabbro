@@ -47,11 +47,11 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get filePickerUnavailable =>
-      'File dialog unavailable here. Type or paste the path instead.';
+      'Диалог выбора файлов здесь недоступен. Введите или вставьте путь.';
 
   @override
   String get filePickerNoPortal =>
-      'File dialog unavailable here. The system file portal isn\'t reachable.';
+      'Диалог выбора файлов здесь недоступен. Системный файловый портал недоступен.';
 
   @override
   String get cancel => 'Отмена';
@@ -1115,7 +1115,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get changePassphraseBiometricDisabled =>
-      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+      'Кодовая фраза изменена. Биометрическая разблокировка отключена; включите её снова в разделе «Безопасность».';
 
   @override
   String get changePassphraseButton => 'Изменить кодовую фразу';

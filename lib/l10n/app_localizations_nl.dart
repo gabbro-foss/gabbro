@@ -47,11 +47,11 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get filePickerUnavailable =>
-      'File dialog unavailable here. Type or paste the path instead.';
+      'Het bestandsdialoogvenster is hier niet beschikbaar. Typ of plak het pad.';
 
   @override
   String get filePickerNoPortal =>
-      'File dialog unavailable here. The system file portal isn\'t reachable.';
+      'Het bestandsdialoogvenster is hier niet beschikbaar. De bestandsportal van het systeem is onbereikbaar.';
 
   @override
   String get cancel => 'Annuleren';
@@ -1113,7 +1113,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get changePassphraseBiometricDisabled =>
-      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+      'Wachtwoordzin gewijzigd. Biometrisch ontgrendelen is uitgeschakeld; schakel het opnieuw in bij Beveiliging.';
 
   @override
   String get changePassphraseButton => 'Wachtwoordzin wijzigen';

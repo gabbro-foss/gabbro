@@ -47,11 +47,11 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get filePickerUnavailable =>
-      'File dialog unavailable here. Type or paste the path instead.';
+      'La boîte de dialogue de fichiers n\'est pas disponible ici. Saisissez ou collez le chemin.';
 
   @override
   String get filePickerNoPortal =>
-      'File dialog unavailable here. The system file portal isn\'t reachable.';
+      'La boîte de dialogue de fichiers n\'est pas disponible ici. Le portail de fichiers du système est inaccessible.';
 
   @override
   String get cancel => 'Annuler';
@@ -1117,7 +1117,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get changePassphraseBiometricDisabled =>
-      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+      'Mot de passe modifié. Le déverrouillage biométrique a été désactivé ; réactivez-le dans Sécurité.';
 
   @override
   String get changePassphraseButton => 'Changer le mot de passe principal';

@@ -231,6 +231,50 @@ void main() {
     }
   });
 
+  // `l10n_test` enforced the key SET, not that a value was ever translated, so a
+  // string could ship English in all 37 locales unnoticed (three did, found
+  // 2026-07-29). A value identical to English is only legitimate when there was
+  // nothing to translate: an endonym, a product name, an acronym, or a format
+  // string that is all placeholder.
+  group('no value ships untranslated', () {
+    // Identical in every language by nature, not by omission.
+    const untranslatable = [
+      'Gabbro', 'YubiKey', 'Bitwarden', 'Dashlane', 'Enpass', 'Google',
+      'Android', 'FIDO2', 'JSON', 'CSV', 'CVV', 'PIN', 'URL', 'USB', 'UUID',
+      'NFC', 'GNU', 'GPL', 'OK',
+    ];
+    final letter = RegExp(r'[A-Za-z]');
+
+    // Judged across ALL locales at once, never per file: plenty of languages
+    // share a word with English ("Symbol" in Czech, "1 min" in Danish), and
+    // flagging those per-locale would be noise. A value that is byte-identical
+    // to English in EVERY one of the 36 is a string nobody ever translated.
+    test('no translatable value is English in all 36 locales', () {
+      final base = _readArb(File('lib/l10n/app_en.arb'));
+      final others = [
+        for (final f in _arbFiles())
+          if (f.uri.pathSegments.last != 'app_en.arb') _readArb(f)
+      ];
+      expect(others, hasLength(36), reason: 'the sweep must not be vacuous');
+
+      final untranslated = <String>[];
+      for (final e in base.entries) {
+        if (_isEndonymKey(e.key)) continue;
+        if (!others.every((o) => o[e.key] == e.value)) continue;
+
+        // Identical everywhere — fine only if nothing here was translatable.
+        var rest = e.value.replaceAll(RegExp(r'\{[^}]*\}'), '');
+        for (final token in untranslatable) {
+          rest = rest.replaceAll(token, '');
+        }
+        if (letter.hasMatch(rest)) untranslated.add(e.key);
+      }
+
+      expect(untranslated, isEmpty,
+          reason: 'shipped as the English string everywhere: $untranslated');
+    });
+  });
+
   group('every listed language is present in every locale', () {
     // The in-app language menu lists N languages; each must have its endonym in
     // every ARB file, or a user in locale X sees a blank / English name for

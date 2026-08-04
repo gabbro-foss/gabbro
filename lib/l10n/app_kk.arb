@@ -24,8 +24,8 @@
   "autofillNoMatchBody": "Бұл қолданбаға немесе сайтқа сәйкес келетін сақталған кіру деректері жоқ.",
 
   "appName": "Gabbro",
-  "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
-  "filePickerNoPortal": "File dialog unavailable here. The system file portal isn't reachable.",
+  "filePickerUnavailable": "Мұнда файл терезесі қолжетімсіз. Жолды теріңіз немесе қойыңыз.",
+  "filePickerNoPortal": "Мұнда файл терезесі қолжетімсіз. Жүйенің файл порталына қол жеткізу мүмкін емес.",
 
   "cancel": "Бас тарту",
   "quit": "Шығу",
@@ -453,7 +453,7 @@
   "genericCsvSection": "Жалпы CSV",
 
   "changePassphraseSuccess": "Кілт фразасы өзгертілді",
-  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
+  "changePassphraseBiometricDisabled": "Кілт тіркесі өзгертілді. Биометриялық ашу өшірілді; оны «Қауіпсіздік» бөлімінде қайта қосыңыз.",
   "changePassphraseButton": "Кілт фразасын өзгерту",
 
   "continueLabel": "Жалғастыру",

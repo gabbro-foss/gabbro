@@ -47,11 +47,11 @@ class AppLocalizationsYo extends AppLocalizations {
 
   @override
   String get filePickerUnavailable =>
-      'File dialog unavailable here. Type or paste the path instead.';
+      'Àpótí ìjíròrò fáìlì kò sí níbí. Tẹ tàbí lẹ ọ̀nà náà.';
 
   @override
   String get filePickerNoPortal =>
-      'File dialog unavailable here. The system file portal isn\'t reachable.';
+      'Àpótí ìjíròrò fáìlì kò sí níbí. Ẹnu-ọ̀nà fáìlì ètò kò ṣeé dé.';
 
   @override
   String get cancel => 'Fagilee';
@@ -1110,7 +1110,7 @@ class AppLocalizationsYo extends AppLocalizations {
 
   @override
   String get changePassphraseBiometricDisabled =>
-      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+      'A ti yí gbólóhùn ìwọlé padà. A pa ìṣílẹ̀kùn bíométíríkì; tún un ṣíṣẹ́ ní Ààbò.';
 
   @override
   String get changePassphraseButton => 'Yipada gbolohun ọrọ igbaniwọle';

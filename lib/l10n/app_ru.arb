@@ -24,8 +24,8 @@
   "autofillNoMatchBody": "Нет сохранённого входа, соответствующего этому приложению или сайту.",
 
   "appName": "Gabbro",
-  "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
-  "filePickerNoPortal": "File dialog unavailable here. The system file portal isn't reachable.",
+  "filePickerUnavailable": "Диалог выбора файлов здесь недоступен. Введите или вставьте путь.",
+  "filePickerNoPortal": "Диалог выбора файлов здесь недоступен. Системный файловый портал недоступен.",
 
   "cancel": "Отмена",
   "quit": "Выход",
@@ -453,7 +453,7 @@
   "genericCsvSection": "Обычный CSV",
 
   "changePassphraseSuccess": "Кодовая фраза изменена",
-  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
+  "changePassphraseBiometricDisabled": "Кодовая фраза изменена. Биометрическая разблокировка отключена; включите её снова в разделе «Безопасность».",
   "changePassphraseButton": "Изменить кодовую фразу",
 
   "continueLabel": "Продолжить",

@@ -47,11 +47,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get filePickerUnavailable =>
-      'File dialog unavailable here. Type or paste the path instead.';
+      'A caixa de diálogo de ficheiros não está disponível aqui. Escreva ou cole o caminho.';
 
   @override
   String get filePickerNoPortal =>
-      'File dialog unavailable here. The system file portal isn\'t reachable.';
+      'A caixa de diálogo de ficheiros não está disponível aqui. O portal de ficheiros do sistema está inacessível.';
 
   @override
   String get cancel => 'Cancelar';
@@ -1110,7 +1110,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get changePassphraseBiometricDisabled =>
-      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+      'Frase de acesso alterada. O desbloqueio biométrico foi desativado; reative-o em Segurança.';
 
   @override
   String get changePassphraseButton => 'Alterar frase secreta';
@@ -2235,11 +2235,11 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get filePickerUnavailable =>
-      'File dialog unavailable here. Type or paste the path instead.';
+      'A caixa de diálogo de arquivos não está disponível aqui. Digite ou cole o caminho.';
 
   @override
   String get filePickerNoPortal =>
-      'File dialog unavailable here. The system file portal isn\'t reachable.';
+      'A caixa de diálogo de arquivos não está disponível aqui. O portal de arquivos do sistema está inacessível.';
 
   @override
   String get cancel => 'Cancelar';
@@ -3298,7 +3298,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get changePassphraseBiometricDisabled =>
-      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+      'Frase de acesso alterada. O desbloqueio biométrico foi desativado; reative-o em Segurança.';
 
   @override
   String get changePassphraseButton => 'Alterar frase secreta';
@@ -4420,11 +4420,11 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get filePickerUnavailable =>
-      'File dialog unavailable here. Type or paste the path instead.';
+      'A caixa de diálogo de ficheiros não está disponível aqui. Escreva ou cole o caminho.';
 
   @override
   String get filePickerNoPortal =>
-      'File dialog unavailable here. The system file portal isn\'t reachable.';
+      'A caixa de diálogo de ficheiros não está disponível aqui. O portal de ficheiros do sistema está inacessível.';
 
   @override
   String get cancel => 'Cancelar';
@@ -5483,7 +5483,7 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get changePassphraseBiometricDisabled =>
-      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+      'Frase de acesso alterada. O desbloqueio biométrico foi desativado; reative-o em Segurança.';
 
   @override
   String get changePassphraseButton => 'Alterar frase-passe';

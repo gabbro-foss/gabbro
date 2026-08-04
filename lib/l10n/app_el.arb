@@ -24,8 +24,8 @@
   "autofillNoMatchBody": "Κανένα αποθηκευμένο στοιχείο σύνδεσης δεν ταιριάζει με αυτήν την εφαρμογή ή τον ιστότοπο.",
 
   "appName": "Gabbro",
-  "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
-  "filePickerNoPortal": "File dialog unavailable here. The system file portal isn't reachable.",
+  "filePickerUnavailable": "Το παράθυρο επιλογής αρχείων δεν είναι διαθέσιμο εδώ. Πληκτρολογήστε ή επικολλήστε τη διαδρομή.",
+  "filePickerNoPortal": "Το παράθυρο επιλογής αρχείων δεν είναι διαθέσιμο εδώ. Η πύλη αρχείων του συστήματος δεν είναι προσβάσιμη.",
 
   "cancel": "Άκυρο",
   "quit": "Έξοδος",
@@ -453,7 +453,7 @@
   "genericCsvSection": "Γενικό CSV",
 
   "changePassphraseSuccess": "Η φράση πρόσβασης άλλαξε",
-  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
+  "changePassphraseBiometricDisabled": "Η φράση πρόσβασης άλλαξε. Το βιομετρικό ξεκλείδωμα απενεργοποιήθηκε· ενεργοποιήστε το ξανά στην Ασφάλεια.",
   "changePassphraseButton": "Αλλαγή φράσης πρόσβασης",
 
   "continueLabel": "Συνέχεια",

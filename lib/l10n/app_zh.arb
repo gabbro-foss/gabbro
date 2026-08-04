@@ -24,8 +24,8 @@
   "autofillNoMatchBody": "没有与此应用或网站匹配的已保存登录信息。",
 
   "appName": "Gabbro",
-  "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
-  "filePickerNoPortal": "File dialog unavailable here. The system file portal isn't reachable.",
+  "filePickerUnavailable": "此处无法使用文件对话框。请输入或粘贴路径。",
+  "filePickerNoPortal": "此处无法使用文件对话框。无法连接系统文件门户。",
 
   "cancel": "取消",
   "quit": "退出",
@@ -453,7 +453,7 @@
   "genericCsvSection": "通用 CSV",
 
   "changePassphraseSuccess": "密码短语已更改",
-  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
+  "changePassphraseBiometricDisabled": "密码短语已更改。生物特征解锁已关闭；请在“安全”中重新启用。",
   "changePassphraseButton": "更改密码短语",
 
   "continueLabel": "继续",

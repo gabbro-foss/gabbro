@@ -47,11 +47,11 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get filePickerUnavailable =>
-      'File dialog unavailable here. Type or paste the path instead.';
+      'Мұнда файл терезесі қолжетімсіз. Жолды теріңіз немесе қойыңыз.';
 
   @override
   String get filePickerNoPortal =>
-      'File dialog unavailable here. The system file portal isn\'t reachable.';
+      'Мұнда файл терезесі қолжетімсіз. Жүйенің файл порталына қол жеткізу мүмкін емес.';
 
   @override
   String get cancel => 'Бас тарту';
@@ -1110,7 +1110,7 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get changePassphraseBiometricDisabled =>
-      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+      'Кілт тіркесі өзгертілді. Биометриялық ашу өшірілді; оны «Қауіпсіздік» бөлімінде қайта қосыңыз.';
 
   @override
   String get changePassphraseButton => 'Кілт фразасын өзгерту';

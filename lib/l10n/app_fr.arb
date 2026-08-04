@@ -24,8 +24,8 @@
   "autofillNoMatchBody": "Aucun identifiant enregistré ne correspond à cette application ou à ce site.",
 
   "appName": "Gabbro",
-  "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
-  "filePickerNoPortal": "File dialog unavailable here. The system file portal isn't reachable.",
+  "filePickerUnavailable": "La boîte de dialogue de fichiers n'est pas disponible ici. Saisissez ou collez le chemin.",
+  "filePickerNoPortal": "La boîte de dialogue de fichiers n'est pas disponible ici. Le portail de fichiers du système est inaccessible.",
 
   "cancel": "Annuler",
   "quit": "Quitter",
@@ -453,7 +453,7 @@
   "genericCsvSection": "CSV générique",
 
   "changePassphraseSuccess": "Mot de passe principal changé avec succès",
-  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
+  "changePassphraseBiometricDisabled": "Mot de passe modifié. Le déverrouillage biométrique a été désactivé ; réactivez-le dans Sécurité.",
   "changePassphraseButton": "Changer le mot de passe principal",
 
   "continueLabel": "Continuer",

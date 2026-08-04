@@ -24,8 +24,8 @@
   "autofillNoMatchBody": "Egyetlen mentett bejelentkezés sem felel meg ennek az alkalmazásnak vagy webhelynek.",
 
   "appName": "Gabbro",
-  "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
-  "filePickerNoPortal": "File dialog unavailable here. The system file portal isn't reachable.",
+  "filePickerUnavailable": "A fájlválasztó itt nem érhető el. Írja be vagy illessze be az elérési utat.",
+  "filePickerNoPortal": "A fájlválasztó itt nem érhető el. A rendszer fájlportálja nem érhető el.",
 
   "cancel": "Mégse",
   "quit": "Kilépés",
@@ -453,7 +453,7 @@
   "genericCsvSection": "Általános CSV",
 
   "changePassphraseSuccess": "Jelmondat módosítva",
-  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
+  "changePassphraseBiometricDisabled": "A jelmondat megváltozott. A biometrikus feloldás ki lett kapcsolva; kapcsolja be újra a Biztonság menüben.",
   "changePassphraseButton": "Jelmondat módosítása",
 
   "continueLabel": "Folytatás",

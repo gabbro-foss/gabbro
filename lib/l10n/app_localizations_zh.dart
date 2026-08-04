@@ -45,12 +45,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get appName => 'Gabbro';
 
   @override
-  String get filePickerUnavailable =>
-      'File dialog unavailable here. Type or paste the path instead.';
+  String get filePickerUnavailable => '此处无法使用文件对话框。请输入或粘贴路径。';
 
   @override
-  String get filePickerNoPortal =>
-      'File dialog unavailable here. The system file portal isn\'t reachable.';
+  String get filePickerNoPortal => '此处无法使用文件对话框。无法连接系统文件门户。';
 
   @override
   String get cancel => '取消';
@@ -1093,7 +1091,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get changePassphraseBiometricDisabled =>
-      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+      '密码短语已更改。生物特征解锁已关闭；请在“安全”中重新启用。';
 
   @override
   String get changePassphraseButton => '更改密码短语';
@@ -2134,12 +2132,10 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get appName => 'Gabbro';
 
   @override
-  String get filePickerUnavailable =>
-      'File dialog unavailable here. Type or paste the path instead.';
+  String get filePickerUnavailable => '此处无法使用文件对话框。请输入或粘贴路径。';
 
   @override
-  String get filePickerNoPortal =>
-      'File dialog unavailable here. The system file portal isn\'t reachable.';
+  String get filePickerNoPortal => '此处无法使用文件对话框。无法连接系统文件门户。';
 
   @override
   String get cancel => '取消';
@@ -3182,7 +3178,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get changePassphraseBiometricDisabled =>
-      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+      '密码短语已更改。生物特征解锁已关闭；请在“安全”中重新启用。';
 
   @override
   String get changePassphraseButton => '更改密码短语';
@@ -4223,12 +4219,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get appName => 'Gabbro';
 
   @override
-  String get filePickerUnavailable =>
-      'File dialog unavailable here. Type or paste the path instead.';
+  String get filePickerUnavailable => '此處無法使用檔案對話框。請輸入或貼上路徑。';
 
   @override
-  String get filePickerNoPortal =>
-      'File dialog unavailable here. The system file portal isn\'t reachable.';
+  String get filePickerNoPortal => '此處無法使用檔案對話框。無法連接系統檔案入口。';
 
   @override
   String get cancel => '取消';
@@ -5271,7 +5265,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get changePassphraseBiometricDisabled =>
-      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+      '密碼短語已變更。生物特徵解鎖已關閉；請在「安全」中重新啟用。';
 
   @override
   String get changePassphraseButton => '變更密碼片語';

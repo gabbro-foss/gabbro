@@ -47,11 +47,11 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get filePickerUnavailable =>
-      'File dialog unavailable here. Type or paste the path instead.';
+      'Tiedostoikkuna ei ole käytettävissä täällä. Kirjoita tai liitä polku.';
 
   @override
   String get filePickerNoPortal =>
-      'File dialog unavailable here. The system file portal isn\'t reachable.';
+      'Tiedostoikkuna ei ole käytettävissä täällä. Järjestelmän tiedostoportaaliin ei saada yhteyttä.';
 
   @override
   String get cancel => 'Peruuta';
@@ -1111,7 +1111,7 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get changePassphraseBiometricDisabled =>
-      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+      'Salauslause vaihdettu. Biometrinen avaus poistettiin käytöstä; ota se uudelleen käyttöön Turvallisuus-osiossa.';
 
   @override
   String get changePassphraseButton => 'Vaihda salauslause';

@@ -24,8 +24,8 @@
   "autofillNoMatchBody": "Ingen sparad inloggning matchar den här appen eller webbplatsen.",
 
   "appName": "Gabbro",
-  "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
-  "filePickerNoPortal": "File dialog unavailable here. The system file portal isn't reachable.",
+  "filePickerUnavailable": "Fildialogen är inte tillgänglig här. Skriv eller klistra in sökvägen.",
+  "filePickerNoPortal": "Fildialogen är inte tillgänglig här. Systemets filportal går inte att nå.",
 
   "cancel": "Avbryt",
   "quit": "Avsluta",
@@ -453,7 +453,7 @@
   "genericCsvSection": "Generisk CSV",
 
   "changePassphraseSuccess": "Lösenfras ändrad",
-  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
+  "changePassphraseBiometricDisabled": "Lösenfrasen har ändrats. Biometrisk upplåsning stängdes av; slå på den igen under Säkerhet.",
   "changePassphraseButton": "Byt lösenfras",
 
   "continueLabel": "Fortsätt",

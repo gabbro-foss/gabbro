@@ -24,8 +24,8 @@
   "autofillNoMatchBody": "Ниједна сачувана пријава не одговара овој апликацији или сајту.",
 
   "appName": "Gabbro",
-  "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
-  "filePickerNoPortal": "File dialog unavailable here. The system file portal isn't reachable.",
+  "filePickerUnavailable": "Дијалог за датотеке овде није доступан. Унесите или налепите путању.",
+  "filePickerNoPortal": "Дијалог за датотеке овде није доступан. Системски портал за датотеке није доступан.",
 
   "cancel": "Откажи",
   "quit": "Изађи",
@@ -453,7 +453,7 @@
   "genericCsvSection": "Генерички CSV",
 
   "changePassphraseSuccess": "Приступна фраза промењена",
-  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
+  "changePassphraseBiometricDisabled": "Приступна фраза је промењена. Биометријско откључавање је искључено; поново га укључите у одељку Безбедност.",
   "changePassphraseButton": "Промени приступну фразу",
 
   "continueLabel": "Настави",

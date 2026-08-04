@@ -47,11 +47,11 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get filePickerUnavailable =>
-      'File dialog unavailable here. Type or paste the path instead.';
+      'Dijalog za datoteke ovdje nije dostupan. Upišite ili zalijepite putanju.';
 
   @override
   String get filePickerNoPortal =>
-      'File dialog unavailable here. The system file portal isn\'t reachable.';
+      'Dijalog za datoteke ovdje nije dostupan. Sistemski portal za datoteke nije dostupan.';
 
   @override
   String get cancel => 'Odustani';
@@ -1111,7 +1111,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get changePassphraseBiometricDisabled =>
-      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+      'Pristupna fraza je promijenjena. Biometrijsko otključavanje je isključeno; ponovno ga uključite u Sigurnosti.';
 
   @override
   String get changePassphraseButton => 'Promijeni pristupnu frazu';

@@ -47,11 +47,11 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get filePickerUnavailable =>
-      'File dialog unavailable here. Type or paste the path instead.';
+      'Fildialogen er ikke tilgjengelig her. Skriv eller lim inn stien i stedet.';
 
   @override
   String get filePickerNoPortal =>
-      'File dialog unavailable here. The system file portal isn\'t reachable.';
+      'Fildialogen er ikke tilgjengelig her. Systemets filportal er ikke tilgjengelig.';
 
   @override
   String get cancel => 'Avbryt';
@@ -1112,7 +1112,7 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get changePassphraseBiometricDisabled =>
-      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+      'Passordfrasen er endret. Biometrisk opplåsing ble slått av; slå den på igjen under Sikkerhet.';
 
   @override
   String get changePassphraseButton => 'Bytt passfrase';

@@ -46,11 +46,11 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get filePickerUnavailable =>
-      'File dialog unavailable here. Type or paste the path instead.';
+      '여기서는 파일 대화 상자를 사용할 수 없습니다. 경로를 입력하거나 붙여넣으세요.';
 
   @override
   String get filePickerNoPortal =>
-      'File dialog unavailable here. The system file portal isn\'t reachable.';
+      '여기서는 파일 대화 상자를 사용할 수 없습니다. 시스템 파일 포털에 연결할 수 없습니다.';
 
   @override
   String get cancel => '취소';
@@ -1097,7 +1097,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get changePassphraseBiometricDisabled =>
-      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+      '암호 문구가 변경되었습니다. 생체 인식 잠금 해제가 해제되었습니다. 보안에서 다시 켜세요.';
 
   @override
   String get changePassphraseButton => '암호 문구 변경';

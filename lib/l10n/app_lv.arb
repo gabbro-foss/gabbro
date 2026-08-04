@@ -24,8 +24,8 @@
   "autofillNoMatchBody": "Neviena saglabātā pieteikšanās neatbilst šai lietotnei vai vietnei.",
 
   "appName": "Gabbro",
-  "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
-  "filePickerNoPortal": "File dialog unavailable here. The system file portal isn't reachable.",
+  "filePickerUnavailable": "Failu dialogs šeit nav pieejams. Ievadiet vai ielīmējiet ceļu.",
+  "filePickerNoPortal": "Failu dialogs šeit nav pieejams. Sistēmas failu portāls nav sasniedzams.",
 
   "cancel": "Atcelt",
   "quit": "Iziet",
@@ -453,7 +453,7 @@
   "genericCsvSection": "Vispārīgs CSV",
 
   "changePassphraseSuccess": "Ieejas frāze nomainīta",
-  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
+  "changePassphraseBiometricDisabled": "Piekļuves frāze mainīta. Biometriskā atbloķēšana tika izslēgta; ieslēdziet to atkārtoti sadaļā «Drošība».",
   "changePassphraseButton": "Mainīt ieejas frāzi",
 
   "continueLabel": "Turpināt",

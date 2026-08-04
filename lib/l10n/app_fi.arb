@@ -24,8 +24,8 @@
   "autofillNoMatchBody": "Mikään tallennettu kirjautuminen ei vastaa tätä sovellusta tai sivustoa.",
 
   "appName": "Gabbro",
-  "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
-  "filePickerNoPortal": "File dialog unavailable here. The system file portal isn't reachable.",
+  "filePickerUnavailable": "Tiedostoikkuna ei ole käytettävissä täällä. Kirjoita tai liitä polku.",
+  "filePickerNoPortal": "Tiedostoikkuna ei ole käytettävissä täällä. Järjestelmän tiedostoportaaliin ei saada yhteyttä.",
 
   "cancel": "Peruuta",
   "quit": "Lopeta",
@@ -453,7 +453,7 @@
   "genericCsvSection": "Yleinen CSV",
 
   "changePassphraseSuccess": "Salauslause vaihdettu",
-  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
+  "changePassphraseBiometricDisabled": "Salauslause vaihdettu. Biometrinen avaus poistettiin käytöstä; ota se uudelleen käyttöön Turvallisuus-osiossa.",
   "changePassphraseButton": "Vaihda salauslause",
 
   "continueLabel": "Jatka",

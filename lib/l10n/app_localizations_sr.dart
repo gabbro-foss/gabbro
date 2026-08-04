@@ -47,11 +47,11 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get filePickerUnavailable =>
-      'File dialog unavailable here. Type or paste the path instead.';
+      'Дијалог за датотеке овде није доступан. Унесите или налепите путању.';
 
   @override
   String get filePickerNoPortal =>
-      'File dialog unavailable here. The system file portal isn\'t reachable.';
+      'Дијалог за датотеке овде није доступан. Системски портал за датотеке није доступан.';
 
   @override
   String get cancel => 'Откажи';
@@ -1111,7 +1111,7 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get changePassphraseBiometricDisabled =>
-      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+      'Приступна фраза је промењена. Биометријско откључавање је искључено; поново га укључите у одељку Безбедност.';
 
   @override
   String get changePassphraseButton => 'Промени приступну фразу';
@@ -2228,11 +2228,11 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get filePickerUnavailable =>
-      'File dialog unavailable here. Type or paste the path instead.';
+      'Dijalog za datoteke ovde nije dostupan. Unesite ili nalepite putanju.';
 
   @override
   String get filePickerNoPortal =>
-      'File dialog unavailable here. The system file portal isn\'t reachable.';
+      'Dijalog za datoteke ovde nije dostupan. Sistemski portal za datoteke nije dostupan.';
 
   @override
   String get cancel => 'Otkaži';
@@ -3293,7 +3293,7 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get changePassphraseBiometricDisabled =>
-      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+      'Pristupna fraza je promenjena. Biometrijsko otključavanje je isključeno; ponovo ga uključite u odeljku Bezbednost.';
 
   @override
   String get changePassphraseButton => 'Promeni pristupnu frazu';

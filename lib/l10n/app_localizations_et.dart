@@ -47,11 +47,11 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get filePickerUnavailable =>
-      'File dialog unavailable here. Type or paste the path instead.';
+      'Failidialoog pole siin saadaval. Sisesta või kleebi tee.';
 
   @override
   String get filePickerNoPortal =>
-      'File dialog unavailable here. The system file portal isn\'t reachable.';
+      'Failidialoog pole siin saadaval. Süsteemi failiportaal pole kättesaadav.';
 
   @override
   String get cancel => 'Tühista';
@@ -1112,7 +1112,7 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get changePassphraseBiometricDisabled =>
-      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+      'Paroolifraas muudetud. Biomeetriline avamine lülitati välja; lülita see uuesti sisse jaotises Turvalisus.';
 
   @override
   String get changePassphraseButton => 'Muuda pääsulauset';

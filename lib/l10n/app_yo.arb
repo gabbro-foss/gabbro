@@ -24,8 +24,8 @@
   "autofillNoMatchBody": "Kò sí ìwọlé tí a fipamọ́ tí ó bá ohun-èlò tàbí ojú-òpó yìí mu.",
 
   "appName": "Gabbro",
-  "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
-  "filePickerNoPortal": "File dialog unavailable here. The system file portal isn't reachable.",
+  "filePickerUnavailable": "Àpótí ìjíròrò fáìlì kò sí níbí. Tẹ tàbí lẹ ọ̀nà náà.",
+  "filePickerNoPortal": "Àpótí ìjíròrò fáìlì kò sí níbí. Ẹnu-ọ̀nà fáìlì ètò kò ṣeé dé.",
 
   "cancel": "Fagilee",
   "quit": "Jáde",
@@ -453,7 +453,7 @@
   "genericCsvSection": "CSV gbogbogbo",
 
   "changePassphraseSuccess": "Gbolohun ọrọ igbaniwọle ti yipada",
-  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
+  "changePassphraseBiometricDisabled": "A ti yí gbólóhùn ìwọlé padà. A pa ìṣílẹ̀kùn bíométíríkì; tún un ṣíṣẹ́ ní Ààbò.",
   "changePassphraseButton": "Yipada gbolohun ọrọ igbaniwọle",
 
   "continueLabel": "Tẹsiwaju",

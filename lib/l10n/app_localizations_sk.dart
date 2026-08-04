@@ -47,11 +47,11 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get filePickerUnavailable =>
-      'File dialog unavailable here. Type or paste the path instead.';
+      'Dialóg na výber súboru tu nie je dostupný. Zadajte alebo vložte cestu.';
 
   @override
   String get filePickerNoPortal =>
-      'File dialog unavailable here. The system file portal isn\'t reachable.';
+      'Dialóg na výber súboru tu nie je dostupný. Systémový portál súborov nie je dostupný.';
 
   @override
   String get cancel => 'Zrušiť';
@@ -1114,7 +1114,7 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get changePassphraseBiometricDisabled =>
-      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+      'Prístupová fráza bola zmenená. Biometrické odomknutie bolo vypnuté; znova ho zapnite v Zabezpečení.';
 
   @override
   String get changePassphraseButton => 'Zmeniť prístupovú frázu';

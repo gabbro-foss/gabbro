@@ -47,11 +47,11 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get filePickerUnavailable =>
-      'File dialog unavailable here. Type or paste the path instead.';
+      'Диалогът за файлове не е достъпен тук. Въведете или поставете пътя.';
 
   @override
   String get filePickerNoPortal =>
-      'File dialog unavailable here. The system file portal isn\'t reachable.';
+      'Диалогът за файлове не е достъпен тук. Системният файлов портал е недостъпен.';
 
   @override
   String get cancel => 'Откажи';
@@ -1113,7 +1113,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get changePassphraseBiometricDisabled =>
-      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+      'Кодовата фраза е променена. Биометричното отключване е изключено; включете го отново в «Сигурност».';
 
   @override
   String get changePassphraseButton => 'Промени паролна фраза';

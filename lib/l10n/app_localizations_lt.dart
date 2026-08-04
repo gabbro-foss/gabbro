@@ -47,11 +47,11 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get filePickerUnavailable =>
-      'File dialog unavailable here. Type or paste the path instead.';
+      'Failų dialogas čia nepasiekiamas. Įveskite arba įklijuokite kelią.';
 
   @override
   String get filePickerNoPortal =>
-      'File dialog unavailable here. The system file portal isn\'t reachable.';
+      'Failų dialogas čia nepasiekiamas. Sistemos failų portalas nepasiekiamas.';
 
   @override
   String get cancel => 'Atšaukti';
@@ -1113,7 +1113,7 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get changePassphraseBiometricDisabled =>
-      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+      'Slaptafrazė pakeista. Biometrinis atrakinimas išjungtas; vėl įjunkite jį skiltyje «Saugumas».';
 
   @override
   String get changePassphraseButton => 'Keisti slaptafrazę';
