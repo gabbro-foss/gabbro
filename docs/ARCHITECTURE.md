@@ -119,30 +119,6 @@ canary that drives the real save paths and byte-compares the real config/vault l
 
 ### Next task
 
-**The unlock screen has no visible Cancel.** Reached from Manage vaults -> switch
-(`main.dart:1143`, `pushReplacement`), the previous vault stays unlocked underneath
-but nothing on screen says how to go back. Only that one of the seven routes to
-`UnlockScreen` can be cancelled; the rest clear the stack on purpose. Gate on
-`Navigator.canPop`, mirroring `onboarding_screen.dart:781`. Cancel **replaces**
-Quit there (Ctrl+Q is already inert on that route, `vault_list_screen.dart:602`);
-Quit's other three surfaces are unchanged. Esc stays two presses
-(`vault_switch_routing_test.dart:138` pins it). `tooltipCancel` already exists,
-translated, in all 37 ARBs.
-
-- [x] N1 net: row 5 today shows Quit and no Cancel (inverted once R1 landed)
-- [x] R1 can-pop: Cancel shown, Quit absent
-- [x] R2 tapping Cancel returns to the previous vault, still unlocked
-- [x] R3 the other six routes: Quit shown, no Cancel
-- [x] R4 Cancel carries the localized accessible name (`semanticLabel`, not just
-      tooltip — Linux reads only the name) + `labeledTapTargetGuideline` in the
-      can-pop state
-- [x] R5 no overflow at 8x text on a 360px phone
-- [ ] hardware: Linux desktop + Android
-
-`flutter test` green (2079). The new can-pop harness uses production's
-`gabbroLocalizationsDelegates`, so its locale sweep demands a clean render —
-`_appShell` still does not (Bikeshed, Code Quality).
-
 Mock vaults for future rounds: `.scratchpad` (A, B, D; C and E deleted 2026-08-01).
 
 ---
