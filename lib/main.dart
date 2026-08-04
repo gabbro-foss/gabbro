@@ -152,6 +152,9 @@ Widget buildAutofillUnlockApp({
   MethodChannel channel = const MethodChannel('app.gabbro.gabbro/autofill'),
   // Test seam: defaults to the real bridge unlock; widget tests inject a fake.
   Future<void> Function(List<int>, String) onUnlock = defaultUnlock,
+  // Test seam: real FFI cannot run under `flutter test`, so the lock is
+  // injectable. Only the device pass proves the real wiring.
+  void Function() onLock = lockVault,
 }) =>
     _AutofillUnlockApp(
       settings: settings,
@@ -159,6 +162,7 @@ Widget buildAutofillUnlockApp({
       initialVaultPath: initialVaultPath,
       channel: channel,
       onUnlock: onUnlock,
+      onLock: onLock,
     );
 
 class _AutofillUnlockApp extends StatefulWidget {
@@ -167,6 +171,7 @@ class _AutofillUnlockApp extends StatefulWidget {
   final String initialVaultPath;
   final MethodChannel channel;
   final Future<void> Function(List<int>, String) onUnlock;
+  final void Function() onLock;
 
   const _AutofillUnlockApp({
     required this.settings,
@@ -174,6 +179,7 @@ class _AutofillUnlockApp extends StatefulWidget {
     required this.initialVaultPath,
     required this.channel,
     required this.onUnlock,
+    required this.onLock,
   });
 
   @override
@@ -235,13 +241,27 @@ class _AutofillUnlockAppState extends State<_AutofillUnlockApp> {
   /// then cancel.
   Future<void> _onUnlocked() async {
     final matched = await widget.channel.invokeMethod<bool>('unlock');
-    if (matched == true || !mounted) return;
+    if (matched == true) {
+      // RT-5: this activity runs only because the vault was locked, so the
+      // session is ours. It finishes here and its Dart isolate dies with it,
+      // leaving nothing to close that session — so lock first, THEN finish.
+      // `unlock` deliberately no longer finishes: locking after it would race
+      // the engine teardown.
+      widget.onLock();
+      await widget.channel.invokeMethod('finish');
+      return;
+    }
+    if (!mounted) return;
     // Show the dialog from a context UNDER the MaterialApp's Navigator/Overlay.
     // This State's own `context` sits above MaterialApp, where showDialog can find
     // neither an Overlay nor MaterialLocalizations and would throw.
     final navContext = _navigatorKey.currentContext;
     if (navContext == null || !navContext.mounted) return;
-    await showAutofillNoMatchDialog(navContext, widget.channel);
+    await showAutofillNoMatchDialog(
+      navContext,
+      widget.channel,
+      onLock: widget.onLock,
+    );
   }
 }
 
@@ -250,8 +270,12 @@ class _AutofillUnlockAppState extends State<_AutofillUnlockApp> {
 /// dismiss it tells the native side to cancel (deliver nothing to the field).
 Future<void> showAutofillNoMatchDialog(
   BuildContext context,
-  MethodChannel channel,
-) async {
+  MethodChannel channel, {
+  // RT-5: the vault was opened for a fill that matched nothing. It is still
+  // ours, so it closes before the activity ends. Defaults to no-op for the
+  // standalone dialog test, which drives no session.
+  void Function()? onLock,
+}) async {
   final l = AppLocalizations.of(context);
   await showDialog<void>(
     context: context,
@@ -267,6 +291,7 @@ Future<void> showAutofillNoMatchDialog(
       ],
     ),
   );
+  onLock?.call();
   await channel.invokeMethod('cancel');
 }
 
@@ -310,6 +335,9 @@ Widget buildAutofillSaveApp({
   required bool alreadyUnlocked,
   MethodChannel channel = const MethodChannel('app.gabbro.gabbro/autofill_save'),
   Future<String> Function()? fetchSaveContextJson,
+  // Test seams: real FFI cannot run under `flutter test`. See the unlock shell.
+  void Function() onLock = lockVault,
+  Future<void> Function(List<int>, String) onUnlock = defaultUnlock,
 }) =>
     _AutofillSaveApp(
       settings: settings,
@@ -317,6 +345,8 @@ Widget buildAutofillSaveApp({
       initialVaultPath: initialVaultPath,
       alreadyUnlocked: alreadyUnlocked,
       channel: channel,
+      onLock: onLock,
+      onUnlock: onUnlock,
       fetchSaveContextJson: fetchSaveContextJson ??
           () async => (await channel.invokeMethod<String>('getSaveContext')) ?? '{}',
     );
@@ -328,6 +358,8 @@ class _AutofillSaveApp extends StatefulWidget {
   final bool alreadyUnlocked;
   final MethodChannel channel;
   final Future<String> Function() fetchSaveContextJson;
+  final void Function() onLock;
+  final Future<void> Function(List<int>, String) onUnlock;
 
   const _AutofillSaveApp({
     required this.settings,
@@ -336,6 +368,8 @@ class _AutofillSaveApp extends StatefulWidget {
     required this.alreadyUnlocked,
     required this.channel,
     required this.fetchSaveContextJson,
+    required this.onLock,
+    required this.onUnlock,
   });
 
   @override
@@ -400,6 +434,7 @@ class _AutofillSaveAppState extends State<_AutofillSaveApp> {
         vaultAlias: _aliasFor(_vaultPath),
         registry: widget.registry,
         onVaultSwitch: (path, alias) => setState(() => _vaultPath = path),
+        onUnlock: widget.onUnlock,
         onUnlocked: () async {
           setState(() => _unlocked = true);
           await _loadContext();
@@ -415,9 +450,18 @@ class _AutofillSaveAppState extends State<_AutofillSaveApp> {
     return SaveConfirmScreen(
       saveContext: ctx,
       showSwitchVaultHint: widget.alreadyUnlocked,
-      onDone: () => widget.channel.invokeMethod('done'),
-      onCancel: () => widget.channel.invokeMethod('cancel'),
+      onDone: () => _finish('done'),
+      onCancel: () => _finish('cancel'),
     );
+  }
+
+  /// RT-5: a vault THIS flow unlocked is ours to close, and the activity's Dart
+  /// isolate dies when it finishes — so lock on the way out, before telling
+  /// Kotlin to finish. A session the main app already had open is left alone:
+  /// closing it would lock the user out of the app they are using.
+  Future<void> _finish(String method) async {
+    if (!widget.alreadyUnlocked) widget.onLock();
+    await widget.channel.invokeMethod(method);
   }
 }
 

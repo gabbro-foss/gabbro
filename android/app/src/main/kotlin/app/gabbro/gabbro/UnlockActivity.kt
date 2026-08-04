@@ -58,14 +58,23 @@ class UnlockActivity : GabbroUnlockHostActivity() {
                         // fill response. Return whether a credential matched so Dart can show
                         // a localized "no credentials" dialog itself — a native AlertDialog
                         // cannot be localized against the Flutter ARBs.
+                        //
+                        // Deliberately does NOT finish (RT-5): this activity unlocked the
+                        // vault, and its Dart isolate dies with the activity, so Dart must
+                        // lock the session before we go. It calls "finish" once it has.
+                        // Finishing here would race the engine teardown against that lock.
                         val fillIntent = buildFillIntent()
                         if (fillIntent != null) {
                             setResult(RESULT_OK, fillIntent)
-                            finish()
                             result.success(true)
                         } else {
                             result.success(false)
                         }
+                    }
+                    "finish" -> {
+                        // The result is already set by "unlock"; Dart has now locked.
+                        finish()
+                        result.success(null)
                     }
                     "cancel" -> {
                         setResult(RESULT_CANCELED)

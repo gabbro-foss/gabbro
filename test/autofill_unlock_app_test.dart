@@ -166,4 +166,71 @@ void main() {
     await tester.tap(find.text('Dismiss'));
     await tester.pumpAndSettle();
   });
+
+  // RT-5: this activity exists only because the vault was locked, so the
+  // session it opens is its own. It finishes right after the fill and its Dart
+  // isolate dies with it, leaving nothing running to close that session — so it
+  // must lock on the way out. The ORDER matters: locking after `finish` would
+  // race the engine teardown, which is why `unlock` no longer finishes.
+  testWidgets('a successful fill locks the vault, then finishes', (tester) async {
+    final events = <String>[];
+    tester.binding.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, (call) async {
+      events.add('channel:${call.method}');
+      if (call.method == 'unlock') return true; // a credential matched
+      return null;
+    });
+    addTearDown(() => tester.binding.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, null));
+
+    await tester.pumpWidget(buildAutofillUnlockApp(
+      settings: AppSettings(),
+      registry: _twoVaults(),
+      initialVaultPath: '/tmp/a.gabbro',
+      channel: channel,
+      onUnlock: (a, b) async {},
+      onLock: () => events.add('lock'),
+    ));
+    await tester.pump();
+
+    await tester.tap(find.text('Unlock'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(events, ['channel:unlock', 'lock', 'channel:finish'],
+        reason: 'the fill response is built, then we lock, then the activity ends');
+  });
+
+  testWidgets('cancelling after no match locks the vault too', (tester) async {
+    final events = <String>[];
+    tester.binding.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, (call) async {
+      events.add('channel:${call.method}');
+      if (call.method == 'unlock') return false; // unlocked, nothing matched
+      return null;
+    });
+    addTearDown(() => tester.binding.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, null));
+
+    await tester.pumpWidget(buildAutofillUnlockApp(
+      settings: AppSettings(),
+      registry: _twoVaults(),
+      initialVaultPath: '/tmp/a.gabbro',
+      channel: channel,
+      onUnlock: (a, b) async {},
+      onLock: () => events.add('lock'),
+    ));
+    await tester.pump();
+
+    await tester.tap(find.text('Unlock'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(find.text('Dismiss'));
+    await tester.pumpAndSettle();
+
+    expect(events, ['channel:unlock', 'lock', 'channel:cancel'],
+        reason: 'a vault opened for a fill that matched nothing still closes');
+  });
 }
