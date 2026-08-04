@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2085 | 10 |
+| Flutter (`flutter test`) | 2089 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -133,25 +133,19 @@ scrub a String). The aim is "can it be RENDERED", not "is the memory clean".
 - [x] cross them: for each holder, what drops it on each close
 - [x] findings list -> triage with maintainer
 
-Audit done. Six holders sound. Two confirmed findings, both "the app does not do
-what its own settings promise", both agreed for fixing:
-- **RT-4** the clipboard wipe never fires once you leave the screen (`dispose()`
-  cancels it), and lock wipes nothing.
-- **RT-5** the auto-lock timeout is ignored when the vault is unlocked through
-  Android autofill — neither autofill shell arms a timer.
+Audit done, both findings fixed and hardware-verified. Six holders sound. Detail
+in `docs/red_team_test.md` (private, gitignored).
 
-Detail in `docs/red_team_test.md` (private, gitignored). Both are changes to
-existing behaviour with tests pinning the current shape, so net-first applies.
-
-**RT-4 DONE** (hardware green 2026-08-04, 8/8). `ClipboardClearMixin` replaced by
-the app-level `clipboardWiper`, so the wipe outlives the screen that scheduled it
-(mirrors `autotypeTarget`). `_lock({automatic})` splits the two locks: timers wipe,
-Ctrl+L / menu / `detached` do not. Quit does not wipe (WONTFIX — clipboard managers
-are not ours). `never` still wipes nothing.
-
-**RT-5 next.** Arm auto-lock in the two Android autofill shells
-(`_AutofillUnlockAppState`, `_AutofillSaveAppState`), which own no timer and no
-lifecycle observer. Needs a device pass.
+- **RT-4 DONE** (Linux 8/8). `ClipboardClearMixin` replaced by the app-level
+  `clipboardWiper`, so the wipe outlives the screen that scheduled it (mirrors
+  `autotypeTarget`). `_lock({automatic})` splits the two locks: timers wipe,
+  Ctrl+L / menu / `detached` do not. Quit does not wipe (WONTFIX — clipboard
+  managers are not ours). `never` still wipes nothing.
+- **RT-5 DONE** (S23 14/14). A vault autofill unlocked is locked again when the
+  flow ends; a session the main app owns is left alone (`alreadyUnlocked`).
+  `UnlockActivity`'s `unlock` no longer finishes — Dart locks, then calls the new
+  `finish`, so the lock cannot race the engine teardown. A timer was not an option:
+  the activity's Dart isolate dies with it while the Rust session lives on.
 
 Mock vaults for future rounds: `.scratchpad` (A, B, D; C and E deleted 2026-08-01).
 
