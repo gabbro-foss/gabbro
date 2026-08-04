@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Serbian (Cyrillic) was almost entirely written in Latin script.** Choosing Српски gave you the same Latin text as Српски (latinica) — only 85 of 645 strings were actually Cyrillic. All of them are now, so the two Serbian options finally differ. A test refuses any Cyrillic locale that ships Latin-script prose, so this cannot come back.
+
 ### Changed
 - **Starting a vault switch and changing your mind is now one tap.** Picking another vault in Manage vaults opens its unlock screen over the vault you already had open; a Cancel button in the top-left goes back to it. That corner offered Quit before, which was never the action you wanted there — Quit stays in the vault menu, on `Ctrl+Q`, and on the first-run and locked screens.
 

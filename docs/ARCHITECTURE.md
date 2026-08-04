@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2089 | 10 |
+| Flutter (`flutter test`) | 2094 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -119,23 +119,21 @@ canary that drives the real save paths and byte-compares the real config/vault l
 
 ### Next task
 
-**Two l10n code-quality items, taken together.**
+Both l10n code-quality items DONE (2026-08-04).
 
-1. **`sr.arb` has one Latin-script value in a Cyrillic file.**
-   `vaultRestoredBiometricDisabled` is byte-identical in `app_sr.arb` and
-   `app_sr_Latn.arb`, so a Cyrillic reader meets one Latin sentence. Fix the
-   value; consider a script-consistency net.
-2. **One locale sweep tolerates an error, so it could hide an overflow.** The
-   format-too-old sweep (`test/unlock_screen_test.dart:633`) allows the "locale
-   not supported by all delegates" warning for nn and yo, so a real overflow in
-   the same frame collapses into an opaque "Multiple exceptions" wrapper and is
-   swallowed. Cause: `_appShell` uses `AppLocalizations.localizationsDelegates`
-   while production uses `gabbroLocalizationsDelegates`, which ships fallbacks
-   for both. Point `_appShell` at production (as the can-pop harness already
-   does) and demand a clean render.
-
-Item 2 may expose overflows the tolerance was hiding — that is the point, but it
-is why it is not a fixed-size job.
+- **Serbian Cyrillic was Latin.** The Bikeshed called it one stray value; the net
+  found 560 — only 85 of 645 `app_sr.arb` values were Cyrillic, so picking Српски
+  gave the same text as Српски (latinica). Transliterated (Serbian is a strict 1:1
+  script pair, digraphs included); values still identical to English were left
+  alone, as that is the separate untranslated-strings item. New net in
+  `l10n_test.dart` fails any Cyrillic locale shipping Latin-script prose.
+  **Residual:** machine transliteration cannot tell a true digraph from `d`+`ž`
+  across a morpheme boundary. Nothing matching those patterns was found, but a
+  native-speaker read is still the honest confirmation.
+- **The tolerant locale sweep is gone.** `_appShell` now uses production's
+  `gabbroLocalizationsDelegates`, so no sweep tolerates a delegate warning that
+  could mask an overflow raised in the same frame. Demanding a clean render found
+  no hidden overflows.
 
 Mock vaults for future rounds: `.scratchpad` (A, B, D; C and E deleted 2026-08-01).
 
