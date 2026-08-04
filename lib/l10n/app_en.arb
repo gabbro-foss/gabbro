@@ -592,7 +592,7 @@
   "genericCsvSection": "Generic CSV",
 
   "changePassphraseSuccess": "Passphrase changed successfully",
-  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
+  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Security.",
   "changePassphraseButton": "Change passphrase",
 
   "continueLabel": "Continue",

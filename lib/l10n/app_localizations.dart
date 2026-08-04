@@ -2194,7 +2194,7 @@ abstract class AppLocalizations {
   /// No description provided for @changePassphraseBiometricDisabled.
   ///
   /// In en, this message translates to:
-  /// **'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.'**
+  /// **'Passphrase changed. Biometric unlock was turned off; re-enable it in Security.'**
   String get changePassphraseBiometricDisabled;
 
   /// No description provided for @changePassphraseButton.

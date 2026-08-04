@@ -389,7 +389,7 @@ void main() {
     expect(find.text('Passphrase changed successfully'), findsOneWidget);
     expect(
       find.text(
-          'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.'),
+          'Passphrase changed. Biometric unlock was turned off; re-enable it in Security.'),
       findsNothing,
     );
   });
@@ -407,7 +407,7 @@ void main() {
     expect(disableCalled, isTrue);
     expect(
       find.text(
-          'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.'),
+          'Passphrase changed. Biometric unlock was turned off; re-enable it in Security.'),
       findsOneWidget,
     );
   });
