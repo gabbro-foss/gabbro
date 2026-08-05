@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.18] – 2026-08-05
+
 ### Fixed
 - **Dialogs cut their question short, then put their buttons off the screen.** A dialog gives its buttons a fixed strip and lets the message shrink into whatever is left. On a phone at double text size the message was quietly truncated; at four times it vanished altogether and both buttons sat below the bottom of the screen, so a confirmation could be neither read nor answered. Every dialog now scrolls as a whole, unchanged at normal text size.
 - **The vault list showed no entries at all at the largest text sizes.** On a narrow phone the search box grew with its placeholder until it had taken the whole screen, and the A-Z bar drew itself into a space too small to hold it. The placeholder now stays on one line and the A-Z bar steps aside when it cannot fit, so the entries keep their room.
@@ -21,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **A copied password stayed on the clipboard for good if you left the entry screen.** The clear timeout only ever ran while that screen stayed open — pressing back, locking or switching vaults cancelled it silently, so the wipe you configured never happened. It now runs to completion wherever you go. An automatic lock (you walked away) wipes it immediately; a lock you ask for yourself leaves it alone, so you can still paste what you just copied. `never` still means never.
 - **The vault registry no longer records which vaults need a YubiKey.** `vaults.jsonc` is plain text, so on a shared computer it showed anyone with file access which vaults were passphrase-only. Nothing in the app ever used the value; the line disappears from the file the next time you unlock a vault.
 - **A failed auto-type could print one character of a password to the terminal (Linux).** When the X server rejected a keystroke, Gabbro printed the whole error, including the value the server objected to — which for that request came from the password. The message now names the failure and the request that failed, never the value.
+
+*Built with Flutter 3.44.8, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21.*
 
 ## [0.1.0-alpha.17] – 2026-08-03
 
