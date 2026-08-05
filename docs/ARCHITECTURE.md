@@ -119,6 +119,16 @@ canary that drives the real save paths and byte-compares the real config/vault l
 
 ### Next task
 
+**CRITICAL — Linux auto-type fills the selected entry, not the matching one.**
+Reported 2026-08-05: triggering auto-type over a web page types whichever entry is
+currently selected in the app, regardless of the target site. A user with the wrong
+entry selected types that secret into an unrelated website. Believed a regression.
+
+Steps: (1) reproduce and pin the trigger; (2) net-first — pin the current
+window/URL -> entry matching behaviour with tests before touching production;
+(3) find where selection overrides the match (`rust/src/autotype/`, `lib/autotype_listener.dart`,
+`lib/autotype_target.dart`); (4) fix + hardware-verify; (5) release.
+
 ---
 
 ## Build & Release
