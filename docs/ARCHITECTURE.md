@@ -119,34 +119,6 @@ canary that drives the real save paths and byte-compares the real config/vault l
 
 ### Next task
 
-**Vault list body overflows at 8x text on a 360dp phone.** Two causes, both fixed:
-the search placeholder wrapped unbounded (field 1364 px at 8x, list squeezed to
-zero) — now capped to one line on both branches; and the alphabet index bar drew
-its 180 px minimum into a 142 px slot — now stands down below that. Pinned in
-`vault_list_overflow_test.dart` + `alphabet_index_bar_test.dart`.
-
-Dialog audit — code done. Every dialog goes through `showGabbroDialog`
-(`lib/widgets/gabbro_dialog.dart`), which scrolls the whole dialog: unchanged at
-1x, message readable and buttons reachable above it. `scrollable: true` never
-helped — it scrolls title+content, never `actions`; the comments claiming
-otherwise are corrected. `test/gabbro_dialog_test.dart` pins the layout, the
-barrier tap, and that no `lib/` file calls `showDialog` directly.
-
-Note the overflow probe sweeps at 2x only, which is why none of this showed up.
-
-**Committed 2026-08-04, not pushed, not hardware-tested.** `flutter test` 2125
-green; Rust/Kotlin untouched. No release until the hardware run passes.
-
-Next: hardware-verify on Linux and the Android emulator (no YubiKey needed).
-A matrix must be written first — the one written this session was rejected as
-unreadable and deleted. **Ask the maintainer for the format before writing it.**
-The checks it has to cover, in order per platform: text size 1x, 2x, 8x; the
-vault list (entries visible, search box one line, A-Z bar gone at 8x); a confirm
-dialog (message readable in full, buttons reachable by scrolling, tapping beside
-it still dismisses). Android has its own search-box code path.
-
-Mock vaults for future rounds: `.scratchpad` (A, B, D; C and E deleted 2026-08-01).
-
 ---
 
 ## Build & Release
