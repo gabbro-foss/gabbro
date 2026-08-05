@@ -119,6 +119,12 @@ canary that drives the real save paths and byte-compares the real config/vault l
 
 ### Next task
 
+**Release v0.1.0-alpha.18.** Version + CHANGELOG bumped, gate green 2026-08-05.
+Remaining: build + sign artifacts, verify embedded version, tag, publish, then the
+AUR bump. The AUR is still down and `gabbro-bin` is live at alpha.16; drop the
+unpushed alpha.17 commit (`git -C ../gabbro-bin-aur reset --hard origin/master`)
+and push a single alpha.18 bump — the AUR accepts a skipped version.
+
 ---
 
 ## Build & Release
@@ -131,15 +137,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 ## Bikeshed / Backlog
 
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
-
-### Release
-- **Outstanding: the AUR push.** `gabbro-bin` is bumped to `0.1.0_alpha.17` and
-  committed in the AUR clone, but the push failed — the AUR was in SSH maintenance
-  on 2026-08-03. Until it lands, Arch users still install alpha.16. Retry with
-  `git -C ../gabbro-bin-aur push` from `gabbro/`.
-
-  v0.1.0-alpha.17 released 2026-08-03: full gate green, artifacts built and signed,
-  embedded version and APK certificate verified, tag pushed, release published.
 
 ### Features and UI/UX
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
