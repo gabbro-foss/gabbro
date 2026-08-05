@@ -31,7 +31,6 @@ void main() {
       expect(steps, hasLength(1));
       expect(steps.single.kind, SyncStepKind.newEntry);
       expect(steps.single.title, 'Bank');
-      expect(steps.single.needsChoice, isFalse);
     });
 
     test('all of one entry\'s changes land in a single step', () {
@@ -77,10 +76,9 @@ void main() {
       expect(s.broughtOver, hasLength(2));
       expect(s.conflicts, hasLength(1));
       expect(s.itemDeletes, hasLength(1));
-      expect(s.needsChoice, isTrue, reason: 'has a clash to pick');
     });
 
-    test('a brought-over-only entry needs no forced choice', () {
+    test('a brought-over-only entry groups into one changes step', () {
       final steps = buildSyncReviewSteps(
         _summary(
           broughtOver: [
@@ -94,10 +92,10 @@ void main() {
           ],
         ),
       );
-      expect(steps.single.needsChoice, isFalse);
+      expect(steps.single.kind, SyncStepKind.changes);
     });
 
-    test('a folder difference forces a choice', () {
+    test('a folder difference becomes a changes step', () {
       final steps = buildSyncReviewSteps(
         _summary(
           folderConflicts: [
@@ -111,7 +109,7 @@ void main() {
         ),
       );
       expect(steps.single.kind, SyncStepKind.changes);
-      expect(steps.single.needsChoice, isTrue);
+      expect(steps.single.folderConflict, isNotNull);
     });
 
     test('a whole-entry delete becomes a deleteEntry step', () {

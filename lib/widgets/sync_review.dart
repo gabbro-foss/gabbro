@@ -39,7 +39,7 @@ class SyncReviewStep {
   /// Items the other device deleted (keep or delete).
   final List<PendingItemDeleteItem> itemDeletes;
 
-  /// A differing folder assignment, if any (the user must pick).
+  /// A differing folder assignment, if any.
   final FolderConflictItem? folderConflict;
 
   const SyncReviewStep({
@@ -53,10 +53,6 @@ class SyncReviewStep {
     this.itemDeletes = const [],
     this.folderConflict,
   });
-
-  /// True when this step has a choice with no safe default, so the user must act
-  /// before moving on (a clash, or a folder difference).
-  bool get needsChoice => conflicts.isNotEmpty || folderConflict != null;
 }
 
 /// Group a [MergeSummary] into ordered per-entry review steps: new entries first,
@@ -263,28 +259,20 @@ class _SyncReviewSheet extends StatefulWidget {
 class _SyncReviewSheetState extends State<_SyncReviewSheet> {
   int _index = 0;
 
-  // Keyed "id field" or by id, as noted. Defaults favour keeping everything.
-  final Map<String, bool> _keepBrought = {}; // default true
-  final Map<String, bool> _keepNewEntry = {}; // default true
-  final Map<String, bool> _deleteItem = {}; // default false
-  final Map<String, bool?> _conflictUseTheirs = {}; // null until picked
-  final Map<String, String?> _folderChoice = {}; // null until picked
-  final Map<String, bool> _confirmEntryDelete = {}; // default false
+  // Keyed "id field" or by id, as noted. Every default is the incoming (other
+  // vault) side: you sync because the other device changed, so its value leads.
+  // A user who taps nothing therefore lands on exactly what auto-merge does.
+  final Map<String, bool> _keepBrought = {}; // default true (keep incoming)
+  final Map<String, bool> _keepNewEntry = {}; // default true (take incoming)
+  final Map<String, bool> _deleteItem = {}; // default true (apply the delete)
+  final Map<String, bool> _conflictUseTheirs = {}; // default true
+  final Map<String, String> _folderChoice = {}; // default incoming folder
+  final Map<String, bool> _confirmEntryDelete = {}; // default true
 
   /// Secret fields the user has revealed, keyed by "id field". Default hidden.
   final Set<String> _revealed = {};
 
   String _k(String id, String field) => '$id $field';
-
-  bool _stepSatisfied(SyncReviewStep step) {
-    for (final c in step.conflicts) {
-      if (_conflictUseTheirs[_k(c.id, c.field)] == null) return false;
-    }
-    if (step.folderConflict != null && _folderChoice[step.id] == null) {
-      return false;
-    }
-    return true;
-  }
 
   String _disp(
     String field,
@@ -353,18 +341,22 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
     );
   }
 
-  Widget _keepDeleteChips({
-    required bool keepSelected,
-    required String keepLabel,
-    required String otherLabel,
-    required VoidCallback onKeep,
-    required VoidCallback onOther,
+  /// A two-choice picker naming its slots by *vault side*, never by keep/drop:
+  /// "keep" means the incoming value at one call site and the local one at
+  /// another, and that mismatch is what once let the two options render in
+  /// opposite orders on the same screen. Incoming always renders first.
+  Widget _incomingLocalChoice({
+    required bool incomingSelected,
+    required String incomingLabel,
+    required String localLabel,
+    required VoidCallback onIncoming,
+    required VoidCallback onLocal,
     bool showsValues = false,
   }) => Padding(
     padding: const EdgeInsets.symmetric(horizontal: 16),
     child: _choiceRow([
-      (label: keepLabel, selected: keepSelected, onSelect: onKeep),
-      (label: otherLabel, selected: !keepSelected, onSelect: onOther),
+      (label: incomingLabel, selected: incomingSelected, onSelect: onIncoming),
+      (label: localLabel, selected: !incomingSelected, onSelect: onLocal),
     ], showsValues: showsValues),
   );
 
@@ -381,10 +373,10 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
     }),
   );
 
-  /// Build and return the decisions. [fastRest] resolves every step the user has
-  /// NOT explicitly decided in favour of the incoming vault (the "merge the rest
-  /// automatically" bail-out); hand-made picks are always honoured.
-  void _finish({bool fastRest = false}) {
+  /// Build and return the decisions. Every choice the user did not touch resolves
+  /// in favour of the incoming vault, so finishing here and "merge the rest
+  /// automatically" are the same call — there is no separate fast path to drift.
+  void _finish() {
     final fields = <SyncFieldResolution>[];
     final history = <SyncHistoryReplacement>[];
     final items = <SyncItemDeleteResolution>[];
@@ -405,8 +397,8 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
           }
           break;
         case SyncStepKind.deleteEntry:
-          // Fast-rest applies the incoming delete; normal keeps unless confirmed.
-          if (_confirmEntryDelete[step.id] ?? fastRest) {
+          // Default: apply the delete the other device made.
+          if (_confirmEntryDelete[step.id] ?? true) {
             entryDeletes.add(step.id);
             deletedTitles.add(step.title);
           }
@@ -435,8 +427,8 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
             }
           }
           for (final c in step.conflicts) {
-            // Undecided clashes take theirs under fast-rest, mine otherwise.
-            final useTheirs = _conflictUseTheirs[_k(c.id, c.field)] ?? fastRest;
+            // Default: the incoming value wins the clash.
+            final useTheirs = _conflictUseTheirs[_k(c.id, c.field)] ?? true;
             if (useTheirs) {
               // Apply theirs; keep the losing local value in history.
               stepChanged = true;
@@ -450,16 +442,15 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
             }
           }
           for (final d in step.itemDeletes) {
-            // Undecided item-deletes apply the incoming delete under fast-rest.
-            final del = _deleteItem[_k(d.id, d.field)] ?? fastRest;
+            // Default: apply the item delete the other device made.
+            final del = _deleteItem[_k(d.id, d.field)] ?? true;
             if (del) stepChanged = true;
             items.add(SyncItemDeleteResolution(d.id, d.field, del));
           }
           final fc = step.folderConflict;
           if (fc != null) {
-            // Undecided folder clashes take the incoming folder under fast-rest.
-            final chosen = _folderChoice[step.id] ??
-                (fastRest ? fc.incomingFolder : fc.localFolder);
+            // Default: move to the incoming folder.
+            final chosen = _folderChoice[step.id] ?? fc.incomingFolder;
             if (chosen != fc.localFolder) stepChanged = true;
             folders.add(SyncFolderResolution(fc.id, chosen));
           }
@@ -506,7 +497,7 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
           TextButton(
             onPressed: () {
               Navigator.of(ctx).pop();
-              _finish(fastRest: true);
+              _finish();
             },
             child: Text(l.syncMergeAutomatically),
           ),
@@ -529,7 +520,6 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
     final l = AppLocalizations.of(context);
     final step = widget.steps[_index];
     final isLast = _index == widget.steps.length - 1;
-    final canAdvance = _stepSatisfied(step);
 
     // Escape cancels the review the safe way: pop with cancelled:true so the
     // caller rolls the vault back to its pre-sync state and applies nothing.
@@ -560,9 +550,9 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
       actions: [
         TextButton(onPressed: _bail, child: Text(l.cancel)),
         TextButton(
-          onPressed: canAdvance
-              ? (isLast ? _finish : () => setState(() => _index++))
-              : null,
+          // Never disabled: every choice already carries an incoming default, so
+          // there is nothing left for the user to satisfy before moving on.
+          onPressed: isLast ? _finish : () => setState(() => _index++),
           child: Text(isLast ? l.ok : l.continueAction),
         ),
       ],
@@ -580,27 +570,30 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: Text('${l.newEntryTitle}: ${step.title}'),
           ),
-          _keepDeleteChips(
-            keepSelected: keepNew,
-            keepLabel: l.keep,
-            otherLabel: l.skip,
-            onKeep: () => setState(() => _keepNewEntry[step.id] = true),
-            onOther: () => setState(() => _keepNewEntry[step.id] = false),
+          // Keeping a new entry IS taking the incoming side.
+          _incomingLocalChoice(
+            incomingSelected: keepNew,
+            incomingLabel: l.keep,
+            localLabel: l.skip,
+            onIncoming: () => setState(() => _keepNewEntry[step.id] = true),
+            onLocal: () => setState(() => _keepNewEntry[step.id] = false),
           ),
         ];
       case SyncStepKind.deleteEntry:
-        final confirmDel = _confirmEntryDelete[step.id] ?? false;
+        final confirmDel = _confirmEntryDelete[step.id] ?? true;
         return [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: Text(l.syncDeleteEntryContent(step.title)),
           ),
-          _keepDeleteChips(
-            keepSelected: !confirmDel,
-            keepLabel: l.keep,
-            otherLabel: l.delete,
-            onKeep: () => setState(() => _confirmEntryDelete[step.id] = false),
-            onOther: () => setState(() => _confirmEntryDelete[step.id] = true),
+          // The other device deleted it, so Delete is the incoming side.
+          _incomingLocalChoice(
+            incomingSelected: confirmDel,
+            incomingLabel: l.delete,
+            localLabel: l.keep,
+            onIncoming: () =>
+                setState(() => _confirmEntryDelete[step.id] = true),
+            onLocal: () => setState(() => _confirmEntryDelete[step.id] = false),
           ),
         ];
       case SyncStepKind.changes:
@@ -633,21 +626,21 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
             ),
           );
           widgets.add(
-            _keepDeleteChips(
-              keepSelected: keep,
-              keepLabel:
+            _incomingLocalChoice(
+              incomingSelected: keep,
+              incomingLabel:
                   '${l.syncOtherVault}: ${_disp(b.field, b.newValue, l, revealed: revealed)}',
-              otherLabel:
+              localLabel:
                   '${l.syncThisVault}: ${_disp(b.field, b.oldValue, l, revealed: revealed)}',
-              onKeep: () => setState(() => _keepBrought[key] = true),
-              onOther: () => setState(() => _keepBrought[key] = false),
+              onIncoming: () => setState(() => _keepBrought[key] = true),
+              onLocal: () => setState(() => _keepBrought[key] = false),
               showsValues: true,
             ),
           );
         }
         for (final c in step.conflicts) {
           final key = _k(c.id, c.field);
-          final pick = _conflictUseTheirs[key];
+          final useTheirs = _conflictUseTheirs[key] ?? true;
           final secret = _isSecret(c.field);
           final revealed = _revealed.contains(key);
           widgets.add(
@@ -670,17 +663,17 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
               child: _choiceRow([
                 (
                   label:
-                      '${l.syncThisVault}: ${_disp(c.field, c.localValue, l, revealed: revealed)}',
-                  selected: pick == false,
+                      '${l.syncOtherVault}: ${_disp(c.field, c.incomingValue, l, revealed: revealed)}',
+                  selected: useTheirs,
                   onSelect: () =>
-                      setState(() => _conflictUseTheirs[key] = false),
+                      setState(() => _conflictUseTheirs[key] = true),
                 ),
                 (
                   label:
-                      '${l.syncOtherVault}: ${_disp(c.field, c.incomingValue, l, revealed: revealed)}',
-                  selected: pick == true,
+                      '${l.syncThisVault}: ${_disp(c.field, c.localValue, l, revealed: revealed)}',
+                  selected: !useTheirs,
                   onSelect: () =>
-                      setState(() => _conflictUseTheirs[key] = true),
+                      setState(() => _conflictUseTheirs[key] = false),
                 ),
               ], showsValues: true),
             ),
@@ -688,7 +681,7 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
         }
         for (final d in step.itemDeletes) {
           final key = _k(d.id, d.field);
-          final del = _deleteItem[key] ?? false;
+          final del = _deleteItem[key] ?? true;
           widgets.add(
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
@@ -696,18 +689,18 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
             ),
           );
           widgets.add(
-            _keepDeleteChips(
-              keepSelected: !del,
-              keepLabel: l.keep,
-              otherLabel: l.delete,
-              onKeep: () => setState(() => _deleteItem[key] = false),
-              onOther: () => setState(() => _deleteItem[key] = true),
+            _incomingLocalChoice(
+              incomingSelected: del,
+              incomingLabel: l.delete,
+              localLabel: l.keep,
+              onIncoming: () => setState(() => _deleteItem[key] = true),
+              onLocal: () => setState(() => _deleteItem[key] = false),
             ),
           );
         }
         final fc = step.folderConflict;
         if (fc != null) {
-          final choice = _folderChoice[step.id];
+          final choice = _folderChoice[step.id] ?? fc.incomingFolder;
           widgets.add(
             Padding(
               padding: const EdgeInsets.only(left: 16, top: 8),
@@ -722,14 +715,6 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: _choiceRow([
                 (
-                  label: fc.localFolder.isEmpty
-                      ? l.folderConflictKeepUnfoldered
-                      : l.folderConflictKeepLocal(fc.localFolder),
-                  selected: choice == fc.localFolder,
-                  onSelect: () =>
-                      setState(() => _folderChoice[step.id] = fc.localFolder),
-                ),
-                (
                   label: fc.incomingFolder.isEmpty
                       ? l.folderConflictMoveUnfoldered
                       : l.folderConflictMoveIncoming(fc.incomingFolder),
@@ -737,6 +722,14 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
                   onSelect: () => setState(
                     () => _folderChoice[step.id] = fc.incomingFolder,
                   ),
+                ),
+                (
+                  label: fc.localFolder.isEmpty
+                      ? l.folderConflictKeepUnfoldered
+                      : l.folderConflictKeepLocal(fc.localFolder),
+                  selected: choice == fc.localFolder,
+                  onSelect: () =>
+                      setState(() => _folderChoice[step.id] = fc.localFolder),
                 ),
               ], showsValues: true),
             ),
