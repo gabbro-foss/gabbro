@@ -208,9 +208,19 @@ data lives in private storage — export a `.gabbro` backup first.)
 
 #### Set up auto-type (optional)
 
-Gabbro ships a small `gabbro-autotype` helper. Bind it to a keyboard shortcut and
-Gabbro types the login you have open into whatever window you are in — no
-copy-paste. Its path depends on how you installed:
+Gabbro ships a small `gabbro-autotype` helper. Nothing is bound by default, so
+auto-type does nothing until you bind it to a shortcut yourself. Once you do,
+pressing that key types the login **currently showing in Gabbro** into **whatever
+window has focus** — username, Tab, password, Enter. No copy-paste.
+
+**You choose the entry; Gabbro cannot.** A browser does not tell the window
+manager which site is on screen, and Gabbro will never ship a browser extension
+to find out. So it does no site matching and cannot warn you when the entry is
+wrong for the page — whatever login is showing is what gets typed, and submitted.
+It stays showing until you pick another or the vault locks. Check the entry before
+you press your key.
+
+Its path depends on how you installed:
 
 - **Package (AUR / `.deb`):** `/usr/lib/gabbro/gabbro-autotype`
 - **Tarball:** `<where-you-extracted>/bundle/gabbro-autotype`
@@ -225,7 +235,7 @@ Cinnamon / Linux Mint: Menu → **Keyboard** → **Shortcuts** → **Custom
 Shortcuts** → **Add custom shortcut**, with the full path as the command.
 
 Requires an X11 session (not Wayland) and Gabbro running and unlocked with a
-login open. Full instructions, other desktops, and troubleshooting:
+login showing. Full instructions, other desktops, and troubleshooting:
 [`docs/AUTOTYPE_AND_AUTOFILL.md`](docs/AUTOTYPE_AND_AUTOFILL.md).
 
 #### Verify the Linux build is genuine

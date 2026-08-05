@@ -7,6 +7,7 @@ copy-paste a password. The two platforms work differently.
 |---|---|---|
 | Name | Auto-type | Autofill |
 | You trigger it with | a keyboard shortcut you choose | tapping the login field |
+| Which entry is used | the one showing in Gabbro — **you** choose it | the one matching the app or site |
 | Setup needed | bind a key (below) | enable Gabbro as the autofill service |
 
 ---
@@ -15,20 +16,28 @@ copy-paste a password. The two platforms work differently.
 
 ### What it does
 
-You open a login in Gabbro, switch to the app or website that wants it,
+You select a login in Gabbro, switch to the app or website that wants it,
 press your shortcut, and Gabbro types the username and password into the
-focused window.
+focused window — then presses Enter.
 
 The password never leaves Gabbro's Rust core as text you can copy — it goes
 straight to the keyboard.
+
+**You choose the entry; Gabbro cannot.** Unlike Android, nothing tells Gabbro
+which site is on screen: a browser does not expose the page URL to the window
+manager, and Gabbro will never ship a browser extension to get at it. So there
+is no site matching and no warning when the entry is wrong for the page —
+whatever login is showing is what gets typed, and submitted. It stays showing
+until you pick another or the vault locks. Check the entry before you press
+your key.
 
 ### Requirements
 
 - An **X11** session. Wayland does not allow one app to type into another, so
   auto-type cannot work there. (Check with `echo $XDG_SESSION_TYPE`.)
 - Gabbro **running and unlocked**.
-- A login **open** in Gabbro — that open entry is what gets typed. If nothing
-  is open, the shortcut does nothing.
+- A login **showing** in Gabbro — that entry is what gets typed, whatever site
+  you are on. If none is showing, the shortcut does nothing.
 
 ### 1. Find `gabbro-autotype`
 
@@ -69,7 +78,7 @@ screen; point it at the same path.
 
 ### 3. Use it
 
-1. Open the login in Gabbro.
+1. Select the login in Gabbro, and check it is the right one for the site.
 2. Click into the username field of the app or site you are signing in to.
 3. Press your shortcut.
 
@@ -79,7 +88,7 @@ If the login has no username, its email is typed instead.
 
 - **Gabbro is locked or closed** — auto-type only works while it is running and
   unlocked.
-- **No login open in Gabbro** — open one first.
+- **No login showing in Gabbro** — select one first.
 - **You are on Wayland** — see Requirements above.
 - **Wrong path** — run the path from a terminal. If it prints
   `no running Gabbro to trigger`, the path is right and Gabbro is not running.
