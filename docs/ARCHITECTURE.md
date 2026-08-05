@@ -119,6 +119,36 @@ canary that drives the real save paths and byte-compares the real config/vault l
 
 ### Next task
 
+**Sync review: the incoming choice always first, always pre-selected.**
+Today a brought-over field lists other-vault first, a clash and a folder list
+this-vault first, so the user is surprised by which side comes first. Make the
+incoming (other vault) option render first *and* be the default everywhere; local
+second. Tapping Continue through the whole review then lands on exactly what
+auto-merge does. Root cause: `_keepDeleteChips` names its slots keep/other, and
+"keep" means incoming at one call site and local at the others — rename the slots
+incoming/local so the mismatch is unrepresentable.
+
+Consequence to accept: a tap-through review applies every incoming delete. The
+only undo is Cancel from the bail-out dialog, before OK.
+
+Net (green against current code):
+- [ ] N1 brought-over: "Use this vault" -> incoming dropped, old value restored
+- [ ] N2 brought-over untouched -> incoming kept, old value in history
+- [ ] N3 clash: "Use other vault" -> incoming applied, local value in history
+- [ ] N4 clash: "Use this vault" -> local kept
+- [ ] N5 folder: each choice yields that folder
+
+Red:
+- [ ] R1 incoming renders first: brought-over, clash, folder, item delete, entry delete
+- [ ] R2 clash untouched -> incoming
+- [ ] R3 folder untouched -> incoming folder
+- [ ] R4 Continue enabled with an untouched clash (drops the `_stepSatisfied` gate
+      and the `needsChoice` getter, which no production code calls)
+- [ ] R5 item delete untouched -> deleted
+- [ ] R6 entry delete untouched -> deleted
+- [ ] R7 new entry: Keep before Skip, untouched -> kept
+- [ ] R8 a zero-tap review yields the same decisions as "merge the rest automatically"
+
 ---
 
 ## Build & Release
@@ -142,15 +172,21 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
-- In the `sync` apply-choice dialog: (1) explain what `auto-merge` does. **Verified 2026-07-30
-  — it is not additive only.** It applies the incoming value on a clash, the incoming folder,
-  removes items the other side removed, and deletes an entry the other side deleted
-  (`session.rs:3540`). What it never does is drop an entry the other side has simply never
-  seen (pinned by `fast_merge_keeps_an_entry_only_this_vault_has`). So the copy must say
-  "deletes only what the other device deleted on purpose", not "never deletes".
-  (2) Add a third choice that takes the incoming vault and replaces this one — discuss first.
-  Note the dialog is already three buttons (auto, review, Cancel) in a scrollable column;
-  a fourth is what `test/sync_chooser_l10n_overflow_test.dart` will catch at 8x text.
+- **Explain `auto-merge` in the app.** It is poorly explained today, which is why it goes
+  unused. **Verified 2026-08-05 — it is not additive only:** it applies the incoming value
+  on a clash, the incoming folder, removes items the other side removed, and deletes an
+  entry the other side deleted (`do_fast_merge`, `session.rs:3590`). What it never does is
+  drop an entry the other side has simply never seen (pinned by
+  `fast_merge_keeps_an_entry_only_this_vault_has`). Once the review defaults land, the copy
+  can simply say "auto-merge = this review with every choice left as-is".
+- **Auto-merge deletes without a tombstone.** `do_fast_merge` drops a deleted entry
+  (`session.rs:3647`); the review path stamps a tombstone (`session.rs:3752`). So a delete
+  applied by auto-merge can return from a third device. Decide which is right, then align.
+- **A third sync choice — decide whether we want it at all before building.** It would take
+  the incoming vault and replace this one (dropping local-only entries, which nothing does
+  today). A third path may make the choice more confusing, not less; settle that first. The
+  dialog is already three buttons (auto, review, Cancel) in a scrollable column; a fourth is
+  what `test/sync_chooser_l10n_overflow_test.dart` will catch at 8x text.
 
 ### Security (pre-v1)
 - **Human expert cryptography review** of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
