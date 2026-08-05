@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2125 | 10 |
+| Flutter (`flutter test`) | 2145 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -131,23 +131,13 @@ incoming/local so the mismatch is unrepresentable.
 Consequence to accept: a tap-through review applies every incoming delete. The
 only undo is Cancel from the bail-out dialog, before OK.
 
-Net (green against current code):
-- [ ] N1 brought-over: "Use this vault" -> incoming dropped, old value restored
-- [ ] N2 brought-over untouched -> incoming kept, old value in history
-- [ ] N3 clash: "Use other vault" -> incoming applied, local value in history
-- [ ] N4 clash: "Use this vault" -> local kept
-- [ ] N5 folder: each choice yields that folder
+**Done:** code and tests. N1-N5 + R1-R8 all green in
+`test/sync_review_choice_order_test.dart` (17 tests); full `flutter test` green
+at 2145. `_keepDeleteChips` is now `_incomingLocalChoice` (slots named by vault
+side). `fastRest`, `_stepSatisfied` and `needsChoice` deleted. Four older tests
+now pin the new defaults and tap Keep explicitly to keep their coverage.
 
-Red:
-- [ ] R1 incoming renders first: brought-over, clash, folder, item delete, entry delete
-- [ ] R2 clash untouched -> incoming
-- [ ] R3 folder untouched -> incoming folder
-- [ ] R4 Continue enabled with an untouched clash (drops the `_stepSatisfied` gate
-      and the `needsChoice` getter, which no production code calls)
-- [ ] R5 item delete untouched -> deleted
-- [ ] R6 entry delete untouched -> deleted
-- [ ] R7 new entry: Keep before Skip, untouched -> kept
-- [ ] R8 a zero-tap review yields the same decisions as "merge the rest automatically"
+**Next:** hardware pass on Linux + Android, on branch `incoming_sync_review`.
 
 ---
 

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **In a sync review, the two options no longer swap places between fields.** A changed password put your own value first, the field below it put the other device's value first, so the option under your thumb kept changing meaning. The other device's value is now always listed first and pre-selected, for every kind of change — including entries and fields it deleted. Stepping through a review without changing anything now does exactly what Merge automatically does. Any choice you make yourself is still honoured, and Cancel still abandons the whole sync.
+
 ## [0.1.0-alpha.18] – 2026-08-05
 
 ### Fixed
