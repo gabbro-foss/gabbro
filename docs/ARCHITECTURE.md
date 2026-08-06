@@ -150,9 +150,8 @@ Then red — all green:
 Done via `semanticsLabel` on each button's `Text`, not a `Semantics` wrapper —
 the wrapper would have taken the button's own tap action and role with it.
 
-**Next:** hardware pass — the dialog on Linux and Android, and the announced
-names read back by a screen reader (widget tests pin the semantics tree, not
-what Orca actually says).
+Hardware pass done, all pass: Linux at normal and 4x text, Android at phone
+width, and Orca reading both announced names back with "button".
 
 Same branch `incoming_sync_review`, which is complete and hardware-verified
 (Linux runs 1-3 + Android) but not gated or merged.
