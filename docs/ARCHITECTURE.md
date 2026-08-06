@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2145 | 10 |
+| Flutter (`flutter test`) | 2147 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -119,25 +119,11 @@ canary that drives the real save paths and byte-compares the real config/vault l
 
 ### Next task
 
-**Sync review: the incoming choice always first, always pre-selected.**
-Today a brought-over field lists other-vault first, a clash and a folder list
-this-vault first, so the user is surprised by which side comes first. Make the
-incoming (other vault) option render first *and* be the default everywhere; local
-second. Tapping Continue through the whole review then lands on exactly what
-auto-merge does. Root cause: `_keepDeleteChips` names its slots keep/other, and
-"keep" means incoming at one call site and local at the others — rename the slots
-incoming/local so the mismatch is unrepresentable.
+(empty — agree the next one with the maintainer)
 
-Consequence to accept: a tap-through review applies every incoming delete. The
-only undo is Cancel from the bail-out dialog, before OK.
-
-**Done:** code and tests. N1-N5 + R1-R8 all green in
-`test/sync_review_choice_order_test.dart` (17 tests); full `flutter test` green
-at 2145. `_keepDeleteChips` is now `_incomingLocalChoice` (slots named by vault
-side). `fastRest`, `_stepSatisfied` and `needsChoice` deleted. Four older tests
-now pin the new defaults and tap Keep explicitly to keep their coverage.
-
-**Next:** hardware pass on Linux + Android, on branch `incoming_sync_review`.
+Branch `incoming_sync_review` is complete and hardware-verified: Linux runs 1-3
+(diverge, review unchanged, review all-local) and the Android run all pass.
+Unmerged to master.
 
 ---
 
@@ -158,6 +144,11 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   (still down 2026-08-05). Until it lands, Arch users install alpha.16. Retry with
   `git -C ../gabbro-bin-aur push` from `gabbro/`.
 
+### Maintenance
+- **14 pub packages have newer versions held back by constraints** (noticed
+  2026-08-06 during an Android build). Decide which to bump and which are pinned
+  by Flutter itself. Any bump needs `gabbro_test --warm` before the gate.
+
 ### Features and UI/UX
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
@@ -172,6 +163,8 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - **Auto-merge deletes without a tombstone.** `do_fast_merge` drops a deleted entry
   (`session.rs:3647`); the review path stamps a tombstone (`session.rs:3752`). So a delete
   applied by auto-merge can return from a third device. Decide which is right, then align.
+  Same call site, opposite surprise: **Skip on a new entry also stamps a tombstone**, so
+  declining an entry once propagates a delete of it back to the other vault.
 - **A third sync choice — decide whether we want it at all before building.** It would take
   the incoming vault and replace this one (dropping local-only entries, which nothing does
   today). A third path may make the choice more confusing, not less; settle that first. The
