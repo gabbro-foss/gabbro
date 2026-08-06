@@ -2386,7 +2386,7 @@ abstract class AppLocalizations {
   /// No description provided for @folderConflictKeepUnfoldered.
   ///
   /// In en, this message translates to:
-  /// **'Keep unfoldered'**
+  /// **'Keep without folder'**
   String get folderConflictKeepUnfoldered;
 
   /// No description provided for @folderConflictKeepLocal.
@@ -2398,7 +2398,7 @@ abstract class AppLocalizations {
   /// No description provided for @folderConflictMoveUnfoldered.
   ///
   /// In en, this message translates to:
-  /// **'Move to unfoldered'**
+  /// **'Move to no folder'**
   String get folderConflictMoveUnfoldered;
 
   /// No description provided for @folderConflictMoveIncoming.

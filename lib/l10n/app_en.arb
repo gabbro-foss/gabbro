@@ -681,14 +681,14 @@
     }
   },
   "syncFieldConflictUseIncoming": "Use the other device's value",
-  "folderConflictKeepUnfoldered": "Keep unfoldered",
+  "folderConflictKeepUnfoldered": "Keep without folder",
   "folderConflictKeepLocal": "Keep \"{folder}\"",
   "@folderConflictKeepLocal": {
     "placeholders": {
       "folder": {"type": "String"}
     }
   },
-  "folderConflictMoveUnfoldered": "Move to unfoldered",
+  "folderConflictMoveUnfoldered": "Move to no folder",
   "folderConflictMoveIncoming": "Move to \"{folder}\"",
   "@folderConflictMoveIncoming": {
     "placeholders": {

@@ -249,6 +249,45 @@ void main() {
       _incomingFirst(tester, 'Delete', 'Keep', exact: true);
     });
 
+    // "Unfoldered" is not English anyone says; every other locale already reads
+    // "keep without folder" / "move to no folder". These pin the English to the
+    // wording the translators used, in both directions.
+    testWidgets('folder clash, this vault has no folder', (tester) async {
+      await openReview(
+        tester,
+        _summary(
+          folderConflicts: [
+            const FolderConflictItem(
+              id: 'e1',
+              title: 'Example',
+              localFolder: '',
+              incomingFolder: 'Work',
+            ),
+          ],
+        ),
+        (_) {},
+      );
+      _incomingFirst(tester, 'Move to "Work"', 'Keep without folder');
+    });
+
+    testWidgets('folder clash, other vault has no folder', (tester) async {
+      await openReview(
+        tester,
+        _summary(
+          folderConflicts: [
+            const FolderConflictItem(
+              id: 'e1',
+              title: 'Example',
+              localFolder: 'Work',
+              incomingFolder: '',
+            ),
+          ],
+        ),
+        (_) {},
+      );
+      _incomingFirst(tester, 'Move to no folder', 'Keep "Work"');
+    });
+
     testWidgets('whole-entry delete', (tester) async {
       await openReview(tester, _summary(pendingDeletes: [_entryDelete]), (_) {});
       _incomingFirst(tester, 'Delete', 'Keep', exact: true);

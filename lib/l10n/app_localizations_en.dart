@@ -1230,7 +1230,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get syncFieldConflictUseIncoming => 'Use the other device\'s value';
 
   @override
-  String get folderConflictKeepUnfoldered => 'Keep unfoldered';
+  String get folderConflictKeepUnfoldered => 'Keep without folder';
 
   @override
   String folderConflictKeepLocal(String folder) {
@@ -1238,7 +1238,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get folderConflictMoveUnfoldered => 'Move to unfoldered';
+  String get folderConflictMoveUnfoldered => 'Move to no folder';
 
   @override
   String folderConflictMoveIncoming(String folder) {
