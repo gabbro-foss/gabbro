@@ -103,14 +103,22 @@ canary that drives the real save paths and byte-compares the real config/vault l
 **Known warnings — under review, see Current Focus. Rows below were waved through on
 2026-07-16; each now gets fixed or gets a reason. The gate's own warnings are not noise.**
 
-| Warning | Source | Why not fixed |
+| Warning | Source | Status / what it costs |
 |---|---|---|
+| `package=` ignored, `rust_lib_gabbro` | ours | **FIXED** 2026-08-06. Merged manifest byte-identical after. |
+| `package=` ignored x5 | `file_picker`, `jni`, `jni_flutter`, `url_launcher_android`, `flutter_plugin_android_lifecycle` | Upstream. Latest versions still warn. Android build breaks at a future AGP. |
+| Gradle space-assignment x42 | `file_picker` 13, `jni` 16, `jni_flutter` 13 | Upstream. Latest versions still warn. Android build breaks at Gradle 10. |
+| `Task.project` at execution time | Flutter's own `compileFlutterBuildDebug` | Upstream. Breaks at Gradle 10. Only shows when the task is not UP-TO-DATE. |
 | Kotlin plugin version (2.0.21 vs 2.2.20) | Flutter SDK's own `:gradle` build | Upstream. Debug and release alike. |
-| Gradle space-assignment x16 | pub-cache `jni`, `jni_flutter`, `file_picker` | Upstream. Hard error at Gradle 10. |
 | JVM restricted-method (`System::load`) | Gradle 8.14 `native-platform` jar | Needs a wrapper bump — a full-gate change, do deliberately. |
 | `cargo deny` no-license-field: `allo-isolate` | `flutter_rust_bridge` dep | Fixed on their master; await release. `[[licenses.clarify]]` is inert — don't retry. |
 | `cargo deny` duplicates x6 | `argon2`->`digest`, `jni`->`libloading`, `bindgen`->`shlex` | Upstream pins. Was x7; RT-3 took the `hybrid-array` duplicate with `ml-kem`. The crate itself stays (`sha2`/`hkdf` -> `digest` need it). |
-| KGP via `buildscript` classpath | `file_picker`, `url_launcher_android` | Upstream. Future Flutter hard error. |
+| "trying to run flutter as root" | the gate's own `unshare -r` | Cosmetic. Not Gabbro. |
+| KGP via `buildscript` classpath | `file_picker`, `url_launcher_android` | Did not reproduce 2026-08-06; re-check before acting. |
+
+**AGP note:** every module, `rust_lib_gabbro` included, loads AGP **8.11.1**. The
+`com.android.tools.build:gradle:7.3.0` line in `rust_builder/android/build.gradle` is
+resolved but never applied — inert, emits no warning.
 
 ---
 
@@ -120,21 +128,25 @@ canary that drives the real save paths and byte-compares the real config/vault l
 
 ### Next task
 
-**Dependency bump + clear the gate warnings.** Left alone, the Android build stops
-compiling at a future AGP/Gradle; the warnings say so now and won't say it twice.
+**Dependency bump + clear the gate warnings.** Done on branch
+`dependency_bump_and_warning_fixes`; awaiting Android hardware test, `--warm` and the gate.
 
-1. `flutter pub upgrade` — 19 packages are locked but unconstrained (incl. file_picker,
-   jni, jni_flutter, url_launcher_android, flutter_plugin_android_lifecycle). Separately
-   decide which constraint-held ones (intl, analyzer, test, win32, meta, …) Flutter pins.
-2. Drop `package=` from `rust_builder/android/src/main/AndroidManifest.xml` — ours;
-   `build.gradle` already sets `namespace`.
-3. AGP 7.3.0 pinned via `buildscript` classpath, `rust_builder/android/build.gradle` — ours.
-4. `./gradlew :app:testDebugUnitTest --warning-mode all` — name the Gradle 9 deprecations
-   the summary line hides.
-5. Regenerate + re-scan `android/app/gradle.lockfile`; `gabbro_test --warm` before the gate.
+Done: our `package=` removed; 16 packages to latest (`xml` fell 7.0.1 -> 6.6.1 — `dbus`
+0.7.14 reverted its own constraint to `^6.6.1`); Android relocked (`tika-core` and
+`commons-io` dropped from the release APK, `androidx.annotation` 1.10.0); `osv-scanner`
+clean; analyze clean; 2159 Flutter and 148 Android tests pass.
 
-Every row of the Known warnings table gets fixed or gets a reason that names the failure
-it accepts.
+Measured, and it settles the question: **the upgrade closed zero warnings** — file_picker
+11.0.3, jni 1.0.3 and jni_flutter 1.0.2 carry the same deprecated Gradle syntax. The
+Gradle 10 cliff needs an upstream fix, not a bump.
+
+Remaining: Android hardware test (file dialogs — file_picker moved), `gabbro_test --warm`,
+full gate. Then decide whether to file the three upstream issues.
+
+**Why the constraint-held packages cannot move:** `freezed` 3.2.5 (its latest stable)
+requires `analyzer >=9.0.0 <11.0.0`, which caps analyzer at 10.2.0 and through it
+`dart_style`, `test`, `build` and `build_runner`. Separately the Flutter SDK pins `meta`,
+`vector_math`, `matcher`, `test_api` and `intl` to exact versions. Neither is ours to move.
 
 ---
 
