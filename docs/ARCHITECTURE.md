@@ -60,7 +60,7 @@ gabbro/
 ├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, VAULT_SYNC, AUTOTYPE_AND_AUTOFILL, AI_*; decisions/ (ADRs); artefacts/
 ├── test/  integration_test/          # Flutter widget/unit + Linux real-FFI suites (dart test)
 ├── test_data/            # Sample import files + migration_vaults/ (refusal corpus at floor v11, one vault per VERSION + MIGRATION_TESTS.md + test_matrix.md)
-├── assets/               # fonts, images, help/; public_suffix_list.dat (autofill eTLD+1)
+├── assets/               # fonts, images, help/ (public_suffix_list.dat is an Android asset)
 ├── challenge/            # crack-me challenge vault + rules
 └── CHANGELOG.md  README.md
 ```
@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2159 | 10 |
+| Flutter (`flutter test`) | 2165 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -128,20 +128,10 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**Dependency bump + clear the gate warnings.** Done on branch
-`dependency_bump_and_warning_fixes`; awaiting Android hardware test, `--warm` and the gate.
-
-Done: our `package=` removed; 16 packages to latest (`xml` fell 7.0.1 -> 6.6.1 — `dbus`
-0.7.14 reverted its own constraint to `^6.6.1`); Android relocked (`tika-core` and
-`commons-io` dropped from the release APK, `androidx.annotation` 1.10.0); `osv-scanner`
-clean; analyze clean; 2159 Flutter and 148 Android tests pass.
-
-Measured, and it settles the question: **the upgrade closed zero warnings** — file_picker
-11.0.3, jni 1.0.3 and jni_flutter 1.0.2 carry the same deprecated Gradle syntax. The
-Gradle 10 cliff needs an upstream fix, not a bump.
-
-Remaining: Android hardware test (file dialogs — file_picker moved), `gabbro_test --warm`,
-full gate. Then decide whether to file the three upstream issues.
+**Dependency bump + clear the gate warnings**, on branch
+`dependency_bump_and_warning_fixes`. Remaining: `gabbro_test --warm`, full gate. Then
+decide whether to file the three upstream Gradle issues, and whether to bump the Gradle
+wrapper off 8.14 (the last warning that is ours).
 
 **Why the constraint-held packages cannot move:** `freezed` 3.2.5 (its latest stable)
 requires `analyzer >=9.0.0 <11.0.0`, which caps analyzer at 10.2.0 and through it
