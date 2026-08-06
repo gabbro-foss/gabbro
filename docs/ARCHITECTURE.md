@@ -110,7 +110,7 @@ canary that drives the real save paths and byte-compares the real config/vault l
 | Gradle space-assignment x42 | `file_picker` 13, `jni` 16, `jni_flutter` 13 | Upstream. Latest versions still warn. Android build breaks at Gradle 10. |
 | `Task.project` at execution time | Flutter's own `compileFlutterBuildDebug` | Upstream. Breaks at Gradle 10. Only shows when the task is not UP-TO-DATE. |
 | Kotlin plugin version (2.0.21 vs 2.2.20) | Flutter SDK's own `:gradle` build | Upstream. Debug and release alike. |
-| JVM restricted-method (`System::load`) | Gradle 8.14 `native-platform` jar | Needs a wrapper bump — a full-gate change, do deliberately. |
+| JVM restricted-method (`System::load`) | Gradle 8.14 `native-platform` jar | Gradle's own jar, and the version is pinned — nothing changes on its own. Clears itself whenever we next raise Gradle. No action. |
 | `cargo deny` no-license-field: `allo-isolate` | `flutter_rust_bridge` dep | Fixed on their master; await release. `[[licenses.clarify]]` is inert — don't retry. |
 | `cargo deny` duplicates x6 | `argon2`->`digest`, `jni`->`libloading`, `bindgen`->`shlex` | Upstream pins. Was x7; RT-3 took the `hybrid-array` duplicate with `ml-kem`. The crate itself stays (`sha2`/`hkdf` -> `digest` need it). |
 | "trying to run flutter as root" | the gate's own `unshare -r` | Cosmetic. Not Gabbro. |
@@ -129,9 +129,7 @@ resolved but never applied — inert, emits no warning.
 ### Next task
 
 **Dependency bump + clear the gate warnings**, on branch
-`dependency_bump_and_warning_fixes`. Remaining: `gabbro_test --warm`, full gate. Then
-decide whether to file the three upstream Gradle issues, and whether to bump the Gradle
-wrapper off 8.14 (the last warning that is ours).
+`dependency_bump_and_warning_fixes` (pushed). Remaining: the full gate.
 
 **Why the constraint-held packages cannot move:** `freezed` 3.2.5 (its latest stable)
 requires `analyzer >=9.0.0 <11.0.0`, which caps analyzer at 10.2.0 and through it
@@ -156,6 +154,18 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   committed in the AUR clone; the push fails — the AUR is in maintenance
   (still down 2026-08-05). Until it lands, Arch users install alpha.16. Retry with
   `git -C ../gabbro-bin-aur push` from `gabbro/`.
+
+### Dependencies
+- **Replace the plugins that emit the Gradle warnings, or roll our own.** No bump clears
+  them — latest versions still warn — and the Android build breaks at Gradle 10 / a
+  future AGP. Affected: `file_picker` (`package=` + deprecated space-assignment), `jni`
+  and `jni_flutter` (both, same), `url_launcher_android` and
+  `flutter_plugin_android_lifecycle` (`package=` only).
+- **Re-source or drop three passphrase wordlists: Finnish, Russian, Portuguese.** Their
+  upstream sources are not confirmed GPL-3.0 compatible — fi is marked `GPL2` with no
+  version, ru permits redistributing modifications in patch form only, pt (dadoware) is
+  CC-BY-NC-3.0. Either find replacement sources or generate our own; dropping all three
+  takes passphrase languages 29 -> 26.
 
 ### Features and UI/UX
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
