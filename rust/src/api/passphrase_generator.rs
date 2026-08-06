@@ -370,9 +370,10 @@ mod tests {
 
     #[test]
     fn test_entropy_chinese_simplified() {
-        // 4 words from 7776-word cfbao list: 4 * log2(7776) ≈ 51.7 bits
+        // 4 words from 7775-word cfbao list: 4 * log2(7775) ≈ 51.7 bits
+        // (7775, not 7776 — the entry containing a fullwidth Latin Q was dropped)
         let entropy = passphrase_entropy_bits(4, Language::ChineseSimplified);
-        let expected = 4.0 * (7776_f64).log2();
+        let expected = 4.0 * (7775_f64).log2();
         assert!((entropy - expected).abs() < 0.1, "Got: {}", entropy);
     }
 
@@ -423,5 +424,219 @@ mod tests {
             ..default_config()
         };
         assert!(generate_passphrase(config).is_err());
+    }
+
+    // -----------------------------------------------------------------
+    // Wordlist integrity net
+    //
+    // Nothing else pins the embedded lists. A regenerate that introduces
+    // duplicates or truncates a list would silently cut real entropy while
+    // the UI keeps showing the old figure, and stray characters produce
+    // passphrases that read as broken.
+    // -----------------------------------------------------------------
+
+    struct Spec {
+        name: &'static str,
+        raw: &'static str,
+        size: usize,
+        /// Allowed characters, explicit per language — never a blanket `a-z`,
+        /// so a missing or foreign letter fails loudly. Empty for CJK, which
+        /// is checked by script range instead.
+        alphabet: &'static str,
+        min: usize,
+        max: usize,
+        /// Unicode ranges the script occupies. Empty for alphabetic languages.
+        ranges: &'static [(char, char)],
+    }
+
+    const fn alpha(
+        name: &'static str,
+        raw: &'static str,
+        size: usize,
+        alphabet: &'static str,
+        min: usize,
+        max: usize,
+    ) -> Spec {
+        Spec {
+            name,
+            raw,
+            size,
+            alphabet,
+            min,
+            max,
+            ranges: &[],
+        }
+    }
+
+    const fn cjk(
+        name: &'static str,
+        raw: &'static str,
+        size: usize,
+        min: usize,
+        max: usize,
+        ranges: &'static [(char, char)],
+    ) -> Spec {
+        Spec {
+            name,
+            raw,
+            size,
+            alphabet: "",
+            min,
+            max,
+            ranges,
+        }
+    }
+
+    #[rustfmt::skip]
+    const SPECS: &[Spec] = &[
+        alpha("en", WORDLIST_EN, 7776, "abcdefghijklmnopqrstuvwxyz-", 3, 9),
+        alpha("fr", WORDLIST_FR, 7775, "abcdefghijklmnopqrstuvwxyz", 4, 8),
+        alpha("de", WORDLIST_DE, 7776, "abcdefghijklmnopqrstuvwxyz", 5, 19),
+        alpha("es", WORDLIST_ES, 8192, "abcdefghijklmnopqrstuvwxyz", 4, 8),
+        alpha("it", WORDLIST_IT, 8192, "abcdefghijklmnopqrstuvxyz", 4, 8),
+        alpha("nl", WORDLIST_NL, 7776, "abcdefghijklmnopqrstuvwxyz", 2, 7),
+        alpha("et", WORDLIST_ET, 7052, "abcdefghijklmnopqrstuvwxyz", 3, 6),
+        alpha("sv", WORDLIST_SV, 7776, "abcdefghijklmnopqrstuvwxyzåäö", 4, 12),
+        alpha("da", WORDLIST_DA, 7776, "abcdefghijklmnopqrstuvwxyzåæø", 4, 12),
+        alpha("nb", WORDLIST_NB, 7776, "abcdefghijklmnopqrstuvwxyzåæø", 4, 12),
+        alpha("fi", WORDLIST_FI, 7776, "abcdefghijklmnopqrstuvwxyzäö", 4, 12),
+        alpha("cs", WORDLIST_CS, 7776, "abcdefghijklmnopqrstuvwxyzáčďéěíňóřšťúůýž", 4, 12),
+        alpha("sk", WORDLIST_SK, 6642, "abcdefghijklmnopqrstuvwxyzáäčďéíĺľňóôŕšťúýž", 3, 17),
+        alpha("sl", WORDLIST_SL, 7776, "abcdefghijklmnoprstuvzčšž", 4, 12),
+        alpha("pl", WORDLIST_PL, 7776, "abcdefghijklmnopqrstuvwxyząćęłńóśźż", 4, 12),
+        alpha("hr", WORDLIST_HR, 7776, "abcdefghijklmnoprstuvzćčđšž", 4, 12),
+        alpha("hu", WORDLIST_HU, 7776, "abcdefghijklmnopqrstuvwxyzáéíóöőúüű", 4, 12),
+        alpha("lt", WORDLIST_LT, 7776, "abcdefghijklmnoprstuvyząčėęįšųūž", 4, 12),
+        alpha("lv", WORDLIST_LV, 7776, "abcdefghijklmnoprstuvzāčēģīķļņšūž", 4, 12),
+        alpha("pt", WORDLIST_PT, 7744, "abcdefghijklmnopqrstuvwxyzàáâãçéêíóôõú", 2, 7),
+        alpha("el", WORDLIST_EL, 7776, "αβγδεζηθικλμνξοπρσςτυφχψωάέήίόύώϊϋΐΰ", 4, 12),
+        alpha("ru", WORDLIST_RU, 7776, "абвгдежзийклмнопрстуфхцчшщъыьэюя", 4, 12),
+        alpha("uk", WORDLIST_UK, 7661, "абвгґдежзийклмнопрстуфхцчшщьюяєії", 2, 7),
+        alpha("bg", WORDLIST_BG, 7527, "абвгдежзийклмнопрстуфхцчшщъьюя", 3, 5),
+        alpha("kk", WORDLIST_KK, 4311, "абвгдежзийклмнопрстуфхцчшыьэюяәғіқңөүұһ", 4, 12),
+        // Hiragana, plus the combining voiced-sound marks.
+        cjk("ja", WORDLIST_JA, 2048, 3, 9, &[('\u{3041}', '\u{309F}')]),
+        // Conjoining Hangul jamo and precomposed syllables.
+        cjk("ko", WORDLIST_KO, 2048, 4, 11, &[('\u{1100}', '\u{11FF}'), ('\u{AC00}', '\u{D7A3}')]),
+        cjk("zh_cn", WORDLIST_ZH_CN, 7775, 1, 3, &[('\u{4E00}', '\u{9FFF}')]),
+        cjk("zh_tw", WORDLIST_ZH_TW, 2048, 1, 1, &[('\u{4E00}', '\u{9FFF}')]),
+    ];
+
+    fn words(raw: &str) -> Vec<&str> {
+        raw.lines().filter(|l| !l.is_empty()).collect()
+    }
+
+    #[test]
+    fn every_wordlist_covers_a_supported_language() {
+        assert_eq!(
+            SPECS.len(),
+            29,
+            "a language was added or removed without updating the integrity net"
+        );
+    }
+
+    #[test]
+    fn every_wordlist_is_duplicate_free() {
+        for spec in SPECS {
+            let all = words(spec.raw);
+            let unique: std::collections::HashSet<&str> = all.iter().copied().collect();
+            assert_eq!(
+                all.len(),
+                unique.len(),
+                "{}: {} duplicate words — real entropy is below the displayed figure",
+                spec.name,
+                all.len() - unique.len()
+            );
+        }
+    }
+
+    #[test]
+    fn every_wordlist_matches_its_declared_size() {
+        for spec in SPECS {
+            assert_eq!(
+                words(spec.raw).len(),
+                spec.size,
+                "{}: wrong list size",
+                spec.name
+            );
+        }
+    }
+
+    #[test]
+    fn no_wordlist_entry_is_blank_or_padded() {
+        for spec in SPECS {
+            for (i, line) in spec.raw.lines().enumerate() {
+                assert!(!line.is_empty(), "{}: blank line at {}", spec.name, i + 1);
+                assert_eq!(
+                    line,
+                    line.trim(),
+                    "{}: padded entry at {}",
+                    spec.name,
+                    i + 1
+                );
+            }
+        }
+    }
+
+    /// Report every offending list in one go, with a sample. Aborting on the
+    /// first bad word would hide how many lists are affected.
+    fn report(offenders: Vec<(&str, usize, Vec<String>)>, what: &str) {
+        if offenders.is_empty() {
+            return;
+        }
+        let mut lines = vec![format!("{} in {} list(s):", what, offenders.len())];
+        for (name, count, sample) in &offenders {
+            lines.push(format!(
+                "  {}: {} — e.g. {}",
+                name,
+                count,
+                sample.join(", ")
+            ));
+        }
+        panic!("{}", lines.join("\n"));
+    }
+
+    #[test]
+    fn every_word_uses_only_its_language_script() {
+        let mut offenders = Vec::new();
+        for spec in SPECS {
+            let allowed: std::collections::HashSet<char> = spec.alphabet.chars().collect();
+            let bad: Vec<String> = words(spec.raw)
+                .into_iter()
+                .filter(|word| {
+                    word.chars().any(|c| {
+                        if spec.ranges.is_empty() {
+                            !allowed.contains(&c)
+                        } else {
+                            !spec.ranges.iter().any(|(lo, hi)| c >= *lo && c <= *hi)
+                        }
+                    })
+                })
+                .map(|w| w.to_string())
+                .collect();
+            if !bad.is_empty() {
+                offenders.push((spec.name, bad.len(), bad.into_iter().take(5).collect()));
+            }
+        }
+        report(offenders, "foreign characters");
+    }
+
+    #[test]
+    fn every_word_length_is_within_bounds() {
+        let mut offenders = Vec::new();
+        for spec in SPECS {
+            let bad: Vec<String> = words(spec.raw)
+                .into_iter()
+                .filter(|w| {
+                    let len = w.chars().count();
+                    len < spec.min || len > spec.max
+                })
+                .map(|w| format!("'{}' ({})", w, w.chars().count()))
+                .collect();
+            if !bad.is_empty() {
+                offenders.push((spec.name, bad.len(), bad.into_iter().take(5).collect()));
+            }
+        }
+        report(offenders, "out-of-bounds lengths");
     }
 }

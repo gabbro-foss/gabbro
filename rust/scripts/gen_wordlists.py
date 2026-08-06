@@ -16,6 +16,13 @@ Frequency corpora (CC-BY-SA 4.0, hermitdave/FrequencyWords):
   lv  — lv_50k.txt  (7776 words, freq_word0 format)
   kk  — kk_full.txt (4311 words — full corpus; freq_word0 format)
 
+Not generated here (committed lists, edited in place): en, fr, de, es, it, nl,
+ja, ko, zh_cn, zh_tw.
+
+Every list is pinned by the integrity net in `rust/src/api/passphrase_generator.rs`
+(size, duplicates, alphabet, length). Change a filter here and that test tells you
+what moved.
+
 Run from the repo root: python3 rust/scripts/gen_wordlists.py
 """
 
@@ -104,7 +111,9 @@ DOWNLOADS: dict[str, tuple[str, str, str | None]] = {
     "pt": (
         "https://raw.githubusercontent.com/thoughtworks/dadoware/master/7776palavras.txt",
         "plain",
-        None,
+        # Explicit Portuguese alphabet, min 2 chars — the source carries single
+        # letters, acronyms (AV, BR, CV) and "km/h", which read as broken words.
+        r"[a-zàáâãçéêíóôõú]{2,7}",
     ),
     "et": (
         f"{BASE_AGREINHOLD}/diceware_%20estonian.txt",
@@ -114,7 +123,10 @@ DOWNLOADS: dict[str, tuple[str, str, str | None]] = {
     "sk": (
         "https://raw.githubusercontent.com/jtomori/diceware_slovak/master/diceware_sk_5_rolls",
         "space_field1",        # NNNNN word
-        None,
+        # Explicit Slovak alphabet, lowercase only — the source is 15% proper
+        # nouns and acronyms (KSC, Friedrich, and Czech place names). Filtering
+        # leaves 6642; there is nothing in the source to top it back up with.
+        r"[a-záäčďéíĺľňóôŕšťúýž]{3,17}",
     ),
     "bg": (
         "https://raw.githubusercontent.com/assenv/diceware-wordlist-bg/main/wordlist_utf_bg.asc",
@@ -150,7 +162,9 @@ DOWNLOADS: dict[str, tuple[str, str, str | None]] = {
     "uk": (
         f"{BASE_AGREINHOLD}/diceware_ua_uk_long.txt",
         "tab_field1_uk",       # header + NNNNN\tword\tRomanized
-        None,
+        # Explicit Ukrainian alphabet, lowercase only — strips proper nouns
+        # (Kharkiv, Azov), apostrophe forms and hyphenated phrases.
+        r"[абвгґдежзиійклмнопрстуфхцчшщьюяєії]{2,7}",
     ),
 }
 

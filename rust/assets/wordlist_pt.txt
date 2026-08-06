@@ -1,4 +1,3 @@
-a
 aba
 abacaxi
 abade
@@ -399,7 +398,6 @@ amoroso
 amostra
 amparar
 amparo
-ampère
 ampliar
 amplo
 ampola
@@ -733,7 +731,6 @@ atroar
 atroz
 atum
 aturar
-Au
 audácia
 audaz
 audição
@@ -759,7 +756,6 @@ autor
 autoral
 autoria
 autuado
-AV
 aval
 avaliar
 avança
@@ -813,7 +809,6 @@ azul
 azulado
 azulão
 azulejo
-b
 baba
 babado
 babar
@@ -955,7 +950,6 @@ batuta
 baú
 bauxite
 bazar
-Be
 beata
 beato
 bêbado
@@ -1147,7 +1141,6 @@ bovino
 bovinos
 box
 boxe
-BR
 brabo
 braça
 braçada
@@ -1552,7 +1545,6 @@ cave
 caveira
 caverna
 caviar
-CC
 cce
 cê
 cear
@@ -2151,9 +2143,7 @@ custo
 custoso
 cutâneo
 cutucar
-CV
 czar
-d
 dádiva
 dado
 dador
@@ -2385,7 +2375,6 @@ divisar
 divisor
 dizer
 dizimar
-DJ
 dna
 dó
 doação
@@ -2451,7 +2440,6 @@ douto
 doutor
 doutora
 doze
-DP
 dra
 dragão
 drama
@@ -2490,7 +2478,6 @@ duro
 dúvida
 duvidar
 dúzia
-e
 ébano
 ébrio
 eclipse
@@ -2946,7 +2933,6 @@ extra
 extrair
 extremo
 exultar
-f
 fã
 fabiano
 fábrica
@@ -3392,7 +3378,6 @@ futurar
 futuro
 fuzil
 fuzilar
-g
 gabão
 gabar
 gabo
@@ -3677,7 +3662,6 @@ gume
 guri
 guru
 gutural
-h
 hã
 habeas
 hábil
@@ -3770,7 +3754,6 @@ húmus
 húngaro
 huno
 hutu
-i
 ião
 iate
 ibérico
@@ -3980,7 +3963,6 @@ ita
 itálico
 item
 iva
-j
 já
 jacaré
 jade
@@ -4075,10 +4057,7 @@ justeza
 justiça
 justo
 juvenil
-k
 kit
-km/h
-l
 lábio
 labor
 laboral
@@ -4419,7 +4398,6 @@ luz
 luzente
 luzidio
 luzir
-m
 maca
 macabro
 macacão
@@ -5094,7 +5072,6 @@ nutrido
 nutrir
 nuvem
 nylon
-o
 oásis
 obeso
 oblíquo
@@ -5271,7 +5248,6 @@ oxidar
 óxido
 ozônio
 ozono
-p
 pá
 pacato
 paço
@@ -5898,7 +5874,6 @@ púrpura
 puxado
 puxão
 puxar
-q
 qi
 qua
 quadra
@@ -5956,7 +5931,6 @@ quitar
 quo
 quorum
 quota
-r
 rã
 rabeca
 rabelo
@@ -6429,7 +6403,6 @@ rural
 rusga
 russo
 rústico
-s
 sáb
 sábado
 sabão
@@ -7362,7 +7335,6 @@ tutela
 tutelar
 tutor
 tutsi
-u
 ucha
 uísque
 uivar
@@ -7426,7 +7398,6 @@ uterino
 utopia
 utópico
 uva
-v
 vacilar
 vacina
 vacinar
@@ -7725,13 +7696,11 @@ vulcão
 vulgar
 vulgo
 vulto
-w
 watt
 web
 western
 whisky
 www
-x
 xá
 xadrez
 xaile
@@ -7744,7 +7713,6 @@ xerife
 xerox
 xícara
 xxi
-z
 zaga
 zaida
 zanga
