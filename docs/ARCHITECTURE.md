@@ -100,8 +100,8 @@ a teardown there once nulled it before any test ran and a production save overwr
 registry, 2026-08-01). Pinned by `test/sandbox_net_test.dart`, including a self-restoring
 canary that drives the real save paths and byte-compares the real config/vault locations.
 
-**Known warnings — under review, see Current Focus. Rows below were waved through on
-2026-07-16; each now gets fixed or gets a reason. The gate's own warnings are not noise.**
+**Known warnings — triaged 2026-08-06; each is fixed or has a reason. The gate's own
+warnings are not noise.**
 
 | Warning | Source | Status / what it costs |
 |---|---|---|
@@ -127,14 +127,6 @@ resolved but never applied — inert, emits no warning.
 > Update at the end of each session. First thing to read at the start of the next.
 
 ### Next task
-
-**Dependency bump + clear the gate warnings**, on branch
-`dependency_bump_and_warning_fixes` (pushed). Remaining: the full gate.
-
-**Why the constraint-held packages cannot move:** `freezed` 3.2.5 (its latest stable)
-requires `analyzer >=9.0.0 <11.0.0`, which caps analyzer at 10.2.0 and through it
-`dart_style`, `test`, `build` and `build_runner`. Separately the Flutter SDK pins `meta`,
-`vector_math`, `matcher`, `test_api` and `intl` to exact versions. Neither is ours to move.
 
 ---
 
