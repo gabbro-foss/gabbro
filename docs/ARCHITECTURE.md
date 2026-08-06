@@ -73,7 +73,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 701 | 17 |
+| Rust (`cargo test -q`) | 707 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 11 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -145,27 +145,12 @@ languages 29 -> 26.
   Still to check: the pt-br list at https://diceware.readthedocs.io/en/stable/wordlists.html
   (7,776 words, purpose-built).
 
-Net first — nothing pins wordlist integrity today, so a bad regenerate would cut real
-entropy below the figure the UI shows. Pin against the current lists, then swap:
+Net in place: `SPECS` in `rust/src/api/passphrase_generator.rs` pins every list's size,
+uniqueness, alphabet and word length. It caught five lists carrying non-words; those are
+stripped, and `gen_wordlists.py` grew the alphabet filters that were missing for sk, uk
+and pt. New sizes: sk 6,642, uk 7,661, pt 7,744, fr 7,775, zh_cn 7,775.
 
-- [ ] every list is duplicate-free
-- [ ] every list matches its declared size (7,776 except es/it 8192, bg 7527, et 7052,
-      kk 4311, ja/ko/zh_tw 2048)
-- [ ] every word matches an explicit per-language alphabet (no Latin in ru/uk/bg/kk/el,
-      no `q w x z å` in fi)
-- [ ] no blank lines, no leading/trailing whitespace
-- [ ] word length within the language's declared bounds (CJK excluded)
-- [ ] then red-first: fi has none of the proper nouns Aspell leaks; ru is frequency-sourced
-
-The alphabet check is red today, not a net — fix these lists as we go. A Portuguese
-passphrase can currently contain `a` or `CV`; a Slovak one, a capitalised surname that
-defeats the capitalise toggle. List sizes are intact, so entropy is unaffected.
-
-- [ ] sk: 1,134 proper nouns/acronyms (`KSČ`, `Friedrich`, `Královohradeckom` — Czech)
-- [ ] uk: 114 proper nouns, apostrophes, hyphens (`Харків`, `кур'єр`, `на-гора`)
-- [ ] pt: 22 single letters, 8 acronyms, `km/h`
-- [ ] zh_cn: `阿Ｑ` (fullwidth Latin Q); fr: `Internet` capitalised
-- [ ] en: `t-shirt`, `yo-yo`, `drop-down`, `felt-tip` — hyphenated but legitimate, keep
+- [ ] swap fi to the KOTUS list, ru to the frequency list; credit KOTUS on About
 
 ---
 
