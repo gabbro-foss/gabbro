@@ -119,22 +119,16 @@ canary that drives the real save paths and byte-compares the real config/vault l
 
 ### Next task
 
-**Skip on a new entry deletes it on the other device too — decide if that is
-right.** In a review, Skip on an entry only the other device has stamps a
-tombstone (`session.rs:3749`), so the next sync carries the delete back and the
-entry disappears there as well. Declining an entry on this device silently
-removes it everywhere. Either that is intended (Skip means "we don't want this")
-or Skip should decline locally and leave the other device alone — in which case
-the entry is offered again at every sync. Settle which, then align.
-
-Verified 2026-08-06 and **not** a defect: auto-merge does not lose tombstones.
-`do_fast_merge` calls `do_merge` (`session.rs:3591`), which unions both sides'
-`deleted_ids` (`session.rs:3411`), so an entry it drops keeps the incoming
-tombstone and the delete cannot return from a third device. The old backlog
-entry claiming otherwise was wrong and is deleted.
+(empty — agree the next one with the maintainer)
 
 Branch `incoming_sync_review`: incoming-first review and the auto-merge
 explainer are both complete and hardware-verified, pushed, not gated or merged.
+
+Tombstone behaviour settled 2026-08-06, no work needed. A delete propagating to
+the other device is the feature. Skip in a review is the user choosing to
+diverge, and that is their call. Auto-merge keeps tombstones too — it calls
+`do_merge` (`session.rs:3591`), which unions both sides' `deleted_ids`
+(`session.rs:3411`), so a delete it applies cannot return from a third device.
 
 ---
 
