@@ -142,6 +142,8 @@ languages 29 -> 26.
   for hr, lt, lv, kk. 45k candidates; commoner and shorter words than today's Aspell list.
 - **pt — no replacement found yet.** `jfoclpf/words-pt` is GPL-3.0 but is a spell-check
   dictionary, not a diceware list: conjugation-dominated, no POS data to strip them.
+  Still to check: the pt-br list at https://diceware.readthedocs.io/en/stable/wordlists.html
+  (7,776 words, purpose-built).
 
 Net first — nothing pins wordlist integrity today, so a bad regenerate would cut real
 entropy below the figure the UI shows. Pin against the current lists, then swap:
@@ -154,6 +156,16 @@ entropy below the figure the UI shows. Pin against the current lists, then swap:
 - [ ] no blank lines, no leading/trailing whitespace
 - [ ] word length within the language's declared bounds (CJK excluded)
 - [ ] then red-first: fi has none of the proper nouns Aspell leaks; ru is frequency-sourced
+
+The alphabet check is red today, not a net — fix these lists as we go. A Portuguese
+passphrase can currently contain `a` or `CV`; a Slovak one, a capitalised surname that
+defeats the capitalise toggle. List sizes are intact, so entropy is unaffected.
+
+- [ ] sk: 1,134 proper nouns/acronyms (`KSČ`, `Friedrich`, `Královohradeckom` — Czech)
+- [ ] uk: 114 proper nouns, apostrophes, hyphens (`Харків`, `кур'єр`, `на-гора`)
+- [ ] pt: 22 single letters, 8 acronyms, `km/h`
+- [ ] zh_cn: `阿Ｑ` (fullwidth Latin Q); fr: `Internet` capitalised
+- [ ] en: `t-shirt`, `yo-yo`, `drop-down`, `felt-tip` — hyphenated but legitimate, keep
 
 ---
 
