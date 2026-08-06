@@ -499,7 +499,8 @@ mod tests {
         alpha("sv", WORDLIST_SV, 7776, "abcdefghijklmnopqrstuvwxyzåäö", 4, 12),
         alpha("da", WORDLIST_DA, 7776, "abcdefghijklmnopqrstuvwxyzåæø", 4, 12),
         alpha("nb", WORDLIST_NB, 7776, "abcdefghijklmnopqrstuvwxyzåæø", 4, 12),
-        alpha("fi", WORDLIST_FI, 7776, "abcdefghijklmnopqrstuvwxyzäö", 4, 12),
+        // The 24 letters of native Finnish — q w x z å appear only in loanwords.
+        alpha("fi", WORDLIST_FI, 7776, "abcdefghijklmnoprstuvyäö", 4, 12),
         alpha("cs", WORDLIST_CS, 7776, "abcdefghijklmnopqrstuvwxyzáčďéěíňóřšťúůýž", 4, 12),
         alpha("sk", WORDLIST_SK, 6642, "abcdefghijklmnopqrstuvwxyzáäčďéíĺľňóôŕšťúýž", 3, 17),
         alpha("sl", WORDLIST_SL, 7776, "abcdefghijklmnoprstuvzčšž", 4, 12),

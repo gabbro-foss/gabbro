@@ -2,8 +2,10 @@
 """
 Generate passphrase wordlists for Gabbro.
 
-Aspell-sourced (GPL-compatible): sv, da, nb, fi, sl, pl, ru, hu, cs
+Aspell-sourced (GPL-compatible): sv, da, nb, sl, pl, hu, cs
 Licensed downloads:
+  fi  — FredrikBorgstrom/finnish-extractor (KOTUS Nykysuomen sanalista, plain
+        words, taken under the LGPL arm of its triple licence; credit KOTUS)
   pt  — thoughtworks/dadoware          (plain words, MIT-ish)
   et  — agreinhold/Diceware-word-lists (tab NNNNN\tword, CC-BY-4.0)
   sk  — jtomori/diceware_slovak        (space NNNNN word, MIT)
@@ -15,6 +17,7 @@ Frequency corpora (CC-BY-SA 4.0, hermitdave/FrequencyWords):
   lt  — lt_50k.txt  (7776 words, freq_word0 format)
   lv  — lv_50k.txt  (7776 words, freq_word0 format)
   kk  — kk_full.txt (4311 words — full corpus; freq_word0 format)
+  ru  — ru_50k.txt  (7776 words, freq_word0 format)
 
 Not generated here (committed lists, edited in place): en, fr, de, es, it, nl,
 ja, ko, zh_cn, zh_tw.
@@ -23,7 +26,8 @@ Every list is pinned by the integrity net in `rust/src/api/passphrase_generator.
 (size, duplicates, alphabet, length). Change a filter here and that test tells you
 what moved.
 
-Run from the repo root: python3 rust/scripts/gen_wordlists.py
+Run from the repo root: python3 rust/scripts/gen_wordlists.py [lang ...]
+Naming languages regenerates only those, so one fix cannot churn the other lists.
 """
 
 import re
@@ -36,6 +40,7 @@ from pathlib import Path
 ASSETS = Path(__file__).resolve().parent.parent / "assets"
 TARGET = 7776
 SEED = 42
+SELECTED = set(sys.argv[1:])
 
 # ---------------------------------------------------------------------------
 # helpers
@@ -52,6 +57,11 @@ def aspell_candidates(lang: str, pattern: str) -> list[str]:
         if re.fullmatch(pattern, word):
             words.add(word)
     return sorted(words)
+
+
+def wanted(lang: str) -> bool:
+    """Languages named on the command line, or all of them if none were."""
+    return not SELECTED or lang in SELECTED
 
 
 def fetch(url: str) -> str:
@@ -82,10 +92,8 @@ ASPELL = {
     "sv": r"[a-zåäö]{4,12}",
     "da": r"[a-zæøå]{4,12}",
     "nb": r"[a-zæøå]{4,12}",
-    "fi": r"[a-zäöå]{4,12}",
     "sl": r"[abcčdefghijklmnoprsštuvzž]{4,12}",  # explicit — excludes q w x y
     "pl": r"[a-ząćęłńóśźż]{4,12}",
-    "ru": r"[а-яё]{4,12}",
     "hu": r"[a-záéíóöőúüű]{4,12}",
     "cs": r"[a-záčďéěíňóřšťúůýž]{4,12}",
     "el": r"[α-ωάέήίόύώΐΰϊϋ]{4,12}",  # Modern Greek lowercase
@@ -93,8 +101,11 @@ ASPELL = {
 
 
 def gen_aspell() -> None:
+    todo = {k: v for k, v in ASPELL.items() if wanted(k)}
+    if not todo:
+        return
     print("Generating from Aspell:")
-    for lang, pat in ASPELL.items():
+    for lang, pat in todo.items():
         candidates = aspell_candidates(lang, pat)
         words = sample(candidates)
         save(lang, words)
@@ -108,6 +119,12 @@ BASE_AGREINHOLD = "https://raw.githubusercontent.com/agreinhold/Diceware-word-li
 
 DOWNLOADS: dict[str, tuple[str, str, str | None]] = {
     # lang: (url, format-key, post-filter regex or None)
+    "fi": (
+        "https://raw.githubusercontent.com/FredrikBorgstrom/finnish-extractor/HEAD/words_fi-FI_kotus.txt",
+        "plain",
+        # The 24 letters of native Finnish — q w x z å appear only in loanwords.
+        r"[abcdefghijklmnoprstuvyäö]{4,12}",
+    ),
     "pt": (
         "https://raw.githubusercontent.com/thoughtworks/dadoware/master/7776palavras.txt",
         "plain",
@@ -159,6 +176,13 @@ DOWNLOADS: dict[str, tuple[str, str, str | None]] = {
         "freq_word0",
         r"[а-яёәғқңөұүһі]{4,12}",
     ),
+    "ru": (
+        "https://raw.githubusercontent.com/hermitdave/FrequencyWords/master/content/2018/ru/ru_50k.txt",
+        "freq_word0",
+        # Explicit Russian alphabet; ё is excluded, as it is routinely written
+        # as е and a passphrase must be typeable exactly as shown.
+        r"[абвгдежзийклмнопрстуфхцчшщъыьэюя]{4,12}",
+    ),
     "uk": (
         f"{BASE_AGREINHOLD}/diceware_ua_uk_long.txt",
         "tab_field1_uk",       # header + NNNNN\tword\tRomanized
@@ -207,8 +231,11 @@ def parse(content: str, fmt: str) -> list[str]:
 
 
 def gen_downloads() -> None:
+    todo = {k: v for k, v in DOWNLOADS.items() if wanted(k)}
+    if not todo:
+        return
     print("Downloading licensed wordlists:")
-    for lang, (url, fmt, post_filter) in DOWNLOADS.items():
+    for lang, (url, fmt, post_filter) in todo.items():
         content = fetch(url)
         words = parse(content, fmt)
         if post_filter:
@@ -224,6 +251,12 @@ def gen_downloads() -> None:
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
+    known = set(ASPELL) | set(DOWNLOADS)
+    unknown = SELECTED - known
+    if unknown:
+        print(f"unknown language(s): {', '.join(sorted(unknown))}", file=sys.stderr)
+        print(f"known: {', '.join(sorted(known))}", file=sys.stderr)
+        sys.exit(1)
     ASSETS.mkdir(exist_ok=True)
     gen_aspell()
     gen_downloads()

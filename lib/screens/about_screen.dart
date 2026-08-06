@@ -316,7 +316,7 @@ const _kComponents = [
     url: 'https://github.com/fzyzcjy/flutter_rust_bridge',
   ),
   _Component(
-    name: 'FrequencyWords (hr, lt, lv, kk)',
+    name: 'FrequencyWords (hr, lt, lv, kk, ru)',
     licence: 'CC-BY-SA 4.0',
     url: 'https://github.com/hermitdave/FrequencyWords',
   ),
@@ -367,6 +367,13 @@ const _kComponents = [
     name: 'libfido2-sys',
     licence: 'MIT',
     url: 'https://github.com/tyan-boot/fido-rs',
+  ),
+  // KOTUS (Institute for the Languages of Finland) requires attribution;
+  // taken under the LGPL arm of its triple licence.
+  _Component(
+    name: 'Nykysuomen sanalista, KOTUS (fi)',
+    licence: 'LGPL',
+    url: 'https://github.com/FredrikBorgstrom/finnish-extractor',
   ),
   _Component(
     name: 'path_provider',
