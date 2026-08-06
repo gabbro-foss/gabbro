@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Finnish and Russian passphrases draw on new wordlists**, re-sourced for GPL-3.0 compatibility. Both are still 7,776 words, so entropy is unchanged.
 - **Passphrases no longer include non-words** — single letters and `CV` in Portuguese, surnames in Slovak and Ukrainian, `Internet` in French. Slovak drops to 6,642 words; add one word to cover the lost entropy.
 - **In a sync review, the two options no longer swap places between fields.** A changed password put your own value first, the field below it put the other device's value first, so the option under your thumb kept changing meaning. The other device's value is now always listed first and pre-selected, for every kind of change — including entries and fields it deleted. Stepping through a review without changing anything now does exactly what Merge automatically does. Any choice you make yourself is still honoured, and Cancel still abandons the whole sync.
 - **The sync dialog now says what "Merge automatically" does.** It offered the choice without explaining it, so it went unused. It now states that the automatic merge takes the other device's value wherever the two differ, and that reviewing starts from those same answers. The two choices carry the same wording for a screen reader, which on Linux reads only a control's name and never the paragraph.

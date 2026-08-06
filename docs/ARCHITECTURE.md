@@ -128,29 +128,11 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**Re-source or drop three passphrase wordlists: Finnish, Russian, Portuguese.** Their
-current sources are not confirmed GPL-3.0 compatible. Dropping all three takes passphrase
-languages 29 -> 26.
-
-- **fi — verified, swap to it.** KOTUS *Nykysuomen sanalista* via
-  https://github.com/FredrikBorgstrom/finnish-extractor — triple-licensed, take it under
-  **LGPL**; attribution to KOTUS required (About screen). 815k candidates match our
-  alphabet; the sampled 7,776 cluster less than today's Aspell list and exclude the
-  proper nouns it leaks.
-- **ru — verified, swap to it.** `ru_50k.txt` from `hermitdave/FrequencyWords`,
-  CC-BY-SA 4.0 (one-way GPLv3-compatible) — the same source and licence we already ship
-  for hr, lt, lv, kk. 45k candidates; commoner and shorter words than today's Aspell list.
-- **pt — no replacement found yet.** `jfoclpf/words-pt` is GPL-3.0 but is a spell-check
-  dictionary, not a diceware list: conjugation-dominated, no POS data to strip them.
-  Still to check: the pt-br list at https://diceware.readthedocs.io/en/stable/wordlists.html
-  (7,776 words, purpose-built).
-
-Net in place: `SPECS` in `rust/src/api/passphrase_generator.rs` pins every list's size,
-uniqueness, alphabet and word length. It caught five lists carrying non-words; those are
-stripped, and `gen_wordlists.py` grew the alphabet filters that were missing for sk, uk
-and pt. New sizes: sk 6,642, uk 7,661, pt 7,744, fr 7,775, zh_cn 7,775.
-
-- [ ] swap fi to the KOTUS list, ru to the frequency list; credit KOTUS on About
+**Re-source or drop the Portuguese passphrase wordlist.** dadoware is CC-BY-NC-3.0, so
+it is not GPL-3.0 compatible; dropping it takes passphrase languages 29 -> 28. fi and ru
+are done. `jfoclpf/words-pt` is GPL-3.0 but is a spell-check dictionary, not a diceware
+list: conjugation-dominated, no POS data to strip them. Still to check: the pt-br list at
+https://diceware.readthedocs.io/en/stable/wordlists.html (7,776 words, purpose-built).
 
 ---
 
