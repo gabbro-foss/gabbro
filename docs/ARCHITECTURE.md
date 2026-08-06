@@ -119,42 +119,22 @@ canary that drives the real save paths and byte-compares the real config/vault l
 
 ### Next task
 
-**Explain auto-merge in the sync dialog.** "Merge automatically" says nothing
-about what it does, so it goes unused. State that it takes the other device's
-value wherever the two differ, and that a review starts from those same answers
-— true and hardware-proven since the incoming-first change (Linux run 2).
+**Skip on a new entry deletes it on the other device too — decide if that is
+right.** In a review, Skip on an entry only the other device has stamps a
+tombstone (`session.rs:3749`), so the next sync carries the delete back and the
+entry disappears there as well. Declining an entry on this device silently
+removes it everywhere. Either that is intended (Skip means "we don't want this")
+or Skip should decline locally and leave the other device alone — in which case
+the entry is offered again at every sync. Settle which, then align.
 
-**Route A (agreed):** the explanation goes in the button names as well as an
-explainer paragraph. On Linux the screen reader reads only a widget's name and
-never announces a paragraph on open, so a paragraph alone would leave a blind
-user with the same bare "Merge automatically" they have today.
+Verified 2026-08-06 and **not** a defect: auto-merge does not lose tombstones.
+`do_fast_merge` calls `do_merge` (`session.rs:3591`), which unions both sides'
+`deleted_ids` (`session.rs:3411`), so an entry it drops keeps the incoming
+tombstone and the delete cannot return from a third device. The old backlog
+entry claiming otherwise was wrong and is deleted.
 
-Net — green in `test/sync_method_dialog_test.dart` (7 tests):
-
-- [x] N1 Merge automatically applies the whole sync, no further questions
-- [x] N2 Review all changes opens the one-by-one review
-- [x] N3 Cancel leaves the vault untouched
-- [x] N4 Same-passphrase warning only for a passphrase-only source
-- [x] N5 The three choices keep their order
-
-Then red — all green:
-
-- [x] R1 Explainer paragraph renders, in both warning branches
-- [x] R2 Each button announces its own meaning (route A), still as a button
-- [x] R3 Both buttons keyboard-reachable on Linux desktop (passed pre-change,
-      so it pins existing reach rather than new behaviour)
-- [x] R4 All 37 locales translated (`l10n_test.dart` parity)
-- [x] R5 No overflow at 8x on a 360px phone, every locale
-      (`sync_chooser_l10n_overflow_test.dart`)
-
-Done via `semanticsLabel` on each button's `Text`, not a `Semantics` wrapper —
-the wrapper would have taken the button's own tap action and role with it.
-
-Hardware pass done, all pass: Linux at normal and 4x text, Android at phone
-width, and Orca reading both announced names back with "button".
-
-Same branch `incoming_sync_review`, which is complete and hardware-verified
-(Linux runs 1-3 + Android) but not gated or merged.
+Branch `incoming_sync_review`: incoming-first review and the auto-merge
+explainer are both complete and hardware-verified, pushed, not gated or merged.
 
 ---
 
@@ -184,11 +164,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
-- **Auto-merge deletes without a tombstone.** `do_fast_merge` drops a deleted entry
-  (`session.rs:3647`); the review path stamps a tombstone (`session.rs:3752`). So a delete
-  applied by auto-merge can return from a third device. Decide which is right, then align.
-  Same call site, opposite surprise: **Skip on a new entry also stamps a tombstone**, so
-  declining an entry once propagates a delete of it back to the other vault.
 - **A third sync choice — decide whether we want it at all before building.** It would take
   the incoming vault and replace this one (dropping local-only entries, which nothing does
   today). A third path may make the choice more confusing, not less; settle that first. The
