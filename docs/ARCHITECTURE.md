@@ -60,7 +60,7 @@ gabbro/
 ├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, VAULT_SYNC, AUTOTYPE_AND_AUTOFILL, AI_*; decisions/ (ADRs); artefacts/
 ├── test/  integration_test/          # Flutter widget/unit + Linux real-FFI suites (dart test)
 ├── test_data/            # Sample import files + migration_vaults/ (refusal corpus at floor v11, one vault per VERSION + MIGRATION_TESTS.md + test_matrix.md)
-├── assets/               # fonts, images, help/; public_suffix_list.dat (autofill eTLD+1)
+├── assets/               # fonts, images, help/ (public_suffix_list.dat is an Android asset)
 ├── challenge/            # crack-me challenge vault + rules
 └── CHANGELOG.md  README.md
 ```
@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2159 | 10 |
+| Flutter (`flutter test`) | 2165 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -100,17 +100,25 @@ a teardown there once nulled it before any test ran and a production save overwr
 registry, 2026-08-01). Pinned by `test/sandbox_net_test.dart`, including a self-restoring
 canary that drives the real save paths and byte-compares the real config/vault locations.
 
-**Known warnings — under review, see Current Focus. Rows below were waved through on
-2026-07-16; each now gets fixed or gets a reason. The gate's own warnings are not noise.**
+**Known warnings — triaged 2026-08-06; each is fixed or has a reason. The gate's own
+warnings are not noise.**
 
-| Warning | Source | Why not fixed |
+| Warning | Source | Status / what it costs |
 |---|---|---|
+| `package=` ignored, `rust_lib_gabbro` | ours | **FIXED** 2026-08-06. Merged manifest byte-identical after. |
+| `package=` ignored x5 | `file_picker`, `jni`, `jni_flutter`, `url_launcher_android`, `flutter_plugin_android_lifecycle` | Upstream. Latest versions still warn. Android build breaks at a future AGP. |
+| Gradle space-assignment x42 | `file_picker` 13, `jni` 16, `jni_flutter` 13 | Upstream. Latest versions still warn. Android build breaks at Gradle 10. |
+| `Task.project` at execution time | Flutter's own `compileFlutterBuildDebug` | Upstream. Breaks at Gradle 10. Only shows when the task is not UP-TO-DATE. |
 | Kotlin plugin version (2.0.21 vs 2.2.20) | Flutter SDK's own `:gradle` build | Upstream. Debug and release alike. |
-| Gradle space-assignment x16 | pub-cache `jni`, `jni_flutter`, `file_picker` | Upstream. Hard error at Gradle 10. |
-| JVM restricted-method (`System::load`) | Gradle 8.14 `native-platform` jar | Needs a wrapper bump — a full-gate change, do deliberately. |
+| JVM restricted-method (`System::load`) | Gradle 8.14 `native-platform` jar | Gradle's own jar, and the version is pinned — nothing changes on its own. Clears itself whenever we next raise Gradle. No action. |
 | `cargo deny` no-license-field: `allo-isolate` | `flutter_rust_bridge` dep | Fixed on their master; await release. `[[licenses.clarify]]` is inert — don't retry. |
 | `cargo deny` duplicates x6 | `argon2`->`digest`, `jni`->`libloading`, `bindgen`->`shlex` | Upstream pins. Was x7; RT-3 took the `hybrid-array` duplicate with `ml-kem`. The crate itself stays (`sha2`/`hkdf` -> `digest` need it). |
-| KGP via `buildscript` classpath | `file_picker`, `url_launcher_android` | Upstream. Future Flutter hard error. |
+| "trying to run flutter as root" | the gate's own `unshare -r` | Cosmetic. Not Gabbro. |
+| KGP via `buildscript` classpath | `file_picker`, `url_launcher_android` | Did not reproduce 2026-08-06; re-check before acting. |
+
+**AGP note:** every module, `rust_lib_gabbro` included, loads AGP **8.11.1**. The
+`com.android.tools.build:gradle:7.3.0` line in `rust_builder/android/build.gradle` is
+resolved but never applied — inert, emits no warning.
 
 ---
 
@@ -119,22 +127,6 @@ canary that drives the real save paths and byte-compares the real config/vault l
 > Update at the end of each session. First thing to read at the start of the next.
 
 ### Next task
-
-**Dependency bump + clear the gate warnings.** Left alone, the Android build stops
-compiling at a future AGP/Gradle; the warnings say so now and won't say it twice.
-
-1. `flutter pub upgrade` — 19 packages are locked but unconstrained (incl. file_picker,
-   jni, jni_flutter, url_launcher_android, flutter_plugin_android_lifecycle). Separately
-   decide which constraint-held ones (intl, analyzer, test, win32, meta, …) Flutter pins.
-2. Drop `package=` from `rust_builder/android/src/main/AndroidManifest.xml` — ours;
-   `build.gradle` already sets `namespace`.
-3. AGP 7.3.0 pinned via `buildscript` classpath, `rust_builder/android/build.gradle` — ours.
-4. `./gradlew :app:testDebugUnitTest --warning-mode all` — name the Gradle 9 deprecations
-   the summary line hides.
-5. Regenerate + re-scan `android/app/gradle.lockfile`; `gabbro_test --warm` before the gate.
-
-Every row of the Known warnings table gets fixed or gets a reason that names the failure
-it accepts.
 
 ---
 
@@ -154,6 +146,18 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   committed in the AUR clone; the push fails — the AUR is in maintenance
   (still down 2026-08-05). Until it lands, Arch users install alpha.16. Retry with
   `git -C ../gabbro-bin-aur push` from `gabbro/`.
+
+### Dependencies
+- **Replace the plugins that emit the Gradle warnings, or roll our own.** No bump clears
+  them — latest versions still warn — and the Android build breaks at Gradle 10 / a
+  future AGP. Affected: `file_picker` (`package=` + deprecated space-assignment), `jni`
+  and `jni_flutter` (both, same), `url_launcher_android` and
+  `flutter_plugin_android_lifecycle` (`package=` only).
+- **Re-source or drop three passphrase wordlists: Finnish, Russian, Portuguese.** Their
+  upstream sources are not confirmed GPL-3.0 compatible — fi is marked `GPL2` with no
+  version, ru permits redistributing modifications in patch form only, pt (dadoware) is
+  CC-BY-NC-3.0. Either find replacement sources or generate our own; dropping all three
+  takes passphrase languages 29 -> 26.
 
 ### Features and UI/UX
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder

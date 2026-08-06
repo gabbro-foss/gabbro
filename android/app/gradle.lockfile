@@ -3,8 +3,8 @@
 # This file is expected to be part of source control.
 androidx.activity:activity:1.9.0=releaseRuntimeClasspath
 androidx.annotation:annotation-experimental:1.4.1=releaseRuntimeClasspath
-androidx.annotation:annotation-jvm:1.9.1=releaseRuntimeClasspath
-androidx.annotation:annotation:1.9.1=releaseRuntimeClasspath
+androidx.annotation:annotation-jvm:1.10.0=releaseRuntimeClasspath
+androidx.annotation:annotation:1.10.0=releaseRuntimeClasspath
 androidx.appcompat:appcompat-resources:1.2.0=releaseRuntimeClasspath
 androidx.appcompat:appcompat:1.2.0=releaseRuntimeClasspath
 androidx.arch.core:core-common:2.2.0=releaseRuntimeClasspath
@@ -57,12 +57,10 @@ com.squareup.okio:okio:3.7.0=releaseRuntimeClasspath
 com.yubico.yubikit:android:3.1.0=releaseRuntimeClasspath
 com.yubico.yubikit:core:3.1.0=releaseRuntimeClasspath
 com.yubico.yubikit:fido:3.1.0=releaseRuntimeClasspath
-commons-io:commons-io:2.20.0=releaseRuntimeClasspath
 io.flutter:arm64_v8a_release:1.0.0-0cd610717bde95fd88343c64f81c11ba4e5c0010=releaseRuntimeClasspath
 io.flutter:armeabi_v7a_release:1.0.0-0cd610717bde95fd88343c64f81c11ba4e5c0010=releaseRuntimeClasspath
 io.flutter:flutter_embedding_release:1.0.0-0cd610717bde95fd88343c64f81c11ba4e5c0010=releaseRuntimeClasspath
 io.flutter:x86_64_release:1.0.0-0cd610717bde95fd88343c64f81c11ba4e5c0010=releaseRuntimeClasspath
-org.apache.tika:tika-core:3.2.3=releaseRuntimeClasspath
 org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.21=releaseRuntimeClasspath
 org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.21=releaseRuntimeClasspath
 org.jetbrains.kotlin:kotlin-stdlib:2.2.20=releaseRuntimeClasspath

@@ -291,6 +291,11 @@ const _kComponents = [
     url: 'https://github.com/agreinhold/Diceware-word-lists',
   ),
   _Component(
+    name: 'diceware_slovak (sk)',
+    licence: 'MIT',
+    url: 'https://github.com/jtomori/diceware_slovak',
+  ),
+  _Component(
     name: 'file_picker',
     licence: 'MIT',
     url: 'https://github.com/miguelpruivo/flutter_file_picker',
@@ -321,9 +326,19 @@ const _kComponents = [
     url: 'https://github.com/rrousselGit/freezed',
   ),
   _Component(
+    name: 'greek-dictionary (el)',
+    licence: 'MIT',
+    url: 'https://github.com/kalpetros/greek-dictionary',
+  ),
+  _Component(
     name: 'hkdf',
     licence: 'Apache-2.0 / MIT',
     url: 'https://github.com/RustCrypto/KDFs',
+  ),
+  _Component(
+    name: 'indexmap',
+    licence: 'Apache-2.0 / MIT',
+    url: 'https://github.com/indexmap-rs/indexmap',
   ),
   _Component(
     name: 'intl',
@@ -332,18 +347,37 @@ const _kComponents = [
   ),
   _Component(
     name: 'jni',
-    licence: 'MIT',
+    licence: 'Apache-2.0 / MIT',
     url: 'https://github.com/jni-rs/jni-rs',
   ),
   _Component(
-    name: 'libfido2-sys',
+    name: 'libc',
+    licence: 'Apache-2.0 / MIT',
+    url: 'https://github.com/rust-lang/libc',
+  ),
+  // Two separate works ship: Yubico's C library and the Rust binding that
+  // links it. Different authors, different licences, so one entry cannot
+  // stand for both.
+  _Component(
+    name: 'libfido2 (Yubico)',
     licence: 'BSD-2-Clause',
     url: 'https://github.com/Yubico/libfido2',
+  ),
+  _Component(
+    name: 'libfido2-sys',
+    licence: 'MIT',
+    url: 'https://github.com/tyan-boot/fido-rs',
   ),
   _Component(
     name: 'path_provider',
     licence: 'BSD-3-Clause',
     url: 'https://github.com/flutter/packages',
+  ),
+  // Mozilla's list, shipped as an Android asset for autofill domain matching.
+  _Component(
+    name: 'Public Suffix List',
+    licence: 'MPL-2.0',
+    url: 'https://publicsuffix.org/list/',
   ),
   _Component(
     name: 'rand',
@@ -371,6 +405,11 @@ const _kComponents = [
     url: 'https://github.com/RustCrypto/hashes',
   ),
   _Component(
+    name: 'thiserror',
+    licence: 'Apache-2.0 / MIT',
+    url: 'https://github.com/dtolnay/thiserror',
+  ),
+  _Component(
     name: 'url_launcher',
     licence: 'BSD-3-Clause',
     url: 'https://github.com/flutter/packages',
@@ -379,6 +418,11 @@ const _kComponents = [
     name: 'uuid',
     licence: 'Apache-2.0 / MIT',
     url: 'https://github.com/uuid-rs/uuid',
+  ),
+  _Component(
+    name: 'x11rb',
+    licence: 'Apache-2.0 / MIT',
+    url: 'https://github.com/psychon/x11rb',
   ),
   _Component(
     name: 'zeroize',
