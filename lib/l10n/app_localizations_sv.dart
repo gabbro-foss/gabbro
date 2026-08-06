@@ -729,10 +729,22 @@ class AppLocalizationsSv extends AppLocalizations {
   String get syncUseIncomingYubikey => 'Använd det inkommande valvets YubiKey';
 
   @override
+  String get syncMethodExplainer =>
+      'Slå samman automatiskt tar den andra enhetens värde överallt där de två skiljer sig. En granskning utgår från samma svar.';
+
+  @override
   String get syncMergeAutomatically => 'Slå samman automatiskt';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Slå samman automatiskt. Tar den andra enhetens värde överallt där de två skiljer sig.';
+
+  @override
   String get syncReviewAllChanges => 'Granska alla ändringar';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Granska alla ändringar. Utgår från samma svar, och du kan ändra vilket som helst av dem.';
 
   @override
   String get syncDetailsAction => 'Detaljer';

@@ -731,10 +731,22 @@ class AppLocalizationsFr extends AppLocalizations {
   String get syncUseIncomingYubikey => 'Utilisez la YubiKey du coffre entrant';
 
   @override
+  String get syncMethodExplainer =>
+      'Fusionner automatiquement reprend la valeur de l\'autre appareil partout où les deux diffèrent. Une vérification part des mêmes réponses.';
+
+  @override
   String get syncMergeAutomatically => 'Fusionner automatiquement';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Fusionner automatiquement. Reprend la valeur de l\'autre appareil partout où les deux diffèrent.';
+
+  @override
   String get syncReviewAllChanges => 'Vérifier toutes les modifications';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Vérifier toutes les modifications. Part des mêmes réponses, et vous pouvez en changer n\'importe laquelle.';
 
   @override
   String get syncDetailsAction => 'Détails';

@@ -49,7 +49,9 @@ MergeSummary _summary({
 
 void main() {
   group('sync review keep/delete labels', () {
-    testWidgets('whole-entry delete defaults to keep', (tester) async {
+    testWidgets('whole-entry delete defaults to the incoming delete', (
+      tester,
+    ) async {
       SyncReviewDecisions? d;
       await openReview(
         tester,
@@ -58,10 +60,24 @@ void main() {
       );
       await tester.tap(find.text('OK'));
       await tester.pumpAndSettle();
+      expect(d!.entryDeletes, contains('g'));
+    });
+
+    testWidgets('choosing Keep spares a whole-entry delete', (tester) async {
+      SyncReviewDecisions? d;
+      await openReview(
+        tester,
+        _summary(pendingDeletes: [const PendingDeleteItem(id: 'g', title: 'Gone')]),
+        (r) => d = r,
+      );
+      await tester.tap(find.widgetWithText(ChoiceChip, 'Keep'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
       expect(d!.entryDeletes, isNot(contains('g')));
     });
 
-    testWidgets('per-item delete defaults to keep', (tester) async {
+    testWidgets('per-item delete defaults to the incoming delete', (tester) async {
       SyncReviewDecisions? d;
       await openReview(
         tester,
@@ -76,6 +92,29 @@ void main() {
         ),
         (r) => d = r,
       );
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
+      final res = d!.itemDeletes.singleWhere((r) => r.field == 'custom_fields:OldNote');
+      expect(res.delete, isTrue);
+    });
+
+    testWidgets('choosing Keep spares an item delete', (tester) async {
+      SyncReviewDecisions? d;
+      await openReview(
+        tester,
+        _summary(
+          pendingItemDeletes: [
+            const PendingItemDeleteItem(
+              id: 'x',
+              title: 'Mail',
+              field: 'custom_fields:OldNote',
+            ),
+          ],
+        ),
+        (r) => d = r,
+      );
+      await tester.tap(find.widgetWithText(ChoiceChip, 'Keep'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('OK'));
       await tester.pumpAndSettle();
       final res = d!.itemDeletes.singleWhere((r) => r.field == 'custom_fields:OldNote');

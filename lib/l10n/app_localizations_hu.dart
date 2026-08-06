@@ -730,10 +730,22 @@ class AppLocalizationsHu extends AppLocalizations {
       'Használja a bejövő széf YubiKey kulcsát';
 
   @override
+  String get syncMethodExplainer =>
+      'Az automatikus egyesítés a másik eszköz értékét veszi át mindenhol, ahol a kettő eltér. Az áttekintés ugyanazokból a válaszokból indul.';
+
+  @override
   String get syncMergeAutomatically => 'Automatikus egyesítés';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Automatikus egyesítés. A másik eszköz értékét veszi át mindenhol, ahol a kettő eltér.';
+
+  @override
   String get syncReviewAllChanges => 'Összes módosítás áttekintése';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Összes módosítás áttekintése. Ugyanazokból a válaszokból indul, és bármelyiket módosíthatja.';
 
   @override
   String get syncDetailsAction => 'Részletek';

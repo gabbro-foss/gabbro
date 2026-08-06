@@ -732,10 +732,22 @@ class AppLocalizationsSl extends AppLocalizations {
   String get syncUseIncomingYubikey => 'Uporabite YubiKey dohodnega trezorja';
 
   @override
+  String get syncMethodExplainer =>
+      'Samodejno združi prevzame vrednost druge naprave povsod, kjer se razlikujeta. Pregled se začne pri istih odgovorih.';
+
+  @override
   String get syncMergeAutomatically => 'Samodejno združi';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Samodejno združi. Prevzame vrednost druge naprave povsod, kjer se razlikujeta.';
+
+  @override
   String get syncReviewAllChanges => 'Preglej vse spremembe';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Preglej vse spremembe. Začne se pri istih odgovorih in katerega koli lahko spremenite.';
 
   @override
   String get syncDetailsAction => 'Podrobnosti';

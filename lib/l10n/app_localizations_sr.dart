@@ -730,10 +730,22 @@ class AppLocalizationsSr extends AppLocalizations {
   String get syncUseIncomingYubikey => 'Користите YubiKey долазног трезора';
 
   @override
+  String get syncMethodExplainer =>
+      'Аутоматски споји преузима вредност другог уређаја свуда где се разликују. Преглед почиње од истих одговора.';
+
+  @override
   String get syncMergeAutomatically => 'Аутоматски споји';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Аутоматски споји. Преузима вредност другог уређаја свуда где се разликују.';
+
+  @override
   String get syncReviewAllChanges => 'Прегледај све промене';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Прегледај све промене. Почиње од истих одговора и можете променити било који.';
 
   @override
   String get syncDetailsAction => 'Детаљи';
@@ -2912,10 +2924,22 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   String get syncUseIncomingYubikey => 'Koristite YubiKey dolaznog trezora';
 
   @override
+  String get syncMethodExplainer =>
+      'Automatski spoji preuzima vrednost drugog uređaja svuda gde se razlikuju. Pregled počinje od istih odgovora.';
+
+  @override
   String get syncMergeAutomatically => 'Automatski spoji';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Automatski spoji. Preuzima vrednost drugog uređaja svuda gde se razlikuju.';
+
+  @override
   String get syncReviewAllChanges => 'Pregledaj sve promene';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Pregledaj sve promene. Počinje od istih odgovora i možete promeniti bilo koji.';
 
   @override
   String get syncDetailsAction => 'Detalji';

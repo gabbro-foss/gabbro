@@ -320,13 +320,25 @@
   "@syncUseIncomingYubikey": {
     "description": "Note in the keyed sync dialog: the key to tap is one registered in the incoming file, which may differ from this vault's keys."
   },
+  "syncMethodExplainer": "Merge automatically takes the other device's value wherever the two differ. A review starts from those same answers.",
+  "@syncMethodExplainer": {
+    "description": "Paragraph in the apply-choice dialog saying what the automatic merge does, and that the review starts from the same defaults."
+  },
   "syncMergeAutomatically": "Merge automatically",
   "@syncMergeAutomatically": {
     "description": "Button: apply all incoming changes automatically (incoming wins), no review."
   },
+  "syncMergeAutomaticallySemantic": "Merge automatically. Takes the other device's value wherever the two differ.",
+  "@syncMergeAutomaticallySemantic": {
+    "description": "Screen-reader name for the Merge automatically button. Linux reads only a widget's name and never announces the explainer paragraph, so the button carries the same meaning itself."
+  },
   "syncReviewAllChanges": "Review all changes",
   "@syncReviewAllChanges": {
     "description": "Button: step through every change one by one and choose (slower)."
+  },
+  "syncReviewAllChangesSemantic": "Review all changes. Starts from those same answers, and you can change any of them.",
+  "@syncReviewAllChangesSemantic": {
+    "description": "Screen-reader name for the Review all changes button. See syncMergeAutomaticallySemantic."
   },
   "syncDetailsAction": "Details",
   "@syncDetailsAction": {
@@ -681,14 +693,14 @@
     }
   },
   "syncFieldConflictUseIncoming": "Use the other device's value",
-  "folderConflictKeepUnfoldered": "Keep unfoldered",
+  "folderConflictKeepUnfoldered": "Keep without folder",
   "folderConflictKeepLocal": "Keep \"{folder}\"",
   "@folderConflictKeepLocal": {
     "placeholders": {
       "folder": {"type": "String"}
     }
   },
-  "folderConflictMoveUnfoldered": "Move to unfoldered",
+  "folderConflictMoveUnfoldered": "Move to no folder",
   "folderConflictMoveIncoming": "Move to \"{folder}\"",
   "@folderConflictMoveIncoming": {
     "placeholders": {

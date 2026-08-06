@@ -728,10 +728,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get syncUseIncomingYubikey => 'Use incoming vault\'s YubiKey';
 
   @override
+  String get syncMethodExplainer =>
+      'Merge automatically takes the other device\'s value wherever the two differ. A review starts from those same answers.';
+
+  @override
   String get syncMergeAutomatically => 'Merge automatically';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Merge automatically. Takes the other device\'s value wherever the two differ.';
+
+  @override
   String get syncReviewAllChanges => 'Review all changes';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Review all changes. Starts from those same answers, and you can change any of them.';
 
   @override
   String get syncDetailsAction => 'Details';
@@ -1230,7 +1242,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get syncFieldConflictUseIncoming => 'Use the other device\'s value';
 
   @override
-  String get folderConflictKeepUnfoldered => 'Keep unfoldered';
+  String get folderConflictKeepUnfoldered => 'Keep without folder';
 
   @override
   String folderConflictKeepLocal(String folder) {
@@ -1238,7 +1250,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get folderConflictMoveUnfoldered => 'Move to unfoldered';
+  String get folderConflictMoveUnfoldered => 'Move to no folder';
 
   @override
   String folderConflictMoveIncoming(String folder) {

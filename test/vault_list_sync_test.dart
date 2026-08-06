@@ -718,7 +718,7 @@ void main() {
       expect(applied.entryDeletes, ['uuid-1']);
     });
 
-    testWidgets('a kept whole-entry delete is not deleted', (tester) async {
+    testWidgets('an untouched whole-entry delete is applied', (tester) async {
       final applied = _Applied();
       await tester.pumpWidget(
         _buildScreen(
@@ -732,7 +732,28 @@ void main() {
         ),
       );
       await _startSync(tester);
-      await tester.tap(find.text('OK')); // leave delete off (keep)
+      await tester.tap(find.text('OK')); // Delete is the incoming default
+      await _settle(tester);
+      expect(applied.entryDeletes, contains('uuid-1'));
+    });
+
+    testWidgets('choosing Keep spares a whole-entry delete', (tester) async {
+      final applied = _Applied();
+      await tester.pumpWidget(
+        _buildScreen(
+          pickedPath: '/tmp/other.gabbro',
+          mergeVault: (_, _) async => _summary(
+            pendingDeletes: [
+              const PendingDeleteItem(id: 'uuid-1', title: 'Example'),
+            ],
+          ),
+          applied: applied,
+        ),
+      );
+      await _startSync(tester);
+      await tester.tap(find.widgetWithText(ChoiceChip, 'Keep'));
+      await _settle(tester);
+      await tester.tap(find.text('OK'));
       await _settle(tester);
       expect(applied.entryDeletes, isEmpty);
     });
@@ -1106,9 +1127,13 @@ void main() {
       expect(d.delete, true);
     });
 
-    testWidgets('finishing is blocked until a clash is picked', (tester) async {
+    testWidgets('a clash starts on the incoming value and never blocks OK', (
+      tester,
+    ) async {
+      final applied = _Applied();
       await tester.pumpWidget(
         _buildScreen(
+          applied: applied,
           pickedPath: '/tmp/other.gabbro',
           mergeVault: (_, _) async => _summary(
             addedEntries: [const AddedEntryItem(id: 'a', title: 'First')],
@@ -1131,15 +1156,21 @@ void main() {
       await tester.tap(find.text('Continue'));
       await _settle(tester);
 
-      // Step 2: the clash. OK is disabled until a value is picked.
+      // Step 2: the clash. Nothing left to satisfy — the incoming value leads,
+      // so OK is live straight away and finishing applies it.
       expect(find.textContaining('Second'), findsOneWidget);
       TextButton okButton() => tester.widget<TextButton>(
         find.ancestor(of: find.text('OK'), matching: find.byType(TextButton)),
       );
-      expect(okButton().onPressed, isNull);
-      await tester.tap(find.textContaining('Use other vault'));
-      await _settle(tester);
       expect(okButton().onPressed, isNotNull);
+
+      await tester.tap(find.text('OK'));
+      await _settle(tester);
+      expect(applied.fields, isEmpty, reason: 'no keep-mine stamp');
+      final h = applied.history.single;
+      expect(h.field, 'content');
+      expect(h.newValue, 't');
+      expect(h.replacedValue, 'm');
     });
 
     // A passphrase-only source never taps a YubiKey, so the "tap now" note must

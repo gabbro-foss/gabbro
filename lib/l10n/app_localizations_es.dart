@@ -730,10 +730,22 @@ class AppLocalizationsEs extends AppLocalizations {
   String get syncUseIncomingYubikey => 'Use la YubiKey del almacén entrante';
 
   @override
+  String get syncMethodExplainer =>
+      'Combinar automáticamente toma el valor del otro dispositivo allí donde ambos difieren. Una revisión parte de esas mismas respuestas.';
+
+  @override
   String get syncMergeAutomatically => 'Combinar automáticamente';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Combinar automáticamente. Toma el valor del otro dispositivo allí donde ambos difieren.';
+
+  @override
   String get syncReviewAllChanges => 'Revisar todos los cambios';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Revisar todos los cambios. Parte de esas mismas respuestas y puede cambiar cualquiera de ellas.';
 
   @override
   String get syncDetailsAction => 'Detalles';

@@ -731,10 +731,22 @@ class AppLocalizationsEt extends AppLocalizations {
       'Kasutage sissetuleva seifi YubiKey võtit';
 
   @override
+  String get syncMethodExplainer =>
+      'Ühenda automaatselt võtab teise seadme väärtuse kõikjal, kus need erinevad. Ülevaatus algab samadest vastustest.';
+
+  @override
   String get syncMergeAutomatically => 'Ühenda automaatselt';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Ühenda automaatselt. Võtab teise seadme väärtuse kõikjal, kus need erinevad.';
+
+  @override
   String get syncReviewAllChanges => 'Vaata kõik muudatused üle';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Vaata kõik muudatused üle. Algab samadest vastustest ja sa saad neist igaüht muuta.';
 
   @override
   String get syncDetailsAction => 'Üksikasjad';

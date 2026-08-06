@@ -729,10 +729,22 @@ class AppLocalizationsYo extends AppLocalizations {
   String get syncUseIncomingYubikey => 'Lo YubiKey vọọliti ti n bọ';
 
   @override
+  String get syncMethodExplainer =>
+      'Dàpọ̀ láìfọwọ́yi yóò lo iye ẹrọ miiran níbi gbogbo tí àwọn méjèèjì bá yàtọ̀. Àyẹ̀wò bẹ̀rẹ̀ láti inú àwọn ìdáhùn kan náà.';
+
+  @override
   String get syncMergeAutomatically => 'Dàpọ̀ láìfọwọ́yi';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Dàpọ̀ láìfọwọ́yi. Ó ń lo iye ẹrọ miiran níbi gbogbo tí àwọn méjèèjì bá yàtọ̀.';
+
+  @override
   String get syncReviewAllChanges => 'Ṣàyẹ̀wò gbogbo àwọn ìyípadà';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Ṣàyẹ̀wò gbogbo àwọn ìyípadà. Ó bẹ̀rẹ̀ láti inú àwọn ìdáhùn kan náà, o sì lè yí èyíkéyìí padà.';
 
   @override
   String get syncDetailsAction => 'Àwọn àlàyé';

@@ -1537,17 +1537,35 @@ abstract class AppLocalizations {
   /// **'Use incoming vault\'s YubiKey'**
   String get syncUseIncomingYubikey;
 
+  /// Paragraph in the apply-choice dialog saying what the automatic merge does, and that the review starts from the same defaults.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge automatically takes the other device\'s value wherever the two differ. A review starts from those same answers.'**
+  String get syncMethodExplainer;
+
   /// Button: apply all incoming changes automatically (incoming wins), no review.
   ///
   /// In en, this message translates to:
   /// **'Merge automatically'**
   String get syncMergeAutomatically;
 
+  /// Screen-reader name for the Merge automatically button. Linux reads only a widget's name and never announces the explainer paragraph, so the button carries the same meaning itself.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge automatically. Takes the other device\'s value wherever the two differ.'**
+  String get syncMergeAutomaticallySemantic;
+
   /// Button: step through every change one by one and choose (slower).
   ///
   /// In en, this message translates to:
   /// **'Review all changes'**
   String get syncReviewAllChanges;
+
+  /// Screen-reader name for the Review all changes button. See syncMergeAutomaticallySemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Review all changes. Starts from those same answers, and you can change any of them.'**
+  String get syncReviewAllChangesSemantic;
 
   /// Snackbar action button that opens the itemized list of what the sync changed.
   ///
@@ -2386,7 +2404,7 @@ abstract class AppLocalizations {
   /// No description provided for @folderConflictKeepUnfoldered.
   ///
   /// In en, this message translates to:
-  /// **'Keep unfoldered'**
+  /// **'Keep without folder'**
   String get folderConflictKeepUnfoldered;
 
   /// No description provided for @folderConflictKeepLocal.
@@ -2398,7 +2416,7 @@ abstract class AppLocalizations {
   /// No description provided for @folderConflictMoveUnfoldered.
   ///
   /// In en, this message translates to:
-  /// **'Move to unfoldered'**
+  /// **'Move to no folder'**
   String get folderConflictMoveUnfoldered;
 
   /// No description provided for @folderConflictMoveIncoming.

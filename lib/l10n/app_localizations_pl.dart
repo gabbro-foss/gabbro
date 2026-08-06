@@ -732,10 +732,22 @@ class AppLocalizationsPl extends AppLocalizations {
   String get syncUseIncomingYubikey => 'Użyj YubiKey przychodzącego skarbca';
 
   @override
+  String get syncMethodExplainer =>
+      'Scal automatycznie przyjmuje wartość drugiego urządzenia wszędzie tam, gdzie się różnią. Przegląd zaczyna się od tych samych odpowiedzi.';
+
+  @override
   String get syncMergeAutomatically => 'Scal automatycznie';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Scal automatycznie. Przyjmuje wartość drugiego urządzenia wszędzie tam, gdzie się różnią.';
+
+  @override
   String get syncReviewAllChanges => 'Przejrzyj wszystkie zmiany';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Przejrzyj wszystkie zmiany. Zaczyna się od tych samych odpowiedzi i możesz zmienić każdą z nich.';
 
   @override
   String get syncDetailsAction => 'Szczegóły';

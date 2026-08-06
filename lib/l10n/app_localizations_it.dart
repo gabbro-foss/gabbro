@@ -731,10 +731,22 @@ class AppLocalizationsIt extends AppLocalizations {
       'Usa la YubiKey dell\'archivio in arrivo';
 
   @override
+  String get syncMethodExplainer =>
+      'Unisci automaticamente prende il valore dell\'altro dispositivo ovunque i due differiscano. Una revisione parte dalle stesse risposte.';
+
+  @override
   String get syncMergeAutomatically => 'Unisci automaticamente';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Unisci automaticamente. Prende il valore dell\'altro dispositivo ovunque i due differiscano.';
+
+  @override
   String get syncReviewAllChanges => 'Rivedi tutte le modifiche';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Rivedi tutte le modifiche. Parte dalle stesse risposte e puoi cambiarne qualsiasi.';
 
   @override
   String get syncDetailsAction => 'Dettagli';

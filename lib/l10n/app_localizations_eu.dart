@@ -731,10 +731,22 @@ class AppLocalizationsEu extends AppLocalizations {
       'Erabili sarrerako gandegiaren YubiKey-a';
 
   @override
+  String get syncMethodExplainer =>
+      'Batu automatikoki aukerak beste gailuaren balioa hartzen du biak desberdinak diren toki guztietan. Berrikuspena erantzun beretatik abiatzen da.';
+
+  @override
   String get syncMergeAutomatically => 'Batu automatikoki';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Batu automatikoki. Beste gailuaren balioa hartzen du biak desberdinak diren toki guztietan.';
+
+  @override
   String get syncReviewAllChanges => 'Berrikusi aldaketa guztiak';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Berrikusi aldaketa guztiak. Erantzun beretatik abiatzen da, eta edozein alda dezakezu.';
 
   @override
   String get syncDetailsAction => 'Xehetasunak';

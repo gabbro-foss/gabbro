@@ -732,10 +732,22 @@ class AppLocalizationsSk extends AppLocalizations {
       'Použite YubiKey prichádzajúceho trezora';
 
   @override
+  String get syncMethodExplainer =>
+      'Zlúčiť automaticky prevezme hodnotu druhého zariadenia všade, kde sa líšia. Kontrola začína rovnakými odpoveďami.';
+
+  @override
   String get syncMergeAutomatically => 'Zlúčiť automaticky';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Zlúčiť automaticky. Prevezme hodnotu druhého zariadenia všade, kde sa líšia.';
+
+  @override
   String get syncReviewAllChanges => 'Skontrolovať všetky zmeny';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Skontrolovať všetky zmeny. Začína rovnakými odpoveďami a ktorúkoľvek z nich môžete zmeniť.';
 
   @override
   String get syncDetailsAction => 'Podrobnosti';

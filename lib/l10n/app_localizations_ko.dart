@@ -719,10 +719,22 @@ class AppLocalizationsKo extends AppLocalizations {
   String get syncUseIncomingYubikey => '들어오는 볼트의 YubiKey를 사용하세요';
 
   @override
+  String get syncMethodExplainer =>
+      '자동으로 병합하면 두 기기가 다른 항목마다 다른 기기의 값을 사용합니다. 검토도 동일한 선택에서 시작합니다.';
+
+  @override
   String get syncMergeAutomatically => '자동으로 병합';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      '자동으로 병합. 두 기기가 다른 항목마다 다른 기기의 값을 사용합니다.';
+
+  @override
   String get syncReviewAllChanges => '모든 변경 사항 검토';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      '모든 변경 사항 검토. 동일한 선택에서 시작하며 무엇이든 변경할 수 있습니다.';
 
   @override
   String get syncDetailsAction => '세부 정보';
