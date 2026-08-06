@@ -733,10 +733,22 @@ class AppLocalizationsDe extends AppLocalizations {
       'Verwenden Sie den YubiKey des eingehenden Tresors';
 
   @override
+  String get syncMethodExplainer =>
+      'Automatisch zusammenführen übernimmt den Wert des anderen Geräts überall dort, wo sich beide unterscheiden. Eine Überprüfung beginnt mit denselben Antworten.';
+
+  @override
   String get syncMergeAutomatically => 'Automatisch zusammenführen';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Automatisch zusammenführen. Übernimmt den Wert des anderen Geräts überall dort, wo sich beide unterscheiden.';
+
+  @override
   String get syncReviewAllChanges => 'Alle Änderungen überprüfen';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Alle Änderungen überprüfen. Beginnt mit denselben Antworten, und Sie können jede davon ändern.';
 
   @override
   String get syncDetailsAction => 'Details';

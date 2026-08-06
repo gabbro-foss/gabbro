@@ -35,14 +35,28 @@ class SyncMethodDialog extends StatelessWidget {
             Text(l.syncSamePassphraseWarning),
             const SizedBox(height: 12),
           ],
+          // "Merge automatically" named an action without saying what it did,
+          // so it went unused. The paragraph is for sighted users; the
+          // semanticsLabel below carries the same meaning to a screen reader,
+          // which on Linux reads only a widget's NAME and never announces this
+          // paragraph when the dialog opens. semanticsLabel (not a Semantics
+          // wrapper) so the button keeps its own tap action and button role.
+          Text(l.syncMethodExplainer),
+          const SizedBox(height: 12),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: Text(l.syncMergeAutomatically),
+            child: Text(
+              l.syncMergeAutomatically,
+              semanticsLabel: l.syncMergeAutomaticallySemantic,
+            ),
           ),
           const SizedBox(height: 8),
           OutlinedButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l.syncReviewAllChanges),
+            child: Text(
+              l.syncReviewAllChanges,
+              semanticsLabel: l.syncReviewAllChangesSemantic,
+            ),
           ),
           const SizedBox(height: 8),
           TextButton(

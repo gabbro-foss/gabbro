@@ -731,10 +731,22 @@ class AppLocalizationsCs extends AppLocalizations {
   String get syncUseIncomingYubikey => 'Použijte YubiKey příchozího trezoru';
 
   @override
+  String get syncMethodExplainer =>
+      'Sloučit automaticky převezme hodnotu druhého zařízení všude, kde se liší. Kontrola začíná stejnými odpověďmi.';
+
+  @override
   String get syncMergeAutomatically => 'Sloučit automaticky';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Sloučit automaticky. Převezme hodnotu druhého zařízení všude, kde se liší.';
+
+  @override
   String get syncReviewAllChanges => 'Zkontrolovat všechny změny';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Zkontrolovat všechny změny. Začíná stejnými odpověďmi a kteroukoli z nich můžete změnit.';
 
   @override
   String get syncDetailsAction => 'Podrobnosti';

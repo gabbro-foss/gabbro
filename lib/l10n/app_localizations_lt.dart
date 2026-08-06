@@ -732,10 +732,22 @@ class AppLocalizationsLt extends AppLocalizations {
       'Naudokite gaunamos saugyklos YubiKey raktą';
 
   @override
+  String get syncMethodExplainer =>
+      'Sulieti automatiškai paima kito įrenginio reikšmę visur, kur jos skiriasi. Peržiūra prasideda nuo tų pačių atsakymų.';
+
+  @override
   String get syncMergeAutomatically => 'Sulieti automatiškai';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Sulieti automatiškai. Paima kito įrenginio reikšmę visur, kur jos skiriasi.';
+
+  @override
   String get syncReviewAllChanges => 'Peržiūrėti visus pakeitimus';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Peržiūrėti visus pakeitimus. Prasideda nuo tų pačių atsakymų, ir galite bet kurį pakeisti.';
 
   @override
   String get syncDetailsAction => 'Išsami informacija';

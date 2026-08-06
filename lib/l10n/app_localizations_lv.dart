@@ -730,10 +730,22 @@ class AppLocalizationsLv extends AppLocalizations {
       'Izmantojiet ienākošā seifa YubiKey atslēgu';
 
   @override
+  String get syncMethodExplainer =>
+      'Apvienot automātiski ņem citas ierīces vērtību visur, kur tās atšķiras. Pārskatīšana sākas ar tām pašām atbildēm.';
+
+  @override
   String get syncMergeAutomatically => 'Apvienot automātiski';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Apvienot automātiski. Ņem citas ierīces vērtību visur, kur tās atšķiras.';
+
+  @override
   String get syncReviewAllChanges => 'Pārskatīt visas izmaiņas';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Pārskatīt visas izmaiņas. Sākas ar tām pašām atbildēm, un jūs varat mainīt jebkuru no tām.';
 
   @override
   String get syncDetailsAction => 'Detaļas';

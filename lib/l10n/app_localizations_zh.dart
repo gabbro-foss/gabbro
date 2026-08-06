@@ -715,10 +715,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get syncUseIncomingYubikey => '请使用传入保险库的YubiKey';
 
   @override
+  String get syncMethodExplainer => '自动合并会在两者不同的地方采用另一台设备的值。查看时也从同样的选择开始。';
+
+  @override
   String get syncMergeAutomatically => '自动合并';
 
   @override
+  String get syncMergeAutomaticallySemantic => '自动合并。在两者不同的地方采用另一台设备的值。';
+
+  @override
   String get syncReviewAllChanges => '查看所有更改';
+
+  @override
+  String get syncReviewAllChangesSemantic => '查看所有更改。从同样的选择开始，其中任何一项都可以更改。';
 
   @override
   String get syncDetailsAction => '详情';
@@ -2802,10 +2811,19 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get syncUseIncomingYubikey => '请使用传入保险库的YubiKey';
 
   @override
+  String get syncMethodExplainer => '自动合并会在两者不同的地方采用另一台设备的值。查看时也从同样的选择开始。';
+
+  @override
   String get syncMergeAutomatically => '自动合并';
 
   @override
+  String get syncMergeAutomaticallySemantic => '自动合并。在两者不同的地方采用另一台设备的值。';
+
+  @override
   String get syncReviewAllChanges => '查看所有更改';
+
+  @override
+  String get syncReviewAllChangesSemantic => '查看所有更改。从同样的选择开始，其中任何一项都可以更改。';
 
   @override
   String get syncDetailsAction => '详情';
@@ -4889,10 +4907,19 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get syncUseIncomingYubikey => '請使用傳入保險庫的YubiKey';
 
   @override
+  String get syncMethodExplainer => '自動合併會在兩者不同的地方採用另一台裝置的值。查看時也從同樣的選擇開始。';
+
+  @override
   String get syncMergeAutomatically => '自動合併';
 
   @override
+  String get syncMergeAutomaticallySemantic => '自動合併。在兩者不同的地方採用另一台裝置的值。';
+
+  @override
   String get syncReviewAllChanges => '查看所有變更';
+
+  @override
+  String get syncReviewAllChangesSemantic => '查看所有變更。從同樣的選擇開始，其中任何一項都可以變更。';
 
   @override
   String get syncDetailsAction => '詳細資料';

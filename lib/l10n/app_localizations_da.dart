@@ -728,10 +728,22 @@ class AppLocalizationsDa extends AppLocalizations {
   String get syncUseIncomingYubikey => 'Brug den indgående hvælvings YubiKey';
 
   @override
+  String get syncMethodExplainer =>
+      'Flet automatisk tager den anden enheds værdi, hvor de to er forskellige. En gennemgang starter fra de samme svar.';
+
+  @override
   String get syncMergeAutomatically => 'Flet automatisk';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Flet automatisk. Tager den anden enheds værdi, hvor de to er forskellige.';
+
+  @override
   String get syncReviewAllChanges => 'Gennemgå alle ændringer';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Gennemgå alle ændringer. Starter fra de samme svar, og du kan ændre dem alle.';
 
   @override
   String get syncDetailsAction => 'Detaljer';

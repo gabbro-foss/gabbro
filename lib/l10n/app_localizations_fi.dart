@@ -731,10 +731,22 @@ class AppLocalizationsFi extends AppLocalizations {
   String get syncUseIncomingYubikey => 'Käytä saapuvan holvin YubiKey-avainta';
 
   @override
+  String get syncMethodExplainer =>
+      'Yhdistä automaattisesti ottaa toisen laitteen arvon kaikkialla, missä ne eroavat. Tarkistus alkaa samoista vastauksista.';
+
+  @override
   String get syncMergeAutomatically => 'Yhdistä automaattisesti';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Yhdistä automaattisesti. Ottaa toisen laitteen arvon kaikkialla, missä ne eroavat.';
+
+  @override
   String get syncReviewAllChanges => 'Tarkista kaikki muutokset';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Tarkista kaikki muutokset. Alkaa samoista vastauksista, ja voit muuttaa mitä tahansa niistä.';
 
   @override
   String get syncDetailsAction => 'Tiedot';

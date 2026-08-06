@@ -729,10 +729,22 @@ class AppLocalizationsKk extends AppLocalizations {
       'Кіріс сейфтің YubiKey кілтін пайдаланыңыз';
 
   @override
+  String get syncMethodExplainer =>
+      'Автоматты біріктіру екеуі әртүрлі болған әр жерде басқа құрылғының мәнін алады. Қарау сол жауаптардан басталады.';
+
+  @override
   String get syncMergeAutomatically => 'Автоматты біріктіру';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Автоматты біріктіру. Екеуі әртүрлі болған әр жерде басқа құрылғының мәнін алады.';
+
+  @override
   String get syncReviewAllChanges => 'Барлық өзгерістерді қарау';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Барлық өзгерістерді қарау. Сол жауаптардан басталады, кез келгенін өзгерте аласыз.';
 
   @override
   String get syncDetailsAction => 'Мәліметтер';

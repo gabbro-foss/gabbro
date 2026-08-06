@@ -728,10 +728,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get syncUseIncomingYubikey => 'Use incoming vault\'s YubiKey';
 
   @override
+  String get syncMethodExplainer =>
+      'Merge automatically takes the other device\'s value wherever the two differ. A review starts from those same answers.';
+
+  @override
   String get syncMergeAutomatically => 'Merge automatically';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Merge automatically. Takes the other device\'s value wherever the two differ.';
+
+  @override
   String get syncReviewAllChanges => 'Review all changes';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Review all changes. Starts from those same answers, and you can change any of them.';
 
   @override
   String get syncDetailsAction => 'Details';

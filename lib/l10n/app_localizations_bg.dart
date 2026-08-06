@@ -731,10 +731,22 @@ class AppLocalizationsBg extends AppLocalizations {
   String get syncUseIncomingYubikey => 'Използвайте YubiKey на входящия трезор';
 
   @override
+  String get syncMethodExplainer =>
+      'Обединяване автоматично взема стойността на другото устройство навсякъде, където се различават. Прегледът започва от същите отговори.';
+
+  @override
   String get syncMergeAutomatically => 'Обединяване автоматично';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Обединяване автоматично. Взема стойността на другото устройство навсякъде, където се различават.';
+
+  @override
   String get syncReviewAllChanges => 'Преглед на всички промени';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Преглед на всички промени. Започва от същите отговори и можете да промените всеки от тях.';
 
   @override
   String get syncDetailsAction => 'Подробности';

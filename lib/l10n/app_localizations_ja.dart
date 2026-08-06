@@ -719,10 +719,22 @@ class AppLocalizationsJa extends AppLocalizations {
   String get syncUseIncomingYubikey => '同期元ボルトのYubiKeyを使用してください';
 
   @override
+  String get syncMethodExplainer =>
+      '自動的にマージすると、2つが異なる箇所では別のデバイスの値が使われます。確認もこれと同じ選択から始まります。';
+
+  @override
   String get syncMergeAutomatically => '自動的にマージ';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      '自動的にマージ。2つが異なる箇所では別のデバイスの値を使います。';
+
+  @override
   String get syncReviewAllChanges => 'すべての変更を確認';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'すべての変更を確認。これと同じ選択から始まり、どれでも変更できます。';
 
   @override
   String get syncDetailsAction => '詳細';

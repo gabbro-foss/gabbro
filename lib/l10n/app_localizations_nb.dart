@@ -730,10 +730,22 @@ class AppLocalizationsNb extends AppLocalizations {
       'Bruk den innkommende hvelvingens YubiKey';
 
   @override
+  String get syncMethodExplainer =>
+      'Slå sammen automatisk tar den andre enhetens verdi overalt der de to er forskjellige. En gjennomgang starter fra de samme svarene.';
+
+  @override
   String get syncMergeAutomatically => 'Slå sammen automatisk';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Slå sammen automatisk. Tar den andre enhetens verdi overalt der de to er forskjellige.';
+
+  @override
   String get syncReviewAllChanges => 'Gjennomgå alle endringer';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Gjennomgå alle endringer. Starter fra de samme svarene, og du kan endre hvilket som helst av dem.';
 
   @override
   String get syncDetailsAction => 'Detaljer';

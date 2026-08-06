@@ -733,10 +733,22 @@ class AppLocalizationsUk extends AppLocalizations {
       'Використовуйте YubiKey вхідного сховища';
 
   @override
+  String get syncMethodExplainer =>
+      'Обʼєднати автоматично бере значення іншого пристрою скрізь, де вони різняться. Перегляд починається з тих самих відповідей.';
+
+  @override
   String get syncMergeAutomatically => 'Обʼєднати автоматично';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Обʼєднати автоматично. Бере значення іншого пристрою скрізь, де вони різняться.';
+
+  @override
   String get syncReviewAllChanges => 'Переглянути всі зміни';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Переглянути всі зміни. Починається з тих самих відповідей, і ви можете змінити будь-яку з них.';
 
   @override
   String get syncDetailsAction => 'Подробиці';

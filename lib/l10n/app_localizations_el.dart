@@ -734,10 +734,22 @@ class AppLocalizationsEl extends AppLocalizations {
       'Χρησιμοποιήστε το YubiKey του εισερχόμενου θησαυροφυλακίου';
 
   @override
+  String get syncMethodExplainer =>
+      'Η αυτόματη συγχώνευση παίρνει την τιμή της άλλης συσκευής όπου οι δύο διαφέρουν. Ο έλεγχος ξεκινά από τις ίδιες απαντήσεις.';
+
+  @override
   String get syncMergeAutomatically => 'Αυτόματη συγχώνευση';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Αυτόματη συγχώνευση. Παίρνει την τιμή της άλλης συσκευής όπου οι δύο διαφέρουν.';
+
+  @override
   String get syncReviewAllChanges => 'Έλεγχος όλων των αλλαγών';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Έλεγχος όλων των αλλαγών. Ξεκινά από τις ίδιες απαντήσεις και μπορείτε να αλλάξετε οποιαδήποτε.';
 
   @override
   String get syncDetailsAction => 'Λεπτομέρειες';

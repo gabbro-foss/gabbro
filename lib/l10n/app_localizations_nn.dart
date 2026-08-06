@@ -730,10 +730,22 @@ class AppLocalizationsNn extends AppLocalizations {
       'Bruk YubiKey-en til det innkomande kvelvet';
 
   @override
+  String get syncMethodExplainer =>
+      'Slå saman automatisk tek verdien frå den andre eininga overalt der dei to er ulike. Ein gjennomgang startar frå dei same svara.';
+
+  @override
   String get syncMergeAutomatically => 'Slå saman automatisk';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Slå saman automatisk. Tek verdien frå den andre eininga overalt der dei to er ulike.';
+
+  @override
   String get syncReviewAllChanges => 'Gå gjennom alle endringar';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Gå gjennom alle endringar. Startar frå dei same svara, og du kan endre kva som helst av dei.';
 
   @override
   String get syncDetailsAction => 'Detaljar';

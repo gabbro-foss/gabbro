@@ -732,10 +732,22 @@ class AppLocalizationsNl extends AppLocalizations {
       'Gebruik de YubiKey van de inkomende kluis';
 
   @override
+  String get syncMethodExplainer =>
+      'Automatisch samenvoegen neemt de waarde van het andere apparaat over overal waar beide verschillen. Een controle begint bij dezelfde antwoorden.';
+
+  @override
   String get syncMergeAutomatically => 'Automatisch samenvoegen';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Automatisch samenvoegen. Neemt de waarde van het andere apparaat over overal waar beide verschillen.';
+
+  @override
   String get syncReviewAllChanges => 'Alle wijzigingen bekijken';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Alle wijzigingen bekijken. Begint bij dezelfde antwoorden en u kunt ze allemaal wijzigen.';
 
   @override
   String get syncDetailsAction => 'Details';

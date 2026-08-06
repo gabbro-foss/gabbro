@@ -730,10 +730,22 @@ class AppLocalizationsPt extends AppLocalizations {
   String get syncUseIncomingYubikey => 'Use a YubiKey do cofre recebido';
 
   @override
+  String get syncMethodExplainer =>
+      'Mesclar automaticamente usa o valor do outro dispositivo sempre que os dois diferem. Uma revisão parte dessas mesmas respostas.';
+
+  @override
   String get syncMergeAutomatically => 'Mesclar automaticamente';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Mesclar automaticamente. Usa o valor do outro dispositivo sempre que os dois diferem.';
+
+  @override
   String get syncReviewAllChanges => 'Rever todas as alterações';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Rever todas as alterações. Parte dessas mesmas respostas e pode alterar qualquer uma delas.';
 
   @override
   String get syncDetailsAction => 'Detalhes';
@@ -2918,10 +2930,22 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get syncUseIncomingYubikey => 'Use a YubiKey do cofre recebido';
 
   @override
+  String get syncMethodExplainer =>
+      'Mesclar automaticamente usa o valor do outro dispositivo sempre que os dois diferem. Uma revisão parte dessas mesmas respostas.';
+
+  @override
   String get syncMergeAutomatically => 'Mesclar automaticamente';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Mesclar automaticamente. Usa o valor do outro dispositivo sempre que os dois diferem.';
+
+  @override
   String get syncReviewAllChanges => 'Revisar todas as alterações';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Revisar todas as alterações. Parte dessas mesmas respostas e você pode alterar qualquer uma delas.';
 
   @override
   String get syncDetailsAction => 'Detalhes';
@@ -5103,10 +5127,22 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   String get syncUseIncomingYubikey => 'Use a YubiKey do cofre recebido';
 
   @override
+  String get syncMethodExplainer =>
+      'Intercalar automaticamente usa o valor do outro dispositivo sempre que os dois diferem. Uma revisão parte dessas mesmas respostas.';
+
+  @override
   String get syncMergeAutomatically => 'Intercalar automaticamente';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Intercalar automaticamente. Usa o valor do outro dispositivo sempre que os dois diferem.';
+
+  @override
   String get syncReviewAllChanges => 'Rever todas as alterações';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Rever todas as alterações. Parte dessas mesmas respostas e pode alterar qualquer uma delas.';
 
   @override
   String get syncDetailsAction => 'Detalhes';

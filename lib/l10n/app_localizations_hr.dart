@@ -730,10 +730,22 @@ class AppLocalizationsHr extends AppLocalizations {
   String get syncUseIncomingYubikey => 'Upotrijebite YubiKey dolaznog trezora';
 
   @override
+  String get syncMethodExplainer =>
+      'Automatski spoji preuzima vrijednost drugog uređaja svugdje gdje se razlikuju. Pregled počinje od istih odgovora.';
+
+  @override
   String get syncMergeAutomatically => 'Automatski spoji';
 
   @override
+  String get syncMergeAutomaticallySemantic =>
+      'Automatski spoji. Preuzima vrijednost drugog uređaja svugdje gdje se razlikuju.';
+
+  @override
   String get syncReviewAllChanges => 'Pregledaj sve promjene';
+
+  @override
+  String get syncReviewAllChangesSemantic =>
+      'Pregledaj sve promjene. Počinje od istih odgovora i možete promijeniti bilo koji.';
 
   @override
   String get syncDetailsAction => 'Pojedinosti';
