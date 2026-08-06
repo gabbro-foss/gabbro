@@ -119,11 +119,36 @@ canary that drives the real save paths and byte-compares the real config/vault l
 
 ### Next task
 
-(empty — agree the next one with the maintainer)
+**Explain auto-merge in the sync dialog.** "Merge automatically" says nothing
+about what it does, so it goes unused. State that it takes the other device's
+value wherever the two differ, and that a review starts from those same answers
+— true and hardware-proven since the incoming-first change (Linux run 2).
 
-Branch `incoming_sync_review` is complete and hardware-verified: Linux runs 1-3
-(diverge, review unchanged, review all-local) and the Android run all pass.
-Unmerged to master.
+**Route A (agreed):** the explanation goes in the button names as well as an
+explainer paragraph. On Linux the screen reader reads only a widget's name and
+never announces a paragraph on open, so a paragraph alone would leave a blind
+user with the same bare "Merge automatically" they have today.
+
+Net — pin green against current code first:
+
+- [ ] N1 Merge automatically applies the whole sync, no further questions
+- [ ] N2 Review all changes opens the one-by-one review
+- [ ] N3 Cancel leaves the vault untouched
+- [ ] N4 Same-passphrase warning only for a passphrase-only source (the
+      YubiKey branch has no test today)
+- [ ] N5 The three choices keep their order
+
+Then red:
+
+- [ ] R1 Explainer paragraph renders, in both warning branches
+- [ ] R2 Each button announces its own meaning (route A)
+- [ ] R3 Both buttons keyboard-reachable on Linux desktop
+- [ ] R4 All 37 locales (`l10n_test.dart` parity fails until translated)
+- [ ] R5 8x text + high contrast on a 360px phone, nothing clipped
+      (`sync_chooser_l10n_overflow_test.dart` sweep stays green)
+
+Same branch `incoming_sync_review`, which is complete and hardware-verified
+(Linux runs 1-3 + Android) but not gated or merged.
 
 ---
 
@@ -153,13 +178,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
-- **Explain `auto-merge` in the app.** It is poorly explained today, which is why it goes
-  unused. **Verified 2026-08-05 — it is not additive only:** it applies the incoming value
-  on a clash, the incoming folder, removes items the other side removed, and deletes an
-  entry the other side deleted (`do_fast_merge`, `session.rs:3590`). What it never does is
-  drop an entry the other side has simply never seen (pinned by
-  `fast_merge_keeps_an_entry_only_this_vault_has`). Once the review defaults land, the copy
-  can simply say "auto-merge = this review with every choice left as-is".
 - **Auto-merge deletes without a tombstone.** `do_fast_merge` drops a deleted entry
   (`session.rs:3647`); the review path stamps a tombstone (`session.rs:3752`). So a delete
   applied by auto-merge can return from a third device. Decide which is right, then align.
