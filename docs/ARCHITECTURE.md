@@ -124,9 +124,21 @@ resolved but never applied — inert, emits no warning.
 
 ## Current Focus
 
-> Update at the end of each session. First thing to read at the start of the next.
+> Update at the end of each session. First thing to read at the start of the next. Completed items are deleted from this section.
 
 ### Next task
+
+**Re-source or drop three passphrase wordlists: Finnish, Russian, Portuguese.** Their
+current sources are not confirmed GPL-3.0 compatible. Dropping all three takes passphrase
+languages 29 -> 26.
+
+- **fi — replacement found, pending verification.** KOTUS *Nykysuomen sanalista* via
+  https://github.com/FredrikBorgstrom/finnish-extractor — triple-licensed, take it under
+  **LGPL**; attribution to KOTUS required (About screen). 83,500 words, need 7,776.
+- **ru — no replacement found yet.**
+- **pt — licence fine, fit pending verification.** https://github.com/jfoclpf/words-pt,
+  GPL-3.0, upstream Minho/Natura GPL/LGPL/MPL. It is an all-inflections list, so check
+  7,776 distinct-enough words can be filtered out of it.
 
 ---
 
@@ -153,11 +165,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   future AGP. Affected: `file_picker` (`package=` + deprecated space-assignment), `jni`
   and `jni_flutter` (both, same), `url_launcher_android` and
   `flutter_plugin_android_lifecycle` (`package=` only).
-- **Re-source or drop three passphrase wordlists: Finnish, Russian, Portuguese.** Their
-  upstream sources are not confirmed GPL-3.0 compatible — fi is marked `GPL2` with no
-  version, ru permits redistributing modifications in patch form only, pt (dadoware) is
-  CC-BY-NC-3.0. Either find replacement sources or generate our own; dropping all three
-  takes passphrase languages 29 -> 26.
 
 ### Features and UI/UX
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
