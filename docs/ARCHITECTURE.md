@@ -132,13 +132,28 @@ resolved but never applied — inert, emits no warning.
 current sources are not confirmed GPL-3.0 compatible. Dropping all three takes passphrase
 languages 29 -> 26.
 
-- **fi — replacement found, pending verification.** KOTUS *Nykysuomen sanalista* via
+- **fi — verified, swap to it.** KOTUS *Nykysuomen sanalista* via
   https://github.com/FredrikBorgstrom/finnish-extractor — triple-licensed, take it under
-  **LGPL**; attribution to KOTUS required (About screen). 83,500 words, need 7,776.
-- **ru — no replacement found yet.**
-- **pt — licence fine, fit pending verification.** https://github.com/jfoclpf/words-pt,
-  GPL-3.0, upstream Minho/Natura GPL/LGPL/MPL. It is an all-inflections list, so check
-  7,776 distinct-enough words can be filtered out of it.
+  **LGPL**; attribution to KOTUS required (About screen). 815k candidates match our
+  alphabet; the sampled 7,776 cluster less than today's Aspell list and exclude the
+  proper nouns it leaks.
+- **ru — verified, swap to it.** `ru_50k.txt` from `hermitdave/FrequencyWords`,
+  CC-BY-SA 4.0 (one-way GPLv3-compatible) — the same source and licence we already ship
+  for hr, lt, lv, kk. 45k candidates; commoner and shorter words than today's Aspell list.
+- **pt — no replacement found yet.** `jfoclpf/words-pt` is GPL-3.0 but is a spell-check
+  dictionary, not a diceware list: conjugation-dominated, no POS data to strip them.
+
+Net first — nothing pins wordlist integrity today, so a bad regenerate would cut real
+entropy below the figure the UI shows. Pin against the current lists, then swap:
+
+- [ ] every list is duplicate-free
+- [ ] every list matches its declared size (7,776 except es/it 8192, bg 7527, et 7052,
+      kk 4311, ja/ko/zh_tw 2048)
+- [ ] every word matches an explicit per-language alphabet (no Latin in ru/uk/bg/kk/el,
+      no `q w x z å` in fi)
+- [ ] no blank lines, no leading/trailing whitespace
+- [ ] word length within the language's declared bounds (CJK excluded)
+- [ ] then red-first: fi has none of the proper nouns Aspell leaks; ru is frequency-sourced
 
 ---
 
