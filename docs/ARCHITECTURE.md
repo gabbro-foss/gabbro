@@ -119,17 +119,6 @@ canary that drives the real save paths and byte-compares the real config/vault l
 
 ### Next task
 
-(empty — agree the next one with the maintainer)
-
-Branch `incoming_sync_review`: incoming-first review and the auto-merge
-explainer are both complete and hardware-verified, pushed, not gated or merged.
-
-Tombstone behaviour settled 2026-08-06, no work needed. A delete propagating to
-the other device is the feature. Skip in a review is the user choosing to
-diverge, and that is their call. Auto-merge keeps tombstones too — it calls
-`do_merge` (`session.rs:3591`), which unions both sides' `deleted_ids`
-(`session.rs:3411`), so a delete it applies cannot return from a third device.
-
 ---
 
 ## Build & Release
