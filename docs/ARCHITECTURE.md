@@ -100,7 +100,8 @@ a teardown there once nulled it before any test ran and a production save overwr
 registry, 2026-08-01). Pinned by `test/sandbox_net_test.dart`, including a self-restoring
 canary that drives the real save paths and byte-compares the real config/vault locations.
 
-**Known warnings — triaged 2026-07-16, no action. Gate stays green; don't re-diagnose.**
+**Known warnings — under review, see Current Focus. Rows below were waved through on
+2026-07-16; each now gets fixed or gets a reason. The gate's own warnings are not noise.**
 
 | Warning | Source | Why not fixed |
 |---|---|---|
@@ -118,6 +119,22 @@ canary that drives the real save paths and byte-compares the real config/vault l
 > Update at the end of each session. First thing to read at the start of the next.
 
 ### Next task
+
+**Dependency bump + clear the gate warnings.** Left alone, the Android build stops
+compiling at a future AGP/Gradle; the warnings say so now and won't say it twice.
+
+1. `flutter pub upgrade` — 19 packages are locked but unconstrained (incl. file_picker,
+   jni, jni_flutter, url_launcher_android, flutter_plugin_android_lifecycle). Separately
+   decide which constraint-held ones (intl, analyzer, test, win32, meta, …) Flutter pins.
+2. Drop `package=` from `rust_builder/android/src/main/AndroidManifest.xml` — ours;
+   `build.gradle` already sets `namespace`.
+3. AGP 7.3.0 pinned via `buildscript` classpath, `rust_builder/android/build.gradle` — ours.
+4. `./gradlew :app:testDebugUnitTest --warning-mode all` — name the Gradle 9 deprecations
+   the summary line hides.
+5. Regenerate + re-scan `android/app/gradle.lockfile`; `gabbro_test --warm` before the gate.
+
+Every row of the Known warnings table gets fixed or gets a reason that names the failure
+it accepts.
 
 ---
 
@@ -137,11 +154,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   committed in the AUR clone; the push fails — the AUR is in maintenance
   (still down 2026-08-05). Until it lands, Arch users install alpha.16. Retry with
   `git -C ../gabbro-bin-aur push` from `gabbro/`.
-
-### Maintenance
-- **14 pub packages have newer versions held back by constraints** (noticed
-  2026-08-06 during an Android build). Decide which to bump and which are pinned
-  by Flutter itself. Any bump needs `gabbro_test --warm` before the gate.
 
 ### Features and UI/UX
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
