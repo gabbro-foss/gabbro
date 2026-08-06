@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2147 | 10 |
+| Flutter (`flutter test`) | 2159 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
@@ -129,23 +129,30 @@ explainer paragraph. On Linux the screen reader reads only a widget's name and
 never announces a paragraph on open, so a paragraph alone would leave a blind
 user with the same bare "Merge automatically" they have today.
 
-Net — pin green against current code first:
+Net — green in `test/sync_method_dialog_test.dart` (7 tests):
 
-- [ ] N1 Merge automatically applies the whole sync, no further questions
-- [ ] N2 Review all changes opens the one-by-one review
-- [ ] N3 Cancel leaves the vault untouched
-- [ ] N4 Same-passphrase warning only for a passphrase-only source (the
-      YubiKey branch has no test today)
-- [ ] N5 The three choices keep their order
+- [x] N1 Merge automatically applies the whole sync, no further questions
+- [x] N2 Review all changes opens the one-by-one review
+- [x] N3 Cancel leaves the vault untouched
+- [x] N4 Same-passphrase warning only for a passphrase-only source
+- [x] N5 The three choices keep their order
 
-Then red:
+Then red — all green:
 
-- [ ] R1 Explainer paragraph renders, in both warning branches
-- [ ] R2 Each button announces its own meaning (route A)
-- [ ] R3 Both buttons keyboard-reachable on Linux desktop
-- [ ] R4 All 37 locales (`l10n_test.dart` parity fails until translated)
-- [ ] R5 8x text + high contrast on a 360px phone, nothing clipped
-      (`sync_chooser_l10n_overflow_test.dart` sweep stays green)
+- [x] R1 Explainer paragraph renders, in both warning branches
+- [x] R2 Each button announces its own meaning (route A), still as a button
+- [x] R3 Both buttons keyboard-reachable on Linux desktop (passed pre-change,
+      so it pins existing reach rather than new behaviour)
+- [x] R4 All 37 locales translated (`l10n_test.dart` parity)
+- [x] R5 No overflow at 8x on a 360px phone, every locale
+      (`sync_chooser_l10n_overflow_test.dart`)
+
+Done via `semanticsLabel` on each button's `Text`, not a `Semantics` wrapper —
+the wrapper would have taken the button's own tap action and role with it.
+
+**Next:** hardware pass — the dialog on Linux and Android, and the announced
+names read back by a screen reader (widget tests pin the semantics tree, not
+what Orca actually says).
 
 Same branch `incoming_sync_review`, which is complete and hardware-verified
 (Linux runs 1-3 + Android) but not gated or merged.
