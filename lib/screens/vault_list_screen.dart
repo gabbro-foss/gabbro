@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
+import 'package:gabbro/gabbro_file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:gabbro/widgets/gabbro_dialog.dart';
 import 'package:flutter/semantics.dart';
@@ -135,13 +135,8 @@ Future<YubikeyHmacMatch> _defaultGetSyncYubikeyHmac(
   String pin,
   String transport,
 ) => getAnyYubikeyHmacSecret(records: records, pin: pin, transport: transport);
-Future<String?> _defaultPickSyncFile() async {
-  final result = await FilePicker.pickFiles(
-    type: FileType.custom,
-    allowedExtensions: ['gabbro'],
-  );
-  return result?.files.single.path;
-}
+Future<String?> _defaultPickSyncFile() =>
+    GabbroFilePicker.pickPath(allowedExtensions: ['gabbro']);
 
 const _yubikeyChannel = MethodChannel('app.gabbro.gabbro/yubikey');
 const _biometricChannel = MethodChannel('app.gabbro.gabbro/biometric');

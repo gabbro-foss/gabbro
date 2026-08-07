@@ -90,6 +90,17 @@ abstract class GabbroUnlockHostActivity : FlutterFragmentActivity() {
         super.configureFlutterEngine(flutterEngine)
         registerBiometricChannel(flutterEngine)
         registerYubikeyChannel(flutterEngine)
+        registerPathsChannel(flutterEngine)
+    }
+
+    private fun registerPathsChannel(flutterEngine: FlutterEngine) {
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, AppPaths.CHANNEL)
+            .setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "getAppSupportDir" -> result.success(AppPaths.appSupportDir(this))
+                    else -> result.notImplemented()
+                }
+            }
     }
 
     private fun registerBiometricChannel(flutterEngine: FlutterEngine) {

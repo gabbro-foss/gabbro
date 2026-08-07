@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
+import 'package:gabbro/gabbro_file_picker.dart';
 import 'package:intl/intl.dart';
 
 import 'package:flutter/material.dart';
@@ -58,10 +58,10 @@ Future<void> _defaultLaunchUrl(String url) async {
 /// desktop the save dialog yields a full path. Returns null if cancelled.
 Future<String?> _defaultExportFilePicker(String filename) async {
   if (Platform.isAndroid) {
-    final dir = await FilePicker.getDirectoryPath();
+    final dir = await GabbroFilePicker.androidPickDirectory();
     return dir == null ? null : '$dir/$filename';
   }
-  return FilePicker.saveFile(fileName: filename);
+  return GabbroFilePicker.savePath(fileName: filename);
 }
 
 Future<List<HistoryRecordData>> _defaultFetchHistory(String id) =>

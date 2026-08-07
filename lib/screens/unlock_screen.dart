@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
+import 'package:gabbro/gabbro_file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:gabbro/widgets/gabbro_dialog.dart';
 import 'package:flutter/services.dart';
@@ -83,18 +83,12 @@ Future<bool> _defaultBackupUsable(String path) async {
 Future<void> _defaultRestoreBackup(String path) => restoreVaultBackup(path: path);
 
 // R-03: let the user pick their own off-device backup `.gabbro`. Returns the
-// picked path, or null if the user cancelled. `file_picker` copies the chosen
-// file to an app-readable path on Android too, so the same path-based restore
-// works on every platform.
-Future<String?> _defaultPickRestoreFile() async {
-  final result = await runPicker(
-    () => FilePicker.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['gabbro'],
-    ),
-  );
-  return result?.files.single.path;
-}
+// picked path, or null if the user cancelled. The Android leg copies the
+// chosen file to an app-readable path, so the same path-based restore works
+// on every platform.
+Future<String?> _defaultPickRestoreFile() => runPicker(
+      () => GabbroFilePicker.pickPath(allowedExtensions: ['gabbro']),
+    );
 
 Future<void> _defaultRestoreFromPickedFile(String vaultPath, String source) =>
     restoreVaultFromFile(path: vaultPath, source: source);

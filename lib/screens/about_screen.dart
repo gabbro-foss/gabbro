@@ -280,6 +280,11 @@ const _kComponents = [
     licence: 'BSD-3-Clause',
     url: 'https://github.com/dart-lang/sdk',
   ),
+  _Component(
+    name: 'dbus',
+    licence: 'MPL-2.0',
+    url: 'https://github.com/canonical/dbus.dart',
+  ),
   // Copyright for the Brazilian Portuguese list is @drebs'; it ships inside
   // ulif/diceware, which is GPL-3.0-or-later.
   _Component(
@@ -381,11 +386,6 @@ const _kComponents = [
     name: 'Nykysuomen sanalista, KOTUS (fi)',
     licence: 'LGPL',
     url: 'https://github.com/FredrikBorgstrom/finnish-extractor',
-  ),
-  _Component(
-    name: 'path_provider',
-    licence: 'BSD-3-Clause',
-    url: 'https://github.com/flutter/packages',
   ),
   // Mozilla's list, shipped as an Android asset for autofill domain matching.
   _Component(
