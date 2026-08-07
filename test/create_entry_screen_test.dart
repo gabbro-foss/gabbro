@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -1213,5 +1214,48 @@ void main() {
       find.widgetWithText(TextFormField, 'user@example.com'),
     );
     expect(field.controller?.text, equals('user@example.com'));
+  });
+
+  // Net for the file_picker replacement: pins the attach-file picker's three
+  // outcomes on the File entry screen.
+  group('attach-file picker wiring (net)', () {
+    testWidgets('a picked file shows its name', (tester) async {
+      await tester.pumpWidget(_buildCreateScreen(
+        'File',
+        pickFile: () async =>
+            (name: 'doc.pdf', bytes: Uint8List.fromList([1, 2, 3])),
+      ));
+      await tester.tap(find.text('Pick file'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('doc.pdf'), findsOneWidget);
+    });
+
+    testWidgets('a cancelled picker changes nothing', (tester) async {
+      await tester.pumpWidget(_buildCreateScreen(
+        'File',
+        pickFile: () async => null,
+      ));
+      await tester.tap(find.text('Pick file'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SnackBar), findsNothing);
+    });
+
+    testWidgets('an unavailable picker shows the no-portal SnackBar',
+        (tester) async {
+      await tester.pumpWidget(_buildCreateScreen(
+        'File',
+        pickFile: () async => throw const SocketException('no bus'),
+      ));
+      await tester.tap(find.text('Pick file'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text(
+            "File dialog unavailable here. The system file portal isn't reachable."),
+        findsOneWidget,
+      );
+    });
   });
 }

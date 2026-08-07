@@ -1000,6 +1000,61 @@ void main() {
     await tester.pumpAndSettle();
     expect(bodyScrollPadding(tester).bottom, 16 + 88);
   });
+
+  // Net for the file_picker replacement: pins the export-dialog picker's
+  // success and cancel behaviour, and that it receives the entry's filename.
+  group('file export picker wiring (net)', () {
+    FileEntryData fileEntry() => FileEntryData(
+          id: 'test-id-file-net',
+          filename: 'secret.txt',
+          data: Uint8List.fromList([104, 105]),
+          notes: null,
+          createdAt: '2025-01-01T00:00:00Z',
+          updatedAt: '2025-01-01T00:00:00Z',
+          folder: '',
+          customFields: const [],
+        );
+
+    testWidgets(
+        'a picked path fills the path field; the picker gets the filename',
+        (tester) async {
+      String? askedFilename;
+      await tester.pumpWidget(_buildScreen(
+        VaultEntryData.file(fileEntry()),
+        exportFilePicker: (filename) async {
+          askedFilename = filename;
+          return '/tmp/out/secret.txt';
+        },
+      ));
+      await tester.tap(find.text('Export file'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.folder_open));
+      await tester.pumpAndSettle();
+
+      expect(askedFilename, 'secret.txt');
+      final field = tester.widget<TextField>(find.byType(TextField));
+      expect(field.controller?.text, '/tmp/out/secret.txt');
+    });
+
+    testWidgets('a cancelled picker leaves the path field untouched',
+        (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        VaultEntryData.file(fileEntry()),
+        exportFilePicker: (_) async => null,
+      ));
+      await tester.tap(find.text('Export file'));
+      await tester.pumpAndSettle();
+
+      final before =
+          tester.widget<TextField>(find.byType(TextField)).controller?.text;
+      await tester.tap(find.byIcon(Icons.folder_open));
+      await tester.pumpAndSettle();
+
+      final field = tester.widget<TextField>(find.byType(TextField));
+      expect(field.controller?.text, before);
+      expect(find.byType(SnackBar), findsNothing);
+    });
+  });
 }
 
 /// The bottom [EdgeInsets] of the detail body's scroll view (the SafeArea >

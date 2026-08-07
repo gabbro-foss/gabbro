@@ -927,4 +927,35 @@ void main() {
       expect(importLimitLabel(kEnpassImportMaxBytes), '128 MB');
     });
   });
+
+  // Net for the file_picker replacement: pins what this screen asks the
+  // picker for. The replacement must honour the same requests.
+  group('PathField wiring (net)', () {
+    testWidgets(
+        'import sections ask for open dialogs with the right filters: '
+        'one .gabbro, three .csv, two .json', (tester) async {
+      final noResult = ImportResult(
+        imported: BigInt.zero,
+        failures: [],
+        skipped: [],
+      );
+      await tester.pumpWidget(testApp(ImportScreen(
+        onImportEnpass: (_) async => noResult,
+        onImportBitwarden: (_) async => noResult,
+        onImportGooglePm: (_) async => noResult,
+        onImportDashlane: (_) async => noResult,
+        onSniffCsv: (_) => CsvPreviewData(headers: [], rows: []),
+      )));
+      await tester.pumpAndSettle();
+
+      final fields =
+          tester.widgetList<PathField>(find.byType(PathField)).toList();
+      for (final pf in fields) {
+        expect(pf.mode, PathFieldMode.open);
+      }
+      final filters = fields.map((pf) => pf.allowedExtensions?.single).toList()
+        ..sort((a, b) => a!.compareTo(b!));
+      expect(filters, ['csv', 'csv', 'csv', 'gabbro', 'json', 'json']);
+    });
+  });
 }

@@ -9,6 +9,7 @@ import 'package:gabbro/safe_file_picker.dart' show FilePickerUnavailable;
 import 'package:gabbro/screens/adopt_vault_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/vault_registry.dart';
+import 'package:gabbro/widgets/path_field.dart';
 
 import 'test_helpers.dart';
 
@@ -592,6 +593,20 @@ void main() {
       final aliasField = find.byKey(const Key('adopt_alias_field'));
       expect(aliasField, findsOneWidget);
       expect(tester.widget<TextField>(aliasField).controller?.text, 'Typed');
+    });
+  });
+
+  // Net for the file_picker replacement: pins what this screen asks the
+  // picker for. The replacement must honour the same request.
+  group('PathField wiring (net)', () {
+    testWidgets('adopt asks for an open dialog filtered to .gabbro',
+        (tester) async {
+      await tester.pumpWidget(_buildScreen());
+      await tester.pumpAndSettle();
+
+      final pf = tester.widget<PathField>(find.byType(PathField));
+      expect(pf.mode, PathFieldMode.open);
+      expect(pf.allowedExtensions, ['gabbro']);
     });
   });
 }
