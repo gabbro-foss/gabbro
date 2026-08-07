@@ -44,7 +44,7 @@ gabbro/
 │   ├── screens/          # unlock, vault list, adopt vault, export, import, generator, keyboard shortcuts, settings, manage vaults/folders, …
 │   ├── widgets/          # path_field, generator_widget, yubikey_tap, password_breakdown_sheet, sync_review, sync_method_dialog, gabbro_dialog (every dialog goes through it), text_size_slider, url_link, …
 │   ├── src/rust/         # Auto-generated bridge (do not edit)
-│   └── *.dart            # main, app_paths (GabbroPaths), settings, text_scale, control_scale, gabbro_contrast (high-contrast theme flag), vault_registry, safe_file_picker, autotype_listener, autotype_target, clipboard_clear
+│   └── *.dart            # main, app_paths (GabbroPaths), settings, text_scale, control_scale, gabbro_contrast (high-contrast theme flag), vault_registry, safe_file_picker, gabbro_file_picker (dialog facade), linux_file_picker (XDG portal client), autotype_listener, autotype_target, clipboard_clear
 ├── rust/src/
 │   ├── api/              # Bridge surface: vault, vault_bridge, import, *_generator, fido_bridge, autofill_bridge, autotype_bridge, entropy, types
 │   ├── crypto/           # Internal (not bridge-exposed): kdf, hkdf, aes_gcm, vault_crypto
@@ -55,7 +55,7 @@ gabbro/
 │   ├── autotype/         # Linux auto-type (ADR-017): keysym, XTEST inject, active-window read, trigger IPC, sequences, fill orchestration (Linux-only)
 │   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics, crash_writer, autotype_{spike,window,trigger} (diagnostics), gabbro-autotype (shipped trigger client); wordlist gen; gen_fixtures
 ├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + crash-safety (kill mid-write) + frozen golden fixtures (FIXTURES.md)
-├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, BiometricHelper + BiometricStore (per-vault; + Robolectric tests)
+├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, AppPaths (paths channel), BiometricHelper + BiometricStore (per-vault; + Robolectric tests)
 ├── linux/packaging/      # Desktop integration: render_icons.sh (icon tree); aur/ (AUR gabbro-bin PKGBUILD; .SRCINFO is generated in the AUR clone), deb/ (build-deb.sh -> binary .deb)
 ├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, VAULT_SYNC, AUTOTYPE_AND_AUTOFILL, AI_*; decisions/ (ADRs); artefacts/
 ├── test/  integration_test/          # Flutter widget/unit + Linux real-FFI suites (dart test)
@@ -81,9 +81,9 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2165 | 10 |
+| Flutter (`flutter test`) | 2188 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
-| Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
+| Android (`./gradlew :app:testDebugUnitTest`) | 150 | 15 |
 
 **Real-FFI suites run under plain `dart test`, never `flutter drive` (non-negotiable):** they test
 Dart -> FFI -> crypto -> disk, touch no UI, and so need no window. Needs the release cdylib (debug
@@ -128,88 +128,20 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**Replace the plugins that emit the Gradle warnings, or roll our own.** No bump clears
-them — latest versions still warn — and the Android build breaks at Gradle 10 / a
-future AGP. Affected: `file_picker` (`package=` + deprecated space-assignment), `jni`
-and `jni_flutter` (both, same), `url_launcher_android` and
-`flutter_plugin_android_lifecycle` (`package=` only).
+**Dependency trimming, remaining (branch `dependency_trimming`).** Done so far:
+Linux file dialogs speak to the XDG portal directly (`linux_file_picker` +
+`gabbro_file_picker` facade); `path_provider` replaced by own resolution
+(`app_paths` + Kotlin `paths` channel), which removed `jni`/`jni_flutter` and
+fixed the clang-22 Linux build break. All hardware-verified 2026-08-07.
 
-**First: replace `file_picker` with our own code (verified 2026-08-07).** Also
-removes `flutter_plugin_android_lifecycle` (pulled in only by file_picker) — 2 of
-the 5 warnings. Same system dialogs as today on both platforms. NOT the source of
-`jni`/`jni_flutter` (those come from `path_provider`).
-- **Linux:** talk to the XDG portal over DBus directly (that is all file_picker
-  does there). One new direct dep: `dbus` (pure Dart, already in the tree via
-  file_picker). ~200–300 lines: pick-file, pick-folder, save-as. file_picker's
-  Linux source is the reference.
-- **Android:** SAF intents via a MethodChannel, like the existing export channel.
-  No new deps. ~100–200 lines Kotlin + Dart wrapper. Must also copy the picked
-  `content://` file to an app-readable path (file_picker does this today —
-  restore-backup relies on it).
-- Call sites all go through `lib/safe_file_picker.dart` (the tested seam) +
-  `FilePicker.{pickFiles,saveFile,getDirectoryPath}` in unlock, path_field,
-  export, entry_detail, create_entry, vault_list screens.
-
-**Second: replace `path_provider` — the source of `jni` + `jni_flutter`** (2 more
-warnings). It answers one question: the app's private data folder (vaults + settings).
-- **Linux:** `app_paths.dart` already has our own fallback resolving the same
-  folder; promote it to the only path.
-- **Android:** one MethodChannel call returning the app files dir. Few lines of Kotlin.
-- **Gate:** before deleting path_provider, prove on real hardware (both platforms)
-  that old and new resolution return byte-identical paths — a different folder
-  means the user sees an empty vault list.
-
-**Third: replace `url_launcher` — the source of `url_launcher_android`** (last
-warning). Opens a URL in the browser; 3 call sites (url_link, entry_detail, about).
-- **Android:** one ACTION_VIEW intent via MethodChannel (~10 lines Kotlin).
-- **Linux:** run `xdg-open <url>` (its Linux impl warns nothing, but keeping the
-  package for one platform makes no sense).
-- **Test:** tap a link on each platform — failure mode is a dead tap.
-
-Together the three steps clear all 5 Gradle warnings.
-
-**Net — file_picker, Linux leg (approved 2026-08-07).** Pin current behaviour
-green through the seams; each flow x 3 outcomes: picked / cancelled / portal
-unreachable (SnackBar; manual path field where present). Rust untouched (only
-`set_process_dumpable`, called from the `runPicker` bracket, which stays).
-Kotlin is the Android leg, later.
-
-- [x] 1. `safe_file_picker` mechanics (8/8 green, confirmed 2026-08-07)
-- [x] 2. `path_field` browse + save-as (14/14 green); wiring pinned for all 4
-      consumers: onboarding, import, adopt, export (mode + filter + suggested
-      filename; 6 new tests, 2026-08-07)
-- [x] 3. `unlock_screen` restore-backup pick — success, cancel, unavailable all
-      already pinned (F11 + R-03 tests); confirmed green
-- [x] 4. `export_screen` folder pick — **Android-only** (`_pickDirectory`,
-      reachable only under `isAndroid`); moved to the Android leg. Linux export
-      goes through PathField (item 2)
-- [x] 5. `entry_detail_screen` export dialog — unavailable was pinned; success
-      (path fills field, picker gets the filename) + cancel added (2 new tests)
-- [x] 6. `create_entry_screen` attach-file — all 3 outcomes added (3 new tests)
-- [x] 7. `vault_list_screen` sync-from-file pick — all 3 already pinned;
-      confirmed green
-- [x] 8. Argument contract (what the replacement must honour, per flow):
-      - restore-backup: open, filter `.gabbro` (`unlock_screen.dart`)
-      - adopt + import vault: open, filter `.gabbro`; import others: 3x `.csv`,
-        2x `.json` (PathField wiring tests)
-      - onboarding: save, filter `.gabbro`, suggested filename
-      - export: save, filter + suffix follow format (`.gabbro`/`.json`), dated
-        filename from alias
-      - entry file export: save, suggested filename = entry's
-      - attach-file: open, any type, must return name + bytes
-        (`withData: true`)
-      - sync-from-file: open, filter `.gabbro`
-- [ ] 9. Manual Linux baseline (maintainer): open all dialogs in the running
-      app — before and after the swap
-
-**Method (big change — extra rigour):**
-- All work on branch `dependency_trimming`; master stays releasable.
-- **Reinforced net first:** before any production change, pin the *current*
-  behaviour of every call site green — picker flows, path resolution, URL taps —
-  including the Android copy-to-readable-path behaviour.
-- **Then canon TDD on top of that net:** red test → minimal code, per operation,
-  per platform. Hardware verification on both platforms before each package is
-  deleted.
+Still to do, same net-first + TDD method:
+1. **file_picker Android leg:** SAF picker via a MethodChannel (pattern: the
+   export channel) + copy the picked `content://` file to an app-readable
+   path. Then delete `file_picker` + `flutter_plugin_android_lifecycle` from
+   pubspec and swap the facade's Android legs.
+2. **url_launcher:** Android = one ACTION_VIEW intent via MethodChannel;
+   Linux = `xdg-open`. 3 call sites (url_link, entry_detail, about). Then
+   delete `url_launcher`.
 
 ---
 

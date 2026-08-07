@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Linux file dialogs now talk to the desktop's file portal directly**, instead of going through the `file_picker` plugin. Same dialogs, one less third-party dependency on that path; Android still uses the plugin until its own replacement lands.
+- **The app now finds its own data folder** instead of asking the `path_provider` plugin — the same folder as before on both platforms, so nothing moves. This also removes the `jni` plugin whose C code newer compilers reject, which had broken fresh Linux builds.
 - **Finnish and Russian passphrases draw on new wordlists**, re-sourced for GPL-3.0 compatibility. Both are still 7,776 words, so entropy is unchanged.
 - **Portuguese passphrases draw on a new wordlist**, also re-sourced for GPL-3.0 compatibility. It is 7,776 words and carries no accents, so a passphrase types on any keyboard. The generator now labels it Português (BR), which is what the Portuguese list has always been.
 - **Passphrases no longer include non-words** — surnames in Slovak and Ukrainian, `Internet` in French. Slovak drops to 6,642 words; add one word to cover the lost entropy.
