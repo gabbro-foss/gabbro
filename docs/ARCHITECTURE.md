@@ -128,6 +128,55 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
+**Replace the plugins that emit the Gradle warnings, or roll our own.** No bump clears
+them — latest versions still warn — and the Android build breaks at Gradle 10 / a
+future AGP. Affected: `file_picker` (`package=` + deprecated space-assignment), `jni`
+and `jni_flutter` (both, same), `url_launcher_android` and
+`flutter_plugin_android_lifecycle` (`package=` only).
+
+**First: replace `file_picker` with our own code (verified 2026-08-07).** Also
+removes `flutter_plugin_android_lifecycle` (pulled in only by file_picker) — 2 of
+the 5 warnings. Same system dialogs as today on both platforms. NOT the source of
+`jni`/`jni_flutter` (those come from `path_provider`).
+- **Linux:** talk to the XDG portal over DBus directly (that is all file_picker
+  does there). One new direct dep: `dbus` (pure Dart, already in the tree via
+  file_picker). ~200–300 lines: pick-file, pick-folder, save-as. file_picker's
+  Linux source is the reference.
+- **Android:** SAF intents via a MethodChannel, like the existing export channel.
+  No new deps. ~100–200 lines Kotlin + Dart wrapper. Must also copy the picked
+  `content://` file to an app-readable path (file_picker does this today —
+  restore-backup relies on it).
+- Call sites all go through `lib/safe_file_picker.dart` (the tested seam) +
+  `FilePicker.{pickFiles,saveFile,getDirectoryPath}` in unlock, path_field,
+  export, entry_detail, create_entry, vault_list screens.
+
+**Second: replace `path_provider` — the source of `jni` + `jni_flutter`** (2 more
+warnings). It answers one question: the app's private data folder (vaults + settings).
+- **Linux:** `app_paths.dart` already has our own fallback resolving the same
+  folder; promote it to the only path.
+- **Android:** one MethodChannel call returning the app files dir. Few lines of Kotlin.
+- **Gate:** before deleting path_provider, prove on real hardware (both platforms)
+  that old and new resolution return byte-identical paths — a different folder
+  means the user sees an empty vault list.
+
+**Third: replace `url_launcher` — the source of `url_launcher_android`** (last
+warning). Opens a URL in the browser; 3 call sites (url_link, entry_detail, about).
+- **Android:** one ACTION_VIEW intent via MethodChannel (~10 lines Kotlin).
+- **Linux:** run `xdg-open <url>` (its Linux impl warns nothing, but keeping the
+  package for one platform makes no sense).
+- **Test:** tap a link on each platform — failure mode is a dead tap.
+
+Together the three steps clear all 5 Gradle warnings.
+
+**Method (big change — extra rigour):**
+- All work on branch `dependency_trimming`; master stays releasable.
+- **Reinforced net first:** before any production change, pin the *current*
+  behaviour of every call site green — picker flows, path resolution, URL taps —
+  including the Android copy-to-readable-path behaviour.
+- **Then canon TDD on top of that net:** red test → minimal code, per operation,
+  per platform. Hardware verification on both platforms before each package is
+  deleted.
+
 ---
 
 ## Build & Release
@@ -146,13 +195,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   committed in the AUR clone; the push fails — the AUR is in maintenance
   (still down 2026-08-05). Until it lands, Arch users install alpha.16. Retry with
   `git -C ../gabbro-bin-aur push` from `gabbro/`.
-
-### Dependencies
-- **Replace the plugins that emit the Gradle warnings, or roll our own.** No bump clears
-  them — latest versions still warn — and the Android build breaks at Gradle 10 / a
-  future AGP. Affected: `file_picker` (`package=` + deprecated space-assignment), `jni`
-  and `jni_flutter` (both, same), `url_launcher_android` and
-  `flutter_plugin_android_lifecycle` (`package=` only).
 
 ### Features and UI/UX
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
