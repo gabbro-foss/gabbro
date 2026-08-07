@@ -128,12 +128,6 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**Re-source or drop the Portuguese passphrase wordlist.** dadoware is CC-BY-NC-3.0, so
-it is not GPL-3.0 compatible; dropping it takes passphrase languages 29 -> 28. fi and ru
-are done. `jfoclpf/words-pt` is GPL-3.0 but is a spell-check dictionary, not a diceware
-list: conjugation-dominated, no POS data to strip them. Still to check: the pt-br list at
-https://diceware.readthedocs.io/en/stable/wordlists.html (7,776 words, purpose-built).
-
 ---
 
 ## Build & Release
