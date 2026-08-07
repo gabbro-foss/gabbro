@@ -28,3 +28,36 @@ how to update, and how often. Re-commit after updating (never fetched at build/r
 - **Cadence:** on demand, or on a security advisory — never automatic. (Hence disabling the IDE's
   auto-`pub get` / auto-reload prompts: fetch deps when *you* decide to. `pub get`/`cargo` do not
   execute dependency code; the risk is *which* packages you pull, not the fetch.)
+- The Android *runtime* graph has its own lock, `android/app/gradle.lockfile`; regenerating and
+  osv-scanning it is part of the release process — see BUILD_AND_RELEASE.md.
+
+## Toolchain versions
+
+Which pins follow something and which never move on their own. Values live in the
+files named — don't copy them here, they drift.
+
+| Thing | Pinned in | Moves when |
+|---|---|---|
+| Dart SDK | ships inside Flutter | Flutter is updated |
+| NDK, minSdk, targetSdk | `flutter.*` refs, `android/app/build.gradle.kts` | Flutter is updated |
+| Gradle | `android/gradle/wrapper/gradle-wrapper.properties` | we edit it |
+| AGP, Kotlin | `android/settings.gradle.kts` | we edit it |
+| compileSdk, Java | `android/app/build.gradle.kts` | we edit it |
+| yubikit-android | `android/app/build.gradle.kts` | we edit it |
+| Rust toolchain | **nowhere** | the build box updates |
+
+**Flutter does not carry Gradle, AGP or Kotlin.** All three were seeded from the
+Flutter Android template when the project was created and then froze; a Flutter bump
+leaves them untouched. To see what a current template would pick, run
+`flutter create --platforms=android <throwaway-dir>` and diff its `android/`.
+
+**flutter_rust_bridge is a three-way lockstep.** `rust/Cargo.toml` (hard `=` pin),
+`pubspec.yaml`, and the `flutter_rust_bridge_codegen` binary that regenerates
+`lib/src/rust/` must all be the same version. Two are in the repo; the binary is not.
+
+**The Rust toolchain is unpinned.** `rustc` is whatever the build box happens to have,
+and the version is only captured in CHANGELOG *after* a release build — so a toolchain
+update can change a release with no diff in the repo to show for it.
+
+- **Cadence:** review at release time. BUILD_AND_RELEASE.md pre-flight step 4 already
+  prints every version that ends up in the release notes.
