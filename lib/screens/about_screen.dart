@@ -280,6 +280,13 @@ const _kComponents = [
     licence: 'BSD-3-Clause',
     url: 'https://github.com/dart-lang/sdk',
   ),
+  // Copyright for the Brazilian Portuguese list is @drebs'; it ships inside
+  // ulif/diceware, which is GPL-3.0-or-later.
+  _Component(
+    name: 'diceware wordlist_pt-br (pt)',
+    licence: 'GPL-3.0-or-later',
+    url: 'https://github.com/ulif/diceware',
+  ),
   _Component(
     name: 'diceware-wordlist-bg',
     licence: 'CC-BY-4.0',

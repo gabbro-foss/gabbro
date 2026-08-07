@@ -6,7 +6,7 @@ Aspell-sourced (GPL-compatible): sv, da, nb, sl, pl, hu, cs
 Licensed downloads:
   fi  — FredrikBorgstrom/finnish-extractor (KOTUS Nykysuomen sanalista, plain
         words, taken under the LGPL arm of its triple licence; credit KOTUS)
-  pt  — thoughtworks/dadoware          (plain words, MIT-ish)
+  pt  — ulif/diceware wordlist_pt-br   (plain words, GPL-3.0+; list (C) @drebs)
   et  — agreinhold/Diceware-word-lists (tab NNNNN\tword, CC-BY-4.0)
   sk  — jtomori/diceware_slovak        (space NNNNN word, MIT)
   bg  — assenv/diceware-wordlist-bg    (space NNNNN word, CC-BY-4.0)
@@ -126,11 +126,13 @@ DOWNLOADS: dict[str, tuple[str, str, str | None]] = {
         r"[abcdefghijklmnoprstuvyäö]{4,12}",
     ),
     "pt": (
-        "https://raw.githubusercontent.com/thoughtworks/dadoware/master/7776palavras.txt",
+        "https://raw.githubusercontent.com/ulif/diceware/master/diceware/wordlists/wordlist_pt-br.txt",
         "plain",
-        # Explicit Portuguese alphabet, min 2 chars — the source carries single
-        # letters, acronyms (AV, BR, CV) and "km/h", which read as broken words.
-        r"[a-zàáâãçéêíóôõú]{2,7}",
+        # Brazilian Portuguese, deliberately unaccented — accented words were
+        # excluded at source, not stripped, so every entry is a real spelling
+        # and types on any keyboard. No y (loanwords only). Source is already
+        # clean; this filter is the net against upstream drift.
+        r"[abcdefghijklmnopqrstuvwxz]{4,9}",
     ),
     "et": (
         f"{BASE_AGREINHOLD}/diceware_%20estonian.txt",

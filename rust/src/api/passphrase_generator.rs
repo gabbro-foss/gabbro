@@ -509,7 +509,7 @@ mod tests {
         alpha("hu", WORDLIST_HU, 7776, "abcdefghijklmnopqrstuvwxyzáéíóöőúüű", 4, 12),
         alpha("lt", WORDLIST_LT, 7776, "abcdefghijklmnoprstuvyząčėęįšųūž", 4, 12),
         alpha("lv", WORDLIST_LV, 7776, "abcdefghijklmnoprstuvzāčēģīķļņšūž", 4, 12),
-        alpha("pt", WORDLIST_PT, 7744, "abcdefghijklmnopqrstuvwxyzàáâãçéêíóôõú", 2, 7),
+        alpha("pt", WORDLIST_PT, 7776, "abcdefghijklmnopqrstuvwxz", 4, 9),
         alpha("el", WORDLIST_EL, 7776, "αβγδεζηθικλμνξοπρσςτυφχψωάέήίόύώϊϋΐΰ", 4, 12),
         alpha("ru", WORDLIST_RU, 7776, "абвгдежзийклмнопрстуфхцчшщъыьэюя", 4, 12),
         alpha("uk", WORDLIST_UK, 7661, "абвгґдежзийклмнопрстуфхцчшщьюяєії", 2, 7),
