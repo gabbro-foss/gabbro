@@ -50,12 +50,14 @@ void main() {
     await tester.pumpWidget(testApp(const AboutScreen()));
     await tester.pumpAndSettle();
 
-    // Scroll to make the licence section visible.
+    // Scroll to make the licence section visible. Match the licence body's own
+    // SPDX id, not a bare 'GPL' — attribution licences contain it too (LGPL),
+    // and scrollUntilVisible requires the finder to resolve to exactly one.
     await tester.scrollUntilVisible(
-      find.textContaining('GPL'),
+      find.textContaining('GPL-3.0-only'),
       200,
       scrollable: find.byType(Scrollable).first,
     );
-    expect(find.textContaining('GPL'), findsWidgets);
+    expect(find.textContaining('GPL-3.0-only'), findsOneWidget);
   });
 }
