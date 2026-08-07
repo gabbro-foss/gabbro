@@ -168,6 +168,40 @@ warning). Opens a URL in the browser; 3 call sites (url_link, entry_detail, abou
 
 Together the three steps clear all 5 Gradle warnings.
 
+**Net — file_picker, Linux leg (approved 2026-08-07).** Pin current behaviour
+green through the seams; each flow x 3 outcomes: picked / cancelled / portal
+unreachable (SnackBar; manual path field where present). Rust untouched (only
+`set_process_dumpable`, called from the `runPicker` bracket, which stays).
+Kotlin is the Android leg, later.
+
+- [x] 1. `safe_file_picker` mechanics (8/8 green, confirmed 2026-08-07)
+- [x] 2. `path_field` browse + save-as (14/14 green); wiring pinned for all 4
+      consumers: onboarding, import, adopt, export (mode + filter + suggested
+      filename; 6 new tests, 2026-08-07)
+- [x] 3. `unlock_screen` restore-backup pick — success, cancel, unavailable all
+      already pinned (F11 + R-03 tests); confirmed green
+- [x] 4. `export_screen` folder pick — **Android-only** (`_pickDirectory`,
+      reachable only under `isAndroid`); moved to the Android leg. Linux export
+      goes through PathField (item 2)
+- [x] 5. `entry_detail_screen` export dialog — unavailable was pinned; success
+      (path fills field, picker gets the filename) + cancel added (2 new tests)
+- [x] 6. `create_entry_screen` attach-file — all 3 outcomes added (3 new tests)
+- [x] 7. `vault_list_screen` sync-from-file pick — all 3 already pinned;
+      confirmed green
+- [x] 8. Argument contract (what the replacement must honour, per flow):
+      - restore-backup: open, filter `.gabbro` (`unlock_screen.dart`)
+      - adopt + import vault: open, filter `.gabbro`; import others: 3x `.csv`,
+        2x `.json` (PathField wiring tests)
+      - onboarding: save, filter `.gabbro`, suggested filename
+      - export: save, filter + suffix follow format (`.gabbro`/`.json`), dated
+        filename from alias
+      - entry file export: save, suggested filename = entry's
+      - attach-file: open, any type, must return name + bytes
+        (`withData: true`)
+      - sync-from-file: open, filter `.gabbro`
+- [ ] 9. Manual Linux baseline (maintainer): open all dialogs in the running
+      app — before and after the swap
+
 **Method (big change — extra rigour):**
 - All work on branch `dependency_trimming`; master stays releasable.
 - **Reinforced net first:** before any production change, pin the *current*
