@@ -2,12 +2,17 @@ package app.gabbro.gabbro
 
 import android.app.PendingIntent
 import android.content.Intent
+import android.net.Uri
 import android.nfc.NfcAdapter
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.DocumentsContract
+import android.provider.OpenableColumns
 import android.view.WindowManager
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import com.yubico.yubikit.core.YubiKeyConnection
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -58,10 +63,88 @@ abstract class GabbroUnlockHostActivity : FlutterFragmentActivity() {
         )
     }
 
+    // File dialogs: the result arrives asynchronously, so the pending Flutter
+    // result is stashed and completed in the launcher callback.
+    private var pendingFilePick: MethodChannel.Result? = null
+    private var pendingPickWantsBytes = false
+    private var pendingFolderPick: MethodChannel.Result? = null
+    private lateinit var openFileLauncher: ActivityResultLauncher<Array<String>>
+    private lateinit var openFolderLauncher: ActivityResultLauncher<Uri?>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+
+        openFileLauncher =
+            registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+                val result = pendingFilePick
+                pendingFilePick = null
+                if (uri == null) {
+                    result?.success(null) // user cancelled the picker
+                    return@registerForActivityResult
+                }
+                deliverPickedFile(uri, pendingPickWantsBytes, result)
+            }
+
+        openFolderLauncher =
+            registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
+                val result = pendingFolderPick
+                pendingFolderPick = null
+                if (uri == null) {
+                    result?.success(null) // user cancelled the picker
+                    return@registerForActivityResult
+                }
+                result?.success(
+                    GabbroPicker.rawPathFromDocumentId(
+                        DocumentsContract.getTreeDocumentId(uri),
+                    ),
+                )
+            }
     }
+
+    /**
+     * Reads the picked file off the main thread — a large attachment would
+     * otherwise freeze the UI — and answers Dart back on it, as Flutter
+     * requires. [wantsBytes] returns the contents; otherwise the file is copied
+     * into the app cache and its path returned.
+     */
+    private fun deliverPickedFile(
+        uri: Uri,
+        wantsBytes: Boolean,
+        result: MethodChannel.Result?,
+    ) {
+        val name = pickedFileName(uri)
+        Thread {
+            val reply = try {
+                val stream = contentResolver.openInputStream(uri)
+                    ?: throw IllegalStateException("Cannot read the picked file")
+                if (wantsBytes) {
+                    val bytes = stream.use { it.readBytes() }
+                    Result.success<Any?>(mapOf("name" to name, "bytes" to bytes))
+                } else {
+                    val target = GabbroPicker.cacheTarget(cacheDir, name)
+                    GabbroPicker.copyTo(stream, target)
+                    Result.success<Any?>(target.absolutePath)
+                }
+            } catch (e: Exception) {
+                Result.failure<Any?>(e)
+            }
+            Handler(Looper.getMainLooper()).post {
+                reply.fold(
+                    onSuccess = { result?.success(it) },
+                    onFailure = { result?.error("PICK_FAILED", it.message, null) },
+                )
+            }
+        }.start()
+    }
+
+    /** The picked file's own name, as the file dialog displays it. */
+    private fun pickedFileName(uri: Uri): String? =
+        contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
+            ?.use { cursor ->
+                val column = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                if (column >= 0 && cursor.moveToFirst()) cursor.getString(column) else null
+            }
 
     // Suppress the YubiKey NDEF URL from opening the browser while the unlock
     // surface is in the foreground. When yubikit's reader mode is active it takes
@@ -91,6 +174,34 @@ abstract class GabbroUnlockHostActivity : FlutterFragmentActivity() {
         registerBiometricChannel(flutterEngine)
         registerYubikeyChannel(flutterEngine)
         registerPathsChannel(flutterEngine)
+        registerPickerChannel(flutterEngine)
+    }
+
+    // File dialogs. Registered on the shared base so the autofill unlock screen
+    // can restore a vault from a picked backup too, not just the main app.
+    private fun registerPickerChannel(flutterEngine: FlutterEngine) {
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, GabbroPicker.CHANNEL)
+            .setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "pick_file" -> {
+                        pendingFilePick = result
+                        pendingPickWantsBytes = false
+                        openFileLauncher.launch(
+                            GabbroPicker.mimeTypes(call.argument<List<String>>("extensions")),
+                        )
+                    }
+                    "pick_file_bytes" -> {
+                        pendingFilePick = result
+                        pendingPickWantsBytes = true
+                        openFileLauncher.launch(GabbroPicker.mimeTypes(null))
+                    }
+                    "pick_dir" -> {
+                        pendingFolderPick = result
+                        openFolderLauncher.launch(null)
+                    }
+                    else -> result.notImplemented()
+                }
+            }
     }
 
     private fun registerPathsChannel(flutterEngine: FlutterEngine) {
