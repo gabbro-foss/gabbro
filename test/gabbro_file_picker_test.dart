@@ -23,6 +23,17 @@ class _RecordingLinuxPicker extends LinuxFilePicker {
   }
 }
 
+/// Cancels every dialog, so no path is ever read from disk.
+class _CancellingLinuxPicker extends LinuxFilePicker {
+  @override
+  Future<String?> openFile({List<String>? allowedExtensions}) async => null;
+
+  @override
+  Future<String?> saveFile(
+          {String? fileName, List<String>? allowedExtensions}) async =>
+      null;
+}
+
 /// Returns a fixed path (or null) from openFile.
 class _PathReturningLinuxPicker extends LinuxFilePicker {
   _PathReturningLinuxPicker(this.path);
@@ -109,6 +120,39 @@ void main() {
     expect(picked, '/storage/from-android.gabbro');
     expect(androidCalled, isTrue);
     expect(linux.calls, isEmpty);
+  });
+
+  test('N5: on Linux no Android leg is called', () async {
+    final origPick = GabbroFilePicker.androidPickPath;
+    final origSave = GabbroFilePicker.androidSavePath;
+    final origPickData = GabbroFilePicker.androidPickFileWithData;
+    addTearDown(() {
+      GabbroFilePicker.androidPickPath = origPick;
+      GabbroFilePicker.androidSavePath = origSave;
+      GabbroFilePicker.androidPickFileWithData = origPickData;
+    });
+
+    final androidCalls = <String>[];
+    GabbroFilePicker.isLinux = () => true;
+    GabbroFilePicker.linuxPicker = _CancellingLinuxPicker();
+    GabbroFilePicker.androidPickPath = ({allowedExtensions}) async {
+      androidCalls.add('pickPath');
+      return null;
+    };
+    GabbroFilePicker.androidSavePath = ({fileName, allowedExtensions}) async {
+      androidCalls.add('savePath');
+      return null;
+    };
+    GabbroFilePicker.androidPickFileWithData = () async {
+      androidCalls.add('pickFileWithData');
+      return null;
+    };
+
+    await GabbroFilePicker.pickPath(allowedExtensions: ['gabbro']);
+    await GabbroFilePicker.savePath(fileName: 'vault.gabbro');
+    await GabbroFilePicker.pickFileWithData();
+
+    expect(androidCalls, isEmpty);
   });
 
   test('N1: off Linux savePath routes to the Android leg, arguments intact',
