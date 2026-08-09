@@ -461,5 +461,49 @@ void main() {
       expect(pf.saveFileName, startsWith('My_Work_'));
       expect(pf.saveFileName, endsWith('.json'));
     });
+
+    // N2: Android never reaches a save dialog here - .gabbro goes through SAF,
+    // JSON through the folder picker. Pins that the save leg is Linux-only.
+    testWidgets('android shows no path field in either format', (tester) async {
+      await tester.pumpWidget(testApp(ExportScreen(
+        isAndroid: true,
+        vaultAlias: 'My Work',
+        onExport: (path) async {},
+        onExportJson: (path) async {},
+      )));
+      await tester.pumpAndSettle();
+      expect(find.byType(PathField), findsNothing);
+
+      await tester.tap(find.text('JSON'));
+      await tester.pumpAndSettle();
+      expect(find.byType(PathField), findsNothing);
+    });
+
+    // N3: the folder the user picks is where the JSON lands. The replacement
+    // picker must keep returning a raw path the export can be written to.
+    testWidgets('android JSON: the picked folder becomes the export path',
+        (tester) async {
+      String? exportedPath;
+      await tester.pumpWidget(testApp(ExportScreen(
+        isAndroid: true,
+        vaultAlias: 'My Work',
+        onExport: (path) async {},
+        onExportJson: (path) async => exportedPath = path,
+        onPickDirectory: () async => '/storage/emulated/0/Download/Gabbro',
+      )));
+      await tester.tap(find.text('JSON'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Choose folder'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('/storage/emulated/0/Download/Gabbro'), findsOneWidget);
+
+      await tester.tap(find.text('Export'));
+      await tester.pumpAndSettle();
+
+      expect(exportedPath,
+          startsWith('/storage/emulated/0/Download/Gabbro/My_Work_'));
+      expect(exportedPath, endsWith('.json'));
+    });
   });
 }

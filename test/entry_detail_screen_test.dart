@@ -8,6 +8,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'test_helpers.dart';
 import 'package:gabbro/autotype_target.dart';
+import 'package:gabbro/gabbro_file_picker.dart';
 import 'package:gabbro/screens/entry_detail_screen.dart';
 import 'package:gabbro/widgets/password_breakdown_sheet.dart';
 import 'package:gabbro/clipboard_clear.dart';
@@ -1042,6 +1043,58 @@ void main() {
         VaultEntryData.file(fileEntry()),
         exportFilePicker: (_) async => null,
       ));
+      await tester.tap(find.text('Export file'));
+      await tester.pumpAndSettle();
+
+      final before =
+          tester.widget<TextField>(find.byType(TextField)).controller?.text;
+      await tester.tap(find.byIcon(Icons.folder_open));
+      await tester.pumpAndSettle();
+
+      final field = tester.widget<TextField>(find.byType(TextField));
+      expect(field.controller?.text, before);
+      expect(find.byType(SnackBar), findsNothing);
+    });
+
+    // N4: drives the real default picker, not an injected seam. On Android the
+    // folder picker gives a directory; the entry's filename is appended to it.
+    testWidgets('android appends the filename to the picked folder',
+        (tester) async {
+      final origPickDir = GabbroFilePicker.androidPickDirectory;
+      addTearDown(() => GabbroFilePicker.androidPickDirectory = origPickDir);
+      GabbroFilePicker.androidPickDirectory =
+          () async => '/storage/emulated/0/Download/Gabbro';
+
+      await tester.pumpWidget(testApp(EntryDetailScreen(
+        entry: VaultEntryData.file(fileEntry()),
+        isAndroid: true,
+        onDeleteEntry: (_) async {},
+        onLaunchUrl: (_) async {},
+        onFetchHistory: (_) async => const [],
+      )));
+      await tester.tap(find.text('Export file'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.folder_open));
+      await tester.pumpAndSettle();
+
+      final field = tester.widget<TextField>(find.byType(TextField));
+      expect(field.controller?.text,
+          '/storage/emulated/0/Download/Gabbro/secret.txt');
+    });
+
+    testWidgets('android: a cancelled folder pick leaves the path untouched',
+        (tester) async {
+      final origPickDir = GabbroFilePicker.androidPickDirectory;
+      addTearDown(() => GabbroFilePicker.androidPickDirectory = origPickDir);
+      GabbroFilePicker.androidPickDirectory = () async => null;
+
+      await tester.pumpWidget(testApp(EntryDetailScreen(
+        entry: VaultEntryData.file(fileEntry()),
+        isAndroid: true,
+        onDeleteEntry: (_) async {},
+        onLaunchUrl: (_) async {},
+        onFetchHistory: (_) async => const [],
+      )));
       await tester.tap(find.text('Export file'));
       await tester.pumpAndSettle();
 

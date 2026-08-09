@@ -56,8 +56,9 @@ Future<void> _defaultLaunchUrl(String url) async {
 /// Pick a destination for a decrypted file export. On Android the native
 /// directory picker yields a folder, to which the filename is appended; on
 /// desktop the save dialog yields a full path. Returns null if cancelled.
-Future<String?> _defaultExportFilePicker(String filename) async {
-  if (Platform.isAndroid) {
+Future<String?> _defaultExportFilePicker(String filename,
+    {required bool isAndroid}) async {
+  if (isAndroid) {
     final dir = await GabbroFilePicker.androidPickDirectory();
     return dir == null ? null : '$dir/$filename';
   }
@@ -93,9 +94,10 @@ class EntryDetailScreen extends StatefulWidget {
 
   final Future<void> Function(String url) onLaunchUrl;
 
-  /// Test seam: pick the decrypted-file export destination. Defaults to the
-  /// native dialog; may throw when the file portal is unavailable (sandbox).
-  final Future<String?> Function(String filename) exportFilePicker;
+  /// Test seam: pick the decrypted-file export destination. Null uses the
+  /// native dialog, which may throw when the file portal is unavailable
+  /// (sandbox).
+  final Future<String?> Function(String filename)? exportFilePicker;
 
   /// Extra bottom padding below the scrollable body, on top of the normal
   /// content padding. The tablet two-pane layout passes this so the detail
@@ -103,10 +105,11 @@ class EntryDetailScreen extends StatefulWidget {
   /// bottom-right corner; the phone full-screen route (no FAB) leaves it 0.
   final double bottomReserve;
 
-  /// Whether this is running on Android. Only the copy announcement depends on
-  /// it, and only Linux gets one: TalkBack reads the snackbar itself, and an
-  /// announcement would make it drop its speech queue. Tests simulating Android
-  /// can pass `isAndroid: true`.
+  /// Whether this is running on Android. Drives the copy announcement (only
+  /// Linux gets one: TalkBack reads the snackbar itself, and an announcement
+  /// would make it drop its speech queue) and the file-export picker, which
+  /// asks Android for a folder and desktop for a full path. Tests simulating
+  /// Android can pass `isAndroid: true`.
   final bool isAndroid;
 
   EntryDetailScreen({
@@ -121,7 +124,7 @@ class EntryDetailScreen extends StatefulWidget {
     this.onLaunchUrl = _defaultLaunchUrl,
     this.onDeleted,
     this.onEdited,
-    this.exportFilePicker = _defaultExportFilePicker,
+    this.exportFilePicker,
     this.bottomReserve = 0,
   }) : isAndroid = isAndroid ?? Platform.isAndroid;
 
@@ -216,6 +219,12 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     Navigator.of(context).pop(true);
   }
 
+  /// The injected picker if the caller supplied one, else the native dialog
+  /// for this platform.
+  Future<String?> _pickExportPath(String filename) =>
+      widget.exportFilePicker?.call(filename) ??
+      _defaultExportFilePicker(filename, isAndroid: widget.isAndroid);
+
   /// Export a file entry's bytes to a user-specified path.
   Future<void> _exportFile(FileEntryData e) async {
     final pathController = TextEditingController(
@@ -247,7 +256,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                       final String? picked;
                       try {
                         picked = await runPicker(
-                          () => widget.exportFilePicker(e.filename),
+                          () => _pickExportPath(e.filename),
                         );
                       } on FilePickerUnavailable {
                         if (ctx.mounted) showPickerUnavailable(ctx);

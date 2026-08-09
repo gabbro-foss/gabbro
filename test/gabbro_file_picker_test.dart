@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/gabbro_file_picker.dart';
@@ -107,6 +108,50 @@ void main() {
 
     expect(picked, '/storage/from-android.gabbro');
     expect(androidCalled, isTrue);
+    expect(linux.calls, isEmpty);
+  });
+
+  test('N1: off Linux savePath routes to the Android leg, arguments intact',
+      () async {
+    final origSave = GabbroFilePicker.androidSavePath;
+    addTearDown(() => GabbroFilePicker.androidSavePath = origSave);
+
+    final linux = _RecordingLinuxPicker();
+    String? gotName;
+    List<String>? gotExtensions;
+    GabbroFilePicker.isLinux = () => false;
+    GabbroFilePicker.linuxPicker = linux;
+    GabbroFilePicker.androidSavePath = ({fileName, allowedExtensions}) async {
+      gotName = fileName;
+      gotExtensions = allowedExtensions;
+      return '/storage/saved-android.gabbro';
+    };
+
+    final saved = await GabbroFilePicker.savePath(
+        fileName: 'vault.gabbro', allowedExtensions: ['gabbro']);
+
+    expect(saved, '/storage/saved-android.gabbro');
+    expect(gotName, 'vault.gabbro');
+    expect(gotExtensions, ['gabbro']);
+    expect(linux.calls, isEmpty);
+  });
+
+  test('N1: off Linux pickFileWithData routes to the Android leg, no disk read',
+      () async {
+    final origPick = GabbroFilePicker.androidPickFileWithData;
+    addTearDown(() => GabbroFilePicker.androidPickFileWithData = origPick);
+
+    final linux = _RecordingLinuxPicker();
+    GabbroFilePicker.isLinux = () => false;
+    GabbroFilePicker.linuxPicker = linux;
+    GabbroFilePicker.androidPickFileWithData = () async =>
+        (name: 'from-android.pdf', bytes: Uint8List.fromList([7, 8]));
+
+    final picked = await GabbroFilePicker.pickFileWithData();
+
+    expect(picked, isNotNull);
+    expect(picked!.name, 'from-android.pdf');
+    expect(picked.bytes, [7, 8]);
     expect(linux.calls, isEmpty);
   });
 }
