@@ -155,6 +155,36 @@ net-first + TDD method:
      so the real default is testable.
    - [x] N5 on Linux no Android leg is called — the swap is Android-only
      (`test/gabbro_file_picker_test.dart`)
+
+   Design: one channel `app.gabbro.gabbro/picker` on `GabbroUnlockHostActivity`
+   (the shared base, so the autofill unlock screen gets it too). Methods: open
+   file, open file with bytes, pick folder. Picked files are copied into the app
+   cache so the rest of the app keeps handling plain paths. `.gabbro` has no
+   registered MIME type, so its picker must show all files — filtering it away
+   hides every vault.
+
+   TDD, red-first, in order:
+   - [ ] 1 open sends the requested extensions, returns the platform's path
+   - [ ] 2 open with no filter sends no extensions
+   - [ ] 3 open returns null on cancel
+   - [ ] 4 open-with-bytes returns name + bytes
+   - [ ] 5 open-with-bytes returns null on cancel
+   - [ ] 6 folder pick returns the path; null on cancel
+   - [ ] 7 a platform failure propagates, so `runPicker` shows the SnackBar
+     (1-7: `test/android_file_picker_test.dart`, channel-mocked)
+   - [ ] 8 `.csv`/`.json` map to MIME types; `.gabbro` falls back to all files
+   - [ ] 9 a picked file is copied to the cache, bytes identical
+   - [ ] 10 two picks of the same filename do not collide
+   - [ ] 11 a picked folder yields a raw path (what the JSON export writes to)
+   - [ ] 12 cancel returns null, not an error
+     (8-12: Kotlin, `android/app/src/test/`)
+   - [ ] 13 off Linux all three legs route to the new client (N1 rewritten)
+   - [ ] 14 `savePath` off Linux throws `UnsupportedError` — dead
+     `androidSavePath` deleted, a future Windows port fails loudly
+   - [ ] 15 `file_picker` + `flutter_plugin_android_lifecycle` out of
+     `pubspec.yaml`; About screen licence list drops `file_picker`
+   - [ ] 16 hardware: the sweep's Android dialogs, plus JSON export and entry
+     file export actually writing
 2. **url_launcher:** Android = one ACTION_VIEW intent via MethodChannel;
    Linux = `xdg-open`. 3 call sites (url_link, entry_detail, about). Then
    delete `url_launcher`.
