@@ -128,17 +128,30 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**Dependency trimming, remaining (branch `dependency_trimming`).** Done so far:
-Linux file dialogs speak to the XDG portal directly (`linux_file_picker` +
-`gabbro_file_picker` facade); `path_provider` replaced by own resolution
-(`app_paths` + Kotlin `paths` channel), which removed `jni`/`jni_flutter` and
-fixed the clang-22 Linux build break. All hardware-verified 2026-08-07.
-
-Still to do, same net-first + TDD method:
+**Dependency trimming, remaining (branch `dependency_trimming`).** Same
+net-first + TDD method:
 1. **file_picker Android leg:** SAF picker via a MethodChannel (pattern: the
    export channel) + copy the picked `content://` file to an app-readable
    path. Then delete `file_picker` + `flutter_plugin_android_lifecycle` from
    pubspec and swap the facade's Android legs.
+
+   Sweep, verified 2026-08-09. Android reaches three legs: `androidPickPath`
+   (adopt, sync-from-file, import `.gabbro`/`.csv`/`.json`),
+   `androidPickFileWithData` (attach file), `androidPickDirectory` (JSON
+   export, entry file export). `androidSavePath` is dead — both save-mode
+   `PathField`s and `entry_detail`'s save branch are gated off Android.
+   `file_picker` copies the picked `content://` into the app cache and returns
+   that path; the folder picker returns a raw path, and writing there works
+   (hardware-checked).
+
+   Net — pin green against current code before any red test:
+   - [ ] N1 off-Linux `savePath` + `pickFileWithData` routing
+     (`test/gabbro_file_picker_test.dart`)
+   - [ ] N2 no save dialog on Android (`export_screen_test`,
+     `onboarding_screen_test`) — clears `androidSavePath` for deletion
+   - [ ] N3 JSON export: picked folder -> exported path (`export_screen_test`)
+   - [ ] N4 entry file export: Android joins folder + filename — needs a
+     platform seam on `entry_detail`
 2. **url_launcher:** Android = one ACTION_VIEW intent via MethodChannel;
    Linux = `xdg-open`. 3 call sites (url_link, entry_detail, about). Then
    delete `url_launcher`.
