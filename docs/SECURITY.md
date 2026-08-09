@@ -70,11 +70,8 @@ Unlocking your vault involves these steps:
    96 bytes of key material.
 
 2. **Vault key derivation.** The Argon2id output is run through HKDF-SHA256 to
-   derive the intermediate key. This step is the same in both modes. *(Vaults
-   created before VERSION 11 instead combined two key-exchange shared secrets — one
-   X25519, one ML-KEM-1024 — via HKDF; that layer was removed as non-load-bearing
-   per ADR-018 and deleted outright at RT-3, so VERSION 11 is the oldest format this
-   build opens.)*
+   derive the intermediate key. This step is the same in both modes. 
+   *VERSION 11 is the oldest format this build opens.*
 
 3. **YubiKey factor (YubiKey mode only).** The intermediate key is combined with
    the YubiKey's HMAC-secret in a second HKDF pass to produce the final vault key.
