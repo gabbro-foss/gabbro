@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2195 | 10 |
+| Flutter (`flutter test`) | 2196 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 150 | 15 |
 
@@ -153,6 +153,8 @@ net-first + TDD method:
    - [x] N4 entry file export: Android joins folder + filename. The picker now
      branches on `EntryDetailScreen.isAndroid` instead of `Platform.isAndroid`,
      so the real default is testable.
+   - [x] N5 on Linux no Android leg is called — the swap is Android-only
+     (`test/gabbro_file_picker_test.dart`)
 2. **url_launcher:** Android = one ACTION_VIEW intent via MethodChannel;
    Linux = `xdg-open`. 3 call sites (url_link, entry_detail, about). Then
    delete `url_launcher`.
