@@ -55,7 +55,7 @@ gabbro/
 │   ├── autotype/         # Linux auto-type (ADR-017): keysym, XTEST inject, active-window read, trigger IPC, sequences, fill orchestration (Linux-only)
 │   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics, crash_writer, autotype_{spike,window,trigger} (diagnostics), gabbro-autotype (shipped trigger client); wordlist gen; gen_fixtures
 ├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + crash-safety (kill mid-write) + frozen golden fixtures (FIXTURES.md)
-├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, AppPaths (paths channel), BiometricHelper + BiometricStore (per-vault; + Robolectric tests)
+├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, AppPaths (paths channel), GabbroPicker (picker channel), BiometricHelper + BiometricStore (per-vault; + Robolectric tests)
 ├── linux/packaging/      # Desktop integration: render_icons.sh (icon tree); aur/ (AUR gabbro-bin PKGBUILD; .SRCINFO is generated in the AUR clone), deb/ (build-deb.sh -> binary .deb)
 ├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, VAULT_SYNC, AUTOTYPE_AND_AUTOFILL, AI_*; decisions/ (ADRs); artefacts/
 ├── test/  integration_test/          # Flutter widget/unit + Linux real-FFI suites (dart test)
@@ -83,7 +83,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
 | Flutter (`flutter test`) | 2203 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
-| Android (`./gradlew :app:testDebugUnitTest`) | 150 | 15 |
+| Android (`./gradlew :app:testDebugUnitTest`) | 163 | 15 |
 
 **Real-FFI suites run under plain `dart test`, never `flutter drive` (non-negotiable):** they test
 Dart -> FFI -> crypto -> disk, touch no UI, and so need no window. Needs the release cdylib (debug
@@ -173,12 +173,14 @@ net-first + TDD method:
    - [x] 7 a platform failure propagates, so `runPicker` shows the SnackBar
      (1-7: `lib/android_file_picker.dart`, `test/android_file_picker_test.dart`,
      channel-mocked)
-   - [ ] 8 `.csv`/`.json` map to MIME types; `.gabbro` falls back to all files
-   - [ ] 9 a picked file is copied to the cache, bytes identical
-   - [ ] 10 two picks of the same filename do not collide
-   - [ ] 11 a picked folder yields a raw path (what the JSON export writes to)
-   - [ ] 12 cancel returns null, not an error
-     (8-12: Kotlin, `android/app/src/test/`)
+   - [x] 8 `.csv`/`.json` map to MIME types; `.gabbro` falls back to all files
+   - [x] 9 a picked file is copied to the cache, bytes identical
+   - [x] 10 two picks of the same filename do not collide
+   - [x] 11 a picked folder yields a raw path (what the JSON export writes to)
+   - [x] 12 cancel returns null, not an error — no Kotlin unit test: the
+     callback needs a live Flutter activity. Covered by TDD 3/5/6 and hardware.
+     (8-12: `GabbroPicker.kt` + `GabbroPickerTest.kt`; the channel and the
+     dialog launchers live on `GabbroUnlockHostActivity`)
    - [ ] 13 off Linux all three legs route to the new client (N1 rewritten)
    - [ ] 14 `savePath` off Linux throws `UnsupportedError` — dead
      `androidSavePath` deleted, a future Windows port fails loudly
