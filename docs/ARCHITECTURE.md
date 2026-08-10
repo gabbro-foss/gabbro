@@ -138,19 +138,41 @@ net-first + TDD method:
    `url_link.dart:37` inside `showUrlDialog`, which seven screens reach
    (unlock x2, import x2, about x2, adopt); and
    `entry_detail_screen.dart:53`, an injectable seam behind its own confirm
-   dialog. Neither has any test — nothing asserts a URL is ever launched.
+   dialog. `entry_detail` is tested either side of its confirm dialog
+   (`entry_detail_screen_test.dart:578,595`); `url_link` had nothing.
    (The old "3 call sites (url_link, entry_detail, about)" note was wrong:
    About goes through `showUrlDialog` like the rest.)
 
    Net — pin green against current code before any red test:
-   - [ ] N1 the dialog's "Open in browser" reaches the launcher with the URL
-     shown (needs a seam in `url_link.dart`; it calls `launchUrl` directly)
-   - [ ] N2 a failed launch tells the user (`couldNotOpen`) — today only
-     `url_link` does
-   - [ ] N3 the entry's confirm dialog: Cancel launches nothing, confirm
-     launches the URL shown
-   - [ ] N4 a bare `example.com` becomes `https://example.com`; an unparseable
-     one launches nothing
+   - [x] N1 the dialog's "Open in browser" reaches the launcher with the URL
+     shown; Close launches nothing (`test/url_link_test.dart`, new `openUrl`
+     seam)
+   - [x] N2 a failed launch tells the user (`couldNotOpen`)
+   - [x] N3 the entry's confirm dialog, both ways — already covered
+   - [x] N4 a bare `example.com` becomes `https://example.com`; an unreadable
+     one opens nothing. The scheme logic is now `browserUri()`, named and
+     tested apart from the launch it used to be tangled with.
+
+   Design: one channel on `GabbroUnlockHostActivity` — the unlock screen shows
+   URL dialogs (`unlock_screen.dart:988,1015`) and the autofill prompts use
+   that screen, so the main activity alone is not enough. Linux runs `xdg-open`
+   with the URL as one argument, never through a shell. **Web pages only:**
+   `http`/`https` are opened, anything else is refused and says so. Entry URLs
+   are user data, and nothing in Gabbro is a file/ftp/ssh client (YAGNI).
+
+   TDD, red-first, in order:
+   - [ ] 1 Linux: opening runs `xdg-open` with the URL as a single argument
+   - [ ] 2 Linux: `xdg-open` missing or failing reports failure, so the user is
+     told rather than left with nothing
+   - [ ] 3 Android: opening sends the URL over the channel; a platform failure
+     reports failure
+   - [ ] 4 Kotlin: the channel starts a view intent; no app to handle it
+     reports failure instead of crashing
+   - [ ] 5 anything but `http`/`https` is refused and says so
+   - [ ] 6 one facade picks Linux vs Android, shaped like the file picker
+   - [ ] 7 `url_launcher` out of `pubspec.yaml`; About screen drops it
+   - [ ] 8 hardware: an About link, an entry's URL and an import help link, on
+     Android and Linux
 
 ---
 
