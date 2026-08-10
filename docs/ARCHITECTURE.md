@@ -106,15 +106,15 @@ warnings are not noise.**
 | Warning | Source | Status / what it costs |
 |---|---|---|
 | `package=` ignored, `rust_lib_gabbro` | ours | **FIXED** 2026-08-06. Merged manifest byte-identical after. |
-| `package=` ignored x5 | `file_picker`, `jni`, `jni_flutter`, `url_launcher_android`, `flutter_plugin_android_lifecycle` | Upstream. Latest versions still warn. Android build breaks at a future AGP. |
-| Gradle space-assignment x42 | `file_picker` 13, `jni` 16, `jni_flutter` 13 | Upstream. Latest versions still warn. Android build breaks at Gradle 10. |
+| `package=` ignored | `jni`, `jni_flutter`, `url_launcher_android` | Upstream. Latest versions still warn. Android build breaks at a future AGP. Was x5; the `file_picker` removal took two. Confirm the count at the next build. |
+| Gradle space-assignment | `jni` 16, `jni_flutter` 13 | Upstream. Latest versions still warn. Android build breaks at Gradle 10. Was x42; `file_picker` held 13. Confirm at the next build. |
 | `Task.project` at execution time | Flutter's own `compileFlutterBuildDebug` | Upstream. Breaks at Gradle 10. Only shows when the task is not UP-TO-DATE. |
 | Kotlin plugin version (2.0.21 vs 2.2.20) | Flutter SDK's own `:gradle` build | Upstream. Debug and release alike. |
 | JVM restricted-method (`System::load`) | Gradle 8.14 `native-platform` jar | Gradle's own jar, and the version is pinned — nothing changes on its own. Clears itself whenever we next raise Gradle. No action. |
 | `cargo deny` no-license-field: `allo-isolate` | `flutter_rust_bridge` dep | Fixed on their master; await release. `[[licenses.clarify]]` is inert — don't retry. |
 | `cargo deny` duplicates x6 | `argon2`->`digest`, `jni`->`libloading`, `bindgen`->`shlex` | Upstream pins. Was x7; RT-3 took the `hybrid-array` duplicate with `ml-kem`. The crate itself stays (`sha2`/`hkdf` -> `digest` need it). |
 | "trying to run flutter as root" | the gate's own `unshare -r` | Cosmetic. Not Gabbro. |
-| KGP via `buildscript` classpath | `file_picker`, `url_launcher_android` | Did not reproduce 2026-08-06; re-check before acting. |
+| KGP via `buildscript` classpath | `url_launcher_android` | Did not reproduce 2026-08-06; re-check before acting. |
 
 **AGP note:** every module, `rust_lib_gabbro` included, loads AGP **8.11.1**. The
 `com.android.tools.build:gradle:7.3.0` line in `rust_builder/android/build.gradle` is
@@ -181,13 +181,16 @@ net-first + TDD method:
      callback needs a live Flutter activity. Covered by TDD 3/5/6 and hardware.
      (8-12: `GabbroPicker.kt` + `GabbroPickerTest.kt`; the channel and the
      dialog launchers live on `GabbroUnlockHostActivity`)
-   - [ ] 13 off Linux all three legs route to the new client (N1 rewritten)
-   - [ ] 14 `savePath` off Linux throws `UnsupportedError` — dead
-     `androidSavePath` deleted, a future Windows port fails loudly
-   - [ ] 15 `file_picker` + `flutter_plugin_android_lifecycle` out of
-     `pubspec.yaml`; About screen licence list drops `file_picker`
-   - [ ] 16 hardware: the sweep's Android dialogs, plus JSON export and entry
-     file export actually writing
+   - [x] 13 off Linux all three legs route to the new client — pinned at the
+     channel, so the default (not a seam) is what is proven (N1 rewritten)
+   - [x] 14 `savePath` off Linux throws `UnsupportedError` — dead
+     `androidSavePath` deleted (it threw `ArgumentError` from `file_picker`,
+     so it could never have worked), a future Windows port fails loudly
+   - [x] 15 `file_picker` gone from `pubspec.yaml` (which took
+     `flutter_plugin_android_lifecycle` with it); About screen licence list
+     drops it, pinned by a test. `gradle.lockfile` regenerated, osv-scan clean.
+   - [x] 16 hardware: all three dialogs, both cancel paths, same-name imports,
+     JSON export and entry file export written to Download, sync from file
 2. **url_launcher:** Android = one ACTION_VIEW intent via MethodChannel;
    Linux = `xdg-open`. 3 call sites (url_link, entry_detail, about). Then
    delete `url_launcher`.

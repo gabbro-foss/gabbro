@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- **Linux file dialogs now talk to the desktop's file portal directly**, instead of going through the `file_picker` plugin. Same dialogs, one less third-party dependency on that path; Android still uses the plugin until its own replacement lands.
+- **File dialogs now talk to the system directly on both platforms**, instead of going through the `file_picker` plugin: the desktop's file portal on Linux, Android's own picker on Android. Same dialogs, two fewer third-party dependencies in the app.
 - **The app now finds its own data folder** instead of asking the `path_provider` plugin — the same folder as before on both platforms, so nothing moves. This also removes the `jni` plugin whose C code newer compilers reject, which had broken fresh Linux builds.
 - **Finnish and Russian passphrases draw on new wordlists**, re-sourced for GPL-3.0 compatibility. Both are still 7,776 words, so entropy is unchanged.
 - **Portuguese passphrases draw on a new wordlist**, also re-sourced for GPL-3.0 compatibility. It is 7,776 words and carries no accents, so a passphrase types on any keyboard. The generator now labels it Português (BR), which is what the Portuguese list has always been.
@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **The sync dialog now says what "Merge automatically" does.** It offered the choice without explaining it, so it went unused. It now states that the automatic merge takes the other device's value wherever the two differ, and that reviewing starts from those same answers. The two choices carry the same wording for a screen reader, which on Linux reads only a control's name and never the paragraph.
 - **The folder choice no longer says "unfoldered".** In English only, the option to leave an entry out of a folder read "Keep unfoldered" / "Move to unfoldered". It now reads "Keep without folder" / "Move to no folder" — what every other language already said.
 - **The About screen did not name everything Gabbro ships.** Four Rust libraries were missing from the open-source list, one licence was wrong, and one entry named a Rust package while showing a different project's licence. Mozilla's Public Suffix List and two wordlist sources were uncredited. All are listed now, and a test refuses any direct dependency added without attribution.
-- **The Android app ships two fewer bundled libraries.** Updating the file-picker dropped Apache Tika and Commons IO from the release build, so the download is smaller and there is less third-party code inside it. No change to how picking a file behaves.
+- **The Android app ships two fewer bundled libraries.** Apache Tika and Commons IO came in with the old file-picker and are out of the release build, so the download is smaller and there is less third-party code inside it. No change to how picking a file behaves.
 
 ## [0.1.0-alpha.18] – 2026-08-05
 
