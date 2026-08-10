@@ -83,7 +83,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
 | Flutter (`flutter test`) | 2203 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
-| Android (`./gradlew :app:testDebugUnitTest`) | 163 | 15 |
+| Android (`./gradlew :app:testDebugUnitTest`) | 165 | 15 |
 
 **Real-FFI suites run under plain `dart test`, never `flutter drive` (non-negotiable):** they test
 Dart -> FFI -> crypto -> disk, touch no UI, and so need no window. Needs the release cdylib (debug
@@ -161,16 +161,31 @@ net-first + TDD method:
    are user data, and nothing in Gabbro is a file/ftp/ssh client (YAGNI).
 
    TDD, red-first, in order:
-   - [ ] 1 Linux: opening runs `xdg-open` with the URL as a single argument
-   - [ ] 2 Linux: `xdg-open` missing or failing reports failure, so the user is
-     told rather than left with nothing
-   - [ ] 3 Android: opening sends the URL over the channel; a platform failure
-     reports failure
-   - [ ] 4 Kotlin: the channel starts a view intent; no app to handle it
-     reports failure instead of crashing
-   - [ ] 5 anything but `http`/`https` is refused and says so
-   - [ ] 6 one facade picks Linux vs Android, shaped like the file picker
-   - [ ] 7 `url_launcher` out of `pubspec.yaml`; About screen drops it
+   - [x] 1 Linux: opening runs `xdg-open` with the URL as a single argument
+     (`lib/linux_url_opener.dart`, `test/linux_url_opener_test.dart`)
+   - [x] 2 Linux: `xdg-open` missing or failing reports failure, so the user is
+     told rather than left with nothing (a box without xdg-utils threw, which
+     would have killed the isolate on a link tap)
+   - [x] 3 Android: opening sends the URL over the channel; a platform failure
+     reports failure (`lib/android_url_opener.dart`, channel-mocked)
+   - [x] 4 Kotlin: the channel starts a view intent; no app to handle it
+     reports failure instead of crashing (`GabbroUrl.kt` + `GabbroUrlTest.kt`;
+     the handler sits on `GabbroUnlockHostActivity` beside the picker)
+   - [x] 5 one facade picks Linux vs Android, shaped like the file picker
+     (`lib/gabbro_url_opener.dart`; `browserUri` moved in from `entry_detail`).
+     Not yet wired to the call sites — that lands with 7.
+   - [x] 6 anything but `http`/`https` is refused and says so — in the facade,
+     the single place both call sites and both platforms pass through.
+     `file://`, `ftp://` and `ssh://` all reached the system before.
+   - [ ] 7a both call sites go through the facade; `url_launcher` out of
+     `pubspec.yaml`; About screen drops it
+   - [ ] 7b `entry_detail` says so when opening fails — today it shows nothing,
+     so a refused link would be a button that does nothing
+   - [ ] 7c a refused non-web link gets its own message: "could not open" reads
+     as a malfunction when the refusal is deliberate. New key, all 37 locales
+   - [ ] 7d both messages announced on Linux (`SemanticsService`, as
+     `adopt_vault`/`vault_list` do) — a screen reader never reads a SnackBar there
+   - [ ] 7e the new string survives 8x text on a 360px phone in every locale
    - [ ] 8 hardware: an About link, an entry's URL and an import help link, on
      Android and Linux
 
