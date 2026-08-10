@@ -195,8 +195,11 @@ net-first + TDD method:
        800dp screen); both messages now use a dialog, which scrolls (ADR-016)
      - the URL dialog's close button was shutting the message dialog instead of
        itself, so the explanation vanished the instant it appeared
-   - [ ] 8 hardware: an About link, an entry's URL and an import help link, on
-     Android and Linux
+   - [x] 8 hardware, Android and Linux: About link, an entry's URL, a
+     scheme-less URL, a refused `ssh://`, the import refusal's upgrade link,
+     and the refusal message at maximum text size. Removing the plugin left
+     `androidx.browser` in `gradle.lockfile`, which failed the release build
+     until it was regenerated — regenerate it with any dependency change.
 
 ---
 
