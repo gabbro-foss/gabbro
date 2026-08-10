@@ -308,11 +308,6 @@ const _kComponents = [
     url: 'https://github.com/jtomori/diceware_slovak',
   ),
   _Component(
-    name: 'file_picker',
-    licence: 'MIT',
-    url: 'https://github.com/miguelpruivo/flutter_file_picker',
-  ),
-  _Component(
     name: 'Fira Code',
     licence: 'SIL OFL 1.1',
     url: 'https://github.com/tonsky/FiraCode',

@@ -173,7 +173,7 @@ class _ExportScreenState extends State<ExportScreen> {
   String? _error;
 
   // Android `.gabbro` SAF destination (remembered across runs). Separate from
-  // `_path`, which holds the file_picker dir used by the JSON + Linux paths.
+  // `_path`, which holds the picked dir used by the JSON + Linux paths.
   String _exportFolderUri = '';
   String? _folderDisplayName;
 

@@ -1,7 +1,8 @@
 import 'dart:io';
-import 'dart:typed_data';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gabbro/android_file_picker.dart';
 import 'package:gabbro/gabbro_file_picker.dart';
 import 'package:gabbro/linux_file_picker.dart';
 
@@ -41,6 +42,23 @@ class _PathReturningLinuxPicker extends LinuxFilePicker {
 
   @override
   Future<String?> openFile({List<String>? allowedExtensions}) async => path;
+}
+
+/// Stands in for the Kotlin picker handler, so a test can see which channel
+/// method the facade's Android leg actually reaches.
+class _RecordingChannel {
+  final calls = <MethodCall>[];
+  Object? reply;
+
+  void install(WidgetTester tester) {
+    tester.binding.defaultBinaryMessenger
+        .setMockMethodCallHandler(AndroidFilePicker.channel, (call) async {
+      calls.add(call);
+      return reply;
+    });
+    addTearDown(() => tester.binding.defaultBinaryMessenger
+        .setMockMethodCallHandler(AndroidFilePicker.channel, null));
+  }
 }
 
 void main() {
@@ -104,32 +122,66 @@ void main() {
     expect(await GabbroFilePicker.pickFileWithData(), isNull);
   });
 
-  test('T7: off Linux the facade routes to the file_picker leg', () async {
+  testWidgets('13: off Linux pickPath asks our picker channel to open a file',
+      (tester) async {
     final linux = _RecordingLinuxPicker();
-    var androidCalled = false;
+    final channel = _RecordingChannel()
+      ..install(tester)
+      ..reply = '/data/cache/gabbro_picker/0/vault.gabbro';
     GabbroFilePicker.isLinux = () => false;
     GabbroFilePicker.linuxPicker = linux;
-    GabbroFilePicker.androidPickPath = ({allowedExtensions}) async {
-      androidCalled = true;
-      return '/storage/from-android.gabbro';
-    };
 
     final picked =
         await GabbroFilePicker.pickPath(allowedExtensions: ['gabbro']);
 
-    expect(picked, '/storage/from-android.gabbro');
-    expect(androidCalled, isTrue);
+    expect(picked, '/data/cache/gabbro_picker/0/vault.gabbro');
+    expect(channel.calls.single.method, 'pick_file');
+    expect((channel.calls.single.arguments as Map)['extensions'], ['gabbro']);
     expect(linux.calls, isEmpty);
+  });
+
+  testWidgets(
+      '13: off Linux pickFileWithData asks our picker channel for the bytes',
+      (tester) async {
+    final linux = _RecordingLinuxPicker();
+    final channel = _RecordingChannel()
+      ..install(tester)
+      ..reply = {
+        'name': 'doc.pdf',
+        'bytes': Uint8List.fromList([7, 8]),
+      };
+    GabbroFilePicker.isLinux = () => false;
+    GabbroFilePicker.linuxPicker = linux;
+
+    final picked = await GabbroFilePicker.pickFileWithData();
+
+    expect(picked, isNotNull);
+    expect(picked!.name, 'doc.pdf');
+    expect(picked.bytes, [7, 8]);
+    expect(channel.calls.single.method, 'pick_file_bytes');
+    expect(linux.calls, isEmpty);
+  });
+
+  testWidgets('13: the folder leg asks our picker channel for a directory',
+      (tester) async {
+    final channel = _RecordingChannel()
+      ..install(tester)
+      ..reply = '/storage/emulated/0/Download/Gabbro';
+    GabbroFilePicker.isLinux = () => false;
+
+    expect(await GabbroFilePicker.androidPickDirectory(),
+        '/storage/emulated/0/Download/Gabbro');
+    expect(channel.calls.single.method, 'pick_dir');
   });
 
   test('N5: on Linux no Android leg is called', () async {
     final origPick = GabbroFilePicker.androidPickPath;
-    final origSave = GabbroFilePicker.androidSavePath;
     final origPickData = GabbroFilePicker.androidPickFileWithData;
+    final origPickDir = GabbroFilePicker.androidPickDirectory;
     addTearDown(() {
       GabbroFilePicker.androidPickPath = origPick;
-      GabbroFilePicker.androidSavePath = origSave;
       GabbroFilePicker.androidPickFileWithData = origPickData;
+      GabbroFilePicker.androidPickDirectory = origPickDir;
     });
 
     final androidCalls = <String>[];
@@ -139,12 +191,12 @@ void main() {
       androidCalls.add('pickPath');
       return null;
     };
-    GabbroFilePicker.androidSavePath = ({fileName, allowedExtensions}) async {
-      androidCalls.add('savePath');
-      return null;
-    };
     GabbroFilePicker.androidPickFileWithData = () async {
       androidCalls.add('pickFileWithData');
+      return null;
+    };
+    GabbroFilePicker.androidPickDirectory = () async {
+      androidCalls.add('pickDirectory');
       return null;
     };
 
@@ -155,47 +207,17 @@ void main() {
     expect(androidCalls, isEmpty);
   });
 
-  test('N1: off Linux savePath routes to the Android leg, arguments intact',
-      () async {
-    final origSave = GabbroFilePicker.androidSavePath;
-    addTearDown(() => GabbroFilePicker.androidSavePath = origSave);
-
-    final linux = _RecordingLinuxPicker();
-    String? gotName;
-    List<String>? gotExtensions;
-    GabbroFilePicker.isLinux = () => false;
-    GabbroFilePicker.linuxPicker = linux;
-    GabbroFilePicker.androidSavePath = ({fileName, allowedExtensions}) async {
-      gotName = fileName;
-      gotExtensions = allowedExtensions;
-      return '/storage/saved-android.gabbro';
-    };
-
-    final saved = await GabbroFilePicker.savePath(
-        fileName: 'vault.gabbro', allowedExtensions: ['gabbro']);
-
-    expect(saved, '/storage/saved-android.gabbro');
-    expect(gotName, 'vault.gabbro');
-    expect(gotExtensions, ['gabbro']);
-    expect(linux.calls, isEmpty);
-  });
-
-  test('N1: off Linux pickFileWithData routes to the Android leg, no disk read',
-      () async {
-    final origPick = GabbroFilePicker.androidPickFileWithData;
-    addTearDown(() => GabbroFilePicker.androidPickFileWithData = origPick);
-
+  test('14: off Linux savePath is refused - no save dialog is reachable there',
+      () {
     final linux = _RecordingLinuxPicker();
     GabbroFilePicker.isLinux = () => false;
     GabbroFilePicker.linuxPicker = linux;
-    GabbroFilePicker.androidPickFileWithData = () async =>
-        (name: 'from-android.pdf', bytes: Uint8List.fromList([7, 8]));
 
-    final picked = await GabbroFilePicker.pickFileWithData();
-
-    expect(picked, isNotNull);
-    expect(picked!.name, 'from-android.pdf');
-    expect(picked.bytes, [7, 8]);
+    expect(
+        () => GabbroFilePicker.savePath(
+            fileName: 'vault.gabbro', allowedExtensions: ['gabbro']),
+        throwsUnsupportedError);
     expect(linux.calls, isEmpty);
   });
+
 }

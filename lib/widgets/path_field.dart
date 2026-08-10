@@ -25,7 +25,7 @@ class PathField extends StatefulWidget {
   final void Function(String path)? onSubmitted;
 
   /// Test seams: override the native dialogs to return a path, `null` (cancel),
-  /// or throw (portal unavailable). Default to the real `file_picker`.
+  /// or throw (portal unavailable). Default to the real native dialogs.
   final Future<String?> Function()? openPicker;
   final Future<String?> Function()? savePicker;
 
