@@ -862,6 +862,9 @@ class AppLocalizationsBg extends AppLocalizations {
   String get openInBrowserTitle => 'Отвори в браузър?';
 
   @override
+  String get onlyWebLinks => 'Могат да се отварят само уеб връзки';
+
+  @override
   String couldNotOpen(String url) {
     return 'Не можа да се отвори $url';
   }

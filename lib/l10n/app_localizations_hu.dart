@@ -862,6 +862,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get openInBrowserTitle => 'Megnyitás böngészőben?';
 
   @override
+  String get onlyWebLinks => 'Csak webes hivatkozások nyithatók meg';
+
+  @override
   String couldNotOpen(String url) {
     return 'Nem sikerült megnyitni: $url';
   }

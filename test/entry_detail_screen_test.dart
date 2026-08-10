@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'test_helpers.dart';
 import 'package:gabbro/autotype_target.dart';
 import 'package:gabbro/gabbro_file_picker.dart';
+import 'package:gabbro/gabbro_url_opener.dart';
 import 'package:gabbro/screens/entry_detail_screen.dart';
 import 'package:gabbro/widgets/password_breakdown_sheet.dart';
 import 'package:gabbro/clipboard_clear.dart';
@@ -70,7 +71,7 @@ Widget _buildScreen(
   Future<void> Function(String id)? onDeleteEntry,
   ClipboardClearTimeout clipboardClearTimeout =
       ClipboardClearTimeout.sixtySeconds,
-  Future<void> Function(String url)? onLaunchUrl,
+  Future<UrlOpenResult> Function(String url)? onLaunchUrl,
   Future<String?> Function(String filename)? exportFilePicker,
   Future<List<HistoryRecordData>> Function(String id)? onFetchHistory,
   bool isAndroid = false,
@@ -80,7 +81,7 @@ Widget _buildScreen(
       isAndroid: isAndroid,
       onDeleteEntry: onDeleteEntry ?? (_) async {},
       clipboardClearTimeout: clipboardClearTimeout,
-      onLaunchUrl: onLaunchUrl ?? (_) async {},
+      onLaunchUrl: onLaunchUrl ?? (_) async => UrlOpenResult.opened,
       exportFilePicker: exportFilePicker ?? (_) async => null,
       onFetchHistory: onFetchHistory ?? (_) async => const [],
     ));
@@ -580,7 +581,10 @@ void main() {
     await tester.pumpWidget(
       _buildScreen(
         VaultEntryData.login(_loginEntry()),
-        onLaunchUrl: (url) async => launched = url,
+        onLaunchUrl: (url) async {
+          launched = url;
+          return UrlOpenResult.opened;
+        },
       ),
     );
 
@@ -598,7 +602,10 @@ void main() {
     await tester.pumpWidget(
       _buildScreen(
         VaultEntryData.login(_loginEntry()),
-        onLaunchUrl: (_) async => launched = true,
+        onLaunchUrl: (_) async {
+          launched = true;
+          return UrlOpenResult.opened;
+        },
       ),
     );
 
@@ -610,22 +617,41 @@ void main() {
     expect(launched, isFalse);
   });
 
-  // N4: a URL typed without a scheme still has to reach a browser. The system
-  // picks the app from the `https://` part — without it Android finds no
-  // handler and Linux treats the text as a filename, so nothing opens.
-  group('N4: the address handed to the system', () {
-    test('a bare host gains https://', () {
-      expect(browserUri('example.com'), Uri.parse('https://example.com'));
-    });
+  // N4 moved to gabbro_url_opener_test.dart with browserUri itself.
 
-    test('an address that already has a scheme is left alone', () {
-      expect(browserUri('http://example.com/x'),
-          Uri.parse('http://example.com/x'));
-    });
+  // 7b: this screen showed nothing at all when opening failed, so a refused or
+  // failed link was a button that did nothing.
+  testWidgets('7b: a link that will not open says so', (tester) async {
+    await tester.pumpWidget(
+      _buildScreen(
+        VaultEntryData.login(_loginEntry()),
+        onLaunchUrl: (_) async => UrlOpenResult.failed,
+      ),
+    );
 
-    test('nothing is opened for an address that cannot be read', () {
-      expect(browserUri('http://[::1'), isNull);
-    });
+    await tester.tap(find.byIcon(Icons.open_in_browser_outlined));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Open in browser'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Could not open'), findsOneWidget);
+  });
+
+  testWidgets('7b: a link that is not a web page gets the other message',
+      (tester) async {
+    await tester.pumpWidget(
+      _buildScreen(
+        VaultEntryData.login(_loginEntry()),
+        onLaunchUrl: (_) async => UrlOpenResult.notAWebLink,
+      ),
+    );
+
+    await tester.tap(find.byIcon(Icons.open_in_browser_outlined));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Open in browser'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Only web links can be opened'), findsOneWidget);
   });
 
   testWidgets('long-pressing revealed password shows breakdown sheet',
@@ -1011,7 +1037,7 @@ void main() {
     await tester.pumpWidget(testApp(EntryDetailScreen(
       entry: VaultEntryData.login(_loginEntry()),
       onDeleteEntry: (_) async {},
-      onLaunchUrl: (_) async {},
+      onLaunchUrl: (_) async => UrlOpenResult.opened,
       exportFilePicker: (_) async => null,
       onFetchHistory: (_) async => const [],
       bottomReserve: 88,
@@ -1087,7 +1113,7 @@ void main() {
         entry: VaultEntryData.file(fileEntry()),
         isAndroid: true,
         onDeleteEntry: (_) async {},
-        onLaunchUrl: (_) async {},
+        onLaunchUrl: (_) async => UrlOpenResult.opened,
         onFetchHistory: (_) async => const [],
       )));
       await tester.tap(find.text('Export file'));
@@ -1110,7 +1136,7 @@ void main() {
         entry: VaultEntryData.file(fileEntry()),
         isAndroid: true,
         onDeleteEntry: (_) async {},
-        onLaunchUrl: (_) async {},
+        onLaunchUrl: (_) async => UrlOpenResult.opened,
         onFetchHistory: (_) async => const [],
       )));
       await tester.tap(find.text('Export file'));

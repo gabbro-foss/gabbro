@@ -173,8 +173,8 @@ class _SectionHeader extends StatelessWidget {
 // ── Link tile — displays a URL as a tappable row ─────────────────────────────
 // Tapping shows a dialog with the URL as SelectableText (copy-friendly) and
 // an explicit "Open in browser" button. Two-step confirmation: the user sees
-// the URL before the browser opens. Uses url_launcher with externalApplication
-// mode — opens the system browser, no in-app webview.
+// the URL before the browser opens. Goes to the system browser, never an
+// in-app webview.
 
 class _LinkTile extends StatelessWidget {
   final IconData icon;
@@ -417,11 +417,6 @@ const _kComponents = [
     name: 'thiserror',
     licence: 'Apache-2.0 / MIT',
     url: 'https://github.com/dtolnay/thiserror',
-  ),
-  _Component(
-    name: 'url_launcher',
-    licence: 'BSD-3-Clause',
-    url: 'https://github.com/flutter/packages',
   ),
   _Component(
     name: 'uuid',

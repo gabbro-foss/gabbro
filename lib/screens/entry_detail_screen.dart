@@ -12,7 +12,8 @@ import 'package:gabbro/clipboard_clear.dart';
 import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/safe_file_picker.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:gabbro/gabbro_url_opener.dart';
+import 'package:gabbro/widgets/url_link.dart';
 import 'package:gabbro/screens/create_entry_screen.dart';
 import 'package:gabbro/screens/recovery_history_screen.dart';
 import 'package:gabbro/settings.dart';
@@ -45,23 +46,8 @@ String formatTimestamp(
 }
 
 Future<void> _defaultDelete(String id) => deleteEntry(id: id);
-/// The address to hand the system for [url], or null if it cannot be read.
-///
-/// The system picks the browser from the scheme, so a URL saved without one
-/// (`example.com`) gets `https://`: Android would otherwise find no app to
-/// handle it, and Linux would take the text for a filename.
-Uri? browserUri(String url) {
-  var uri = Uri.tryParse(url);
-  if (uri == null) return null;
-  if (uri.scheme.isEmpty) uri = Uri.tryParse('https://$url');
-  return uri;
-}
-
-Future<void> _defaultLaunchUrl(String url) async {
-  final uri = browserUri(url);
-  if (uri == null) return;
-  await launchUrl(uri, mode: LaunchMode.externalApplication);
-}
+Future<UrlOpenResult> _defaultLaunchUrl(String url) =>
+    GabbroUrlOpener.open(url);
 
 /// Pick a destination for a decrypted file export. On Android the native
 /// directory picker yields a folder, to which the filename is appended; on
@@ -102,7 +88,7 @@ class EntryDetailScreen extends StatefulWidget {
   /// layout to refresh the list pane without popping the route.
   final VoidCallback? onEdited;
 
-  final Future<void> Function(String url) onLaunchUrl;
+  final Future<UrlOpenResult> Function(String url) onLaunchUrl;
 
   /// Test seam: pick the decrypted-file export destination. Null uses the
   /// native dialog, which may throw when the file portal is unavailable
@@ -705,7 +691,8 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       },
     );
     if (confirmed != true) return;
-    await widget.onLaunchUrl(url);
+    final result = await widget.onLaunchUrl(url);
+    if (context.mounted) reportUrlOutcome(context, result, url);
   }
 
   Widget _urlField(String url, AppLocalizations l) {

@@ -332,6 +332,7 @@
   },
 
   "openInBrowserTitle": "브라우저에서 열기?",
+  "onlyWebLinks": "웹 링크만 열 수 있습니다",
   "couldNotOpen": "{url}을(를) 열 수 없습니다",
   "@couldNotOpen": {
     "placeholders": {

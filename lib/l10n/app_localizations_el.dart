@@ -866,6 +866,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get openInBrowserTitle => 'Άνοιγμα στο πρόγραμμα περιήγησης;';
 
   @override
+  String get onlyWebLinks => 'Μπορούν να ανοίξουν μόνο σύνδεσμοι ιστού';
+
+  @override
   String couldNotOpen(String url) {
     return 'Δεν ήταν δυνατό το άνοιγμα $url';
   }

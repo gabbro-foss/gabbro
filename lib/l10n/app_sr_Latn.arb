@@ -332,6 +332,7 @@
   },
 
   "openInBrowserTitle": "Otvori u pregledaču?",
+  "onlyWebLinks": "Mogu se otvoriti samo veb veze",
   "couldNotOpen": "Ne mogu da otvorim {url}",
   "@couldNotOpen": {
     "placeholders": {

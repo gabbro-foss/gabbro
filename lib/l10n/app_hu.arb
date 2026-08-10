@@ -332,6 +332,7 @@
   },
 
   "openInBrowserTitle": "Megnyitás böngészőben?",
+  "onlyWebLinks": "Csak webes hivatkozások nyithatók meg",
   "couldNotOpen": "Nem sikerült megnyitni: {url}",
   "@couldNotOpen": {
     "placeholders": {

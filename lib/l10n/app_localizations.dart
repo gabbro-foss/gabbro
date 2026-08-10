@@ -1729,6 +1729,12 @@ abstract class AppLocalizations {
   /// **'Open in browser?'**
   String get openInBrowserTitle;
 
+  /// No description provided for @onlyWebLinks.
+  ///
+  /// In en, this message translates to:
+  /// **'Only web links can be opened'**
+  String get onlyWebLinks;
+
   /// No description provided for @couldNotOpen.
   ///
   /// In en, this message translates to:

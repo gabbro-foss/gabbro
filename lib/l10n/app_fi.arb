@@ -332,6 +332,7 @@
   },
 
   "openInBrowserTitle": "Avataan selaimessa?",
+  "onlyWebLinks": "Vain verkkolinkkejä voi avata",
   "couldNotOpen": "Ei voitu avata {url}",
   "@couldNotOpen": {
     "placeholders": {

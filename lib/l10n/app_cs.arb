@@ -332,6 +332,7 @@
   },
 
   "openInBrowserTitle": "Otevřít v prohlížeči?",
+  "onlyWebLinks": "Otevřít lze pouze webové odkazy",
   "couldNotOpen": "Nelze otevřít {url}",
   "@couldNotOpen": {
     "placeholders": {

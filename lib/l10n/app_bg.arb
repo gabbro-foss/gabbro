@@ -332,6 +332,7 @@
   },
 
   "openInBrowserTitle": "Отвори в браузър?",
+  "onlyWebLinks": "Могат да се отварят само уеб връзки",
   "couldNotOpen": "Не можа да се отвори {url}",
   "@couldNotOpen": {
     "placeholders": {

@@ -51,7 +51,7 @@ void main() {
 
     final opened = await GabbroUrlOpener.open('https://example.com');
 
-    expect(opened, isTrue);
+    expect(opened, UrlOpenResult.opened);
     expect(linux.opened.single, Uri.parse('https://example.com'));
     expect(android.opened, isEmpty);
   });
@@ -61,7 +61,7 @@ void main() {
 
     final opened = await GabbroUrlOpener.open('https://example.com');
 
-    expect(opened, isTrue);
+    expect(opened, UrlOpenResult.opened);
     expect(android.opened.single, Uri.parse('https://example.com'));
     expect(linux.opened, isEmpty);
   });
@@ -85,7 +85,7 @@ void main() {
   test('5: an address that cannot be read opens nothing', () async {
     GabbroUrlOpener.isLinux = () => true;
 
-    expect(await GabbroUrlOpener.open('http://[::1'), isFalse);
+    expect(await GabbroUrlOpener.open('http://[::1'), UrlOpenResult.notAWebLink);
     expect(linux.opened, isEmpty);
   });
 
@@ -93,7 +93,8 @@ void main() {
     GabbroUrlOpener.isLinux = () => true;
     linux.result = false;
 
-    expect(await GabbroUrlOpener.open('https://example.com'), isFalse);
+    expect(await GabbroUrlOpener.open('https://example.com'),
+        UrlOpenResult.failed);
   });
 
   // 6: entry URLs are user data, and this button means "open a web page".
@@ -103,25 +104,25 @@ void main() {
     setUp(() => GabbroUrlOpener.isLinux = () => true);
 
     test('http and https are opened', () async {
-      expect(await GabbroUrlOpener.open('http://example.com'), isTrue);
-      expect(await GabbroUrlOpener.open('https://example.com'), isTrue);
+      expect(await GabbroUrlOpener.open('http://example.com'), UrlOpenResult.opened);
+      expect(await GabbroUrlOpener.open('https://example.com'), UrlOpenResult.opened);
       expect(linux.opened, hasLength(2));
     });
 
     test('a local file is refused', () async {
-      expect(await GabbroUrlOpener.open('file:///etc/passwd'), isFalse);
+      expect(await GabbroUrlOpener.open('file:///etc/passwd'), UrlOpenResult.notAWebLink);
       expect(linux.opened, isEmpty);
     });
 
     test('ftp and ssh are refused', () async {
-      expect(await GabbroUrlOpener.open('ftp://example.com'), isFalse);
-      expect(await GabbroUrlOpener.open('ssh://example.com'), isFalse);
+      expect(await GabbroUrlOpener.open('ftp://example.com'), UrlOpenResult.notAWebLink);
+      expect(await GabbroUrlOpener.open('ssh://example.com'), UrlOpenResult.notAWebLink);
       expect(linux.opened, isEmpty);
     });
 
     test('the scheme is judged whatever its case', () async {
-      expect(await GabbroUrlOpener.open('HTTPS://example.com'), isTrue);
-      expect(await GabbroUrlOpener.open('FILE:///etc/passwd'), isFalse);
+      expect(await GabbroUrlOpener.open('HTTPS://example.com'), UrlOpenResult.opened);
+      expect(await GabbroUrlOpener.open('FILE:///etc/passwd'), UrlOpenResult.notAWebLink);
       expect(linux.opened, hasLength(1));
     });
   });

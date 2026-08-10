@@ -332,6 +332,7 @@
   },
 
   "openInBrowserTitle": "Atvērt pārlūkā?",
+  "onlyWebLinks": "Var atvērt tikai tīmekļa saites",
   "couldNotOpen": "Nevarēja atvērt {url}",
   "@couldNotOpen": {
     "placeholders": {

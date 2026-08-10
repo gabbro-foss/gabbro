@@ -3,6 +3,12 @@ import 'dart:io';
 import 'android_url_opener.dart';
 import 'linux_url_opener.dart';
 
+/// What came of asking to open a link.
+///
+/// [notAWebLink] is a deliberate refusal, not a malfunction, so callers say
+/// something different about it than about [failed].
+enum UrlOpenResult { opened, notAWebLink, failed }
+
 /// The one way Gabbro opens a link.
 ///
 /// Linux hands it to `xdg-open`; Android to our own channel. Both open the
@@ -28,14 +34,18 @@ class GabbroUrlOpener {
   /// for others appears, widen it deliberately.
   static const _webSchemes = {'http', 'https'};
 
-  /// Opens [url] in the user's browser. False when nothing opened — not a web
-  /// address, an address that cannot be read, or no app to handle it — which
-  /// callers turn into a message rather than a silent no-op.
-  static Future<bool> open(String url) async {
+  /// Opens [url] in the user's browser. Anything other than
+  /// [UrlOpenResult.opened] must reach the user as a message: a button that
+  /// silently does nothing is the same as a broken one.
+  static Future<UrlOpenResult> open(String url) async {
     final uri = browserUri(url);
-    if (uri == null) return false;
-    if (!_webSchemes.contains(uri.scheme.toLowerCase())) return false;
-    return isLinux() ? linuxOpener.open(uri) : androidOpener.open(uri);
+    if (uri == null) return UrlOpenResult.notAWebLink;
+    if (!_webSchemes.contains(uri.scheme.toLowerCase())) {
+      return UrlOpenResult.notAWebLink;
+    }
+    final opened =
+        isLinux() ? await linuxOpener.open(uri) : await androidOpener.open(uri);
+    return opened ? UrlOpenResult.opened : UrlOpenResult.failed;
   }
 
   /// The address to hand the system for [url], or null if it cannot be read.

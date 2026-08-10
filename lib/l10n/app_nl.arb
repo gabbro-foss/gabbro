@@ -332,6 +332,7 @@
   },
 
   "openInBrowserTitle": "Openen in browser?",
+  "onlyWebLinks": "Alleen weblinks kunnen worden geopend",
   "couldNotOpen": "Kon {url} niet openen",
   "@couldNotOpen": {
     "placeholders": {

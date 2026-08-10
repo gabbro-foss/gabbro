@@ -862,6 +862,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get openInBrowserTitle => 'Avataan selaimessa?';
 
   @override
+  String get onlyWebLinks => 'Vain verkkolinkkejä voi avata';
+
+  @override
   String couldNotOpen(String url) {
     return 'Ei voitu avata $url';
   }

@@ -859,6 +859,9 @@ class AppLocalizationsYo extends AppLocalizations {
   String get openInBrowserTitle => 'Ṣii ninu aṣawakiri?';
 
   @override
+  String get onlyWebLinks => 'Àwọn ọ̀nà ayélujára nìkan ni a lè ṣí';
+
+  @override
   String couldNotOpen(String url) {
     return 'Ko le ṣii $url';
   }

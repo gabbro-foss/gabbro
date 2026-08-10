@@ -863,6 +863,9 @@ class AppLocalizationsLt extends AppLocalizations {
   String get openInBrowserTitle => 'Atidaryti naršyklėje?';
 
   @override
+  String get onlyWebLinks => 'Galima atidaryti tik interneto nuorodas';
+
+  @override
   String couldNotOpen(String url) {
     return 'Nepavyko atidaryti $url';
   }

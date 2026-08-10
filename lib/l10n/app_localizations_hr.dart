@@ -861,6 +861,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get openInBrowserTitle => 'Otvori u pregledniku?';
 
   @override
+  String get onlyWebLinks => 'Mogu se otvoriti samo web poveznice';
+
+  @override
   String couldNotOpen(String url) {
     return 'Ne mogu otvoriti $url';
   }

@@ -332,6 +332,7 @@
   },
 
   "openInBrowserTitle": "Opne i nettlesar?",
+  "onlyWebLinks": "Berre weblenkjer kan opnast",
   "couldNotOpen": "Klarte ikkje opne {url}",
   "@couldNotOpen": {
     "placeholders": {

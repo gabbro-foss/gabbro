@@ -332,6 +332,7 @@
   },
 
   "openInBrowserTitle": "Atidaryti naršyklėje?",
+  "onlyWebLinks": "Galima atidaryti tik interneto nuorodas",
   "couldNotOpen": "Nepavyko atidaryti {url}",
   "@couldNotOpen": {
     "placeholders": {

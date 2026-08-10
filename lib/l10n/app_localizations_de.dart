@@ -865,6 +865,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get openInBrowserTitle => 'Im Browser öffnen?';
 
   @override
+  String get onlyWebLinks => 'Es können nur Weblinks geöffnet werden';
+
+  @override
   String couldNotOpen(String url) {
     return '$url konnte nicht geöffnet werden';
   }

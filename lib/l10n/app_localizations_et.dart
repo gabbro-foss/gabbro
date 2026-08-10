@@ -862,6 +862,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get openInBrowserTitle => 'Ava brauseris?';
 
   @override
+  String get onlyWebLinks => 'Avada saab ainult veebilinke';
+
+  @override
   String couldNotOpen(String url) {
     return 'Ei saanud avada $url';
   }

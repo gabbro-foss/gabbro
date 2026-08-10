@@ -862,6 +862,9 @@ class AppLocalizationsEu extends AppLocalizations {
   String get openInBrowserTitle => 'Nabigatzailean ireki?';
 
   @override
+  String get onlyWebLinks => 'Web estekak soilik ireki daitezke';
+
+  @override
   String couldNotOpen(String url) {
     return 'Ezin da ireki $url';
   }

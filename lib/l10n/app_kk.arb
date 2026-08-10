@@ -332,6 +332,7 @@
   },
 
   "openInBrowserTitle": "Браузерде ашу керек пе?",
+  "onlyWebLinks": "Тек веб сілтемелерді ашуға болады",
   "couldNotOpen": "{url} ашылмады",
   "@couldNotOpen": {
     "placeholders": {
