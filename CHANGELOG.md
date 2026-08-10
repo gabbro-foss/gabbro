@@ -8,9 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **A link that would not open said nothing, or said the wrong thing.** Opening a URL from an entry gave no message at all when it failed, and at the largest text sizes the message shown elsewhere ran off the bottom of the screen. Both now appear in a dialog that scrolls, and a link that is not a web page says so instead of reporting a failure.
 - **An entry in the vault list at the autofill prompt did nothing (Android).** When Gabbro asked for your passphrase to fill or save a login, the list of vaults also offered "Open a vault file…" — tapping it opened nothing and said nothing. It is no longer offered there, and where you have a single vault the list itself is gone, since it could only reselect the vault you were already unlocking. The app's own unlock screen is unchanged.
 
 ### Changed
+- **Links open through Gabbro's own code**, not the `url_launcher` plugin: the desktop's handler on Linux, Android's own on Android. Same system browser as before, never an in-app view, one less third-party dependency. Only `http` and `https` links are opened now — a stored `file://`, `ftp://` or `ssh://` address is refused, since this button means "open a web page".
 - **File dialogs now talk to the system directly on both platforms**, instead of going through the `file_picker` plugin: the desktop's file portal on Linux, Android's own picker on Android. Same dialogs, two fewer third-party dependencies in the app.
 - **The app now finds its own data folder** instead of asking the `path_provider` plugin — the same folder as before on both platforms, so nothing moves. This also removes the `jni` plugin whose C code newer compilers reject, which had broken fresh Linux builds.
 - **Finnish and Russian passphrases draw on new wordlists**, re-sourced for GPL-3.0 compatibility. Both are still 7,776 words, so entropy is unchanged.

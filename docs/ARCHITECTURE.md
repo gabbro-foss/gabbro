@@ -177,15 +177,24 @@ net-first + TDD method:
    - [x] 6 anything but `http`/`https` is refused and says so — in the facade,
      the single place both call sites and both platforms pass through.
      `file://`, `ftp://` and `ssh://` all reached the system before.
-   - [ ] 7a both call sites go through the facade; `url_launcher` out of
-     `pubspec.yaml`; About screen drops it
-   - [ ] 7b `entry_detail` says so when opening fails — today it shows nothing,
-     so a refused link would be a button that does nothing
-   - [ ] 7c a refused non-web link gets its own message: "could not open" reads
-     as a malfunction when the refusal is deliberate. New key, all 37 locales
-   - [ ] 7d both messages announced on Linux (`SemanticsService`, as
-     `adopt_vault`/`vault_list` do) — a screen reader never reads a SnackBar there
-   - [ ] 7e the new string survives 8x text on a 360px phone in every locale
+   - [x] 7a both call sites go through the facade; `url_launcher` out of
+     `pubspec.yaml`; About screen drops it. `open()` answers with which of the
+     three outcomes happened, so callers can tell a refusal from a failure.
+   - [x] 7b `entry_detail` says so when opening fails — it showed nothing
+     before, so a refused link was a button that did nothing
+   - [x] 7c a refused non-web link gets its own message (`onlyWebLinks`, all 37
+     locales): "could not open" reads as a malfunction when it is a rule
+   - [x] 7d both messages announced on Linux (`reportUrlOutcome`, shared by both
+     call sites) — a screen reader never reads a SnackBar there
+   - [x] 7e the new string survives 8x text on a 360px phone in every locale
+     (`test/url_link_overflow_test.dart`). At 8x no message this long fits a
+     screen, so the test asks whether it can be **scrolled to**, not whether it
+     fits. Both checks proven to fail against a SnackBar before being trusted.
+     Two real defects found:
+     - the message ran off the bottom in all 37 locales (2080dp of text on an
+       800dp screen); both messages now use a dialog, which scrolls (ADR-016)
+     - the URL dialog's close button was shutting the message dialog instead of
+       itself, so the explanation vanished the instant it appeared
    - [ ] 8 hardware: an About link, an entry's URL and an import help link, on
      Android and Linux
 
@@ -209,6 +218,13 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   `git -C ../gabbro-bin-aur push` from `gabbro/`.
 
 ### Features and UI/UX
+- **Every SnackBar is unreadable at the largest text sizes.** A SnackBar clips
+  instead of scrolling, so at 8x on a 360dp phone its text runs off the bottom
+  of the screen — measured 2080dp tall against 800dp, in all 37 locales
+  (found 2026-08-10 while netting the URL messages). Those two messages moved to
+  a dialog; every other SnackBar in the app has the same problem. Sweep them and
+  decide: dialog, capped text scale, or accepted limit. Test by the message's
+  rectangle — a clipped SnackBar throws no layout exception.
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
