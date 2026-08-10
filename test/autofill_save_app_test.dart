@@ -95,8 +95,29 @@ void main() {
     );
   });
 
-  // N5: pins today's behaviour with a single vault — the list is shown.
-  testWidgets('locked, one vault: the list is shown', (tester) async {
+  // 2: same as the fill prompt — nothing here can open the pick-a-vault-file
+  // screen, so the entry is not offered.
+  testWidgets('locked: the vault list does not offer the adopt entry',
+      (tester) async {
+    await tester.pumpWidget(buildAutofillSaveApp(
+      settings: AppSettings(),
+      registry: _vaults(),
+      initialVaultPath: '/tmp/a.gabbro',
+      alreadyUnlocked: false,
+      fetchSaveContextJson: () async => '{}',
+    ));
+    await tester.pump();
+
+    await tester.tap(find.byType(DropdownButton<String>));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('unlock_adopt_item')), findsNothing);
+    expect(find.text('Beta').hitTestable(), findsWidgets);
+  });
+
+  // 4: with the entry gone and only one vault, the list can do nothing but
+  // reselect the vault already being unlocked, so it is not shown at all.
+  testWidgets('locked, one vault: no list at all', (tester) async {
     await tester.pumpWidget(buildAutofillSaveApp(
       settings: AppSettings(),
       registry: _oneVault(),
@@ -106,7 +127,7 @@ void main() {
     ));
     await tester.pump();
 
-    expect(find.byType(DropdownButton<String>), findsOneWidget);
+    expect(find.byType(DropdownButton<String>), findsNothing);
   });
 
   // RT-5: a vault this flow unlocked is its own, and the activity's isolate dies

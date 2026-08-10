@@ -111,8 +111,28 @@ void main() {
     expect(find.text('Beta'), findsNothing);
   });
 
-  // N5: pins today's behaviour with a single vault — the list is shown.
-  testWidgets('one vault: the list is shown', (tester) async {
+  // 1: nothing here can open the pick-a-vault-file screen, so the entry must
+  // not be offered — tapping it did nothing at all.
+  testWidgets('the vault list does not offer the adopt entry', (tester) async {
+    await tester.pumpWidget(buildAutofillUnlockApp(
+      settings: const AppSettings(),
+      registry: _twoVaults(),
+      initialVaultPath: '/tmp/a.gabbro',
+      channel: channel,
+    ));
+    await tester.pump();
+
+    await tester.tap(find.byType(DropdownButton<String>));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('unlock_adopt_item')), findsNothing);
+    expect(find.text('Alpha').hitTestable(), findsWidgets);
+    expect(find.text('Beta').hitTestable(), findsWidgets);
+  });
+
+  // 3: with the entry gone and only one vault, the list can do nothing but
+  // reselect the vault already being unlocked, so it is not shown at all.
+  testWidgets('one vault: no list at all', (tester) async {
     await tester.pumpWidget(buildAutofillUnlockApp(
       settings: const AppSettings(),
       registry: _oneVault(),
@@ -121,7 +141,7 @@ void main() {
     ));
     await tester.pump();
 
-    expect(find.byType(DropdownButton<String>), findsOneWidget);
+    expect(find.byType(DropdownButton<String>), findsNothing);
   });
 
   testWidgets('no-match dialog shows localized text and cancels on dismiss',

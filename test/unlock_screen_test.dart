@@ -11,6 +11,7 @@ import 'package:gabbro/main.dart';
 import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
+import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/vault_registry.dart';
@@ -103,6 +104,35 @@ Widget _buildScreen({
       onQuit: onQuit,
       onAdoptRequested: onAdoptRequested,
     ));
+
+/// The same screen under the real app shell, as the main app builds it
+/// (`main.dart:_buildUnlockScreen`): no adopt callback, the shell above it.
+/// `testApp` alone renders it bare, which no user ever meets — and the offer to
+/// open another vault file depends on that shell being there.
+Widget _buildScreenInApp({
+  String vaultPath = '/tmp/a.gabbro',
+  String? vaultAlias,
+  VaultRegistry? registry,
+}) =>
+    GabbroApp(
+      registry: registry ?? VaultRegistry([]),
+      vaultPath: vaultPath,
+      settings: const AppSettings(),
+      initialScreen: UnlockScreen(
+        vaultPath: vaultPath,
+        vaultAlias: vaultAlias,
+        registry: registry,
+        onUnlock: (a, b) async {},
+        onEstimateEntropy: _fakeEntropy,
+        onBiometricIsEnrolled: (_) async => false,
+        onBiometricAuthenticate: (_) async => null,
+        onCancelTap: () async {},
+        onVaultIsReadable: (_) async => true,
+        onVaultFormatTooOld: (_) async => false,
+        onVaultFormatTooNew: (_) async => false,
+        onBackupUsable: (_) async => false,
+      ),
+    );
 
 // ── Net B appearance shell (top-level per test-helper convention) ──────────────
 // Mirrors main.dart's MaterialApp wiring so the screen is exercised under the
@@ -1342,12 +1372,16 @@ void main() {
       final singleRegistry = VaultRegistry([
         _vaultRecord(path: '/tmp/a.gabbro', alias: 'Alpha'),
       ]);
-      await tester.pumpWidget(_buildScreen(
+      await tester.pumpWidget(_buildScreenInApp(
         vaultPath: '/tmp/a.gabbro',
         vaultAlias: 'Alpha',
         registry: singleRegistry,
       ));
       expect(find.byType(DropdownButton<String>), findsOneWidget);
+
+      await tester.tap(find.byType(DropdownButton<String>));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('unlock_adopt_item')), findsWidgets);
     });
 
     testWidgets('no dropdown when registry is null', (tester) async {
@@ -1414,7 +1448,7 @@ void main() {
     // E3: the adopt entry rides along without regressing vault switching.
     testWidgets('two vaults: both aliases and the adopt entry are offered',
         (tester) async {
-      await tester.pumpWidget(_buildScreen(
+      await tester.pumpWidget(_buildScreenInApp(
         vaultPath: '/tmp/a.gabbro',
         vaultAlias: 'Alpha',
         registry: twoVaultRegistry,
