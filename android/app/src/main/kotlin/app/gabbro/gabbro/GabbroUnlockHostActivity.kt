@@ -1,6 +1,7 @@
 package app.gabbro.gabbro
 
 import android.app.PendingIntent
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.nfc.NfcAdapter
@@ -175,6 +176,33 @@ abstract class GabbroUnlockHostActivity : FlutterFragmentActivity() {
         registerYubikeyChannel(flutterEngine)
         registerPathsChannel(flutterEngine)
         registerPickerChannel(flutterEngine)
+        registerUrlChannel(flutterEngine)
+    }
+
+    // Links. On the shared base because the unlock surface itself shows URL
+    // dialogs (the vault-upgrade link), which the autofill prompts reuse.
+    private fun registerUrlChannel(flutterEngine: FlutterEngine) {
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, GabbroUrl.CHANNEL)
+            .setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "open_url" -> {
+                        val url = call.argument<String>("url")
+                        if (url == null) {
+                            result.error("BAD_ARGS", "url required", null)
+                            return@setMethodCallHandler
+                        }
+                        try {
+                            startActivity(GabbroUrl.viewIntent(url))
+                            result.success(true)
+                        } catch (e: ActivityNotFoundException) {
+                            // Nothing installed that opens links: Dart says so
+                            // rather than the tap appearing to do nothing.
+                            result.success(false)
+                        }
+                    }
+                    else -> result.notImplemented()
+                }
+            }
     }
 
     // File dialogs. Registered on the shared base so the autofill unlock screen
