@@ -128,48 +128,29 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**A dead "Open a vault file…" entry at the autofill prompts (Android).** Tapping
-it does nothing — no screen, no message. The vault list carries the entry
-unconditionally (`unlock_screen.dart:1169`), but neither autofill shell wires it.
-Hide it at both prompts; with one vault left, hide the whole list there too.
-
-Sweep: the main-app side is already pinned (`unlock_screen_test.dart:1322-1430`),
-as is the fill prompt's list and vault switching
-(`autofill_unlock_app_test.dart:58,75`).
-
-Net — pin green against current code before any red test:
-- [x] N3 save prompt: the list appears and switches vault
-- [x] N4 the collapsed list still names the current vault (`items` and
-  `selectedItemBuilder` are parallel; shortening one alone misnames it)
-- [x] N5 with one vault both prompts show a list today
-  (N3, N5: `autofill_save_app_test.dart`; N4, N5: `autofill_unlock_app_test.dart`)
-
-Design: offer the entry only where it can work — one getter on the unlock screen
-checking for an adopt callback or a `GabbroApp` ancestor. The main app's own
-unlock screen passes no callback either (`main.dart:1009`) and relies on that
-ancestor, so the callback alone cannot tell the two apart. A future shell with
-neither can then never show a dead entry. The list itself shows when there is
-more than one vault, or when adopting is possible.
-
-TDD, red-first, in order:
-- [x] 1 fill prompt does not offer the entry. The main-app dropdown tests ran
-  bare, with no shell above them, so they never covered the app: they now build
-  under `GabbroApp`, and the one-vault test asserts the entry it is named for.
-- [x] 2 save prompt does not offer it — green with no red step: both prompts
-  share the unlock screen, so 1 fixed it. Kept as a separate pin per shell.
-- [x] 3 fill prompt, one vault: no list at all
-- [x] 4 save prompt, one vault: no list at all (N5 flipped to the new behaviour)
-- [x] 5 main app keeps the entry with one vault and with two — green, plus the
-  navigation suites that build real unlock screens
-- [x] 6 hardware: fill prompt in Brave and the save prompt in an app — entry
-  gone, vault switching intact, list absent with one vault; the app's own
-  unlock screen still offers it
-
 **Dependency trimming, remaining (branch `dependency_trimming`).** Same
 net-first + TDD method:
 1. **url_launcher:** Android = one ACTION_VIEW intent via MethodChannel;
-   Linux = `xdg-open`. 3 call sites (url_link, entry_detail, about). Then
-   delete `url_launcher`.
+   Linux = `xdg-open`. Then delete `url_launcher`.
+
+   Sweep, verified 2026-08-10. `launchUrl` is called in two places, both
+   `LaunchMode.externalApplication` (system browser, never a webview):
+   `url_link.dart:37` inside `showUrlDialog`, which seven screens reach
+   (unlock x2, import x2, about x2, adopt); and
+   `entry_detail_screen.dart:53`, an injectable seam behind its own confirm
+   dialog. Neither has any test — nothing asserts a URL is ever launched.
+   (The old "3 call sites (url_link, entry_detail, about)" note was wrong:
+   About goes through `showUrlDialog` like the rest.)
+
+   Net — pin green against current code before any red test:
+   - [ ] N1 the dialog's "Open in browser" reaches the launcher with the URL
+     shown (needs a seam in `url_link.dart`; it calls `launchUrl` directly)
+   - [ ] N2 a failed launch tells the user (`couldNotOpen`) — today only
+     `url_link` does
+   - [ ] N3 the entry's confirm dialog: Cancel launches nothing, confirm
+     launches the URL shown
+   - [ ] N4 a bare `example.com` becomes `https://example.com`; an unparseable
+     one launches nothing
 
 ---
 
