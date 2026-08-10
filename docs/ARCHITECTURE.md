@@ -171,10 +171,10 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Release
-- **Outstanding: the AUR push.** `gabbro-bin` is bumped to `0.1.0_alpha.18` and
-  committed in the AUR clone; the push fails — the AUR is in maintenance
-  (still down 2026-08-05). Until it lands, Arch users install alpha.16. Retry with
-  `git -C ../gabbro-bin-aur push` from `gabbro/`.
+- **Outstanding: the AUR push.** `gabbro-bin` is bumped to `0.1.0_alpha.19`; two
+  commits (alpha.18, alpha.19) wait in the AUR clone — the push fails, the AUR is
+  in maintenance (still down 2026-08-10). Until it lands, Arch users install
+  alpha.16. Retry with `git -C ../gabbro-bin-aur push` from `gabbro/`.
 
 ### Features and UI/UX
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
