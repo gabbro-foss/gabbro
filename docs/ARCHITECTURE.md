@@ -152,13 +152,18 @@ neither can then never show a dead entry. The list itself shows when there is
 more than one vault, or when adopting is possible.
 
 TDD, red-first, in order:
-- [ ] 1 fill prompt does not offer the entry
-- [ ] 2 save prompt does not offer it
-- [ ] 3 fill prompt, one vault: no list at all
-- [ ] 4 save prompt, one vault: no list at all
-- [ ] 5 main app keeps the entry with one vault and with two — already pinned
-  (`unlock_screen_test.dart:1340,1415`), must stay green
-- [ ] 6 hardware: autofill from an app and from Brave, plus the save prompt
+- [x] 1 fill prompt does not offer the entry. The main-app dropdown tests ran
+  bare, with no shell above them, so they never covered the app: they now build
+  under `GabbroApp`, and the one-vault test asserts the entry it is named for.
+- [x] 2 save prompt does not offer it — green with no red step: both prompts
+  share the unlock screen, so 1 fixed it. Kept as a separate pin per shell.
+- [x] 3 fill prompt, one vault: no list at all
+- [x] 4 save prompt, one vault: no list at all (N5 flipped to the new behaviour)
+- [x] 5 main app keeps the entry with one vault and with two — green, plus the
+  navigation suites that build real unlock screens
+- [x] 6 hardware: fill prompt in Brave and the save prompt in an app — entry
+  gone, vault switching intact, list absent with one vault; the app's own
+  unlock screen still offers it
 
 **Dependency trimming, remaining (branch `dependency_trimming`).** Same
 net-first + TDD method:
