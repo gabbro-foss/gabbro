@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2203 | 10 |
+| Flutter (`flutter test`) | 2238 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 165 | 15 |
 
@@ -128,78 +128,34 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**Dependency trimming, remaining (branch `dependency_trimming`).** Same
-net-first + TDD method:
-1. **url_launcher:** Android = one ACTION_VIEW intent via MethodChannel;
-   Linux = `xdg-open`. Then delete `url_launcher`.
+**Messages that cannot be read at large text sizes.** A SnackBar is a fixed
+strip: long text runs past the bottom edge and the rest is unreachable by any
+gesture. At 8x on a 360dp phone the URL message measured 2080dp of text on an
+800dp screen, in all 37 locales (found 2026-08-10). Those two moved to a dialog,
+which scrolls as a whole (ADR-016). The other 26 have the same problem.
 
-   Sweep, verified 2026-08-10. `launchUrl` is called in two places, both
-   `LaunchMode.externalApplication` (system browser, never a webview):
-   `url_link.dart:37` inside `showUrlDialog`, which seven screens reach
-   (unlock x2, import x2, about x2, adopt); and
-   `entry_detail_screen.dart:53`, an injectable seam behind its own confirm
-   dialog. `entry_detail` is tested either side of its confirm dialog
-   (`entry_detail_screen_test.dart:578,595`); `url_link` had nothing.
-   (The old "3 call sites (url_link, entry_detail, about)" note was wrong:
-   About goes through `showUrlDialog` like the rest.)
+Sweep, verified 2026-08-10:
 
-   Net — pin green against current code before any red test:
-   - [x] N1 the dialog's "Open in browser" reaches the launcher with the URL
-     shown; Close launches nothing (`test/url_link_test.dart`, new `openUrl`
-     seam)
-   - [x] N2 a failed launch tells the user (`couldNotOpen`)
-   - [x] N3 the entry's confirm dialog, both ways — already covered
-   - [x] N4 a bare `example.com` becomes `https://example.com`; an unreadable
-     one opens nothing. The scheme logic is now `browserUri()`, named and
-     tested apart from the launch it used to be tangled with.
+| Where | N | What they say |
+|---|---|---|
+| `manage_yubikeys_screen` | 8 | key added/removed; add, remove, alias-save failed; no FIDO device |
+| `vault_list_screen` | 6 | vault synced, nothing to sync, sync cancelled, entries imported |
+| `manage_folders_screen` | 3 | folder action failed |
+| `entry_detail_screen` | 3 | copied (+ clear timeout), recovery action failed |
+| `security_screen` | 2 | biometric unavailable, enrol failed |
+| `recovery_history_screen` | 1 | recovery action failed |
+| `create_entry_screen` | 1 | no changes to save |
+| `change_passphrase_screen` | 1 | export failed |
+| `safe_file_picker` | 1 | file dialog unavailable — every picker flow uses it |
 
-   Design: one channel on `GabbroUnlockHostActivity` — the unlock screen shows
-   URL dialogs (`unlock_screen.dart:988,1015`) and the autofill prompts use
-   that screen, so the main activity alone is not enough. Linux runs `xdg-open`
-   with the URL as one argument, never through a shell. **Web pages only:**
-   `http`/`https` are opened, anything else is refused and says so. Entry URLs
-   are user data, and nothing in Gabbro is a file/ftp/ssh client (YAGNI).
+The failures are what matter: they are the only explanation the user gets, and
+they are the ones that run off the screen. A success ("copied", "vault synced")
+costs little if missed — so this is not automatically 26 dialogs; decide per
+message between dialog, capped text scale, and accepted limit.
 
-   TDD, red-first, in order:
-   - [x] 1 Linux: opening runs `xdg-open` with the URL as a single argument
-     (`lib/linux_url_opener.dart`, `test/linux_url_opener_test.dart`)
-   - [x] 2 Linux: `xdg-open` missing or failing reports failure, so the user is
-     told rather than left with nothing (a box without xdg-utils threw, which
-     would have killed the isolate on a link tap)
-   - [x] 3 Android: opening sends the URL over the channel; a platform failure
-     reports failure (`lib/android_url_opener.dart`, channel-mocked)
-   - [x] 4 Kotlin: the channel starts a view intent; no app to handle it
-     reports failure instead of crashing (`GabbroUrl.kt` + `GabbroUrlTest.kt`;
-     the handler sits on `GabbroUnlockHostActivity` beside the picker)
-   - [x] 5 one facade picks Linux vs Android, shaped like the file picker
-     (`lib/gabbro_url_opener.dart`; `browserUri` moved in from `entry_detail`).
-     Not yet wired to the call sites — that lands with 7.
-   - [x] 6 anything but `http`/`https` is refused and says so — in the facade,
-     the single place both call sites and both platforms pass through.
-     `file://`, `ftp://` and `ssh://` all reached the system before.
-   - [x] 7a both call sites go through the facade; `url_launcher` out of
-     `pubspec.yaml`; About screen drops it. `open()` answers with which of the
-     three outcomes happened, so callers can tell a refusal from a failure.
-   - [x] 7b `entry_detail` says so when opening fails — it showed nothing
-     before, so a refused link was a button that did nothing
-   - [x] 7c a refused non-web link gets its own message (`onlyWebLinks`, all 37
-     locales): "could not open" reads as a malfunction when it is a rule
-   - [x] 7d both messages announced on Linux (`reportUrlOutcome`, shared by both
-     call sites) — a screen reader never reads a SnackBar there
-   - [x] 7e the new string survives 8x text on a 360px phone in every locale
-     (`test/url_link_overflow_test.dart`). At 8x no message this long fits a
-     screen, so the test asks whether it can be **scrolled to**, not whether it
-     fits. Both checks proven to fail against a SnackBar before being trusted.
-     Two real defects found:
-     - the message ran off the bottom in all 37 locales (2080dp of text on an
-       800dp screen); both messages now use a dialog, which scrolls (ADR-016)
-     - the URL dialog's close button was shutting the message dialog instead of
-       itself, so the explanation vanished the instant it appeared
-   - [x] 8 hardware, Android and Linux: About link, an entry's URL, a
-     scheme-less URL, a refused `ssh://`, the import refusal's upgrade link,
-     and the refusal message at maximum text size. Removing the plugin left
-     `androidx.browser` in `gradle.lockfile`, which failed the release build
-     until it was regenerated — regenerate it with any dependency change.
+Test by the message's rectangle or its scroll ancestor, never by a layout
+exception: a SnackBar clips instead of overflowing and throws nothing, so an
+overflow sweep passes blind (proven — see `test/url_link_overflow_test.dart`).
 
 ---
 
@@ -221,13 +177,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   `git -C ../gabbro-bin-aur push` from `gabbro/`.
 
 ### Features and UI/UX
-- **Every SnackBar is unreadable at the largest text sizes.** A SnackBar clips
-  instead of scrolling, so at 8x on a 360dp phone its text runs off the bottom
-  of the screen — measured 2080dp tall against 800dp, in all 37 locales
-  (found 2026-08-10 while netting the URL messages). Those two messages moved to
-  a dialog; every other SnackBar in the app has the same problem. Sweep them and
-  decide: dialog, capped text scale, or accepted limit. Test by the message's
-  rectangle — a clipped SnackBar throws no layout exception.
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
