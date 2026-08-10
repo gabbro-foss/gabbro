@@ -22,6 +22,8 @@ VaultRegistry _twoVaults() => VaultRegistry([
       _rec('/tmp/b.gabbro', 'Beta'),
     ]);
 
+VaultRegistry _oneVault() => VaultRegistry([_rec('/tmp/a.gabbro', 'Alpha')]);
+
 void main() {
   const channel = MethodChannel('app.gabbro.gabbro/autofill');
 
@@ -91,6 +93,35 @@ void main() {
       tester.widget<UnlockScreen>(find.byType(UnlockScreen)).vaultPath,
       '/tmp/b.gabbro',
     );
+  });
+
+  // N4: the closed list names the vault you are about to unlock. The screen
+  // builds two parallel lists (the entries and their collapsed labels); if they
+  // ever fall out of step the prompt names the wrong vault.
+  testWidgets('the closed list names the current vault', (tester) async {
+    await tester.pumpWidget(buildAutofillUnlockApp(
+      settings: const AppSettings(),
+      registry: _twoVaults(),
+      initialVaultPath: '/tmp/a.gabbro',
+      channel: channel,
+    ));
+    await tester.pump();
+
+    expect(find.text('Alpha'), findsWidgets);
+    expect(find.text('Beta'), findsNothing);
+  });
+
+  // N5: pins today's behaviour with a single vault — the list is shown.
+  testWidgets('one vault: the list is shown', (tester) async {
+    await tester.pumpWidget(buildAutofillUnlockApp(
+      settings: const AppSettings(),
+      registry: _oneVault(),
+      initialVaultPath: '/tmp/a.gabbro',
+      channel: channel,
+    ));
+    await tester.pump();
+
+    expect(find.byType(DropdownButton<String>), findsOneWidget);
   });
 
   testWidgets('no-match dialog shows localized text and cancels on dismiss',

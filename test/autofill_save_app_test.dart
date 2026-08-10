@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/main.dart';
@@ -21,6 +22,8 @@ VaultRegistry _vaults() => VaultRegistry([
       _rec('/tmp/a.gabbro', 'Alpha'),
       _rec('/tmp/b.gabbro', 'Beta'),
     ]);
+
+VaultRegistry _oneVault() => VaultRegistry([_rec('/tmp/a.gabbro', 'Alpha')]);
 
 String _createJson() => jsonEncode({
       'captured': {
@@ -64,6 +67,46 @@ void main() {
 
     expect(find.byType(UnlockScreen), findsOneWidget);
     expect(find.byType(SaveConfirmScreen), findsNothing);
+  });
+
+  // N3: the save prompt offers the vault list, and choosing another vault
+  // retargets the unlock — the login is saved into the vault you picked.
+  testWidgets('locked: choosing another vault switches the unlock target',
+      (tester) async {
+    await tester.pumpWidget(buildAutofillSaveApp(
+      settings: AppSettings(),
+      registry: _vaults(),
+      initialVaultPath: '/tmp/a.gabbro',
+      alreadyUnlocked: false,
+      fetchSaveContextJson: () async => '{}',
+    ));
+    await tester.pump();
+
+    expect(find.byType(DropdownButton<String>), findsOneWidget);
+
+    await tester.tap(find.byType(DropdownButton<String>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Beta').last);
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.widget<UnlockScreen>(find.byType(UnlockScreen)).vaultPath,
+      '/tmp/b.gabbro',
+    );
+  });
+
+  // N5: pins today's behaviour with a single vault — the list is shown.
+  testWidgets('locked, one vault: the list is shown', (tester) async {
+    await tester.pumpWidget(buildAutofillSaveApp(
+      settings: AppSettings(),
+      registry: _oneVault(),
+      initialVaultPath: '/tmp/a.gabbro',
+      alreadyUnlocked: false,
+      fetchSaveContextJson: () async => '{}',
+    ));
+    await tester.pump();
+
+    expect(find.byType(DropdownButton<String>), findsOneWidget);
   });
 
   // RT-5: a vault this flow unlocked is its own, and the activity's isolate dies
