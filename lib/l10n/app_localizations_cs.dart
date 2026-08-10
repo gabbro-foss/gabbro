@@ -863,6 +863,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get openInBrowserTitle => 'Otevřít v prohlížeči?';
 
   @override
+  String get onlyWebLinks => 'Otevřít lze pouze webové odkazy';
+
+  @override
   String couldNotOpen(String url) {
     return 'Nelze otevřít $url';
   }

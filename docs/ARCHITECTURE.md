@@ -44,7 +44,7 @@ gabbro/
 │   ├── screens/          # unlock, vault list, adopt vault, export, import, generator, keyboard shortcuts, settings, manage vaults/folders, …
 │   ├── widgets/          # path_field, generator_widget, yubikey_tap, password_breakdown_sheet, sync_review, sync_method_dialog, gabbro_dialog (every dialog goes through it), text_size_slider, url_link, …
 │   ├── src/rust/         # Auto-generated bridge (do not edit)
-│   └── *.dart            # main, app_paths (GabbroPaths), settings, text_scale, control_scale, gabbro_contrast (high-contrast theme flag), vault_registry, safe_file_picker, autotype_listener, autotype_target, clipboard_clear
+│   └── *.dart            # main, app_paths (GabbroPaths), settings, text_scale, control_scale, gabbro_contrast (high-contrast theme flag), vault_registry, safe_file_picker, gabbro_file_picker (dialog facade), linux_file_picker (XDG portal client), android_file_picker (picker channel client), autotype_listener, autotype_target, clipboard_clear
 ├── rust/src/
 │   ├── api/              # Bridge surface: vault, vault_bridge, import, *_generator, fido_bridge, autofill_bridge, autotype_bridge, entropy, types
 │   ├── crypto/           # Internal (not bridge-exposed): kdf, hkdf, aes_gcm, vault_crypto
@@ -55,7 +55,7 @@ gabbro/
 │   ├── autotype/         # Linux auto-type (ADR-017): keysym, XTEST inject, active-window read, trigger IPC, sequences, fill orchestration (Linux-only)
 │   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics, crash_writer, autotype_{spike,window,trigger} (diagnostics), gabbro-autotype (shipped trigger client); wordlist gen; gen_fixtures
 ├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + crash-safety (kill mid-write) + frozen golden fixtures (FIXTURES.md)
-├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, BiometricHelper + BiometricStore (per-vault; + Robolectric tests)
+├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, AppPaths (paths channel), GabbroPicker (picker channel), BiometricHelper + BiometricStore (per-vault; + Robolectric tests)
 ├── linux/packaging/      # Desktop integration: render_icons.sh (icon tree); aur/ (AUR gabbro-bin PKGBUILD; .SRCINFO is generated in the AUR clone), deb/ (build-deb.sh -> binary .deb)
 ├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, VAULT_SYNC, AUTOTYPE_AND_AUTOFILL, AI_*; decisions/ (ADRs); artefacts/
 ├── test/  integration_test/          # Flutter widget/unit + Linux real-FFI suites (dart test)
@@ -81,9 +81,9 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2165 | 10 |
+| Flutter (`flutter test`) | 2238 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
-| Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
+| Android (`./gradlew :app:testDebugUnitTest`) | 165 | 15 |
 
 **Real-FFI suites run under plain `dart test`, never `flutter drive` (non-negotiable):** they test
 Dart -> FFI -> crypto -> disk, touch no UI, and so need no window. Needs the release cdylib (debug
@@ -106,15 +106,15 @@ warnings are not noise.**
 | Warning | Source | Status / what it costs |
 |---|---|---|
 | `package=` ignored, `rust_lib_gabbro` | ours | **FIXED** 2026-08-06. Merged manifest byte-identical after. |
-| `package=` ignored x5 | `file_picker`, `jni`, `jni_flutter`, `url_launcher_android`, `flutter_plugin_android_lifecycle` | Upstream. Latest versions still warn. Android build breaks at a future AGP. |
-| Gradle space-assignment x42 | `file_picker` 13, `jni` 16, `jni_flutter` 13 | Upstream. Latest versions still warn. Android build breaks at Gradle 10. |
+| `package=` ignored | `jni`, `jni_flutter`, `url_launcher_android` | Upstream. Latest versions still warn. Android build breaks at a future AGP. Was x5; the `file_picker` removal took two. Confirm the count at the next build. |
+| Gradle space-assignment | `jni` 16, `jni_flutter` 13 | Upstream. Latest versions still warn. Android build breaks at Gradle 10. Was x42; `file_picker` held 13. Confirm at the next build. |
 | `Task.project` at execution time | Flutter's own `compileFlutterBuildDebug` | Upstream. Breaks at Gradle 10. Only shows when the task is not UP-TO-DATE. |
 | Kotlin plugin version (2.0.21 vs 2.2.20) | Flutter SDK's own `:gradle` build | Upstream. Debug and release alike. |
 | JVM restricted-method (`System::load`) | Gradle 8.14 `native-platform` jar | Gradle's own jar, and the version is pinned — nothing changes on its own. Clears itself whenever we next raise Gradle. No action. |
 | `cargo deny` no-license-field: `allo-isolate` | `flutter_rust_bridge` dep | Fixed on their master; await release. `[[licenses.clarify]]` is inert — don't retry. |
 | `cargo deny` duplicates x6 | `argon2`->`digest`, `jni`->`libloading`, `bindgen`->`shlex` | Upstream pins. Was x7; RT-3 took the `hybrid-array` duplicate with `ml-kem`. The crate itself stays (`sha2`/`hkdf` -> `digest` need it). |
 | "trying to run flutter as root" | the gate's own `unshare -r` | Cosmetic. Not Gabbro. |
-| KGP via `buildscript` classpath | `file_picker`, `url_launcher_android` | Did not reproduce 2026-08-06; re-check before acting. |
+| KGP via `buildscript` classpath | `url_launcher_android` | Did not reproduce 2026-08-06; re-check before acting. |
 
 **AGP note:** every module, `rust_lib_gabbro` included, loads AGP **8.11.1**. The
 `com.android.tools.build:gradle:7.3.0` line in `rust_builder/android/build.gradle` is
@@ -127,6 +127,35 @@ resolved but never applied — inert, emits no warning.
 > Update at the end of each session. First thing to read at the start of the next. Completed items are deleted from this section.
 
 ### Next task
+
+**Messages that cannot be read at large text sizes.** A SnackBar is a fixed
+strip: long text runs past the bottom edge and the rest is unreachable by any
+gesture. At 8x on a 360dp phone the URL message measured 2080dp of text on an
+800dp screen, in all 37 locales (found 2026-08-10). Those two moved to a dialog,
+which scrolls as a whole (ADR-016). The other 26 have the same problem.
+
+Sweep, verified 2026-08-10:
+
+| Where | N | What they say |
+|---|---|---|
+| `manage_yubikeys_screen` | 8 | key added/removed; add, remove, alias-save failed; no FIDO device |
+| `vault_list_screen` | 6 | vault synced, nothing to sync, sync cancelled, entries imported |
+| `manage_folders_screen` | 3 | folder action failed |
+| `entry_detail_screen` | 3 | copied (+ clear timeout), recovery action failed |
+| `security_screen` | 2 | biometric unavailable, enrol failed |
+| `recovery_history_screen` | 1 | recovery action failed |
+| `create_entry_screen` | 1 | no changes to save |
+| `change_passphrase_screen` | 1 | export failed |
+| `safe_file_picker` | 1 | file dialog unavailable — every picker flow uses it |
+
+The failures are what matter: they are the only explanation the user gets, and
+they are the ones that run off the screen. A success ("copied", "vault synced")
+costs little if missed — so this is not automatically 26 dialogs; decide per
+message between dialog, capped text scale, and accepted limit.
+
+Test by the message's rectangle or its scroll ancestor, never by a layout
+exception: a SnackBar clips instead of overflowing and throws nothing, so an
+overflow sweep passes blind (proven — see `test/url_link_overflow_test.dart`).
 
 ---
 
@@ -146,13 +175,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   committed in the AUR clone; the push fails — the AUR is in maintenance
   (still down 2026-08-05). Until it lands, Arch users install alpha.16. Retry with
   `git -C ../gabbro-bin-aur push` from `gabbro/`.
-
-### Dependencies
-- **Replace the plugins that emit the Gradle warnings, or roll our own.** No bump clears
-  them — latest versions still warn — and the Android build breaks at Gradle 10 / a
-  future AGP. Affected: `file_picker` (`package=` + deprecated space-assignment), `jni`
-  and `jni_flutter` (both, same), `url_launcher_android` and
-  `flutter_plugin_android_lifecycle` (`package=` only).
 
 ### Features and UI/UX
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder

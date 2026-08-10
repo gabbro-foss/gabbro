@@ -332,6 +332,7 @@
   },
 
   "openInBrowserTitle": "Открыть в браузере?",
+  "onlyWebLinks": "Можно открывать только веб-ссылки",
   "couldNotOpen": "Не удалось открыть {url}",
   "@couldNotOpen": {
     "placeholders": {

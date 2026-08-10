@@ -20,17 +20,18 @@ Named after the intrusive igneous rock — hard, stable, enduring.
 
 - **Quantum-resistant by design** — vault security rests on Argon2id +
   AES-256-GCM, both quantum-resistant. Vaults derive the vault key
-  straight from Argon2id (VERSION 11); an earlier X25519 + ML-KEM-1024
-  layer was removed as non-load-bearing (ADR-018)
+  straight from Argon2id (VERSION 11)
 - **Hardware key (optional, recommended)** — FIDO2/YubiKey authentication; passphrase-only
   by default, with a minimum of two keys when keys are used (primary + backup)
 - **Rust for all keys** — every cryptographic operation lives in Rust;
   keys never cross the Flutter/Rust bridge. Secrets you view, generate
   or autofill do reach Flutter in plaintext to be displayed
 - **Local-first** — your vault lives on your device; sync is your
-  choice and your responsibility
-- **Localised** — UI available in many languages (EN, FR, DE, IT, ES, and more); follows system locale with in-app override
-- **Multi-language passphrase generator** — wordlist library covering many languages; classic generator uses language-native character pools (Greek, Cyrillic, Hiragana/Katakana, Hangul, CJK)
+  choice and your responsibility (for example with [syncthing](https://syncthing.net/))
+- **Localised** — UI available in many languages (EN, FR, DE, IT, ES, and more);
+ follows system locale with in-app override
+- **Multi-language passphrase generator** — wordlist library covering many languages;
+ classic generator uses language-native character pools (Greek, Cyrillic, Hiragana/Katakana, Hangul, CJK)
 - **In-app help** — offline help carousel; no external website or internet connection required
 - **FOSS** — GPL-3.0-only licensed
 
@@ -94,8 +95,7 @@ passphrase + random_salt
 ```
 
 Quantum resistance comes from Argon2id + AES-256-GCM. Vaults (VERSION 11)
-derive the vault key directly from Argon2id; an earlier hybrid X25519 +
-ML-KEM-1024 key-exchange layer was removed as non-load-bearing (ADR-018).
+derive the vault key directly from Argon2id.
 VERSION 11 is the oldest format this build opens — an older vault is refused
 without being modified, and can be upgraded via
 [docs/VAULT_UPGRADE_PATH.md](docs/VAULT_UPGRADE_PATH.md).
@@ -215,7 +215,8 @@ window has focus** — username, Tab, password, Enter. No copy-paste.
 
 **You choose the entry; Gabbro cannot.** A browser does not tell the window
 manager which site is on screen, and Gabbro will never ship a browser extension
-to find out. So it does no site matching and cannot warn you when the entry is
+to find out [docs/decisions/ADR-008-no-browser-extension.md](docs/decisions/ADR-008-no-browser-extension.md). 
+So it does no site matching and cannot warn you when the entry is
 wrong for the page — whatever login is showing is what gets typed, and submitted.
 It stays showing until you pick another or the vault locks. Check the entry before
 you press your key.
@@ -486,7 +487,8 @@ human-authored and human-reviewed.
   a reflection on AI tools generally — it is a recognition that
   security-sensitive code requires human understanding, human
   accountability, and human judgement at every step. 
-  (See: [the curl project's experience with AI contributions](https://daniel.haxx.se/blog/2024/01/02/the-i-in-llm-stands-for-intelligence/) for context on why this matters.)
+  (See: [the curl project's experience with AI contributions](https://daniel.haxx.se/blog/2024/01/02/the-i-in-llm-stands-for-intelligence/) 
+  for context on why this matters.)
 - **Agents are welcome to open issues.** If an AI assistant has
   identified a bug, a security concern, or a reasonable feature
   request, a respectfully written issue is a genuine contribution.

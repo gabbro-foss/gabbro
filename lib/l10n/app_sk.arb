@@ -332,6 +332,7 @@
   },
 
   "openInBrowserTitle": "Otvoriť v prehliadači?",
+  "onlyWebLinks": "Otvoriť možno len webové odkazy",
   "couldNotOpen": "Nedá sa otvoriť {url}",
   "@couldNotOpen": {
     "placeholders": {

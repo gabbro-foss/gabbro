@@ -861,6 +861,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get openInBrowserTitle => 'Atvērt pārlūkā?';
 
   @override
+  String get onlyWebLinks => 'Var atvērt tikai tīmekļa saites';
+
+  @override
   String couldNotOpen(String url) {
     return 'Nevarēja atvērt $url';
   }

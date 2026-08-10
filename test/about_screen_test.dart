@@ -60,4 +60,14 @@ void main() {
     );
     expect(find.textContaining('GPL-3.0-only'), findsOneWidget);
   });
+
+  testWidgets('15: the attribution list names no dependency we dropped',
+      (tester) async {
+    // A stale entry credits code the app no longer ships, which misleads
+    // anyone auditing what is actually in the binary.
+    await tester.pumpWidget(testApp(const AboutScreen()));
+    await tester.pumpAndSettle();
+
+    expect(find.text('file_picker'), findsNothing);
+  });
 }

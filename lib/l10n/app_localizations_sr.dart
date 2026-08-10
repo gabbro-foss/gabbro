@@ -862,6 +862,9 @@ class AppLocalizationsSr extends AppLocalizations {
   String get openInBrowserTitle => 'Отвори у прегледачу?';
 
   @override
+  String get onlyWebLinks => 'Могу се отворити само веб везе';
+
+  @override
   String couldNotOpen(String url) {
     return 'Не могу да отворим $url';
   }
@@ -3054,6 +3057,9 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get openInBrowserTitle => 'Otvori u pregledaču?';
+
+  @override
+  String get onlyWebLinks => 'Mogu se otvoriti samo veb veze';
 
   @override
   String couldNotOpen(String url) {

@@ -859,6 +859,9 @@ class AppLocalizationsKk extends AppLocalizations {
   String get openInBrowserTitle => 'Браузерде ашу керек пе?';
 
   @override
+  String get onlyWebLinks => 'Тек веб сілтемелерді ашуға болады';
+
+  @override
   String couldNotOpen(String url) {
     return '$url ашылмады';
   }

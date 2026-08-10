@@ -332,6 +332,7 @@
   },
 
   "openInBrowserTitle": "在瀏覽器中開啟？",
+  "onlyWebLinks": "只能開啟網頁連結",
   "couldNotOpen": "無法開啟 {url}",
   "@couldNotOpen": {
     "placeholders": {

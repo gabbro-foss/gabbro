@@ -7,7 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **A link that would not open said nothing, or said the wrong thing.** Opening a URL from an entry gave no message at all when it failed, and at the largest text sizes the message shown elsewhere ran off the bottom of the screen. Both now appear in a dialog that scrolls, and a link that is not a web page says so instead of reporting a failure.
+- **An entry in the vault list at the autofill prompt did nothing (Android).** When Gabbro asked for your passphrase to fill or save a login, the list of vaults also offered "Open a vault file…" — tapping it opened nothing and said nothing. It is no longer offered there, and where you have a single vault the list itself is gone, since it could only reselect the vault you were already unlocking. The app's own unlock screen is unchanged.
+
 ### Changed
+- **Links open through Gabbro's own code**, not the `url_launcher` plugin: the desktop's handler on Linux, Android's own on Android. Same system browser as before, never an in-app view, one less third-party dependency. Only `http` and `https` links are opened now — a stored `file://`, `ftp://` or `ssh://` address is refused, since this button means "open a web page".
+- **File dialogs now talk to the system directly on both platforms**, instead of going through the `file_picker` plugin: the desktop's file portal on Linux, Android's own picker on Android. Same dialogs, two fewer third-party dependencies in the app.
+- **The app now finds its own data folder** instead of asking the `path_provider` plugin — the same folder as before on both platforms, so nothing moves. This also removes the `jni` plugin whose C code newer compilers reject, which had broken fresh Linux builds.
 - **Finnish and Russian passphrases draw on new wordlists**, re-sourced for GPL-3.0 compatibility. Both are still 7,776 words, so entropy is unchanged.
 - **Portuguese passphrases draw on a new wordlist**, also re-sourced for GPL-3.0 compatibility. It is 7,776 words and carries no accents, so a passphrase types on any keyboard. The generator now labels it Português (BR), which is what the Portuguese list has always been.
 - **Passphrases no longer include non-words** — surnames in Slovak and Ukrainian, `Internet` in French. Slovak drops to 6,642 words; add one word to cover the lost entropy.
@@ -15,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **The sync dialog now says what "Merge automatically" does.** It offered the choice without explaining it, so it went unused. It now states that the automatic merge takes the other device's value wherever the two differ, and that reviewing starts from those same answers. The two choices carry the same wording for a screen reader, which on Linux reads only a control's name and never the paragraph.
 - **The folder choice no longer says "unfoldered".** In English only, the option to leave an entry out of a folder read "Keep unfoldered" / "Move to unfoldered". It now reads "Keep without folder" / "Move to no folder" — what every other language already said.
 - **The About screen did not name everything Gabbro ships.** Four Rust libraries were missing from the open-source list, one licence was wrong, and one entry named a Rust package while showing a different project's licence. Mozilla's Public Suffix List and two wordlist sources were uncredited. All are listed now, and a test refuses any direct dependency added without attribution.
-- **The Android app ships two fewer bundled libraries.** Updating the file-picker dropped Apache Tika and Commons IO from the release build, so the download is smaller and there is less third-party code inside it. No change to how picking a file behaves.
+- **The Android app ships two fewer bundled libraries.** Apache Tika and Commons IO came in with the old file-picker and are out of the release build, so the download is smaller and there is less third-party code inside it. No change to how picking a file behaves.
 
 ## [0.1.0-alpha.18] – 2026-08-05
 

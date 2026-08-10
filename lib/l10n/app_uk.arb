@@ -332,6 +332,7 @@
   },
 
   "openInBrowserTitle": "Відкрити в браузері?",
+  "onlyWebLinks": "Можна відкривати лише вебпосилання",
   "couldNotOpen": "Не вдалося відкрити {url}",
   "@couldNotOpen": {
     "placeholders": {

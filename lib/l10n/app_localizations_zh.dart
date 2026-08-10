@@ -842,6 +842,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get openInBrowserTitle => '在浏览器中打开？';
 
   @override
+  String get onlyWebLinks => '只能打开网页链接';
+
+  @override
   String couldNotOpen(String url) {
     return '无法打开 $url';
   }
@@ -2938,6 +2941,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get openInBrowserTitle => '在浏览器中打开？';
 
   @override
+  String get onlyWebLinks => '只能打开网页链接';
+
+  @override
   String couldNotOpen(String url) {
     return '无法打开 $url';
   }
@@ -5032,6 +5038,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get openInBrowserTitle => '在瀏覽器中開啟？';
+
+  @override
+  String get onlyWebLinks => '只能開啟網頁連結';
 
   @override
   String couldNotOpen(String url) {

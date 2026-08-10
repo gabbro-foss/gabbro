@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
+import 'package:gabbro/gabbro_file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
@@ -84,7 +84,8 @@ Future<ExportArtifact> _defaultBuildExportPassphraseOnlyBytes(
 Future<void> _noopSaveFolder(String treeUri) async {}
 
 /// Android JSON export: pick a raw-path destination folder.
-Future<String?> _defaultPickDirectory() => FilePicker.getDirectoryPath();
+Future<String?> _defaultPickDirectory() =>
+    GabbroFilePicker.androidPickDirectory();
 
 class ExportScreen extends StatefulWidget {
   final String? initialPath;
@@ -172,7 +173,7 @@ class _ExportScreenState extends State<ExportScreen> {
   String? _error;
 
   // Android `.gabbro` SAF destination (remembered across runs). Separate from
-  // `_path`, which holds the file_picker dir used by the JSON + Linux paths.
+  // `_path`, which holds the picked dir used by the JSON + Linux paths.
   String _exportFolderUri = '';
   String? _folderDisplayName;
 

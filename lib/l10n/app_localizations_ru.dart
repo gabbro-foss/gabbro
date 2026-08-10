@@ -864,6 +864,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get openInBrowserTitle => 'Открыть в браузере?';
 
   @override
+  String get onlyWebLinks => 'Можно открывать только веб-ссылки';
+
+  @override
   String couldNotOpen(String url) {
     return 'Не удалось открыть $url';
   }

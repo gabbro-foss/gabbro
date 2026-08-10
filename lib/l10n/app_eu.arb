@@ -332,6 +332,7 @@
   },
 
   "openInBrowserTitle": "Nabigatzailean ireki?",
+  "onlyWebLinks": "Web estekak soilik ireki daitezke",
   "couldNotOpen": "Ezin da ireki {url}",
   "@couldNotOpen": {
     "placeholders": {

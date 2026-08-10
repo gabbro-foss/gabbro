@@ -22,6 +22,8 @@ VaultRegistry _twoVaults() => VaultRegistry([
       _rec('/tmp/b.gabbro', 'Beta'),
     ]);
 
+VaultRegistry _oneVault() => VaultRegistry([_rec('/tmp/a.gabbro', 'Alpha')]);
+
 void main() {
   const channel = MethodChannel('app.gabbro.gabbro/autofill');
 
@@ -91,6 +93,55 @@ void main() {
       tester.widget<UnlockScreen>(find.byType(UnlockScreen)).vaultPath,
       '/tmp/b.gabbro',
     );
+  });
+
+  // N4: the closed list names the vault you are about to unlock. The screen
+  // builds two parallel lists (the entries and their collapsed labels); if they
+  // ever fall out of step the prompt names the wrong vault.
+  testWidgets('the closed list names the current vault', (tester) async {
+    await tester.pumpWidget(buildAutofillUnlockApp(
+      settings: const AppSettings(),
+      registry: _twoVaults(),
+      initialVaultPath: '/tmp/a.gabbro',
+      channel: channel,
+    ));
+    await tester.pump();
+
+    expect(find.text('Alpha'), findsWidgets);
+    expect(find.text('Beta'), findsNothing);
+  });
+
+  // 1: nothing here can open the pick-a-vault-file screen, so the entry must
+  // not be offered — tapping it did nothing at all.
+  testWidgets('the vault list does not offer the adopt entry', (tester) async {
+    await tester.pumpWidget(buildAutofillUnlockApp(
+      settings: const AppSettings(),
+      registry: _twoVaults(),
+      initialVaultPath: '/tmp/a.gabbro',
+      channel: channel,
+    ));
+    await tester.pump();
+
+    await tester.tap(find.byType(DropdownButton<String>));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('unlock_adopt_item')), findsNothing);
+    expect(find.text('Alpha').hitTestable(), findsWidgets);
+    expect(find.text('Beta').hitTestable(), findsWidgets);
+  });
+
+  // 3: with the entry gone and only one vault, the list can do nothing but
+  // reselect the vault already being unlocked, so it is not shown at all.
+  testWidgets('one vault: no list at all', (tester) async {
+    await tester.pumpWidget(buildAutofillUnlockApp(
+      settings: const AppSettings(),
+      registry: _oneVault(),
+      initialVaultPath: '/tmp/a.gabbro',
+      channel: channel,
+    ));
+    await tester.pump();
+
+    expect(find.byType(DropdownButton<String>), findsNothing);
   });
 
   testWidgets('no-match dialog shows localized text and cancels on dismiss',

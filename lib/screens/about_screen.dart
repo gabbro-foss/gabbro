@@ -173,8 +173,8 @@ class _SectionHeader extends StatelessWidget {
 // ── Link tile — displays a URL as a tappable row ─────────────────────────────
 // Tapping shows a dialog with the URL as SelectableText (copy-friendly) and
 // an explicit "Open in browser" button. Two-step confirmation: the user sees
-// the URL before the browser opens. Uses url_launcher with externalApplication
-// mode — opens the system browser, no in-app webview.
+// the URL before the browser opens. Goes to the system browser, never an
+// in-app webview.
 
 class _LinkTile extends StatelessWidget {
   final IconData icon;
@@ -280,6 +280,11 @@ const _kComponents = [
     licence: 'BSD-3-Clause',
     url: 'https://github.com/dart-lang/sdk',
   ),
+  _Component(
+    name: 'dbus',
+    licence: 'MPL-2.0',
+    url: 'https://github.com/canonical/dbus.dart',
+  ),
   // Copyright for the Brazilian Portuguese list is @drebs'; it ships inside
   // ulif/diceware, which is GPL-3.0-or-later.
   _Component(
@@ -301,11 +306,6 @@ const _kComponents = [
     name: 'diceware_slovak (sk)',
     licence: 'MIT',
     url: 'https://github.com/jtomori/diceware_slovak',
-  ),
-  _Component(
-    name: 'file_picker',
-    licence: 'MIT',
-    url: 'https://github.com/miguelpruivo/flutter_file_picker',
   ),
   _Component(
     name: 'Fira Code',
@@ -382,11 +382,6 @@ const _kComponents = [
     licence: 'LGPL',
     url: 'https://github.com/FredrikBorgstrom/finnish-extractor',
   ),
-  _Component(
-    name: 'path_provider',
-    licence: 'BSD-3-Clause',
-    url: 'https://github.com/flutter/packages',
-  ),
   // Mozilla's list, shipped as an Android asset for autofill domain matching.
   _Component(
     name: 'Public Suffix List',
@@ -422,11 +417,6 @@ const _kComponents = [
     name: 'thiserror',
     licence: 'Apache-2.0 / MIT',
     url: 'https://github.com/dtolnay/thiserror',
-  ),
-  _Component(
-    name: 'url_launcher',
-    licence: 'BSD-3-Clause',
-    url: 'https://github.com/flutter/packages',
   ),
   _Component(
     name: 'uuid',

@@ -10,7 +10,8 @@ randomly-generated passphrase and two registered YubiKeys.
 
 ## The challenge
 
-Decrypt the vault body and read the note inside. The note contains a field labelled as `decryptionProof_*` which is a random string.
+Decrypt the vault body and read the note inside. 
+The note contains a field labelled as `decryptionProof_*` which is a random string.
 
 ## The reward
 
@@ -35,7 +36,8 @@ passphrase alone is not sufficient: it recovers the `wrapping_key` from the
 YubiKey layer.
 
 Valid proof means reproducing the exact character string from the vault
-note. The character random string has high entropy (no entropy value is provided so as not to suggest what str lenght was used): guessing it is
+note. The character random string has high entropy (no entropy value is provided 
+so as not to suggest what str length was used): guessing it is
 not a viable strategy. Proof requires actually decrypting the vault, which
 means bypassing the full crypto stack, not just Argon2id.
 

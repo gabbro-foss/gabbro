@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/main.dart';
@@ -21,6 +22,8 @@ VaultRegistry _vaults() => VaultRegistry([
       _rec('/tmp/a.gabbro', 'Alpha'),
       _rec('/tmp/b.gabbro', 'Beta'),
     ]);
+
+VaultRegistry _oneVault() => VaultRegistry([_rec('/tmp/a.gabbro', 'Alpha')]);
 
 String _createJson() => jsonEncode({
       'captured': {
@@ -64,6 +67,67 @@ void main() {
 
     expect(find.byType(UnlockScreen), findsOneWidget);
     expect(find.byType(SaveConfirmScreen), findsNothing);
+  });
+
+  // N3: the save prompt offers the vault list, and choosing another vault
+  // retargets the unlock — the login is saved into the vault you picked.
+  testWidgets('locked: choosing another vault switches the unlock target',
+      (tester) async {
+    await tester.pumpWidget(buildAutofillSaveApp(
+      settings: AppSettings(),
+      registry: _vaults(),
+      initialVaultPath: '/tmp/a.gabbro',
+      alreadyUnlocked: false,
+      fetchSaveContextJson: () async => '{}',
+    ));
+    await tester.pump();
+
+    expect(find.byType(DropdownButton<String>), findsOneWidget);
+
+    await tester.tap(find.byType(DropdownButton<String>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Beta').last);
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.widget<UnlockScreen>(find.byType(UnlockScreen)).vaultPath,
+      '/tmp/b.gabbro',
+    );
+  });
+
+  // 2: same as the fill prompt — nothing here can open the pick-a-vault-file
+  // screen, so the entry is not offered.
+  testWidgets('locked: the vault list does not offer the adopt entry',
+      (tester) async {
+    await tester.pumpWidget(buildAutofillSaveApp(
+      settings: AppSettings(),
+      registry: _vaults(),
+      initialVaultPath: '/tmp/a.gabbro',
+      alreadyUnlocked: false,
+      fetchSaveContextJson: () async => '{}',
+    ));
+    await tester.pump();
+
+    await tester.tap(find.byType(DropdownButton<String>));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('unlock_adopt_item')), findsNothing);
+    expect(find.text('Beta').hitTestable(), findsWidgets);
+  });
+
+  // 4: with the entry gone and only one vault, the list can do nothing but
+  // reselect the vault already being unlocked, so it is not shown at all.
+  testWidgets('locked, one vault: no list at all', (tester) async {
+    await tester.pumpWidget(buildAutofillSaveApp(
+      settings: AppSettings(),
+      registry: _oneVault(),
+      initialVaultPath: '/tmp/a.gabbro',
+      alreadyUnlocked: false,
+      fetchSaveContextJson: () async => '{}',
+    ));
+    await tester.pump();
+
+    expect(find.byType(DropdownButton<String>), findsNothing);
   });
 
   // RT-5: a vault this flow unlocked is its own, and the activity's isolate dies

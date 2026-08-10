@@ -332,6 +332,7 @@
   },
 
   "openInBrowserTitle": "Ava brauseris?",
+  "onlyWebLinks": "Avada saab ainult veebilinke",
   "couldNotOpen": "Ei saanud avada {url}",
   "@couldNotOpen": {
     "placeholders": {

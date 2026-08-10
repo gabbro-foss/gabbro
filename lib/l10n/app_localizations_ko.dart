@@ -849,6 +849,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get openInBrowserTitle => '브라우저에서 열기?';
 
   @override
+  String get onlyWebLinks => '웹 링크만 열 수 있습니다';
+
+  @override
   String couldNotOpen(String url) {
     return '$url을(를) 열 수 없습니다';
   }

@@ -332,6 +332,7 @@
   },
 
   "openInBrowserTitle": "Ṣii ninu aṣawakiri?",
+  "onlyWebLinks": "Àwọn ọ̀nà ayélujára nìkan ni a lè ṣí",
   "couldNotOpen": "Ko le ṣii {url}",
   "@couldNotOpen": {
     "placeholders": {

@@ -8,6 +8,7 @@ import 'package:gabbro/app_paths.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/settings.dart';
+import 'package:gabbro/widgets/path_field.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 import 'package:gabbro/vault_registry.dart';
@@ -1350,6 +1351,45 @@ void main() {
       await enterPassphrase(tester);
       expect(isEnabled(tester), isTrue);
       expect(find.text('Passphrase is too weak'), findsNothing);
+    });
+  });
+
+  // Net for the file_picker replacement: pins what this screen asks the
+  // picker for. The replacement must honour the same request.
+  group('PathField wiring (net)', () {
+    testWidgets(
+        'onboarding asks for a save dialog filtered to .gabbro, '
+        'suggesting the current filename', (tester) async {
+      await tester.pumpWidget(_buildScreen());
+      await tester.pumpAndSettle();
+
+      final pf = tester.widget<PathField>(find.byType(PathField));
+      expect(pf.mode, PathFieldMode.save);
+      expect(pf.allowedExtensions, ['gabbro']);
+      expect(pf.saveFileName, 'test.gabbro');
+    });
+
+    testWidgets('onboarding with no path suggests gabbro.gabbro',
+        (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        initialPath: null,
+        resolveDataDir: () async => throw Exception('no data dir'),
+      ));
+      await tester.pumpAndSettle();
+
+      final pf = tester.widget<PathField>(find.byType(PathField));
+      expect(pf.saveFileName, 'gabbro.gabbro');
+    });
+
+    // N2: on Android the vault location is fixed app-private storage, so no
+    // save dialog is reachable. Pins that the save leg is Linux-only.
+    testWidgets('android shows the path as text, with no path field',
+        (tester) async {
+      await tester.pumpWidget(_buildScreen(isAndroid: true));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(PathField), findsNothing);
+      expect(find.text('/tmp/test.gabbro'), findsOneWidget);
     });
   });
 }

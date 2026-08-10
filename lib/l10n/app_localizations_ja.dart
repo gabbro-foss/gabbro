@@ -849,6 +849,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get openInBrowserTitle => 'ブラウザで開きますか?';
 
   @override
+  String get onlyWebLinks => 'ウェブリンクのみ開けます';
+
+  @override
   String couldNotOpen(String url) {
     return '$urlを開けませんでした';
   }

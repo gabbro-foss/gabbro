@@ -864,6 +864,9 @@ class AppLocalizationsSk extends AppLocalizations {
   String get openInBrowserTitle => 'Otvoriť v prehliadači?';
 
   @override
+  String get onlyWebLinks => 'Otvoriť možno len webové odkazy';
+
+  @override
   String couldNotOpen(String url) {
     return 'Nedá sa otvoriť $url';
   }

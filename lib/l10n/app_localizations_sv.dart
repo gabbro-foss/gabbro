@@ -860,6 +860,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get openInBrowserTitle => 'Öppna i webbläsare?';
 
   @override
+  String get onlyWebLinks => 'Endast webblänkar kan öppnas';
+
+  @override
   String couldNotOpen(String url) {
     return 'Kunde inte öppna $url';
   }

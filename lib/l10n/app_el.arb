@@ -332,6 +332,7 @@
   },
 
   "openInBrowserTitle": "Άνοιγμα στο πρόγραμμα περιήγησης;",
+  "onlyWebLinks": "Μπορούν να ανοίξουν μόνο σύνδεσμοι ιστού",
   "couldNotOpen": "Δεν ήταν δυνατό το άνοιγμα {url}",
   "@couldNotOpen": {
     "placeholders": {

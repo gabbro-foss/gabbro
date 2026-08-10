@@ -1,8 +1,8 @@
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:gabbro/control_scale.dart';
+import 'package:gabbro/gabbro_file_picker.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/safe_file_picker.dart';
@@ -12,8 +12,9 @@ import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/widgets/generator_widget.dart';
 
-/// A file the user picked to attach: its name and (eagerly-loaded) bytes.
-typedef PickedFile = ({String name, Uint8List? bytes});
+/// [PickedFile] lives with the facade; re-exported so callers of this screen
+/// (and its tests) keep one import.
+export 'package:gabbro/gabbro_file_picker.dart' show PickedFile;
 
 Future<void> _defaultCreate(VaultEntryData entry) => createEntry(entry: entry);
 VaultEntryData _defaultGetEntry(String id) => getEntry(id: id);
@@ -32,12 +33,7 @@ Future<List<String>> _defaultRecentApps() async {
 }
 List<String> _defaultListFolders() => listFolders();
 
-Future<PickedFile?> _defaultPickFile() async {
-  final result = await FilePicker.pickFiles(withData: true);
-  if (result == null || result.files.isEmpty) return null;
-  final f = result.files.first;
-  return (name: f.name, bytes: f.bytes);
-}
+Future<PickedFile?> _defaultPickFile() => GabbroFilePicker.pickFileWithData();
 
 class CreateEntryScreen extends StatefulWidget {
   final String entryType;

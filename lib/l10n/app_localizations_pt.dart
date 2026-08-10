@@ -861,6 +861,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get openInBrowserTitle => 'Abrir no navegador?';
 
   @override
+  String get onlyWebLinks => 'Só é possível abrir links da web';
+
+  @override
   String couldNotOpen(String url) {
     return 'Não foi possível abrir $url';
   }
@@ -3061,6 +3064,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get openInBrowserTitle => 'Abrir no navegador?';
 
   @override
+  String get onlyWebLinks => 'Só é possível abrir links da web';
+
+  @override
   String couldNotOpen(String url) {
     return 'Não foi possível abrir $url';
   }
@@ -5256,6 +5262,9 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get openInBrowserTitle => 'Abrir no browser?';
+
+  @override
+  String get onlyWebLinks => 'Só é possível abrir ligações web';
 
   @override
   String couldNotOpen(String url) {

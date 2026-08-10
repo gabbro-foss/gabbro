@@ -1,4 +1,4 @@
-import 'package:file_picker/file_picker.dart';
+import '../gabbro_file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 
@@ -25,7 +25,7 @@ class PathField extends StatefulWidget {
   final void Function(String path)? onSubmitted;
 
   /// Test seams: override the native dialogs to return a path, `null` (cancel),
-  /// or throw (portal unavailable). Default to the real `file_picker`.
+  /// or throw (portal unavailable). Default to the real native dialogs.
   final Future<String?> Function()? openPicker;
   final Future<String?> Function()? savePicker;
 
@@ -78,18 +78,12 @@ class _PathFieldState extends State<PathField> {
     super.dispose();
   }
 
-  Future<String?> _defaultOpen() async {
-    final result = await FilePicker.pickFiles(
-      type: widget.allowedExtensions != null ? FileType.custom : FileType.any,
-      allowedExtensions: widget.allowedExtensions,
-    );
-    return result?.files.single.path;
-  }
+  Future<String?> _defaultOpen() =>
+      GabbroFilePicker.pickPath(allowedExtensions: widget.allowedExtensions);
 
-  Future<String?> _defaultSave() => FilePicker.saveFile(
+  Future<String?> _defaultSave() => GabbroFilePicker.savePath(
         fileName: widget.saveFileName,
         allowedExtensions: widget.allowedExtensions,
-        type: widget.allowedExtensions != null ? FileType.custom : FileType.any,
       );
 
   Future<void> _pick() async {

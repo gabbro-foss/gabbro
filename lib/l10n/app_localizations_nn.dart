@@ -862,6 +862,9 @@ class AppLocalizationsNn extends AppLocalizations {
   String get openInBrowserTitle => 'Opne i nettlesar?';
 
   @override
+  String get onlyWebLinks => 'Berre weblenkjer kan opnast';
+
+  @override
   String couldNotOpen(String url) {
     return 'Klarte ikkje opne $url';
   }

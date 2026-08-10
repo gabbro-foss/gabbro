@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
+import 'package:gabbro/gabbro_file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:gabbro/widgets/gabbro_dialog.dart';
 import 'package:flutter/services.dart';
@@ -83,18 +83,12 @@ Future<bool> _defaultBackupUsable(String path) async {
 Future<void> _defaultRestoreBackup(String path) => restoreVaultBackup(path: path);
 
 // R-03: let the user pick their own off-device backup `.gabbro`. Returns the
-// picked path, or null if the user cancelled. `file_picker` copies the chosen
-// file to an app-readable path on Android too, so the same path-based restore
-// works on every platform.
-Future<String?> _defaultPickRestoreFile() async {
-  final result = await runPicker(
-    () => FilePicker.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['gabbro'],
-    ),
-  );
-  return result?.files.single.path;
-}
+// picked path, or null if the user cancelled. The Android leg copies the
+// chosen file to an app-readable path, so the same path-based restore works
+// on every platform.
+Future<String?> _defaultPickRestoreFile() => runPicker(
+      () => GabbroFilePicker.pickPath(allowedExtensions: ['gabbro']),
+    );
 
 Future<void> _defaultRestoreFromPickedFile(String vaultPath, String source) =>
     restoreVaultFromFile(path: vaultPath, source: source);
@@ -381,10 +375,21 @@ class _UnlockScreenState extends State<UnlockScreen>
 
   bool get _isYubikeyMode => _yubikeyRecords.isNotEmpty;
 
-  // Any registered vault: the dropdown always carries the adopt entry, so a
-  // one-vault registry shows it too (pre-adopt it needed 2+).
-  bool get _showDropdown =>
-      widget.registry != null && widget.registry!.records.isNotEmpty;
+  // Where opening another vault file can actually do something: the caller
+  // wired a callback, or the main app shell is above us to push the screen.
+  // The autofill prompts have neither, and an entry offered there does nothing
+  // at all when tapped — so it is not offered.
+  bool get _canAdopt =>
+      widget.onAdoptRequested != null || GabbroApp.maybeOf(context) != null;
+
+  // Shown only where it can change something: another vault to switch to, or
+  // the offer to open a vault file. A lone vault with no such offer (the
+  // autofill prompts) gets no list — it could only reselect itself.
+  bool get _showDropdown {
+    final records = widget.registry?.records;
+    if (records == null || records.isEmpty) return false;
+    return records.length > 1 || _canAdopt;
+  }
 
   @override
   void initState() {
@@ -1158,12 +1163,13 @@ class _UnlockScreenState extends State<UnlockScreen>
                         itemHeight: null, // menu items grow to wrapped height at large text
                         value: _selectedPath,
                         // Collapsed selection ellipsizes instead of hard-clipping (ADR-016).
-                        // Must stay as long as `items` (adopt entry included),
-                        // though the adopt entry is never the collapsed value.
+                        // Must stay as long as `items` — so the adopt entry's
+                        // placeholder appears on exactly the same condition,
+                        // or the closed list names the wrong vault.
                         selectedItemBuilder: (context) => [
                           ...widget.registry!.records.map((r) => Text(r.alias,
                               maxLines: 1, overflow: TextOverflow.ellipsis)),
-                          const SizedBox.shrink(),
+                          if (_canAdopt) const SizedBox.shrink(),
                         ],
                         items: [
                           ...widget.registry!.records.map(
@@ -1172,11 +1178,12 @@ class _UnlockScreenState extends State<UnlockScreen>
                               child: Text(r.alias),
                             ),
                           ),
-                          DropdownMenuItem(
-                            key: const Key('unlock_adopt_item'),
-                            value: _UnlockScreenState.adoptDropdownValue,
-                            child: Text(l.unlockAdoptItem),
-                          ),
+                          if (_canAdopt)
+                            DropdownMenuItem(
+                              key: const Key('unlock_adopt_item'),
+                              value: _UnlockScreenState.adoptDropdownValue,
+                              child: Text(l.unlockAdoptItem),
+                            ),
                         ],
                         onChanged: _onDropdownChanged,
                       ),
