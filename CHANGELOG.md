@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.19] – 2026-08-10
+
 ### Fixed
 - **A link that would not open said nothing, or said the wrong thing.** Opening a URL from an entry gave no message at all when it failed, and at the largest text sizes the message shown elsewhere ran off the bottom of the screen. Both now appear in a dialog that scrolls, and a link that is not a web page says so instead of reporting a failure.
 - **An entry in the vault list at the autofill prompt did nothing (Android).** When Gabbro asked for your passphrase to fill or save a login, the list of vaults also offered "Open a vault file…" — tapping it opened nothing and said nothing. It is no longer offered there, and where you have a single vault the list itself is gone, since it could only reselect the vault you were already unlocking. The app's own unlock screen is unchanged.
@@ -23,6 +25,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **The folder choice no longer says "unfoldered".** In English only, the option to leave an entry out of a folder read "Keep unfoldered" / "Move to unfoldered". It now reads "Keep without folder" / "Move to no folder" — what every other language already said.
 - **The About screen did not name everything Gabbro ships.** Four Rust libraries were missing from the open-source list, one licence was wrong, and one entry named a Rust package while showing a different project's licence. Mozilla's Public Suffix List and two wordlist sources were uncredited. All are listed now, and a test refuses any direct dependency added without attribution.
 - **The Android app ships two fewer bundled libraries.** Apache Tika and Commons IO came in with the old file-picker and are out of the release build, so the download is smaller and there is less third-party code inside it. No change to how picking a file behaves.
+
+*Built with Flutter 3.44.8, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21.*
 
 ## [0.1.0-alpha.18] – 2026-08-05
 
