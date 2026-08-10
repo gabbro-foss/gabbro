@@ -128,70 +128,41 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
+**A dead "Open a vault file…" entry at the autofill prompts (Android).** Tapping
+it does nothing — no screen, no message. The vault list carries the entry
+unconditionally (`unlock_screen.dart:1169`), but neither autofill shell wires it.
+Hide it at both prompts; with one vault left, hide the whole list there too.
+
+Sweep: the main-app side is already pinned (`unlock_screen_test.dart:1322-1430`),
+as is the fill prompt's list and vault switching
+(`autofill_unlock_app_test.dart:58,75`).
+
+Net — pin green against current code before any red test:
+- [x] N3 save prompt: the list appears and switches vault
+- [x] N4 the collapsed list still names the current vault (`items` and
+  `selectedItemBuilder` are parallel; shortening one alone misnames it)
+- [x] N5 with one vault both prompts show a list today
+  (N3, N5: `autofill_save_app_test.dart`; N4, N5: `autofill_unlock_app_test.dart`)
+
+Design: offer the entry only where it can work — one getter on the unlock screen
+checking for an adopt callback or a `GabbroApp` ancestor. The main app's own
+unlock screen passes no callback either (`main.dart:1009`) and relies on that
+ancestor, so the callback alone cannot tell the two apart. A future shell with
+neither can then never show a dead entry. The list itself shows when there is
+more than one vault, or when adopting is possible.
+
+TDD, red-first, in order:
+- [ ] 1 fill prompt does not offer the entry
+- [ ] 2 save prompt does not offer it
+- [ ] 3 fill prompt, one vault: no list at all
+- [ ] 4 save prompt, one vault: no list at all
+- [ ] 5 main app keeps the entry with one vault and with two — already pinned
+  (`unlock_screen_test.dart:1340,1415`), must stay green
+- [ ] 6 hardware: autofill from an app and from Brave, plus the save prompt
+
 **Dependency trimming, remaining (branch `dependency_trimming`).** Same
 net-first + TDD method:
-1. **file_picker Android leg:** SAF picker via a MethodChannel (pattern: the
-   export channel) + copy the picked `content://` file to an app-readable
-   path. Then delete `file_picker` + `flutter_plugin_android_lifecycle` from
-   pubspec and swap the facade's Android legs.
-
-   Sweep, verified 2026-08-09. Android reaches three legs: `androidPickPath`
-   (adopt, sync-from-file, import `.gabbro`/`.csv`/`.json`),
-   `androidPickFileWithData` (attach file), `androidPickDirectory` (JSON
-   export, entry file export). `androidSavePath` is dead — both save-mode
-   `PathField`s and `entry_detail`'s save branch are gated off Android.
-   `file_picker` copies the picked `content://` into the app cache and returns
-   that path; the folder picker returns a raw path, and writing there works
-   (hardware-checked).
-
-   Net — pin green against current code before any red test:
-   - [x] N1 off-Linux `savePath` + `pickFileWithData` routing
-     (`test/gabbro_file_picker_test.dart`)
-   - [x] N2 no save dialog on Android (`export_screen_test`,
-     `onboarding_screen_test`) — clears `androidSavePath` for deletion
-   - [x] N3 JSON export: picked folder -> exported path (`export_screen_test`)
-   - [x] N4 entry file export: Android joins folder + filename. The picker now
-     branches on `EntryDetailScreen.isAndroid` instead of `Platform.isAndroid`,
-     so the real default is testable.
-   - [x] N5 on Linux no Android leg is called — the swap is Android-only
-     (`test/gabbro_file_picker_test.dart`)
-
-   Design: one channel `app.gabbro.gabbro/picker` on `GabbroUnlockHostActivity`
-   (the shared base, so the autofill unlock screen gets it too). Methods: open
-   file, open file with bytes, pick folder. Picked files are copied into the app
-   cache so the rest of the app keeps handling plain paths. `.gabbro` has no
-   registered MIME type, so its picker must show all files — filtering it away
-   hides every vault.
-
-   TDD, red-first, in order:
-   - [x] 1 open sends the requested extensions, returns the platform's path
-   - [x] 2 open with no filter sends no extensions
-   - [x] 3 open returns null on cancel
-   - [x] 4 open-with-bytes returns name + bytes
-   - [x] 5 open-with-bytes returns null on cancel
-   - [x] 6 folder pick returns the path; null on cancel
-   - [x] 7 a platform failure propagates, so `runPicker` shows the SnackBar
-     (1-7: `lib/android_file_picker.dart`, `test/android_file_picker_test.dart`,
-     channel-mocked)
-   - [x] 8 `.csv`/`.json` map to MIME types; `.gabbro` falls back to all files
-   - [x] 9 a picked file is copied to the cache, bytes identical
-   - [x] 10 two picks of the same filename do not collide
-   - [x] 11 a picked folder yields a raw path (what the JSON export writes to)
-   - [x] 12 cancel returns null, not an error — no Kotlin unit test: the
-     callback needs a live Flutter activity. Covered by TDD 3/5/6 and hardware.
-     (8-12: `GabbroPicker.kt` + `GabbroPickerTest.kt`; the channel and the
-     dialog launchers live on `GabbroUnlockHostActivity`)
-   - [x] 13 off Linux all three legs route to the new client — pinned at the
-     channel, so the default (not a seam) is what is proven (N1 rewritten)
-   - [x] 14 `savePath` off Linux throws `UnsupportedError` — dead
-     `androidSavePath` deleted (it threw `ArgumentError` from `file_picker`,
-     so it could never have worked), a future Windows port fails loudly
-   - [x] 15 `file_picker` gone from `pubspec.yaml` (which took
-     `flutter_plugin_android_lifecycle` with it); About screen licence list
-     drops it, pinned by a test. `gradle.lockfile` regenerated, osv-scan clean.
-   - [x] 16 hardware: all three dialogs, both cancel paths, same-name imports,
-     JSON export and entry file export written to Download, sync from file
-2. **url_launcher:** Android = one ACTION_VIEW intent via MethodChannel;
+1. **url_launcher:** Android = one ACTION_VIEW intent via MethodChannel;
    Linux = `xdg-open`. 3 call sites (url_link, entry_detail, about). Then
    delete `url_launcher`.
 
