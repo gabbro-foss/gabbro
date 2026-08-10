@@ -45,10 +45,20 @@ String formatTimestamp(
 }
 
 Future<void> _defaultDelete(String id) => deleteEntry(id: id);
-Future<void> _defaultLaunchUrl(String url) async {
+/// The address to hand the system for [url], or null if it cannot be read.
+///
+/// The system picks the browser from the scheme, so a URL saved without one
+/// (`example.com`) gets `https://`: Android would otherwise find no app to
+/// handle it, and Linux would take the text for a filename.
+Uri? browserUri(String url) {
   var uri = Uri.tryParse(url);
-  if (uri == null) return;
+  if (uri == null) return null;
   if (uri.scheme.isEmpty) uri = Uri.tryParse('https://$url');
+  return uri;
+}
+
+Future<void> _defaultLaunchUrl(String url) async {
+  final uri = browserUri(url);
   if (uri == null) return;
   await launchUrl(uri, mode: LaunchMode.externalApplication);
 }

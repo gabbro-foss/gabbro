@@ -610,6 +610,24 @@ void main() {
     expect(launched, isFalse);
   });
 
+  // N4: a URL typed without a scheme still has to reach a browser. The system
+  // picks the app from the `https://` part — without it Android finds no
+  // handler and Linux treats the text as a filename, so nothing opens.
+  group('N4: the address handed to the system', () {
+    test('a bare host gains https://', () {
+      expect(browserUri('example.com'), Uri.parse('https://example.com'));
+    });
+
+    test('an address that already has a scheme is left alone', () {
+      expect(browserUri('http://example.com/x'),
+          Uri.parse('http://example.com/x'));
+    });
+
+    test('nothing is opened for an address that cannot be read', () {
+      expect(browserUri('http://[::1'), isNull);
+    });
+  });
+
   testWidgets('long-pressing revealed password shows breakdown sheet',
       (tester) async {
     await tester.pumpWidget(

@@ -4,6 +4,19 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/app_localizations.dart';
 
+/// Hands a URL to the system browser. Returns false when nothing could open it,
+/// which the caller turns into a message rather than a silent no-op.
+typedef UrlOpener = Future<bool> Function(Uri uri);
+
+Future<bool> _defaultOpenUrl(Uri uri) =>
+    launchUrl(uri, mode: LaunchMode.externalApplication);
+
+/// Overridable in tests; defaults to the real launcher.
+UrlOpener openUrl = _defaultOpenUrl;
+
+/// Restores [openUrl] to the production implementation (test teardown).
+void resetUrlOpener() => openUrl = _defaultOpenUrl;
+
 /// Show a URL to the user, then let them open it in the system browser.
 ///
 /// Gabbro never opens a browser straight from a tap: the URL is shown first
@@ -34,10 +47,7 @@ Future<void> showUrlDialog(
             icon: const Icon(Icons.open_in_new, size: 16),
             label: Text(l.openInBrowser),
             onPressed: () async {
-              final launched = await launchUrl(
-                Uri.parse(url),
-                mode: LaunchMode.externalApplication,
-              );
+              final launched = await openUrl(Uri.parse(url));
               if (!launched && context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
