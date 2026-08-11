@@ -2,6 +2,7 @@ import java.util.Properties
 
 plugins {
     id("com.android.application")
+    id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android Gradle plugin.
     id("dev.flutter.flutter-gradle-plugin")
 }
@@ -73,6 +74,14 @@ flutter {
     source = "../.."
 }
 
+// Kotlin must target the same JVM as compileOptions above; under Gradle 9 the
+// mismatch (Kotlin follows the running JDK) is a hard error, not a warning.
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+    }
+}
+
 // Dependency locking (app module): pins the SHIPPED release runtime dependency
 // graph — including external libraries pulled in transitively via plugin
 // subprojects — into gradle.lockfile, so the release APK is reproducible and its
@@ -100,5 +109,7 @@ dependencies {
     // classes (android.net.Uri, org.json, SharedPreferences) that are otherwise
     // stubbed to throw in plain unit tests — runs on the JVM, no device needed.
     testImplementation("junit:junit:4.13.2")
-    testImplementation("org.robolectric:robolectric:4.13")
+    // 4.16.1: first line whose ASM parses Java-25 class files (the JBR the
+    // tests run on); 4.13's ASM dies on class file major version 69.
+    testImplementation("org.robolectric:robolectric:4.16.1")
 }
