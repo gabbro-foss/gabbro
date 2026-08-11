@@ -145,11 +145,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
-- **A third sync choice — decide whether we want it at all before building.** It would take
-  the incoming vault and replace this one (dropping local-only entries, which nothing does
-  today). A third path may make the choice more confusing, not less; settle that first. The
-  dialog is already three buttons (auto, review, Cancel) in a scrollable column; a fourth is
-  what `test/sync_chooser_l10n_overflow_test.dart` will catch at 2x text.
 
 ### Security (pre-v1)
 - **Human expert cryptography review** of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
