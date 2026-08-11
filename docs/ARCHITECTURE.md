@@ -128,41 +128,25 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**8x cleanup done (2026-08-11); the SnackBar decision remains.** The render
-ceiling is 2x phone / 3x tablet (`clampToDevice`); 8x was the pre-trim ADR-016
-phase-1 cap that survived in storage, tests and docs. Fixed: storage ceiling
-now `kTabletMaxScale` (a stored 8.0 loads as 3.0, pinned in `settings_test.dart`
-A5), 17 test files swept to the real ceilings (tests import
-`kPhoneMaxScale`/`kTabletMaxScale`), lib comments and docs corrected.
+**Fix the three SnackBar messages that clip at reachable scale.** Sweep re-run
+2026-08-11 at the real 2x ceiling, 360dp phone, all 37 locales
+(`test/snackbar_message_reach_test.dart` — measurement harness, asserts
+nothing): 22 of 25 messages are readable everywhere with worst-case arguments;
+for them the 8x concern was fiction. Three failure messages clip — and a
+SnackBar clips without scrolling or throwing, so the rest of the only
+explanation the user gets is unreachable by any gesture:
 
-Remaining: re-judge the 26 SnackBar messages below at the *reachable* 2x/3x —
-does any run off screen, or was the concern pure 8x fiction and droppable?
-`test/snackbar_message_reach_test.dart` (untracked) measures but asserts
-nothing — make it a gate, or delete it with the concern.
+- `biometricEnrollFailed` (security_screen): 6/37 locales at a ~130-char
+  platform error.
+- `recoveryActionFailed` (recovery_history_screen): clips in kk at a realistic
+  path — embeds a `FileSystemException` carrying the full path, no cap.
+- `exportFailed` (entry_detail_screen): same unbounded path mechanism; clips
+  in any locale past ~200 chars total.
 
-Sweep, verified 2026-08-10 (locations still good):
-
-| Where | N | What they say |
-|---|---|---|
-| `manage_yubikeys_screen` | 8 | key added/removed; add, remove, alias-save failed; no FIDO device |
-| `vault_list_screen` | 6 | vault synced, nothing to sync, sync cancelled, entries imported |
-| `manage_folders_screen` | 3 | folder action failed |
-| `entry_detail_screen` | 3 | copied (+ clear timeout), recovery action failed |
-| `security_screen` | 2 | biometric unavailable, enrol failed |
-| `recovery_history_screen` | 1 | recovery action failed |
-| `create_entry_screen` | 1 | no changes to save |
-| `change_passphrase_screen` | 1 | export failed |
-| `safe_file_picker` | 1 | file dialog unavailable — every picker flow uses it |
-
-The failures are what matter: they are the only explanation the user gets. A
-success ("copied", "vault synced") costs little if missed — so this is not
-automatically 26 dialogs; decide per message between dialog, capped text scale,
-and accepted limit. Whether any of them runs off the screen at a *reachable*
-scale is unproven — that is step 2.
-
-Test by the message's rectangle or its scroll ancestor, never by a layout
-exception: a SnackBar clips instead of overflowing and throws nothing, so an
-overflow sweep passes blind (proven — see `test/url_link_overflow_test.dart`).
+Fix these three only (net first, then canon-TDD): scrolling dialog (ADR-016,
+as the URL refusal) or cap the detail — then turn the harness into a gate
+pinning them. Judge by the message's rectangle or scroll ancestor, never by a
+layout exception (a SnackBar throws nothing).
 
 ---
 
