@@ -8,6 +8,7 @@ import 'package:gabbro/app_paths.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/settings.dart';
+import 'package:gabbro/text_scale.dart';
 import 'package:gabbro/widgets/path_field.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
@@ -348,13 +349,13 @@ void main() {
 
   // The flagged risk: first-run now has three fixed buttons across the top
   // (Quit + language + accessibility). Longest-narrowest-largest must not clip.
-  testWidgets('first-run top row does not overflow at 8x on a 360px phone',
+  testWidgets('first-run top row does not overflow at 2x on a 360px phone',
       (tester) async {
     tester.view.physicalSize = const Size(360, 800);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
-    tester.platformDispatcher.textScaleFactorTestValue = 8.0;
+    tester.platformDispatcher.textScaleFactorTestValue = kPhoneMaxScale;
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
     await tester.pumpWidget(_buildScreen(onQuit: () {}));
     await tester.pumpAndSettle();

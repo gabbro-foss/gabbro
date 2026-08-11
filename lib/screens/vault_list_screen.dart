@@ -1734,8 +1734,8 @@ class _VaultListScreenState extends State<VaultListScreen>
           // a11y_region_net_test.dart.
           hintText: widget.isAndroid ? placeholder : null,
           // One line, both branches. Left to wrap, the placeholder grew the
-          // field to 1364 px at 8x text on a 360dp phone and the entry list
-          // was squeezed to nothing (vault_list_overflow_test.dart).
+          // field until the entry list was squeezed to nothing on a 360dp
+          // phone (vault_list_overflow_test.dart).
           hintMaxLines: 1,
           hint: widget.isAndroid
               ? null

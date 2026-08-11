@@ -11,6 +11,7 @@ import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/screens/import_screen.dart';
 import 'package:gabbro/screens/import_skipped_dialog.dart';
 import 'package:gabbro/src/rust/api/import.dart';
+import 'package:gabbro/text_scale.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/widgets/path_field.dart';
 import 'package:gabbro/widgets/yubikey_tap.dart';
@@ -746,7 +747,7 @@ void main() {
       await tester.pump();
     }
 
-    testWidgets('the too-old refusal survives every locale at 8x text',
+    testWidgets('the too-old refusal survives every locale at 2x text',
         (tester) async {
       tester.view.physicalSize = const Size(360, 800);
       tester.view.devicePixelRatio = 1.0;
@@ -757,12 +758,12 @@ void main() {
           tester,
           importShell(
             locale: locale,
-            textScaler: const TextScaler.linear(8.0),
+            textScaler: const TextScaler.linear(kPhoneMaxScale),
           ),
         );
 
         expect(tester.takeException(), isNull,
-            reason: '$locale at 8x must scroll, never overflow');
+            reason: '$locale at 2x must scroll, never overflow');
       }
     });
 

@@ -8,6 +8,7 @@ import 'package:gabbro/main.dart' show gabbroLocalizationsDelegates;
 import 'package:gabbro/safe_file_picker.dart' show FilePickerUnavailable;
 import 'package:gabbro/screens/adopt_vault_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
+import 'package:gabbro/text_scale.dart';
 import 'package:gabbro/vault_registry.dart';
 import 'package:gabbro/widgets/path_field.dart';
 
@@ -430,7 +431,7 @@ void main() {
   // N2: longest strings x largest text x narrowest phone, together, through
   // every state of the flow — the catalog probe only sweeps the initial state
   // at 2x.
-  group('N2: every locale at 8x on a 360dp phone', () {
+  group('N2: every locale at 2x on a 360dp phone', () {
     testWidgets('all five states render without overflow', (tester) async {
       tester.view.physicalSize = const Size(360, 800);
       tester.view.devicePixelRatio = 1.0;
@@ -453,7 +454,7 @@ void main() {
           supportedLocales: AppLocalizations.supportedLocales,
           builder: (context, child) => MediaQuery(
             data: MediaQuery.of(context)
-                .copyWith(textScaler: const TextScaler.linear(8.0)),
+                .copyWith(textScaler: const TextScaler.linear(kPhoneMaxScale)),
             child: child!,
           ),
           home: AdoptVaultScreen(
@@ -474,7 +475,7 @@ void main() {
         await tester.pumpAndSettle();
         final l = lookupAppLocalizations(locale);
 
-        // The screen's own list, not a TextField's inner scrollable — at 8x a
+        // The screen's own list, not a TextField's inner scrollable — at 2x a
         // huge field can own the list's centre, so centre-drags are unsafe.
         final list = find
             .descendant(
@@ -488,13 +489,13 @@ void main() {
         }
 
         Future<void> browse() async {
-          // Back to the top: at 8x the lazy ListView disposes the path field
+          // Back to the top: at 2x the lazy ListView disposes the path field
           // once later steps scroll it away.
           await show(find.byKey(const Key('adopt_path_field')), -400);
           await _tapBrowse(tester);
           await tester.pumpAndSettle();
           expect(tester.takeException(), isNull,
-              reason: 'state after pick ${picks[pick - 1]} must scroll at 8x '
+              reason: 'state after pick ${picks[pick - 1]} must scroll at 2x '
                   'in $locale, never overflow');
         }
 
@@ -504,7 +505,7 @@ void main() {
             reason: 'confirm must be on screen for $locale');
 
         // 2. confirm with the colliding alias -> collision error. Invoked
-        // directly: at 8x the button can be taller than the viewport, so a
+        // directly: at 2x the button can be taller than the viewport, so a
         // centre-tap misses — a harness artifact. Tappability is pinned at
         // 1x by F3; this sweep asserts layout.
         await show(find.byKey(const Key('adopt_confirm_button')), 400);
@@ -513,9 +514,9 @@ void main() {
             .onPressed!();
         await tester.pumpAndSettle();
         expect(tester.takeException(), isNull,
-            reason: 'collision error must scroll at 8x in $locale');
+            reason: 'collision error must scroll at 2x in $locale');
         // The zero-size collision marker can sit outside the lazy list's
-        // build range at 8x — assert the user-visible signal instead: the
+        // build range at 2x — assert the user-visible signal instead: the
         // localized collision message on the alias field.
         await show(find.byKey(const Key('adopt_alias_field')), -400);
         expect(

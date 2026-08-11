@@ -2,14 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gabbro/text_scale.dart';
 import 'package:gabbro/widgets/gabbro_dialog.dart';
 
 // A dialog's buttons live in a fixed strip that never scrolls, and its message
-// shrinks to whatever is left over. Measured on a 360dp phone: at 2x the message
-// is silently cut short, at 4x it renders at zero height and the buttons sit at
-// y=960 on an 800px screen — the user cannot read the question or reach either
-// answer. showGabbroDialog puts the whole dialog in a scroll view to fix that,
-// and must leave normal text exactly as it was.
+// shrinks to whatever is left over. Measured on a 360dp phone at the 2x device
+// ceiling: the message is silently cut short — the user cannot read the whole
+// question. showGabbroDialog puts the whole dialog in a scroll view to fix
+// that, and must leave normal text exactly as it was.
 
 const _body = 'This cannot be undone. The vault file and every entry inside it '
     'will be removed from this device permanently.';
@@ -66,13 +66,12 @@ void main() {
     expect(tester.getRect(find.text(_body)), stockBody);
   });
 
-  for (final scale in <double>[2.0, 4.0, 8.0]) {
+  for (final scale in <double>[kPhoneMaxScale]) {
     testWidgets('${scale}x text: the question is readable in full',
         (tester) async {
       await _pump(tester, scale: scale, dialog: _confirm());
       expect(tester.takeException(), isNull);
-      // Cut short, the message renders shorter than its own text needs — at 4x
-      // and above it collapsed to zero.
+      // Cut short, the message renders shorter than its own text needs.
       expect(
         tester.getRect(find.text(_body)).height,
         greaterThan(200 * scale),
@@ -102,7 +101,7 @@ void main() {
   testWidgets('a dialog with scrollable: true still lays out', (tester) async {
     await _pump(
       tester,
-      scale: 8.0,
+      scale: kPhoneMaxScale,
       dialog: AlertDialog(
         scrollable: true,
         title: const Text('Delete vault?'),
@@ -117,7 +116,7 @@ void main() {
   testWidgets('a dialog holding a list still lays out', (tester) async {
     await _pump(
       tester,
-      scale: 8.0,
+      scale: kPhoneMaxScale,
       dialog: AlertDialog(
         title: const Text('Pick one'),
         content: SizedBox(

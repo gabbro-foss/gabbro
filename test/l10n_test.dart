@@ -382,13 +382,14 @@ void main() {
       });
     }
 
-    testWidgets('stored 8.0 clamps to device max 2.0 on a phone-sized surface',
-        (tester) async {
+    testWidgets(
+        'an out-of-range stored scale clamps to device max 2.0 on a '
+        'phone-sized surface', (tester) async {
       tester.view.physicalSize = const Size(360 * 3, 800 * 3);
       tester.view.devicePixelRatio = 3.0;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
-      await tester.pumpWidget(buildWithScale(8.0));
+      await tester.pumpWidget(buildWithScale(99.0));
       await tester.pump();
       expect(find.text('2.00'), findsOneWidget);
     });

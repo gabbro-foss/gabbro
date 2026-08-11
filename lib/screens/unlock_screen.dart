@@ -510,8 +510,8 @@ class _UnlockScreenState extends State<UnlockScreen>
       context: context,
       builder: (ctx) => AlertDialog(
         // Buttons live in the scrollable content, not `actions`: an
-        // AlertDialog never scrolls its actions, which pushes them off a
-        // 360dp phone at 8x text (same fix as SyncMethodDialog, ADR-016).
+        // AlertDialog never scrolls its actions, which can push them off a
+        // 360dp phone at 2x text (same fix as SyncMethodDialog, ADR-016).
         scrollable: true,
         title: Text(l.restoreFromFileConfirmTitle),
         content: Column(

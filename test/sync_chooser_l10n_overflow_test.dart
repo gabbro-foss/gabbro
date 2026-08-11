@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart' show gabbroLocalizationsDelegates;
+import 'package:gabbro/text_scale.dart';
 import 'package:gabbro/widgets/sync_method_dialog.dart';
 
 // The sync-method chooser is the last thing between a user and a merge they
@@ -71,25 +72,25 @@ void main() {
     expect(find.text('Cancel'), findsOneWidget);
   });
 
-  testWidgets('no overflow in any locale at 8x on a 360dp phone',
+  testWidgets('no overflow in any locale at 2x on a 360dp phone',
       (tester) async {
     phoneSurface(tester);
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
 
     final failed = <String>[];
     for (final locale in AppLocalizations.supportedLocales) {
-      if (await _overflowFor(tester, locale, 8.0) != null) {
+      if (await _overflowFor(tester, locale, kPhoneMaxScale) != null) {
         failed.add(locale.toLanguageTag());
       }
     }
-    expect(failed, isEmpty, reason: 'locales overflowing at 8x: $failed');
+    expect(failed, isEmpty, reason: 'locales overflowing at 2x: $failed');
   });
 
-  // Cancel lives in the AlertDialog's `actions`, which never scroll: at 8x it is
-  // pushed off the bottom of a 360dp phone, so a user at the largest text size
-  // has no visible way out of the chooser. Every choice must be reachable at
-  // every supported text scale.
-  testWidgets('all three choices are tappable at 8x on a 360dp phone',
+  // Cancel lives in the AlertDialog's `actions`, which never scroll: at large
+  // text it can be pushed off the bottom of a 360dp phone, leaving a user at
+  // the largest text size no visible way out of the chooser. Every choice must
+  // be reachable at every supported text scale.
+  testWidgets('all three choices are tappable at 2x on a 360dp phone',
       (tester) async {
     phoneSurface(tester);
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
@@ -101,7 +102,7 @@ void main() {
       l.cancel,
     ]) {
       final navigator = GlobalKey<NavigatorState>();
-      tester.platformDispatcher.textScaleFactorTestValue = 8.0;
+      tester.platformDispatcher.textScaleFactorTestValue = kPhoneMaxScale;
       await tester.pumpWidget(
         MaterialApp(
           navigatorKey: navigator,
@@ -124,8 +125,8 @@ void main() {
       final target = find.text(label);
       await tester.ensureVisible(target);
       await tester.pumpAndSettle();
-      // At 8x one wrapped label is taller than the whole screen, so its centre
-      // (what tester.tap aims at) is off the bottom while the control itself is
+      // A wrapped label can extend below the screen, putting its centre (what
+      // tester.tap aims at) off the bottom while the control itself is
       // perfectly reachable. Tap a point inside its visible part, as a finger
       // would — that is the real question: can the user hit this choice?
       final rect = tester.getRect(target);
@@ -137,7 +138,7 @@ void main() {
       );
       await tester.tapAt(Offset(rect.center.dx, y));
       await tester.pumpAndSettle();
-      expect(popped, isTrue, reason: '"$label" must be tappable at 8x');
+      expect(popped, isTrue, reason: '"$label" must be tappable at 2x');
     }
   });
 }

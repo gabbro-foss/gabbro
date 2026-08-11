@@ -601,9 +601,9 @@ void main() {
   //
   // Windowed mode cannot go below two chevrons, two ellipsis slots and one
   // letter. Given less than that it used to draw all of it anyway and overflow
-  // the bottom — on a 360dp phone at 8x text the list area is ~142px, so the
-  // bar spilled 38px over the entries. Below its minimum the bar stands down
-  // and the list keeps the space.
+  // the bottom — with the list area squeezed to ~142px the bar spilled 38px
+  // over the entries. Below its minimum the bar stands down and the list
+  // keeps the space.
 
   testWidgets('short but usable height: still renders, no overflow',
       (tester) async {

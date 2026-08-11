@@ -6,6 +6,7 @@ import 'package:gabbro/gabbro_url_opener.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/linux_url_opener.dart';
 import 'package:gabbro/main.dart' show gabbroLocalizationsDelegates;
+import 'package:gabbro/text_scale.dart';
 import 'package:gabbro/widgets/url_link.dart';
 
 // The refusal message is the only thing a user gets when a stored link will not
@@ -61,9 +62,8 @@ Future<Object?> _overflowFor(
 
 /// Whether the user can actually get to the whole message.
 ///
-/// At 8x no message this long fits a phone screen — the wrapped text is taller
-/// than the display — so "fits inside the screen" is unachievable and the wrong
-/// thing to ask. What matters is that it can be scrolled to, which is what a
+/// At the 2x phone ceiling a long translation can wrap taller than the
+/// display, so "fits inside the screen" is the wrong thing to ask. What matters is that it can be scrolled to, which is what a
 /// dialog gives (ADR-016) and a SnackBar does not: a SnackBar clips, leaving
 /// the rest unreachable by any gesture.
 bool _messageIsReachable(WidgetTester tester, Finder message) {
@@ -98,14 +98,14 @@ void main() {
     expect(await _overflowFor(tester, const Locale('en'), 1.0), isNull);
   });
 
-  testWidgets('7e-2: no overflow in any locale at 8x on a 360dp phone',
+  testWidgets('7e-2: no overflow in any locale at 2x on a 360dp phone',
       (tester) async {
     phoneSurface(tester);
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
 
     final failed = <String>[];
     for (final locale in AppLocalizations.supportedLocales) {
-      final exception = await _overflowFor(tester, locale, 8.0);
+      final exception = await _overflowFor(tester, locale, kPhoneMaxScale);
       final message = find.text(
         lookupAppLocalizations(locale).onlyWebLinks,
       );
@@ -115,15 +115,18 @@ void main() {
         failed.add(locale.toLanguageTag());
       }
     }
-    expect(failed, isEmpty, reason: 'locales unreadable at 8x: $failed');
+    expect(failed, isEmpty, reason: 'locales unreadable at 2x: $failed');
   });
 
-  testWidgets('7e-3: at 8x the message can still be scrolled to',
+  testWidgets('7e-3: at 2x the message can still be scrolled to',
       (tester) async {
     phoneSurface(tester);
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
 
-    expect(await _overflowFor(tester, const Locale('en'), 8.0), isNull);
+    expect(
+      await _overflowFor(tester, const Locale('en'), kPhoneMaxScale),
+      isNull,
+    );
 
     final message = find.text('Only web links can be opened');
     expect(message, findsOneWidget);

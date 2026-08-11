@@ -20,10 +20,9 @@ class SyncMethodDialog extends StatelessWidget {
     final l = AppLocalizations.of(context);
     return AlertDialog(
       // All three choices are long buttons, so they live in scrollable content.
-      // An AlertDialog never scrolls its `actions`: a Cancel left there is
-      // pushed off the bottom of a 360dp phone at the maximum supported text
-      // scale (8x) and cannot be tapped at all, and the dialog overflows in 32
-      // of the 37 languages. Cancel therefore sits with the other two, and
+      // An AlertDialog never scrolls its `actions`: a Cancel left there can be
+      // pushed off the bottom of a 360dp phone at the 2x device ceiling and
+      // cannot be tapped at all. Cancel therefore sits with the other two, and
       // replaces the barrier tap (ADR-016).
       scrollable: true,
       title: Text(l.syncMethodTitle),

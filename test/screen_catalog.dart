@@ -48,6 +48,7 @@ import 'package:gabbro/src/rust/api/entropy.dart';
 import 'package:gabbro/src/rust/api/import.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
+import 'package:gabbro/text_scale.dart';
 
 // Shared catalog of every headless-renderable screen, widget and dialog, plus
 // the surfaces and app shell used to render them. Both "every screen" nets sweep
@@ -66,13 +67,14 @@ class Surface {
 const phone = Surface('phone 360dp->2.0x', Size(1080, 2400), 3.0);
 const tablet = Surface('tablet 866dp->3x', Size(1732, 2400), 2.0);
 
-/// The real app shell around [screen]. [textScale] 8.0 is above every device
-/// max, so `clampToDevice` renders each surface at its ceiling (overflow probe);
-/// pass 1.0 for a natural render (accessibility net). [localizationsDelegates]
-/// defaults to production; the overflow probe's padded axis swaps it.
+/// The real app shell around [screen]. The default [textScale] is the tablet
+/// ceiling, which `clampToDevice` trims to each surface's own max (2x phone,
+/// 3x tablet — overflow probe); pass 1.0 for a natural render (accessibility
+/// net). [localizationsDelegates] defaults to production; the overflow probe's
+/// padded axis swaps it.
 Widget appShell(
   Widget screen, {
-  double textScale = 8.0,
+  double textScale = kTabletMaxScale,
   ThemeChoice theme = ThemeChoice.system,
   bool highContrast = false,
   Iterable<LocalizationsDelegate<dynamic>> localizationsDelegates =
@@ -352,7 +354,7 @@ final Map<String, Widget Function()> screens = {
     onBackupUsable: (_) async => false,
   ),
   // Initial state only (path field): the picked/error states need interaction
-  // and are swept at 8x/37 locales by the flow test in
+  // and are swept at 2x/37 locales by the flow test in
   // adopt_vault_screen_test.dart.
   'adopt_vault': () => AdoptVaultScreen(
     registry: VaultRegistry([]),

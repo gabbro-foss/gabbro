@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/screens/csv_mapping_screen.dart';
 import 'package:gabbro/src/rust/api/import.dart';
+import 'package:gabbro/text_scale.dart';
 import 'test_helpers.dart';
 
 // ── Factories ─────────────────────────────────────────────────────────────────
@@ -76,12 +77,13 @@ Future<void> _tapImport(WidgetTester tester) async {
 void main() {
   // ── Large-text preview table (ADR-016) ────────────────────────────────────
   // On hardware the preview heading row ([name, url, username]) clipped
-  // mid-height at tablet 5x (default 56px row); it must grow with the scale.
+  // mid-height at large tablet scale (default 56px row, seen during the
+  // ADR-016 trimming passes); it must grow with the scale.
 
   testWidgets('preview heading row grows with the text scale', (tester) async {
     await tester.pumpWidget(_buildScreenScaled(
       preview: _preview(['Name', 'URL', 'Username']),
-      scale: 3.0,
+      scale: kTabletMaxScale,
     ));
     final h = _previewTable(tester).headingRowHeight;
     expect(h, isNotNull);

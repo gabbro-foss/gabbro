@@ -5,6 +5,7 @@ import 'test_helpers.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
+import 'package:gabbro/text_scale.dart';
 
 // Regression coverage for the "BOTTOM OVERFLOWED" the keyboard caused on the
 // vault list. Each case opens the keyboard (a large bottom view inset) across
@@ -98,7 +99,7 @@ double _listHeight(WidgetTester tester) =>
 void main() {
   // Two-pane layout at large text, no keyboard. Pins the current geometry so a
   // change to the row's children is judged against a known-good baseline.
-  for (final scale in <double>[2.0, 4.0]) {
+  for (final scale in <double>[2.0, kTabletMaxScale]) {
     testWidgets('two-pane at ${scale}x text: no overflow', (tester) async {
       await _pumpAtTextScale(tester, w: 900, h: 700, textScale: scale);
       expect(tester.takeException(), isNull);
@@ -107,11 +108,9 @@ void main() {
 
   // Phone width at large text. The header (search, folder, chips) is fixed
   // height and the list takes what is left, so a header that grows without
-  // bound leaves the list nothing: at 8x the entry list was 0 px tall and the
-  // body overflowed by 1010 px. The placeholder inside the search box was the
-  // whole of it — it wrapped to as many lines as it liked (1344 px of a
-  // 1364 px field).
-  for (final scale in <double>[1.0, 2.0, 4.0, 8.0]) {
+  // bound leaves the list nothing: the unclamped search placeholder once
+  // wrapped to as many lines as it liked and left the entry list 0 px tall.
+  for (final scale in <double>[1.0, kPhoneMaxScale]) {
     testWidgets('phone 360dp at ${scale}x text: list still has room',
         (tester) async {
       await _pumpAtTextScale(tester, w: 360, h: 800, textScale: scale);
@@ -126,17 +125,17 @@ void main() {
   // overflow on one platform only.
   for (final android in <bool>[false, true]) {
     testWidgets(
-        'search box stays one line at 8x text (isAndroid: $android)',
+        'search box stays one line at 2x text (isAndroid: $android)',
         (tester) async {
       await _pumpAtTextScale(
         tester,
         w: 360,
         h: 800,
-        textScale: 8.0,
+        textScale: kPhoneMaxScale,
         isAndroid: android,
       );
-      // One 8x line plus the field's own padding measures 212; a second line
-      // would put it near 400. The unbounded placeholder made it 1364.
+      // One line plus the field's own padding stays well under 300; a
+      // placeholder that wraps instead of ellipsizing pushes past it.
       expect(
         tester.getSize(find.byType(TextField).first).height,
         lessThan(300),

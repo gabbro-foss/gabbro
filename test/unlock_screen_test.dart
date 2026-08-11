@@ -14,6 +14,7 @@ import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
+import 'package:gabbro/text_scale.dart';
 import 'package:gabbro/vault_registry.dart';
 import 'package:gabbro/widgets/gabbro_logo.dart';
 
@@ -350,7 +351,7 @@ void main() {
   // R5: the label is longer in most languages than in English, and the worst
   // case is the longest translation at the largest scale on the narrowest
   // screen — all three together (ADR-016).
-  testWidgets('Cancel survives every locale at 8x text on a 360dp phone',
+  testWidgets('Cancel survives every locale at 2x text on a 360dp phone',
       (tester) async {
     tester.view.physicalSize = const Size(360, 800);
     tester.view.devicePixelRatio = 1.0;
@@ -360,14 +361,14 @@ void main() {
       await tester.pumpWidget(_nestedUnlock(
         onQuit: () {},
         locale: locale,
-        textScaler: const TextScaler.linear(8.0),
+        textScaler: const TextScaler.linear(kPhoneMaxScale),
       ));
       await tester.pumpAndSettle();
 
       expect(find.byType(IconButton), findsWidgets,
           reason: 'precondition: the Cancel control is rendered in $locale');
       expect(tester.takeException(), isNull,
-          reason: 'Cancel must not overflow at 8x text in $locale');
+          reason: 'Cancel must not overflow at 2x text in $locale');
     }
   });
 
@@ -726,7 +727,7 @@ void main() {
 
     // RT-3 banner: two sentences plus a link button, so it is the longest text
     // block on the screen and the likeliest to bleed.
-    testWidgets('format-too-old banner survives a narrow phone at 8x text',
+    testWidgets('format-too-old banner survives a narrow phone at 2x text',
         (tester) async {
       // 360x800 phone, the app's text-scale ceiling (ADR-016).
       tester.view.physicalSize = const Size(360, 800);
@@ -735,20 +736,20 @@ void main() {
 
       await tester.pumpWidget(_appShell(
         _bareFormatTooOld(),
-        textScaler: const TextScaler.linear(8.0),
+        textScaler: const TextScaler.linear(kPhoneMaxScale),
       ));
       await tester.pumpAndSettle();
 
       expect(tester.takeException(), isNull,
-          reason: 'the banner must scroll at 8x text, never overflow');
+          reason: 'the banner must scroll at 2x text, never overflow');
     });
 
     // A user who needs large text must not get a broken screen in their own
     // language: the worst case is the LONGEST translation at the LARGEST scale
     // on the NARROWEST screen, and testing scale and locale separately never
-    // meets it. Sweep every supported locale at the 8x ceiling rather than
-    // guessing which translation is longest.
-    testWidgets('format-too-old banner survives every locale at 8x text',
+    // meets it. Sweep every supported locale at the 2x phone ceiling rather
+    // than guessing which translation is longest.
+    testWidgets('format-too-old banner survives every locale at 2x text',
         (tester) async {
       tester.view.physicalSize = const Size(360, 800);
       tester.view.devicePixelRatio = 1.0;
@@ -758,7 +759,7 @@ void main() {
         await tester.pumpWidget(_appShell(
           _bareFormatTooOld(),
           locale: locale,
-          textScaler: const TextScaler.linear(8.0),
+          textScaler: const TextScaler.linear(kPhoneMaxScale),
         ));
         await tester.pumpAndSettle();
 
@@ -768,7 +769,7 @@ void main() {
         // Flutter folds both into one opaque "Multiple exceptions" wrapper, and
         // a `contains` check on it passes either way.
         expect(tester.takeException(), isNull,
-            reason: '$locale at 8x must scroll, never overflow');
+            reason: '$locale at 2x must scroll, never overflow');
       }
     });
 
@@ -1297,7 +1298,7 @@ void main() {
     });
 
     testWidgets(
-        'H1e: the stale-biometric message survives every locale at 8x on a '
+        'H1e: the stale-biometric message survives every locale at 2x on a '
         '360dp phone', (tester) async {
       tester.view.physicalSize = const Size(360, 800);
       tester.view.devicePixelRatio = 1.0;
@@ -1313,7 +1314,7 @@ void main() {
           supportedLocales: AppLocalizations.supportedLocales,
           builder: (context, child) => MediaQuery(
             data: MediaQuery.of(context)
-                .copyWith(textScaler: const TextScaler.linear(8.0)),
+                .copyWith(textScaler: const TextScaler.linear(kPhoneMaxScale)),
             child: child!,
           ),
           home: UnlockScreen(
@@ -1341,7 +1342,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(tester.takeException(), isNull,
-            reason: 'the message must scroll at 8x in $locale, never overflow');
+            reason: 'the message must scroll at 2x in $locale, never overflow');
         final l = lookupAppLocalizations(locale);
         expect(find.text(l.biometricStaleDisabled), findsOneWidget,
             reason: 'the message must be on screen for $locale to mean anything');
@@ -2472,7 +2473,7 @@ void main() {
   // text on the narrowest phone. Testing scale and locale apart never meets that
   // case — the sync chooser overflowed in 32 of 37 languages while its English
   // check passed.
-  testWidgets('the biometric notice survives every locale at 8x on a 360dp phone',
+  testWidgets('the biometric notice survives every locale at 2x on a 360dp phone',
       (tester) async {
     tester.view.physicalSize = const Size(360, 800);
     tester.view.devicePixelRatio = 1.0;
@@ -2495,7 +2496,7 @@ void main() {
         supportedLocales: AppLocalizations.supportedLocales,
         builder: (context, child) => MediaQuery(
           data: MediaQuery.of(context)
-              .copyWith(textScaler: const TextScaler.linear(8.0)),
+              .copyWith(textScaler: const TextScaler.linear(kPhoneMaxScale)),
           child: child!,
         ),
         home: UnlockScreen(
@@ -2518,7 +2519,7 @@ void main() {
       ));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull,
-          reason: '$locale must render the corrupt screen cleanly at 8x');
+          reason: '$locale must render the corrupt screen cleanly at 2x');
 
       // Drive the restore, or the notice never renders and this sweep passes
       // without ever laying the new string out.
@@ -2526,16 +2527,16 @@ void main() {
       final restoreButton = find.text(l.restoreFromFileButton).first;
       await tester.ensureVisible(restoreButton);
       await tester.pumpAndSettle();
-      // At 8x the wrapped label is taller than the screen, so its centre (what
-      // tap aims at) is off the bottom while the control is reachable. Hit a
-      // point inside its visible part, as a finger would.
+      // At large text the wrapped label can extend below the screen, putting
+      // its centre (what tap aims at) off the bottom while the control is
+      // reachable. Hit a point inside its visible part, as a finger would.
       final rect = tester.getRect(restoreButton);
       final y = (rect.top < 0 ? 0.0 : rect.top) + 20;
       await tester.tapAt(Offset(rect.center.dx, y));
       await tester.pumpAndSettle();
 
       expect(tester.takeException(), isNull,
-          reason: 'the confirm dialog must render at 8x in $locale, '
+          reason: 'the confirm dialog must render at 2x in $locale, '
               'never overflow');
 
       // F12: drive through the confirm dialog, same visible-part tap.
@@ -2549,7 +2550,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(tester.takeException(), isNull,
-          reason: 'the notice must scroll at 8x in $locale, never overflow');
+          reason: 'the notice must scroll at 2x in $locale, never overflow');
 
       expect(
         find.text(l.vaultRestoredBiometricDisabled),
