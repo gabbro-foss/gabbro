@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **The stored text-scale ceiling now matches what the app can show.** Renders always capped at 2x (phone) / 3x (tablet); the settings file could still hold up to 8.0 from an older design. A hand-edited value above 3.0 now loads as 3.0.
+
 ## [0.1.0-alpha.19] – 2026-08-10
 
 ### Fixed

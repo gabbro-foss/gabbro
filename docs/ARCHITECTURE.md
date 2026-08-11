@@ -24,7 +24,7 @@ Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
 
 **Password generator:** classic (32–256 chars) and passphrase (4–20 words, many languages, EFF-style wordlists embedded at compile time). Classic mode is script-aware (Latin/Greek/Cyrillic pools). All generation in Rust.
 
-**Settings:** `~/.config/gabbro/settings.jsonc` (Linux). JSONC format — human-editable. Theme, text scale (`text_scale`, 0.8-8.0), high-contrast, alphabet bar position.
+**Settings:** `~/.config/gabbro/settings.jsonc` (Linux). JSONC format — human-editable. Theme, text scale (`text_scale`, 0.8-3.0; renders clamp to the device max — 2x under 600dp shortest side, 3x above, `lib/text_scale.dart`), high-contrast, alphabet bar position.
 
 **Keyboard shortcuts (Linux desktop):** Ctrl+L lock, Ctrl+F / Ctrl+Shift+F search, Ctrl+N new entry, Ctrl+M menu, Ctrl+Q lock and quit (confirms first), Esc dismiss/cancel. No Ctrl+C (copying a secret stays a deliberate, auto-clearing action); no Super key. Listed in-app on the desktop-only Keyboard shortcuts screen.
 
@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2238 | 10 |
+| Flutter (`flutter test`) | 2240 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 165 | 15 |
 
@@ -128,13 +128,19 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**Messages that cannot be read at large text sizes.** A SnackBar is a fixed
-strip: long text runs past the bottom edge and the rest is unreachable by any
-gesture. At 8x on a 360dp phone the URL message measured 2080dp of text on an
-800dp screen, in all 37 locales (found 2026-08-10). Those two moved to a dialog,
-which scrolls as a whole (ADR-016). The other 26 have the same problem.
+**8x cleanup done (2026-08-11); the SnackBar decision remains.** The render
+ceiling is 2x phone / 3x tablet (`clampToDevice`); 8x was the pre-trim ADR-016
+phase-1 cap that survived in storage, tests and docs. Fixed: storage ceiling
+now `kTabletMaxScale` (a stored 8.0 loads as 3.0, pinned in `settings_test.dart`
+A5), 17 test files swept to the real ceilings (tests import
+`kPhoneMaxScale`/`kTabletMaxScale`), lib comments and docs corrected.
 
-Sweep, verified 2026-08-10:
+Remaining: re-judge the 26 SnackBar messages below at the *reachable* 2x/3x —
+does any run off screen, or was the concern pure 8x fiction and droppable?
+`test/snackbar_message_reach_test.dart` (untracked) measures but asserts
+nothing — make it a gate, or delete it with the concern.
+
+Sweep, verified 2026-08-10 (locations still good):
 
 | Where | N | What they say |
 |---|---|---|
@@ -148,10 +154,11 @@ Sweep, verified 2026-08-10:
 | `change_passphrase_screen` | 1 | export failed |
 | `safe_file_picker` | 1 | file dialog unavailable — every picker flow uses it |
 
-The failures are what matter: they are the only explanation the user gets, and
-they are the ones that run off the screen. A success ("copied", "vault synced")
-costs little if missed — so this is not automatically 26 dialogs; decide per
-message between dialog, capped text scale, and accepted limit.
+The failures are what matter: they are the only explanation the user gets. A
+success ("copied", "vault synced") costs little if missed — so this is not
+automatically 26 dialogs; decide per message between dialog, capped text scale,
+and accepted limit. Whether any of them runs off the screen at a *reachable*
+scale is unproven — that is step 2.
 
 Test by the message's rectangle or its scroll ancestor, never by a layout
 exception: a SnackBar clips instead of overflowing and throws nothing, so an
@@ -184,7 +191,7 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   the incoming vault and replace this one (dropping local-only entries, which nothing does
   today). A third path may make the choice more confusing, not less; settle that first. The
   dialog is already three buttons (auto, review, Cancel) in a scrollable column; a fourth is
-  what `test/sync_chooser_l10n_overflow_test.dart` will catch at 8x text.
+  what `test/sync_chooser_l10n_overflow_test.dart` will catch at 2x text.
 
 ### Security (pre-v1)
 - **Human expert cryptography review** of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
