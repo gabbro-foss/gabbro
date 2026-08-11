@@ -21,27 +21,27 @@ void main() {
 
   group('scaleForPos', () {
     test('pos 0 is the minimum scale 0.8', () {
-      expect(scaleForPos(0.0, 6.0), closeTo(0.8, 1e-9));
-      expect(scaleForPos(0.0, 8.0), closeTo(0.8, 1e-9));
+      expect(scaleForPos(0.0, kPhoneMaxScale), closeTo(0.8, 1e-9));
+      expect(scaleForPos(0.0, kTabletMaxScale), closeTo(0.8, 1e-9));
     });
 
     test('pos 1 is the device max', () {
-      expect(scaleForPos(1.0, 6.0), closeTo(6.0, 1e-9));
-      expect(scaleForPos(1.0, 8.0), closeTo(8.0, 1e-9));
+      expect(scaleForPos(1.0, kPhoneMaxScale), closeTo(2.0, 1e-9));
+      expect(scaleForPos(1.0, kTabletMaxScale), closeTo(3.0, 1e-9));
     });
 
     test('is monotonic increasing across the track', () {
-      var prev = scaleForPos(0.0, 6.0);
+      var prev = scaleForPos(0.0, kTabletMaxScale);
       for (var p = 0.05; p <= 1.0; p += 0.05) {
-        final s = scaleForPos(p, 6.0);
+        final s = scaleForPos(p, kTabletMaxScale);
         expect(s, greaterThan(prev), reason: 'pos=$p');
         prev = s;
       }
     });
 
     test('pos 0.5 sits below the linear midpoint (exponential slope)', () {
-      // Linear midpoint would be (0.8 + 6.0) / 2 = 3.4.
-      expect(scaleForPos(0.5, 6.0), lessThan(3.4));
+      // Linear midpoint would be (0.8 + 3.0) / 2 = 1.9.
+      expect(scaleForPos(0.5, kTabletMaxScale), lessThan(1.9));
     });
   });
 
@@ -49,13 +49,15 @@ void main() {
 
   group('posForScale', () {
     test('min scale maps to pos 0, device max to pos 1', () {
-      expect(posForScale(0.8, 6.0), closeTo(0.0, 1e-9));
-      expect(posForScale(6.0, 6.0), closeTo(1.0, 1e-9));
+      expect(posForScale(0.8, kTabletMaxScale), closeTo(0.0, 1e-9));
+      expect(posForScale(3.0, kTabletMaxScale), closeTo(1.0, 1e-9));
     });
 
     test('is the exact inverse of scaleForPos', () {
-      for (final x in [0.8, 1.0, 2.0, 6.0]) {
-        expect(scaleForPos(posForScale(x, 6.0), 6.0), closeTo(x, 1e-9),
+      for (final x in [0.8, 1.0, 2.0, 3.0]) {
+        expect(
+            scaleForPos(posForScale(x, kTabletMaxScale), kTabletMaxScale),
+            closeTo(x, 1e-9),
             reason: 'x=$x');
       }
     });
@@ -65,23 +67,23 @@ void main() {
 
   group('targetScaleFor', () {
     test('normal text scale gives normal targets (1.0)', () {
-      expect(targetScaleFor(1.0, 6.0), closeTo(1.0, 1e-9));
+      expect(targetScaleFor(1.0, kTabletMaxScale), closeTo(1.0, 1e-9));
     });
 
     test('device-max text scale gives 2x targets', () {
-      expect(targetScaleFor(6.0, 6.0), closeTo(2.0, 1e-9));
+      expect(targetScaleFor(3.0, kTabletMaxScale), closeTo(2.0, 1e-9));
     });
 
     test('midpoint text scale gives 1.5x targets', () {
-      expect(targetScaleFor(3.5, 6.0), closeTo(1.5, 1e-9));
+      expect(targetScaleFor(2.0, kTabletMaxScale), closeTo(1.5, 1e-9));
     });
 
     test('below-normal text scale never shrinks targets', () {
-      expect(targetScaleFor(0.8, 6.0), closeTo(1.0, 1e-9));
+      expect(targetScaleFor(0.8, kTabletMaxScale), closeTo(1.0, 1e-9));
     });
 
     test('above device-max clamps at 2x', () {
-      expect(targetScaleFor(9.0, 6.0), closeTo(2.0, 1e-9));
+      expect(targetScaleFor(9.0, kTabletMaxScale), closeTo(2.0, 1e-9));
     });
   });
 
@@ -89,6 +91,10 @@ void main() {
 
   group('clampToDevice', () {
     test('caps a tablet-set value on a phone', () {
+      expect(clampToDevice(3.0, 411), 2.0);
+    });
+
+    test('caps an out-of-range stored value on a phone', () {
       expect(clampToDevice(8.0, 411), 2.0);
     });
 

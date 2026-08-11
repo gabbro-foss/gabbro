@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/settings.dart';
+import 'package:gabbro/text_scale.dart';
 
 void main() {
   // ── _stripComments ────────────────────────────────────────────────────────
@@ -392,9 +393,9 @@ void main() {
     });
 
     test('A1 toJson round-trips textScale', () {
-      const original = AppSettings(textScale: 3.25);
+      const original = AppSettings(textScale: 2.25);
       final restored = AppSettings.fromJson(original.toJson());
-      expect(restored.textScale, 3.25);
+      expect(restored.textScale, 2.25);
     });
 
     test('A2 legacy text_size words migrate to numeric scale', () {
@@ -426,9 +427,21 @@ void main() {
       expect(s.textScale, 1.0);
     });
 
-    test('A5 out-of-range clamps to [0.8, 8.0]', () {
-      expect(AppSettings.fromJson({'text_scale': 99.0}).textScale, 8.0);
+    test('A5 out-of-range clamps to [0.8, 3.0]', () {
+      expect(AppSettings.fromJson({'text_scale': 99.0}).textScale, 3.0);
       expect(AppSettings.fromJson({'text_scale': 0.1}).textScale, 0.8);
+    });
+
+    test('A5 stored 8.0 from the old ceiling loads as 3.0', () {
+      expect(AppSettings.fromJson({'text_scale': 8.0}).textScale, 3.0);
+    });
+
+    test('A5 in-range values survive', () {
+      expect(AppSettings.fromJson({'text_scale': 3.0}).textScale, 3.0);
+    });
+
+    test('A5 storage ceiling equals the tablet render ceiling', () {
+      expect(AppSettings.maxTextScale, kTabletMaxScale);
     });
 
     test('A5 integer JSON value accepted', () {
@@ -444,8 +457,8 @@ void main() {
 
     test('copyWith overrides textScale only', () {
       const original = AppSettings();
-      final updated = original.copyWith(textScale: 4.0);
-      expect(updated.textScale, 4.0);
+      final updated = original.copyWith(textScale: 2.5);
+      expect(updated.textScale, 2.5);
       expect(updated.theme, original.theme);
       expect(updated.foregroundLockTimeout, original.foregroundLockTimeout);
     });

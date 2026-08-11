@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:gabbro/app_paths.dart';
+import 'package:gabbro/text_scale.dart';
 
 // Valid values shown in comments throughout this file.
 // Lines beginning with // or # are stripped before parsing.
@@ -97,10 +98,11 @@ class AppSettings {
     );
   }
 
-  // Hard bounds on the stored scale; the device-derived max is applied
-  // separately at load/render time (text_scale.dart, ADR-016).
-  static const double minTextScale = 0.8;
-  static const double maxTextScale = 8.0;
+  // Hard bounds on the stored scale, tied to the render ceilings in
+  // text_scale.dart (ADR-016) so storage and render can't drift apart. The
+  // device-derived max (2x phone) is still applied at load/render time.
+  static const double minTextScale = kMinTextScale;
+  static const double maxTextScale = kTabletMaxScale;
 
   /// Resolves the interface text scale from persisted JSON. Prefers the new
   /// numeric `text_scale` key; falls back to migrating the legacy `text_size`
