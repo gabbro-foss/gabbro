@@ -10,7 +10,8 @@ operational reference for building and shipping.
 
 **Critical notes — read before Android or Kotlin sessions.**
 
-- System Java is 26.0.1 — incompatible with Kotlin compiler. Fix: `org.gradle.java.home=/opt/android-studio/jbr` in `android/gradle.properties` (points to Java 21).
+- System Java is 26.0.1 — incompatible with Kotlin compiler. Fix: `org.gradle.java.home=/opt/android-studio/jbr` in `android/gradle.properties` (Java 25.0.2 since the 2026-08 android-studio update). Gradle wrapper is 9.3.1 — 9.1.0 is the floor for running on Java 25, 9.3.1 is Flutter 3.44.8's max validated.
+- Gradle 9 accommodations (nets: `test/android_build_config_test.dart`): cargokit's vendored `plugin.gradle` uses injected `ExecOperations` (`Project.exec` was removed — re-patch after any flutter_rust_bridge template refresh), and `app/build.gradle.kts` pins Kotlin to JVM 21 to match `compileOptions` (unpinned, Kotlin follows the running JDK and the mismatch is a hard error).
 - AGP 8.11.1 in `android/settings.gradle.kts`. Java and Kotlin JVM target both set to 21 in `app/build.gradle.kts`.
 - `libfido2-sys` and `pub mod fido` are gated behind `cfg(not(target_os = "android"))` — libfido2 is Linux-only; Android uses yubikit-android via Kotlin.
 - yubikit-android 3.1.0: use `Ctap2Session` (raw CTAP2) not `Ctap2Client` (WebAuthn wrapper). `Ctap2Client` enforces WebAuthn domain validation — rejects `"app.gabbro.gabbro"` as RP ID. `Ctap2Session` has no such restriction.

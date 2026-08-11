@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2243 | 10 |
+| Flutter (`flutter test`) | 2246 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 165 | 15 |
 
@@ -110,7 +110,7 @@ warnings are not noise.**
 | Gradle space-assignment | `jni` 16, `jni_flutter` 13 | Upstream. Latest versions still warn. Android build breaks at Gradle 10. Was x42; `file_picker` held 13. Confirm at the next build. |
 | `Task.project` at execution time | Flutter's own `compileFlutterBuildDebug` | Upstream. Breaks at Gradle 10. Only shows when the task is not UP-TO-DATE. |
 | Kotlin plugin version (2.0.21 vs 2.2.20) | Flutter SDK's own `:gradle` build | Upstream. Debug and release alike. |
-| JVM restricted-method (`System::load`) | Gradle 8.14 `native-platform` jar | Gradle's own jar, and the version is pinned — nothing changes on its own. Clears itself whenever we next raise Gradle. No action. |
+| JVM restricted-method (`System::load`) | Gradle `native-platform` jar | Gradle's own jar. Did NOT clear at 9.3.1 (still ships `0.22-milestone-29`); Java 25 warns on it every run. Blocks at a future Java. No action. |
 | `cargo deny` no-license-field: `allo-isolate` | `flutter_rust_bridge` dep | Fixed on their master; await release. `[[licenses.clarify]]` is inert — don't retry. |
 | `cargo deny` duplicates x6 | `argon2`->`digest`, `jni`->`libloading`, `bindgen`->`shlex` | Upstream pins. Was x7; RT-3 took the `hybrid-array` duplicate with `ml-kem`. The crate itself stays (`sha2`/`hkdf` -> `digest` need it). |
 | "trying to run flutter as root" | the gate's own `unshare -r` | Cosmetic. Not Gabbro. |
@@ -128,7 +128,16 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-(empty — ask the maintainer)
+**Failure-dialog fix (b40a647): hardware green on Linux AND Android
+(2026-08-11).** The Gradle-9 bump that unblocked Android — wrapper 8.14 ->
+9.3.1 (runs on the Java-25 JBR), cargokit `ExecOperations` patch, Kotlin
+JVM-21 pin, Robolectric 4.13 -> 4.16.1; netted by
+`test/android_build_config_test.dart`, all suites green — is **uncommitted**
+(see BUILD_AND_RELEASE.md). Remaining, in order:
+1. Full gate with `--warm` — Flutter moved 3.44.6 -> 3.44.8 and the
+   Gradle/Robolectric bump changes the Android leg's downloads.
+2. Decide release. **No commits, no push until the gate is green**
+   (master is 7 commits ahead of origin; this file has uncommitted edits).
 
 ---
 
@@ -142,12 +151,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 ## Bikeshed / Backlog
 
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
-
-### Release
-- **Outstanding: the AUR push.** `gabbro-bin` is bumped to `0.1.0_alpha.19`; two
-  commits (alpha.18, alpha.19) wait in the AUR clone — the push fails, the AUR is
-  in maintenance (still down 2026-08-10). Until it lands, Arch users install
-  alpha.16. Retry with `git -C ../gabbro-bin-aur push` from `gabbro/`.
 
 ### Features and UI/UX
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
