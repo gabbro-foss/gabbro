@@ -114,7 +114,6 @@ warnings are not noise.**
 | JVM restricted-method (`System::load`) | Gradle `native-platform` jar | Gradle's own jar. Did NOT clear at 9.3.1 (still ships `0.22-milestone-29`); Java 25 warns on it every run. Blocks at a future Java. No action. |
 | `cargo deny` no-license-field: `allo-isolate` | `flutter_rust_bridge` dep | Fixed on their master; await release. `[[licenses.clarify]]` is inert — don't retry. |
 | `cargo deny` duplicates x6 | `argon2`->`digest`, `jni`->`libloading`, `bindgen`->`shlex` | Upstream pins. Was x7; RT-3 took the `hybrid-array` duplicate with `ml-kem`. The crate itself stays (`sha2`/`hkdf` -> `digest` need it). |
-| "trying to run flutter as root" | the gate's own `unshare -r` | Cosmetic. Not Gabbro. |
 | KGP via `buildscript` classpath | `url_launcher_android` | Did not reproduce 2026-08-06; re-check before acting. |
 
 **AGP note:** every module, `rust_lib_gabbro` included, loads AGP **8.11.1**. The
@@ -128,9 +127,6 @@ resolved but never applied — inert, emits no warning.
 > Update at the end of each session. First thing to read at the start of the next. Completed items are deleted from this section.
 
 ### Next task
-
-**Full gate green 2026-08-11** (failure-dialog fix + Gradle-9 bump, all
-committed). Remaining: decide release; push (master ahead of origin).
 
 ---
 
