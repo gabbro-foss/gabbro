@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2240 | 10 |
+| Flutter (`flutter test`) | 2243 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 165 | 15 |
 
@@ -128,25 +128,7 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**Fix the three SnackBar messages that clip at reachable scale.** Sweep re-run
-2026-08-11 at the real 2x ceiling, 360dp phone, all 37 locales
-(`test/snackbar_message_reach_test.dart` — measurement harness, asserts
-nothing): 22 of 25 messages are readable everywhere with worst-case arguments;
-for them the 8x concern was fiction. Three failure messages clip — and a
-SnackBar clips without scrolling or throwing, so the rest of the only
-explanation the user gets is unreachable by any gesture:
-
-- `biometricEnrollFailed` (security_screen): 6/37 locales at a ~130-char
-  platform error.
-- `recoveryActionFailed` (recovery_history_screen): clips in kk at a realistic
-  path — embeds a `FileSystemException` carrying the full path, no cap.
-- `exportFailed` (entry_detail_screen): same unbounded path mechanism; clips
-  in any locale past ~200 chars total.
-
-Fix these three only (net first, then canon-TDD): scrolling dialog (ADR-016,
-as the URL refusal) or cap the detail — then turn the harness into a gate
-pinning them. Judge by the message's rectangle or scroll ancestor, never by a
-layout exception (a SnackBar throws nothing).
+(empty — ask the maintainer)
 
 ---
 

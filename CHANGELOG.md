@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **The stored text-scale ceiling now matches what the app can show.** Renders always capped at 2x (phone) / 3x (tablet); the settings file could still hold up to 8.0 from an older design. A hand-edited value above 3.0 now loads as 3.0.
 
+### Fixed
+- **Three failure messages could be cut off at the largest text size.** When enabling biometric unlock, exporting a file, or restoring a synced-over value failed, the explanation appeared in a bottom strip that cut long text off with no way to read the rest. All three now open a dialog that scrolls, so the full reason — including the file path involved — is always readable.
+
 ## [0.1.0-alpha.19] – 2026-08-10
 
 ### Fixed
