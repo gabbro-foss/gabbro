@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'test_helpers.dart';
 import 'package:gabbro/screens/recovery_history_screen.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
+import 'package:gabbro/text_scale.dart';
 
 HistoryRecordData _rec(String field, String value) => HistoryRecordData(
   field: field,
@@ -137,5 +140,69 @@ void main() {
 
     expect(deleted, 0);
     expect(find.text('url'), findsNothing);
+  });
+
+  // Net: a failed action must tell the user why and keep the row (nothing was
+  // restored or deleted). Pins the message text, not its container.
+  testWidgets('a failed action shows the failure message and keeps the row',
+      (tester) async {
+    await tester.pumpWidget(
+      testApp(
+        RecoveryHistoryScreen(
+          records: [_rec('url', 'a')],
+          onRestore: (_) async => throw Exception('boom'),
+          onDelete: (_) async {},
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Revert'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Recovery action failed: Exception: boom'),
+      findsOneWidget,
+    );
+    expect(find.text('Revert'), findsOneWidget, reason: 'failed row stays');
+  });
+
+  // Red (SnackBar clip): the failure explanation must be fully readable in
+  // the worst supported case - largest reachable text, narrowest phone, a
+  // realistic FileSystemException carrying the full path.
+  testWidgets(
+      'a failed action message is fully reachable at 2x on a 360dp phone',
+      (tester) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    tester.platformDispatcher.textScaleFactorTestValue = kPhoneMaxScale;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    const err = FileSystemException(
+      'Cannot open file',
+      '/storage/emulated/0/Documents/Recovery/Very long folder name for the '
+          'archive of restored entries/backup-2026-08-11/entry.dat',
+      OSError('Permission denied', 13),
+    );
+    await tester.pumpWidget(
+      testApp(
+        RecoveryHistoryScreen(
+          records: [_rec('url', 'a')],
+          onRestore: (_) async => throw err,
+          onDelete: (_) async {},
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('Revert'));
+    await tester.tap(find.text('Revert'));
+    await tester.pumpAndSettle();
+
+    final message = find.textContaining('Recovery action failed:');
+    expect(messageIsReachable(tester, message), isTrue,
+        reason: 'the failure explanation must be fully readable at 2x');
   });
 }

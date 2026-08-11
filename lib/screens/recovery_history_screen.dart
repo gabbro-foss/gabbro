@@ -3,6 +3,7 @@ import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/screens/entry_detail_screen.dart';
+import 'package:gabbro/widgets/gabbro_dialog.dart';
 
 /// Shows an entry's recovery history: values replaced during sync, each
 /// restorable or deletable. Reuses existing strings (no new l10n).
@@ -50,13 +51,11 @@ class _RecoveryHistoryScreenState extends State<RecoveryHistoryScreen> {
       if (mounted) setState(() => _records.removeAt(index));
     } catch (err) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context).recoveryActionFailed(err.toString()),
-          ),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
+      // A dialog, not a SnackBar: the error carries the full path, which can
+      // outgrow the strip, and a SnackBar clips without scrolling (ADR-016).
+      await showFailureMessage(
+        context,
+        AppLocalizations.of(context).recoveryActionFailed(err.toString()),
       );
     }
   }

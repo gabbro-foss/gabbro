@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
@@ -10,11 +8,14 @@ import 'package:gabbro/text_scale.dart';
 // the worst case the app supports - longest translation, largest reachable
 // text, narrowest phone, together - or that explanation is unreadable.
 //
-// MEASUREMENT HARNESS, NOT A GATE. Prints per-message reachability for every
-// SnackBar message at the 2x phone ceiling (the largest scale a 360dp phone
-// ever renders, clampToDevice) across all locales, and asserts nothing. The
-// scale is applied via platformDispatcher, which bypasses clampToDevice - only
-// values at or below the surface's ceiling may be used here.
+// GATE: every message the app still shows in a SnackBar must be reachable at
+// the 2x phone ceiling (the largest scale a 360dp phone ever renders,
+// clampToDevice) in every locale. The three messages that could not meet this
+// (biometricEnrollFailed, exportFailed, recoveryActionFailed) were moved to a
+// scrolling dialog (showFailureMessage, ADR-016) and are gated in their own
+// screen tests - not here, where a synthetic SnackBar would wrongly fail
+// them. The scale is applied via platformDispatcher, which bypasses
+// clampToDevice - only values at or below the surface's ceiling may be used.
 //
 // Judge by the message's rectangle, never by a layout exception: a SnackBar
 // sits in an overlay and clips its content instead of overflowing, so it
@@ -89,13 +90,6 @@ const _boundedError =
 /// A realistic export path a phone user actually produces (SAF folder).
 const _realisticPath = '/storage/emulated/0/Documents/GabbroSync/backup.gabbro';
 
-/// The unbounded case: a FileSystemException prints the full path.
-String _fsError(String path) => FileSystemException(
-  'Cannot open file',
-  path,
-  const OSError('Permission denied', 13),
-).toString();
-
 void main() {
   // Every SnackBar message in the app (the 26-message sweep in
   // docs/ARCHITECTURE.md), with worst-case arguments where parameterised.
@@ -120,12 +114,8 @@ void main() {
     // entry_detail_screen
     'copiedClears60s': (l) => l.copiedClears60s,
     'exportedToPath': (l) => l.exportedToPath(_realisticPath),
-    'exportFailed': (l) => l.exportFailed(_fsError(_realisticPath)),
     // security_screen
     'biometricUnavailable': (l) => l.biometricUnavailable,
-    'biometricEnrollFailed': (l) => l.biometricEnrollFailed(_boundedError),
-    // recovery_history_screen
-    'recoveryActionFailed': (l) => l.recoveryActionFailed(_fsError(_realisticPath)),
     // create_entry_screen
     'noChangesToSave': (l) => l.noChangesToSave,
     // change_passphrase_screen
@@ -143,12 +133,8 @@ void main() {
     phoneSurface(tester);
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
 
-    final report = <String>[];
+    final failed = <String>[];
     for (final entry in cases.entries) {
-      var unreachable = 0;
-      var worstBottom = 0.0;
-      var worstLocale = '';
-      var worstChars = 0;
       for (final locale in AppLocalizations.supportedLocales) {
         final rect = await _rectFor(
           tester,
@@ -157,49 +143,14 @@ void main() {
           entry.value,
         );
         final text = entry.value(lookupAppLocalizations(locale));
-        if (!_isReachable(tester, rect, find.text(text))) unreachable++;
-        if (rect.bottom > worstBottom) {
-          worstBottom = rect.bottom;
-          worstLocale = locale.toLanguageTag();
-          worstChars = text.length;
+        if (!_isReachable(tester, rect, find.text(text))) {
+          failed.add('${entry.key} in ${locale.toLanguageTag()} '
+              '(${text.length} chars, bottom ${rect.bottom.round()}dp)');
         }
       }
-      report.add(
-        '${entry.key}: unreachable $unreachable/37, worst $worstLocale '
-        '($worstChars chars, bottom ${worstBottom.round()}dp of 800dp)',
-      );
     }
-    // ignore: avoid_print
-    print('sweep at ${kPhoneMaxScale}x on 360dp:\n${report.join('\n')}');
-  });
-
-  // The unbounded case: exportFailed and recoveryActionFailed interpolate a
-  // FileSystemException, which prints the whole path the user chose. Nothing
-  // caps that, so the message grows with the path - at any text size.
-  testWidgets('sweep: exportFailed grows with the export path', (tester) async {
-    phoneSurface(tester);
-    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
-
-    final rows = <String>[];
-    for (final depth in [1, 4, 10, 30]) {
-      final path =
-          '/storage/emulated/0/Documents/'
-          '${List.filled(depth, 'archive').join('/')}/entry.dat';
-      final rect = await _rectFor(
-        tester,
-        const Locale('en'),
-        kPhoneMaxScale,
-        (l) => l.exportFailed(_fsError(path)),
-      );
-      final text = lookupAppLocalizations(
-        const Locale('en'),
-      ).exportFailed(_fsError(path));
-      rows.add(
-        'depth $depth: ${text.length} chars -> bottom ${rect.bottom.round()}dp, '
-        'reachable=${_isReachable(tester, rect, find.text(text))}',
-      );
-    }
-    // ignore: avoid_print
-    print('exportFailed at ${kPhoneMaxScale}x:\n${rows.join('\n')}');
+    expect(failed, isEmpty,
+        reason: 'SnackBar messages clipped at 2x - move them to '
+            'showFailureMessage (ADR-016): $failed');
   });
 }

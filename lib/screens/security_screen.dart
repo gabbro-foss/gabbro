@@ -181,12 +181,11 @@ class _SecurityScreenState extends State<SecurityScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context).biometricEnrollFailed(e.toString()),
-            ),
-          ),
+        // A dialog, not a SnackBar: the error detail can outgrow the strip,
+        // which clips without scrolling (ADR-016).
+        await showFailureMessage(
+          context,
+          AppLocalizations.of(context).biometricEnrollFailed(e.toString()),
         );
       }
     }

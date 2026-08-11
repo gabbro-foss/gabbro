@@ -16,6 +16,7 @@ import 'package:gabbro/clipboard_clear.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
+import 'package:gabbro/text_scale.dart';
 
 // ── Fake data helpers ─────────────────────────────────────────────────────────
 
@@ -698,6 +699,102 @@ void main() {
     expect(find.byType(TextField), findsOneWidget);
     // Picker IconButton is present
     expect(find.byIcon(Icons.folder_open), findsOneWidget);
+  });
+
+  // Net: a failed export write must tell the user why. Pins the message text,
+  // not its container. The path points below a plain file, so the directory
+  // create fails with a real FileSystemException. The write is real IO, so
+  // the confirm tap runs inside runAsync (a fake-clock await never resolves).
+  testWidgets('a failed export shows the failure message', (tester) async {
+    final tmp = Directory.systemTemp.createTempSync('gabbro_export_net');
+    addTearDown(() => tmp.deleteSync(recursive: true));
+    final blocker = File('${tmp.path}/blocker')..writeAsStringSync('x');
+
+    final entry = FileEntryData(
+      id: 'test-id-file-net',
+      filename: 'secret.txt',
+      data: Uint8List.fromList([104, 105]),
+      notes: null,
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: '',
+      customFields: const [],
+    );
+    await tester.pumpWidget(_buildScreen(VaultEntryData.file(entry)));
+    await tester.tap(find.text('Export file'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byType(TextField), '${blocker.path}/sub/secret.txt');
+    // Confirm via onPressed inside runAsync: the failing write is real IO,
+    // which the fake-clock test zone never completes (see LEARNINGS "Async
+    // dart:io inside testWidgets"); a plain pump after - pumpAndSettle would
+    // run the message's auto-dismiss timer to the end and report it missing.
+    final confirm = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, 'Export'),
+    );
+    await tester.runAsync(() async {
+      confirm.onPressed!();
+      // Real-time beats WITH pumps, all inside one runAsync window: the IO
+      // completion arrives on the real event loop but is queued on the fake
+      // zone's microtask queue, which only a pump flushes.
+      for (var i = 0; i < 5; i++) {
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+        await tester.pump();
+      }
+    });
+
+    expect(find.textContaining('Export failed:'), findsOneWidget);
+  });
+
+  // Red (SnackBar clip): the failure explanation must be fully readable in
+  // the worst supported case - largest reachable text, narrowest phone, a
+  // long path in the FileSystemException (nothing caps its length).
+  testWidgets(
+      'a failed export message is fully reachable at 2x on a 360dp phone',
+      (tester) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    tester.platformDispatcher.textScaleFactorTestValue = kPhoneMaxScale;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    final tmp = Directory.systemTemp.createTempSync('gabbro_export_red');
+    addTearDown(() => tmp.deleteSync(recursive: true));
+    final blocker = File(
+      '${tmp.path}/a_rather_long_export_folder_name_the_user_chose_for_'
+      'their_decrypted_documents_archive_backup_august_2026',
+    )..writeAsStringSync('x');
+
+    final entry = FileEntryData(
+      id: 'test-id-file-red',
+      filename: 'secret.txt',
+      data: Uint8List.fromList([104, 105]),
+      notes: null,
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: '',
+      customFields: const [],
+    );
+    await tester.pumpWidget(_buildScreen(VaultEntryData.file(entry)));
+    await tester.tap(find.text('Export file'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byType(TextField), '${blocker.path}/sub/secret.txt');
+    final confirm = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, 'Export'),
+    );
+    await tester.runAsync(() async {
+      confirm.onPressed!();
+      for (var i = 0; i < 5; i++) {
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+        await tester.pump();
+      }
+    });
+
+    final message = find.textContaining('Export failed:');
+    expect(messageIsReachable(tester, message), isTrue,
+        reason: 'the failure explanation must be fully readable at 2x');
   });
 
   // The file-export picker must degrade gracefully when the native dialog can't

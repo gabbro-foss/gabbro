@@ -297,13 +297,12 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       }
     } catch (err) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context).exportFailed(err.toString()),
-            ),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
+        // A dialog, not a SnackBar: the error carries the full path, which
+        // can outgrow the strip, and a SnackBar clips without scrolling
+        // (ADR-016).
+        await showFailureMessage(
+          context,
+          AppLocalizations.of(context).exportFailed(err.toString()),
         );
       }
     }

@@ -148,3 +148,18 @@ List<String> recordClipboardWrites(WidgetTester tester) {
       .setMockMethodCallHandler(SystemChannels.platform, null));
   return writes;
 }
+
+/// Whether the user can actually get to the whole of [message]: either its
+/// rectangle fits the screen, or a scroll ancestor can reach the rest. A
+/// SnackBar has neither once the text outgrows the strip - it clips, and the
+/// remainder is unreachable by any gesture (see snackbar_message_reach_test).
+bool messageIsReachable(WidgetTester tester, Finder message) {
+  if (message.evaluate().isEmpty) return false;
+  final rect = tester.getRect(message);
+  final screen = tester.view.physicalSize.height / tester.view.devicePixelRatio;
+  if (rect.top >= 0 && rect.bottom <= screen) return true;
+  return find
+      .ancestor(of: message, matching: find.byType(Scrollable))
+      .evaluate()
+      .isNotEmpty;
+}

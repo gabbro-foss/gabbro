@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'test_helpers.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/screens/security_screen.dart';
+import 'package:gabbro/text_scale.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
 
 Widget _buildScreen({
@@ -244,6 +245,81 @@ void main() {
       await tester.tap(find.text('Cancel'));
       await tester.pumpAndSettle();
       expect(updated, isNull);
+    });
+
+    // Net: a failed enrolment must tell the user why, and the toggle stays
+    // off. Pins the message text, not its container.
+    testWidgets('a failed enrolment shows the failure message', (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        isAndroid: true,
+        vaultPath: '/vault/a.gabbro',
+        onBiometricAvailable: () async => true,
+        onBiometricEnroll: (_, _) async => throw Exception('boom'),
+      ));
+      await tester.scrollUntilVisible(
+        find.widgetWithText(SwitchListTile, 'Enable biometric unlock'), 300);
+      await tester.tap(
+        find.widgetWithText(SwitchListTile, 'Enable biometric unlock'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).last, 'pass');
+      await tester.tap(find.text('Confirm'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text("Couldn't enable biometric unlock: Exception: boom"),
+        findsOneWidget,
+      );
+      final tile = tester.widget<SwitchListTile>(
+        find.widgetWithText(SwitchListTile, 'Enable biometric unlock'),
+      );
+      expect(tile.value, isFalse, reason: 'failed enrolment stays off');
+    });
+
+    // Red (SnackBar clip): the failure explanation must be fully readable in
+    // the worst supported case - largest reachable text, narrowest phone, a
+    // plausible long platform error. A SnackBar clips it with no scroll.
+    testWidgets(
+        'a failed enrolment message is fully reachable at 2x on a 360dp phone',
+        (tester) async {
+      tester.view.physicalSize = const Size(360, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      tester.platformDispatcher.textScaleFactorTestValue = kPhoneMaxScale;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+      const longError =
+          'PlatformException(enroll-failed, Unable to establish connection '
+          'on channel app.gabbro.gabbro/biometric: the platform thread has '
+          'shut down unexpectedly while waiting for the sensor, null, null)';
+      await tester.pumpWidget(_buildScreen(
+        isAndroid: true,
+        vaultPath: '/vault/a.gabbro',
+        onBiometricAvailable: () async => true,
+        onBiometricEnroll: (_, _) async => throw Exception(longError),
+      ));
+      await tester.scrollUntilVisible(
+        find.widgetWithText(SwitchListTile, 'Enable biometric unlock'), 300);
+      await tester.tap(
+        find.widgetWithText(SwitchListTile, 'Enable biometric unlock'));
+      await tester.pumpAndSettle();
+      // Drive the dialog buttons directly: at 2x they can sit off-screen and
+      // a centre-tap misses (harness artifact; tappability is pinned at 1x).
+      tester
+          .widget<FilledButton>(find.widgetWithText(FilledButton, 'Continue'))
+          .onPressed!();
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).last, 'pass');
+      tester
+          .widget<FilledButton>(find.widgetWithText(FilledButton, 'Confirm'))
+          .onPressed!();
+      await tester.pumpAndSettle();
+
+      final message = find.textContaining("Couldn't enable biometric unlock:");
+      expect(messageIsReachable(tester, message), isTrue,
+          reason: 'the failure explanation must be fully readable at 2x');
     });
 
     // ADR-016 reveal-eye: the enroll passphrase dialog eye scales (capped) at
