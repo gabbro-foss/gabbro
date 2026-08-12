@@ -128,6 +128,34 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
+**Remove the "Recently used apps" suggestion chips (Android, Login editor).**
+
+*What it is:* under the "Android app ID" field on Android, a row of tap-to-fill chips
+listing package names. Populated only when the autofill service fires on a **native**
+app **while the vault is unlocked** and nothing matched; capped at 10, newest first.
+
+*Why remove:* redundant. From that same login screen the user can just type the
+password and let `onSaveRequest` create the entry with `app_id` already set — no editor
+visit, no chip. The chips only help if the user hits the login screen, does *not* log
+in, and later creates the entry by hand. Cost: an unencrypted SharedPreferences list of
+"apps I tried to log into", with no clear/reset UI anywhere. Added 2026-06-16
+(`7d5c689` + `6df2124`); stated reason was only "so you needn't hunt for the package
+name" (CHANGELOG.md:222).
+
+*Caveat to check first:* some apps never send Android a save request, so the
+type-it-and-save path silently fails there and the chip is the only fallback. Not
+observed in practice; maintainer accepted the risk. If it turns up, reconsider.
+
+*Sites (net-first: pin current behaviour green before cutting):*
+- `android/…/GabbroAutofillService.kt` — `object RecentAutofillApps`, `recentAppsUpdated()`, the `record()` call in `onFillRequest`
+- `android/…/MainActivity.kt` — `getRecentApps` channel method
+- `lib/screens/create_entry_screen.dart` — `_defaultRecentApps()`, `recentAppsFetcher`, `_recentApps`, the chips block
+- `lib/l10n/*.arb` — `recentlyUsedApps` key in all 37 locales; regenerate `app_localizations_*.dart`
+- Tests: `android/…/GabbroAutofillServiceRobolectricTest.kt`, `test/create_entry_screen_test.dart`, `test/screen_catalog.dart`
+- Docs: CHANGELOG entry for the removal; `CHANGELOG.md:222` is history, leave it
+
+The app-id field itself **stays** — only the chips and the capture store go.
+
 ---
 
 ## Build & Release
