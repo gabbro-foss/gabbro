@@ -81,9 +81,9 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2246 | 10 |
+| Flutter (`flutter test`) | 2244 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
-| Android (`./gradlew :app:testDebugUnitTest`) | 165 | 15 |
+| Android (`./gradlew :app:testDebugUnitTest`) | 160 | 15 |
 
 **Real-FFI suites run under plain `dart test`, never `flutter drive` (non-negotiable):** they test
 Dart -> FFI -> crypto -> disk, touch no UI, and so need no window. Needs the release cdylib (debug
@@ -167,6 +167,24 @@ mocks — out of proportion to a 3-line cut. Hardware pass covers it.
 
 The app-id field itself **stays** — only the chips and the capture store go.
 
+*Progress (tick as each lands):*
+- [x] Baseline green: full `flutter test` (2246 pass / 10 skip)
+- [x] Baseline green: `./gradlew :app:testDebugUnitTest` (165 pass / 15 skip; needs
+      `cleanTestDebugUnitTest` first — a bare run reports UP-TO-DATE and runs nothing)
+- [x] Red test: `purgeLegacyRecentApps` (`LegacyPurgeTest`, 3 tests, green)
+- [x] Cut Kotlin: `RecentAutofillApps`, `recentAppsUpdated`, `shouldRecordPackage`, `record()` call
+- [x] Cut Kotlin: `MainActivity` AUTOFILL_CHANNEL block + const + doc-comment
+- [x] Cut Dart: `_defaultRecentApps`, `recentAppsFetcher`, `_recentApps`, chips block
+- [x] Cut l10n: `recentlyUsedApps` x37 + regenerate
+- [x] Cut tests: Kotlin x8, Dart chips x2, `screen_catalog.dart`
+- [x] Green: purge wired into `MainActivity.onCreate`
+- [x] Re-run both suites green (`flutter test` 2244/10; Kotlin 160/15; `flutter analyze` clean)
+- [x] Docs: CHANGELOG entry + Bikeshed "delete the purge at v1.0"
+- [x] Hardware, emulator: no chips in the Login editor; seeded legacy store deleted on
+      next launch (debug build — `run-as` needs one, Play image blocks `adb root`)
+- [x] Hardware, phone: Android's save prompt created the entry with the app ID set, and
+      that entry then autofilled (release build; native login form, emulator has no such app)
+
 *Also agreed:* purge the orphaned store on upgraded installs. `MainActivity` is a
 FlutterActivity with no test harness, so put the purge in a top-level
 `internal fun purgeLegacyRecentApps(context)` in `MainActivity.kt`, called from
@@ -191,6 +209,9 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
+
+### Housekeeping
+- **Delete `purgeLegacyRecentApps` at v1.0** (`MainActivity.kt` + `LegacyPurgeTest.kt`) — the one-shot cleanup of the removed suggestion-chip store. No pre-1.0 install will still be upgrading by then.
 
 ### Security (pre-v1)
 - **Human expert cryptography review** of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).

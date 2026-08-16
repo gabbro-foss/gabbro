@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+- **The "Recently used apps" suggestions under a login's Android app ID (Android).** Filling that field now means typing the package name, or letting Android's save prompt create the entry with it already set. The list of apps you had tried to log into is no longer kept, and any existing one is deleted on first launch.
+
 ## [0.1.0-alpha.20] – 2026-08-11
 
 ### Changed
