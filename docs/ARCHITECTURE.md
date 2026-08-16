@@ -146,24 +146,33 @@ name" (CHANGELOG.md:222).
 type-it-and-save path silently fails there and the chip is the only fallback. Not
 observed in practice; maintainer accepted the risk. If it turns up, reconsider.
 
-*Sites (net-first: pin current behaviour green before cutting — the baseline is a
-**full** `flutter test`, not one file: `screen_catalog.dart` feeds other sweeps):*
+*Sites (verified 2026-08-16. Net-first: pin current behaviour green before cutting —
+the baseline is a **full** `flutter test`, not one file: `screen_catalog.dart` feeds
+other sweeps):*
 - `android/…/GabbroAutofillService.kt` — `object RecentAutofillApps`, `recentAppsUpdated()`, `shouldRecordPackage()`, the `record()` call in `onFillRequest`
-- `android/…/MainActivity.kt` — `getRecentApps` channel method, `AUTOFILL_CHANNEL` const, class doc-comment
+- `android/…/MainActivity.kt` — the **whole** `AUTOFILL_CHANNEL` MethodChannel block (it serves only `getRecentApps`), the const, class doc-comment. Safe: `UnlockActivity` registers the same channel *name* on its own engine and `lib/main.dart` targets that one
 - `lib/screens/create_entry_screen.dart` — `_defaultRecentApps()`, `recentAppsFetcher`, `_recentApps`, the chips block
-- `lib/l10n/*.arb` — `recentlyUsedApps` key (verify the locale count); regenerate `app_localizations_*.dart`
-- Tests: `android/…/GabbroAutofillServiceTest.kt` (`recentAppsUpdated_*` x3, `shouldRecordPackage_*` x3), `android/…/GabbroAutofillServiceRobolectricTest.kt`, `test/create_entry_screen_test.dart`, `test/screen_catalog.dart`
+- `lib/l10n/*.arb` — `recentlyUsedApps` in all **37** locales (no `@`-description block); regenerate `app_localizations_*.dart`
+- Tests: `android/…/GabbroAutofillServiceTest.kt` (`recentAppsUpdated_*` x3, `shouldRecordPackage_*` x3), `android/…/GabbroAutofillServiceRobolectricTest.kt` (`recentAutofillApps_*` x2), `test/create_entry_screen_test.dart` (chips x2), `test/screen_catalog.dart`
 - Docs: CHANGELOG entry for the removal; `CHANGELOG.md:222` is history, leave it
+- Not sites: backup rules exclude `sharedpref` by wildcard; `AutofillChipLabelTest.kt` guards the *system autofill dropdown* label — unrelated, leave it
 
 Nets that must not regress already exist — no new ones needed for the cut:
 `matchingCredentials_native_exact_app_id_match`, `matchSaveTarget_native_app_id_*`,
 `parseSummariesJson_reads_app_id_field`, and four app-id tests in `create_entry_screen_test.dart`.
 
+Accepted net gap: `onFillRequest` has no test at all. The deleted `record()` block leaves
+the branch's `buildSaveOnlyResponse` untouched; pinning it needs FillRequest/AssistStructure
+mocks — out of proportion to a 3-line cut. Hardware pass covers it.
+
 The app-id field itself **stays** — only the chips and the capture store go.
 
-*Also agreed:* purge the orphaned store on upgraded installs —
-`deleteSharedPreferences("gabbro_recent_autofill_apps")` in `MainActivity.onCreate`
-(no-op once absent). Red-test it first. Add a Bikeshed entry to delete the purge at v1.0.
+*Also agreed:* purge the orphaned store on upgraded installs. `MainActivity` is a
+FlutterActivity with no test harness, so put the purge in a top-level
+`internal fun purgeLegacyRecentApps(context)` in `MainActivity.kt`, called from
+`onCreate`; Robolectric red-tests it via `RuntimeEnvironment.getApplication()`
+(pattern: `BiometricStoreTest`). `deleteSharedPreferences` is API 24 = our minSdk, no
+guard needed. Add a Bikeshed entry to delete the purge at v1.0.
 
 ---
 
