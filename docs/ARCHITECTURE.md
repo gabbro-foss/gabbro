@@ -146,15 +146,24 @@ name" (CHANGELOG.md:222).
 type-it-and-save path silently fails there and the chip is the only fallback. Not
 observed in practice; maintainer accepted the risk. If it turns up, reconsider.
 
-*Sites (net-first: pin current behaviour green before cutting):*
-- `android/…/GabbroAutofillService.kt` — `object RecentAutofillApps`, `recentAppsUpdated()`, the `record()` call in `onFillRequest`
-- `android/…/MainActivity.kt` — `getRecentApps` channel method
+*Sites (net-first: pin current behaviour green before cutting — the baseline is a
+**full** `flutter test`, not one file: `screen_catalog.dart` feeds other sweeps):*
+- `android/…/GabbroAutofillService.kt` — `object RecentAutofillApps`, `recentAppsUpdated()`, `shouldRecordPackage()`, the `record()` call in `onFillRequest`
+- `android/…/MainActivity.kt` — `getRecentApps` channel method, `AUTOFILL_CHANNEL` const, class doc-comment
 - `lib/screens/create_entry_screen.dart` — `_defaultRecentApps()`, `recentAppsFetcher`, `_recentApps`, the chips block
-- `lib/l10n/*.arb` — `recentlyUsedApps` key in all 37 locales; regenerate `app_localizations_*.dart`
-- Tests: `android/…/GabbroAutofillServiceRobolectricTest.kt`, `test/create_entry_screen_test.dart`, `test/screen_catalog.dart`
+- `lib/l10n/*.arb` — `recentlyUsedApps` key (verify the locale count); regenerate `app_localizations_*.dart`
+- Tests: `android/…/GabbroAutofillServiceTest.kt` (`recentAppsUpdated_*` x3, `shouldRecordPackage_*` x3), `android/…/GabbroAutofillServiceRobolectricTest.kt`, `test/create_entry_screen_test.dart`, `test/screen_catalog.dart`
 - Docs: CHANGELOG entry for the removal; `CHANGELOG.md:222` is history, leave it
 
+Nets that must not regress already exist — no new ones needed for the cut:
+`matchingCredentials_native_exact_app_id_match`, `matchSaveTarget_native_app_id_*`,
+`parseSummariesJson_reads_app_id_field`, and four app-id tests in `create_entry_screen_test.dart`.
+
 The app-id field itself **stays** — only the chips and the capture store go.
+
+*Also agreed:* purge the orphaned store on upgraded installs —
+`deleteSharedPreferences("gabbro_recent_autofill_apps")` in `MainActivity.onCreate`
+(no-op once absent). Red-test it first. Add a Bikeshed entry to delete the purge at v1.0.
 
 ---
 
