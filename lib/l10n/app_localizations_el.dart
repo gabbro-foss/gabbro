@@ -1083,9 +1083,6 @@ class AppLocalizationsEl extends AppLocalizations {
       'Συμπληρώνει αυτά τα στοιχεία σύνδεσης σε μια εφαρμογή Android. Λειτουργεί μόνο ακριβής αντιστοίχιση. Βρείτε το αναγνωριστικό στον σύνδεσμο Play Store της εφαρμογής, μετά το id= (π.χ. id=com.company.app).';
 
   @override
-  String get recentlyUsedApps => 'Πρόσφατα χρησιμοποιημένες εφαρμογές';
-
-  @override
   String get fieldUsername => 'Όνομα χρήστη (προαιρετικό)';
 
   @override

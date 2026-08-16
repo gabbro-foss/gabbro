@@ -1076,9 +1076,6 @@ class AppLocalizationsEu extends AppLocalizations {
       'Saio-hasiera hau Android aplikazio batean betetzen du. Bat-etortze zehatzak baino ez du funtzionatzen. Aurkitu IDa aplikazioaren Play Store estekan, id= ondoren (adib. id=com.company.app).';
 
   @override
-  String get recentlyUsedApps => 'Azkenaldian erabilitako aplikazioak';
-
-  @override
   String get fieldUsername => 'Erabiltzaile-izena (aukerakoa)';
 
   @override

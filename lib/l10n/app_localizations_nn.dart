@@ -1076,9 +1076,6 @@ class AppLocalizationsNn extends AppLocalizations {
       'Fyller ut denne innlogginga i ein Android-app. Berre nøyaktig treff fungerer. Finn ID-en i Play Store-lenkja til appen etter id= (t.d. id=com.company.app).';
 
   @override
-  String get recentlyUsedApps => 'Nyleg brukte appar';
-
-  @override
   String get fieldUsername => 'Brukarnamn (valfritt)';
 
   @override

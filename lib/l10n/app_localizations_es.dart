@@ -1075,9 +1075,6 @@ class AppLocalizationsEs extends AppLocalizations {
       'Rellena este inicio de sesión en una app de Android. Solo funciona una coincidencia exacta. Encuentra el ID en el enlace de Play Store de la app, después de id= (p. ej. id=com.company.app).';
 
   @override
-  String get recentlyUsedApps => 'Apps usadas recientemente';
-
-  @override
   String get fieldUsername => 'Nombre de usuario (opcional)';
 
   @override

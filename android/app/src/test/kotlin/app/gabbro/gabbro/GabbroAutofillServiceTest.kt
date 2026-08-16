@@ -329,51 +329,6 @@ class GabbroAutofillServiceTest {
         assertTrue(nativeAppIdMatches("  com.company.app  ", "com.company.app"))
     }
 
-    // ── shouldRecordPackage ───────────────────────────────────────────────────
-
-    @Test
-    fun shouldRecordPackage_third_party_app_is_recorded() {
-        assertTrue(shouldRecordPackage("com.company.app", "app.gabbro.gabbro"))
-    }
-
-    @Test
-    fun shouldRecordPackage_own_package_is_not_recorded() {
-        assertFalse(shouldRecordPackage("app.gabbro.gabbro", "app.gabbro.gabbro"))
-    }
-
-    @Test
-    fun shouldRecordPackage_blank_is_not_recorded() {
-        assertFalse(shouldRecordPackage(null, "app.gabbro.gabbro"))
-        assertFalse(shouldRecordPackage("", "app.gabbro.gabbro"))
-        assertFalse(shouldRecordPackage("  ", "app.gabbro.gabbro"))
-    }
-
-    // ── recentAppsUpdated ─────────────────────────────────────────────────────
-
-    @Test
-    fun recentAppsUpdated_prepends_new_package() {
-        assertEquals(
-            listOf("new.app", "old.app"),
-            recentAppsUpdated(listOf("old.app"), "new.app", 10),
-        )
-    }
-
-    @Test
-    fun recentAppsUpdated_moves_duplicate_to_front_without_duplicating() {
-        assertEquals(
-            listOf("b.app", "a.app", "c.app"),
-            recentAppsUpdated(listOf("a.app", "b.app", "c.app"), "b.app", 10),
-        )
-    }
-
-    @Test
-    fun recentAppsUpdated_enforces_cap_dropping_oldest() {
-        assertEquals(
-            listOf("d.app", "c.app", "b.app"),
-            recentAppsUpdated(listOf("c.app", "b.app", "a.app"), "d.app", 3),
-        )
-    }
-
     // ── fillValueFor ──────────────────────────────────────────────────────────
     // Routes the right identifier to a field, each falling back to the other.
 

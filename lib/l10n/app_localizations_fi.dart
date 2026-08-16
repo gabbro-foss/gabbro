@@ -1075,9 +1075,6 @@ class AppLocalizationsFi extends AppLocalizations {
       'Täyttää nämä kirjautumistiedot Android-sovelluksessa. Vain tarkka vastaavuus toimii. Löydät tunnuksen sovelluksen Play Store -linkistä kohdan id= jälkeen (esim. id=com.company.app).';
 
   @override
-  String get recentlyUsedApps => 'Viimeksi käytetyt sovellukset';
-
-  @override
   String get fieldUsername => 'Käyttäjänimi (valinnainen)';
 
   @override

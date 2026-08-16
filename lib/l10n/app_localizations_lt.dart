@@ -1077,9 +1077,6 @@ class AppLocalizationsLt extends AppLocalizations {
       'Užpildo šį prisijungimą Android programoje. Veikia tik tikslus atitikmuo. ID rasite programos Play Store nuorodoje po id= (pvz., id=com.company.app).';
 
   @override
-  String get recentlyUsedApps => 'Neseniai naudotos programos';
-
-  @override
   String get fieldUsername => 'Vartotojo vardas (nebūtinas)';
 
   @override

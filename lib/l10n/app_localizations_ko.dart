@@ -1061,9 +1061,6 @@ class AppLocalizationsKo extends AppLocalizations {
       '이 로그인을 Android 앱에서 자동 입력합니다. 정확히 일치할 때만 작동합니다. 앱의 Play Store 링크에서 id= 뒤에 ID가 있습니다(예: id=com.company.app).';
 
   @override
-  String get recentlyUsedApps => '최근 사용한 앱';
-
-  @override
   String get fieldUsername => '사용자 이름 (선택사항)';
 
   @override

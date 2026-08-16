@@ -433,7 +433,6 @@
   "fieldUrl": "URL (valfritt)",
   "fieldAndroidAppId": "Android-app-ID (valfritt)",
   "fieldAndroidAppIdHelper": "Fyller ut denne innlogginga i ein Android-app. Berre nøyaktig treff fungerer. Finn ID-en i Play Store-lenkja til appen etter id= (t.d. id=com.company.app).",
-  "recentlyUsedApps": "Nyleg brukte appar",
   "fieldUsername": "Brukarnamn (valfritt)",
   "fieldPassword": "Passord",
   "fieldSeparator": "Skilje­teikn",

@@ -188,25 +188,6 @@ class GabbroAutofillServiceRobolectricTest {
         assertEquals("", parseSummariesJson(json)[0].email)
     }
 
-    // ── RecentAutofillApps (capture store) ────────────────────────────────────
-
-    @Test
-    fun recentAutofillApps_records_and_reads_back_most_recent_first() {
-        val ctx = service.applicationContext
-        RecentAutofillApps.record(ctx, "a.app")
-        RecentAutofillApps.record(ctx, "b.app")
-        assertEquals(listOf("b.app", "a.app"), RecentAutofillApps.recent(ctx))
-    }
-
-    @Test
-    fun recentAutofillApps_caps_stored_entries() {
-        val ctx = service.applicationContext
-        for (i in 1..(RecentAutofillApps.CAP + 5)) {
-            RecentAutofillApps.record(ctx, "app$i")
-        }
-        assertEquals(RecentAutofillApps.CAP, RecentAutofillApps.recent(ctx).size)
-    }
-
     // ── matchingCredentials ───────────────────────────────────────────────────
     // The single matcher shared by the unlocked path (GabbroAutofillService) and the
     // locked-vault path (UnlockActivity). Web context: PSL eTLD+1 equality. Native

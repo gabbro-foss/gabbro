@@ -1077,9 +1077,6 @@ class AppLocalizationsSk extends AppLocalizations {
       'Vyplní toto prihlásenie v aplikácii pre Android. Funguje iba presná zhoda. ID nájdete v odkaze aplikácie v Play Store, za id= (napr. id=com.company.app).';
 
   @override
-  String get recentlyUsedApps => 'Nedávno použité aplikácie';
-
-  @override
   String get fieldUsername => 'Používateľské meno (voliteľné)';
 
   @override

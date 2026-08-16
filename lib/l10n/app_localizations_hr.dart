@@ -1075,9 +1075,6 @@ class AppLocalizationsHr extends AppLocalizations {
       'Ispunjava ovu prijavu u Android aplikaciji. Radi samo točno podudaranje. ID pronađite u poveznici aplikacije na Play Storeu, nakon id= (npr. id=com.company.app).';
 
   @override
-  String get recentlyUsedApps => 'Nedavno korištene aplikacije';
-
-  @override
   String get fieldUsername => 'Korisničko ime (neobavezno)';
 
   @override

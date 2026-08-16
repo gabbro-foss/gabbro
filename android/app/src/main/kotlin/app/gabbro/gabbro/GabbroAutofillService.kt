@@ -95,14 +95,6 @@ class GabbroAutofillService : AutofillService() {
             publicSuffixList,
         )
 
-        // Native no-match: record the package (login fields were detected here) so the
-        // Login editor can offer it as a tap-to-fill app-id suggestion.
-        if (matches.isEmpty() && parseResult.webDomain == null &&
-            shouldRecordPackage(parseResult.packageName, applicationContext.packageName)
-        ) {
-            RecentAutofillApps.record(applicationContext, parseResult.packageName!!.trim())
-        }
-
         if (matches.isEmpty()) {
             // Unlocked but nothing matched: silent by design — no no-match indicator is
             // surfaced. No chip shows (the Android convention when nothing matches), the user
@@ -619,48 +611,6 @@ internal fun nativeAppIdMatches(appId: String?, packageName: String?): Boolean {
     val a = appId?.trim().orEmpty()
     val p = packageName?.trim().orEmpty()
     return a.isNotEmpty() && a == p
-}
-
-/**
- * Whether a native package should be recorded for the "recently seen apps"
- * suggestion list: a non-blank third-party package, never our own app.
- */
-internal fun shouldRecordPackage(packageName: String?, ownPackage: String): Boolean {
-    val p = packageName?.trim().orEmpty()
-    return p.isNotEmpty() && p != ownPackage
-}
-
-/**
- * Pure list update for the recent-apps store: put `pkg` first, drop any prior
- * occurrence (most-recent-first, no duplicates), and cap the size (oldest fall
- * off the end).
- */
-internal fun recentAppsUpdated(existing: List<String>, pkg: String, cap: Int): List<String> {
-    return (listOf(pkg) + existing.filter { it != pkg }).take(cap)
-}
-
-/**
- * App-private store of native apps that requested autofill but matched no entry,
- * surfaced by the Login editor as tap-to-fill suggestions for the app-id field
- * (so users need not hunt for a package name). Metadata only — package names,
- * no secrets — capped and clearable.
- */
-object RecentAutofillApps {
-    private const val PREFS = "gabbro_recent_autofill_apps"
-    private const val KEY = "packages"
-    const val CAP = 10
-
-    fun record(context: android.content.Context, packageName: String) {
-        val prefs = context.getSharedPreferences(PREFS, android.content.Context.MODE_PRIVATE)
-        val updated = recentAppsUpdated(read(prefs), packageName, CAP)
-        prefs.edit().putString(KEY, updated.joinToString("\n")).apply()
-    }
-
-    fun recent(context: android.content.Context): List<String> =
-        read(context.getSharedPreferences(PREFS, android.content.Context.MODE_PRIVATE))
-
-    private fun read(prefs: android.content.SharedPreferences): List<String> =
-        prefs.getString(KEY, "").orEmpty().split("\n").filter { it.isNotBlank() }
 }
 
 // -----------------------------------------------------------------------------

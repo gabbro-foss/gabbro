@@ -1075,9 +1075,6 @@ class AppLocalizationsSv extends AppLocalizations {
       'Fyller i den här inloggningen i en Android-app. Endast en exakt matchning fungerar. Hitta ID:t i appens Play Store-länk efter id= (t.ex. id=com.company.app).';
 
   @override
-  String get recentlyUsedApps => 'Nyligen använda appar';
-
-  @override
   String get fieldUsername => 'Användarnamn (valfritt)';
 
   @override

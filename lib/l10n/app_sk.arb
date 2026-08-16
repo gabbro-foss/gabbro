@@ -433,7 +433,6 @@
   "fieldUrl": "URL (voliteľné)",
   "fieldAndroidAppId": "ID aplikácie pre Android (voliteľné)",
   "fieldAndroidAppIdHelper": "Vyplní toto prihlásenie v aplikácii pre Android. Funguje iba presná zhoda. ID nájdete v odkaze aplikácie v Play Store, za id= (napr. id=com.company.app).",
-  "recentlyUsedApps": "Nedávno použité aplikácie",
   "fieldUsername": "Používateľské meno (voliteľné)",
   "fieldPassword": "Heslo",
   "fieldSeparator": "Oddeľovač",

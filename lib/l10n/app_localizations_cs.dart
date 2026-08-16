@@ -1076,9 +1076,6 @@ class AppLocalizationsCs extends AppLocalizations {
       'Vyplní toto přihlášení v aplikaci pro Android. Funguje pouze přesná shoda. ID najdete v odkazu aplikace na Play Store, za id= (např. id=com.company.app).';
 
   @override
-  String get recentlyUsedApps => 'Naposledy použité aplikace';
-
-  @override
   String get fieldUsername => 'Uživatelské jméno (volitelné)';
 
   @override

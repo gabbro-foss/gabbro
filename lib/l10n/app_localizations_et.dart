@@ -1076,9 +1076,6 @@ class AppLocalizationsEt extends AppLocalizations {
       'Täidab selle sisselogimise Androidi rakenduses. Töötab ainult täpne vaste. Leia ID rakenduse Play Store\'i lingilt pärast id= (nt id=com.company.app).';
 
   @override
-  String get recentlyUsedApps => 'Hiljuti kasutatud rakendused';
-
-  @override
   String get fieldUsername => 'Kasutajanimi (valikuline)';
 
   @override

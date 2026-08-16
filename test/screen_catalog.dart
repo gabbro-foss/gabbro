@@ -219,7 +219,6 @@ final Map<String, Widget Function()> screens = {
       'Work',
       'A rather long folder name to stress the field',
     ],
-    recentAppsFetcher: () async => const [],
   ),
   // lib/widgets/ — nothing enumerated these before, which is how the
   // sync_review clipped-value bug reached a release. Each is wrapped in a

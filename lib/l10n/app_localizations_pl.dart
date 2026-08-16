@@ -1079,9 +1079,6 @@ class AppLocalizationsPl extends AppLocalizations {
       'Wypełnia te dane logowania w aplikacji Android. Działa tylko dokładne dopasowanie. Identyfikator znajdziesz w linku aplikacji w Play Store, po id= (np. id=com.company.app).';
 
   @override
-  String get recentlyUsedApps => 'Ostatnio używane aplikacje';
-
-  @override
   String get fieldUsername => 'Nazwa użytkownika (opcjonalnie)';
 
   @override

@@ -1075,9 +1075,6 @@ class AppLocalizationsSr extends AppLocalizations {
       'Попуњава ову пријаву у Android апликацији. Ради само тачно подударање. ИД пронађите у вези апликације на Play Store-у, након ид= (нпр. ид=com.company.app).';
 
   @override
-  String get recentlyUsedApps => 'Недавно коришћене апликације';
-
-  @override
   String get fieldUsername => 'Корисничко име (необавезно)';
 
   @override
@@ -3270,9 +3267,6 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   @override
   String get fieldAndroidAppIdHelper =>
       'Popunjava ovu prijavu u Android aplikaciji. Radi samo tačno podudaranje. ID pronađite u vezi aplikacije na Play Store-u, nakon id= (npr. id=com.company.app).';
-
-  @override
-  String get recentlyUsedApps => 'Nedavno korišćene aplikacije';
 
   @override
   String get fieldUsername => 'Korisničko ime (neobavezno)';

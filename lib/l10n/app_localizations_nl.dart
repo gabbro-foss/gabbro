@@ -1077,9 +1077,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Vult deze login in in een Android-app. Alleen een exacte overeenkomst werkt. Vind de ID in de Play Store-link van de app, na id= (bijv. id=com.company.app).';
 
   @override
-  String get recentlyUsedApps => 'Onlangs gebruikte apps';
-
-  @override
   String get fieldUsername => 'Gebruikersnaam (optioneel)';
 
   @override

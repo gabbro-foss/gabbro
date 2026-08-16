@@ -2119,12 +2119,6 @@ abstract class AppLocalizations {
   /// **'Fills this login in an Android app. Only an exact match works. Find the ID in the app\'s Play Store link, after id= (e.g. id=com.company.app).'**
   String get fieldAndroidAppIdHelper;
 
-  /// No description provided for @recentlyUsedApps.
-  ///
-  /// In en, this message translates to:
-  /// **'Recently used apps'**
-  String get recentlyUsedApps;
-
   /// No description provided for @fieldUsername.
   ///
   /// In en, this message translates to:

@@ -1,5 +1,6 @@
 package app.gabbro.gabbro
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -12,14 +13,12 @@ import io.flutter.plugin.common.MethodChannel
 /**
  * MainActivity — the app's main Flutter surface. Inherits the shared unlock
  * plumbing (YubiKey + biometric channels, NFC NDEF suppression, FLAG_SECURE)
- * from [GabbroUnlockHostActivity] and adds the main-app-only channels: SAF
- * export and the autofill "recent apps" suggestion feed.
+ * from [GabbroUnlockHostActivity] and adds the main-app-only channel: SAF export.
  */
 class MainActivity : GabbroUnlockHostActivity() {
 
     private companion object {
         const val EXPORT_CHANNEL = "app.gabbro.gabbro/export"
-        const val AUTOFILL_CHANNEL = "app.gabbro.gabbro/autofill"
     }
 
     // SAF directory picker: the result arrives asynchronously, so we stash the
@@ -29,6 +28,8 @@ class MainActivity : GabbroUnlockHostActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        purgeLegacyRecentApps(applicationContext)
 
         // ACTION_OPEN_DOCUMENT_TREE picker for choosing the export folder. The
         // grant is scoped to exactly the folder the user picks — no manifest
@@ -54,16 +55,6 @@ class MainActivity : GabbroUnlockHostActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         // Registers the shared YubiKey + biometric channels and NFC suppression.
         super.configureFlutterEngine(flutterEngine)
-
-        // Suggestion chips for the entry editor's app-id field: native apps that
-        // requested autofill but matched no entry (app-private, capped).
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, AUTOFILL_CHANNEL)
-            .setMethodCallHandler { call, result ->
-                when (call.method) {
-                    "getRecentApps" -> result.success(RecentAutofillApps.recent(this))
-                    else -> result.notImplemented()
-                }
-            }
 
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, EXPORT_CHANNEL)
             .setMethodCallHandler { call, result ->
@@ -127,4 +118,20 @@ class MainActivity : GabbroUnlockHostActivity() {
         contentResolver.openOutputStream(target.uri, "wt")?.use { it.write(data) }
             ?: throw IllegalStateException("Cannot open $filename for writing")
     }
+}
+
+/** SharedPreferences file of the removed autofill "recently used apps" store. */
+internal const val LEGACY_RECENT_APPS_PREFS = "gabbro_recent_autofill_apps"
+
+/**
+ * Delete the leftover capture store on installs upgraded from a build that shipped
+ * the app-id suggestion chips. It listed apps the user had tried to log into and
+ * nothing reads it any more, so it would otherwise sit on disk forever. No-op once
+ * absent. A free function because MainActivity is a FlutterActivity and cannot be
+ * driven under Robolectric; nets in `LegacyPurgeTest`.
+ *
+ * Remove at v1.0 — no pre-1.0 install will still be around to upgrade.
+ */
+internal fun purgeLegacyRecentApps(context: Context) {
+    context.deleteSharedPreferences(LEGACY_RECENT_APPS_PREFS)
 }

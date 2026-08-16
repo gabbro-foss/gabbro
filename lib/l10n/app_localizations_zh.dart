@@ -1052,9 +1052,6 @@ class AppLocalizationsZh extends AppLocalizations {
       '在 Android 应用中填充此登录信息。仅精确匹配有效。在应用的 Play Store 链接中 id= 之后可找到该 ID（例如 id=com.company.app）。';
 
   @override
-  String get recentlyUsedApps => '最近使用的应用';
-
-  @override
   String get fieldUsername => '用户名（可选）';
 
   @override
@@ -3151,9 +3148,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
       '在 Android 应用中填充此登录信息。仅精确匹配有效。在应用的 Play Store 链接中 id= 之后可找到该 ID（例如 id=com.company.app）。';
 
   @override
-  String get recentlyUsedApps => '最近使用的应用';
-
-  @override
   String get fieldUsername => '用户名（可选）';
 
   @override
@@ -5248,9 +5242,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String get fieldAndroidAppIdHelper =>
       '在 Android 應用程式中填入此登入資訊。僅完全相符時有效。在應用程式的 Play Store 連結中 id= 之後可找到此 ID（例如 id=com.company.app）。';
-
-  @override
-  String get recentlyUsedApps => '最近使用的應用程式';
 
   @override
   String get fieldUsername => '使用者名稱（選填）';

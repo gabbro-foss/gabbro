@@ -1076,9 +1076,6 @@ class AppLocalizationsHu extends AppLocalizations {
       'Kitölti ezt a bejelentkezést egy Android-alkalmazásban. Csak a pontos egyezés működik. Az azonosítót az alkalmazás Play Store-linkjében találja, az id= után (pl. id=com.company.app).';
 
   @override
-  String get recentlyUsedApps => 'Nemrég használt alkalmazások';
-
-  @override
   String get fieldUsername => 'Felhasználónév (opcionális)';
 
   @override

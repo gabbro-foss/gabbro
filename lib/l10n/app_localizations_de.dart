@@ -1079,9 +1079,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Füllt diese Anmeldung in einer Android-App aus. Nur eine exakte Übereinstimmung funktioniert. Die ID finden Sie im Play-Store-Link der App nach id= (z. B. id=com.company.app).';
 
   @override
-  String get recentlyUsedApps => 'Zuletzt verwendete Apps';
-
-  @override
   String get fieldUsername => 'Benutzername (optional)';
 
   @override

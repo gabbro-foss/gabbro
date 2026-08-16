@@ -1077,9 +1077,6 @@ class AppLocalizationsBg extends AppLocalizations {
       'Попълва тези данни за вход в приложение за Android. Работи само точно съвпадение. Намерете ID във връзката на приложението в Play Store, след id= (напр. id=com.company.app).';
 
   @override
-  String get recentlyUsedApps => 'Наскоро използвани приложения';
-
-  @override
   String get fieldUsername => 'Потребителско ime (незадължително)';
 
   @override

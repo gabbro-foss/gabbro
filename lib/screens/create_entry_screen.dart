@@ -19,18 +19,6 @@ export 'package:gabbro/gabbro_file_picker.dart' show PickedFile;
 Future<void> _defaultCreate(VaultEntryData entry) => createEntry(entry: entry);
 VaultEntryData _defaultGetEntry(String id) => getEntry(id: id);
 
-/// Native apps that asked Gabbro to autofill but matched no entry — surfaced as
-/// tap-to-fill suggestions for the app-id field. Android only; empty elsewhere.
-Future<List<String>> _defaultRecentApps() async {
-  if (defaultTargetPlatform != TargetPlatform.android) return const [];
-  try {
-    const channel = MethodChannel('app.gabbro.gabbro/autofill');
-    final list = await channel.invokeMethod<List<dynamic>>('getRecentApps');
-    return list?.cast<String>() ?? const [];
-  } catch (_) {
-    return const [];
-  }
-}
 List<String> _defaultListFolders() => listFolders();
 
 Future<PickedFile?> _defaultPickFile() => GabbroFilePicker.pickFileWithData();
@@ -51,10 +39,6 @@ class CreateEntryScreen extends StatefulWidget {
   /// when the file portal is unavailable (sandbox).
   final Future<PickedFile?> Function() pickFile;
 
-  /// Test seam: fetch recently-seen native app ids for the suggestion chips.
-  /// Defaults to the Android autofill MethodChannel; empty off-Android.
-  final Future<List<String>> Function() recentAppsFetcher;
-
   const CreateEntryScreen({
     super.key,
     required this.entryType,
@@ -64,7 +48,6 @@ class CreateEntryScreen extends StatefulWidget {
     this.onGetEntry = _defaultGetEntry,
     this.listFolders,
     this.pickFile = _defaultPickFile,
-    this.recentAppsFetcher = _defaultRecentApps,
   });
 
   @override
@@ -77,7 +60,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   String? _error;
   late String _selectedFolder;
   List<String> _folders = [];
-  List<String> _recentApps = const [];
 
   // ── Login fields ────────────────────────────────────────────────────────────
   late final TextEditingController _loginTitleController;
@@ -173,10 +155,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     } catch (_) {
       _folders = [];
     }
-    // Suggestion chips for the app-id field (login form only).
-    widget.recentAppsFetcher().then((apps) {
-      if (mounted) setState(() => _recentApps = apps);
-    });
   }
 
   String _existingFolder() {
@@ -1121,28 +1099,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         border: const OutlineInputBorder(),
       ),
     ),
-    if (_recentApps.isNotEmpty) ...[
-      const SizedBox(height: 8),
-      Align(
-        alignment: Alignment.centerLeft,
-        child: Text(
-          l.recentlyUsedApps,
-          style: Theme.of(context).textTheme.labelMedium,
-        ),
-      ),
-      const SizedBox(height: 4),
-      Wrap(
-        spacing: 8,
-        runSpacing: 4,
-        children: [
-          for (final pkg in _recentApps)
-            ActionChip(
-              label: Text(pkg),
-              onPressed: () => setState(() => _appIdController.text = pkg),
-            ),
-        ],
-      ),
-    ],
     const SizedBox(height: 16),
     _customFieldsSection(
       fields: _loginCustomFields,

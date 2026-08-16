@@ -1074,9 +1074,6 @@ class AppLocalizationsLv extends AppLocalizations {
       'Aizpilda šo pieteikšanos Android lietotnē. Darbojas tikai precīza atbilstība. ID atrodiet lietotnes Play Store saitē aiz id= (piem., id=com.company.app).';
 
   @override
-  String get recentlyUsedApps => 'Nesen lietotās lietotnes';
-
-  @override
   String get fieldUsername => 'Lietotājvārds (neobligāts)';
 
   @override

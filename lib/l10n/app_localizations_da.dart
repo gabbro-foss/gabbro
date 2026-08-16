@@ -1075,9 +1075,6 @@ class AppLocalizationsDa extends AppLocalizations {
       'Udfylder dette login i en Android-app. Kun et nøjagtigt match virker. Find id\'et i appens Play Store-link efter id= (f.eks. id=com.company.app).';
 
   @override
-  String get recentlyUsedApps => 'Senest brugte apps';
-
-  @override
   String get fieldUsername => 'Brugernavn (valgfrit)';
 
   @override

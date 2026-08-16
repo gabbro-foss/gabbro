@@ -1074,9 +1074,6 @@ class AppLocalizationsYo extends AppLocalizations {
       'Ó kún ìwọlé yìí sínú app Android. Ìbámu pípé nìkan ló ń ṣiṣẹ́. Wá ID nínú ọ̀nà ìjápọ̀ Play Store ti app náà, lẹ́yìn id= (f.a. id=com.company.app).';
 
   @override
-  String get recentlyUsedApps => 'Àwọn app tí a lò láìpẹ́';
-
-  @override
   String get fieldUsername => 'Orukọ olumulo (aṣayan)';
 
   @override

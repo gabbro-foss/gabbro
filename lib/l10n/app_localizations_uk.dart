@@ -1080,9 +1080,6 @@ class AppLocalizationsUk extends AppLocalizations {
       'Заповнює ці дані для входу в додатку Android. Працює лише точний збіг. Знайдіть ідентифікатор у посиланні додатка в Play Store, після id= (напр. id=com.company.app).';
 
   @override
-  String get recentlyUsedApps => 'Нещодавно використані додатки';
-
-  @override
   String get fieldUsername => 'Ім\'я користувача (необов\'язково)';
 
   @override

@@ -1109,25 +1109,6 @@ void main() {
     expect(field.controller?.text, equals('com.company.app'));
   });
 
-  testWidgets('recent app chips render and fill the app ID field',
-      (tester) async {
-    await tester.pumpWidget(testApp(CreateEntryScreen(
-      entryType: 'Login',
-      onCreateEntry: (_) async {},
-      onGetEntry: (_) => VaultEntryData.login(_loginEntry()),
-      recentAppsFetcher: () async => ['com.company.app', 'com.other.app'],
-    )));
-    await tester.pumpAndSettle();
-    expect(find.text('Recently used apps'), findsOneWidget);
-    await tester.ensureVisible(find.widgetWithText(ActionChip, 'com.other.app'));
-    await tester.tap(find.widgetWithText(ActionChip, 'com.other.app'));
-    await tester.pump();
-    final field = tester.widget<TextFormField>(
-      find.widgetWithText(TextFormField, 'com.other.app'),
-    );
-    expect(field.controller?.text, equals('com.other.app'));
-  });
-
   testWidgets('changing only the Android app ID is detected as a change',
       (tester) async {
     await tester.pumpWidget(_buildEditScreen(VaultEntryData.login(_loginEntry())));
@@ -1148,18 +1129,6 @@ void main() {
     // The app-id change must be detected — not dismissed as "no changes".
     expect(find.byType(SnackBar), findsNothing);
     expect(find.byType(ReviewChangesScreen), findsOneWidget);
-  });
-
-  testWidgets('no recent app chips when the list is empty', (tester) async {
-    await tester.pumpWidget(testApp(CreateEntryScreen(
-      entryType: 'Login',
-      onCreateEntry: (_) async {},
-      onGetEntry: (_) => VaultEntryData.login(_loginEntry()),
-      recentAppsFetcher: () async => const [],
-    )));
-    await tester.pumpAndSettle();
-    expect(find.text('Recently used apps'), findsNothing);
-    expect(find.byType(ActionChip), findsNothing);
   });
 
   // ── Login email field ─────────────────────────────────────────────────────

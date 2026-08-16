@@ -1079,9 +1079,6 @@ class AppLocalizationsSl extends AppLocalizations {
       'Izpolni to prijavo v aplikaciji za Android. Deluje samo natančno ujemanje. ID poiščite v povezavi aplikacije v trgovini Play Store, za id= (npr. id=com.company.app).';
 
   @override
-  String get recentlyUsedApps => 'Nedavno uporabljene aplikacije';
-
-  @override
   String get fieldUsername => 'Uporabniško ime (neobvezno)';
 
   @override

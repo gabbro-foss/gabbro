@@ -1072,9 +1072,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Fills this login in an Android app. Only an exact match works. Find the ID in the app\'s Play Store link, after id= (e.g. id=com.company.app).';
 
   @override
-  String get recentlyUsedApps => 'Recently used apps';
-
-  @override
   String get fieldUsername => 'Username (optional)';
 
   @override
