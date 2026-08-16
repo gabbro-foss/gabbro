@@ -128,69 +128,17 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**Remove the "Recently used apps" suggestion chips (Android, Login editor).**
+**Import: content-hash deduplication and entry-level merge.**
 
-*What it is:* under the "Android app ID" field on Android, a row of tap-to-fill chips
-listing package names. Populated only when the autofill service fires on a **native**
-app **while the vault is unlocked** and nothing matched; capped at 10, newest first.
+Import already skips an entry whose UUID is in the vault (`rust/src/api/import.rs`),
+so a repeat Bitwarden/Enpass/Google/Dashlane export is deduped. CSV is not: it carries
+no id and its `skipped` list is hardcoded empty, so re-importing the same CSV leaves the
+user deleting duplicates by hand. Same for any source that mints fresh ids per export.
 
-*Why remove:* redundant. From that same login screen the user can just type the
-password and let `onSaveRequest` create the entry with `app_id` already set — no editor
-visit, no chip. The chips only help if the user hits the login screen, does *not* log
-in, and later creates the entry by hand. Cost: an unencrypted SharedPreferences list of
-"apps I tried to log into", with no clear/reset UI anywhere. Added 2026-06-16
-(`7d5c689` + `6df2124`); stated reason was only "so you needn't hunt for the package
-name" (CHANGELOG.md:222).
+Scope to agree before any code: which fields the content hash covers, and what a merge
+does when two versions of one entry differ.
 
-*Caveat to check first:* some apps never send Android a save request, so the
-type-it-and-save path silently fails there and the chip is the only fallback. Not
-observed in practice; maintainer accepted the risk. If it turns up, reconsider.
-
-*Sites (verified 2026-08-16. Net-first: pin current behaviour green before cutting —
-the baseline is a **full** `flutter test`, not one file: `screen_catalog.dart` feeds
-other sweeps):*
-- `android/…/GabbroAutofillService.kt` — `object RecentAutofillApps`, `recentAppsUpdated()`, `shouldRecordPackage()`, the `record()` call in `onFillRequest`
-- `android/…/MainActivity.kt` — the **whole** `AUTOFILL_CHANNEL` MethodChannel block (it serves only `getRecentApps`), the const, class doc-comment. Safe: `UnlockActivity` registers the same channel *name* on its own engine and `lib/main.dart` targets that one
-- `lib/screens/create_entry_screen.dart` — `_defaultRecentApps()`, `recentAppsFetcher`, `_recentApps`, the chips block
-- `lib/l10n/*.arb` — `recentlyUsedApps` in all **37** locales (no `@`-description block); regenerate `app_localizations_*.dart`
-- Tests: `android/…/GabbroAutofillServiceTest.kt` (`recentAppsUpdated_*` x3, `shouldRecordPackage_*` x3), `android/…/GabbroAutofillServiceRobolectricTest.kt` (`recentAutofillApps_*` x2), `test/create_entry_screen_test.dart` (chips x2), `test/screen_catalog.dart`
-- Docs: CHANGELOG entry for the removal; `CHANGELOG.md:222` is history, leave it
-- Not sites: backup rules exclude `sharedpref` by wildcard; `AutofillChipLabelTest.kt` guards the *system autofill dropdown* label — unrelated, leave it
-
-Nets that must not regress already exist — no new ones needed for the cut:
-`matchingCredentials_native_exact_app_id_match`, `matchSaveTarget_native_app_id_*`,
-`parseSummariesJson_reads_app_id_field`, and four app-id tests in `create_entry_screen_test.dart`.
-
-Accepted net gap: `onFillRequest` has no test at all. The deleted `record()` block leaves
-the branch's `buildSaveOnlyResponse` untouched; pinning it needs FillRequest/AssistStructure
-mocks — out of proportion to a 3-line cut. Hardware pass covers it.
-
-The app-id field itself **stays** — only the chips and the capture store go.
-
-*Progress (tick as each lands):*
-- [x] Baseline green: full `flutter test` (2246 pass / 10 skip)
-- [x] Baseline green: `./gradlew :app:testDebugUnitTest` (165 pass / 15 skip; needs
-      `cleanTestDebugUnitTest` first — a bare run reports UP-TO-DATE and runs nothing)
-- [x] Red test: `purgeLegacyRecentApps` (`LegacyPurgeTest`, 3 tests, green)
-- [x] Cut Kotlin: `RecentAutofillApps`, `recentAppsUpdated`, `shouldRecordPackage`, `record()` call
-- [x] Cut Kotlin: `MainActivity` AUTOFILL_CHANNEL block + const + doc-comment
-- [x] Cut Dart: `_defaultRecentApps`, `recentAppsFetcher`, `_recentApps`, chips block
-- [x] Cut l10n: `recentlyUsedApps` x37 + regenerate
-- [x] Cut tests: Kotlin x8, Dart chips x2, `screen_catalog.dart`
-- [x] Green: purge wired into `MainActivity.onCreate`
-- [x] Re-run both suites green (`flutter test` 2244/10; Kotlin 160/15; `flutter analyze` clean)
-- [x] Docs: CHANGELOG entry + Bikeshed "delete the purge at v1.0"
-- [x] Hardware, emulator: no chips in the Login editor; seeded legacy store deleted on
-      next launch (debug build — `run-as` needs one, Play image blocks `adb root`)
-- [x] Hardware, phone: Android's save prompt created the entry with the app ID set, and
-      that entry then autofilled (release build; native login form, emulator has no such app)
-
-*Also agreed:* purge the orphaned store on upgraded installs. `MainActivity` is a
-FlutterActivity with no test harness, so put the purge in a top-level
-`internal fun purgeLegacyRecentApps(context)` in `MainActivity.kt`, called from
-`onCreate`; Robolectric red-tests it via `RuntimeEnvironment.getApplication()`
-(pattern: `BiometricStoreTest`). `deleteSharedPreferences` is API 24 = our minSdk, no
-guard needed. Add a Bikeshed entry to delete the purge at v1.0.
+Not started — sites and nets not yet identified beyond the above.
 
 ---
 
@@ -221,10 +169,8 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - **Passkey provider**: store website passkeys (WebAuthn discoverable credentials) in
   the vault so they sync/back up. Distinct from the YubiKey (which unlocks the app);
   tradeoff — website private keys would live in the vault, not in hardware.
-- **Custom and hideable filter chips** (post-v1 user feedback gate).
 - **Windows support.**
 - **Yubico partnership.**
 - **Donation/sustainability model**: GitHub Sponsors is live; Monero possible later (a large, dedicated effort). Liberapay ruled out (2026-07-22 — Stripe forces business-type onboarding for individuals and has suspended Liberapay-linked accounts; no PayPal). Don't re-propose Liberapay.
 - **No-telemetry verification guide** (ripgrep scan, Wireshark, NetGuard).
 - **Support model** (GitHub Issues + SUPPORT.md for v1; revisit when user base exists).
-- **Import**: content-hash deduplication and entry-level merge.
