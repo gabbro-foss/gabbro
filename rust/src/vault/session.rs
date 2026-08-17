@@ -375,18 +375,15 @@ pub fn session_delete_entries_no_save(ids: &[String]) -> Result<(), String> {
     Ok(())
 }
 
-/// Return the set of UUIDs of all entries currently in the session.
+/// Return the content hashes of all entries currently in the session.
 ///
-/// Used by import to check for existing entries before adding new ones.
+/// Used by import to recognise an entry the vault already holds, whatever id the
+/// source file gave it. See `VaultEntry::content_hash`.
 /// Sync — reads from in-memory session, no I/O.
-pub fn session_entry_ids() -> Result<std::collections::HashSet<String>, String> {
+pub fn session_entry_content_hashes() -> Result<std::collections::HashSet<[u8; 32]>, String> {
     let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     let session = session.as_ref().ok_or("Vault is locked")?;
-    Ok(session
-        .entries
-        .iter()
-        .map(|e| entry_id(e).to_string())
-        .collect())
+    Ok(session.entries.iter().map(|e| e.content_hash()).collect())
 }
 
 /// Add a new entry to the in-memory session only — no disk write.
