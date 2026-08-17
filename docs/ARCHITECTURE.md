@@ -194,7 +194,9 @@ All green.
 Then the change, canon-TDD. Scenario list agreed 2026-08-17:
 
 *The hash*
-- [ ] S1 two entries with identical content hash the same
+- [x] S1 two entries with identical content hash the same — `VaultEntry::content_hash()`
+      (`vault/entry.rs`), SHA-256 over null-separated fields, returns `[u8; 32]`. Login only;
+      the other five types are `todo!()` until S2.
 - [ ] S2 changing any one hashed field changes the hash (one per entry type, 6)
 - [ ] S3 entries differing only in `id`/`created_at`/`updated_at`/`field_times`/`history`/`folder`
       hash the same
