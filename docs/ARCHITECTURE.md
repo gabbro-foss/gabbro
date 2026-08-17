@@ -205,7 +205,11 @@ Then the change, canon-TDD. Scenario list agreed 2026-08-17:
 - [x] S5 all six types carrying identical text hash pairwise differently (type is in the hash)
 
 *Dedup at import — one per source: CSV, Google PM, Dashlane, Bitwarden, Enpass, Gabbro*
-- [ ] S6 re-importing the same file imports nothing and reports every entry skipped
+- [x] S6 re-importing the same file imports nothing and reports every entry skipped — all six
+      sources; `session_entry_content_hashes()` replaces the id check, CSV gained the check it
+      never had, and the now-dead `session_entry_ids()` is deleted. The three N2/N3 nets were
+      replaced by their inversions, as planned. The skip *reason* still reads "UUID already
+      exists" — a lie in the UI until S11.
 - [ ] S7 a file mixing new and already-present entries imports only the new ones
 - [ ] S8 two identical rows inside one file: the second is skipped
 - [ ] S9 an entry whose id matches but whose content differs is imported (inverts today)
