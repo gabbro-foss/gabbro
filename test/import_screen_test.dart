@@ -79,16 +79,14 @@ void main() {
       );
     });
 
-    testWidgets('skipped dialog shows entry title and reason', (tester) async {
+    testWidgets('skipped dialog shows entry title and the localized reason',
+        (tester) async {
       await tester.pumpWidget(testApp(Builder(
         builder: (context) => TextButton(
           onPressed: () => showSkippedEntriesDialog(
             context,
             [
-              SkippedEntryData(
-                title: 'Dupe Entry',
-                reason: 'UUID already exists',
-              ),
+              SkippedEntryData(title: 'Dupe Entry'),
             ],
           ),
           child: const Text('show'),
@@ -98,7 +96,11 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(seconds: 1));
       expect(find.textContaining('Dupe Entry'), findsOneWidget);
-      expect(find.textContaining('UUID already exists'), findsOneWidget);
+      expect(
+        find.textContaining('already exist in your vault'),
+        findsOneWidget,
+        reason: 'the reason is the localized note, not raw English from Rust',
+      );
     });
 
     testWidgets('skipped dialog shows correct entry count in title',
@@ -108,8 +110,8 @@ void main() {
           onPressed: () => showSkippedEntriesDialog(
             context,
             [
-              SkippedEntryData(title: 'Entry A', reason: 'UUID already exists'),
-              SkippedEntryData(title: 'Entry B', reason: 'UUID already exists'),
+              SkippedEntryData(title: 'Entry A'),
+              SkippedEntryData(title: 'Entry B'),
             ],
           ),
           child: const Text('show'),

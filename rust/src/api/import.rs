@@ -134,10 +134,7 @@ pub async fn import_from_csv(
         let (_, title) = entry_id_and_title(&entry);
         let hash = entry.content_hash();
         if existing.contains(&hash) {
-            skipped.push(SkippedEntryData {
-                title,
-                reason: String::from("UUID already exists"),
-            });
+            skipped.push(SkippedEntryData { title });
         } else {
             existing.insert(hash);
             session::session_add_entry_no_save(entry)?;
@@ -216,10 +213,7 @@ pub async fn import_from_bitwarden(data: Vec<u8>) -> Result<ImportResult, String
         let (_, title) = entry_id_and_title(&entry);
         let hash = entry.content_hash();
         if existing.contains(&hash) {
-            skipped.push(SkippedEntryData {
-                title,
-                reason: String::from("UUID already exists"),
-            });
+            skipped.push(SkippedEntryData { title });
         } else {
             existing.insert(hash);
             session::session_add_entry_no_save(entry)?;
@@ -268,10 +262,7 @@ pub async fn import_from_enpass(data: Vec<u8>) -> Result<ImportResult, String> {
         let (_, title) = entry_id_and_title(&entry);
         let hash = entry.content_hash();
         if existing.contains(&hash) {
-            skipped.push(SkippedEntryData {
-                title,
-                reason: String::from("UUID already exists"),
-            });
+            skipped.push(SkippedEntryData { title });
         } else {
             existing.insert(hash);
             session::session_add_entry_no_save(entry)?;
@@ -317,10 +308,7 @@ pub async fn import_from_google_pm(data: Vec<u8>) -> Result<ImportResult, String
         let (_, title) = entry_id_and_title(&entry);
         let hash = entry.content_hash();
         if existing.contains(&hash) {
-            skipped.push(SkippedEntryData {
-                title,
-                reason: String::from("UUID already exists"),
-            });
+            skipped.push(SkippedEntryData { title });
         } else {
             existing.insert(hash);
             let now = chrono_now();
@@ -369,10 +357,7 @@ pub async fn import_from_dashlane(data: Vec<u8>) -> Result<ImportResult, String>
         let (_, title) = entry_id_and_title(&entry);
         let hash = entry.content_hash();
         if existing.contains(&hash) {
-            skipped.push(SkippedEntryData {
-                title,
-                reason: String::from("UUID already exists"),
-            });
+            skipped.push(SkippedEntryData { title });
         } else {
             existing.insert(hash);
             let now = chrono_now();
@@ -404,9 +389,11 @@ pub async fn import_from_dashlane(data: Vec<u8>) -> Result<ImportResult, String>
 #[derive(Debug)]
 pub struct SkippedEntryData {
     /// Display title of the skipped entry.
+    ///
+    /// No reason field: there is exactly one reason (the vault already holds this
+    /// content), and the dialog states it once in the user's own language. A
+    /// per-entry reason meant shipping hardcoded English across the bridge.
     pub title: String,
-    /// Human-readable reason for skipping.
-    pub reason: String,
 }
 
 /// Returned by [`import_from_gabbro`].
@@ -481,10 +468,7 @@ fn merge_source_into_session(
         let (_, title) = entry_id_and_title(&entry);
         let hash = entry.content_hash();
         if existing.contains(&hash) {
-            skipped.push(SkippedEntryData {
-                title,
-                reason: String::from("UUID already exists"),
-            });
+            skipped.push(SkippedEntryData { title });
         } else {
             existing.insert(hash);
             session::session_add_entry_no_save(entry)?;

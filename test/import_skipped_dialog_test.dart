@@ -19,7 +19,6 @@ void main() {
       8,
       (i) => SkippedEntryData(
         title: 'A rather long skipped entry title number $i that wraps at 2x',
-        reason: 'Skipped because its UUID already exists in the target vault',
       ),
     );
 
@@ -52,11 +51,12 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('each skipped row exposes its title and reason to a screen reader',
+  testWidgets('the skipped row and the localized reason reach a screen reader',
       (tester) async {
     // Linux reads only the semantic label, so the reason must be part of a
-    // label — not a hint, and not a decoration a reader skips. Without this a
-    // blind user hears the entry name and never learns why it was skipped.
+    // label — not a hint, and not a decoration a reader skips. The reason is the
+    // dialog's own localized note; the per-entry line carried raw English from
+    // Rust, which no translation covered.
     final handle = tester.ensureSemantics();
 
     await tester.pumpWidget(
@@ -68,10 +68,7 @@ void main() {
             builder: (context) => Center(
               child: ElevatedButton(
                 onPressed: () => showSkippedEntriesDialog(context, [
-                  SkippedEntryData(
-                    title: 'Dupe Entry',
-                    reason: 'UUID already exists',
-                  ),
+                  SkippedEntryData(title: 'Dupe Entry'),
                 ]),
                 child: const Text('show'),
               ),
@@ -90,11 +87,47 @@ void main() {
       reason: 'the skipped entry title must be readable',
     );
     expect(
-      find.bySemanticsLabel('UUID already exists'),
+      find.bySemanticsLabel(
+        'These entries already exist in your vault and were not overwritten:',
+      ),
       findsOneWidget,
-      reason: 'the reason must reach the reader as a label',
+      reason: 'the localized reason must reach the reader as a label',
     );
 
     handle.dispose();
+  });
+
+  testWidgets('no untranslated reason string reaches the user', (tester) async {
+    // The reason crossed the bridge as hardcoded English, so every non-English
+    // user was shown an English sentence naming a mechanism that no longer
+    // exists. The localized note above the list says it instead.
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: Builder(
+            builder: (context) => Center(
+              child: ElevatedButton(
+                onPressed: () => showSkippedEntriesDialog(context, [
+                  SkippedEntryData(title: 'Dupe Entry'),
+                ]),
+                child: const Text('show'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('show'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Dupe Entry'), findsOneWidget);
+    expect(
+      find.textContaining('UUID', findRichText: true),
+      findsNothing,
+      reason: 'the raw Rust reason must not be rendered',
+    );
   });
 }

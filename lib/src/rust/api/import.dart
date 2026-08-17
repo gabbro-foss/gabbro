@@ -76,9 +76,9 @@ Future<ImportResult> importFromDashlane({required List<int> data}) =>
 /// Import entries from a `.gabbro` vault file into the live session.
 ///
 /// Decrypts the source vault at `path` using `passphrase`, then applies
-/// UUID-based deduplication: entries whose UUID already exists in the session
-/// are skipped; new entries are added. A single vault save is performed at
-/// the end.
+/// content-hash deduplication: entries the session already holds are skipped;
+/// new entries are added. Import never updates an existing entry — that is
+/// sync's job. A single vault save is performed at the end.
 ///
 /// The vault must already be unlocked — returns `Err` if no session is active.
 /// Async — triggers a single vault save (Argon2id + encryption) at the end.
@@ -239,7 +239,7 @@ class ImportResult {
   /// Entries that failed domain validation and were not imported.
   final List<ImportFailureData> failures;
 
-  /// Entries skipped because their UUID already exists in the vault.
+  /// Entries skipped because the vault already holds identical content.
   final List<SkippedEntryData> skipped;
 
   const ImportResult({
@@ -264,21 +264,21 @@ class ImportResult {
 /// A single entry skipped during Gabbro → Gabbro import.
 class SkippedEntryData {
   /// Display title of the skipped entry.
+  ///
+  /// No reason field: there is exactly one reason (the vault already holds this
+  /// content), and the dialog states it once in the user's own language. A
+  /// per-entry reason meant shipping hardcoded English across the bridge.
   final String title;
 
-  /// Human-readable reason for skipping.
-  final String reason;
-
-  const SkippedEntryData({required this.title, required this.reason});
+  const SkippedEntryData({required this.title});
 
   @override
-  int get hashCode => title.hashCode ^ reason.hashCode;
+  int get hashCode => title.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is SkippedEntryData &&
           runtimeType == other.runtimeType &&
-          title == other.title &&
-          reason == other.reason;
+          title == other.title;
 }

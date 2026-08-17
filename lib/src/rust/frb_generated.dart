@@ -3559,12 +3559,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   SkippedEntryData dco_decode_skipped_entry_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-    return SkippedEntryData(
-      title: dco_decode_String(arr[0]),
-      reason: dco_decode_String(arr[1]),
-    );
+    if (arr.length != 1)
+      throw Exception('unexpected arr length: expect 1 but see ${arr.length}');
+    return SkippedEntryData(title: dco_decode_String(arr[0]));
   }
 
   @protected
@@ -4744,8 +4741,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   SkippedEntryData sse_decode_skipped_entry_data(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_title = sse_decode_String(deserializer);
-    var var_reason = sse_decode_String(deserializer);
-    return SkippedEntryData(title: var_title, reason: var_reason);
+    return SkippedEntryData(title: var_title);
   }
 
   @protected
@@ -5776,7 +5772,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.title, serializer);
-    sse_encode_String(self.reason, serializer);
   }
 
   @protected

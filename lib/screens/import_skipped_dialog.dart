@@ -56,20 +56,12 @@ class _SkippedEntriesDialog extends StatelessWidget {
           const SizedBox(height: 12),
           for (var i = 0; i < skipped.length; i++) ...[
             if (i > 0) const Divider(height: 1),
+            // The reason is not repeated per entry: there is only one, and
+            // `skippedEntriesNote` above states it in the user's language. The
+            // per-entry line carried hardcoded English across the bridge.
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(skipped[i].title, style: theme.textTheme.bodyMedium),
-                  Text(
-                    skipped[i].reason,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
+              child: Text(skipped[i].title, style: theme.textTheme.bodyMedium),
             ),
           ],
         ],

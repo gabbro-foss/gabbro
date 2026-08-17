@@ -509,7 +509,6 @@ final Map<String, Future<void> Function(BuildContext)> dialogs = {
   'import_skipped_dialog': (ctx) => showSkippedEntriesDialog(ctx, const [
     SkippedEntryData(
       title: 'An entry title long enough to stress the row at max text',
-      reason: 'A skip reason long enough to wrap on a narrow phone',
     ),
   ]),
   'import_failures_dialog': (ctx) => showImportFailuresDialog(ctx, const [
