@@ -164,6 +164,30 @@ void main() {
       return f;
     }
 
+    testWidgets('no skipped dialog when nothing was skipped', (tester) async {
+      // The screen guards the dialog on skipped.isNotEmpty. A clean import must
+      // not interrupt the user with an empty "0 entries skipped" box.
+      final tmp = tempGabbroFile();
+
+      await tester.pumpWidget(testApp(ImportScreen(
+        isAndroid: false,
+        initialGabbroPath: tmp.path,
+        onDetectSourceRecords: (_) => [],
+        onImportGabbro: (_, _) async =>
+            GabbroImportResult(imported: BigInt.one, skipped: []),
+      )));
+
+      await tester.enterText(
+          find.widgetWithText(TextField, 'Vault passphrase'), 'pw');
+      await tester.ensureVisible(find.text('Sync from vault'));
+      await tester.tap(find.text('Sync from vault'));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(find.textContaining('entries skipped'), findsNothing);
+    });
+
     testWidgets('key-protected source shows YubiKey PIN field and info note',
         (tester) async {
       final tmp = tempGabbroFile();

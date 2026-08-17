@@ -685,6 +685,40 @@ Sample,https://example.net,user@example.com,s3cr3t,,no";
 
     #[test]
     #[serial]
+    fn import_never_modifies_an_existing_entry() {
+        // Add-only invariant: import adds entries, it never reconciles fields on one
+        // already in the vault — that is sync's job. The incoming entry carries the
+        // same id as "existing-001" but different content; the stored entry must be
+        // byte-identical afterwards.
+        let bitwarden_collides_and_differs: &str = r#"{
+            "encrypted": false,
+            "folders": [],
+            "items": [
+                {"id":"existing-001","folderId":null,"type":2,"name":"Changed title","notes":"changed content","favorite":false,"fields":[],"secureNote":{}}
+            ]
+        }"#;
+
+        let pass = b"import add only passphrase";
+        let path = setup_vault(pass);
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let before = session::get_entry("existing-001").unwrap();
+        let _ = run(import_from_bitwarden(
+            bitwarden_collides_and_differs.as_bytes().to_vec(),
+        ))
+        .unwrap();
+        let after = session::get_entry("existing-001").unwrap();
+
+        assert_eq!(
+            before, after,
+            "import must leave an existing entry untouched"
+        );
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
     fn import_from_bitwarden_adds_entries_to_session() {
         let pass = b"bitwarden test passphrase";
         let path = setup_vault(pass);
@@ -993,6 +1027,80 @@ user@example.com,backup@example.com,,https://example.net,Personal,,s3cr3t,Sample
         session::lock_vault().unwrap();
         let result = run(import_from_dashlane(DASHLANE_CSV.as_bytes().to_vec()));
         assert!(result.is_err());
+    }
+
+    // ── Re-import duplication: pins TODAY'S behaviour ─────────────────────────
+    // These three sources carry no id, so their parsers mint a fresh one per row and
+    // the UUID check can never hit. Re-importing the same file duplicates everything.
+    // Recorded so the content-hash change has a before/after. Expected to be inverted
+    // (imported == 0) once dedup lands.
+
+    #[test]
+    #[serial]
+    fn google_pm_reimport_duplicates_every_entry_today() {
+        let pass = b"google pm reimport passphrase";
+        let path = setup_vault(pass);
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let first = run(import_from_google_pm(GOOGLE_PM_CSV.as_bytes().to_vec())).unwrap();
+        let second = run(import_from_google_pm(GOOGLE_PM_CSV.as_bytes().to_vec())).unwrap();
+
+        assert_eq!(first.imported, 2);
+        assert_eq!(second.imported, 2, "no dedup today: the same rows import again");
+        assert!(second.skipped.is_empty(), "nothing is skipped today");
+        // 1 existing note + 2 + 2
+        assert_eq!(session::list_entry_summaries().unwrap().len(), 5);
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn dashlane_reimport_duplicates_every_entry_today() {
+        let pass = b"dashlane reimport passphrase";
+        let path = setup_vault(pass);
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let first = run(import_from_dashlane(DASHLANE_CSV.as_bytes().to_vec())).unwrap();
+        let second = run(import_from_dashlane(DASHLANE_CSV.as_bytes().to_vec())).unwrap();
+
+        assert_eq!(first.imported, 2);
+        assert_eq!(second.imported, 2, "no dedup today: the same rows import again");
+        assert!(second.skipped.is_empty(), "nothing is skipped today");
+        assert_eq!(session::list_entry_summaries().unwrap().len(), 5);
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn csv_reimport_duplicates_and_never_reports_a_skip_today() {
+        // Also pins N3: `skipped` is hardcoded empty on the CSV path, so the dialog
+        // can never appear for it no matter what the file contains.
+        let pass = b"csv reimport passphrase";
+        let path = setup_vault(pass);
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let config = || CsvImportConfigData {
+            title_col: Some("name".to_string()),
+            url_col: Some("url".to_string()),
+            username_col: Some("login".to_string()),
+            password_col: Some("password".to_string()),
+            notes_col: Some("comments".to_string()),
+        };
+
+        let first = run(import_from_csv(SAMPLE_CSV.to_string(), config())).unwrap();
+        let second = run(import_from_csv(SAMPLE_CSV.to_string(), config())).unwrap();
+
+        assert_eq!(first.imported, 2);
+        assert_eq!(second.imported, 2, "no dedup today: the same rows import again");
+        assert!(
+            first.skipped.is_empty() && second.skipped.is_empty(),
+            "the CSV path hardcodes an empty skipped list"
+        );
+        assert_eq!(session::list_entry_summaries().unwrap().len(), 5);
+
+        teardown(&path);
     }
 
     // ── Locked-vault error paths for remaining importers ──────────────────────

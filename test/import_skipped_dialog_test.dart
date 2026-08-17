@@ -51,4 +51,50 @@ void main() {
 
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('each skipped row exposes its title and reason to a screen reader',
+      (tester) async {
+    // Linux reads only the semantic label, so the reason must be part of a
+    // label — not a hint, and not a decoration a reader skips. Without this a
+    // blind user hears the entry name and never learns why it was skipped.
+    final handle = tester.ensureSemantics();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: Builder(
+            builder: (context) => Center(
+              child: ElevatedButton(
+                onPressed: () => showSkippedEntriesDialog(context, [
+                  SkippedEntryData(
+                    title: 'Dupe Entry',
+                    reason: 'UUID already exists',
+                  ),
+                ]),
+                child: const Text('show'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('show'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.bySemanticsLabel('Dupe Entry'),
+      findsOneWidget,
+      reason: 'the skipped entry title must be readable',
+    );
+    expect(
+      find.bySemanticsLabel('UUID already exists'),
+      findsOneWidget,
+      reason: 'the reason must reach the reader as a label',
+    );
+
+    handle.dispose();
+  });
 }
