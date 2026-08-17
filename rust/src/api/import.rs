@@ -96,7 +96,8 @@ pub async fn import_from_csv(
     // Scrub the raw import buffer (holds plaintext secrets) on drop (S-06).
     let input = zeroize::Zeroizing::new(input);
     let entries = import_csv(&input, &csv_config)?;
-    let existing = session::session_entry_content_hashes()?;
+    // Grows as rows are added, so a file listing the same row twice imports it once.
+    let mut existing = session::session_entry_content_hashes()?;
 
     let mut imported = 0;
     let mut skipped = Vec::new();
@@ -131,12 +132,14 @@ pub async fn import_from_csv(
             email: None,
         });
         let (_, title) = entry_id_and_title(&entry);
-        if existing.contains(&entry.content_hash()) {
+        let hash = entry.content_hash();
+        if existing.contains(&hash) {
             skipped.push(SkippedEntryData {
                 title,
                 reason: String::from("UUID already exists"),
             });
         } else {
+            existing.insert(hash);
             session::session_add_entry_no_save(entry)?;
             imported += 1;
         }
@@ -202,19 +205,23 @@ pub async fn import_from_bitwarden(data: Vec<u8>) -> Result<ImportResult, String
     // Scrub the raw import buffer (holds plaintext secrets) on drop (S-06).
     let data = zeroize::Zeroizing::new(data);
     let (entries, failures) = bitwarden::parse(&data)?;
-    let existing = session::session_entry_content_hashes()?;
+    // Grows as entries are added, so a file listing the same credential twice
+    // imports it once.
+    let mut existing = session::session_entry_content_hashes()?;
 
     let mut imported = 0;
     let mut skipped = Vec::new();
 
     for entry in entries {
         let (_, title) = entry_id_and_title(&entry);
-        if existing.contains(&entry.content_hash()) {
+        let hash = entry.content_hash();
+        if existing.contains(&hash) {
             skipped.push(SkippedEntryData {
                 title,
                 reason: String::from("UUID already exists"),
             });
         } else {
+            existing.insert(hash);
             session::session_add_entry_no_save(entry)?;
             imported += 1;
         }
@@ -250,19 +257,23 @@ pub async fn import_from_enpass(data: Vec<u8>) -> Result<ImportResult, String> {
     // Scrub the raw import buffer (holds plaintext secrets) on drop (S-06).
     let data = zeroize::Zeroizing::new(data);
     let (entries, failures) = enpass::parse(&data)?;
-    let existing = session::session_entry_content_hashes()?;
+    // Grows as entries are added, so a file listing the same credential twice
+    // imports it once.
+    let mut existing = session::session_entry_content_hashes()?;
 
     let mut imported = 0;
     let mut skipped = Vec::new();
 
     for entry in entries {
         let (_, title) = entry_id_and_title(&entry);
-        if existing.contains(&entry.content_hash()) {
+        let hash = entry.content_hash();
+        if existing.contains(&hash) {
             skipped.push(SkippedEntryData {
                 title,
                 reason: String::from("UUID already exists"),
             });
         } else {
+            existing.insert(hash);
             session::session_add_entry_no_save(entry)?;
             imported += 1;
         }
@@ -295,19 +306,23 @@ pub async fn import_from_google_pm(data: Vec<u8>) -> Result<ImportResult, String
     // Scrub the raw import buffer (holds plaintext secrets) on drop (S-06).
     let data = zeroize::Zeroizing::new(data);
     let (entries, failures) = google_pm::parse(&data)?;
-    let existing = session::session_entry_content_hashes()?;
+    // Grows as entries are added, so a file listing the same credential twice
+    // imports it once.
+    let mut existing = session::session_entry_content_hashes()?;
 
     let mut imported = 0;
     let mut skipped = Vec::new();
 
     for entry in entries {
         let (_, title) = entry_id_and_title(&entry);
-        if existing.contains(&entry.content_hash()) {
+        let hash = entry.content_hash();
+        if existing.contains(&hash) {
             skipped.push(SkippedEntryData {
                 title,
                 reason: String::from("UUID already exists"),
             });
         } else {
+            existing.insert(hash);
             let now = chrono_now();
             // Google PM entries are freshly assigned UUIDs — stamp timestamps.
             let entry = stamp_timestamps(entry, &now);
@@ -343,19 +358,23 @@ pub async fn import_from_dashlane(data: Vec<u8>) -> Result<ImportResult, String>
     // Scrub the raw import buffer (holds plaintext secrets) on drop (S-06).
     let data = zeroize::Zeroizing::new(data);
     let (entries, failures) = dashlane::parse(&data)?;
-    let existing = session::session_entry_content_hashes()?;
+    // Grows as entries are added, so a file listing the same credential twice
+    // imports it once.
+    let mut existing = session::session_entry_content_hashes()?;
 
     let mut imported = 0;
     let mut skipped = Vec::new();
 
     for entry in entries {
         let (_, title) = entry_id_and_title(&entry);
-        if existing.contains(&entry.content_hash()) {
+        let hash = entry.content_hash();
+        if existing.contains(&hash) {
             skipped.push(SkippedEntryData {
                 title,
                 reason: String::from("UUID already exists"),
             });
         } else {
+            existing.insert(hash);
             let now = chrono_now();
             let entry = stamp_timestamps(entry, &now);
             session::session_add_entry_no_save(entry)?;
@@ -451,19 +470,23 @@ pub async fn import_from_gabbro_with_key(
 fn merge_source_into_session(
     source: crate::vault::serialization::VaultBody,
 ) -> Result<GabbroImportResult, String> {
-    let existing = session::session_entry_content_hashes()?;
+    // Grows as entries are added, so a source holding the same entry twice
+    // imports it once.
+    let mut existing = session::session_entry_content_hashes()?;
 
     let mut imported = 0;
     let mut skipped = Vec::new();
 
     for entry in source.entries {
         let (_, title) = entry_id_and_title(&entry);
-        if existing.contains(&entry.content_hash()) {
+        let hash = entry.content_hash();
+        if existing.contains(&hash) {
             skipped.push(SkippedEntryData {
                 title,
                 reason: String::from("UUID already exists"),
             });
         } else {
+            existing.insert(hash);
             session::session_add_entry_no_save(entry)?;
             imported += 1;
         }
@@ -1275,6 +1298,114 @@ Third,https://example.org,third,t0ps3cr3t,,no";
         assert_eq!(session::list_entry_summaries().unwrap().len(), 4);
 
         teardown(&path);
+    }
+
+    // ── S8: duplicate rows within one file ────────────────────────────────────
+    // Three tests, one per distinct dedup site: the shape shared by
+    // bitwarden/enpass/google_pm/dashlane, `merge_source_into_session`, and the
+    // CSV loop. A file listing the same credential twice must leave one entry.
+
+    #[test]
+    #[serial]
+    fn google_pm_duplicate_rows_in_one_file_import_once() {
+        const TWICE: &str = "\
+name,url,username,password,note
+Example,https://example.com,user,hunter2,my example
+Example,https://example.com,user,hunter2,my example";
+
+        let pass = b"google pm self dedup passphrase";
+        let path = setup_vault(pass);
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let result = run(import_from_google_pm(TWICE.as_bytes().to_vec())).unwrap();
+
+        assert_eq!(result.imported, 1, "the repeated row must import once");
+        assert_eq!(result.skipped.len(), 1, "the repeat is reported");
+        // 1 existing note + 1
+        assert_eq!(session::list_entry_summaries().unwrap().len(), 2);
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn csv_duplicate_rows_in_one_file_import_once() {
+        const TWICE: &str = "\
+name,url,login,password,comments,favourite
+Example,https://example.com,user,hunter2,my example,yes
+Example,https://example.com,user,hunter2,my example,yes";
+
+        let pass = b"csv self dedup passphrase";
+        let path = setup_vault(pass);
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let config = CsvImportConfigData {
+            title_col: Some("name".to_string()),
+            url_col: Some("url".to_string()),
+            username_col: Some("login".to_string()),
+            password_col: Some("password".to_string()),
+            notes_col: Some("comments".to_string()),
+        };
+
+        let result = run(import_from_csv(TWICE.to_string(), config)).unwrap();
+
+        assert_eq!(result.imported, 1, "the repeated row must import once");
+        assert_eq!(result.skipped.len(), 1, "the repeat is reported");
+        assert_eq!(session::list_entry_summaries().unwrap().len(), 2);
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn gabbro_source_holding_the_same_entry_twice_imports_it_once() {
+        // A source vault carrying one note under two different ids. The ids differ,
+        // the content does not, so the user should end up with one entry.
+        let session_pass = b"gabbro self dedup session passphrase";
+        let session_path = setup_vault(session_pass);
+
+        let source_pass = b"gabbro self dedup source passphrase";
+        let mut source_path = temp_dir();
+        source_path.push("gabbro_self_dedup_source.gabbro");
+        let twin = |id: &str| {
+            VaultEntry::Note(NoteEntry {
+                meta: EntryMeta {
+                    id: String::from(id),
+                    created_at: String::from("2025-03-01T00:00:00Z"),
+                    updated_at: String::from("2025-03-01T00:00:00Z"),
+                    folder: String::from("Personal"),
+                    ..Default::default()
+                },
+                title: String::from("Twin note"),
+                content: String::from("same content"),
+                custom_fields: vec![],
+                attachments: vec![],
+            })
+        };
+        save_vault(
+            &VaultBody {
+                folders: vec![],
+                entries: vec![twin("twin-a"), twin("twin-b")],
+                ..Default::default()
+            },
+            source_pass,
+            &source_path,
+        )
+        .unwrap();
+
+        session::unlock_vault(session_pass, session_path.clone()).unwrap();
+        let result = run(import_from_gabbro(
+            source_path.to_str().unwrap().to_string(),
+            source_pass.to_vec(),
+        ))
+        .unwrap();
+
+        assert_eq!(result.imported, 1, "the twin must import once");
+        assert_eq!(result.skipped.len(), 1, "the twin is reported skipped");
+        assert_eq!(session::list_entry_summaries().unwrap().len(), 2);
+
+        teardown(&session_path);
+        let _ = std::fs::remove_file(&source_path);
     }
 
     // ── Locked-vault error paths for remaining importers ──────────────────────
