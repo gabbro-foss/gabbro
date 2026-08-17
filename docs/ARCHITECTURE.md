@@ -199,8 +199,8 @@ Then the change, canon-TDD. Scenario list agreed 2026-08-17:
 - [x] S2 changing any one hashed field changes the hash — all six types covered. Values are
       length-prefixed so no two field splits collide; `Option` carries a set/unset tag byte so
       clearing a field differs from blanking it
-- [ ] S3 entries differing only in `id`/`created_at`/`updated_at`/`field_times`/`history`/`folder`
-      hash the same
+- [x] S3 entries differing only in `id`/`created_at`/`updated_at`/`field_times`/`history`/`folder`
+      hash the same — checked across all six types
 - [ ] S4 a Custom entry with the same fields in a different order hashes the same
 - [ ] S5 a Note and a Login with matching text hash differently (type is in the hash)
 
