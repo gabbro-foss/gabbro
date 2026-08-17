@@ -201,8 +201,8 @@ Then the change, canon-TDD. Scenario list agreed 2026-08-17:
       clearing a field differs from blanking it
 - [x] S3 entries differing only in `id`/`created_at`/`updated_at`/`field_times`/`history`/`folder`
       hash the same — checked across all six types
-- [ ] S4 a Custom entry with the same fields in a different order hashes the same
-- [ ] S5 a Note and a Login with matching text hash differently (type is in the hash)
+- [x] S4 a Custom entry with the same fields in a different order hashes the same
+- [x] S5 all six types carrying identical text hash pairwise differently (type is in the hash)
 
 *Dedup at import — one per source: CSV, Google PM, Dashlane, Bitwarden, Enpass, Gabbro*
 - [ ] S6 re-importing the same file imports nothing and reports every entry skipped
