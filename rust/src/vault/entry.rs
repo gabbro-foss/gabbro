@@ -657,6 +657,92 @@ mod tests {
     }
 
     #[test]
+    fn custom_entry_field_order_does_not_change_the_hash() {
+        // `fields` is an order-preserving IndexMap, so two vaults holding the same
+        // custom entry can carry its fields in different orders. The user sees one
+        // entry either way; a re-import must not add a second copy.
+        let field = |label: &str, value: &str| CustomField {
+            label: String::from(label),
+            value: String::from(value),
+            hidden: false,
+        };
+
+        let mut forward = IndexMap::new();
+        forward.insert(String::from("Alpha"), field("Alpha", "one"));
+        forward.insert(String::from("Beta"), field("Beta", "two"));
+
+        let mut reversed = IndexMap::new();
+        reversed.insert(String::from("Beta"), field("Beta", "two"));
+        reversed.insert(String::from("Alpha"), field("Alpha", "one"));
+
+        let mut a = sample_custom();
+        a.fields = forward;
+        let mut b = sample_custom();
+        b.fields = reversed;
+
+        assert_eq!(
+            VaultEntry::Custom(a).content_hash(),
+            VaultEntry::Custom(b).content_hash()
+        );
+    }
+
+    #[test]
+    fn entry_type_is_part_of_the_hash() {
+        // Every type carries the same text here, so only the type tag separates
+        // them. Without it a Note could be mistaken for the Login of the same name
+        // and one of them would vanish from an import.
+        let shared = String::from("Example");
+
+        let mut login = sample_login();
+        login.title = shared.clone();
+        login.url = shared.clone();
+        login.username = shared.clone();
+        login.password = shared.clone();
+        login.notes = Some(shared.clone());
+
+        let mut note = sample_note();
+        note.title = shared.clone();
+        note.content = shared.clone();
+
+        let mut identity = sample_identity();
+        identity.first_name = shared.clone();
+        identity.last_name = shared.clone();
+        identity.email = shared.clone();
+        identity.phone = Some(shared.clone());
+        identity.address = Some(shared.clone());
+
+        let mut card = sample_card();
+        card.card_name = Some(shared.clone());
+        card.cardholder_name = shared.clone();
+
+        let mut file = sample_file();
+        file.filename = shared.clone();
+        file.notes = Some(shared.clone());
+
+        let mut custom = sample_custom();
+        custom.title = shared.clone();
+
+        let entries = [
+            ("Login", VaultEntry::Login(login)),
+            ("Note", VaultEntry::Note(note)),
+            ("Identity", VaultEntry::Identity(identity)),
+            ("Card", VaultEntry::Card(card)),
+            ("File", VaultEntry::File(file)),
+            ("Custom", VaultEntry::Custom(custom)),
+        ];
+
+        for (i, (name_a, a)) in entries.iter().enumerate() {
+            for (name_b, b) in entries.iter().skip(i + 1) {
+                assert_ne!(
+                    a.content_hash(),
+                    b.content_hash(),
+                    "{name_a} and {name_b} must not share a content hash"
+                );
+            }
+        }
+    }
+
+    #[test]
     fn changing_any_login_field_changes_the_hash() {
         let base = VaultEntry::Login(sample_login());
         let m = |f: fn(&mut LoginEntry)| {
