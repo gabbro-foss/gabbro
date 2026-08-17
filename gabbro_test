@@ -65,7 +65,7 @@ flutter test --no-pub; report $? "flutter unit/widget tests"
 # -j 1 is REQUIRED: the Rust session is process-global, so parallel suites clobber each
 # other's vault ("Vault is locked").
 (cd rust && cargo build --release --lib --offline); report $? "rust cdylib for dart test (release)"
-dart test integration_test/ -j 1; report $? "dart real-FFI suites (vault_session/entry_edit/vault_corruption)"
+dart test integration_test/ -j 1; report $? "dart real-FFI suites (vault_session/entry_edit/vault_corruption/import_reimport/import_hw_sequence)"
 
 echo ">>> ===== RUST (OFFLINE: no-network namespace) ====="
 # Supply chain first - seconds-cheap. Both read DBs warmed by --warm, never the network:
