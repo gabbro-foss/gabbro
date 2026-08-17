@@ -1046,7 +1046,10 @@ user@example.com,backup@example.com,,https://example.net,Personal,,s3cr3t,Sample
         let second = run(import_from_google_pm(GOOGLE_PM_CSV.as_bytes().to_vec())).unwrap();
 
         assert_eq!(first.imported, 2);
-        assert_eq!(second.imported, 2, "no dedup today: the same rows import again");
+        assert_eq!(
+            second.imported, 2,
+            "no dedup today: the same rows import again"
+        );
         assert!(second.skipped.is_empty(), "nothing is skipped today");
         // 1 existing note + 2 + 2
         assert_eq!(session::list_entry_summaries().unwrap().len(), 5);
@@ -1065,7 +1068,10 @@ user@example.com,backup@example.com,,https://example.net,Personal,,s3cr3t,Sample
         let second = run(import_from_dashlane(DASHLANE_CSV.as_bytes().to_vec())).unwrap();
 
         assert_eq!(first.imported, 2);
-        assert_eq!(second.imported, 2, "no dedup today: the same rows import again");
+        assert_eq!(
+            second.imported, 2,
+            "no dedup today: the same rows import again"
+        );
         assert!(second.skipped.is_empty(), "nothing is skipped today");
         assert_eq!(session::list_entry_summaries().unwrap().len(), 5);
 
@@ -1093,7 +1099,10 @@ user@example.com,backup@example.com,,https://example.net,Personal,,s3cr3t,Sample
         let second = run(import_from_csv(SAMPLE_CSV.to_string(), config())).unwrap();
 
         assert_eq!(first.imported, 2);
-        assert_eq!(second.imported, 2, "no dedup today: the same rows import again");
+        assert_eq!(
+            second.imported, 2,
+            "no dedup today: the same rows import again"
+        );
         assert!(
             first.skipped.is_empty() && second.skipped.is_empty(),
             "the CSV path hardcodes an empty skipped list"

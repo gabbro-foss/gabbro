@@ -334,6 +334,36 @@ pub enum VaultEntry {
     Custom(CustomEntry),
 }
 
+impl VaultEntry {
+    /// Hash of the entry's user-visible content, used by import to recognise an
+    /// entry it already holds.
+    ///
+    /// Deliberately excludes everything vault-local or volatile — `meta.id`,
+    /// timestamps, `field_times`, `history` and `folder` — so re-filing an entry
+    /// or re-importing a file that mints fresh ids still dedupes. See
+    /// ARCHITECTURE.md "Current Focus" for the agreed per-type field list.
+    pub fn content_hash(&self) -> [u8; 32] {
+        use sha2::{Digest, Sha256};
+        let mut h = Sha256::new();
+        match self {
+            VaultEntry::Login(e) => {
+                h.update(b"login\0");
+                h.update(e.title.as_bytes());
+                h.update(b"\0");
+                h.update(e.url.as_bytes());
+                h.update(b"\0");
+                h.update(e.username.as_bytes());
+                h.update(b"\0");
+                h.update(e.password.as_bytes());
+                h.update(b"\0");
+                h.update(e.notes.as_deref().unwrap_or_default().as_bytes());
+            }
+            _ => todo!("remaining entry types land with their own scenario"),
+        }
+        h.finalize().into()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -358,6 +388,32 @@ mod tests {
             folder: String::from("Personal"),
             ..Default::default()
         }
+    }
+
+    // ── content hash: identifies an entry by what it holds, not by its id ─────
+
+    fn sample_login() -> LoginEntry {
+        LoginEntry {
+            meta: default_meta(),
+            title: String::from("Example"),
+            url: String::from("https://example.com"),
+            username: String::from("user"),
+            password: String::from("hunter2"),
+            notes: Some(String::from("a note")),
+            custom_fields: vec![],
+            attachments: vec![],
+            app_id: None,
+            email: None,
+        }
+    }
+
+    #[test]
+    fn identical_content_hashes_the_same() {
+        // Import dedup rests on this: two entries the user would call the same
+        // entry must produce the same hash, or a re-import duplicates them.
+        let a = VaultEntry::Login(sample_login());
+        let b = VaultEntry::Login(sample_login());
+        assert_eq!(a.content_hash(), b.content_hash());
     }
 
     // ── per-field change-times for granular sync (v9) ─────────────────────────
