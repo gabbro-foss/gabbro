@@ -1463,6 +1463,53 @@ Example,https://example.com,user,hunter2,my example,yes";
         teardown(&path);
     }
 
+    // ── S14: the accepted cost of content-based dedup ─────────────────────────
+
+    #[test]
+    #[serial]
+    fn an_entry_edited_after_import_reimports_as_a_second_copy() {
+        // Deliberate, documented behaviour, not a defect. Change the password in
+        // Gabbro and the entry no longer matches the file, so a re-import adds it
+        // back. Import is add-only by design; sync is the flow that reconciles an
+        // edited entry. Pinned so the tradeoff cannot be lost silently.
+        let pass = b"edited then reimported passphrase";
+        let path = setup_vault(pass);
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let first = run(import_from_google_pm(GOOGLE_PM_CSV.as_bytes().to_vec())).unwrap();
+        assert_eq!(first.imported, 2);
+
+        // The user changes one imported password in Gabbro.
+        let summaries = session::list_entry_summaries().unwrap();
+        let target = summaries
+            .iter()
+            .find(|s| s.title == "Example")
+            .expect("the imported login should be present");
+        let mut entry = session::get_entry(&target.id).unwrap();
+        match &mut entry {
+            VaultEntry::Login(e) => e.password = String::from("rotated-by-hand"),
+            other => panic!("expected a Login, got {other:?}"),
+        }
+        session::session_update_entry(entry, None).unwrap();
+
+        // Re-importing the same file brings the pre-edit version back.
+        let second = run(import_from_google_pm(GOOGLE_PM_CSV.as_bytes().to_vec())).unwrap();
+
+        assert_eq!(
+            second.imported, 1,
+            "the edited entry no longer matches the file, so it imports again"
+        );
+        assert_eq!(
+            second.skipped.len(),
+            1,
+            "the untouched entry is still recognised"
+        );
+        // 1 existing note + 2 imported + 1 re-added
+        assert_eq!(session::list_entry_summaries().unwrap().len(), 4);
+
+        teardown(&path);
+    }
+
     // ── Locked-vault error paths for remaining importers ──────────────────────
 
     #[test]
