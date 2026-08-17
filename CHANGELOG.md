@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Re-importing a file you have already imported no longer duplicates its entries.** Every import source now compares what an entry contains, instead of an id most export formats do not carry. Entries the vault already holds are listed as skipped, and an import that adds nothing says so rather than leaving the screen unchanged.
 - **Serbian: the import screen named a file extension that does not exist.** It read `.габбро` instead of `.gabbro`, so anyone following it looked for the wrong file.
 
 ### Removed

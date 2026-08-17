@@ -229,7 +229,7 @@ users to look for a file that cannot exist. Fixed.
 *Accepted cost, pinned deliberately*
 - [x] S14 an entry edited in Gabbro after import re-imports as a second copy
 
-- [ ] S15 hardware pass — **FAILED 2026-08-17, see below**
+- [ ] S15 hardware pass — not run; see below
 
 Already netted, no work needed: all six sources add entries and refuse a locked vault; CSV
 persists to disk at the current version; parse failures do not abort; Gabbro key-protected,
@@ -237,55 +237,41 @@ wrong-passphrase and pre-v11 paths; Enpass attachment decode; CSV unmapped colum
 folder lookup. l10n key completeness and English-only values are caught generically by
 `l10n_test.dart`.
 
-### Hardware run 2026-08-17 — void, stopped at row 8
+### The two UI defects the void hardware run found — both FIXED
 
-Linux release bundle, mock vault. The two string checks are solid. Everything from row 3 on is
-void because the matrix was ambiguous (see below), so it must be re-run.
+Rust was never at fault; both were in Dart.
 
-| Row | Check | Result |
-|---|---|---|
-| 1 | banner has no "UUID" | pass |
-| 2 | Gabbro subtitle says Import, extension `.gabbro` | pass |
-| 3 | first CSV import of 2 rows | pass, 2 imported |
-| 4 | same file again | **fail** — reported 2 imported, entries duplicated |
-| 5 | no per-entry reason in the dialog | pass, but vacuous (see D1: CSV shows no dialog) |
-| 6 | mixed file | **fail** — reported 2 |
-| 7 | same row twice in one file | **fail** — reported 2 |
-| 8 | edit the imported "Alpha" | **blocked** — no Alpha in the list |
-| 9-12 | not run | |
+- **D1 CSV discarded the skipped list.** CSV imports from its own screen, so it now raises the
+  skipped dialog there, as the other five sources do from `ImportScreen`. The pop stays an `int`.
+  The red test also caught the progress spinner never stopping; it stops before the dialog now.
+- **D2 a fully-skipped import was silent.** The vault list now reports and re-reads on any result,
+  0 included; only backing out stays silent. Needed an `openImport` seam on `VaultListScreen`.
 
-**Two defects found in the Dart layer, both mine, neither in Rust:**
+Nets and red tests in `test/csv_mapping_screen_test.dart` and
+`test/vault_list_import_result_test.dart`.
 
-- **D1 CSV discarded the skipped list** — **FIXED**. CSV imports from its own screen, so it now
-  raises the skipped dialog there, as the other five sources do from `ImportScreen`. The pop stays
-  an `int`. The red test also caught the progress spinner never stopping; it stops before the
-  dialog now.
-- **D2 a fully-skipped import was silent** — **FIXED**. The vault list now reports and re-reads on
-  any result, 0 included; only backing out stays silent. Reaching it needed an `openImport` seam on
-  `VaultListScreen`.
+### S15 hardware — still not run
 
-So S6 is only half-shipped: Rust skips correctly, the UI never says so.
+The 2026-08-17 run was void (ambiguous matrix) and the rewrite attempt was abandoned: three
+successive drafts each carried a step that had not been verified against the code —
+a markdown-escaped `\|` that broke the build command when pasted, "Manage vaults" for a control
+that lives on the unlock screen's vault dropdown ("Open a vault file…"), and a typed `~/…` path
+the app never expands. **Verify every step against the code before writing it, not after.**
 
-**Treat the rows above as unreliable, not as findings.** The matrix was ambiguous: it wrote
-"Alpha" for an imported *entry title* without ever saying so, and it was read as a vault name. So
-row 8 says nothing about the vault list, and rows 4/6/7's "imported 2" cannot be trusted to mean
-what the importer returned. The run has to be redone before any conclusion is drawn from it.
+Facts confirmed while drafting, for whoever writes the next one:
 
-Rust is ruled out for the exact fixture bytes — `hardware_fixture_csv_reimport_imports_nothing`
-and `csv_reimport_after_a_reload_still_imports_nothing` both pass. Two guesses at the cause
-(stale build, lossy save/reload) were both wrong; instrument the running app instead of
-theorising.
-
-**Rewrite the matrix before re-running.** What made it unusable: rows depended on vault state
-that cannot be inspected; duplicated entries were indistinguishable; rows 4-7 asked for a dialog
-D1 makes impossible; and it used bare names like "Alpha" without saying whether they were a
-vault, a file, or an entry. Every row needs one observable check and unambiguous nouns.
+- The app expands no `~`; a typed path must be absolute.
+- Adopt route: unlock-screen vault dropdown -> "Open a vault file…" -> path field -> "Vault name"
+  -> "Add vault" -> back to the unlock screen for the new vault.
+- CSV route: Import entries -> "Generic CSV" -> path -> "Next: map columns" -> "Import".
+- Evidence strings: dialog title "N entries skipped"; SnackBar "Imported N entries." / "Imported
+  1 entry.".
+- Never import into mock vault A/B/D; copy one to a scratch path and adopt the copy.
 
 ### Next steps, in order
 
-1. ~~D1~~, ~~D2~~ done.
-2. Rewrite the hardware matrix: one observable check per row, no dependence on prior state.
-3. Re-run hardware. Then the full gate (`gabbro_test`) — not before.
+1. Write the hardware matrix — every step verified against the code first.
+2. Re-run hardware. Then the full gate (`gabbro_test`) — not before.
 
 Rust counts in the Testing table above are stale: `cargo test -q` has not run since this work
 began. Flutter (2329) and clippy are current and green.
