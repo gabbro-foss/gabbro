@@ -344,21 +344,104 @@ impl VaultEntry {
     /// ARCHITECTURE.md "Current Focus" for the agreed per-type field list.
     pub fn content_hash(&self) -> [u8; 32] {
         use sha2::{Digest, Sha256};
+
+        // Every value is length-prefixed so no two different field splits can
+        // produce the same byte stream ("ab" + "c" must not collide with "a" + "bc").
+        fn put(h: &mut Sha256, bytes: &[u8]) {
+            h.update((bytes.len() as u64).to_le_bytes());
+            h.update(bytes);
+        }
+        fn put_str(h: &mut Sha256, s: &str) {
+            put(h, s.as_bytes());
+        }
+        // A tag byte separates "unset" from "set to empty" — otherwise clearing a
+        // field would look identical to blanking it.
+        fn put_opt(h: &mut Sha256, v: Option<&String>) {
+            match v {
+                None => h.update([0u8]),
+                Some(s) => {
+                    h.update([1u8]);
+                    put_str(h, s);
+                }
+            }
+        }
+        fn put_custom_fields(h: &mut Sha256, fields: &[CustomField]) {
+            h.update((fields.len() as u64).to_le_bytes());
+            for f in fields {
+                put_str(h, &f.label);
+                put_str(h, &f.value);
+                h.update([f.hidden as u8]);
+            }
+        }
+
         let mut h = Sha256::new();
         match self {
             VaultEntry::Login(e) => {
-                h.update(b"login\0");
-                h.update(e.title.as_bytes());
-                h.update(b"\0");
-                h.update(e.url.as_bytes());
-                h.update(b"\0");
-                h.update(e.username.as_bytes());
-                h.update(b"\0");
-                h.update(e.password.as_bytes());
-                h.update(b"\0");
-                h.update(e.notes.as_deref().unwrap_or_default().as_bytes());
+                put(&mut h, b"login");
+                put_str(&mut h, &e.title);
+                put_str(&mut h, &e.url);
+                put_str(&mut h, &e.username);
+                put_str(&mut h, &e.password);
+                put_opt(&mut h, e.notes.as_ref());
+                put_custom_fields(&mut h, &e.custom_fields);
+                put_opt(&mut h, e.app_id.as_ref());
+                put_opt(&mut h, e.email.as_ref());
             }
-            _ => todo!("remaining entry types land with their own scenario"),
+            VaultEntry::Note(e) => {
+                put(&mut h, b"note");
+                put_str(&mut h, &e.title);
+                put_str(&mut h, &e.content);
+                put_custom_fields(&mut h, &e.custom_fields);
+            }
+            VaultEntry::Identity(e) => {
+                put(&mut h, b"identity");
+                put_str(&mut h, &e.first_name);
+                put_str(&mut h, &e.last_name);
+                put_str(&mut h, &e.email);
+                put_opt(&mut h, e.phone.as_ref());
+                put_opt(&mut h, e.address.as_ref());
+                put_custom_fields(&mut h, &e.custom_fields);
+            }
+            VaultEntry::Card(e) => {
+                put(&mut h, b"card");
+                put_opt(&mut h, e.card_name.as_ref());
+                put_str(&mut h, &e.status);
+                put_str(&mut h, &e.cardholder_name);
+                put_str(&mut h, &e.card_number);
+                put_str(&mut h, &e.expiry);
+                put_str(&mut h, &e.cvv);
+                put_opt(&mut h, e.credit_limit.as_ref());
+                put_opt(&mut h, e.card_account_number.as_ref());
+                put_opt(&mut h, e.payment_network.as_ref());
+                put_opt(&mut h, e.pin.as_ref());
+                put_opt(&mut h, e.bank_name.as_ref());
+                put_opt(&mut h, e.transaction_password.as_ref());
+                put_opt(&mut h, e.notes.as_ref());
+                put_custom_fields(&mut h, &e.custom_fields);
+            }
+            VaultEntry::File(e) => {
+                put(&mut h, b"file");
+                put_str(&mut h, &e.filename);
+                put(&mut h, &e.data);
+                put_opt(&mut h, e.notes.as_ref());
+                put_custom_fields(&mut h, &e.custom_fields);
+            }
+            VaultEntry::Custom(e) => {
+                put(&mut h, b"custom");
+                put_str(&mut h, &e.title);
+                // `fields` is an order-preserving IndexMap, so sort by key first:
+                // the same fields entered in a different order are the same entry.
+                let mut keys: Vec<&String> = e.fields.keys().collect();
+                keys.sort();
+                h.update((keys.len() as u64).to_le_bytes());
+                for k in keys {
+                    let f = &e.fields[k];
+                    put_str(&mut h, k);
+                    put_str(&mut h, &f.label);
+                    put_str(&mut h, &f.value);
+                    h.update([f.hidden as u8]);
+                }
+            }
         }
         h.finalize().into()
     }
@@ -407,6 +490,103 @@ mod tests {
         }
     }
 
+    fn sample_note() -> NoteEntry {
+        NoteEntry {
+            meta: default_meta(),
+            title: String::from("Example"),
+            content: String::from("some content"),
+            custom_fields: vec![],
+            attachments: vec![],
+        }
+    }
+
+    fn sample_identity() -> IdentityEntry {
+        IdentityEntry {
+            meta: default_meta(),
+            first_name: String::from("Alex"),
+            last_name: String::from("Example"),
+            email: String::from("user@example.com"),
+            phone: Some(String::from("555-0100")),
+            address: Some(String::from("1 Example Street")),
+            custom_fields: vec![],
+            attachments: vec![],
+        }
+    }
+
+    fn sample_card() -> CardEntry {
+        CardEntry {
+            meta: default_meta(),
+            card_name: Some(String::from("Example Card")),
+            status: String::from("active"),
+            cardholder_name: String::from("Alex Example"),
+            card_number: String::from("4111111111111111"),
+            expiry: String::from("12/28"),
+            cvv: String::from("123"),
+            credit_limit: Some(String::from("1000")),
+            card_account_number: Some(String::from("acct-1")),
+            payment_network: Some(String::from("Visa")),
+            pin: Some(String::from("0000")),
+            bank_name: Some(String::from("Example Bank")),
+            transaction_password: Some(String::from("txpw")),
+            notes: Some(String::from("a note")),
+            custom_fields: vec![],
+            attachments: vec![],
+        }
+    }
+
+    fn sample_file() -> FileEntry {
+        FileEntry {
+            meta: default_meta(),
+            filename: String::from("example.pdf"),
+            data: vec![1, 2, 3],
+            notes: Some(String::from("a note")),
+            custom_fields: vec![],
+        }
+    }
+
+    fn sample_custom() -> CustomEntry {
+        let mut fields = IndexMap::new();
+        fields.insert(
+            String::from("Alpha"),
+            CustomField {
+                label: String::from("Alpha"),
+                value: String::from("one"),
+                hidden: false,
+            },
+        );
+        CustomEntry {
+            meta: default_meta(),
+            title: String::from("Example"),
+            fields,
+            attachments: vec![],
+        }
+    }
+
+    fn a_custom_field() -> CustomField {
+        CustomField {
+            label: String::from("Extra"),
+            value: String::from("value"),
+            hidden: false,
+        }
+    }
+
+    /// Asserts every mutation changes the hash. Each entry in `mutations` is a
+    /// (field name, already-mutated entry) pair.
+    fn assert_each_mutation_changes_the_hash(
+        base: &VaultEntry,
+        mutations: Vec<(&str, VaultEntry)>,
+    ) {
+        let base_hash = base.content_hash();
+        for (field, mutated) in mutations {
+            assert_ne!(
+                base_hash,
+                mutated.content_hash(),
+                "changing `{field}` must change the content hash, or import \
+                 silently treats a different entry as a duplicate"
+            );
+        }
+    }
+
     #[test]
     fn identical_content_hashes_the_same() {
         // Import dedup rests on this: two entries the user would call the same
@@ -414,6 +594,200 @@ mod tests {
         let a = VaultEntry::Login(sample_login());
         let b = VaultEntry::Login(sample_login());
         assert_eq!(a.content_hash(), b.content_hash());
+    }
+
+    #[test]
+    fn changing_any_login_field_changes_the_hash() {
+        let base = VaultEntry::Login(sample_login());
+        let m = |f: fn(&mut LoginEntry)| {
+            let mut e = sample_login();
+            f(&mut e);
+            VaultEntry::Login(e)
+        };
+        assert_each_mutation_changes_the_hash(
+            &base,
+            vec![
+                ("title", m(|e| e.title = String::from("Other"))),
+                ("url", m(|e| e.url = String::from("https://other.example"))),
+                ("username", m(|e| e.username = String::from("other"))),
+                ("password", m(|e| e.password = String::from("other"))),
+                ("notes", m(|e| e.notes = Some(String::from("other")))),
+                ("notes cleared", m(|e| e.notes = None)),
+                (
+                    "custom_fields",
+                    m(|e| e.custom_fields = vec![a_custom_field()]),
+                ),
+                (
+                    "app_id",
+                    m(|e| e.app_id = Some(String::from("com.company.app"))),
+                ),
+                (
+                    "email",
+                    m(|e| e.email = Some(String::from("other@example.com"))),
+                ),
+            ],
+        );
+    }
+
+    #[test]
+    fn changing_any_note_field_changes_the_hash() {
+        let base = VaultEntry::Note(sample_note());
+        let m = |f: fn(&mut NoteEntry)| {
+            let mut e = sample_note();
+            f(&mut e);
+            VaultEntry::Note(e)
+        };
+        assert_each_mutation_changes_the_hash(
+            &base,
+            vec![
+                ("title", m(|e| e.title = String::from("Other"))),
+                ("content", m(|e| e.content = String::from("other"))),
+                (
+                    "custom_fields",
+                    m(|e| e.custom_fields = vec![a_custom_field()]),
+                ),
+            ],
+        );
+    }
+
+    #[test]
+    fn changing_any_identity_field_changes_the_hash() {
+        let base = VaultEntry::Identity(sample_identity());
+        let m = |f: fn(&mut IdentityEntry)| {
+            let mut e = sample_identity();
+            f(&mut e);
+            VaultEntry::Identity(e)
+        };
+        assert_each_mutation_changes_the_hash(
+            &base,
+            vec![
+                ("first_name", m(|e| e.first_name = String::from("Other"))),
+                ("last_name", m(|e| e.last_name = String::from("Other"))),
+                ("email", m(|e| e.email = String::from("other@example.com"))),
+                ("phone", m(|e| e.phone = Some(String::from("555-0199")))),
+                ("phone cleared", m(|e| e.phone = None)),
+                ("address", m(|e| e.address = Some(String::from("2 Other")))),
+                ("address cleared", m(|e| e.address = None)),
+                (
+                    "custom_fields",
+                    m(|e| e.custom_fields = vec![a_custom_field()]),
+                ),
+            ],
+        );
+    }
+
+    #[test]
+    fn changing_any_card_field_changes_the_hash() {
+        let base = VaultEntry::Card(sample_card());
+        let m = |f: fn(&mut CardEntry)| {
+            let mut e = sample_card();
+            f(&mut e);
+            VaultEntry::Card(e)
+        };
+        assert_each_mutation_changes_the_hash(
+            &base,
+            vec![
+                (
+                    "card_name",
+                    m(|e| e.card_name = Some(String::from("Other"))),
+                ),
+                ("card_name cleared", m(|e| e.card_name = None)),
+                ("status", m(|e| e.status = String::from("lapsed"))),
+                (
+                    "cardholder_name",
+                    m(|e| e.cardholder_name = String::from("Other Name")),
+                ),
+                (
+                    "card_number",
+                    m(|e| e.card_number = String::from("4222222222222")),
+                ),
+                ("expiry", m(|e| e.expiry = String::from("01/30"))),
+                ("cvv", m(|e| e.cvv = String::from("999"))),
+                (
+                    "credit_limit",
+                    m(|e| e.credit_limit = Some(String::from("2000"))),
+                ),
+                ("credit_limit cleared", m(|e| e.credit_limit = None)),
+                (
+                    "card_account_number",
+                    m(|e| e.card_account_number = Some(String::from("acct-2"))),
+                ),
+                (
+                    "payment_network",
+                    m(|e| e.payment_network = Some(String::from("Mastercard"))),
+                ),
+                ("pin", m(|e| e.pin = Some(String::from("1111")))),
+                (
+                    "bank_name",
+                    m(|e| e.bank_name = Some(String::from("Other Bank"))),
+                ),
+                (
+                    "transaction_password",
+                    m(|e| e.transaction_password = Some(String::from("other"))),
+                ),
+                ("notes", m(|e| e.notes = Some(String::from("other")))),
+                (
+                    "custom_fields",
+                    m(|e| e.custom_fields = vec![a_custom_field()]),
+                ),
+            ],
+        );
+    }
+
+    #[test]
+    fn changing_any_file_field_changes_the_hash() {
+        let base = VaultEntry::File(sample_file());
+        let m = |f: fn(&mut FileEntry)| {
+            let mut e = sample_file();
+            f(&mut e);
+            VaultEntry::File(e)
+        };
+        assert_each_mutation_changes_the_hash(
+            &base,
+            vec![
+                ("filename", m(|e| e.filename = String::from("other.pdf"))),
+                ("data", m(|e| e.data = vec![9, 9, 9])),
+                ("notes", m(|e| e.notes = Some(String::from("other")))),
+                (
+                    "custom_fields",
+                    m(|e| e.custom_fields = vec![a_custom_field()]),
+                ),
+            ],
+        );
+    }
+
+    #[test]
+    fn changing_any_custom_field_changes_the_hash() {
+        let base = VaultEntry::Custom(sample_custom());
+        let m = |f: fn(&mut CustomEntry)| {
+            let mut e = sample_custom();
+            f(&mut e);
+            VaultEntry::Custom(e)
+        };
+        assert_each_mutation_changes_the_hash(
+            &base,
+            vec![
+                ("title", m(|e| e.title = String::from("Other"))),
+                (
+                    "a field's value",
+                    m(|e| {
+                        e.fields.get_mut("Alpha").unwrap().value = String::from("two");
+                    }),
+                ),
+                (
+                    "a field's hidden flag",
+                    m(|e| {
+                        e.fields.get_mut("Alpha").unwrap().hidden = true;
+                    }),
+                ),
+                (
+                    "an added field",
+                    m(|e| {
+                        e.fields.insert(String::from("Beta"), a_custom_field());
+                    }),
+                ),
+            ],
+        );
     }
 
     // ── per-field change-times for granular sync (v9) ─────────────────────────
