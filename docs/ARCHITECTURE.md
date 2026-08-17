@@ -179,7 +179,30 @@ Also in scope:
   "Import entries from another Gabbro vault" — the current string promises field updates that
   never happen. 37 locales.
 
-Not started. Nets not yet written.
+### Progress
+
+Nets first — each pins *current* behaviour green before production changes.
+
+- [ ] N1 import leaves an existing entry's fields untouched (the add-only invariant)
+- [ ] N2 Google PM / Dashlane / CSV duplicate on re-import (pins today's defect)
+- [ ] N3 CSV's hardcoded empty `skipped`
+- [ ] N4 S-06: the raw import buffer is zeroized
+- [ ] N5 no skipped dialog when nothing was skipped
+- [ ] N6 the skipped dialog's reason reaches a screen reader as a label
+
+Then the change:
+
+- [ ] C1 content hash over the per-type fields above, order-insensitive for `IndexMap`
+- [ ] C2 all six sites use it; the UUID check is deleted
+- [ ] C3 the skip reason is localized (37 locales)
+- [ ] C4 `importGabbroSubtitle` re-worded (37 locales)
+- [ ] C5 hardware pass
+
+Already netted, no work needed: all six sources add entries and refuse a locked vault; CSV
+persists to disk at the current version; parse failures do not abort; Gabbro key-protected,
+wrong-passphrase and pre-v11 paths; Enpass attachment decode; CSV unmapped columns; Bitwarden
+folder lookup. l10n key completeness and English-only values are caught generically by
+`l10n_test.dart`.
 
 ---
 
