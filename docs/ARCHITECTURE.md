@@ -128,17 +128,58 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**Import: content-hash deduplication and entry-level merge.**
+**Import: content-hash deduplication.**
 
-Import already skips an entry whose UUID is in the vault (`rust/src/api/import.rs`),
-so a repeat Bitwarden/Enpass/Google/Dashlane export is deduped. CSV is not: it carries
-no id and its `skipped` list is hardcoded empty, so re-importing the same CSV leaves the
-user deleting duplicates by hand. Same for any source that mints fresh ids per export.
+**Scope (agreed 2026-08-17):** import only ever *adds* entries. It never updates a field on
+an existing entry — that is sync's job, and sync stays the only reconciliation path. Applies to
+every source including Gabbro -> Gabbro (`importFromGabbro`, add-only, distinct from
+`_syncFromFile()` in `vault_list_screen.dart`).
 
-Scope to agree before any code: which fields the content hash covers, and what a merge
-does when two versions of one entry differ.
+**Decision (2026-08-17): replace the UUID check with a content hash on all six paths.** The
+UUID check goes away entirely. Re-importing the same file twice must import nothing, for every
+source.
 
-Not started — sites and nets not yet identified beyond the above.
+Why the UUID check fails. It compares one unvalidated string: imported ids are copied verbatim
+from the file (`bitwarden.rs:142`, `enpass.rs:415`) and never parsed as a UUID. Only Bitwarden,
+Enpass and Gabbro carry a reusable id; Google PM, Dashlane and generic CSV have no id column, so
+their parsers mint `new_entry_id()` and the check can never hit (CSV has no check at all —
+`skipped` is hardcoded empty). Keeping both mechanisms would give the same user action opposite
+results depending on the source picked.
+
+The hash covers the entry's user-visible content, per type, and excludes everything vault-local
+or volatile (`meta.id`, `created_at`, `updated_at`, `field_times`, `history`):
+
+| Type | Hashed fields |
+|---|---|
+| Login | title, url, username, password, notes, custom_fields, app_id, email |
+| Note | title, content, custom_fields |
+| Identity | first_name, last_name, email, phone, address, custom_fields |
+| Card | card_name, status, cardholder_name, card_number, expiry, cvv, credit_limit, card_account_number, payment_network, pin, bank_name, transaction_password, notes, custom_fields |
+| File | filename, data, notes, custom_fields |
+| Custom | title, fields |
+
+Two traps: Identity and Card have no `title`, so no hash can key on it; Custom's `fields` is an
+order-preserving `IndexMap`, so sort by label before hashing. `attachments` is excluded — it
+never crosses the bridge (see Bikeshed).
+
+`meta.folder` is excluded too (agreed): it is the user's filing, not part of what the entry is,
+so re-filing an entry does not make a re-import duplicate it.
+
+Accepted cost: an entry edited in Gabbro after import no longer matches the file, so re-importing
+adds a second copy. Inherent to add-only; sync is the flow for the edited case.
+
+Sites: six, not seven — `import_from_gabbro` and `import_from_gabbro_with_key` both funnel into
+`merge_source_into_session`. CSV is the outlier: no check exists there to replace.
+
+Also in scope:
+- **The skip reason.** `reason: "UUID already exists"` is hardcoded at five sites in
+  `import.rs` and rendered verbatim by `import_skipped_dialog.dart:66` — raw English in a
+  37-locale app, and wrong once the mechanism changes. Localize it via the log-level rule.
+- **`importGabbroSubtitle` wording.** Says "Sync entries from another Gabbro vault"; must read
+  "Import entries from another Gabbro vault" — the current string promises field updates that
+  never happen. 37 locales.
+
+Not started. Nets not yet written.
 
 ---
 
@@ -154,6 +195,10 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Features and UI/UX
+- **Allow attachments for all entry types.** Rust already stores, diffs and merges
+  `attachments` on Login/Note/Identity/Card/Custom (`FileEntry` has none — it is a file), but the
+  field never crosses the bridge, so a user cannot add or view one. Only Enpass import fills it:
+  an imported attachment is invisible and unrecoverable in the app.
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
