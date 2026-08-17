@@ -213,7 +213,9 @@ Then the change, canon-TDD. Scenario list agreed 2026-08-17:
 - [x] S7 a file mixing new and already-present entries imports only the new ones — new tests for
       the three id-less sources; the other three were already covered by their
       `skips_entries_already_in_the_vault` fixtures
-- [ ] S8 two identical rows inside one file: the second is skipped
+- [x] S8 two identical rows inside one file: the second is skipped — the hash set now grows as
+      entries are added. Six sites; a bulk replace caught only four (google_pm and dashlane
+      differ, they call `stamp_timestamps`), so audit by grep, not by clippy
 - [ ] S9 an entry whose id matches but whose content differs is imported (inverts today)
 - [ ] S10 importing into an empty vault imports everything
 
