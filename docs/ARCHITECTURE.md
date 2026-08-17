@@ -210,7 +210,9 @@ Then the change, canon-TDD. Scenario list agreed 2026-08-17:
       never had, and the now-dead `session_entry_ids()` is deleted. The three N2/N3 nets were
       replaced by their inversions, as planned. The skip *reason* still reads "UUID already
       exists" — a lie in the UI until S11.
-- [ ] S7 a file mixing new and already-present entries imports only the new ones
+- [x] S7 a file mixing new and already-present entries imports only the new ones — new tests for
+      the three id-less sources; the other three were already covered by their
+      `skips_entries_already_in_the_vault` fixtures
 - [ ] S8 two identical rows inside one file: the second is skipped
 - [ ] S9 an entry whose id matches but whose content differs is imported (inverts today)
 - [ ] S10 importing into an empty vault imports everything
