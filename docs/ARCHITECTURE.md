@@ -183,12 +183,17 @@ Also in scope:
 
 Nets first — each pins *current* behaviour green before production changes.
 
-- [ ] N1 import leaves an existing entry's fields untouched (the add-only invariant)
-- [ ] N2 Google PM / Dashlane / CSV duplicate on re-import (pins today's defect)
-- [ ] N3 CSV's hardcoded empty `skipped`
-- [ ] N4 S-06: the raw import buffer is zeroized
-- [ ] N5 no skipped dialog when nothing was skipped
-- [ ] N6 the skipped dialog's reason reaches a screen reader as a label
+- [x] N1 import leaves an existing entry's fields untouched (the add-only invariant) — written,
+      clippy-clean, not yet run (maintainer runs the Rust suite)
+- [x] N2 Google PM / Dashlane / CSV duplicate on re-import (pins today's defect) — same status
+- [x] N3 CSV's hardcoded empty `skipped` — folded into N2's CSV test, same status
+- [ ] N4 S-06: the raw import buffer is zeroized — approach undecided, see below
+- [x] N5 no skipped dialog when nothing was skipped — green
+- [x] N6 the skipped dialog's reason reaches a screen reader as a label — green
+
+N4 has no honest unit test: the buffer is a function-local `Zeroizing`, unobservable after drop.
+The audit verified it by reasoning + `mem_forensics` (AI_SECURITY_AUDIT_3.md). The new S-06
+surface is the hash input, which will hold secrets — net that instead.
 
 Then the change:
 
@@ -196,7 +201,9 @@ Then the change:
 - [ ] C2 all six sites use it; the UUID check is deleted
 - [ ] C3 the skip reason is localized (37 locales)
 - [ ] C4 `importGabbroSubtitle` re-worded (37 locales)
-- [ ] C5 hardware pass
+- [ ] C5 `importDuplicateWarning` re-worded — the banner promises "Entries whose UUID already
+      exists ... will be skipped" (37 locales)
+- [ ] C6 hardware pass
 
 Already netted, no work needed: all six sources add entries and refuse a locked vault; CSV
 persists to disk at the current version; parse failures do not abort; Gabbro key-protected,
