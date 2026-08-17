@@ -235,7 +235,7 @@ caught a real bug — `app_sr.arb` had transliterated the extension to `.габ�
 users to look for a file that cannot exist. Fixed.
 
 *Accepted cost, pinned deliberately*
-- [ ] S14 an entry edited in Gabbro after import re-imports as a second copy
+- [x] S14 an entry edited in Gabbro after import re-imports as a second copy
 
 - [ ] S15 hardware pass
 
