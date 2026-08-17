@@ -596,6 +596,66 @@ mod tests {
         assert_eq!(a.content_hash(), b.content_hash());
     }
 
+    /// The six sample entries, one per type, each built fresh.
+    fn one_of_each_type() -> Vec<(&'static str, VaultEntry)> {
+        vec![
+            ("Login", VaultEntry::Login(sample_login())),
+            ("Note", VaultEntry::Note(sample_note())),
+            ("Identity", VaultEntry::Identity(sample_identity())),
+            ("Card", VaultEntry::Card(sample_card())),
+            ("File", VaultEntry::File(sample_file())),
+            ("Custom", VaultEntry::Custom(sample_custom())),
+        ]
+    }
+
+    fn meta_mut(entry: &mut VaultEntry) -> &mut EntryMeta {
+        match entry {
+            VaultEntry::Login(e) => &mut e.meta,
+            VaultEntry::Note(e) => &mut e.meta,
+            VaultEntry::Identity(e) => &mut e.meta,
+            VaultEntry::Card(e) => &mut e.meta,
+            VaultEntry::File(e) => &mut e.meta,
+            VaultEntry::Custom(e) => &mut e.meta,
+        }
+    }
+
+    #[test]
+    fn vault_local_metadata_is_excluded_from_the_hash() {
+        // The hash answers "is this the same entry?", not "is this the same record?".
+        // Re-filing an entry into another folder, or a source minting a fresh id on
+        // every export, must not make a re-import add a second copy.
+        type MetaMutation = (&'static str, fn(&mut EntryMeta));
+        let mutations: Vec<MetaMutation> = vec![
+            ("id", |m| m.id = String::from("a-completely-different-id")),
+            ("created_at", |m| {
+                m.created_at = String::from("2030-06-06T06:06:06Z")
+            }),
+            ("updated_at", |m| {
+                m.updated_at = String::from("2030-06-06T06:06:06Z")
+            }),
+            ("folder", |m| m.folder = String::from("Work")),
+            ("field_times", |m| {
+                m.field_times.insert(String::from("password"), 42);
+            }),
+            ("history", |m| {
+                m.record_previous("password", "old", "2025-01-01T00:00:00Z", None)
+            }),
+        ];
+
+        for (type_name, base) in one_of_each_type() {
+            let base_hash = base.content_hash();
+            for (field, mutate) in &mutations {
+                let mut variant = base.clone();
+                mutate(meta_mut(&mut variant));
+                assert_eq!(
+                    base_hash,
+                    variant.content_hash(),
+                    "{type_name}: `meta.{field}` must not affect the content hash"
+                );
+            }
+        }
+    }
+
     #[test]
     fn changing_any_login_field_changes_the_hash() {
         let base = VaultEntry::Login(sample_login());
