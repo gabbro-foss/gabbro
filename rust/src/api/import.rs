@@ -1463,6 +1463,79 @@ Example,https://example.com,user,hunter2,my example,yes";
         teardown(&path);
     }
 
+    // ── PROBE: the exact hardware fixture, byte for byte ──────────────────────
+
+    #[test]
+    #[serial]
+    fn hardware_fixture_csv_reimport_imports_nothing() {
+        // The exact file from the hardware matrix, trailing newline included, with
+        // the mapping csv_mapping_screen auto-selects for these headers
+        // (name->title, url->url, login->username, password->password,
+        // comments->notes). Every column is mapped, so custom_fields stays empty —
+        // unlike SAMPLE_CSV, which leaves `favourite` unmapped.
+        const HW: &str = "name,url,login,password,comments\n\
+Alpha,https://alpha.example.com,user@example.com,pw-alpha,first\n\
+Beta,https://beta.example.com,user@example.com,pw-beta,second\n";
+
+        let pass = b"hardware fixture passphrase";
+        let path = setup_vault(pass);
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let config = || CsvImportConfigData {
+            title_col: Some("name".to_string()),
+            url_col: Some("url".to_string()),
+            username_col: Some("login".to_string()),
+            password_col: Some("password".to_string()),
+            notes_col: Some("comments".to_string()),
+        };
+
+        let first = run(import_from_csv(HW.to_string(), config())).unwrap();
+        assert_eq!(first.imported, 2, "first import adds both rows");
+
+        let second = run(import_from_csv(HW.to_string(), config())).unwrap();
+        assert_eq!(second.imported, 0, "re-import must add nothing");
+        assert_eq!(second.skipped.len(), 2, "both rows reported skipped");
+        assert_eq!(session::list_entry_summaries().unwrap().len(), 3);
+
+        teardown(&path);
+    }
+
+    // ── PROBE: does a save/reload round trip break the content hash? ──────────
+
+    #[test]
+    #[serial]
+    fn csv_reimport_after_a_reload_still_imports_nothing() {
+        // Hardware found re-import duplicating where the in-session test passes.
+        // The app saves, navigates, and can auto-lock between two imports, so the
+        // second import compares against entries that went through serialization.
+        let pass = b"csv reload reimport passphrase";
+        let path = setup_vault(pass);
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let config = || CsvImportConfigData {
+            title_col: Some("name".to_string()),
+            url_col: Some("url".to_string()),
+            username_col: Some("login".to_string()),
+            password_col: Some("password".to_string()),
+            notes_col: Some("comments".to_string()),
+        };
+
+        let first = run(import_from_csv(SAMPLE_CSV.to_string(), config())).unwrap();
+        assert_eq!(first.imported, 2);
+
+        // Round-trip through disk, exactly as the app does.
+        session::lock_vault().unwrap();
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let second = run(import_from_csv(SAMPLE_CSV.to_string(), config())).unwrap();
+        assert_eq!(
+            second.imported, 0,
+            "a saved-and-reloaded entry must still hash the same"
+        );
+
+        teardown(&path);
+    }
+
     // ── S14: the accepted cost of content-based dedup ─────────────────────────
 
     #[test]
