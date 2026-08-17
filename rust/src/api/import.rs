@@ -1186,6 +1186,97 @@ user@example.com,backup@example.com,,https://example.net,Personal,,s3cr3t,Sample
         let _ = std::fs::remove_file(&source_path);
     }
 
+    // ── S7: a mixed file imports only the entries not already held ────────────
+    // The three sources with no id in their export. The other three are covered by
+    // `import_from_{bitwarden,enpass,gabbro}_skips_entries_already_in_the_vault`,
+    // whose fixtures each pair one duplicate with one new entry.
+
+    #[test]
+    #[serial]
+    fn google_pm_mixed_file_imports_only_the_new_rows() {
+        // Row 1 repeats a row already imported; row 2 is new. A user who adds one
+        // password at the source and re-exports must get exactly that one entry.
+        const MIXED: &str = "\
+name,url,username,password,note
+Example,https://example.com,user,hunter2,my example
+Third,https://example.org,third,t0ps3cr3t,";
+
+        let pass = b"google pm mixed passphrase";
+        let path = setup_vault(pass);
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let first = run(import_from_google_pm(GOOGLE_PM_CSV.as_bytes().to_vec())).unwrap();
+        assert_eq!(first.imported, 2);
+
+        let second = run(import_from_google_pm(MIXED.as_bytes().to_vec())).unwrap();
+        assert_eq!(second.imported, 1, "only the new row imports");
+        assert_eq!(second.skipped.len(), 1, "the repeated row is reported");
+        assert_eq!(second.skipped[0].title, "Example");
+
+        // 1 existing note + 2 + 1
+        assert_eq!(session::list_entry_summaries().unwrap().len(), 4);
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn dashlane_mixed_file_imports_only_the_new_rows() {
+        const MIXED: &str = "\
+username,username2,username3,url,category,note,password,title
+user@example.com,,,https://example.com,Work,my example,hunter2,Example
+third@example.com,,,https://example.org,Work,,t0ps3cr3t,Third";
+
+        let pass = b"dashlane mixed passphrase";
+        let path = setup_vault(pass);
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let first = run(import_from_dashlane(DASHLANE_CSV.as_bytes().to_vec())).unwrap();
+        assert_eq!(first.imported, 2);
+
+        let second = run(import_from_dashlane(MIXED.as_bytes().to_vec())).unwrap();
+        assert_eq!(second.imported, 1, "only the new row imports");
+        assert_eq!(second.skipped.len(), 1, "the repeated row is reported");
+        assert_eq!(second.skipped[0].title, "Example");
+
+        assert_eq!(session::list_entry_summaries().unwrap().len(), 4);
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn csv_mixed_file_imports_only_the_new_rows() {
+        const MIXED: &str = "\
+name,url,login,password,comments,favourite
+Example,https://example.com,user,hunter2,my example,yes
+Third,https://example.org,third,t0ps3cr3t,,no";
+
+        let pass = b"csv mixed passphrase";
+        let path = setup_vault(pass);
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let config = || CsvImportConfigData {
+            title_col: Some("name".to_string()),
+            url_col: Some("url".to_string()),
+            username_col: Some("login".to_string()),
+            password_col: Some("password".to_string()),
+            notes_col: Some("comments".to_string()),
+        };
+
+        let first = run(import_from_csv(SAMPLE_CSV.to_string(), config())).unwrap();
+        assert_eq!(first.imported, 2);
+
+        let second = run(import_from_csv(MIXED.to_string(), config())).unwrap();
+        assert_eq!(second.imported, 1, "only the new row imports");
+        assert_eq!(second.skipped.len(), 1, "the repeated row is reported");
+        assert_eq!(second.skipped[0].title, "Example");
+
+        assert_eq!(session::list_entry_summaries().unwrap().len(), 4);
+
+        teardown(&path);
+    }
+
     // ── Locked-vault error paths for remaining importers ──────────────────────
 
     #[test]
