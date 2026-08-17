@@ -128,7 +128,10 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-(empty — set with the maintainer at session start)
+**Allow attachments for all entry types.** Rust already stores, diffs and merges
+`attachments` on Login/Note/Identity/Card/Custom (`FileEntry` has none — it is a file), but the
+field never crosses the bridge, so a user cannot add or view one. Only Enpass import fills it:
+an imported attachment is invisible and unrecoverable in the app.
 
 ---
 
@@ -144,10 +147,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Features and UI/UX
-- **Allow attachments for all entry types.** Rust already stores, diffs and merges
-  `attachments` on Login/Note/Identity/Card/Custom (`FileEntry` has none — it is a file), but the
-  field never crosses the bridge, so a user cannot add or view one. Only Enpass import fills it:
-  an imported attachment is invisible and unrecoverable in the app.
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
