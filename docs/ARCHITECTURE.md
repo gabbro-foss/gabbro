@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2322 | 10 |
+| Flutter (`flutter test`) | 2329 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 160 | 15 |
 
@@ -260,9 +260,9 @@ void because the matrix was ambiguous (see below), so it must be re-run.
   raises the skipped dialog there, as the other five sources do from `ImportScreen`. The pop stays
   an `int`. The red test also caught the progress spinner never stopping; it stops before the
   dialog now.
-- **D2 a fully-skipped import is silent.** `vault_list_screen.dart:1026` gates the SnackBar *and*
-  `_loadEntries()` on `count > 0`. When everything is skipped the screen does not change at all —
-  no message, no refresh. Indistinguishable from a broken button.
+- **D2 a fully-skipped import was silent** — **FIXED**. The vault list now reports and re-reads on
+  any result, 0 included; only backing out stays silent. Reaching it needed an `openImport` seam on
+  `VaultListScreen`.
 
 So S6 is only half-shipped: Rust skips correctly, the UI never says so.
 
@@ -283,13 +283,12 @@ vault, a file, or an entry. Every row needs one observable check and unambiguous
 
 ### Next steps, in order
 
-1. ~~D1~~ done.
-2. Red-first test for D2, then report and refresh on a 0-import result too.
-3. Rewrite the hardware matrix: one observable check per row, no dependence on prior state.
-4. Re-run hardware. Then the full gate (`gabbro_test`) — not before.
+1. ~~D1~~, ~~D2~~ done.
+2. Rewrite the hardware matrix: one observable check per row, no dependence on prior state.
+3. Re-run hardware. Then the full gate (`gabbro_test`) — not before.
 
 Rust counts in the Testing table above are stale: `cargo test -q` has not run since this work
-began. Flutter (2322) and clippy are current and green.
+began. Flutter (2329) and clippy are current and green.
 
 ---
 
