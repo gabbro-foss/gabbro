@@ -256,9 +256,10 @@ void because the matrix was ambiguous (see below), so it must be re-run.
 
 **Two defects found in the Dart layer, both mine, neither in Rust:**
 
-- **D1 CSV discards the skipped list.** `csv_mapping_screen.dart:76` pops only
-  `result.imported`; `skipped` is dropped, then `import_screen.dart:552` pops itself. The skipped
-  dialog can never appear for a CSV import, so the user is never told anything was recognised.
+- **D1 CSV discarded the skipped list** — **FIXED**. CSV imports from its own screen, so it now
+  raises the skipped dialog there, as the other five sources do from `ImportScreen`. The pop stays
+  an `int`. The red test also caught the progress spinner never stopping; it stops before the
+  dialog now.
 - **D2 a fully-skipped import is silent.** `vault_list_screen.dart:1026` gates the SnackBar *and*
   `_loadEntries()` on `count > 0`. When everything is skipped the screen does not change at all —
   no message, no refresh. Indistinguishable from a broken button.
@@ -282,7 +283,7 @@ vault, a file, or an entry. Every row needs one observable check and unambiguous
 
 ### Next steps, in order
 
-1. Red-first test for D1, then carry `skipped` through the CSV pop path to the dialog.
+1. ~~D1~~ done.
 2. Red-first test for D2, then report and refresh on a 0-import result too.
 3. Rewrite the hardware matrix: one observable check per row, no dependence on prior state.
 4. Re-run hardware. Then the full gate (`gabbro_test`) — not before.
