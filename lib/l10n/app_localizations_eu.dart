@@ -1593,11 +1593,11 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'UUIDs zure gandegian dagoeneko dauden sarrerak automatikoki saltatuko dira. Laburpena erakutsiko da.';
+      'Zure gandegian dagoeneko dauden sarrerak automatikoki saltatuko dira. Laburpena erakutsiko da.';
 
   @override
   String get importGabbroSubtitle =>
-      'Beste Gabbro gandegi batetik sarrerak sinkronizatu (.gabbro fitxategia)';
+      'Beste Gabbro gandegi batetik sarrerak inportatu (.gabbro fitxategia)';
 
   @override
   String get importEnpassSubtitle =>

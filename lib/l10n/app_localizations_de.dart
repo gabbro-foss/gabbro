@@ -1600,11 +1600,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Einträge, deren UUID bereits im Tresor vorhanden ist, werden automatisch übersprungen. Eine Zusammenfassung wird angezeigt.';
+      'Einträge, die bereits im Tresor vorhanden sind, werden automatisch übersprungen. Eine Zusammenfassung wird angezeigt.';
 
   @override
   String get importGabbroSubtitle =>
-      'Einträge aus einem anderen Gabbro-Tresor synchronisieren (.gabbro-Datei)';
+      'Einträge aus einem anderen Gabbro-Tresor importieren (.gabbro-Datei)';
 
   @override
   String get importEnpassSubtitle =>

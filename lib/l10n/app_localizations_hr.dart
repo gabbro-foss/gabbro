@@ -1594,11 +1594,11 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Unosi čiji UUID već postoji u vašem trezoru bit će automatski preskočeni. Prikazat će se pregled.';
+      'Unosi koji već postoje u vašem trezoru bit će automatski preskočeni. Prikazat će se pregled.';
 
   @override
   String get importGabbroSubtitle =>
-      'Sinkroniziraj unose iz drugog Gabbro trezora (datoteka .gabbro)';
+      'Uvezi unose iz drugog Gabbro trezora (datoteka .gabbro)';
 
   @override
   String get importEnpassSubtitle => 'JSON izvoz iz Enpass (Alati → Izvezi)';

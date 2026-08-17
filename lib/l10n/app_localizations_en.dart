@@ -1587,11 +1587,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Entries whose UUID already exists in your vault will be skipped automatically. You will be shown a summary.';
+      'Entries your vault already holds will be skipped automatically. You will be shown a summary.';
 
   @override
   String get importGabbroSubtitle =>
-      'Sync entries from another Gabbro vault (.gabbro file)';
+      'Import entries from another Gabbro vault (.gabbro file)';
 
   @override
   String get importEnpassSubtitle => 'JSON export from Enpass (Tools → Export)';

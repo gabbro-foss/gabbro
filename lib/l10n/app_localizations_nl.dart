@@ -1599,11 +1599,11 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Items waarvan het UUID al in uw kluis bestaat, worden automatisch overgeslagen. Er wordt een samenvatting getoond.';
+      'Items die al in uw kluis staan, worden automatisch overgeslagen. Er wordt een samenvatting getoond.';
 
   @override
   String get importGabbroSubtitle =>
-      'Items synchroniseren vanuit een andere Gabbro-kluis (.gabbro-bestand)';
+      'Items importeren vanuit een andere Gabbro-kluis (.gabbro-bestand)';
 
   @override
   String get importEnpassSubtitle =>

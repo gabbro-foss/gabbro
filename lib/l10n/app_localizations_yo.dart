@@ -1590,11 +1590,11 @@ class AppLocalizationsYo extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'A yoo fo awọn titẹ sii ti UUID wọn ti wa ninu vọọliti rẹ tẹlẹ laifọwọyi. A yoo ṣe afihan akopọ.';
+      'A yoo fo awọn titẹ sii ti o ti wa ninu vọọliti rẹ tẹlẹ laifọwọyi. A yoo ṣe afihan akopọ.';
 
   @override
   String get importGabbroSubtitle =>
-      'Ṣọkan awọn titẹ sii lati vọọliti Gabbro miiran (faili .gabbro)';
+      'Mu awọn titẹ sii wọle lati vọọliti Gabbro miiran (faili .gabbro)';
 
   @override
   String get importEnpassSubtitle =>

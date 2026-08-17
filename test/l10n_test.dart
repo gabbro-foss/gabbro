@@ -394,4 +394,66 @@ void main() {
       expect(find.text('2.00'), findsOneWidget);
     });
   });
+
+  // ── Import strings must not describe the retired UUID mechanism ─────────────
+  //
+  // Import dedups on a content hash, not on the source file's id. A string that
+  // still promises UUID matching tells the user their edited entry will be
+  // recognised when it will not.
+
+  group('import dedup strings', () {
+    for (final f in _arbFiles()) {
+      final name = f.uri.pathSegments.last;
+
+      test('$name does not mention UUID in importDuplicateWarning', () {
+        final v = _readArb(f)['importDuplicateWarning'];
+        if (v == null) return; // absent keys are caught by the key-set test
+        expect(
+          v.toUpperCase(),
+          isNot(contains('UUID')),
+          reason: '$name still describes UUID-based dedup, which is gone',
+        );
+      });
+
+    }
+  });
+
+  // ── The .gabbro extension is a filename, never prose ───────────────────────
+  //
+  // app_sr.arb once transliterated it to ".габбро", sending a Serbian user to
+  // look for a file that cannot exist. Every key whose English text names the
+  // extension must keep it byte-identical in every locale.
+
+  group('.gabbro extension is never transliterated', () {
+    final base = _readArb(File('lib/l10n/app_en.arb'));
+    final extensionKeys = base.entries
+        .where((e) => e.value.contains('.gabbro'))
+        .map((e) => e.key)
+        .toList()
+      ..sort();
+
+    test('the base ARB exposes keys naming the extension', () {
+      // Sanity: at zero, every per-locale check below would vacuously pass.
+      expect(extensionKeys, isNotEmpty);
+      expect(extensionKeys, contains('importGabbroSubtitle'));
+    });
+
+    for (final f in _arbFiles()) {
+      final name = f.uri.pathSegments.last;
+      test('$name keeps .gabbro literal in every string that names it', () {
+        final values = _readArb(f);
+        for (final key in extensionKeys) {
+          final v = values[key];
+          if (v == null) continue; // missing keys are the key-set test's job
+          expect(
+            v,
+            contains('.gabbro'),
+            reason: '$name -> $key must name the real extension. A translated or '
+                'transliterated extension points the user at a file that does '
+                'not exist.',
+          );
+        }
+      });
+    }
+  });
 }

@@ -3028,13 +3028,13 @@ abstract class AppLocalizations {
   /// No description provided for @importDuplicateWarning.
   ///
   /// In en, this message translates to:
-  /// **'Entries whose UUID already exists in your vault will be skipped automatically. You will be shown a summary.'**
+  /// **'Entries your vault already holds will be skipped automatically. You will be shown a summary.'**
   String get importDuplicateWarning;
 
   /// No description provided for @importGabbroSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Sync entries from another Gabbro vault (.gabbro file)'**
+  /// **'Import entries from another Gabbro vault (.gabbro file)'**
   String get importGabbroSubtitle;
 
   /// No description provided for @importEnpassSubtitle.

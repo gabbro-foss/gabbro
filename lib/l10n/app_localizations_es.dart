@@ -1600,11 +1600,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Las entradas cuyo UUID ya existe en tu almacén se omitirán automáticamente. Se te mostrará un resumen.';
+      'Las entradas que ya están en tu almacén se omitirán automáticamente. Se te mostrará un resumen.';
 
   @override
   String get importGabbroSubtitle =>
-      'Sincronizar entradas desde otro almacén Gabbro (archivo .gabbro)';
+      'Importar entradas desde otro almacén Gabbro (archivo .gabbro)';
 
   @override
   String get importEnpassSubtitle =>

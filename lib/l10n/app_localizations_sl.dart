@@ -1599,11 +1599,11 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Vnosi, katerih UUID že obstaja v vašem trezorju, bodo samodejno preskočeni. Prikazan bo pregled.';
+      'Vnosi, ki so že v vašem trezorju, bodo samodejno preskočeni. Prikazan bo pregled.';
 
   @override
   String get importGabbroSubtitle =>
-      'Sinhroniziraj vnose iz drugega trezorja Gabbro (datoteka .gabbro)';
+      'Uvozi vnose iz drugega trezorja Gabbro (datoteka .gabbro)';
 
   @override
   String get importEnpassSubtitle => 'JSON izvoz iz Enpass (Orodja → Izvozi)';

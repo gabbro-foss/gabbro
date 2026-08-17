@@ -1594,11 +1594,11 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Kirjed, mille UUID on juba seifis olemas, jäetakse automaatselt vahele. Kuvatakse kokkuvõte.';
+      'Kirjed, mis on juba seifis olemas, jäetakse automaatselt vahele. Kuvatakse kokkuvõte.';
 
   @override
   String get importGabbroSubtitle =>
-      'Sünkrooni kirjeid teisest Gabbro seifist (.gabbro fail)';
+      'Impordi kirjeid teisest Gabbro seifist (.gabbro fail)';
 
   @override
   String get importEnpassSubtitle =>

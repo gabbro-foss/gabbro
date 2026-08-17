@@ -1610,11 +1610,11 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Les entrées dont l\'UUID existe déjà dans votre coffre seront automatiquement ignorées. Un résumé vous sera présenté.';
+      'Les entrées déjà présentes dans votre coffre seront automatiquement ignorées. Un résumé vous sera présenté.';
 
   @override
   String get importGabbroSubtitle =>
-      'Synchroniser les entrées depuis un autre coffre Gabbro (fichier .gabbro)';
+      'Importer les entrées depuis un autre coffre Gabbro (fichier .gabbro)';
 
   @override
   String get importEnpassSubtitle =>

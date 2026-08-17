@@ -1544,10 +1544,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get importSourceKeyProtected => '此保险库受 YubiKey 保护。同步时需要轻触已注册的密钥。';
 
   @override
-  String get importDuplicateWarning => 'UUID 已存在于您保险库中的条目将自动跳过。将显示摘要。';
+  String get importDuplicateWarning => '您保险库中已有的条目将自动跳过。将显示摘要。';
 
   @override
-  String get importGabbroSubtitle => '从另一个 Gabbro 保险库（.gabbro 文件）同步条目';
+  String get importGabbroSubtitle => '从另一个 Gabbro 保险库（.gabbro 文件）导入条目';
 
   @override
   String get importEnpassSubtitle => '来自 Enpass 的 JSON 导出（工具 → 导出）';
@@ -3640,10 +3640,10 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get importSourceKeyProtected => '此保险库受 YubiKey 保护。同步时需要轻触已注册的密钥。';
 
   @override
-  String get importDuplicateWarning => 'UUID 已存在于您保险库中的条目将自动跳过。将显示摘要。';
+  String get importDuplicateWarning => '您保险库中已有的条目将自动跳过。将显示摘要。';
 
   @override
-  String get importGabbroSubtitle => '从另一个 Gabbro 保险库（.gabbro 文件）同步条目';
+  String get importGabbroSubtitle => '从另一个 Gabbro 保险库（.gabbro 文件）导入条目';
 
   @override
   String get importEnpassSubtitle => '来自 Enpass 的 JSON 导出（工具 → 导出）';
@@ -5736,10 +5736,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get importSourceKeyProtected => '此保險庫受 YubiKey 保護。同步時需要輕觸已註冊的金鑰。';
 
   @override
-  String get importDuplicateWarning => 'UUID 已存在於您保險庫中的項目將自動跳過。將顯示摘要。';
+  String get importDuplicateWarning => '您保險庫中已有的項目將自動跳過。將顯示摘要。';
 
   @override
-  String get importGabbroSubtitle => '從另一個 Gabbro 保險庫（.gabbro 檔案）同步項目';
+  String get importGabbroSubtitle => '從另一個 Gabbro 保險庫（.gabbro 檔案）匯入項目';
 
   @override
   String get importEnpassSubtitle => '來自 Enpass 的 JSON 匯出（工具 → 匯出）';

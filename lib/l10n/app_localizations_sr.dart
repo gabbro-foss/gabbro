@@ -1596,11 +1596,11 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Уноси чији UUID већ постоји у вашем трезору биће аутоматски прескочени. Приказаће се преглед.';
+      'Уноси који већ постоје у вашем трезору биће аутоматски прескочени. Приказаће се преглед.';
 
   @override
   String get importGabbroSubtitle =>
-      'Синхронизуј уносе из другог Gabbro трезора (датотека .габбро)';
+      'Увези уносе из другог Gabbro трезора (датотека .gabbro)';
 
   @override
   String get importEnpassSubtitle => 'JSON извоз из Enpass (Алати → Извези)';
@@ -3791,11 +3791,11 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get importDuplicateWarning =>
-      'Unosi čiji UUID već postoji u vašem trezoru biće automatski preskočeni. Prikazaće se pregled.';
+      'Unosi koji već postoje u vašem trezoru biće automatski preskočeni. Prikazaće se pregled.';
 
   @override
   String get importGabbroSubtitle =>
-      'Sinhronizuj unose iz drugog Gabbro trezora (datoteka .gabbro)';
+      'Uvezi unose iz drugog Gabbro trezora (datoteka .gabbro)';
 
   @override
   String get importEnpassSubtitle => 'JSON izvoz iz Enpass (Alati → Izvezi)';

@@ -1595,11 +1595,11 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Записи, чийто UUID вече съществува в твоя трезор, ще бъдат автоматично пропуснати. Ще видиш обобщение.';
+      'Записи, които вече са в твоя трезор, ще бъдат автоматично пропуснати. Ще видиш обобщение.';
 
   @override
   String get importGabbroSubtitle =>
-      'Синхронизирай записи от друг трезор Gabbro (.gabbro файл)';
+      'Импортирай записи от друг трезор Gabbro (.gabbro файл)';
 
   @override
   String get importEnpassSubtitle =>

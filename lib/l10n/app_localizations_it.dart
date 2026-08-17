@@ -1598,11 +1598,11 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Le voci il cui UUID esiste già nel tuo archivio verranno saltate automaticamente. Ti verrà mostrato un riepilogo.';
+      'Le voci già presenti nel tuo archivio verranno saltate automaticamente. Ti verrà mostrato un riepilogo.';
 
   @override
   String get importGabbroSubtitle =>
-      'Sincronizza voci da un altro archivio Gabbro (file .gabbro)';
+      'Importa voci da un altro archivio Gabbro (file .gabbro)';
 
   @override
   String get importEnpassSubtitle =>

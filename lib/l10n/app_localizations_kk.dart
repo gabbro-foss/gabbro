@@ -1593,11 +1593,11 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'UUID сейфте бар жазбалар автоматты өткізіп жіберіледі. Қорытынды көрсетіледі.';
+      'Сейфте бұрыннан бар жазбалар автоматты өткізіп жіберіледі. Қорытынды көрсетіледі.';
 
   @override
   String get importGabbroSubtitle =>
-      'Басқа Gabbro сейфінен жазбаларды синхрондау (.gabbro файлы)';
+      'Басқа Gabbro сейфінен жазбаларды импорттау (.gabbro файлы)';
 
   @override
   String get importEnpassSubtitle =>

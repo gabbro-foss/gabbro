@@ -1591,11 +1591,11 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Oppføringer hvis UUID allerede finnes i hvelvet hoppes over automatisk. Du vil se et sammendrag.';
+      'Oppføringer som allerede finnes i hvelvet hoppes over automatisk. Du vil se et sammendrag.';
 
   @override
   String get importGabbroSubtitle =>
-      'Synkroniser oppføringer fra et annet Gabbro-hvelv (.gabbro-fil)';
+      'Importer oppføringer fra et annet Gabbro-hvelv (.gabbro-fil)';
 
   @override
   String get importEnpassSubtitle =>

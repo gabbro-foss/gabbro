@@ -1596,11 +1596,11 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Įrašai, kurių UUID jau yra jūsų saugykloje, bus automatiškai praleisti. Bus parodytas suvestinė.';
+      'Įrašai, kurie jau yra jūsų saugykloje, bus automatiškai praleisti. Bus parodyta suvestinė.';
 
   @override
   String get importGabbroSubtitle =>
-      'Sinchronizuoti įrašus iš kitos Gabbro saugyklos (.gabbro failas)';
+      'Importuoti įrašus iš kitos Gabbro saugyklos (.gabbro failas)';
 
   @override
   String get importEnpassSubtitle =>

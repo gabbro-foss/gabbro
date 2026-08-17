@@ -1595,11 +1595,11 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Ieraksti, kuru UUID jau pastāv jūsu seifā, tiks automātiski izlaisti. Tiks parādīts kopsavilkums.';
+      'Ieraksti, kas jau ir jūsu seifā, tiks automātiski izlaisti. Tiks parādīts kopsavilkums.';
 
   @override
   String get importGabbroSubtitle =>
-      'Sinhronizēt ierakstus no cita Gabbro seifa (.gabbro fails)';
+      'Importēt ierakstus no cita Gabbro seifa (.gabbro fails)';
 
   @override
   String get importEnpassSubtitle =>

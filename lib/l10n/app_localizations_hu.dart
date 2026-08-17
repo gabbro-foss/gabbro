@@ -1593,11 +1593,11 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Az olyan bejegyzések, amelyek UUID-je már létezik a széfedben, automatikusan kimaradnak. Látni fogsz egy összefoglalót.';
+      'Az olyan bejegyzések, amelyek már megvannak a széfedben, automatikusan kimaradnak. Látni fogsz egy összefoglalót.';
 
   @override
   String get importGabbroSubtitle =>
-      'Bejegyzések szinkronizálása másik Gabbro széfből (.gabbro fájl)';
+      'Bejegyzések importálása másik Gabbro széfből (.gabbro fájl)';
 
   @override
   String get importEnpassSubtitle =>

@@ -1599,11 +1599,11 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Записи, UUID яких вже існує у вашому сховищі, будуть автоматично пропущені. Ви побачите зведення.';
+      'Записи, які вже є у вашому сховищі, будуть автоматично пропущені. Ви побачите зведення.';
 
   @override
   String get importGabbroSubtitle =>
-      'Синхронізувати записи з іншого сховища Gabbro (файл .gabbro)';
+      'Імпортувати записи з іншого сховища Gabbro (файл .gabbro)';
 
   @override
   String get importEnpassSubtitle =>

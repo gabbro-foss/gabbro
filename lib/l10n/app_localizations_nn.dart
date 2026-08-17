@@ -1592,11 +1592,11 @@ class AppLocalizationsNn extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Oppføringer der UUID allereie finst i kvelvet vert automatisk hoppa over. Du vil sjå eit samandrag.';
+      'Oppføringer som allereie finst i kvelvet vert automatisk hoppa over. Du vil sjå eit samandrag.';
 
   @override
   String get importGabbroSubtitle =>
-      'Synkroniser oppføringer frå eit anna Gabbro-kvelv (.gabbro-fil)';
+      'Importer oppføringer frå eit anna Gabbro-kvelv (.gabbro-fil)';
 
   @override
   String get importEnpassSubtitle =>

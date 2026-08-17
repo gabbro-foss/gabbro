@@ -1560,11 +1560,10 @@ class AppLocalizationsKo extends AppLocalizations {
       '이 보관함은 YubiKey로 보호됩니다. 동기화하려면 등록된 키를 탭해야 합니다.';
 
   @override
-  String get importDuplicateWarning =>
-      'UUID가 이미 볼트에 존재하는 항목은 자동으로 건너뜁니다. 요약이 표시됩니다.';
+  String get importDuplicateWarning => '이미 볼트에 있는 항목은 자동으로 건너뜁니다. 요약이 표시됩니다.';
 
   @override
-  String get importGabbroSubtitle => '다른 Gabbro 볼트 (.gabbro)에서 항목 동기화';
+  String get importGabbroSubtitle => '다른 Gabbro 볼트 (.gabbro)에서 항목 가져오기';
 
   @override
   String get importEnpassSubtitle => 'Enpass에서 JSON 내보내기 (도구 → 내보내기)';

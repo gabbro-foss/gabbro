@@ -1558,11 +1558,10 @@ class AppLocalizationsJa extends AppLocalizations {
       'この保管庫は YubiKey で保護されています。同期するには、登録済みのキーをタップする必要があります。';
 
   @override
-  String get importDuplicateWarning =>
-      'UUIDがすでにボルトに存在するエントリは自動的にスキップされます。概要が表示されます。';
+  String get importDuplicateWarning => 'すでにボルトにあるエントリは自動的にスキップされます。概要が表示されます。';
 
   @override
-  String get importGabbroSubtitle => '別のGabbroボルト (.gabbro) からエントリを同期';
+  String get importGabbroSubtitle => '別のGabbroボルト (.gabbro) からエントリをインポート';
 
   @override
   String get importEnpassSubtitle => 'EnpassからのJSONエクスポート (ツール → エクスポート)';

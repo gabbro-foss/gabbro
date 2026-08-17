@@ -1601,11 +1601,11 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Wpisy, których UUID już istnieje w Twoim skarbcu, zostaną automatycznie pominięte. Zobaczysz podsumowanie.';
+      'Wpisy, które już są w Twoim skarbcu, zostaną automatycznie pominięte. Zobaczysz podsumowanie.';
 
   @override
   String get importGabbroSubtitle =>
-      'Synchronizuj wpisy z innego skarbca Gabbro (plik .gabbro)';
+      'Importuj wpisy z innego skarbca Gabbro (plik .gabbro)';
 
   @override
   String get importEnpassSubtitle =>

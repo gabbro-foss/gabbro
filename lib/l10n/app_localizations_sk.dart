@@ -1597,11 +1597,11 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Záznamy, ktorých UUID už existuje vo vašom trezore, budú automaticky preskočené. Zobrazí sa prehľad.';
+      'Záznamy, ktoré už vo svojom trezore máte, budú automaticky preskočené. Zobrazí sa prehľad.';
 
   @override
   String get importGabbroSubtitle =>
-      'Synchronizovať záznamy z iného trezora Gabbro (súbor .gabbro)';
+      'Importovať záznamy z iného trezora Gabbro (súbor .gabbro)';
 
   @override
   String get importEnpassSubtitle =>

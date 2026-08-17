@@ -1605,11 +1605,11 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Οι καταχωρίσεις των οποίων το UUID υπάρχει ήδη στο θησαυροφυλάκιό σας θα παραλειφθούν αυτόματα. Θα εμφανιστεί περίληψη.';
+      'Οι καταχωρίσεις που υπάρχουν ήδη στο θησαυροφυλάκιό σας θα παραλειφθούν αυτόματα. Θα εμφανιστεί περίληψη.';
 
   @override
   String get importGabbroSubtitle =>
-      'Συγχρονισμός καταχωρίσεων από άλλο θησαυροφυλάκιο Gabbro (αρχείο .gabbro)';
+      'Εισαγωγή καταχωρίσεων από άλλο θησαυροφυλάκιο Gabbro (αρχείο .gabbro)';
 
   @override
   String get importEnpassSubtitle =>

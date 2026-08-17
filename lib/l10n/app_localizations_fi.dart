@@ -1594,11 +1594,11 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Merkinnät, joiden UUID on jo holvissa, ohitetaan automaattisesti. Näet yhteenvedon.';
+      'Merkinnät, jotka ovat jo holvissa, ohitetaan automaattisesti. Näet yhteenvedon.';
 
   @override
   String get importGabbroSubtitle =>
-      'Synkronoi merkintöjä toisesta Gabbro-holvista (.gabbro-tiedosto)';
+      'Tuo merkintöjä toisesta Gabbro-holvista (.gabbro-tiedosto)';
 
   @override
   String get importEnpassSubtitle => 'JSON-vienti Enpassista (Työkalut → Vie)';

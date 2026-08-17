@@ -1595,11 +1595,11 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Poster hvis UUID allerede findes i din hvælving springes automatisk over. Du vil se et resumé.';
+      'Poster, der allerede findes i din hvælving, springes automatisk over. Du vil se et resumé.';
 
   @override
   String get importGabbroSubtitle =>
-      'Synkronisér poster fra en anden Gabbro-hvælving (.gabbro-fil)';
+      'Importér poster fra en anden Gabbro-hvælving (.gabbro-fil)';
 
   @override
   String get importEnpassSubtitle =>

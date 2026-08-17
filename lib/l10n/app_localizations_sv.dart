@@ -1590,11 +1590,11 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Poster vars UUID redan finns i ditt valv hoppas över automatiskt. Du kommer se en sammanfattning.';
+      'Poster som redan finns i ditt valv hoppas över automatiskt. Du kommer se en sammanfattning.';
 
   @override
   String get importGabbroSubtitle =>
-      'Synkronisera poster från ett annat Gabbro-valv (.gabbro-fil)';
+      'Importera poster från ett annat Gabbro-valv (.gabbro-fil)';
 
   @override
   String get importEnpassSubtitle =>

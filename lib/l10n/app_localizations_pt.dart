@@ -1595,11 +1595,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Entradas cujo UUID já existe no cofre serão puladas automaticamente. Será exibido um resumo.';
+      'Entradas que já estão no cofre serão puladas automaticamente. Será exibido um resumo.';
 
   @override
   String get importGabbroSubtitle =>
-      'Sincronizar entradas de outro cofre Gabbro (arquivo .gabbro)';
+      'Importar entradas de outro cofre Gabbro (arquivo .gabbro)';
 
   @override
   String get importEnpassSubtitle =>
@@ -3795,11 +3795,11 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get importDuplicateWarning =>
-      'Entradas cujo UUID já existe no cofre serão puladas automaticamente. Será exibido um resumo.';
+      'Entradas que já estão no cofre serão puladas automaticamente. Será exibido um resumo.';
 
   @override
   String get importGabbroSubtitle =>
-      'Sincronizar entradas de outro cofre Gabbro (arquivo .gabbro)';
+      'Importar entradas de outro cofre Gabbro (arquivo .gabbro)';
 
   @override
   String get importEnpassSubtitle =>
@@ -5994,11 +5994,11 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get importDuplicateWarning =>
-      'As entradas cujo UUID já existe no cofre serão ignoradas automaticamente. Será apresentado um resumo.';
+      'As entradas que já estão no cofre serão ignoradas automaticamente. Será apresentado um resumo.';
 
   @override
   String get importGabbroSubtitle =>
-      'Sincronizar entradas de outro cofre Gabbro (ficheiro .gabbro)';
+      'Importar entradas de outro cofre Gabbro (ficheiro .gabbro)';
 
   @override
   String get importEnpassSubtitle =>

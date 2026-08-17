@@ -74,8 +74,9 @@ void main() {
     testWidgets('shows duplicate warning banner', (tester) async {
       await tester.pumpWidget(buildScreen());
       expect(
-        find.textContaining('Entries whose UUID already exists'),
+        find.textContaining('Entries your vault already holds'),
         findsOneWidget,
+        reason: 'the banner must describe content matching, not UUIDs',
       );
     });
 

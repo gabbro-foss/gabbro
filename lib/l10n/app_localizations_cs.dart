@@ -1596,11 +1596,11 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Záznamy, jejichž UUID již existuje ve vašem trezoru, budou automaticky přeskočeny. Zobrazí se přehled.';
+      'Záznamy, které již ve svém trezoru máte, budou automaticky přeskočeny. Zobrazí se přehled.';
 
   @override
   String get importGabbroSubtitle =>
-      'Synchronizovat záznamy z jiného trezoru Gabbro (soubor .gabbro)';
+      'Importovat záznamy z jiného trezoru Gabbro (soubor .gabbro)';
 
   @override
   String get importEnpassSubtitle =>
