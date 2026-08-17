@@ -183,27 +183,40 @@ Also in scope:
 
 Nets first — each pins *current* behaviour green before production changes.
 
-- [x] N1 import leaves an existing entry's fields untouched (the add-only invariant) — written,
-      clippy-clean, not yet run (maintainer runs the Rust suite)
-- [x] N2 Google PM / Dashlane / CSV duplicate on re-import (pins today's defect) — same status
-- [x] N3 CSV's hardcoded empty `skipped` — folded into N2's CSV test, same status
-- [ ] N4 S-06: the raw import buffer is zeroized — approach undecided, see below
-- [x] N5 no skipped dialog when nothing was skipped — green
-- [x] N6 the skipped dialog's reason reaches a screen reader as a label — green
+- [x] N1 import leaves an existing entry's fields untouched (the add-only invariant)
+- [x] N2 Google PM / Dashlane / CSV duplicate on re-import (pins today's defect)
+- [x] N3 CSV's hardcoded empty `skipped` (folded into N2's CSV test)
+- [x] N4 no skipped dialog when nothing was skipped
+- [x] N5 the skipped dialog's reason reaches a screen reader as a label
 
-N4 has no honest unit test: the buffer is a function-local `Zeroizing`, unobservable after drop.
-The audit verified it by reasoning + `mem_forensics` (AI_SECURITY_AUDIT_3.md). The new S-06
-surface is the hash input, which will hold secrets — net that instead.
+All green.
 
-Then the change:
+Then the change, canon-TDD. Scenario list agreed 2026-08-17:
 
-- [ ] C1 content hash over the per-type fields above, order-insensitive for `IndexMap`
-- [ ] C2 all six sites use it; the UUID check is deleted
-- [ ] C3 the skip reason is localized (37 locales)
-- [ ] C4 `importGabbroSubtitle` re-worded (37 locales)
-- [ ] C5 `importDuplicateWarning` re-worded — the banner promises "Entries whose UUID already
-      exists ... will be skipped" (37 locales)
-- [ ] C6 hardware pass
+*The hash*
+- [ ] S1 two entries with identical content hash the same
+- [ ] S2 changing any one hashed field changes the hash (one per entry type, 6)
+- [ ] S3 entries differing only in `id`/`created_at`/`updated_at`/`field_times`/`history`/`folder`
+      hash the same
+- [ ] S4 a Custom entry with the same fields in a different order hashes the same
+- [ ] S5 a Note and a Login with matching text hash differently (type is in the hash)
+
+*Dedup at import — one per source: CSV, Google PM, Dashlane, Bitwarden, Enpass, Gabbro*
+- [ ] S6 re-importing the same file imports nothing and reports every entry skipped
+- [ ] S7 a file mixing new and already-present entries imports only the new ones
+- [ ] S8 two identical rows inside one file: the second is skipped
+- [ ] S9 an entry whose id matches but whose content differs is imported (inverts today)
+- [ ] S10 importing into an empty vault imports everything
+
+*User-visible text*
+- [ ] S11 the skip reason names a content match, not a UUID; all 37 locales
+- [ ] S12 `importGabbroSubtitle` reads "Import entries from another Gabbro vault"
+- [ ] S13 `importDuplicateWarning` no longer mentions UUIDs
+
+*Accepted cost, pinned deliberately*
+- [ ] S14 an entry edited in Gabbro after import re-imports as a second copy
+
+- [ ] S15 hardware pass
 
 Already netted, no work needed: all six sources add entries and refuse a locked vault; CSV
 persists to disk at the current version; parse failures do not abort; Gabbro key-protected,
