@@ -171,14 +171,6 @@ adds a second copy. Inherent to add-only; sync is the flow for the edited case.
 Sites: six, not seven — `import_from_gabbro` and `import_from_gabbro_with_key` both funnel into
 `merge_source_into_session`. CSV is the outlier: no check exists there to replace.
 
-Also in scope:
-- **The skip reason.** `reason: "UUID already exists"` is hardcoded at five sites in
-  `import.rs` and rendered verbatim by `import_skipped_dialog.dart:66` — raw English in a
-  37-locale app, and wrong once the mechanism changes. Localize it via the log-level rule.
-- **`importGabbroSubtitle` wording.** Says "Sync entries from another Gabbro vault"; must read
-  "Import entries from another Gabbro vault" — the current string promises field updates that
-  never happen. 37 locales.
-
 ### Progress
 
 Nets first — each pins *current* behaviour green before production changes.
@@ -237,13 +229,66 @@ users to look for a file that cannot exist. Fixed.
 *Accepted cost, pinned deliberately*
 - [x] S14 an entry edited in Gabbro after import re-imports as a second copy
 
-- [ ] S15 hardware pass
+- [ ] S15 hardware pass — **FAILED 2026-08-17, see below**
 
 Already netted, no work needed: all six sources add entries and refuse a locked vault; CSV
 persists to disk at the current version; parse failures do not abort; Gabbro key-protected,
 wrong-passphrase and pre-v11 paths; Enpass attachment decode; CSV unmapped columns; Bitwarden
 folder lookup. l10n key completeness and English-only values are caught generically by
 `l10n_test.dart`.
+
+### Hardware run 2026-08-17 — void, stopped at row 8
+
+Linux release bundle, mock vault. The two string checks are solid. Everything from row 3 on is
+void because the matrix was ambiguous (see below), so it must be re-run.
+
+| Row | Check | Result |
+|---|---|---|
+| 1 | banner has no "UUID" | pass |
+| 2 | Gabbro subtitle says Import, extension `.gabbro` | pass |
+| 3 | first CSV import of 2 rows | pass, 2 imported |
+| 4 | same file again | **fail** — reported 2 imported, entries duplicated |
+| 5 | no per-entry reason in the dialog | pass, but vacuous (see D1: CSV shows no dialog) |
+| 6 | mixed file | **fail** — reported 2 |
+| 7 | same row twice in one file | **fail** — reported 2 |
+| 8 | edit the imported "Alpha" | **blocked** — no Alpha in the list |
+| 9-12 | not run | |
+
+**Two defects found in the Dart layer, both mine, neither in Rust:**
+
+- **D1 CSV discards the skipped list.** `csv_mapping_screen.dart:76` pops only
+  `result.imported`; `skipped` is dropped, then `import_screen.dart:552` pops itself. The skipped
+  dialog can never appear for a CSV import, so the user is never told anything was recognised.
+- **D2 a fully-skipped import is silent.** `vault_list_screen.dart:1026` gates the SnackBar *and*
+  `_loadEntries()` on `count > 0`. When everything is skipped the screen does not change at all —
+  no message, no refresh. Indistinguishable from a broken button.
+
+So S6 is only half-shipped: Rust skips correctly, the UI never says so.
+
+**Treat the rows above as unreliable, not as findings.** The matrix was ambiguous: it wrote
+"Alpha" for an imported *entry title* without ever saying so, and it was read as a vault name. So
+row 8 says nothing about the vault list, and rows 4/6/7's "imported 2" cannot be trusted to mean
+what the importer returned. The run has to be redone before any conclusion is drawn from it.
+
+Rust is ruled out for the exact fixture bytes — `hardware_fixture_csv_reimport_imports_nothing`
+and `csv_reimport_after_a_reload_still_imports_nothing` both pass. Two guesses at the cause
+(stale build, lossy save/reload) were both wrong; instrument the running app instead of
+theorising.
+
+**Rewrite the matrix before re-running.** What made it unusable: rows depended on vault state
+that cannot be inspected; duplicated entries were indistinguishable; rows 4-7 asked for a dialog
+D1 makes impossible; and it used bare names like "Alpha" without saying whether they were a
+vault, a file, or an entry. Every row needs one observable check and unambiguous nouns.
+
+### Next steps, in order
+
+1. Red-first test for D1, then carry `skipped` through the CSV pop path to the dialog.
+2. Red-first test for D2, then report and refresh on a 0-import result too.
+3. Rewrite the hardware matrix: one observable check per row, no dependence on prior state.
+4. Re-run hardware. Then the full gate (`gabbro_test`) — not before.
+
+Rust counts in the Testing table above are stale: `cargo test -q` has not run since this work
+began. Flutter (2322) and clippy are current and green.
 
 ---
 

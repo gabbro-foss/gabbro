@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Serbian: the import screen named a file extension that does not exist.** It read `.габбро` instead of `.gabbro`, so anyone following it looked for the wrong file.
+
 ### Removed
 - **The "Recently used apps" suggestions under a login's Android app ID (Android).** Filling that field now means typing the package name, or letting Android's save prompt create the entry with it already set. The list of apps you had tried to log into is no longer kept, and any existing one is deleted on first launch.
 
