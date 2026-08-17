@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2244 | 10 |
+| Flutter (`flutter test`) | 2247 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 160 | 15 |
 
@@ -220,7 +220,11 @@ Then the change, canon-TDD. Scenario list agreed 2026-08-17:
 - [x] S10 importing into an empty vault imports everything
 
 *User-visible text*
-- [ ] S11 the skip reason names a content match, not a UUID; all 37 locales
+- [x] S11 the skip reason names a content match, not a UUID; all 37 locales — solved by
+      *deleting* the field. `skippedEntriesNote` already said it, localized; the per-entry
+      `reason` shipped hardcoded English across the bridge. `SkippedEntryData.reason` removed and
+      the bridge regenerated (codegen 2.12.0, matching the pinned crate; diff confined to that
+      type). No new ARB key needed.
 - [ ] S12 `importGabbroSubtitle` reads "Import entries from another Gabbro vault"
 - [ ] S13 `importDuplicateWarning` no longer mentions UUIDs
 
