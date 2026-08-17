@@ -1408,6 +1408,77 @@ Example,https://example.com,user,hunter2,my example,yes";
         let _ = std::fs::remove_file(&source_path);
     }
 
+    // ── S9: a colliding id no longer suppresses a genuinely different entry ────
+
+    #[test]
+    #[serial]
+    fn an_entry_whose_id_collides_but_content_differs_is_imported() {
+        // Inverts the old behaviour. Under the UUID check this entry was silently
+        // dropped and the user was told a duplicate had been skipped — for an entry
+        // they had never seen. Ids from a file are arbitrary strings; content is not.
+        let collides_by_id_only: &str = r#"{
+            "encrypted": false,
+            "folders": [],
+            "items": [
+                {"id":"existing-001","folderId":null,"type":2,"name":"Different note","notes":"different content","favorite":false,"fields":[],"secureNote":{}}
+            ]
+        }"#;
+
+        let pass = b"id collision passphrase";
+        let path = setup_vault(pass);
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let result = run(import_from_bitwarden(
+            collides_by_id_only.as_bytes().to_vec(),
+        ))
+        .unwrap();
+
+        assert_eq!(result.imported, 1, "different content must import");
+        assert!(
+            result.skipped.is_empty(),
+            "a shared id alone must not report a skip"
+        );
+        // The original is still there, untouched, alongside the new one.
+        assert_eq!(session::list_entry_summaries().unwrap().len(), 2);
+
+        teardown(&path);
+    }
+
+    // ── S10: importing into an empty vault ────────────────────────────────────
+
+    fn setup_empty_vault(passphrase: &[u8]) -> std::path::PathBuf {
+        let mut path = temp_dir();
+        path.push("gabbro_import_empty_test.gabbro");
+        save_vault(
+            &VaultBody {
+                folders: vec![],
+                entries: vec![],
+                ..Default::default()
+            },
+            passphrase,
+            &path,
+        )
+        .unwrap();
+        path
+    }
+
+    #[test]
+    #[serial]
+    fn importing_into_an_empty_vault_imports_everything() {
+        // Nothing to compare against, so dedup must not swallow a first import.
+        let pass = b"empty vault import passphrase";
+        let path = setup_empty_vault(pass);
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let result = run(import_from_bitwarden(BITWARDEN_JSON.as_bytes().to_vec())).unwrap();
+
+        assert_eq!(result.imported, 4, "all four supported items import");
+        assert!(result.skipped.is_empty());
+        assert_eq!(session::list_entry_summaries().unwrap().len(), 4);
+
+        teardown(&path);
+    }
+
     // ── Locked-vault error paths for remaining importers ──────────────────────
 
     #[test]
