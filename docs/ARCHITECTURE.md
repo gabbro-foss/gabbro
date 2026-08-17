@@ -73,7 +73,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 707 | 17 |
+| Rust (`cargo test -q`) | 735 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 11 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -82,7 +82,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
 | Flutter (`flutter test`) | 2329 | 10 |
-| Real-FFI suites (`dart test integration_test/ -j 1`) | 12 | 0 |
+| Real-FFI suites (`dart test integration_test/ -j 1`) | 15 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 160 | 15 |
 
 **Real-FFI suites run under plain `dart test`, never `flutter drive` (non-negotiable):** they test
@@ -128,153 +128,7 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**Import: content-hash deduplication.**
-
-**Scope (agreed 2026-08-17):** import only ever *adds* entries. It never updates a field on
-an existing entry — that is sync's job, and sync stays the only reconciliation path. Applies to
-every source including Gabbro -> Gabbro (`importFromGabbro`, add-only, distinct from
-`_syncFromFile()` in `vault_list_screen.dart`).
-
-**Decision (2026-08-17): replace the UUID check with a content hash on all six paths.** The
-UUID check goes away entirely. Re-importing the same file twice must import nothing, for every
-source.
-
-Why the UUID check fails. It compares one unvalidated string: imported ids are copied verbatim
-from the file (`bitwarden.rs:142`, `enpass.rs:415`) and never parsed as a UUID. Only Bitwarden,
-Enpass and Gabbro carry a reusable id; Google PM, Dashlane and generic CSV have no id column, so
-their parsers mint `new_entry_id()` and the check can never hit (CSV has no check at all —
-`skipped` is hardcoded empty). Keeping both mechanisms would give the same user action opposite
-results depending on the source picked.
-
-The hash covers the entry's user-visible content, per type, and excludes everything vault-local
-or volatile (`meta.id`, `created_at`, `updated_at`, `field_times`, `history`):
-
-| Type | Hashed fields |
-|---|---|
-| Login | title, url, username, password, notes, custom_fields, app_id, email |
-| Note | title, content, custom_fields |
-| Identity | first_name, last_name, email, phone, address, custom_fields |
-| Card | card_name, status, cardholder_name, card_number, expiry, cvv, credit_limit, card_account_number, payment_network, pin, bank_name, transaction_password, notes, custom_fields |
-| File | filename, data, notes, custom_fields |
-| Custom | title, fields |
-
-Two traps: Identity and Card have no `title`, so no hash can key on it; Custom's `fields` is an
-order-preserving `IndexMap`, so sort by label before hashing. `attachments` is excluded — it
-never crosses the bridge (see Bikeshed).
-
-`meta.folder` is excluded too (agreed): it is the user's filing, not part of what the entry is,
-so re-filing an entry does not make a re-import duplicate it.
-
-Accepted cost: an entry edited in Gabbro after import no longer matches the file, so re-importing
-adds a second copy. Inherent to add-only; sync is the flow for the edited case.
-
-Sites: six, not seven — `import_from_gabbro` and `import_from_gabbro_with_key` both funnel into
-`merge_source_into_session`. CSV is the outlier: no check exists there to replace.
-
-### Progress
-
-Nets first — each pins *current* behaviour green before production changes.
-
-- [x] N1 import leaves an existing entry's fields untouched (the add-only invariant)
-- [x] N2 Google PM / Dashlane / CSV duplicate on re-import (pins today's defect)
-- [x] N3 CSV's hardcoded empty `skipped` (folded into N2's CSV test)
-- [x] N4 no skipped dialog when nothing was skipped
-- [x] N5 the skipped dialog's reason reaches a screen reader as a label
-
-All green.
-
-Then the change, canon-TDD. Scenario list agreed 2026-08-17:
-
-*The hash*
-- [x] S1 two entries with identical content hash the same — `VaultEntry::content_hash()`
-      (`vault/entry.rs`), SHA-256, returns `[u8; 32]`
-- [x] S2 changing any one hashed field changes the hash — all six types covered. Values are
-      length-prefixed so no two field splits collide; `Option` carries a set/unset tag byte so
-      clearing a field differs from blanking it
-- [x] S3 entries differing only in `id`/`created_at`/`updated_at`/`field_times`/`history`/`folder`
-      hash the same — checked across all six types
-- [x] S4 a Custom entry with the same fields in a different order hashes the same
-- [x] S5 all six types carrying identical text hash pairwise differently (type is in the hash)
-
-*Dedup at import — one per source: CSV, Google PM, Dashlane, Bitwarden, Enpass, Gabbro*
-- [x] S6 re-importing the same file imports nothing and reports every entry skipped — all six
-      sources; `session_entry_content_hashes()` replaces the id check, CSV gained the check it
-      never had, and the now-dead `session_entry_ids()` is deleted. The three N2/N3 nets were
-      replaced by their inversions, as planned. The skip *reason* still reads "UUID already
-      exists" — a lie in the UI until S11.
-- [x] S7 a file mixing new and already-present entries imports only the new ones — new tests for
-      the three id-less sources; the other three were already covered by their
-      `skips_entries_already_in_the_vault` fixtures
-- [x] S8 two identical rows inside one file: the second is skipped — the hash set now grows as
-      entries are added. Six sites; a bulk replace caught only four (google_pm and dashlane
-      differ, they call `stamp_timestamps`), so audit by grep, not by clippy
-- [x] S9 an entry whose id matches but whose content differs is imported (inverts today)
-- [x] S10 importing into an empty vault imports everything
-
-*User-visible text*
-- [x] S11 the skip reason names a content match, not a UUID; all 37 locales — solved by
-      *deleting* the field. `skippedEntriesNote` already said it, localized; the per-entry
-      `reason` shipped hardcoded English across the bridge. `SkippedEntryData.reason` removed and
-      the bridge regenerated (codegen 2.12.0, matching the pinned crate; diff confined to that
-      type). No new ARB key needed.
-- [x] S12 `importGabbroSubtitle` reads "Import entries from another Gabbro vault" — 37 locales,
-      each using its own import verb taken from that locale's `importTitle`
-- [x] S13 `importDuplicateWarning` no longer mentions UUIDs — 37 locales
-
-Two nets added in `l10n_test.dart` while doing them: no locale may mention UUID in
-`importDuplicateWarning`, and every string naming `.gabbro` must keep it literal. The second
-caught a real bug — `app_sr.arb` had transliterated the extension to `.габбро`, sending Serbian
-users to look for a file that cannot exist. Fixed.
-
-*Accepted cost, pinned deliberately*
-- [x] S14 an entry edited in Gabbro after import re-imports as a second copy
-
-- [ ] S15 hardware pass — not run; see below
-
-Already netted, no work needed: all six sources add entries and refuse a locked vault; CSV
-persists to disk at the current version; parse failures do not abort; Gabbro key-protected,
-wrong-passphrase and pre-v11 paths; Enpass attachment decode; CSV unmapped columns; Bitwarden
-folder lookup. l10n key completeness and English-only values are caught generically by
-`l10n_test.dart`.
-
-### The two UI defects the void hardware run found — both FIXED
-
-Rust was never at fault; both were in Dart.
-
-- **D1 CSV discarded the skipped list.** CSV imports from its own screen, so it now raises the
-  skipped dialog there, as the other five sources do from `ImportScreen`. The pop stays an `int`.
-  The red test also caught the progress spinner never stopping; it stops before the dialog now.
-- **D2 a fully-skipped import was silent.** The vault list now reports and re-reads on any result,
-  0 included; only backing out stays silent. Needed an `openImport` seam on `VaultListScreen`.
-
-Nets and red tests in `test/csv_mapping_screen_test.dart` and
-`test/vault_list_import_result_test.dart`.
-
-### S15 hardware — still not run
-
-The 2026-08-17 run was void (ambiguous matrix) and the rewrite attempt was abandoned: three
-successive drafts each carried a step that had not been verified against the code —
-a markdown-escaped `\|` that broke the build command when pasted, "Manage vaults" for a control
-that lives on the unlock screen's vault dropdown ("Open a vault file…"), and a typed `~/…` path
-the app never expands. **Verify every step against the code before writing it, not after.**
-
-Facts confirmed while drafting, for whoever writes the next one:
-
-- The app expands no `~`; a typed path must be absolute.
-- Adopt route: unlock-screen vault dropdown -> "Open a vault file…" -> path field -> "Vault name"
-  -> "Add vault" -> back to the unlock screen for the new vault.
-- CSV route: Import entries -> "Generic CSV" -> path -> "Next: map columns" -> "Import".
-- Evidence strings: dialog title "N entries skipped"; SnackBar "Imported N entries." / "Imported
-  1 entry.".
-- Never import into mock vault A/B/D; copy one to a scratch path and adopt the copy.
-
-### Next steps, in order
-
-1. Write the hardware matrix — every step verified against the code first.
-2. Re-run hardware. Then the full gate (`gabbro_test`) — not before.
-
-Rust counts in the Testing table above are stale: `cargo test -q` has not run since this work
-began. Flutter (2329) and clippy are current and green.
+(empty — set with the maintainer at session start)
 
 ---
 
