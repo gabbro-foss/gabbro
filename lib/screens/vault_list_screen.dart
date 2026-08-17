@@ -109,6 +109,13 @@ Future<MergeSummary?> _defaultFastMergeVaultWithKeyHeld(
 /// Cancel an in-progress granular sync: roll the vault back to its pre-sync state.
 Future<void> _defaultCancelSync() => cancelSync();
 
+/// Run the import flow. Returns the number of entries added — 0 when every
+/// entry in the file was already in the vault, `null` when the user backed out
+/// without importing.
+Future<int?> _defaultOpenImport(BuildContext context) => Navigator.of(
+  context,
+).push<int>(MaterialPageRoute(builder: (context) => ImportScreen()));
+
 /// Apply a whole granular-sync review in one FFI call (one vault re-seal for the
 /// entire review, instead of one per decision).
 Future<void> _defaultApplySyncDecisions({
@@ -353,6 +360,10 @@ class VaultListScreen extends StatefulWidget {
   /// [lockVault] bridge call. Quit calls this before exiting.
   final void Function() onLock;
 
+  /// Opens the import flow and returns how many entries it added (`null` = the
+  /// user backed out). Seam for tests; defaults to pushing [ImportScreen].
+  final Future<int?> Function(BuildContext context) openImport;
+
   VaultListScreen({
     super.key,
     required this.vaultPath,
@@ -380,6 +391,7 @@ class VaultListScreen extends StatefulWidget {
     this.yubikeyRecords,
     this.onQuit,
     this.onLock = lockVault,
+    this.openImport = _defaultOpenImport,
     bool? isAndroid,
   }) : isAndroid = isAndroid ?? Platform.isAndroid;
 
@@ -1017,12 +1029,13 @@ class _VaultListScreenState extends State<VaultListScreen>
 
   Future<void> _openImportScreen() async {
     setState(() => _isImporting = true);
-    final count = await Navigator.of(
-      context,
-    ).push<int>(MaterialPageRoute(builder: (context) => ImportScreen()));
+    final count = await widget.openImport(context);
     if (mounted) {
       setState(() => _isImporting = false);
-      if (count != null && count > 0) {
+      // `null` means the user backed out — say nothing. Any number, 0 included,
+      // means an import ran: report it and re-read, or a run where every entry
+      // was already present leaves the screen looking like a dead button.
+      if (count != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(AppLocalizations.of(context).importedEntries(count)),
