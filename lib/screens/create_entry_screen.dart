@@ -167,6 +167,11 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   final List<AttachmentMetaData> _attachments = [];
   /// Files picked while creating — persisted right after the entry exists.
   final List<PickedFile> _pendingAttachments = [];
+
+  /// True once an edit-mode add/remove persisted. Review-with-no-field-changes
+  /// then returns silently — "No changes to save." would read as the
+  /// attachment change having failed.
+  bool _attachmentsChanged = false;
   late final TextEditingController _fileNotesController;
   final List<_CustomFieldState> _fileCustomFields = [];
 
@@ -485,11 +490,16 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     final updated = _buildUpdated();
     if (updated == null) return;
     if (!_hasChanges(widget.existing!, updated)) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).noChangesToSave)));
+      if (!mounted) return;
+      if (_attachmentsChanged) {
+        // The attachment ops are already saved; the detail screen re-reads
+        // the entry on a null result.
+        Navigator.of(context).pop();
+        return;
       }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).noChangesToSave)));
       return;
     }
     final expiry = _expiryDays();
@@ -1662,6 +1672,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       );
       if (!mounted) return;
       setState(() {
+        _attachmentsChanged = true;
         _attachments.add(
           AttachmentMetaData(
             uuid: uuid,
@@ -1704,7 +1715,12 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     if (id == null) return;
     try {
       await widget.onRemoveAttachment(id, att.uuid);
-      if (mounted) setState(() => _attachments.removeAt(index));
+      if (mounted) {
+        setState(() {
+          _attachmentsChanged = true;
+          _attachments.removeAt(index);
+        });
+      }
     } catch (e) {
       if (!mounted) return;
       showFailureMessage(

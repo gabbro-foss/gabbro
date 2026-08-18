@@ -236,6 +236,66 @@ void main() {
     );
   });
 
+  // Hardware pass 1 step 7: after adding an attachment the natural action is
+  // Save; answering "No changes to save." reads as the add having failed.
+  testWidgets('Save after an attachment-only edit returns silently', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      testApp(
+        Builder(
+          builder: (ctx) => ElevatedButton(
+            onPressed: () => Navigator.of(ctx).push(
+              MaterialPageRoute(
+                builder: (_) => CreateEntryScreen(
+                  entryType: 'Note',
+                  existing: VaultEntryData.note(_noteWith([])),
+                  onCreateEntry: (_) async => '',
+                  onGetEntry: (_) => VaultEntryData.note(_noteWith([])),
+                  pickFile: () async =>
+                      (name: 'scan.png', bytes: Uint8List.fromList([1])),
+                  onAddAttachment: (a, b, c, d) async => 'uuid-new',
+                  onRemoveAttachment: (a, b) async {},
+                ),
+              ),
+            ),
+            child: const Text('go'),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('go'));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('Add attachment'));
+    await tester.tap(find.text('Add attachment'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('scan.png'), findsOneWidget);
+
+    await tester.tap(find.text('Review →'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('No changes to save.'), findsNothing);
+    expect(
+      find.byType(CreateEntryScreen),
+      findsNothing,
+      reason: 'returns to the previous screen — the add is already saved',
+    );
+  });
+
+  testWidgets('a truly unchanged form still says no changes', (tester) async {
+    await tester.pumpWidget(
+      _editScreen(VaultEntryData.note(_noteWith([]))),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Review →'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('No changes to save.'), findsOneWidget);
+  });
+
   testWidgets('an attachment picked while creating persists after create', (
     tester,
   ) async {
