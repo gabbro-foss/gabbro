@@ -184,9 +184,11 @@ anywhere (all screens per `test/screen_catalogue.dart`, a11y, l10n, Rust backend
       changes to save." after an attachment add read as failure. Review with
       attachment-only changes now returns to detail silently; snackbar only when
       truly nothing changed. Red-then-green; hardware check in pass 2.
-- [ ] Hardware pass (matrix v2 in `.scratchpad`: isolated HOME, verified UI labels,
-      two linear passes; pass 1 green 2026-08-18, pass 2 pending — fixture path fixed
-      to a literal `/tmp/gabbro_hw/` copy)
+- [x] Hardware pass, Linux (2026-08-18): both passes green — add/cap/remove/extract,
+      oversized refusal, Enpass import visible + extractable, edit preserves, silent
+      review return
+- [ ] Hardware pass, Android (attachment picker channel + export path)
+- [ ] Full gate (`gabbro_test`) + test-count table update
 
 ---
 
