@@ -73,7 +73,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 735 | 17 |
+| Rust (`cargo test -q`) | 745 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 11 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -81,8 +81,8 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2329 | 10 |
-| Real-FFI suites (`dart test integration_test/ -j 1`) | 15 | 0 |
+| Flutter (`flutter test`) | 2347 | 10 |
+| Real-FFI suites (`dart test integration_test/ -j 1`) | 16 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 160 | 15 |
 
 **Real-FFI suites run under plain `dart test`, never `flutter drive` (non-negotiable):** they test
@@ -128,31 +128,9 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**Attachments for all entry types — implementation DONE, close-out pending.**
-Branch `allow_attachments` (30 commits on master @ aeb6629). Shipped on the branch:
-attachment metadata in the five entry DTOs; `add_attachment` (25 MB size cap, count
-cap 3 for in-app adds — import/merge exempt) / `extract_attachment` /
-`remove_attachment` (tombstoned); edit/create screen section; detail-screen extract;
-filenames (not uuids) in sync review + recovery history; 5 l10n keys x37; real-FFI
-round-trip suite; 3 bug/UX fixes found en route (edit wiped attachments + synced the
-loss; stale detail after save-less edit back; "No changes to save." after
-attachment-only edits). Both hardware passes green (Linux 2026-08-18, Android
-emulator 2026-08-18).
-
-Remaining (gate was RUNNING when the session closed — read its result from
-`gabbro/.scratchpad` or ask):
-
-- [ ] Gate red -> fix on the branch.
-- [ ] Gate green -> merge: master has NOT moved (merge-base == master tip), so
-      `git checkout master && git merge --no-ff allow_attachments` yields a tree
-      byte-identical to what the gate tested — verify with
-      `git diff master allow_attachments --stat` (must be empty) after merging;
-      no gate re-run needed then.
-- [ ] Update the Testing table counts from the gate output (Flutter now 2347/10s,
-      real-FFI 16; Rust count from the gate log).
-- [ ] New release (maintainer decided 2026-08-18): follow BUILD_AND_RELEASE.md,
-      next tag v0.1.0-alpha.21. No dep bumps this branch — no `--warm`.
-- [ ] Delete this section's completed text when the release is out.
+**Release v0.1.0-alpha.21.** Attachments work is merged to master; gate ALL GREEN
+2026-08-18. Follow BUILD_AND_RELEASE.md — no dep bumps, so no `--warm`.
+Delete this section once the release is published.
 
 ---
 

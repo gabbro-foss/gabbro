@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.21] – 2026-08-18
+
 ### Added
 - **File attachments on every entry type.** Any entry (not just File entries) can now hold up to 3 attached files of up to 25 MB each — add and remove them on the edit screen, save them back to disk from the entry view. Attachments imported from Enpass, previously invisible, now appear and can be recovered; sync names them by filename in every prompt.
 
@@ -17,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 - **The "Recently used apps" suggestions under a login's Android app ID (Android).** Filling that field now means typing the package name, or letting Android's save prompt create the entry with it already set. The list of apps you had tried to log into is no longer kept, and any existing one is deleted on first launch.
+
+*Built with Flutter 3.44.8, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21.*
 
 ## [0.1.0-alpha.20] – 2026-08-11
 
