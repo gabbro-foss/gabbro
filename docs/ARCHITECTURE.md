@@ -166,7 +166,8 @@ anywhere (all screens per `test/screen_catalogue.dart`, a11y, l10n, Rust backend
   6. [x] create/edit screen: attachments section; pick-during-create persists
          (edit mode applies add/remove immediately, like YubiKey management)
   7. [x] entry detail: extract per row via the File-entry save dialog, byte-equal
-  8. [ ] oversized pick -> localized error, nothing added
+  8. [x] oversized pick -> localized error, nothing added (Dart pre-check mirrors the
+         Rust cap; Rust still enforces its own)
   9. [ ] sync review + recovery history show filename, not uuid (updates the pin)
   10. [ ] real-FFI: add -> lock -> unlock -> extract, byte-compare
   11. [ ] l10n x37; overflow/a11y via the screen-catalog sweep
