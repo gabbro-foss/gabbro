@@ -379,6 +379,31 @@ fn entry_meta_mut(entry: &mut VaultEntry) -> &mut crate::vault::entry::EntryMeta
     }
 }
 
+/// Attachments of an entry (`File` stores its payload in `data`, not here).
+fn entry_attachments(entry: &VaultEntry) -> &[crate::vault::entry::EntryAttachment] {
+    match entry {
+        VaultEntry::Login(e) => &e.attachments,
+        VaultEntry::Note(e) => &e.attachments,
+        VaultEntry::Identity(e) => &e.attachments,
+        VaultEntry::Card(e) => &e.attachments,
+        VaultEntry::Custom(e) => &e.attachments,
+        VaultEntry::File(_) => &[],
+    }
+}
+
+fn entry_attachments_mut(
+    entry: &mut VaultEntry,
+) -> Option<&mut Vec<crate::vault::entry::EntryAttachment>> {
+    match entry {
+        VaultEntry::Login(e) => Some(&mut e.attachments),
+        VaultEntry::Note(e) => Some(&mut e.attachments),
+        VaultEntry::Identity(e) => Some(&mut e.attachments),
+        VaultEntry::Card(e) => Some(&mut e.attachments),
+        VaultEntry::Custom(e) => Some(&mut e.attachments),
+        VaultEntry::File(_) => None,
+    }
+}
+
 /// Field keys that differ between `old` and `new` (assumed same entry type).
 /// Scalar fields are keyed by their serde name; custom pairs by
 /// "custom_fields:<label>"; attachments by "attachments:<uuid>". Derived secrets
@@ -731,6 +756,14 @@ pub fn update_entry(
 
     let now = chrono_now();
     let expires_at = expiry_days.map(|days| add_days_to_timestamp(&now, days));
+
+    // Attachments are not round-tripped by Flutter (like field_times/history):
+    // the stored entry is the source of truth and mutation happens only via the
+    // dedicated attachment calls. Copy before diffing, or every app edit would
+    // wipe them and stamp `del:attachments:<uuid>` tombstones that sync the loss.
+    if let Some(dst) = entry_attachments_mut(&mut updated) {
+        *dst = entry_attachments(&entries[pos]).to_vec();
+    }
 
     // Per-field change-times (granular sync, v9). Flutter does not round-trip
     // field_times across the bridge, so the existing entry is the source of truth:

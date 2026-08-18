@@ -2146,6 +2146,78 @@ mod tests {
         let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
+    // Scenario 1 (attachments task) — red first: an app edit must not destroy
+    // stored attachments or stamp deletion tombstones that sync the loss.
+    #[test]
+    #[serial]
+    fn update_entry_preserves_stored_attachments() {
+        use crate::api::vault::save_vault;
+        use crate::vault::entry::VaultEntry as InternalEntry;
+        use crate::vault::entry::{EntryAttachment, EntryMeta, NoteEntry};
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_update_keeps_attachments.gabbro");
+        let pass = b"keep-attachments-pass";
+        let mut body = VaultBody::empty();
+        body.entries.push(InternalEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                field_times: Default::default(),
+                history: Vec::new(),
+                id: String::from("id-att"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::new(),
+            },
+            title: String::from("T"),
+            content: String::from("c"),
+            custom_fields: vec![],
+            attachments: vec![EntryAttachment {
+                uuid: String::from("att-1"),
+                name: String::from("passport.pdf"),
+                kind: String::from("application/pdf"),
+                data: vec![1, 2, 3],
+            }],
+        }));
+        save_vault(&body, pass, &path).unwrap();
+        run(unlock_vault(
+            pass.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
+
+        run(update_entry(
+            VaultEntryData::Note(crate::api::vault::NoteEntryData {
+                id: String::from("id-att"),
+                created_at: String::new(),
+                updated_at: String::new(),
+                folder: String::new(),
+                title: String::from("Edited"),
+                content: String::from("edited"),
+                custom_fields: vec![],
+            }),
+            None,
+        ))
+        .unwrap();
+
+        let stored = session::get_entry("id-att").unwrap();
+        match &stored {
+            InternalEntry::Note(n) => {
+                assert_eq!(n.attachments.len(), 1, "edit must not wipe attachments");
+                assert_eq!(n.attachments[0].data, vec![1, 2, 3]);
+                assert!(
+                    !n.meta.field_times.contains_key("del:attachments:att-1"),
+                    "edit must not stamp an attachment deletion tombstone"
+                );
+            }
+            _ => panic!("expected the note"),
+        }
+
+        lock_vault().unwrap();
+        let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
+    }
+
     #[test]
     #[serial]
     fn update_entry_persists_change() {

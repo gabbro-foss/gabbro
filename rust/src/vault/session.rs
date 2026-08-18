@@ -2865,6 +2865,46 @@ mod field_merge_tests {
         );
     }
 
+    // Net (attachments task): the merged entry must carry the incoming
+    // attachment's BYTES, not just report it by name.
+    #[test]
+    fn merge_carries_attachment_bytes_into_the_merged_entry() {
+        use crate::vault::entry::EntryAttachment;
+        let att = EntryAttachment {
+            uuid: String::from("att-1"),
+            name: String::from("passport.pdf"),
+            kind: String::from("application/pdf"),
+            data: vec![1, 2, 3],
+        };
+        let local = VaultEntry::Note(NoteEntry {
+            meta: meta("n1", "t", &[]),
+            title: String::from("T"),
+            content: String::from("C"),
+            custom_fields: vec![],
+            attachments: vec![],
+        });
+        let incoming = VaultEntry::Note(NoteEntry {
+            meta: meta("n1", "t", &[("attachments:att-1", 200)]),
+            title: String::from("T"),
+            content: String::from("C"),
+            custom_fields: vec![],
+            attachments: vec![att],
+        });
+        let (merged, _c, _dels, _brought) = merge_entry_pair(&local, &incoming);
+        match &merged {
+            VaultEntry::Note(n) => {
+                assert_eq!(n.attachments.len(), 1);
+                assert_eq!(n.attachments[0].uuid, "att-1");
+                assert_eq!(
+                    n.attachments[0].data,
+                    vec![1, 2, 3],
+                    "bytes survive the merge"
+                );
+            }
+            _ => panic!("expected a note"),
+        }
+    }
+
     #[test]
     fn merge_reentry_over_local_delete_is_pending_not_brought_over() {
         use crate::vault::entry::CustomField;
@@ -4662,6 +4702,56 @@ mod tests {
         let summaries = list_entry_summaries().unwrap();
 
         assert_eq!(summaries.len(), 2);
+
+        teardown(&path);
+    }
+
+    // Net (attachments task): nothing else ever round-trips attachment BYTES
+    // through the encrypted file — imports fill them, merge tests use names.
+    #[test]
+    #[serial]
+    fn attachment_bytes_survive_a_disk_round_trip() {
+        use crate::vault::entry::EntryAttachment;
+        let pass = b"test passphrase";
+        let path = setup_vault(pass);
+
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let bytes = vec![0x25, 0x50, 0x44, 0x46, 0x00, 0xFF, 0x07];
+        let entry = VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                field_times: Default::default(),
+                history: Vec::new(),
+                id: String::from("id-att"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+            },
+            title: String::from("With attachment"),
+            content: String::from("c"),
+            custom_fields: vec![],
+            attachments: vec![EntryAttachment {
+                uuid: String::from("att-1"),
+                name: String::from("passport.pdf"),
+                kind: String::from("application/pdf"),
+                data: bytes.clone(),
+            }],
+        });
+        session_create_entry(entry).unwrap();
+
+        lock_vault().unwrap();
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let got = get_entry("id-att").unwrap();
+        match &got {
+            VaultEntry::Note(n) => {
+                assert_eq!(n.attachments.len(), 1);
+                assert_eq!(n.attachments[0].name, "passport.pdf");
+                assert_eq!(n.attachments[0].kind, "application/pdf");
+                assert_eq!(n.attachments[0].data, bytes, "bytes intact after reload");
+            }
+            _ => panic!("expected the note back"),
+        }
 
         teardown(&path);
     }
