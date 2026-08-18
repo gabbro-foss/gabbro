@@ -168,6 +168,9 @@ pub struct PendingItemDeleteItem {
     pub id: String,
     pub title: String,
     pub field: String,
+    /// Human-readable name of the item — the attachment's filename or the
+    /// custom pair's label. The keep/delete prompt shows this, never the key.
+    pub label: String,
 }
 
 /// A folder assignment conflict discovered during vault merge.

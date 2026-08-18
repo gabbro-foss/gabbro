@@ -1484,7 +1484,7 @@ impl<'a> FieldMerger<'a> {
     // (a "del:<key>" tombstone) more recently than this side last changed it,
     // record a pending delete for the user to confirm. Never auto-drops. Returns
     // true if a pending delete was flagged.
-    fn carry_or_flag_delete(&mut self, key: &str, present_on_incoming: bool) -> bool {
+    fn carry_or_flag_delete(&mut self, key: &str, label: &str, present_on_incoming: bool) -> bool {
         let del_key = format!("del:{key}");
         let (present_meta, other_meta) = if present_on_incoming {
             (self.im, self.lm)
@@ -1499,6 +1499,7 @@ impl<'a> FieldMerger<'a> {
                     id: self.id.clone(),
                     title: self.title.clone(),
                     field: key.to_string(),
+                    label: label.to_string(),
                 });
                 flagged = true;
             }
@@ -1532,11 +1533,11 @@ impl<'a> FieldMerger<'a> {
                     });
                 }
                 (Some(lf), None) => {
-                    self.carry_or_flag_delete(&key, false);
+                    self.carry_or_flag_delete(&key, &lf.label, false);
                     out.push((*lf).clone());
                 }
                 (None, Some(inf)) => {
-                    if !self.carry_or_flag_delete(&key, true) {
+                    if !self.carry_or_flag_delete(&key, &inf.label, true) {
                         self.record_brought_over(&key, "", &inf.value);
                     }
                     out.push((*inf).clone());
@@ -1572,11 +1573,11 @@ impl<'a> FieldMerger<'a> {
                     });
                 }
                 (Some(la), None) => {
-                    self.carry_or_flag_delete(&key, false);
+                    self.carry_or_flag_delete(&key, &la.name, false);
                     out.push((*la).clone());
                 }
                 (None, Some(ia)) => {
-                    if !self.carry_or_flag_delete(&key, true) {
+                    if !self.carry_or_flag_delete(&key, &ia.name, true) {
                         self.record_brought_over(&key, "", &ia.name);
                     }
                     out.push((*ia).clone());
@@ -1737,11 +1738,11 @@ pub(crate) fn merge_entry_pair(
                         );
                     }
                     (Some(lf), None) => {
-                        m.carry_or_flag_delete(&key, false);
+                        m.carry_or_flag_delete(&key, &lf.label, false);
                         fields.insert(k.clone(), lf.clone());
                     }
                     (None, Some(inf)) => {
-                        if !m.carry_or_flag_delete(&key, true) {
+                        if !m.carry_or_flag_delete(&key, &inf.label, true) {
                             m.record_brought_over(&key, "", &inf.value);
                         }
                         fields.insert(k.clone(), inf.clone());
@@ -2977,6 +2978,41 @@ mod field_merge_tests {
         assert_eq!(
             brought[0].new_value, "passport.pdf",
             "name, never raw bytes"
+        );
+    }
+
+    // Scenario 9 (attachments task) — red first: a pending attachment delete
+    // must carry the display name, or the keep/delete prompt shows a bare uuid
+    // and the user cannot tell what they are deleting.
+    #[test]
+    fn pending_attachment_delete_carries_the_display_name() {
+        use crate::vault::entry::EntryAttachment;
+        let att = EntryAttachment {
+            uuid: String::from("att-1"),
+            name: String::from("passport.pdf"),
+            kind: String::from("application/pdf"),
+            data: vec![1],
+        };
+        let local = VaultEntry::Note(NoteEntry {
+            meta: meta("n1", "t", &[("attachments:att-1", 100)]),
+            title: String::from("T"),
+            content: String::from("C"),
+            custom_fields: vec![],
+            attachments: vec![att],
+        });
+        let incoming = VaultEntry::Note(NoteEntry {
+            meta: meta("n1", "t", &[("del:attachments:att-1", 200)]),
+            title: String::from("T"),
+            content: String::from("C"),
+            custom_fields: vec![],
+            attachments: vec![],
+        });
+        let (_m, _c, dels, _brought) = merge_entry_pair(&local, &incoming);
+        assert_eq!(dels.len(), 1);
+        assert_eq!(dels[0].field, "attachments:att-1");
+        assert_eq!(
+            dels[0].label, "passport.pdf",
+            "the prompt must name the file, not the uuid"
         );
     }
 

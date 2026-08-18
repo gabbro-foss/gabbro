@@ -85,6 +85,7 @@ const _itemDelete = PendingItemDeleteItem(
   id: 'e1',
   title: 'Example',
   field: 'custom_fields:Recovery code',
+  label: 'Recovery code',
 );
 
 const _entryDelete = PendingDeleteItem(id: 'g', title: 'Gone');

@@ -736,14 +736,20 @@ class PendingItemDeleteItem {
   final String title;
   final String field;
 
+  /// Human-readable name of the item — the attachment's filename or the
+  /// custom pair's label. The keep/delete prompt shows this, never the key.
+  final String label;
+
   const PendingItemDeleteItem({
     required this.id,
     required this.title,
     required this.field,
+    required this.label,
   });
 
   @override
-  int get hashCode => id.hashCode ^ title.hashCode ^ field.hashCode;
+  int get hashCode =>
+      id.hashCode ^ title.hashCode ^ field.hashCode ^ label.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -752,7 +758,8 @@ class PendingItemDeleteItem {
           runtimeType == other.runtimeType &&
           id == other.id &&
           title == other.title &&
-          field == other.field;
+          field == other.field &&
+          label == other.label;
 }
 
 /// Set a field/pair on a clash: keep-mine (`keep_incoming` false, `value` ignored)

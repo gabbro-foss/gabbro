@@ -1093,7 +1093,34 @@ void main() {
         ),
       );
       await _startSync(tester);
+      // Scenario 9: the row is labelled by filename; the uuid never shows.
+      expect(find.textContaining('passport.pdf'), findsWidgets);
+      expect(find.textContaining('uuid-9'), findsNothing);
+    });
+
+    // Scenario 9 (attachments task): the keep/delete prompt must name the
+    // file — a bare uuid gives the user nothing to decide on.
+    testWidgets('an attachment item-delete prompt names the file', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _buildScreen(
+          pickedPath: '/tmp/other.gabbro',
+          mergeVault: (_, _) async => _summary(
+            pendingItemDeletes: [
+              const PendingItemDeleteItem(
+                id: 'x',
+                title: 'Doc',
+                field: 'attachments:uuid-9',
+                label: 'passport.pdf',
+              ),
+            ],
+          ),
+        ),
+      );
+      await _startSync(tester);
       expect(find.textContaining('passport.pdf'), findsOneWidget);
+      expect(find.textContaining('uuid-9'), findsNothing);
     });
 
     testWidgets('an item-delete shows keep/delete chips in the entry step', (
@@ -1109,6 +1136,7 @@ void main() {
                 id: 'x',
                 title: 'Mail',
                 field: 'custom_fields:OldNote',
+                label: 'OldNote',
               ),
             ],
           ),

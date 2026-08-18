@@ -3687,12 +3687,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   PendingItemDeleteItem dco_decode_pending_item_delete_item(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
     return PendingItemDeleteItem(
       id: dco_decode_String(arr[0]),
       title: dco_decode_String(arr[1]),
       field: dco_decode_String(arr[2]),
+      label: dco_decode_String(arr[3]),
     );
   }
 
@@ -4912,10 +4913,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_id = sse_decode_String(deserializer);
     var var_title = sse_decode_String(deserializer);
     var var_field = sse_decode_String(deserializer);
+    var var_label = sse_decode_String(deserializer);
     return PendingItemDeleteItem(
       id: var_id,
       title: var_title,
       field: var_field,
+      label: var_label,
     );
   }
 
@@ -5974,6 +5977,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.id, serializer);
     sse_encode_String(self.title, serializer);
     sse_encode_String(self.field, serializer);
+    sse_encode_String(self.label, serializer);
   }
 
   @protected

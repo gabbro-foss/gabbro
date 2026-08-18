@@ -84,11 +84,9 @@ void main() {
     expect(find.text('hunter2'), findsNothing);
   });
 
-  // Net (attachments task): a sync brought-over attachment lands in history as
-  // field 'attachments:<uuid>' with the filename as value. Pins: prefix is
-  // stripped (raw key never shown) and the filename is visible. The label is
-  // currently the bare uuid; if it later becomes the filename, update here.
-  testWidgets('an attachment history row strips the key prefix', (
+  // Scenario 9 (attachments task): an attachment history row is titled by its
+  // FILENAME (the record's value) — never the uuid or the raw key.
+  testWidgets('an attachment history row is titled by filename', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -102,8 +100,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('uuid-9'), findsOneWidget);
     expect(find.text('passport.pdf'), findsOneWidget);
+    expect(find.textContaining('uuid-9'), findsNothing);
     expect(find.textContaining('attachments:'), findsNothing);
   });
 

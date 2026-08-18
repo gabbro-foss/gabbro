@@ -3956,10 +3956,12 @@ impl SseDecode for crate::api::vault::PendingItemDeleteItem {
         let mut var_id = <String>::sse_decode(deserializer);
         let mut var_title = <String>::sse_decode(deserializer);
         let mut var_field = <String>::sse_decode(deserializer);
+        let mut var_label = <String>::sse_decode(deserializer);
         return crate::api::vault::PendingItemDeleteItem {
             id: var_id,
             title: var_title,
             field: var_field,
+            label: var_label,
         };
     }
 }
@@ -5242,6 +5244,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::vault::PendingItemDeleteItem 
             self.id.into_into_dart().into_dart(),
             self.title.into_into_dart().into_dart(),
             self.field.into_into_dart().into_dart(),
+            self.label.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -6196,6 +6199,7 @@ impl SseEncode for crate::api::vault::PendingItemDeleteItem {
         <String>::sse_encode(self.id, serializer);
         <String>::sse_encode(self.title, serializer);
         <String>::sse_encode(self.field, serializer);
+        <String>::sse_encode(self.label, serializer);
     }
 }
 

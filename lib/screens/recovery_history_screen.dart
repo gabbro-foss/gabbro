@@ -73,6 +73,13 @@ class _RecoveryHistoryScreenState extends State<RecoveryHistoryScreen> {
           final secret = _secretFields.contains(r.field);
           final binary = _isBinary(r.field);
           final revealed = _revealed.contains(index);
+          // An attachment row is titled by its filename (the record's value);
+          // a uuid tells the user nothing. The value line is dropped — it
+          // would repeat the title.
+          final isAttachment = r.field.startsWith('attachments:');
+          final title = isAttachment && r.value.isNotEmpty
+              ? r.value
+              : _fieldLabel(r.field);
           final display = binary
               ? '<binary>'
               : (secret && !revealed ? '••••' : r.value);
@@ -82,11 +89,11 @@ class _RecoveryHistoryScreenState extends State<RecoveryHistoryScreen> {
           // off the right edge where they could not be tapped. A Wrap reflows
           // them onto another line instead.
           return ListTile(
-            title: Text(_fieldLabel(r.field)),
+            title: Text(title),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(display),
+                if (!isAttachment) Text(display),
                 Text(
                   l.historySavedOn(
                     formatTimestamp(
