@@ -151,6 +151,9 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
 
+### Distribution
+- Flathub vs appimages vs snaps: investigate if gabbro can be distributed on one of them, preferably flathub for easy update on Linux Mint.
+
 ### Housekeeping
 - **Delete `purgeLegacyRecentApps` at v1.0** (`MainActivity.kt` + `LegacyPurgeTest.kt`) — the one-shot cleanup of the removed suggestion-chip store. No pre-1.0 install will still be upgrading by then.
 
