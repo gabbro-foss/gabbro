@@ -163,7 +163,8 @@ anywhere (all screens per `test/screen_catalogue.dart`, a11y, l10n, Rust backend
   3. [x] `add_attachment` persists; rejects > `ENPASS_ATTACHMENT_MAX_BYTES`
   4. [x] `extract_attachment` returns exact bytes; errors on unknown uuid / locked
   5. [x] `remove_attachment` deletes + stamps `del:` tombstone (removal syncs)
-  6. [ ] create/edit screen: attachments section; pick-during-create persists
+  6. [x] create/edit screen: attachments section; pick-during-create persists
+         (edit mode applies add/remove immediately, like YubiKey management)
   7. [ ] entry detail: extract per row via the File-entry save dialog, byte-equal
   8. [ ] oversized pick -> localized error, nothing added
   9. [ ] sync review + recovery history show filename, not uuid (updates the pin)
