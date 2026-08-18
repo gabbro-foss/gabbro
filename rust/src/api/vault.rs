@@ -395,7 +395,7 @@ fn entry_meta(entry: &VaultEntry) -> &crate::vault::entry::EntryMeta {
     }
 }
 
-fn entry_meta_mut(entry: &mut VaultEntry) -> &mut crate::vault::entry::EntryMeta {
+pub(crate) fn entry_meta_mut(entry: &mut VaultEntry) -> &mut crate::vault::entry::EntryMeta {
     match entry {
         VaultEntry::Login(e) => &mut e.meta,
         VaultEntry::Note(e) => &mut e.meta,
@@ -407,7 +407,7 @@ fn entry_meta_mut(entry: &mut VaultEntry) -> &mut crate::vault::entry::EntryMeta
 }
 
 /// Attachments of an entry (`File` stores its payload in `data`, not here).
-fn entry_attachments(entry: &VaultEntry) -> &[crate::vault::entry::EntryAttachment] {
+pub(crate) fn entry_attachments(entry: &VaultEntry) -> &[crate::vault::entry::EntryAttachment] {
     match entry {
         VaultEntry::Login(e) => &e.attachments,
         VaultEntry::Note(e) => &e.attachments,
@@ -418,7 +418,7 @@ fn entry_attachments(entry: &VaultEntry) -> &[crate::vault::entry::EntryAttachme
     }
 }
 
-fn entry_attachments_mut(
+pub(crate) fn entry_attachments_mut(
     entry: &mut VaultEntry,
 ) -> Option<&mut Vec<crate::vault::entry::EntryAttachment>> {
     match entry {

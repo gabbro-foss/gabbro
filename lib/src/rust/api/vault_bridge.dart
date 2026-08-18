@@ -91,6 +91,23 @@ Future<void> updateEntry({required VaultEntryData entry, int? expiryDays}) =>
       expiryDays: expiryDays,
     );
 
+/// Add an attachment to an entry and persist. Returns the new attachment uuid.
+///
+/// Bytes cross the bridge only here and in `extract_attachment` — entry DTOs
+/// carry metadata alone. Size-capped (same limit as Enpass import); a `File`
+/// entry is refused. Async — triggers a full vault save.
+Future<String> addAttachment({
+  required String entryId,
+  required String name,
+  required String kind,
+  required List<int> data,
+}) => RustLib.instance.api.crateApiVaultBridgeAddAttachment(
+  entryId: entryId,
+  name: name,
+  kind: kind,
+  data: data,
+);
+
 /// Remove an entry by UUID and persist.
 ///
 /// Async — triggers a full vault save.

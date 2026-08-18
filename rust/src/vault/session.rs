@@ -462,6 +462,59 @@ pub fn session_update_entry(updated: VaultEntry, expiry_days: Option<u32>) -> Re
     Ok(())
 }
 
+/// Add an attachment to an entry and persist. Returns the new attachment uuid.
+///
+/// Size-capped like Enpass import — the same limit keeps a vault loadable on a
+/// phone. A `File` entry takes none: the file IS its payload. Stamps
+/// `attachments:<uuid>` in field_times so the addition syncs to other devices.
+pub fn session_add_attachment(
+    id: &str,
+    name: &str,
+    kind: &str,
+    data: Vec<u8>,
+) -> Result<String, String> {
+    if data.len() > crate::import::ENPASS_ATTACHMENT_MAX_BYTES {
+        return Err(format!(
+            "Attachment exceeds the {} MB limit",
+            crate::import::ENPASS_ATTACHMENT_MAX_BYTES / (1024 * 1024)
+        ));
+    }
+    let uuid = crate::vault::entry::new_entry_id();
+    let (body, passphrase, path, yubikey) = {
+        let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+        let session = session.as_mut().ok_or("Vault is locked")?;
+        let entry = session
+            .entries
+            .iter_mut()
+            .find(|e| entry_id(e) == id)
+            .ok_or_else(|| format!("No entry found with id: {id}"))?;
+        let atts = crate::api::vault::entry_attachments_mut(entry)
+            .ok_or("A File entry takes no attachments")?;
+        atts.push(crate::vault::entry::EntryAttachment {
+            uuid: uuid.clone(),
+            name: name.to_string(),
+            kind: kind.to_string(),
+            data,
+        });
+        let key = format!("attachments:{uuid}");
+        let now_ms = crate::api::vault::now_ms();
+        let meta = crate::api::vault::entry_meta_mut(entry);
+        meta.field_times.insert(key.clone(), now_ms);
+        meta.field_times.remove(&format!("del:{key}"));
+        meta.updated_at = crate::api::vault::chrono_now();
+        let body = build_body(session);
+        let yubikey = extract_yubikey(session);
+        (
+            body,
+            session.passphrase.clone(),
+            session.path.clone(),
+            yubikey,
+        )
+    }; // ← lock released here
+    do_save(&body, &passphrase, &path, yubikey)?;
+    Ok(uuid)
+}
+
 /// Remove an entry by UUID and persist.
 ///
 /// Async — triggers a full vault save.

@@ -487,6 +487,20 @@ pub async fn update_entry(entry: VaultEntryData, expiry_days: Option<u32>) -> Re
     session::session_update_entry(internal, expiry_days)
 }
 
+/// Add an attachment to an entry and persist. Returns the new attachment uuid.
+///
+/// Bytes cross the bridge only here and in `extract_attachment` — entry DTOs
+/// carry metadata alone. Size-capped (same limit as Enpass import); a `File`
+/// entry is refused. Async — triggers a full vault save.
+pub async fn add_attachment(
+    entry_id: String,
+    name: String,
+    kind: String,
+    data: Vec<u8>,
+) -> Result<String, String> {
+    session::session_add_attachment(&entry_id, &name, &kind, data)
+}
+
 /// Remove an entry by UUID and persist.
 ///
 /// Async — triggers a full vault save.
@@ -2291,6 +2305,160 @@ mod tests {
         match get_entry(String::from("id-custom")).unwrap() {
             VaultEntryData::Custom(d) => check(&d.attachments),
             _ => panic!("expected custom"),
+        }
+
+        lock_vault().unwrap();
+        let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
+    }
+
+    // Scenario 3 (attachments task) — red first: an added attachment must
+    // persist across lock/unlock and carry a sync stamp, or another device
+    // would never receive it.
+    #[test]
+    #[serial]
+    fn add_attachment_persists_and_stamps_sync_time() {
+        use crate::api::vault::save_vault;
+        use crate::vault::entry::VaultEntry as InternalEntry;
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_add_attachment.gabbro");
+        let pass = b"add-attachment-pass";
+        save_vault(&VaultBody::empty(), pass, &path).unwrap();
+        run(unlock_vault(
+            pass.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
+
+        let summary = run(create_entry(VaultEntryData::Note(
+            crate::api::vault::NoteEntryData {
+                id: String::new(),
+                created_at: String::new(),
+                updated_at: String::new(),
+                folder: String::new(),
+                title: String::from("Host"),
+                content: String::new(),
+                custom_fields: vec![],
+                attachments: vec![],
+            },
+        )))
+        .unwrap();
+        let id = summary.id.clone();
+
+        let uuid = run(add_attachment(
+            id.clone(),
+            String::from("scan.png"),
+            String::from("image/png"),
+            vec![7u8; 16],
+        ))
+        .unwrap();
+
+        lock_vault().unwrap();
+        run(unlock_vault(
+            pass.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
+
+        match get_entry(id.clone()).unwrap() {
+            VaultEntryData::Note(d) => {
+                assert_eq!(d.attachments.len(), 1);
+                assert_eq!(d.attachments[0].uuid, uuid);
+                assert_eq!(d.attachments[0].name, "scan.png");
+                assert_eq!(d.attachments[0].size, 16);
+            }
+            _ => panic!("expected note"),
+        }
+        let stored = session::get_entry(&id).unwrap();
+        match &stored {
+            InternalEntry::Note(n) => {
+                assert!(
+                    n.meta
+                        .field_times
+                        .contains_key(&format!("attachments:{uuid}")),
+                    "no sync stamp: the attachment would never reach another device"
+                );
+            }
+            _ => panic!("expected note"),
+        }
+
+        lock_vault().unwrap();
+        let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
+    }
+
+    // Scenario 3 (attachments task) — red first: the cap keeps a vault
+    // loadable on a phone; a File entry is its own payload and takes none.
+    #[test]
+    #[serial]
+    fn add_attachment_refuses_oversized_and_file_target() {
+        use crate::api::vault::save_vault;
+        use crate::import::ENPASS_ATTACHMENT_MAX_BYTES;
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_add_attachment_refusals.gabbro");
+        let pass = b"add-attachment-refuse-pass";
+        save_vault(&VaultBody::empty(), pass, &path).unwrap();
+        run(unlock_vault(
+            pass.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
+
+        let note = run(create_entry(VaultEntryData::Note(
+            crate::api::vault::NoteEntryData {
+                id: String::new(),
+                created_at: String::new(),
+                updated_at: String::new(),
+                folder: String::new(),
+                title: String::from("N"),
+                content: String::new(),
+                custom_fields: vec![],
+                attachments: vec![],
+            },
+        )))
+        .unwrap();
+        let file = run(create_entry(VaultEntryData::File(
+            crate::api::vault::FileEntryData {
+                id: String::new(),
+                created_at: String::new(),
+                updated_at: String::new(),
+                folder: String::new(),
+                filename: String::from("doc.txt"),
+                data: vec![1, 2],
+                notes: None,
+                custom_fields: vec![],
+            },
+        )))
+        .unwrap();
+
+        let oversized = vec![0u8; ENPASS_ATTACHMENT_MAX_BYTES + 1];
+        assert!(
+            run(add_attachment(
+                note.id.clone(),
+                String::from("big.bin"),
+                String::from("application/octet-stream"),
+                oversized,
+            ))
+            .is_err(),
+            "over the cap must be refused"
+        );
+        assert!(
+            run(add_attachment(
+                file.id.clone(),
+                String::from("x.txt"),
+                String::from("text/plain"),
+                vec![1],
+            ))
+            .is_err(),
+            "a File entry takes no attachments"
+        );
+        match get_entry(note.id).unwrap() {
+            VaultEntryData::Note(d) => assert!(d.attachments.is_empty(), "nothing added"),
+            _ => panic!("expected note"),
         }
 
         lock_vault().unwrap();

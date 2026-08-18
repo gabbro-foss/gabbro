@@ -38,7 +38,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -865857971;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1714613937;
 
 // Section: executor
 
@@ -46,6 +46,51 @@ flutter_rust_bridge::frb_generated_default_handler!();
 
 // Section: wire_funcs
 
+fn wire__crate__api__vault_bridge__add_attachment_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "add_attachment",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_entry_id = <String>::sse_decode(&mut deserializer);
+            let api_name = <String>::sse_decode(&mut deserializer);
+            let api_kind = <String>::sse_decode(&mut deserializer);
+            let api_data = <Vec<u8>>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let output_ok = crate::api::vault_bridge::add_attachment(
+                            api_entry_id,
+                            api_name,
+                            api_kind,
+                            api_data,
+                        )
+                        .await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
 fn wire__crate__api__vault_bridge__add_yubikey_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -4066,251 +4111,252 @@ fn pde_ffi_dispatcher_primary_impl(
 ) {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        1 => wire__crate__api__vault_bridge__add_yubikey_impl(port, ptr, rust_vec_len, data_len),
-        2 => {
+        1 => wire__crate__api__vault_bridge__add_attachment_impl(port, ptr, rust_vec_len, data_len),
+        2 => wire__crate__api__vault_bridge__add_yubikey_impl(port, ptr, rust_vec_len, data_len),
+        3 => {
             wire__crate__api__vault_bridge__adopt_vault_file_impl(port, ptr, rust_vec_len, data_len)
         }
-        3 => wire__crate__api__vault_bridge__apply_sync_decisions_impl(
+        4 => wire__crate__api__vault_bridge__apply_sync_decisions_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        4 => wire__crate__api__vault_bridge__assign_folder_to_entries_impl(
+        5 => wire__crate__api__vault_bridge__assign_folder_to_entries_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        5 => wire__crate__api__autotype_bridge__autotype_capture_active_window_impl(
+        6 => wire__crate__api__autotype_bridge__autotype_capture_active_window_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        6 => {
+        7 => {
             wire__crate__api__autotype_bridge__autotype_fill_impl(port, ptr, rust_vec_len, data_len)
         }
-        7 => wire__crate__api__autotype_bridge__autotype_socket_path_impl(
+        8 => wire__crate__api__autotype_bridge__autotype_socket_path_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        8 => wire__crate__api__autotype_bridge__autotype_trigger_token_impl(
+        9 => wire__crate__api__autotype_bridge__autotype_trigger_token_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        9 => wire__crate__api__vault_bridge__build_export_bytes_impl(
+        10 => wire__crate__api__vault_bridge__build_export_bytes_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        10 => wire__crate__api__vault_bridge__build_export_passphrase_only_bytes_impl(
+        11 => wire__crate__api__vault_bridge__build_export_passphrase_only_bytes_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        11 => wire__crate__api__vault_bridge__cancel_sync_impl(port, ptr, rust_vec_len, data_len),
-        12 => wire__crate__api__vault_bridge__change_passphrase_impl(
+        12 => wire__crate__api__vault_bridge__cancel_sync_impl(port, ptr, rust_vec_len, data_len),
+        13 => wire__crate__api__vault_bridge__change_passphrase_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        13 => wire__crate__api__vault__chrono_now_impl(port, ptr, rust_vec_len, data_len),
-        14 => wire__crate__api__vault_bridge__create_entry_impl(port, ptr, rust_vec_len, data_len),
-        15 => wire__crate__api__vault_bridge__create_folder_impl(port, ptr, rust_vec_len, data_len),
-        16 => wire__crate__api__vault__create_login_entry_impl(port, ptr, rust_vec_len, data_len),
-        17 => {
+        14 => wire__crate__api__vault__chrono_now_impl(port, ptr, rust_vec_len, data_len),
+        15 => wire__crate__api__vault_bridge__create_entry_impl(port, ptr, rust_vec_len, data_len),
+        16 => wire__crate__api__vault_bridge__create_folder_impl(port, ptr, rust_vec_len, data_len),
+        17 => wire__crate__api__vault__create_login_entry_impl(port, ptr, rust_vec_len, data_len),
+        18 => {
             wire__crate__api__vault_bridge__delete_entries_impl(port, ptr, rust_vec_len, data_len)
         }
-        18 => wire__crate__api__vault_bridge__delete_entry_impl(port, ptr, rust_vec_len, data_len),
-        19 => wire__crate__api__vault_bridge__delete_folder_impl(port, ptr, rust_vec_len, data_len),
-        20 => {
+        19 => wire__crate__api__vault_bridge__delete_entry_impl(port, ptr, rust_vec_len, data_len),
+        20 => wire__crate__api__vault_bridge__delete_folder_impl(port, ptr, rust_vec_len, data_len),
+        21 => {
             wire__crate__api__vault_bridge__delete_history_impl(port, ptr, rust_vec_len, data_len)
         }
-        21 => wire__crate__api__vault_bridge__delete_whole_vault_impl(
+        22 => wire__crate__api__vault_bridge__delete_whole_vault_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        24 => wire__crate__api__vault_bridge__export_vault_impl(port, ptr, rust_vec_len, data_len),
-        25 => wire__crate__api__vault_bridge__export_vault_json_impl(
+        25 => wire__crate__api__vault_bridge__export_vault_impl(port, ptr, rust_vec_len, data_len),
+        26 => wire__crate__api__vault_bridge__export_vault_json_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        26 => wire__crate__api__vault_bridge__export_vault_passphrase_only_impl(
+        27 => wire__crate__api__vault_bridge__export_vault_passphrase_only_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        27 => wire__crate__api__vault_bridge__fast_merge_vault_from_file_impl(
+        28 => wire__crate__api__vault_bridge__fast_merge_vault_from_file_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        28 => wire__crate__api__vault_bridge__fast_merge_vault_from_file_held_impl(
+        29 => wire__crate__api__vault_bridge__fast_merge_vault_from_file_held_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        29 => wire__crate__api__vault_bridge__fast_merge_vault_from_file_with_key_impl(
+        30 => wire__crate__api__vault_bridge__fast_merge_vault_from_file_with_key_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        30 => wire__crate__api__vault_bridge__fast_merge_vault_from_file_with_key_held_impl(
+        31 => wire__crate__api__vault_bridge__fast_merge_vault_from_file_with_key_held_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        31 => wire__crate__api__fido_bridge__fido_get_hmac_secret_impl(
+        32 => wire__crate__api__fido_bridge__fido_get_hmac_secret_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        32 => wire__crate__api__fido_bridge__fido_get_hmac_secret_any_impl(
+        33 => wire__crate__api__fido_bridge__fido_get_hmac_secret_any_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        34 => wire__crate__api__fido_bridge__fido_register_impl(port, ptr, rust_vec_len, data_len),
-        35 => wire__crate__api__passphrase_generator__generate_passphrase_impl(
+        35 => wire__crate__api__fido_bridge__fido_register_impl(port, ptr, rust_vec_len, data_len),
+        36 => wire__crate__api__passphrase_generator__generate_passphrase_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        38 => wire__crate__api__vault_bridge__get_entry_history_impl(
+        39 => wire__crate__api__vault_bridge__get_entry_history_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        39 => {
+        40 => {
             wire__crate__api__import__import_from_bitwarden_impl(port, ptr, rust_vec_len, data_len)
         }
-        40 => wire__crate__api__import__import_from_csv_impl(port, ptr, rust_vec_len, data_len),
-        41 => {
+        41 => wire__crate__api__import__import_from_csv_impl(port, ptr, rust_vec_len, data_len),
+        42 => {
             wire__crate__api__import__import_from_dashlane_impl(port, ptr, rust_vec_len, data_len)
         }
-        42 => wire__crate__api__import__import_from_enpass_impl(port, ptr, rust_vec_len, data_len),
-        43 => wire__crate__api__import__import_from_gabbro_impl(port, ptr, rust_vec_len, data_len),
-        44 => wire__crate__api__import__import_from_gabbro_with_key_impl(
+        43 => wire__crate__api__import__import_from_enpass_impl(port, ptr, rust_vec_len, data_len),
+        44 => wire__crate__api__import__import_from_gabbro_impl(port, ptr, rust_vec_len, data_len),
+        45 => wire__crate__api__import__import_from_gabbro_with_key_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        45 => {
+        46 => {
             wire__crate__api__import__import_from_google_pm_impl(port, ptr, rust_vec_len, data_len)
         }
-        46 => wire__crate__api__simple__init_app_impl(port, ptr, rust_vec_len, data_len),
-        47 => wire__crate__api__vault_bridge__init_vault_impl(port, ptr, rust_vec_len, data_len),
-        48 => wire__crate__api__vault_bridge__init_vault_with_keys_impl(
+        47 => wire__crate__api__simple__init_app_impl(port, ptr, rust_vec_len, data_len),
+        48 => wire__crate__api__vault_bridge__init_vault_impl(port, ptr, rust_vec_len, data_len),
+        49 => wire__crate__api__vault_bridge__init_vault_with_keys_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        54 => wire__crate__api__vault_bridge__merge_vault_from_file_impl(
+        55 => wire__crate__api__vault_bridge__merge_vault_from_file_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        55 => wire__crate__api__vault_bridge__merge_vault_from_file_held_impl(
+        56 => wire__crate__api__vault_bridge__merge_vault_from_file_held_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        56 => wire__crate__api__vault_bridge__merge_vault_from_file_with_key_impl(
+        57 => wire__crate__api__vault_bridge__merge_vault_from_file_with_key_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        57 => wire__crate__api__vault_bridge__merge_vault_from_file_with_key_held_impl(
+        58 => wire__crate__api__vault_bridge__merge_vault_from_file_with_key_held_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        58 => wire__crate__api__vault__now_ms_impl(port, ptr, rust_vec_len, data_len),
-        59 => wire__crate__api__passphrase_generator__passphrase_entropy_bits_impl(
+        59 => wire__crate__api__vault__now_ms_impl(port, ptr, rust_vec_len, data_len),
+        60 => wire__crate__api__passphrase_generator__passphrase_entropy_bits_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        61 => {
+        62 => {
             wire__crate__api__vault_bridge__remove_yubikey_impl(port, ptr, rust_vec_len, data_len)
         }
-        62 => wire__crate__api__vault_bridge__rename_folder_impl(port, ptr, rust_vec_len, data_len),
-        63 => {
+        63 => wire__crate__api__vault_bridge__rename_folder_impl(port, ptr, rust_vec_len, data_len),
+        64 => {
             wire__crate__api__vault_bridge__restore_history_impl(port, ptr, rust_vec_len, data_len)
         }
-        64 => wire__crate__api__vault_bridge__restore_vault_backup_impl(
+        65 => wire__crate__api__vault_bridge__restore_vault_backup_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        65 => wire__crate__api__vault_bridge__restore_vault_from_file_impl(
+        66 => wire__crate__api__vault_bridge__restore_vault_from_file_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        66 => {
+        67 => {
             wire__crate__api__simple__set_process_dumpable_impl(port, ptr, rust_vec_len, data_len)
         }
-        67 => {
+        68 => {
             wire__crate__api__vault_bridge__set_vault_alias_impl(port, ptr, rust_vec_len, data_len)
         }
-        68 => wire__crate__api__vault_bridge__set_yubikey_alias_impl(
+        69 => wire__crate__api__vault_bridge__set_yubikey_alias_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        70 => wire__crate__api__vault_bridge__unlock_vault_impl(port, ptr, rust_vec_len, data_len),
-        71 => wire__crate__api__vault_bridge__unlock_vault_with_yubikey_impl(
+        71 => wire__crate__api__vault_bridge__unlock_vault_impl(port, ptr, rust_vec_len, data_len),
+        72 => wire__crate__api__vault_bridge__unlock_vault_with_yubikey_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        72 => wire__crate__api__vault_bridge__update_entry_impl(port, ptr, rust_vec_len, data_len),
-        73 => wire__crate__api__vault_bridge__vault_backup_usable_impl(
+        73 => wire__crate__api__vault_bridge__update_entry_impl(port, ptr, rust_vec_len, data_len),
+        74 => wire__crate__api__vault_bridge__vault_backup_usable_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        74 => wire__crate__api__vault_bridge__vault_format_too_new_impl(
+        75 => wire__crate__api__vault_bridge__vault_format_too_new_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        75 => wire__crate__api__vault_bridge__vault_format_too_old_impl(
+        76 => wire__crate__api__vault_bridge__vault_format_too_old_impl(
             port,
             ptr,
             rust_vec_len,
@@ -4328,30 +4374,30 @@ fn pde_ffi_dispatcher_sync_impl(
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        22 => wire__crate__api__password_generator__entropy_bits_impl(ptr, rust_vec_len, data_len),
-        23 => wire__crate__api__entropy__estimate_entropy_impl(ptr, rust_vec_len, data_len),
-        33 => wire__crate__api__fido_bridge__fido_list_devices_impl(ptr, rust_vec_len, data_len),
-        36 => wire__crate__api__password_generator__generate_password_impl(
+        23 => wire__crate__api__password_generator__entropy_bits_impl(ptr, rust_vec_len, data_len),
+        24 => wire__crate__api__entropy__estimate_entropy_impl(ptr, rust_vec_len, data_len),
+        34 => wire__crate__api__fido_bridge__fido_list_devices_impl(ptr, rust_vec_len, data_len),
+        37 => wire__crate__api__password_generator__generate_password_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        37 => wire__crate__api__vault_bridge__get_entry_impl(ptr, rust_vec_len, data_len),
-        49 => {
+        38 => wire__crate__api__vault_bridge__get_entry_impl(ptr, rust_vec_len, data_len),
+        50 => {
             wire__crate__api__vault_bridge__list_entry_summaries_impl(ptr, rust_vec_len, data_len)
         }
-        50 => wire__crate__api__vault_bridge__list_folders_impl(ptr, rust_vec_len, data_len),
-        51 => wire__crate__api__vault_bridge__list_vault_yubikey_records_impl(
+        51 => wire__crate__api__vault_bridge__list_folders_impl(ptr, rust_vec_len, data_len),
+        52 => wire__crate__api__vault_bridge__list_vault_yubikey_records_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        52 => {
+        53 => {
             wire__crate__api__vault_bridge__list_yubikey_aliases_impl(ptr, rust_vec_len, data_len)
         }
-        53 => wire__crate__api__vault_bridge__lock_vault_impl(ptr, rust_vec_len, data_len),
-        60 => wire__crate__api__vault_bridge__read_vault_header_impl(ptr, rust_vec_len, data_len),
-        69 => wire__crate__api__import__sniff_csv_file_impl(ptr, rust_vec_len, data_len),
+        54 => wire__crate__api__vault_bridge__lock_vault_impl(ptr, rust_vec_len, data_len),
+        61 => wire__crate__api__vault_bridge__read_vault_header_impl(ptr, rust_vec_len, data_len),
+        70 => wire__crate__api__import__sniff_csv_file_impl(ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
