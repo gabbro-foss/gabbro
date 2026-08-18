@@ -175,7 +175,13 @@ anywhere (all screens per `test/screen_catalogue.dart`, a11y, l10n, Rust backend
          carries the name via a new `PendingItemDeleteItem.label`
   10. [x] real-FFI: add -> lock -> unlock -> extract -> remove, byte-compare
   11. [x] l10n x37 (5 keys); overflow/a11y via the screen-catalog sweep
-- [ ] Hardware pass
+- [x] **Fix stale detail after save-less edit back** (found writing hardware matrix v2,
+      2026-08-18): edit-mode attachment adds persist immediately, but backing out of
+      edit without a review-save left the detail screen on its stale entry — the new
+      attachment invisible until the entry was reopened. Fix: re-read the entry when
+      the edit route returns null (`entry_detail_screen.dart`), red test first.
+- [ ] Hardware pass (matrix v2 in `.scratchpad`: isolated HOME, verified UI labels,
+      two linear passes)
 
 ---
 
