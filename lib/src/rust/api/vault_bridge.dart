@@ -108,6 +108,17 @@ Future<String> addAttachment({
   data: data,
 );
 
+/// Remove an attachment and persist. The removal syncs (tombstoned).
+///
+/// Async — triggers a full vault save.
+Future<void> removeAttachment({
+  required String entryId,
+  required String uuid,
+}) => RustLib.instance.api.crateApiVaultBridgeRemoveAttachment(
+  entryId: entryId,
+  uuid: uuid,
+);
+
 /// Return an attachment's raw bytes for saving to disk.
 ///
 /// The only path besides `add_attachment` where attachment bytes cross the

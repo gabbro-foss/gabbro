@@ -501,6 +501,13 @@ pub async fn add_attachment(
     session::session_add_attachment(&entry_id, &name, &kind, data)
 }
 
+/// Remove an attachment and persist. The removal syncs (tombstoned).
+///
+/// Async — triggers a full vault save.
+pub async fn remove_attachment(entry_id: String, uuid: String) -> Result<(), String> {
+    session::session_remove_attachment(&entry_id, &uuid)
+}
+
 /// Return an attachment's raw bytes for saving to disk.
 ///
 /// The only path besides `add_attachment` where attachment bytes cross the
@@ -2531,6 +2538,85 @@ mod tests {
             "locked vault errors"
         );
 
+        let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
+    }
+
+    // Scenario 5 (attachments task) — red first: a deliberate removal must
+    // persist AND stamp the `del:` tombstone — without it, the next sync
+    // quietly brings the attachment back.
+    #[test]
+    #[serial]
+    fn remove_attachment_deletes_and_stamps_tombstone() {
+        use crate::api::vault::save_vault;
+        use crate::vault::entry::VaultEntry as InternalEntry;
+        use crate::vault::entry::{EntryAttachment, EntryMeta, NoteEntry};
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_remove_attachment.gabbro");
+        let pass = b"remove-attachment-pass";
+        let mut body = VaultBody::empty();
+        body.entries.push(InternalEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                field_times: Default::default(),
+                history: Vec::new(),
+                id: String::from("id-x"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::new(),
+            },
+            title: String::from("T"),
+            content: String::new(),
+            custom_fields: vec![],
+            attachments: vec![EntryAttachment {
+                uuid: String::from("att-1"),
+                name: String::from("scan.png"),
+                kind: String::from("image/png"),
+                data: vec![1, 2, 3],
+            }],
+        }));
+        save_vault(&body, pass, &path).unwrap();
+        run(unlock_vault(
+            pass.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
+
+        run(remove_attachment(
+            String::from("id-x"),
+            String::from("att-1"),
+        ))
+        .unwrap();
+        assert!(
+            run(remove_attachment(
+                String::from("id-x"),
+                String::from("att-1")
+            ))
+            .is_err(),
+            "removing twice errors"
+        );
+
+        lock_vault().unwrap();
+        run(unlock_vault(
+            pass.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
+
+        let stored = session::get_entry("id-x").unwrap();
+        match &stored {
+            InternalEntry::Note(n) => {
+                assert!(n.attachments.is_empty(), "removal persisted");
+                assert!(
+                    n.meta.field_times.contains_key("del:attachments:att-1"),
+                    "no tombstone: the next sync would bring the attachment back"
+                );
+            }
+            _ => panic!("expected note"),
+        }
+
+        lock_vault().unwrap();
         let _ = std::fs::remove_file(&path);
         let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }

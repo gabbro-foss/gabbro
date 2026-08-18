@@ -515,6 +515,43 @@ pub fn session_add_attachment(
     Ok(uuid)
 }
 
+/// Remove an attachment and persist. Stamps `del:attachments:<uuid>` so the
+/// removal syncs — without the tombstone the next sync would restore it.
+pub fn session_remove_attachment(id: &str, uuid: &str) -> Result<(), String> {
+    let (body, passphrase, path, yubikey) = {
+        let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+        let session = session.as_mut().ok_or("Vault is locked")?;
+        let entry = session
+            .entries
+            .iter_mut()
+            .find(|e| entry_id(e) == id)
+            .ok_or_else(|| format!("No entry found with id: {id}"))?;
+        let atts = crate::api::vault::entry_attachments_mut(entry)
+            .ok_or("A File entry takes no attachments")?;
+        let before = atts.len();
+        atts.retain(|a| a.uuid != uuid);
+        if atts.len() == before {
+            return Err(format!("No attachment found with uuid: {uuid}"));
+        }
+        let key = format!("attachments:{uuid}");
+        let now_ms = crate::api::vault::now_ms();
+        let meta = crate::api::vault::entry_meta_mut(entry);
+        meta.field_times.remove(&key);
+        meta.field_times.insert(format!("del:{key}"), now_ms);
+        meta.updated_at = crate::api::vault::chrono_now();
+        let body = build_body(session);
+        let yubikey = extract_yubikey(session);
+        (
+            body,
+            session.passphrase.clone(),
+            session.path.clone(),
+            yubikey,
+        )
+    }; // ← lock released here
+    do_save(&body, &passphrase, &path, yubikey)?;
+    Ok(())
+}
+
 /// Return an attachment's raw bytes. Read-only — no save.
 pub fn session_extract_attachment(id: &str, uuid: &str) -> Result<Vec<u8>, String> {
     let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
