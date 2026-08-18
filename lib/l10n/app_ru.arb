@@ -449,6 +449,12 @@
       "name": {"type": "String"}
     }
   },
+  "attachmentTooLarge": "Вложение больше {mb} МБ. Прикрепите файл меньшего размера.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (необязательно)",
   "@fieldLabelOptional": {
     "placeholders": {

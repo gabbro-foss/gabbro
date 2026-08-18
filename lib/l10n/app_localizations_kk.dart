@@ -1109,6 +1109,11 @@ class AppLocalizationsKk extends AppLocalizations {
   }
 
   @override
+  String attachmentTooLarge(int mb) {
+    return 'Тіркеме $mb МБ-тан үлкен. Кішірек файл тіркеңіз.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (міндетті емес)';
   }

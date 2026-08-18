@@ -1110,6 +1110,11 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
+  String attachmentTooLarge(int mb) {
+    return 'Bilagan är större än $mb MB. Bifoga en mindre fil.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (valfritt)';
   }

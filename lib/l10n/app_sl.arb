@@ -449,6 +449,12 @@
       "name": {"type": "String"}
     }
   },
+  "attachmentTooLarge": "Priloga je večja od {mb} MB. Priložite manjšo datoteko.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (neobvezno)",
   "@fieldLabelOptional": {
     "placeholders": {

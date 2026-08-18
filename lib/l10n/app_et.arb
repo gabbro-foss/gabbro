@@ -449,6 +449,12 @@
       "name": {"type": "String"}
     }
   },
+  "attachmentTooLarge": "Manus on suurem kui {mb} MB. Lisa väiksem fail.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (valikuline)",
   "@fieldLabelOptional": {
     "placeholders": {

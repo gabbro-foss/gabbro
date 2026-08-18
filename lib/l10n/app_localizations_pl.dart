@@ -1114,6 +1114,11 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
+  String attachmentTooLarge(int mb) {
+    return 'Załącznik jest większy niż $mb MB. Dołącz mniejszy plik.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (opcjonalnie)';
   }

@@ -449,6 +449,12 @@
       "name": {"type": "String"}
     }
   },
+  "attachmentTooLarge": "Прилог је већи од {mb} MB. Приложите мању датотеку.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (необавезно)",
   "@fieldLabelOptional": {
     "placeholders": {

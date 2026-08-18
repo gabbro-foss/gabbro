@@ -449,6 +449,12 @@
       "name": {"type": "String"}
     }
   },
+  "attachmentTooLarge": "Załącznik jest większy niż {mb} MB. Dołącz mniejszy plik.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (opcjonalnie)",
   "@fieldLabelOptional": {
     "placeholders": {

@@ -449,6 +449,12 @@
       "name": {"type": "String"}
     }
   },
+  "attachmentTooLarge": "Тіркеме {mb} МБ-тан үлкен. Кішірек файл тіркеңіз.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (міндетті емес)",
   "@fieldLabelOptional": {
     "placeholders": {

@@ -1111,6 +1111,11 @@ class AppLocalizationsEt extends AppLocalizations {
   }
 
   @override
+  String attachmentTooLarge(int mb) {
+    return 'Manus on suurem kui $mb MB. Lisa väiksem fail.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (valikuline)';
   }

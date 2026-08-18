@@ -449,6 +449,12 @@
       "name": {"type": "String"}
     }
   },
+  "attachmentTooLarge": "Priedas didesnis nei {mb} MB. Pridėkite mažesnį failą.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (nebūtinas)",
   "@fieldLabelOptional": {
     "placeholders": {

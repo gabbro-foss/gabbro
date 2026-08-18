@@ -1112,6 +1112,11 @@ class AppLocalizationsSk extends AppLocalizations {
   }
 
   @override
+  String attachmentTooLarge(int mb) {
+    return 'Príloha je väčšia ako $mb MB. Priložte menší súbor.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (voliteľné)';
   }

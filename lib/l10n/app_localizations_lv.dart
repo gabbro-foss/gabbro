@@ -1109,6 +1109,11 @@ class AppLocalizationsLv extends AppLocalizations {
   }
 
   @override
+  String attachmentTooLarge(int mb) {
+    return 'Pielikums ir lielāks par $mb MB. Pievienojiet mazāku failu.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (neobligāts)';
   }

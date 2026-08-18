@@ -25,6 +25,10 @@ List<String> _defaultListFolders() => listFolders();
 
 Future<PickedFile?> _defaultPickFile() => GabbroFilePicker.pickFileWithData();
 
+/// Mirrors the Rust-side cap (`ENPASS_ATTACHMENT_MAX_BYTES`) so the refusal is
+/// localized and instant; Rust still enforces its own cap on every add.
+const int kAttachmentMaxBytes = 25 * 1024 * 1024;
+
 Future<String> _defaultAddAttachment(
   String entryId,
   String name,
@@ -1628,6 +1632,17 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       return;
     }
     if (f == null || f.bytes == null) return;
+    if (f.bytes!.length > kAttachmentMaxBytes) {
+      if (mounted) {
+        showFailureMessage(
+          context,
+          AppLocalizations.of(
+            context,
+          ).attachmentTooLarge(kAttachmentMaxBytes ~/ (1024 * 1024)),
+        );
+      }
+      return;
+    }
     final id = _existingEntryId();
     if (id == null) {
       setState(() => _pendingAttachments.add(f!));

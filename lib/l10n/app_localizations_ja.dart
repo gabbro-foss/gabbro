@@ -1095,6 +1095,11 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String attachmentTooLarge(int mb) {
+    return '添付ファイルが $mb MB を超えています。より小さいファイルを添付してください。';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (任意)';
   }

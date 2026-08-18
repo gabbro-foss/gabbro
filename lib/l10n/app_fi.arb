@@ -449,6 +449,12 @@
       "name": {"type": "String"}
     }
   },
+  "attachmentTooLarge": "Liite on suurempi kuin {mb} Mt. Liitä pienempi tiedosto.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (valinnainen)",
   "@fieldLabelOptional": {
     "placeholders": {

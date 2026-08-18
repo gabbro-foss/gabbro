@@ -449,6 +449,12 @@
       "name": {"type": "String"}
     }
   },
+  "attachmentTooLarge": "Eranskinak {mb} MB baino gehiago ditu. Erantsi fitxategi txikiago bat.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (aukerakoa)",
   "@fieldLabelOptional": {
     "placeholders": {

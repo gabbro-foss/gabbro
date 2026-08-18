@@ -1087,6 +1087,11 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String attachmentTooLarge(int mb) {
+    return '附件大于 $mb MB。请附加较小的文件。';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label（可选）';
   }
@@ -3197,6 +3202,11 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   }
 
   @override
+  String attachmentTooLarge(int mb) {
+    return '附件大于 $mb MB。请附加较小的文件。';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label（可选）';
   }
@@ -5304,6 +5314,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String removeAttachmentConfirm(String name) {
     return '移除«$name»？';
+  }
+
+  @override
+  String attachmentTooLarge(int mb) {
+    return '附件大於 $mb MB。請附加較小的檔案。';
   }
 
   @override

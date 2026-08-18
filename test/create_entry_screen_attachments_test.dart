@@ -142,6 +142,37 @@ void main() {
     expect(find.textContaining('passport.pdf'), findsOneWidget);
   });
 
+  testWidgets('an oversized pick shows a localized error and adds nothing', (
+    tester,
+  ) async {
+    final calls = <String>[];
+    // 25 MB cap; a 1-byte overflow must be refused BEFORE the bridge —
+    // matching the Rust-side cap that keeps a vault loadable on a phone.
+    final oversized = Uint8List(25 * 1024 * 1024 + 1);
+    await tester.pumpWidget(
+      _editScreen(
+        VaultEntryData.note(_noteWith([])),
+        pickFile: () async => (name: 'video.mp4', bytes: oversized),
+        onAddAttachment: (id, name, kind, bytes) async {
+          calls.add(name);
+          return 'nope';
+        },
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('Add attachment'));
+    await tester.tap(find.text('Add attachment'));
+    await tester.pumpAndSettle();
+
+    expect(calls, isEmpty, reason: 'bytes must never cross the bridge');
+    expect(find.textContaining('video.mp4'), findsNothing);
+    expect(
+      find.text('Attachment is larger than 25 MB. Attach a smaller file.'),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('an attachment picked while creating persists after create', (
     tester,
   ) async {

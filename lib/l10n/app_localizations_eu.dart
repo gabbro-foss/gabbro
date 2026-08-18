@@ -1111,6 +1111,11 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
+  String attachmentTooLarge(int mb) {
+    return 'Eranskinak $mb MB baino gehiago ditu. Erantsi fitxategi txikiago bat.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (aukerakoa)';
   }

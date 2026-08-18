@@ -449,6 +449,12 @@
       "name": {"type": "String"}
     }
   },
+  "attachmentTooLarge": "Příloha je větší než {mb} MB. Přiložte menší soubor.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (volitelné)",
   "@fieldLabelOptional": {
     "placeholders": {

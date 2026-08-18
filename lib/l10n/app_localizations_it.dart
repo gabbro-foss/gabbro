@@ -1111,6 +1111,11 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String attachmentTooLarge(int mb) {
+    return 'L\'allegato supera $mb MB. Allega un file più piccolo.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (facoltativo)';
   }

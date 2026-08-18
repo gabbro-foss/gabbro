@@ -1112,6 +1112,11 @@ class AppLocalizationsLt extends AppLocalizations {
   }
 
   @override
+  String attachmentTooLarge(int mb) {
+    return 'Priedas didesnis nei $mb MB. Pridėkite mažesnį failą.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (nebūtinas)';
   }

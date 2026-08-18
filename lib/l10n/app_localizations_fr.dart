@@ -1114,6 +1114,11 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String attachmentTooLarge(int mb) {
+    return 'La pièce jointe dépasse $mb Mo. Joignez un fichier plus petit.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (facultatif)';
   }

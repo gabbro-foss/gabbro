@@ -449,6 +449,12 @@
       "name": {"type": "String"}
     }
   },
+  "attachmentTooLarge": "Vedhæftningen er større end {mb} MB. Vedhæft en mindre fil.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (valgfrit)",
   "@fieldLabelOptional": {
     "placeholders": {

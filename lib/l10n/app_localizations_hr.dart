@@ -1110,6 +1110,11 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
+  String attachmentTooLarge(int mb) {
+    return 'Privitak je veći od $mb MB. Priložite manju datoteku.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (neobavezno)';
   }

@@ -449,6 +449,12 @@
       "name": {"type": "String"}
     }
   },
+  "attachmentTooLarge": "添付ファイルが {mb} MB を超えています。より小さいファイルを添付してください。",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (任意)",
   "@fieldLabelOptional": {
     "placeholders": {

@@ -1118,6 +1118,11 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
+  String attachmentTooLarge(int mb) {
+    return 'Το συνημμένο είναι μεγαλύτερο από $mb MB. Επισυνάψτε μικρότερο αρχείο.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (προαιρετικό)';
   }

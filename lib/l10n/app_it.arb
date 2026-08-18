@@ -449,6 +449,12 @@
       "name": {"type": "String"}
     }
   },
+  "attachmentTooLarge": "L'allegato supera {mb} MB. Allega un file più piccolo.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (facoltativo)",
   "@fieldLabelOptional": {
     "placeholders": {

@@ -1111,6 +1111,11 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String attachmentTooLarge(int mb) {
+    return 'A melléklet nagyobb, mint $mb MB. Csatoljon kisebb fájlt.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (opcionális)';
   }

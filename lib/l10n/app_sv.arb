@@ -449,6 +449,12 @@
       "name": {"type": "String"}
     }
   },
+  "attachmentTooLarge": "Bilagan är större än {mb} MB. Bifoga en mindre fil.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (valfritt)",
   "@fieldLabelOptional": {
     "placeholders": {

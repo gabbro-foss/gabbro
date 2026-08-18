@@ -1112,6 +1112,11 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
+  String attachmentTooLarge(int mb) {
+    return 'Прикаченият файл е по-голям от $mb МБ. Прикачете по-малък файл.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (незадължително)';
   }

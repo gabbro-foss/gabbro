@@ -449,6 +449,12 @@
       "name": {"type": "String"}
     }
   },
+  "attachmentTooLarge": "A melléklet nagyobb, mint {mb} MB. Csatoljon kisebb fájlt.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (opcionális)",
   "@fieldLabelOptional": {
     "placeholders": {

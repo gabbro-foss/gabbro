@@ -1096,6 +1096,11 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String attachmentTooLarge(int mb) {
+    return '첨부 파일이 $mb MB보다 큽니다. 더 작은 파일을 첨부하세요.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (선택사항)';
   }

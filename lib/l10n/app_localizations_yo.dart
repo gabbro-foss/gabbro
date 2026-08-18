@@ -1109,6 +1109,11 @@ class AppLocalizationsYo extends AppLocalizations {
   }
 
   @override
+  String attachmentTooLarge(int mb) {
+    return 'Àfikún fáìlì tóbi ju $mb MB lọ. Fi fáìlì tó kéré kún.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (aṣayan)';
   }

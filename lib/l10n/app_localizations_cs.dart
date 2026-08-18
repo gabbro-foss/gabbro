@@ -1111,6 +1111,11 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
+  String attachmentTooLarge(int mb) {
+    return 'Příloha je větší než $mb MB. Přiložte menší soubor.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (volitelné)';
   }

@@ -2185,6 +2185,12 @@ abstract class AppLocalizations {
   /// **'Remove \"{name}\"?'**
   String removeAttachmentConfirm(String name);
 
+  /// No description provided for @attachmentTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'Attachment is larger than {mb} MB. Attach a smaller file.'**
+  String attachmentTooLarge(int mb);
+
   /// No description provided for @fieldLabelOptional.
   ///
   /// In en, this message translates to:

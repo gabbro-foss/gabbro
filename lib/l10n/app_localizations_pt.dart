@@ -1109,6 +1109,11 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String attachmentTooLarge(int mb) {
+    return 'O anexo é maior que $mb MB. Anexe um arquivo menor.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (opcional)';
   }
@@ -3323,6 +3328,11 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   }
 
   @override
+  String attachmentTooLarge(int mb) {
+    return 'O anexo é maior que $mb MB. Anexe um arquivo menor.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (opcional)';
   }
@@ -5531,6 +5541,11 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   @override
   String removeAttachmentConfirm(String name) {
     return 'Remover \"$name\"?';
+  }
+
+  @override
+  String attachmentTooLarge(int mb) {
+    return 'O anexo é maior do que $mb MB. Anexe um ficheiro mais pequeno.';
   }
 
   @override

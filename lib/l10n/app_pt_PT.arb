@@ -449,6 +449,12 @@
       "name": {"type": "String"}
     }
   },
+  "attachmentTooLarge": "O anexo é maior do que {mb} MB. Anexe um ficheiro mais pequeno.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (opcional)",
   "@fieldLabelOptional": {
     "placeholders": {

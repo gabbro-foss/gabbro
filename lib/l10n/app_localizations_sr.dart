@@ -1110,6 +1110,11 @@ class AppLocalizationsSr extends AppLocalizations {
   }
 
   @override
+  String attachmentTooLarge(int mb) {
+    return 'Прилог је већи од $mb MB. Приложите мању датотеку.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (необавезно)';
   }
@@ -3315,6 +3320,11 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   @override
   String removeAttachmentConfirm(String name) {
     return 'Ukloni «$name»?';
+  }
+
+  @override
+  String attachmentTooLarge(int mb) {
+    return 'Prilog je veći od $mb MB. Priložite manju datoteku.';
   }
 
   @override

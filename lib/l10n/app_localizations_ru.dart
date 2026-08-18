@@ -1114,6 +1114,11 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String attachmentTooLarge(int mb) {
+    return 'Вложение больше $mb МБ. Прикрепите файл меньшего размера.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (необязательно)';
   }

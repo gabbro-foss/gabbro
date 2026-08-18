@@ -1110,6 +1110,11 @@ class AppLocalizationsDa extends AppLocalizations {
   }
 
   @override
+  String attachmentTooLarge(int mb) {
+    return 'Vedhæftningen er større end $mb MB. Vedhæft en mindre fil.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (valgfrit)';
   }

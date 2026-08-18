@@ -449,6 +449,12 @@
       "name": {"type": "String"}
     }
   },
+  "attachmentTooLarge": "Το συνημμένο είναι μεγαλύτερο από {mb} MB. Επισυνάψτε μικρότερο αρχείο.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (προαιρετικό)",
   "@fieldLabelOptional": {
     "placeholders": {

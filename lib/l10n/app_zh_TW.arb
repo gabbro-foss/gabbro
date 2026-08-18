@@ -449,6 +449,12 @@
       "name": {"type": "String"}
     }
   },
+  "attachmentTooLarge": "附件大於 {mb} MB。請附加較小的檔案。",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label}（選填）",
   "@fieldLabelOptional": {
     "placeholders": {

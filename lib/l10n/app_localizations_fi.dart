@@ -1110,6 +1110,11 @@ class AppLocalizationsFi extends AppLocalizations {
   }
 
   @override
+  String attachmentTooLarge(int mb) {
+    return 'Liite on suurempi kuin $mb Mt. Liitä pienempi tiedosto.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (valinnainen)';
   }
