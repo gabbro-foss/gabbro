@@ -97,17 +97,21 @@ real fix.
 
 **Tag format:** `v0.1.0-alpha.N` until the pre-v1 security gates (Bikeshed) clear, so testers know no external crypto review has happened yet. The repo is public; testers and the Debian collaborator pull from the GitHub Releases page.
 
-**Every command below runs from `gabbro/` unless stated otherwise.** Set `ver` once per shell. It reads `pubspec.yaml`, so it is always the version being released:
-
-```bash
-ver=$(sed -n 's/^version: *//p' pubspec.yaml | cut -d+ -f1) && echo "$ver"
-```
+**Every command below runs from `gabbro/` unless stated otherwise, once each, top to bottom.**
 
 **Pre-flight:**
 
 1. Move the `[Unreleased]` block in `CHANGELOG.md` to `[0.1.0-alpha.N] - YYYY-MM-DD`, leaving `[Unreleased]` empty.
-2. Bump `version` in `pubspec.yaml` to match, then re-run the `ver` line above.
-3. Run the full gate green. It covers every suite (Flutter, real-FFI, Rust, supply chain, Android); nothing else needs running by hand:
+2. Bump `version` in `pubspec.yaml` to match.
+3. Set `ver` for the whole release. Every command from here on uses it, so it must be set
+   in each shell you open. It reads the `pubspec.yaml` just bumped, so the printed value
+   is the version being released; if it is wrong, fix step 2 before going on:
+
+   ```bash
+   ver=$(sed -n 's/^version: *//p' pubspec.yaml | cut -d+ -f1) && echo "$ver"
+   ```
+
+4. Run the full gate green. It covers every suite (Flutter, real-FFI, Rust, supply chain, Android); nothing else needs running by hand:
 
    ```bash
    ./gabbro_test
@@ -122,7 +126,7 @@ ver=$(sed -n 's/^version: *//p' pubspec.yaml | cut -d+ -f1) && echo "$ver"
      sequence to `vault_backward_compat.rs` as a regression test. Widen the search with
      `GABBRO_FUZZ_CASES=64`.
    - Ignored Rust + Kotlin tests are hardware-only (YubiKey, biometric, AndroidKeyStore).
-4. Record the build toolchain:
+5. Record the build toolchain:
 
    ```bash
    flutter --version | head -1 && rustc --version && grep -oP '(com\.android\.application|org\.jetbrains\.kotlin\.android)"\) version "\K[^"]+' android/settings.gradle.kts && grep -oP 'VERSION_\K[0-9]+' android/app/build.gradle.kts | head -1
@@ -136,7 +140,7 @@ ver=$(sed -n 's/^version: *//p' pubspec.yaml | cut -d+ -f1) && echo "$ver"
    The NDK is deliberately absent: `ndkVersion = flutter.ndkVersion`
    (`android/app/build.gradle.kts:16`), so the Flutter version determines it. Pinning it
    separately would drift.
-5. Commit and push the version + CHANGELOG bump. The tag goes last, after the artifacts verify.
+6. Commit and push the version + CHANGELOG bump. The tag goes last, after the artifacts verify.
 
 **Build:**
 
