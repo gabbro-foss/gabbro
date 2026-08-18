@@ -165,7 +165,7 @@ anywhere (all screens per `test/screen_catalogue.dart`, a11y, l10n, Rust backend
   5. [x] `remove_attachment` deletes + stamps `del:` tombstone (removal syncs)
   6. [x] create/edit screen: attachments section; pick-during-create persists
          (edit mode applies add/remove immediately, like YubiKey management)
-  7. [ ] entry detail: extract per row via the File-entry save dialog, byte-equal
+  7. [x] entry detail: extract per row via the File-entry save dialog, byte-equal
   8. [ ] oversized pick -> localized error, nothing added
   9. [ ] sync review + recovery history show filename, not uuid (updates the pin)
   10. [ ] real-FFI: add -> lock -> unlock -> extract, byte-compare
