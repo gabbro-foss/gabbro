@@ -1096,6 +1096,25 @@ class AppLocalizationsFi extends AppLocalizations {
   String get fieldCustomFields => 'Mukautetut kentät';
 
   @override
+  String get fieldAttachments => 'Liitteet';
+
+  @override
+  String get addAttachment => 'Lisää liite';
+
+  @override
+  String get tooltipRemoveAttachment => 'Poista liite';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return 'Poistetaanko \"$name\"?';
+  }
+
+  @override
+  String attachmentTooLarge(int mb) {
+    return 'Liite on suurempi kuin $mb Mt. Liitä pienempi tiedosto.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (valinnainen)';
   }

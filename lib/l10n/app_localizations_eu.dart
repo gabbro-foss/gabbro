@@ -1097,6 +1097,25 @@ class AppLocalizationsEu extends AppLocalizations {
   String get fieldCustomFields => 'Eremu pertsonalizatuak';
 
   @override
+  String get fieldAttachments => 'Eranskinak';
+
+  @override
+  String get addAttachment => 'Gehitu eranskina';
+
+  @override
+  String get tooltipRemoveAttachment => 'Kendu eranskina';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return '«$name» kendu?';
+  }
+
+  @override
+  String attachmentTooLarge(int mb) {
+    return 'Eranskinak $mb MB baino gehiago ditu. Erantsi fitxategi txikiago bat.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (aukerakoa)';
   }

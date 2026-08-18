@@ -440,6 +440,21 @@
   "fieldLabel": "Etiketa",
   "fieldValue": "Balioa",
   "fieldCustomFields": "Eremu pertsonalizatuak",
+  "fieldAttachments": "Eranskinak",
+  "addAttachment": "Gehitu eranskina",
+  "tooltipRemoveAttachment": "Kendu eranskina",
+  "removeAttachmentConfirm": "«{name}» kendu?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "attachmentTooLarge": "Eranskinak {mb} MB baino gehiago ditu. Erantsi fitxategi txikiago bat.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (aukerakoa)",
   "@fieldLabelOptional": {
     "placeholders": {

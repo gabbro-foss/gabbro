@@ -1098,6 +1098,25 @@ class AppLocalizationsBg extends AppLocalizations {
   String get fieldCustomFields => 'Персонализирани полета';
 
   @override
+  String get fieldAttachments => 'Прикачени файлове';
+
+  @override
+  String get addAttachment => 'Добави прикачен файл';
+
+  @override
+  String get tooltipRemoveAttachment => 'Премахни прикачения файл';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return 'Премахни «$name»?';
+  }
+
+  @override
+  String attachmentTooLarge(int mb) {
+    return 'Прикаченият файл е по-голям от $mb МБ. Прикачете по-малък файл.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (незадължително)';
   }

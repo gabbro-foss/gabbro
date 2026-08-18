@@ -440,6 +440,21 @@
   "fieldLabel": "Метка",
   "fieldValue": "Значение",
   "fieldCustomFields": "Пользовательские поля",
+  "fieldAttachments": "Вложения",
+  "addAttachment": "Добавить вложение",
+  "tooltipRemoveAttachment": "Удалить вложение",
+  "removeAttachmentConfirm": "Удалить «{name}»?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "attachmentTooLarge": "Вложение больше {mb} МБ. Прикрепите файл меньшего размера.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (необязательно)",
   "@fieldLabelOptional": {
     "placeholders": {

@@ -1100,6 +1100,25 @@ class AppLocalizationsFr extends AppLocalizations {
   String get fieldCustomFields => 'Champs personnalisés';
 
   @override
+  String get fieldAttachments => 'Pièces jointes';
+
+  @override
+  String get addAttachment => 'Ajouter une pièce jointe';
+
+  @override
+  String get tooltipRemoveAttachment => 'Retirer la pièce jointe';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return 'Retirer « $name » ?';
+  }
+
+  @override
+  String attachmentTooLarge(int mb) {
+    return 'La pièce jointe dépasse $mb Mo. Joignez un fichier plus petit.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (facultatif)';
   }

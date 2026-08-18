@@ -10,18 +10,39 @@ import 'package:gabbro/screens/review_changes_screen.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
+import 'package:gabbro/widgets/gabbro_dialog.dart';
 import 'package:gabbro/widgets/generator_widget.dart';
 
 /// [PickedFile] lives with the facade; re-exported so callers of this screen
 /// (and its tests) keep one import.
 export 'package:gabbro/gabbro_file_picker.dart' show PickedFile;
 
-Future<void> _defaultCreate(VaultEntryData entry) => createEntry(entry: entry);
+Future<String> _defaultCreate(VaultEntryData entry) async =>
+    (await createEntry(entry: entry)).id;
 VaultEntryData _defaultGetEntry(String id) => getEntry(id: id);
 
 List<String> _defaultListFolders() => listFolders();
 
 Future<PickedFile?> _defaultPickFile() => GabbroFilePicker.pickFileWithData();
+
+/// Mirrors the Rust-side cap (`ENPASS_ATTACHMENT_MAX_BYTES`) so the refusal is
+/// localized and instant; Rust still enforces its own cap on every add.
+const int kAttachmentMaxBytes = 25 * 1024 * 1024;
+
+/// Mirrors the Rust-side count cap (`ENTRY_ATTACHMENT_MAX_COUNT`): the Add
+/// button hides at the cap. Import/merge can exceed it; those entries still
+/// list and extract everything — only adding more is off.
+const int kAttachmentMaxCount = 3;
+
+Future<String> _defaultAddAttachment(
+  String entryId,
+  String name,
+  String kind,
+  List<int> bytes,
+) => addAttachment(entryId: entryId, name: name, kind: kind, data: bytes);
+
+Future<void> _defaultRemoveAttachment(String entryId, String uuid) =>
+    removeAttachment(entryId: entryId, uuid: uuid);
 
 class CreateEntryScreen extends StatefulWidget {
   final String entryType;
@@ -31,13 +52,26 @@ class CreateEntryScreen extends StatefulWidget {
   /// Distinct from [existing] — carries unvalidated data that never made it
   /// into the vault. Used by the import failures review flow.
   final Map<String, String>? prefill;
-  final Future<void> Function(VaultEntryData entry) onCreateEntry;
+  /// Creates the entry and returns its new id — needed so attachments picked
+  /// during creation can be persisted against it right after.
+  final Future<String> Function(VaultEntryData entry) onCreateEntry;
   final VaultEntryData Function(String id) onGetEntry;
   final List<String> Function()? listFolders;
 
   /// Test seam: pick a file to attach. Defaults to the native dialog; may throw
   /// when the file portal is unavailable (sandbox).
   final Future<PickedFile?> Function() pickFile;
+
+  /// Test seams for the attachment bridge calls (edit mode applies them
+  /// immediately, like YubiKey management — independent of the field Save).
+  final Future<String> Function(
+    String entryId,
+    String name,
+    String kind,
+    List<int> bytes,
+  )
+  onAddAttachment;
+  final Future<void> Function(String entryId, String uuid) onRemoveAttachment;
 
   const CreateEntryScreen({
     super.key,
@@ -48,6 +82,8 @@ class CreateEntryScreen extends StatefulWidget {
     this.onGetEntry = _defaultGetEntry,
     this.listFolders,
     this.pickFile = _defaultPickFile,
+    this.onAddAttachment = _defaultAddAttachment,
+    this.onRemoveAttachment = _defaultRemoveAttachment,
   });
 
   @override
@@ -124,6 +160,18 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   // ── File fields ─────────────────────────────────────────────────────────────
   String? _pickedFilename;
   Uint8List? _pickedFileBytes;
+
+  // ── Attachments (all types except File — a File entry IS its payload) ───────
+  /// Stored attachments of the entry being edited (metadata only; bytes stay
+  /// behind the bridge). Empty in create mode.
+  final List<AttachmentMetaData> _attachments = [];
+  /// Files picked while creating — persisted right after the entry exists.
+  final List<PickedFile> _pendingAttachments = [];
+
+  /// True once an edit-mode add/remove persisted. Review-with-no-field-changes
+  /// then returns silently — "No changes to save." would read as the
+  /// attachment change having failed.
+  bool _attachmentsChanged = false;
   late final TextEditingController _fileNotesController;
   final List<_CustomFieldState> _fileCustomFields = [];
 
@@ -149,6 +197,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   void initState() {
     super.initState();
     _initControllers();
+    _attachments.addAll(_existingAttachments());
     _selectedFolder = _existingFolder();
     try {
       _folders = (widget.listFolders ?? _defaultListFolders)();
@@ -441,11 +490,16 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     final updated = _buildUpdated();
     if (updated == null) return;
     if (!_hasChanges(widget.existing!, updated)) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).noChangesToSave)));
+      if (!mounted) return;
+      if (_attachmentsChanged) {
+        // The attachment ops are already saved; the detail screen re-reads
+        // the entry on a null result.
+        Navigator.of(context).pop();
+        return;
       }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).noChangesToSave)));
       return;
     }
     final expiry = _expiryDays();
@@ -592,6 +646,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                   ),
                 )
                 .toList(),
+            attachments: field0.attachments,
             appId: _appIdOrNull(),
             email: _loginEmailOrNull(),
           ),
@@ -614,6 +669,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                   ),
                 )
                 .toList(),
+            attachments: field0.attachments,
           ),
         );
       case VaultEntryData_Identity(:final field0):
@@ -639,6 +695,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                   ),
                 )
                 .toList(),
+            attachments: field0.attachments,
           ),
         );
       case VaultEntryData_Card(:final field0):
@@ -682,6 +739,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                   ),
                 )
                 .toList(),
+            attachments: field0.attachments,
           ),
         );
       case VaultEntryData_File(:final field0):
@@ -724,6 +782,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                   ),
                 )
                 .toList(),
+            attachments: field0.attachments,
           ),
         );
       default:
@@ -732,9 +791,10 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   }
 
   Future<void> _saveCreate() async {
+    String? id;
     switch (widget.entryType) {
       case 'Login':
-        await widget.onCreateEntry(
+        id = await widget.onCreateEntry(
           VaultEntryData.login(
             LoginEntryData(
               id: '',
@@ -757,6 +817,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                     ),
                   )
                   .toList(),
+              attachments: const [],
               appId: _appIdOrNull(),
               email: _loginEmailOrNull(),
             ),
@@ -764,7 +825,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         );
 
       case 'Note':
-        await widget.onCreateEntry(
+        id = await widget.onCreateEntry(
           VaultEntryData.note(
             NoteEntryData(
               id: '',
@@ -782,12 +843,13 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                     ),
                   )
                   .toList(),
+              attachments: const [],
             ),
           ),
         );
 
       case 'Identity':
-        await widget.onCreateEntry(
+        id = await widget.onCreateEntry(
           VaultEntryData.identity(
             IdentityEntryData(
               id: '',
@@ -812,12 +874,13 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                     ),
                   )
                   .toList(),
+              attachments: const [],
             ),
           ),
         );
 
       case 'Card':
-        await widget.onCreateEntry(
+        id = await widget.onCreateEntry(
           VaultEntryData.card(
             CardEntryData(
               id: '',
@@ -856,12 +919,13 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                     ),
                   )
                   .toList(),
+              attachments: const [],
             ),
           ),
         );
 
       case 'File':
-        await widget.onCreateEntry(
+        id = await widget.onCreateEntry(
           VaultEntryData.file(
             FileEntryData(
               id: '',
@@ -887,7 +951,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         );
 
       case 'Custom':
-        await widget.onCreateEntry(
+        id = await widget.onCreateEntry(
           VaultEntryData.custom(
             CustomEntryData(
               id: '',
@@ -904,9 +968,24 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                     ),
                   )
                   .toList(),
+              attachments: const [],
             ),
           ),
         );
+    }
+    // Persist attachments staged while the entry did not exist yet.
+    final createdId = id;
+    if (createdId != null) {
+      for (final p in _pendingAttachments) {
+        final bytes = p.bytes;
+        if (bytes == null) continue;
+        await widget.onAddAttachment(
+          createdId,
+          p.name,
+          'application/octet-stream',
+          bytes,
+        );
+      }
     }
   }
 
@@ -1112,6 +1191,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         () => _loginCustomFields[i].hidden = !_loginCustomFields[i].hidden,
       ),
     ),
+    const SizedBox(height: 8),
+    _attachmentsSection(l),
   ];
 
   // ── Note fields ──────────────────────────────────────────────────────────────
@@ -1155,6 +1236,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         () => _noteCustomFields[i].hidden = !_noteCustomFields[i].hidden,
       ),
     ),
+    const SizedBox(height: 8),
+    _attachmentsSection(l),
   ];
 
   // ── Identity fields ──────────────────────────────────────────────────────────
@@ -1234,6 +1317,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             _identityCustomFields[i].hidden = !_identityCustomFields[i].hidden,
       ),
     ),
+    const SizedBox(height: 8),
+    _attachmentsSection(l),
   ];
 
   // ── Card fields ──────────────────────────────────────────────────────────────
@@ -1459,6 +1544,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         () => _cardCustomFields[i].hidden = !_cardCustomFields[i].hidden,
       ),
     ),
+    const SizedBox(height: 8),
+    _attachmentsSection(l),
   ];
 
   // ── File fields ──────────────────────────────────────────────────────────────
@@ -1529,6 +1616,188 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     });
   }
 
+  // ── Attachments (all entry types except File) ───────────────────────────────
+
+  List<AttachmentMetaData> _existingAttachments() => switch (widget.existing) {
+    VaultEntryData_Login(:final field0) => field0.attachments,
+    VaultEntryData_Note(:final field0) => field0.attachments,
+    VaultEntryData_Identity(:final field0) => field0.attachments,
+    VaultEntryData_Card(:final field0) => field0.attachments,
+    VaultEntryData_Custom(:final field0) => field0.attachments,
+    _ => const [],
+  };
+
+  String? _existingEntryId() => switch (widget.existing) {
+    VaultEntryData_Login(:final field0) => field0.id,
+    VaultEntryData_Note(:final field0) => field0.id,
+    VaultEntryData_Identity(:final field0) => field0.id,
+    VaultEntryData_Card(:final field0) => field0.id,
+    VaultEntryData_Custom(:final field0) => field0.id,
+    _ => null,
+  };
+
+  /// Edit mode applies the add immediately (the entry exists); create mode
+  /// stages the pick and persists right after the entry is created.
+  Future<void> _addAttachmentFlow() async {
+    final PickedFile? f;
+    try {
+      f = await runPicker(widget.pickFile);
+    } on FilePickerUnavailable {
+      if (mounted) showPickerUnavailable(context, hasManualEntry: false);
+      return;
+    }
+    if (f == null || f.bytes == null) return;
+    if (f.bytes!.length > kAttachmentMaxBytes) {
+      if (mounted) {
+        showFailureMessage(
+          context,
+          AppLocalizations.of(
+            context,
+          ).attachmentTooLarge(kAttachmentMaxBytes ~/ (1024 * 1024)),
+        );
+      }
+      return;
+    }
+    final id = _existingEntryId();
+    if (id == null) {
+      setState(() => _pendingAttachments.add(f!));
+      return;
+    }
+    try {
+      final uuid = await widget.onAddAttachment(
+        id,
+        f.name,
+        'application/octet-stream',
+        f.bytes!,
+      );
+      if (!mounted) return;
+      setState(() {
+        _attachmentsChanged = true;
+        _attachments.add(
+          AttachmentMetaData(
+            uuid: uuid,
+            name: f!.name,
+            kind: 'application/octet-stream',
+            size: BigInt.from(f.bytes!.length),
+          ),
+        );
+      });
+    } catch (e) {
+      if (!mounted) return;
+      showFailureMessage(
+        context,
+        AppLocalizations.of(context).saveEntryFailed(e.toString()),
+      );
+    }
+  }
+
+  Future<void> _removeAttachmentFlow(int index) async {
+    final l = AppLocalizations.of(context);
+    final att = _attachments[index];
+    final confirmed = await showGabbroDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l.removeAttachmentConfirm(att.name)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(l.remove),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    final id = _existingEntryId();
+    if (id == null) return;
+    try {
+      await widget.onRemoveAttachment(id, att.uuid);
+      if (mounted) {
+        setState(() {
+          _attachmentsChanged = true;
+          _attachments.removeAt(index);
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
+      showFailureMessage(
+        context,
+        AppLocalizations.of(context).saveEntryFailed(e.toString()),
+      );
+    }
+  }
+
+  String _kbLabel(int bytes) => '${(bytes / 1024).toStringAsFixed(1)} KB';
+
+  Widget _attachmentRow({
+    required String name,
+    required int sizeBytes,
+    required String removeTooltip,
+    required VoidCallback onRemove,
+  }) => Padding(
+    padding: const EdgeInsets.only(bottom: 8),
+    child: Row(
+      children: [
+        const Icon(Icons.attach_file),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            '$name (${_kbLabel(sizeBytes)})',
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        IconButton(
+          icon: const Icon(Icons.remove_circle_outline),
+          tooltip: removeTooltip,
+          onPressed: onRemove,
+        ),
+      ],
+    ),
+  );
+
+  Widget _attachmentsSection(AppLocalizations l) {
+    final hasRows = _attachments.isNotEmpty || _pendingAttachments.isNotEmpty;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (hasRows)
+          Text(l.fieldAttachments, style: Theme.of(context).textTheme.titleSmall),
+        if (hasRows) const SizedBox(height: 8),
+        ...List.generate(
+          _attachments.length,
+          (i) => _attachmentRow(
+            name: _attachments[i].name,
+            sizeBytes: _attachments[i].size.toInt(),
+            removeTooltip: l.tooltipRemoveAttachment,
+            onRemove: () => _removeAttachmentFlow(i),
+          ),
+        ),
+        ...List.generate(
+          _pendingAttachments.length,
+          (i) => _attachmentRow(
+            name: _pendingAttachments[i].name,
+            sizeBytes: _pendingAttachments[i].bytes?.length ?? 0,
+            removeTooltip: l.tooltipRemoveAttachment,
+            onRemove: () => setState(() => _pendingAttachments.removeAt(i)),
+          ),
+        ),
+        if (_attachments.length + _pendingAttachments.length <
+            kAttachmentMaxCount)
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: TextButton.icon(
+              icon: const Icon(Icons.attach_file),
+              onPressed: _isSaving ? null : _addAttachmentFlow,
+              label: Text(l.addAttachment),
+            ),
+          ),
+      ],
+    );
+  }
+
   // ── Custom entry fields ──────────────────────────────────────────────────────
 
   List<Widget> _customEntryFields(AppLocalizations l) => [
@@ -1556,6 +1825,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       onToggleHidden: (i) =>
           setState(() => _customFields[i].hidden = !_customFields[i].hidden),
     ),
+    const SizedBox(height: 8),
+    _attachmentsSection(l),
   ];
 
   // ── Shared custom fields section ─────────────────────────────────────────────

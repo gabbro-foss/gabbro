@@ -1097,6 +1097,25 @@ class AppLocalizationsNb extends AppLocalizations {
   String get fieldCustomFields => 'Egendefinerte felt';
 
   @override
+  String get fieldAttachments => 'Vedlegg';
+
+  @override
+  String get addAttachment => 'Legg til vedlegg';
+
+  @override
+  String get tooltipRemoveAttachment => 'Fjern vedlegg';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return 'Fjern \"$name\"?';
+  }
+
+  @override
+  String attachmentTooLarge(int mb) {
+    return 'Vedlegget er større enn $mb MB. Legg ved en mindre fil.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (valgfritt)';
   }

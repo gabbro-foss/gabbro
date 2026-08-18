@@ -440,6 +440,21 @@
   "fieldLabel": "Aami",
   "fieldValue": "Iye",
   "fieldCustomFields": "Awọn aaye aṣa",
+  "fieldAttachments": "Àwọn àfikún fáìlì",
+  "addAttachment": "Fi àfikún fáìlì kún",
+  "tooltipRemoveAttachment": "Yọ àfikún fáìlì kúrò",
+  "removeAttachmentConfirm": "Yọ «{name}» kúrò?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "attachmentTooLarge": "Àfikún fáìlì tóbi ju {mb} MB lọ. Fi fáìlì tó kéré kún.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (aṣayan)",
   "@fieldLabelOptional": {
     "placeholders": {

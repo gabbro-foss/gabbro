@@ -1097,6 +1097,25 @@ class AppLocalizationsEt extends AppLocalizations {
   String get fieldCustomFields => 'Kohandatud väljad';
 
   @override
+  String get fieldAttachments => 'Manused';
+
+  @override
+  String get addAttachment => 'Lisa manus';
+
+  @override
+  String get tooltipRemoveAttachment => 'Eemalda manus';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return 'Eemalda \"$name\"?';
+  }
+
+  @override
+  String attachmentTooLarge(int mb) {
+    return 'Manus on suurem kui $mb MB. Lisa väiksem fail.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (valikuline)';
   }

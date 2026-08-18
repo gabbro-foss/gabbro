@@ -440,6 +440,21 @@
   "fieldLabel": "Felirat",
   "fieldValue": "Érték",
   "fieldCustomFields": "Egyéni mezők",
+  "fieldAttachments": "Mellékletek",
+  "addAttachment": "Melléklet hozzáadása",
+  "tooltipRemoveAttachment": "Melléklet eltávolítása",
+  "removeAttachmentConfirm": "«{name}» eltávolítása?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "attachmentTooLarge": "A melléklet nagyobb, mint {mb} MB. Csatoljon kisebb fájlt.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (opcionális)",
   "@fieldLabelOptional": {
     "placeholders": {

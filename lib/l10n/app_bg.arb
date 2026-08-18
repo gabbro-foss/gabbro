@@ -440,6 +440,21 @@
   "fieldLabel": "Етикет",
   "fieldValue": "Стойност",
   "fieldCustomFields": "Персонализирани полета",
+  "fieldAttachments": "Прикачени файлове",
+  "addAttachment": "Добави прикачен файл",
+  "tooltipRemoveAttachment": "Премахни прикачения файл",
+  "removeAttachmentConfirm": "Премахни «{name}»?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "attachmentTooLarge": "Прикаченият файл е по-голям от {mb} МБ. Прикачете по-малък файл.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (незадължително)",
   "@fieldLabelOptional": {
     "placeholders": {

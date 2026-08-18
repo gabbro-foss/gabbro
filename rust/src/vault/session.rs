@@ -462,6 +462,121 @@ pub fn session_update_entry(updated: VaultEntry, expiry_days: Option<u32>) -> Re
     Ok(())
 }
 
+/// Add an attachment to an entry and persist. Returns the new attachment uuid.
+///
+/// Size-capped like Enpass import — the same limit keeps a vault loadable on a
+/// phone. A `File` entry takes none: the file IS its payload. Stamps
+/// `attachments:<uuid>` in field_times so the addition syncs to other devices.
+/// In-app adds stop at this many attachments per entry. Import and merge are
+/// exempt: refusing there would destroy data that already exists elsewhere.
+pub const ENTRY_ATTACHMENT_MAX_COUNT: usize = 3;
+
+pub fn session_add_attachment(
+    id: &str,
+    name: &str,
+    kind: &str,
+    data: Vec<u8>,
+) -> Result<String, String> {
+    if data.len() > crate::import::ENPASS_ATTACHMENT_MAX_BYTES {
+        return Err(format!(
+            "Attachment exceeds the {} MB limit",
+            crate::import::ENPASS_ATTACHMENT_MAX_BYTES / (1024 * 1024)
+        ));
+    }
+    let uuid = crate::vault::entry::new_entry_id();
+    let (body, passphrase, path, yubikey) = {
+        let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+        let session = session.as_mut().ok_or("Vault is locked")?;
+        let entry = session
+            .entries
+            .iter_mut()
+            .find(|e| entry_id(e) == id)
+            .ok_or_else(|| format!("No entry found with id: {id}"))?;
+        let atts = crate::api::vault::entry_attachments_mut(entry)
+            .ok_or("A File entry takes no attachments")?;
+        if atts.len() >= ENTRY_ATTACHMENT_MAX_COUNT {
+            return Err(format!(
+                "Entry already has {ENTRY_ATTACHMENT_MAX_COUNT} attachments"
+            ));
+        }
+        atts.push(crate::vault::entry::EntryAttachment {
+            uuid: uuid.clone(),
+            name: name.to_string(),
+            kind: kind.to_string(),
+            data,
+        });
+        let key = format!("attachments:{uuid}");
+        let now_ms = crate::api::vault::now_ms();
+        let meta = crate::api::vault::entry_meta_mut(entry);
+        meta.field_times.insert(key.clone(), now_ms);
+        meta.field_times.remove(&format!("del:{key}"));
+        meta.updated_at = crate::api::vault::chrono_now();
+        let body = build_body(session);
+        let yubikey = extract_yubikey(session);
+        (
+            body,
+            session.passphrase.clone(),
+            session.path.clone(),
+            yubikey,
+        )
+    }; // ← lock released here
+    do_save(&body, &passphrase, &path, yubikey)?;
+    Ok(uuid)
+}
+
+/// Remove an attachment and persist. Stamps `del:attachments:<uuid>` so the
+/// removal syncs — without the tombstone the next sync would restore it.
+pub fn session_remove_attachment(id: &str, uuid: &str) -> Result<(), String> {
+    let (body, passphrase, path, yubikey) = {
+        let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+        let session = session.as_mut().ok_or("Vault is locked")?;
+        let entry = session
+            .entries
+            .iter_mut()
+            .find(|e| entry_id(e) == id)
+            .ok_or_else(|| format!("No entry found with id: {id}"))?;
+        let atts = crate::api::vault::entry_attachments_mut(entry)
+            .ok_or("A File entry takes no attachments")?;
+        let before = atts.len();
+        atts.retain(|a| a.uuid != uuid);
+        if atts.len() == before {
+            return Err(format!("No attachment found with uuid: {uuid}"));
+        }
+        let key = format!("attachments:{uuid}");
+        let now_ms = crate::api::vault::now_ms();
+        let meta = crate::api::vault::entry_meta_mut(entry);
+        meta.field_times.remove(&key);
+        meta.field_times.insert(format!("del:{key}"), now_ms);
+        meta.updated_at = crate::api::vault::chrono_now();
+        let body = build_body(session);
+        let yubikey = extract_yubikey(session);
+        (
+            body,
+            session.passphrase.clone(),
+            session.path.clone(),
+            yubikey,
+        )
+    }; // ← lock released here
+    do_save(&body, &passphrase, &path, yubikey)?;
+    Ok(())
+}
+
+/// Return an attachment's raw bytes. Read-only — no save.
+pub fn session_extract_attachment(id: &str, uuid: &str) -> Result<Vec<u8>, String> {
+    let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+    let session = session.as_ref().ok_or("Vault is locked")?;
+    let entry = session
+        .entries
+        .iter()
+        .find(|e| entry_id(e) == id)
+        .ok_or_else(|| format!("No entry found with id: {id}"))?;
+    crate::api::vault::entry_attachments(entry)
+        .iter()
+        .find(|a| a.uuid == uuid)
+        .map(|a| a.data.clone())
+        .ok_or_else(|| format!("No attachment found with uuid: {uuid}"))
+}
+
 /// Remove an entry by UUID and persist.
 ///
 /// Async — triggers a full vault save.
@@ -1369,7 +1484,7 @@ impl<'a> FieldMerger<'a> {
     // (a "del:<key>" tombstone) more recently than this side last changed it,
     // record a pending delete for the user to confirm. Never auto-drops. Returns
     // true if a pending delete was flagged.
-    fn carry_or_flag_delete(&mut self, key: &str, present_on_incoming: bool) -> bool {
+    fn carry_or_flag_delete(&mut self, key: &str, label: &str, present_on_incoming: bool) -> bool {
         let del_key = format!("del:{key}");
         let (present_meta, other_meta) = if present_on_incoming {
             (self.im, self.lm)
@@ -1384,6 +1499,7 @@ impl<'a> FieldMerger<'a> {
                     id: self.id.clone(),
                     title: self.title.clone(),
                     field: key.to_string(),
+                    label: label.to_string(),
                 });
                 flagged = true;
             }
@@ -1417,11 +1533,11 @@ impl<'a> FieldMerger<'a> {
                     });
                 }
                 (Some(lf), None) => {
-                    self.carry_or_flag_delete(&key, false);
+                    self.carry_or_flag_delete(&key, &lf.label, false);
                     out.push((*lf).clone());
                 }
                 (None, Some(inf)) => {
-                    if !self.carry_or_flag_delete(&key, true) {
+                    if !self.carry_or_flag_delete(&key, &inf.label, true) {
                         self.record_brought_over(&key, "", &inf.value);
                     }
                     out.push((*inf).clone());
@@ -1457,11 +1573,11 @@ impl<'a> FieldMerger<'a> {
                     });
                 }
                 (Some(la), None) => {
-                    self.carry_or_flag_delete(&key, false);
+                    self.carry_or_flag_delete(&key, &la.name, false);
                     out.push((*la).clone());
                 }
                 (None, Some(ia)) => {
-                    if !self.carry_or_flag_delete(&key, true) {
+                    if !self.carry_or_flag_delete(&key, &ia.name, true) {
                         self.record_brought_over(&key, "", &ia.name);
                     }
                     out.push((*ia).clone());
@@ -1622,11 +1738,11 @@ pub(crate) fn merge_entry_pair(
                         );
                     }
                     (Some(lf), None) => {
-                        m.carry_or_flag_delete(&key, false);
+                        m.carry_or_flag_delete(&key, &lf.label, false);
                         fields.insert(k.clone(), lf.clone());
                     }
                     (None, Some(inf)) => {
-                        if !m.carry_or_flag_delete(&key, true) {
+                        if !m.carry_or_flag_delete(&key, &inf.label, true) {
                             m.record_brought_over(&key, "", &inf.value);
                         }
                         fields.insert(k.clone(), inf.clone());
@@ -2863,6 +2979,81 @@ mod field_merge_tests {
             brought[0].new_value, "passport.pdf",
             "name, never raw bytes"
         );
+    }
+
+    // Scenario 9 (attachments task) — red first: a pending attachment delete
+    // must carry the display name, or the keep/delete prompt shows a bare uuid
+    // and the user cannot tell what they are deleting.
+    #[test]
+    fn pending_attachment_delete_carries_the_display_name() {
+        use crate::vault::entry::EntryAttachment;
+        let att = EntryAttachment {
+            uuid: String::from("att-1"),
+            name: String::from("passport.pdf"),
+            kind: String::from("application/pdf"),
+            data: vec![1],
+        };
+        let local = VaultEntry::Note(NoteEntry {
+            meta: meta("n1", "t", &[("attachments:att-1", 100)]),
+            title: String::from("T"),
+            content: String::from("C"),
+            custom_fields: vec![],
+            attachments: vec![att],
+        });
+        let incoming = VaultEntry::Note(NoteEntry {
+            meta: meta("n1", "t", &[("del:attachments:att-1", 200)]),
+            title: String::from("T"),
+            content: String::from("C"),
+            custom_fields: vec![],
+            attachments: vec![],
+        });
+        let (_m, _c, dels, _brought) = merge_entry_pair(&local, &incoming);
+        assert_eq!(dels.len(), 1);
+        assert_eq!(dels[0].field, "attachments:att-1");
+        assert_eq!(
+            dels[0].label, "passport.pdf",
+            "the prompt must name the file, not the uuid"
+        );
+    }
+
+    // Net (attachments task): the merged entry must carry the incoming
+    // attachment's BYTES, not just report it by name.
+    #[test]
+    fn merge_carries_attachment_bytes_into_the_merged_entry() {
+        use crate::vault::entry::EntryAttachment;
+        let att = EntryAttachment {
+            uuid: String::from("att-1"),
+            name: String::from("passport.pdf"),
+            kind: String::from("application/pdf"),
+            data: vec![1, 2, 3],
+        };
+        let local = VaultEntry::Note(NoteEntry {
+            meta: meta("n1", "t", &[]),
+            title: String::from("T"),
+            content: String::from("C"),
+            custom_fields: vec![],
+            attachments: vec![],
+        });
+        let incoming = VaultEntry::Note(NoteEntry {
+            meta: meta("n1", "t", &[("attachments:att-1", 200)]),
+            title: String::from("T"),
+            content: String::from("C"),
+            custom_fields: vec![],
+            attachments: vec![att],
+        });
+        let (merged, _c, _dels, _brought) = merge_entry_pair(&local, &incoming);
+        match &merged {
+            VaultEntry::Note(n) => {
+                assert_eq!(n.attachments.len(), 1);
+                assert_eq!(n.attachments[0].uuid, "att-1");
+                assert_eq!(
+                    n.attachments[0].data,
+                    vec![1, 2, 3],
+                    "bytes survive the merge"
+                );
+            }
+            _ => panic!("expected a note"),
+        }
     }
 
     #[test]
@@ -4662,6 +4853,56 @@ mod tests {
         let summaries = list_entry_summaries().unwrap();
 
         assert_eq!(summaries.len(), 2);
+
+        teardown(&path);
+    }
+
+    // Net (attachments task): nothing else ever round-trips attachment BYTES
+    // through the encrypted file — imports fill them, merge tests use names.
+    #[test]
+    #[serial]
+    fn attachment_bytes_survive_a_disk_round_trip() {
+        use crate::vault::entry::EntryAttachment;
+        let pass = b"test passphrase";
+        let path = setup_vault(pass);
+
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let bytes = vec![0x25, 0x50, 0x44, 0x46, 0x00, 0xFF, 0x07];
+        let entry = VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                field_times: Default::default(),
+                history: Vec::new(),
+                id: String::from("id-att"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+            },
+            title: String::from("With attachment"),
+            content: String::from("c"),
+            custom_fields: vec![],
+            attachments: vec![EntryAttachment {
+                uuid: String::from("att-1"),
+                name: String::from("passport.pdf"),
+                kind: String::from("application/pdf"),
+                data: bytes.clone(),
+            }],
+        });
+        session_create_entry(entry).unwrap();
+
+        lock_vault().unwrap();
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let got = get_entry("id-att").unwrap();
+        match &got {
+            VaultEntry::Note(n) => {
+                assert_eq!(n.attachments.len(), 1);
+                assert_eq!(n.attachments[0].name, "passport.pdf");
+                assert_eq!(n.attachments[0].kind, "application/pdf");
+                assert_eq!(n.attachments[0].data, bytes, "bytes intact after reload");
+            }
+            _ => panic!("expected the note back"),
+        }
 
         teardown(&path);
     }

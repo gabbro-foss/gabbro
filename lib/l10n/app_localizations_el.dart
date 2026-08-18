@@ -1104,6 +1104,25 @@ class AppLocalizationsEl extends AppLocalizations {
   String get fieldCustomFields => 'Προσαρμοσμένα πεδία';
 
   @override
+  String get fieldAttachments => 'Συνημμένα';
+
+  @override
+  String get addAttachment => 'Προσθήκη συνημμένου';
+
+  @override
+  String get tooltipRemoveAttachment => 'Αφαίρεση συνημμένου';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return 'Αφαίρεση «$name»;';
+  }
+
+  @override
+  String attachmentTooLarge(int mb) {
+    return 'Το συνημμένο είναι μεγαλύτερο από $mb MB. Επισυνάψτε μικρότερο αρχείο.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (προαιρετικό)';
   }

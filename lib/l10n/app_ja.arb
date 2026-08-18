@@ -440,6 +440,21 @@
   "fieldLabel": "ラベル",
   "fieldValue": "値",
   "fieldCustomFields": "カスタムフィールド",
+  "fieldAttachments": "添付ファイル",
+  "addAttachment": "添付ファイルを追加",
+  "tooltipRemoveAttachment": "添付ファイルを削除",
+  "removeAttachmentConfirm": "「{name}」を削除しますか?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "attachmentTooLarge": "添付ファイルが {mb} MB を超えています。より小さいファイルを添付してください。",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (任意)",
   "@fieldLabelOptional": {
     "placeholders": {

@@ -1100,6 +1100,25 @@ class AppLocalizationsPl extends AppLocalizations {
   String get fieldCustomFields => 'Pola niestandardowe';
 
   @override
+  String get fieldAttachments => 'Załączniki';
+
+  @override
+  String get addAttachment => 'Dodaj załącznik';
+
+  @override
+  String get tooltipRemoveAttachment => 'Usuń załącznik';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return 'Usunąć «$name»?';
+  }
+
+  @override
+  String attachmentTooLarge(int mb) {
+    return 'Załącznik jest większy niż $mb MB. Dołącz mniejszy plik.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (opcjonalnie)';
   }

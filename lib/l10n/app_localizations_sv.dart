@@ -1096,6 +1096,25 @@ class AppLocalizationsSv extends AppLocalizations {
   String get fieldCustomFields => 'Anpassade fält';
 
   @override
+  String get fieldAttachments => 'Bilagor';
+
+  @override
+  String get addAttachment => 'Lägg till bilaga';
+
+  @override
+  String get tooltipRemoveAttachment => 'Ta bort bilaga';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return 'Ta bort \"$name\"?';
+  }
+
+  @override
+  String attachmentTooLarge(int mb) {
+    return 'Bilagan är större än $mb MB. Bifoga en mindre fil.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (valfritt)';
   }

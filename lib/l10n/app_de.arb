@@ -440,6 +440,21 @@
   "fieldLabel": "Bezeichnung",
   "fieldValue": "Wert",
   "fieldCustomFields": "Benutzerdefinierte Felder",
+  "fieldAttachments": "Anhänge",
+  "addAttachment": "Anhang hinzufügen",
+  "tooltipRemoveAttachment": "Anhang entfernen",
+  "removeAttachmentConfirm": "«{name}» entfernen?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "attachmentTooLarge": "Der Anhang ist größer als {mb} MB. Hängen Sie eine kleinere Datei an.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (optional)",
   "@fieldLabelOptional": {
     "placeholders": {

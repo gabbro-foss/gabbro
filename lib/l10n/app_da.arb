@@ -440,6 +440,21 @@
   "fieldLabel": "Etiket",
   "fieldValue": "Værdi",
   "fieldCustomFields": "Brugerdefinerede felter",
+  "fieldAttachments": "Vedhæftninger",
+  "addAttachment": "Tilføj vedhæftning",
+  "tooltipRemoveAttachment": "Fjern vedhæftning",
+  "removeAttachmentConfirm": "Fjern \"{name}\"?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "attachmentTooLarge": "Vedhæftningen er større end {mb} MB. Vedhæft en mindre fil.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (valgfrit)",
   "@fieldLabelOptional": {
     "placeholders": {

@@ -22,6 +22,7 @@ CardEntryData _cardEntry({String? pin}) => CardEntryData(
       cvv: '123',
       status: 'active',
       customFields: [],
+      attachments: const [],
       pin: pin,
     );
 
@@ -33,6 +34,7 @@ LoginEntryData _loginEntry() => LoginEntryData(
       password: 's3cr3tP@ss',
       notes: null,
       customFields: [],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
@@ -42,13 +44,13 @@ LoginEntryData _loginEntry() => LoginEntryData(
 
 Widget _buildCreateScreen(
   String entryType, {
-  Future<void> Function(VaultEntryData)? onCreateEntry,
+  Future<String> Function(VaultEntryData)? onCreateEntry,
   List<String> Function()? listFolders,
   Future<PickedFile?> Function()? pickFile,
 }) =>
     testApp(CreateEntryScreen(
       entryType: entryType,
-      onCreateEntry: onCreateEntry ?? (_) async {},
+      onCreateEntry: onCreateEntry ?? (_) async => '',
       onGetEntry: (_) => VaultEntryData.login(_loginEntry()),
       listFolders: listFolders ?? () => ['Work', 'Private'],
       pickFile: pickFile ?? (() async => null),
@@ -57,7 +59,7 @@ Widget _buildCreateScreen(
 Widget _buildEditScreen(VaultEntryData existing) => testApp(CreateEntryScreen(
       entryType: 'Login',
       existing: existing,
-      onCreateEntry: (_) async {},
+      onCreateEntry: (_) async => '',
       onGetEntry: (_) => existing,
     ));
 
@@ -207,7 +209,10 @@ void main() {
   testWidgets('card PIN value is passed to onCreateEntry', (tester) async {
     VaultEntryData? captured;
     await tester.pumpWidget(
-      _buildCreateScreen('Card', onCreateEntry: (e) async => captured = e),
+      _buildCreateScreen('Card', onCreateEntry: (e) async {
+        captured = e;
+        return '';
+      }),
     );
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Card label (e.g. "Visa Platinum")'),
@@ -248,7 +253,7 @@ void main() {
       testApp(CreateEntryScreen(
         entryType: 'Card',
         existing: VaultEntryData.card(_cardEntry(pin: '1234')),
-        onCreateEntry: (_) async {},
+        onCreateEntry: (_) async => '',
         onGetEntry: (_) => VaultEntryData.card(_cardEntry(pin: '1234')),
       )),
     );
@@ -289,7 +294,10 @@ void main() {
   testWidgets('card form saves without CVV', (tester) async {
     VaultEntryData? captured;
     await tester.pumpWidget(
-      _buildCreateScreen('Card', onCreateEntry: (e) async => captured = e),
+      _buildCreateScreen('Card', onCreateEntry: (e) async {
+        captured = e;
+        return '';
+      }),
     );
 
     await tester.enterText(
@@ -333,6 +341,7 @@ void main() {
       password: 'p@ss',
       notes: 'remember to update this annually',
       customFields: [],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
@@ -341,7 +350,7 @@ void main() {
       testApp(CreateEntryScreen(
         entryType: 'Login',
         existing: VaultEntryData.login(entry),
-        onCreateEntry: (_) async {},
+        onCreateEntry: (_) async => '',
         onGetEntry: (_) => VaultEntryData.login(entry),
       )),
     );
@@ -364,6 +373,7 @@ void main() {
       password: 'p@ss',
       notes: 'do not delete',
       customFields: [],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
@@ -372,7 +382,7 @@ void main() {
       testApp(CreateEntryScreen(
         entryType: 'Login',
         existing: VaultEntryData.login(entry),
-        onCreateEntry: (_) async {},
+        onCreateEntry: (_) async => '',
         onGetEntry: (_) => VaultEntryData.login(entry),
       )),
     );
@@ -410,7 +420,10 @@ void main() {
     await tester.pumpWidget(
       _buildCreateScreen(
         'Login',
-        onCreateEntry: (e) async => captured = e,
+        onCreateEntry: (e) async {
+          captured = e;
+          return '';
+        },
       ),
     );
     await tester.enterText(
@@ -450,7 +463,10 @@ void main() {
     await tester.pumpWidget(
       _buildCreateScreen(
         'Login',
-        onCreateEntry: (e) async => captured = e,
+        onCreateEntry: (e) async {
+          captured = e;
+          return '';
+        },
       ),
     );
 
@@ -483,7 +499,10 @@ void main() {
     await tester.pumpWidget(
       _buildCreateScreen(
         'Login',
-        onCreateEntry: (entry) async => captured = entry,
+        onCreateEntry: (entry) async {
+          captured = entry;
+          return '';
+        },
       ),
     );
 
@@ -529,7 +548,10 @@ void main() {
     await tester.pumpWidget(
       _buildCreateScreen(
         'Login',
-        onCreateEntry: (e) async => captured = e,
+        onCreateEntry: (e) async {
+          captured = e;
+          return '';
+        },
         listFolders: () => ['Work', 'Private'],
       ),
     );
@@ -560,7 +582,10 @@ void main() {
     await tester.pumpWidget(
       _buildCreateScreen(
         'Login',
-        onCreateEntry: (e) async => captured = e,
+        onCreateEntry: (e) async {
+          captured = e;
+          return '';
+        },
         listFolders: () => ['Work', 'Private'],
       ),
     );
@@ -585,7 +610,7 @@ void main() {
       testApp(CreateEntryScreen(
         entryType: 'Login',
         existing: VaultEntryData.login(_loginEntry()),
-        onCreateEntry: (_) async {},
+        onCreateEntry: (_) async => '',
         onGetEntry: (_) => VaultEntryData.login(_loginEntry()),
         listFolders: () => ['Work', 'Personal', 'Private'],
       )),
@@ -603,7 +628,7 @@ void main() {
       testApp(CreateEntryScreen(
         entryType: 'Card',
         existing: VaultEntryData.card(_cardEntry()),
-        onCreateEntry: (_) async {},
+        onCreateEntry: (_) async => '',
         onGetEntry: (_) => VaultEntryData.card(_cardEntry()),
         listFolders: () => ['Personal'],
       )),
@@ -661,7 +686,10 @@ void main() {
       (tester) async {
     VaultEntryData? captured;
     await tester.pumpWidget(
-      _buildCreateScreen('Note', onCreateEntry: (e) async => captured = e),
+      _buildCreateScreen('Note', onCreateEntry: (e) async {
+        captured = e;
+        return '';
+      }),
     );
 
     await tester.enterText(
@@ -708,7 +736,10 @@ void main() {
     ) async {
       var created = false;
       await tester.pumpWidget(
-        _buildCreateScreen(type, onCreateEntry: (_) async => created = true),
+        _buildCreateScreen(type, onCreateEntry: (_) async {
+          created = true;
+          return '';
+        }),
       );
       await tester.pumpAndSettle();
 
@@ -740,7 +771,10 @@ void main() {
   testWidgets('two distinct custom-field labels save fine', (tester) async {
     VaultEntryData? captured;
     await tester.pumpWidget(
-      _buildCreateScreen('Note', onCreateEntry: (e) async => captured = e),
+      _buildCreateScreen('Note', onCreateEntry: (e) async {
+        captured = e;
+        return '';
+      }),
     );
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Title'),
@@ -778,6 +812,7 @@ void main() {
       customFields: const [
         CustomFieldData(label: 'Pin', value: '1234', hidden: true),
       ],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: '',
@@ -786,7 +821,7 @@ void main() {
       testApp(CreateEntryScreen(
         entryType: 'Note',
         existing: VaultEntryData.note(entry),
-        onCreateEntry: (_) async {},
+        onCreateEntry: (_) async => '',
         onGetEntry: (_) => VaultEntryData.note(entry),
       )),
     );
@@ -807,7 +842,10 @@ void main() {
       (tester) async {
     VaultEntryData? captured;
     await tester.pumpWidget(
-      _buildCreateScreen('Login', onCreateEntry: (e) async => captured = e),
+      _buildCreateScreen('Login', onCreateEntry: (e) async {
+        captured = e;
+        return '';
+      }),
     );
 
     await tester.enterText(
@@ -994,6 +1032,7 @@ void main() {
         'Custom',
         onCreateEntry: (e) async {
           saved = e;
+          return '';
         },
       ),
     );
@@ -1070,7 +1109,10 @@ void main() {
   testWidgets('login app ID is passed to onCreateEntry', (tester) async {
     VaultEntryData? captured;
     await tester.pumpWidget(
-      _buildCreateScreen('Login', onCreateEntry: (e) async => captured = e),
+      _buildCreateScreen('Login', onCreateEntry: (e) async {
+        captured = e;
+        return '';
+      }),
     );
     await tester.enterText(find.widgetWithText(TextFormField, 'Title'), 'Example');
     await tester.enterText(find.widgetWithText(TextFormField, 'Username (optional)'), 'user');
@@ -1097,6 +1139,7 @@ void main() {
       password: 'secret',
       notes: null,
       customFields: [],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
@@ -1142,7 +1185,10 @@ void main() {
       (tester) async {
     VaultEntryData? captured;
     await tester.pumpWidget(
-      _buildCreateScreen('Login', onCreateEntry: (e) async => captured = e),
+      _buildCreateScreen('Login', onCreateEntry: (e) async {
+        captured = e;
+        return '';
+      }),
     );
     await tester.enterText(find.widgetWithText(TextFormField, 'Title'), 'Example');
     await tester.enterText(
@@ -1173,6 +1219,7 @@ void main() {
       password: 'secret',
       notes: null,
       customFields: [],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',

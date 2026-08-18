@@ -440,6 +440,21 @@
   "fieldLabel": "Libellé",
   "fieldValue": "Valeur",
   "fieldCustomFields": "Champs personnalisés",
+  "fieldAttachments": "Pièces jointes",
+  "addAttachment": "Ajouter une pièce jointe",
+  "tooltipRemoveAttachment": "Retirer la pièce jointe",
+  "removeAttachmentConfirm": "Retirer « {name} » ?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "attachmentTooLarge": "La pièce jointe dépasse {mb} Mo. Joignez un fichier plus petit.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (facultatif)",
   "@fieldLabelOptional": {
     "placeholders": {

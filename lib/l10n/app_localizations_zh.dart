@@ -1073,6 +1073,25 @@ class AppLocalizationsZh extends AppLocalizations {
   String get fieldCustomFields => '自定义字段';
 
   @override
+  String get fieldAttachments => '附件';
+
+  @override
+  String get addAttachment => '添加附件';
+
+  @override
+  String get tooltipRemoveAttachment => '移除附件';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return '移除«$name»？';
+  }
+
+  @override
+  String attachmentTooLarge(int mb) {
+    return '附件大于 $mb MB。请附加较小的文件。';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label（可选）';
   }
@@ -3169,6 +3188,25 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get fieldCustomFields => '自定义字段';
 
   @override
+  String get fieldAttachments => '附件';
+
+  @override
+  String get addAttachment => '添加附件';
+
+  @override
+  String get tooltipRemoveAttachment => '移除附件';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return '移除«$name»？';
+  }
+
+  @override
+  String attachmentTooLarge(int mb) {
+    return '附件大于 $mb MB。请附加较小的文件。';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label（可选）';
   }
@@ -5263,6 +5301,25 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get fieldCustomFields => '自訂欄位';
+
+  @override
+  String get fieldAttachments => '附件';
+
+  @override
+  String get addAttachment => '新增附件';
+
+  @override
+  String get tooltipRemoveAttachment => '移除附件';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return '移除«$name»？';
+  }
+
+  @override
+  String attachmentTooLarge(int mb) {
+    return '附件大於 $mb MB。請附加較小的檔案。';
+  }
 
   @override
   String fieldLabelOptional(String label) {

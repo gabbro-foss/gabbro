@@ -1098,6 +1098,25 @@ class AppLocalizationsLt extends AppLocalizations {
   String get fieldCustomFields => 'Pasirinktiniai laukai';
 
   @override
+  String get fieldAttachments => 'Priedai';
+
+  @override
+  String get addAttachment => 'Pridėti priedą';
+
+  @override
+  String get tooltipRemoveAttachment => 'Pašalinti priedą';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return 'Pašalinti «$name»?';
+  }
+
+  @override
+  String attachmentTooLarge(int mb) {
+    return 'Priedas didesnis nei $mb MB. Pridėkite mažesnį failą.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (nebūtinas)';
   }

@@ -84,6 +84,27 @@ void main() {
     expect(find.text('hunter2'), findsNothing);
   });
 
+  // Scenario 9 (attachments task): an attachment history row is titled by its
+  // FILENAME (the record's value) — never the uuid or the raw key.
+  testWidgets('an attachment history row is titled by filename', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      testApp(
+        RecoveryHistoryScreen(
+          records: [_rec('attachments:uuid-9', 'passport.pdf')],
+          onRestore: (_) async {},
+          onDelete: (_) async {},
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('passport.pdf'), findsOneWidget);
+    expect(find.textContaining('uuid-9'), findsNothing);
+    expect(find.textContaining('attachments:'), findsNothing);
+  });
+
   testWidgets('file-data history shows <binary>, not the base64', (
     tester,
   ) async {

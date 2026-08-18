@@ -440,6 +440,21 @@
   "fieldLabel": "Ознака",
   "fieldValue": "Вредност",
   "fieldCustomFields": "Прилагођена поља",
+  "fieldAttachments": "Прилози",
+  "addAttachment": "Додај прилог",
+  "tooltipRemoveAttachment": "Уклони прилог",
+  "removeAttachmentConfirm": "Уклони «{name}»?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "attachmentTooLarge": "Прилог је већи од {mb} MB. Приложите мању датотеку.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (необавезно)",
   "@fieldLabelOptional": {
     "placeholders": {

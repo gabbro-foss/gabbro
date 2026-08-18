@@ -440,6 +440,21 @@
   "fieldLabel": "Etiķete",
   "fieldValue": "Vērtība",
   "fieldCustomFields": "Pielāgotie lauki",
+  "fieldAttachments": "Pielikumi",
+  "addAttachment": "Pievienot pielikumu",
+  "tooltipRemoveAttachment": "Noņemt pielikumu",
+  "removeAttachmentConfirm": "Noņemt \"{name}\"?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "attachmentTooLarge": "Pielikums ir lielāks par {mb} MB. Pievienojiet mazāku failu.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (neobligāts)",
   "@fieldLabelOptional": {
     "placeholders": {

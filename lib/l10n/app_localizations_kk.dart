@@ -1095,6 +1095,25 @@ class AppLocalizationsKk extends AppLocalizations {
   String get fieldCustomFields => 'Арнаулы өрістер';
 
   @override
+  String get fieldAttachments => 'Тіркемелер';
+
+  @override
+  String get addAttachment => 'Тіркеме қосу';
+
+  @override
+  String get tooltipRemoveAttachment => 'Тіркемені өшіру';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return '«$name» өшіру керек пе?';
+  }
+
+  @override
+  String attachmentTooLarge(int mb) {
+    return 'Тіркеме $mb МБ-тан үлкен. Кішірек файл тіркеңіз.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (міндетті емес)';
   }

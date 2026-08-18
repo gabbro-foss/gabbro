@@ -440,6 +440,21 @@
   "fieldLabel": "Silt",
   "fieldValue": "Väärtus",
   "fieldCustomFields": "Kohandatud väljad",
+  "fieldAttachments": "Manused",
+  "addAttachment": "Lisa manus",
+  "tooltipRemoveAttachment": "Eemalda manus",
+  "removeAttachmentConfirm": "Eemalda \"{name}\"?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "attachmentTooLarge": "Manus on suurem kui {mb} MB. Lisa väiksem fail.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (valikuline)",
   "@fieldLabelOptional": {
     "placeholders": {

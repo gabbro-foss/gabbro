@@ -28,6 +28,7 @@ LoginEntryData _loginEntry() => LoginEntryData(
       password: 's3cr3tP@ss',
       notes: null,
       customFields: [],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
@@ -41,6 +42,7 @@ NoteEntryData _noteEntry() => NoteEntryData(
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
       customFields: const [],
+      attachments: const [],
     );
 
 CardEntryData _cardEntry() => CardEntryData(
@@ -54,6 +56,7 @@ CardEntryData _cardEntry() => CardEntryData(
       updatedAt: '2025-01-01T00:00:00Z',
       folder: '',
       customFields: const [],
+      attachments: const [],
     );
 
 CustomEntryData _customEntry() => CustomEntryData(
@@ -63,6 +66,7 @@ CustomEntryData _customEntry() => CustomEntryData(
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: '',
+      attachments: const [],
     );
 
 // ── Widget helper ─────────────────────────────────────────────────────────────
@@ -412,6 +416,7 @@ void main() {
       password: 'p@ss',
       notes: null,
       customFields: [],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: '',
@@ -838,6 +843,7 @@ void main() {
       customFields: [
         CustomFieldData(label: 'Passport', value: 'AB123456', hidden: true),
       ],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
@@ -952,6 +958,7 @@ void main() {
       password: 'pw',
       notes: null,
       customFields: const [],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: '',
@@ -973,6 +980,7 @@ void main() {
       customFields: [
         CustomFieldData(label: 'Token', value: 'secret_token', hidden: true),
       ],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: '',
@@ -1000,6 +1008,7 @@ void main() {
       password: 'secret',
       notes: null,
       customFields: [],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
@@ -1024,6 +1033,7 @@ void main() {
       password: 'secret',
       notes: null,
       customFields: [],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',

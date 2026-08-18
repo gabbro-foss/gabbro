@@ -440,6 +440,21 @@
   "fieldLabel": "Štítek",
   "fieldValue": "Hodnota",
   "fieldCustomFields": "Vlastní pole",
+  "fieldAttachments": "Přílohy",
+  "addAttachment": "Přidat přílohu",
+  "tooltipRemoveAttachment": "Odebrat přílohu",
+  "removeAttachmentConfirm": "Odebrat «{name}»?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "attachmentTooLarge": "Příloha je větší než {mb} MB. Přiložte menší soubor.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (volitelné)",
   "@fieldLabelOptional": {
     "placeholders": {

@@ -23,6 +23,18 @@ pub struct CustomFieldData {
     pub hidden: bool,
 }
 
+/// Attachment metadata as seen by Flutter. The bytes never ride in an entry
+/// DTO — they cross the bridge only through the dedicated attachment calls —
+/// so opening an entry stays fast however large its attachments are.
+pub struct AttachmentMetaData {
+    pub uuid: String,
+    pub name: String,
+    /// MIME type (e.g. "image/png", "application/pdf").
+    pub kind: String,
+    /// Byte length of the stored data.
+    pub size: u64,
+}
+
 /// A recovery-history record for Flutter: a value replaced during sync, kept so
 /// the user can restore it. `value` is plaintext — Flutter masks secret fields.
 pub struct HistoryRecordData {
@@ -46,6 +58,7 @@ pub struct LoginEntryData {
     pub password: String,
     pub notes: Option<String>,
     pub custom_fields: Vec<CustomFieldData>,
+    pub attachments: Vec<AttachmentMetaData>,
     /// Android application id for native-app autofill matching; `None` if unset.
     pub app_id: Option<String>,
     /// Email/identifier routed to email-typed fields; `None` if unset.
@@ -61,6 +74,7 @@ pub struct NoteEntryData {
     pub title: String,
     pub content: String,
     pub custom_fields: Vec<CustomFieldData>,
+    pub attachments: Vec<AttachmentMetaData>,
 }
 
 /// An identity entry as seen by Flutter.
@@ -75,6 +89,7 @@ pub struct IdentityEntryData {
     pub phone: Option<String>,
     pub address: Option<String>,
     pub custom_fields: Vec<CustomFieldData>,
+    pub attachments: Vec<AttachmentMetaData>,
 }
 
 /// A card entry as seen by Flutter.
@@ -97,6 +112,7 @@ pub struct CardEntryData {
     pub transaction_password: Option<String>,
     pub notes: Option<String>,
     pub custom_fields: Vec<CustomFieldData>,
+    pub attachments: Vec<AttachmentMetaData>,
 }
 
 /// A file entry as seen by Flutter.
@@ -119,6 +135,7 @@ pub struct CustomEntryData {
     pub folder: String,
     pub title: String,
     pub fields: Vec<CustomFieldData>,
+    pub attachments: Vec<AttachmentMetaData>,
 }
 
 /// An entry flagged for user-consent deletion during vault merge.
@@ -151,6 +168,9 @@ pub struct PendingItemDeleteItem {
     pub id: String,
     pub title: String,
     pub field: String,
+    /// Human-readable name of the item — the attachment's filename or the
+    /// custom pair's label. The keep/delete prompt shows this, never the key.
+    pub label: String,
 }
 
 /// A folder assignment conflict discovered during vault merge.
@@ -275,6 +295,16 @@ fn login_entry_to_data(e: &LoginEntry) -> LoginEntryData {
         password: e.password.clone(),
         notes: e.notes.clone(),
         custom_fields: e.custom_fields.iter().map(custom_field_to_data).collect(),
+        attachments: e
+            .attachments
+            .iter()
+            .map(|a| AttachmentMetaData {
+                uuid: a.uuid.clone(),
+                name: a.name.clone(),
+                kind: a.kind.clone(),
+                size: a.data.len() as u64,
+            })
+            .collect(),
         app_id: e.app_id.clone(),
         email: e.email.clone(),
     }
@@ -368,7 +398,7 @@ fn entry_meta(entry: &VaultEntry) -> &crate::vault::entry::EntryMeta {
     }
 }
 
-fn entry_meta_mut(entry: &mut VaultEntry) -> &mut crate::vault::entry::EntryMeta {
+pub(crate) fn entry_meta_mut(entry: &mut VaultEntry) -> &mut crate::vault::entry::EntryMeta {
     match entry {
         VaultEntry::Login(e) => &mut e.meta,
         VaultEntry::Note(e) => &mut e.meta,
@@ -376,6 +406,31 @@ fn entry_meta_mut(entry: &mut VaultEntry) -> &mut crate::vault::entry::EntryMeta
         VaultEntry::Card(e) => &mut e.meta,
         VaultEntry::File(e) => &mut e.meta,
         VaultEntry::Custom(e) => &mut e.meta,
+    }
+}
+
+/// Attachments of an entry (`File` stores its payload in `data`, not here).
+pub(crate) fn entry_attachments(entry: &VaultEntry) -> &[crate::vault::entry::EntryAttachment] {
+    match entry {
+        VaultEntry::Login(e) => &e.attachments,
+        VaultEntry::Note(e) => &e.attachments,
+        VaultEntry::Identity(e) => &e.attachments,
+        VaultEntry::Card(e) => &e.attachments,
+        VaultEntry::Custom(e) => &e.attachments,
+        VaultEntry::File(_) => &[],
+    }
+}
+
+pub(crate) fn entry_attachments_mut(
+    entry: &mut VaultEntry,
+) -> Option<&mut Vec<crate::vault::entry::EntryAttachment>> {
+    match entry {
+        VaultEntry::Login(e) => Some(&mut e.attachments),
+        VaultEntry::Note(e) => Some(&mut e.attachments),
+        VaultEntry::Identity(e) => Some(&mut e.attachments),
+        VaultEntry::Card(e) => Some(&mut e.attachments),
+        VaultEntry::Custom(e) => Some(&mut e.attachments),
+        VaultEntry::File(_) => None,
     }
 }
 
@@ -731,6 +786,14 @@ pub fn update_entry(
 
     let now = chrono_now();
     let expires_at = expiry_days.map(|days| add_days_to_timestamp(&now, days));
+
+    // Attachments are not round-tripped by Flutter (like field_times/history):
+    // the stored entry is the source of truth and mutation happens only via the
+    // dedicated attachment calls. Copy before diffing, or every app edit would
+    // wipe them and stamp `del:attachments:<uuid>` tombstones that sync the loss.
+    if let Some(dst) = entry_attachments_mut(&mut updated) {
+        *dst = entry_attachments(&entries[pos]).to_vec();
+    }
 
     // Per-field change-times (granular sync, v9). Flutter does not round-trip
     // field_times across the bridge, so the existing entry is the source of truth:

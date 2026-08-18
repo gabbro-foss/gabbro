@@ -9,7 +9,7 @@ import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 import 'vault.dart';
 part 'vault_bridge.freezed.dart';
 
-// These functions are ignored because they are not marked as `pub`: `vault_entry_from_data`, `vault_entry_to_data`
+// These functions are ignored because they are not marked as `pub`: `attachment_meta`, `vault_entry_from_data`, `vault_entry_to_data`
 
 /// Decrypt the vault at `path` and store it in the session.
 ///
@@ -90,6 +90,46 @@ Future<void> updateEntry({required VaultEntryData entry, int? expiryDays}) =>
       entry: entry,
       expiryDays: expiryDays,
     );
+
+/// Add an attachment to an entry and persist. Returns the new attachment uuid.
+///
+/// Bytes cross the bridge only here and in `extract_attachment` — entry DTOs
+/// carry metadata alone. Size-capped (same limit as Enpass import); a `File`
+/// entry is refused. Async — triggers a full vault save.
+Future<String> addAttachment({
+  required String entryId,
+  required String name,
+  required String kind,
+  required List<int> data,
+}) => RustLib.instance.api.crateApiVaultBridgeAddAttachment(
+  entryId: entryId,
+  name: name,
+  kind: kind,
+  data: data,
+);
+
+/// Remove an attachment and persist. The removal syncs (tombstoned).
+///
+/// Async — triggers a full vault save.
+Future<void> removeAttachment({
+  required String entryId,
+  required String uuid,
+}) => RustLib.instance.api.crateApiVaultBridgeRemoveAttachment(
+  entryId: entryId,
+  uuid: uuid,
+);
+
+/// Return an attachment's raw bytes for saving to disk.
+///
+/// The only path besides `add_attachment` where attachment bytes cross the
+/// bridge — on demand, when the user extracts. Read-only, synchronous.
+Future<Uint8List> extractAttachment({
+  required String entryId,
+  required String uuid,
+}) => RustLib.instance.api.crateApiVaultBridgeExtractAttachment(
+  entryId: entryId,
+  uuid: uuid,
+);
 
 /// Remove an entry by UUID and persist.
 ///

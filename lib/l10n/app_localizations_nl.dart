@@ -1098,6 +1098,25 @@ class AppLocalizationsNl extends AppLocalizations {
   String get fieldCustomFields => 'Aangepaste velden';
 
   @override
+  String get fieldAttachments => 'Bijlagen';
+
+  @override
+  String get addAttachment => 'Bijlage toevoegen';
+
+  @override
+  String get tooltipRemoveAttachment => 'Bijlage verwijderen';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return '\"$name\" verwijderen?';
+  }
+
+  @override
+  String attachmentTooLarge(int mb) {
+    return 'De bijlage is groter dan $mb MB. Voeg een kleiner bestand toe.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (optioneel)';
   }

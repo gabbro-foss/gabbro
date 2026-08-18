@@ -1096,6 +1096,25 @@ class AppLocalizationsSr extends AppLocalizations {
   String get fieldCustomFields => 'Прилагођена поља';
 
   @override
+  String get fieldAttachments => 'Прилози';
+
+  @override
+  String get addAttachment => 'Додај прилог';
+
+  @override
+  String get tooltipRemoveAttachment => 'Уклони прилог';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return 'Уклони «$name»?';
+  }
+
+  @override
+  String attachmentTooLarge(int mb) {
+    return 'Прилог је већи од $mb MB. Приложите мању датотеку.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (необавезно)';
   }
@@ -3288,6 +3307,25 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get fieldCustomFields => 'Prilagođena polja';
+
+  @override
+  String get fieldAttachments => 'Prilozi';
+
+  @override
+  String get addAttachment => 'Dodaj prilog';
+
+  @override
+  String get tooltipRemoveAttachment => 'Ukloni prilog';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return 'Ukloni «$name»?';
+  }
+
+  @override
+  String attachmentTooLarge(int mb) {
+    return 'Prilog je veći od $mb MB. Priložite manju datoteku.';
+  }
 
   @override
   String fieldLabelOptional(String label) {

@@ -440,6 +440,21 @@
   "fieldLabel": "Štítok",
   "fieldValue": "Hodnota",
   "fieldCustomFields": "Vlastné polia",
+  "fieldAttachments": "Prílohy",
+  "addAttachment": "Pridať prílohu",
+  "tooltipRemoveAttachment": "Odstrániť prílohu",
+  "removeAttachmentConfirm": "Odstrániť «{name}»?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "attachmentTooLarge": "Príloha je väčšia ako {mb} MB. Priložte menší súbor.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (voliteľné)",
   "@fieldLabelOptional": {
     "placeholders": {

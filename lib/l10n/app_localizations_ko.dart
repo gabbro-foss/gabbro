@@ -1082,6 +1082,25 @@ class AppLocalizationsKo extends AppLocalizations {
   String get fieldCustomFields => '사용자 정의 필드';
 
   @override
+  String get fieldAttachments => '첨부 파일';
+
+  @override
+  String get addAttachment => '첨부 파일 추가';
+
+  @override
+  String get tooltipRemoveAttachment => '첨부 파일 제거';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return '«$name»을(를) 제거하시겠습니까?';
+  }
+
+  @override
+  String attachmentTooLarge(int mb) {
+    return '첨부 파일이 $mb MB보다 큽니다. 더 작은 파일을 첨부하세요.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (선택사항)';
   }

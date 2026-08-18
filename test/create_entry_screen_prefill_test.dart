@@ -15,6 +15,7 @@ LoginEntryData _loginEntry() => LoginEntryData(
       password: '',
       notes: null,
       customFields: [],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
@@ -23,7 +24,7 @@ LoginEntryData _loginEntry() => LoginEntryData(
 Widget _buildCardScreenWithPrefill(Map<String, String> prefill) => testApp(CreateEntryScreen(
       entryType: 'Card',
       prefill: prefill,
-      onCreateEntry: (_) async {},
+      onCreateEntry: (_) async => '',
       onGetEntry: (_) => VaultEntryData.login(_loginEntry()),
     ));
 
@@ -85,7 +86,7 @@ void main() {
     await tester.pumpWidget(
       testApp(CreateEntryScreen(
         entryType: 'Card',
-        onCreateEntry: (_) async {},
+        onCreateEntry: (_) async => '',
         onGetEntry: (_) => VaultEntryData.login(_loginEntry()),
       )),
     );
@@ -110,6 +111,7 @@ void main() {
       cvv: '123',
       status: 'active',
       customFields: [],
+      attachments: const [],
       pin: null,
     );
     await tester.pumpWidget(
@@ -117,7 +119,7 @@ void main() {
         entryType: 'Card',
         existing: VaultEntryData.card(card),
         prefill: const {'card_number': 'should-not-appear'},
-        onCreateEntry: (_) async {},
+        onCreateEntry: (_) async => '',
         onGetEntry: (_) => VaultEntryData.card(card),
       )),
     );

@@ -1096,6 +1096,25 @@ class AppLocalizationsHr extends AppLocalizations {
   String get fieldCustomFields => 'Prilagođena polja';
 
   @override
+  String get fieldAttachments => 'Privici';
+
+  @override
+  String get addAttachment => 'Dodaj privitak';
+
+  @override
+  String get tooltipRemoveAttachment => 'Ukloni privitak';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return 'Ukloni «$name»?';
+  }
+
+  @override
+  String attachmentTooLarge(int mb) {
+    return 'Privitak je veći od $mb MB. Priložite manju datoteku.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (neobavezno)';
   }

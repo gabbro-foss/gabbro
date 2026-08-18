@@ -440,6 +440,21 @@
   "fieldLabel": "Tunniste",
   "fieldValue": "Arvo",
   "fieldCustomFields": "Mukautetut kentät",
+  "fieldAttachments": "Liitteet",
+  "addAttachment": "Lisää liite",
+  "tooltipRemoveAttachment": "Poista liite",
+  "removeAttachmentConfirm": "Poistetaanko \"{name}\"?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "attachmentTooLarge": "Liite on suurempi kuin {mb} Mt. Liitä pienempi tiedosto.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (valinnainen)",
   "@fieldLabelOptional": {
     "placeholders": {

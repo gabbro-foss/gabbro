@@ -61,6 +61,7 @@ void main() {
           id: 'x',
           title: 'Mail',
           field: 'custom_fields:OldNote',
+          label: 'OldNote',
         ),
       ],
     );

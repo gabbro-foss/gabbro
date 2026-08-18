@@ -440,6 +440,21 @@
   "fieldLabel": "Мітка",
   "fieldValue": "Значення",
   "fieldCustomFields": "Власні поля",
+  "fieldAttachments": "Вкладення",
+  "addAttachment": "Додати вкладення",
+  "tooltipRemoveAttachment": "Видалити вкладення",
+  "removeAttachmentConfirm": "Видалити «{name}»?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "attachmentTooLarge": "Вкладення більше за {mb} МБ. Прикріпіть менший файл.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (необов'язково)",
   "@fieldLabelOptional": {
     "placeholders": {

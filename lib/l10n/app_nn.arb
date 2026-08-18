@@ -440,6 +440,21 @@
   "fieldLabel": "Etikett",
   "fieldValue": "Verdi",
   "fieldCustomFields": "Eigendefinerte felt",
+  "fieldAttachments": "Vedlegg",
+  "addAttachment": "Legg til vedlegg",
+  "tooltipRemoveAttachment": "Fjern vedlegg",
+  "removeAttachmentConfirm": "Fjern \"{name}\"?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "attachmentTooLarge": "Vedlegget er større enn {mb} MB. Legg ved ei mindre fil.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (valfritt)",
   "@fieldLabelOptional": {
     "placeholders": {

@@ -440,6 +440,21 @@
   "fieldLabel": "Жапсырма",
   "fieldValue": "Мән",
   "fieldCustomFields": "Арнаулы өрістер",
+  "fieldAttachments": "Тіркемелер",
+  "addAttachment": "Тіркеме қосу",
+  "tooltipRemoveAttachment": "Тіркемені өшіру",
+  "removeAttachmentConfirm": "«{name}» өшіру керек пе?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "attachmentTooLarge": "Тіркеме {mb} МБ-тан үлкен. Кішірек файл тіркеңіз.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (міндетті емес)",
   "@fieldLabelOptional": {
     "placeholders": {

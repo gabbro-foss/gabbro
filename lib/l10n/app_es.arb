@@ -440,6 +440,21 @@
   "fieldLabel": "Etiqueta",
   "fieldValue": "Valor",
   "fieldCustomFields": "Campos personalizados",
+  "fieldAttachments": "Adjuntos",
+  "addAttachment": "Añadir adjunto",
+  "tooltipRemoveAttachment": "Quitar adjunto",
+  "removeAttachmentConfirm": "¿Quitar «{name}»?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "attachmentTooLarge": "El adjunto supera los {mb} MB. Adjunta un archivo más pequeño.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (opcional)",
   "@fieldLabelOptional": {
     "placeholders": {

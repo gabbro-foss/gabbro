@@ -128,10 +128,31 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**Allow attachments for all entry types.** Rust already stores, diffs and merges
-`attachments` on Login/Note/Identity/Card/Custom (`FileEntry` has none — it is a file), but the
-field never crosses the bridge, so a user cannot add or view one. Only Enpass import fills it:
-an imported attachment is invisible and unrecoverable in the app.
+**Attachments for all entry types — implementation DONE, close-out pending.**
+Branch `allow_attachments` (30 commits on master @ aeb6629). Shipped on the branch:
+attachment metadata in the five entry DTOs; `add_attachment` (25 MB size cap, count
+cap 3 for in-app adds — import/merge exempt) / `extract_attachment` /
+`remove_attachment` (tombstoned); edit/create screen section; detail-screen extract;
+filenames (not uuids) in sync review + recovery history; 5 l10n keys x37; real-FFI
+round-trip suite; 3 bug/UX fixes found en route (edit wiped attachments + synced the
+loss; stale detail after save-less edit back; "No changes to save." after
+attachment-only edits). Both hardware passes green (Linux 2026-08-18, Android
+emulator 2026-08-18).
+
+Remaining (gate was RUNNING when the session closed — read its result from
+`gabbro/.scratchpad` or ask):
+
+- [ ] Gate red -> fix on the branch.
+- [ ] Gate green -> merge: master has NOT moved (merge-base == master tip), so
+      `git checkout master && git merge --no-ff allow_attachments` yields a tree
+      byte-identical to what the gate tested — verify with
+      `git diff master allow_attachments --stat` (must be empty) after merging;
+      no gate re-run needed then.
+- [ ] Update the Testing table counts from the gate output (Flutter now 2347/10s,
+      real-FFI 16; Rust count from the gate log).
+- [ ] New release (maintainer decided 2026-08-18): follow BUILD_AND_RELEASE.md,
+      next tag v0.1.0-alpha.21. No dep bumps this branch — no `--warm`.
+- [ ] Delete this section's completed text when the release is out.
 
 ---
 

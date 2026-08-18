@@ -1101,6 +1101,25 @@ class AppLocalizationsUk extends AppLocalizations {
   String get fieldCustomFields => 'Власні поля';
 
   @override
+  String get fieldAttachments => 'Вкладення';
+
+  @override
+  String get addAttachment => 'Додати вкладення';
+
+  @override
+  String get tooltipRemoveAttachment => 'Видалити вкладення';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return 'Видалити «$name»?';
+  }
+
+  @override
+  String attachmentTooLarge(int mb) {
+    return 'Вкладення більше за $mb МБ. Прикріпіть менший файл.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (необов\'язково)';
   }

@@ -1097,6 +1097,25 @@ class AppLocalizationsHu extends AppLocalizations {
   String get fieldCustomFields => 'Egyéni mezők';
 
   @override
+  String get fieldAttachments => 'Mellékletek';
+
+  @override
+  String get addAttachment => 'Melléklet hozzáadása';
+
+  @override
+  String get tooltipRemoveAttachment => 'Melléklet eltávolítása';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return '«$name» eltávolítása?';
+  }
+
+  @override
+  String attachmentTooLarge(int mb) {
+    return 'A melléklet nagyobb, mint $mb MB. Csatoljon kisebb fájlt.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (opcionális)';
   }

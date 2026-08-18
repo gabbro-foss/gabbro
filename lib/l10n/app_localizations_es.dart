@@ -1096,6 +1096,25 @@ class AppLocalizationsEs extends AppLocalizations {
   String get fieldCustomFields => 'Campos personalizados';
 
   @override
+  String get fieldAttachments => 'Adjuntos';
+
+  @override
+  String get addAttachment => 'Añadir adjunto';
+
+  @override
+  String get tooltipRemoveAttachment => 'Quitar adjunto';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return '¿Quitar «$name»?';
+  }
+
+  @override
+  String attachmentTooLarge(int mb) {
+    return 'El adjunto supera los $mb MB. Adjunta un archivo más pequeño.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (opcional)';
   }

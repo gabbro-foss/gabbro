@@ -440,6 +440,21 @@
   "fieldLabel": "Etykieta",
   "fieldValue": "Wartość",
   "fieldCustomFields": "Pola niestandardowe",
+  "fieldAttachments": "Załączniki",
+  "addAttachment": "Dodaj załącznik",
+  "tooltipRemoveAttachment": "Usuń załącznik",
+  "removeAttachmentConfirm": "Usunąć «{name}»?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "attachmentTooLarge": "Załącznik jest większy niż {mb} MB. Dołącz mniejszy plik.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (opcjonalnie)",
   "@fieldLabelOptional": {
     "placeholders": {

@@ -440,6 +440,21 @@
   "fieldLabel": "Etikett",
   "fieldValue": "Värde",
   "fieldCustomFields": "Anpassade fält",
+  "fieldAttachments": "Bilagor",
+  "addAttachment": "Lägg till bilaga",
+  "tooltipRemoveAttachment": "Ta bort bilaga",
+  "removeAttachmentConfirm": "Ta bort \"{name}\"?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "attachmentTooLarge": "Bilagan är större än {mb} MB. Bifoga en mindre fil.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (valfritt)",
   "@fieldLabelOptional": {
     "placeholders": {

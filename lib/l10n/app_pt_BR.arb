@@ -440,6 +440,21 @@
   "fieldLabel": "Rótulo",
   "fieldValue": "Valor",
   "fieldCustomFields": "Campos personalizados",
+  "fieldAttachments": "Anexos",
+  "addAttachment": "Adicionar anexo",
+  "tooltipRemoveAttachment": "Remover anexo",
+  "removeAttachmentConfirm": "Remover \"{name}\"?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "attachmentTooLarge": "O anexo é maior que {mb} MB. Anexe um arquivo menor.",
+  "@attachmentTooLarge": {
+    "placeholders": {
+      "mb": {"type": "int"}
+    }
+  },
   "fieldLabelOptional": "{label} (opcional)",
   "@fieldLabelOptional": {
     "placeholders": {

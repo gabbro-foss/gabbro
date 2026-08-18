@@ -226,6 +226,13 @@ String _fieldLabel(String field) {
   return field;
 }
 
+/// Attachment rows are labelled by filename ([name], their value) — the key
+/// holds a uuid, which tells the user nothing. Other rows keep the field key.
+String _itemLabel(String field, String name) =>
+    field.startsWith('attachments:') && name.isNotEmpty
+    ? name
+    : _fieldLabel(field);
+
 const _secretFields = {'password', 'cvv', 'pin', 'transaction_password'};
 
 bool _isSecret(String field) => _secretFields.contains(field);
@@ -617,7 +624,7 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
               child: Row(
                 children: [
                   Text(
-                    _fieldLabel(b.field),
+                    _itemLabel(b.field, b.newValue),
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   if (secret) _eye(key, revealed, l),
@@ -649,7 +656,7 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
               child: Row(
                 children: [
                   Text(
-                    _fieldLabel(c.field),
+                    _itemLabel(c.field, c.incomingValue),
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   if (secret) _eye(key, revealed, l),
@@ -685,7 +692,11 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
           widgets.add(
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-              child: Text(l.syncDeleteEntryContent(_fieldLabel(d.field))),
+              child: Text(
+                l.syncDeleteEntryContent(
+                  d.label.isNotEmpty ? d.label : _fieldLabel(d.field),
+                ),
+              ),
             ),
           );
           widgets.add(

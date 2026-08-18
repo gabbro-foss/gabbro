@@ -1100,6 +1100,25 @@ class AppLocalizationsRu extends AppLocalizations {
   String get fieldCustomFields => 'Пользовательские поля';
 
   @override
+  String get fieldAttachments => 'Вложения';
+
+  @override
+  String get addAttachment => 'Добавить вложение';
+
+  @override
+  String get tooltipRemoveAttachment => 'Удалить вложение';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return 'Удалить «$name»?';
+  }
+
+  @override
+  String attachmentTooLarge(int mb) {
+    return 'Вложение больше $mb МБ. Прикрепите файл меньшего размера.';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (необязательно)';
   }
