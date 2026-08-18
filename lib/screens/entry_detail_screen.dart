@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:gabbro/gabbro_file_picker.dart';
 import 'package:intl/intl.dart';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gabbro/widgets/gabbro_dialog.dart';
 import 'package:flutter/semantics.dart';
@@ -46,6 +47,8 @@ String formatTimestamp(
 }
 
 Future<void> _defaultDelete(String id) => deleteEntry(id: id);
+Future<Uint8List> _defaultExtractAttachment(String entryId, String uuid) =>
+    extractAttachment(entryId: entryId, uuid: uuid);
 Future<UrlOpenResult> _defaultLaunchUrl(String url) =>
     GabbroUrlOpener.open(url);
 
@@ -95,6 +98,11 @@ class EntryDetailScreen extends StatefulWidget {
   /// (sandbox).
   final Future<String?> Function(String filename)? exportFilePicker;
 
+  /// Test seam: fetch an attachment's bytes for saving to disk. Bytes cross
+  /// the bridge only on demand — the entry DTO carries metadata alone.
+  final Future<Uint8List> Function(String entryId, String uuid)
+  onExtractAttachment;
+
   /// Extra bottom padding below the scrollable body, on top of the normal
   /// content padding. The tablet two-pane layout passes this so the detail
   /// pane's last item clears the Scaffold-level FAB that floats over its
@@ -121,6 +129,7 @@ class EntryDetailScreen extends StatefulWidget {
     this.onDeleted,
     this.onEdited,
     this.exportFilePicker,
+    this.onExtractAttachment = _defaultExtractAttachment,
     this.bottomReserve = 0,
   }) : isAndroid = isAndroid ?? Platform.isAndroid;
 
@@ -222,9 +231,22 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       _defaultExportFilePicker(filename, isAndroid: widget.isAndroid);
 
   /// Export a file entry's bytes to a user-specified path.
-  Future<void> _exportFile(FileEntryData e) async {
+  Future<void> _exportFile(FileEntryData e) =>
+      _exportBytes(e.filename, () async => e.data);
+
+  /// Save an attachment to disk: bytes are fetched from the vault only after
+  /// the user confirms a destination.
+  Future<void> _exportAttachment(AttachmentMetaData a) =>
+      _exportBytes(a.name, () => widget.onExtractAttachment(_entryId(), a.uuid));
+
+  /// Shared save-to-disk flow (File entry payloads and attachments): path
+  /// dialog with browse button, then the write, errors in a scrollable dialog.
+  Future<void> _exportBytes(
+    String filename,
+    Future<List<int>> Function() loadBytes,
+  ) async {
     final pathController = TextEditingController(
-      text: '${Platform.environment['HOME'] ?? '/tmp'}/${e.filename}',
+      text: '${Platform.environment['HOME'] ?? '/tmp'}/$filename',
     );
     final confirmed = await showGabbroDialog<bool>(
       context: context,
@@ -252,7 +274,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                       final String? picked;
                       try {
                         picked = await runPicker(
-                          () => _pickExportPath(e.filename),
+                          () => _pickExportPath(filename),
                         );
                       } on FilePickerUnavailable {
                         if (ctx.mounted) showPickerUnavailable(ctx);
@@ -287,7 +309,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     try {
       final file = File(path);
       await file.parent.create(recursive: true);
-      await file.writeAsBytes(e.data);
+      await file.writeAsBytes(await loadBytes());
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -392,6 +414,39 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
 
   // ── Entry type views ─────────────────────────────────────────────────────────
 
+  /// Attachment rows for the five attachment-bearing types (a File entry is
+  /// its own payload and uses the export button in the app bar instead).
+  List<Widget> _attachmentBlock(
+    List<AttachmentMetaData> atts,
+    AppLocalizations l,
+  ) {
+    if (atts.isEmpty) return const [];
+    return [
+      const SizedBox(height: 8),
+      _sectionHeader(l.fieldAttachments),
+      ...atts.map(
+        (a) => Row(
+          children: [
+            const Icon(Icons.attach_file),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                '${a.name} (${(a.size.toInt() / 1024).toStringAsFixed(1)} KB)',
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.download_outlined),
+              iconSize: scaledIconSize(context),
+              tooltip: l.tooltipExportFile,
+              onPressed: () => _exportAttachment(a),
+            ),
+          ],
+        ),
+      ),
+    ];
+  }
+
   Widget _loginView(LoginEntryData e, AppLocalizations l) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -437,6 +492,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                 : _field(f.label, f.value, l),
           ),
         ],
+        ..._attachmentBlock(e.attachments, l),
         _timestampsRow(e.createdAt, e.updatedAt, e.folder, l),
       ],
     );
@@ -469,6 +525,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                 : _field(f.label, f.value, l),
           ),
         ],
+        ..._attachmentBlock(e.attachments, l),
         _timestampsRow(e.createdAt, e.updatedAt, e.folder, l),
       ],
     );
@@ -504,6 +561,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                 : _field(f.label, f.value, l),
           ),
         ],
+        ..._attachmentBlock(e.attachments, l),
         _timestampsRow(e.createdAt, e.updatedAt, e.folder, l),
       ],
     );
@@ -589,6 +647,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                 : _field(f.label, f.value, l),
           ),
         ],
+        ..._attachmentBlock(e.attachments, l),
         _timestampsRow(e.createdAt, e.updatedAt, e.folder, l),
       ],
     );
@@ -659,6 +718,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                 : _field(f.label, f.value, l),
           ),
         ],
+        ..._attachmentBlock(e.attachments, l),
         _timestampsRow(e.createdAt, e.updatedAt, e.folder, l),
       ],
     );
