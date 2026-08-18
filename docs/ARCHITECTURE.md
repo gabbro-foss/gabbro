@@ -180,8 +180,13 @@ anywhere (all screens per `test/screen_catalogue.dart`, a11y, l10n, Rust backend
       edit without a review-save left the detail screen on its stale entry — the new
       attachment invisible until the entry was reopened. Fix: re-read the entry when
       the edit route returns null (`entry_detail_screen.dart`), red test first.
+- [x] **Fix Review-after-attachment-only-edit UX** (hardware pass 1 step 7): "No
+      changes to save." after an attachment add read as failure. Review with
+      attachment-only changes now returns to detail silently; snackbar only when
+      truly nothing changed. Red-then-green; hardware check in pass 2.
 - [ ] Hardware pass (matrix v2 in `.scratchpad`: isolated HOME, verified UI labels,
-      two linear passes)
+      two linear passes; pass 1 green 2026-08-18, pass 2 pending — fixture path fixed
+      to a literal `/tmp/gabbro_hw/` copy)
 
 ---
 
