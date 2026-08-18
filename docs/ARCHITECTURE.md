@@ -187,7 +187,8 @@ anywhere (all screens per `test/screen_catalogue.dart`, a11y, l10n, Rust backend
 - [x] Hardware pass, Linux (2026-08-18): both passes green — add/cap/remove/extract,
       oversized refusal, Enpass import visible + extractable, edit preserves, silent
       review return
-- [ ] Hardware pass, Android (attachment picker channel + export path)
+- [x] Hardware pass, Android emulator (2026-08-18): all 10 steps green (one matrix
+      expectation corrected: sub-KB sizes show 0.0 KB, matching the File-entry format)
 - [ ] Full gate (`gabbro_test`) + test-count table update
 
 ---
