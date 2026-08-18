@@ -25,6 +25,7 @@ CardEntryData _originalCard() => CardEntryData(
       transactionPassword: null,
       notes: null,
       customFields: [],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
@@ -46,6 +47,7 @@ CardEntryData _updatedCardCvvAndPin() => CardEntryData(
       transactionPassword: null,
       notes: null,
       customFields: [],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
@@ -61,6 +63,7 @@ IdentityEntryData _originalIdentity() => IdentityEntryData(
       customFields: [
         CustomFieldData(label: 'Passport', value: 'AB123456', hidden: false),
       ],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
@@ -76,6 +79,7 @@ IdentityEntryData _updatedIdentityCustomField() => IdentityEntryData(
       customFields: [
         CustomFieldData(label: 'Passport', value: 'ZZ999999', hidden: false),
       ],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
@@ -90,6 +94,7 @@ CustomEntryData _originalCustom() => CustomEntryData(
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
+      attachments: const [],
     );
 
 CustomEntryData _updatedCustomField() => CustomEntryData(
@@ -101,6 +106,7 @@ CustomEntryData _updatedCustomField() => CustomEntryData(
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
+      attachments: const [],
     );
 
 LoginEntryData _original() => LoginEntryData(
@@ -111,6 +117,7 @@ LoginEntryData _original() => LoginEntryData(
       password: 'old_password',
       notes: null,
       customFields: [],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
@@ -124,6 +131,7 @@ LoginEntryData _updatedPasswordAndUrl() => LoginEntryData(
       password: 'new_password',
       notes: null,
       customFields: [],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
@@ -137,6 +145,7 @@ LoginEntryData _updatedUrlOnly() => LoginEntryData(
       password: 'old_password',
       notes: null,
       customFields: [],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
@@ -151,6 +160,7 @@ LoginEntryData _appIdLogin({String? appId, String? email}) => LoginEntryData(
       password: 'secret',
       notes: null,
       customFields: [],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
@@ -347,6 +357,7 @@ void main() {
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
+      attachments: const [],
     );
     final updated = CustomEntryData(
       id: 'custom-id-2',
@@ -357,6 +368,7 @@ void main() {
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
+      attachments: const [],
     );
     await tester.pumpWidget(_buildReviewScreen(
       original: VaultEntryData.custom(original),
@@ -400,6 +412,7 @@ void main() {
       transactionPassword: null,
       notes: null,
       customFields: [],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
@@ -431,6 +444,7 @@ void main() {
       transactionPassword: null,
       notes: null,
       customFields: [],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
@@ -462,6 +476,7 @@ void main() {
       transactionPassword: null,
       notes: 'Primary travel card',
       customFields: [],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
@@ -486,6 +501,7 @@ void main() {
       customFields: const [
         CustomFieldData(label: 'Token', value: 'abc123', hidden: false),
       ],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: '',
@@ -497,6 +513,7 @@ void main() {
       customFields: const [
         CustomFieldData(label: 'Token', value: 'xyz789', hidden: false),
       ],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: '',
@@ -593,6 +610,7 @@ void main() {
       customFields: const [
         CustomFieldData(label: '2FA backup', value: 'code-old', hidden: false),
       ],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: '',
@@ -607,6 +625,7 @@ void main() {
       customFields: const [
         CustomFieldData(label: '2FA backup', value: 'code-new', hidden: false),
       ],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: '',
@@ -639,6 +658,7 @@ void main() {
       transactionPassword: null,
       notes: null,
       customFields: const [],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
@@ -672,6 +692,7 @@ void main() {
       transactionPassword: 's3cr3t',
       notes: null,
       customFields: const [],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
@@ -704,6 +725,7 @@ void main() {
       customFields: const [
         CustomFieldData(label: 'Membership', value: 'Gold', hidden: false),
       ],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
@@ -726,6 +748,7 @@ void main() {
       customFields: const [
         CustomFieldData(label: 'Membership', value: 'Platinum', hidden: false),
       ],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
@@ -747,13 +770,15 @@ void main() {
     final original = LoginEntryData(
       id: 'test-id-1', title: 'Example', url: 'https://example.com',
       username: 'user@example.com', password: 'old_password', notes: null,
-      customFields: [], createdAt: '2025-01-01T00:00:00Z',
+      customFields: [], attachments: const [],
+      createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z', folder: 'Work',
     );
     final updated = LoginEntryData(
       id: 'test-id-1', title: 'Example', url: 'https://example.com',
       username: 'user@example.com', password: 'old_password', notes: null,
-      customFields: [], createdAt: '2025-01-01T00:00:00Z',
+      customFields: [], attachments: const [],
+      createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z', folder: 'Personal',
     );
     await tester.pumpWidget(_buildReviewScreen(

@@ -36,6 +36,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   AddedEntryItem dco_decode_added_entry_item(dynamic raw);
 
   @protected
+  AttachmentMetaData dco_decode_attachment_meta_data(dynamic raw);
+
+  @protected
   bool dco_decode_bool(dynamic raw);
 
   @protected
@@ -156,6 +159,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<AddedEntryItem> dco_decode_list_added_entry_item(dynamic raw);
+
+  @protected
+  List<AttachmentMetaData> dco_decode_list_attachment_meta_data(dynamic raw);
 
   @protected
   List<BroughtOverItem> dco_decode_list_brought_over_item(dynamic raw);
@@ -323,6 +329,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   AddedEntryItem sse_decode_added_entry_item(SseDeserializer deserializer);
 
   @protected
+  AttachmentMetaData sse_decode_attachment_meta_data(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   bool sse_decode_bool(SseDeserializer deserializer);
 
   @protected
@@ -483,6 +494,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<AddedEntryItem> sse_decode_list_added_entry_item(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<AttachmentMetaData> sse_decode_list_attachment_meta_data(
     SseDeserializer deserializer,
   );
 
@@ -701,6 +717,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_attachment_meta_data(
+    AttachmentMetaData self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_bool(bool self, SseSerializer serializer);
 
   @protected
@@ -904,6 +926,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_added_entry_item(
     List<AddedEntryItem> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_attachment_meta_data(
+    List<AttachmentMetaData> self,
     SseSerializer serializer,
   );
 

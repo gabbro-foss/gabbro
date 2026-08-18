@@ -592,6 +592,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                   ),
                 )
                 .toList(),
+            attachments: field0.attachments,
             appId: _appIdOrNull(),
             email: _loginEmailOrNull(),
           ),
@@ -614,6 +615,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                   ),
                 )
                 .toList(),
+            attachments: field0.attachments,
           ),
         );
       case VaultEntryData_Identity(:final field0):
@@ -639,6 +641,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                   ),
                 )
                 .toList(),
+            attachments: field0.attachments,
           ),
         );
       case VaultEntryData_Card(:final field0):
@@ -682,6 +685,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                   ),
                 )
                 .toList(),
+            attachments: field0.attachments,
           ),
         );
       case VaultEntryData_File(:final field0):
@@ -724,6 +728,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                   ),
                 )
                 .toList(),
+            attachments: field0.attachments,
           ),
         );
       default:
@@ -757,6 +762,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                     ),
                   )
                   .toList(),
+              attachments: const [],
               appId: _appIdOrNull(),
               email: _loginEmailOrNull(),
             ),
@@ -782,6 +788,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                     ),
                   )
                   .toList(),
+              attachments: const [],
             ),
           ),
         );
@@ -812,6 +819,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                     ),
                   )
                   .toList(),
+              attachments: const [],
             ),
           ),
         );
@@ -856,6 +864,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                     ),
                   )
                   .toList(),
+              attachments: const [],
             ),
           ),
         );
@@ -904,6 +913,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                     ),
                   )
                   .toList(),
+              attachments: const [],
             ),
           ),
         );

@@ -2834,6 +2834,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  AttachmentMetaData dco_decode_attachment_meta_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return AttachmentMetaData(
+      uuid: dco_decode_String(arr[0]),
+      name: dco_decode_String(arr[1]),
+      kind: dco_decode_String(arr[2]),
+      size: dco_decode_u_64(arr[3]),
+    );
+  }
+
+  @protected
   bool dco_decode_bool(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as bool;
@@ -2951,8 +2965,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   CardEntryData dco_decode_card_entry_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 18)
-      throw Exception('unexpected arr length: expect 18 but see ${arr.length}');
+    if (arr.length != 19)
+      throw Exception('unexpected arr length: expect 19 but see ${arr.length}');
     return CardEntryData(
       id: dco_decode_String(arr[0]),
       createdAt: dco_decode_String(arr[1]),
@@ -2972,6 +2986,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       transactionPassword: dco_decode_opt_String(arr[15]),
       notes: dco_decode_opt_String(arr[16]),
       customFields: dco_decode_list_custom_field_data(arr[17]),
+      attachments: dco_decode_list_attachment_meta_data(arr[18]),
     );
   }
 
@@ -3006,8 +3021,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   CustomEntryData dco_decode_custom_entry_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 6)
-      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    if (arr.length != 7)
+      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
     return CustomEntryData(
       id: dco_decode_String(arr[0]),
       createdAt: dco_decode_String(arr[1]),
@@ -3015,6 +3030,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       folder: dco_decode_String(arr[3]),
       title: dco_decode_String(arr[4]),
       fields: dco_decode_list_custom_field_data(arr[5]),
+      attachments: dco_decode_list_attachment_meta_data(arr[6]),
     );
   }
 
@@ -3195,8 +3211,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   IdentityEntryData dco_decode_identity_entry_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 10)
-      throw Exception('unexpected arr length: expect 10 but see ${arr.length}');
+    if (arr.length != 11)
+      throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
     return IdentityEntryData(
       id: dco_decode_String(arr[0]),
       createdAt: dco_decode_String(arr[1]),
@@ -3208,6 +3224,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       phone: dco_decode_opt_String(arr[7]),
       address: dco_decode_opt_String(arr[8]),
       customFields: dco_decode_list_custom_field_data(arr[9]),
+      attachments: dco_decode_list_attachment_meta_data(arr[10]),
     );
   }
 
@@ -3254,6 +3271,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   List<AddedEntryItem> dco_decode_list_added_entry_item(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_added_entry_item).toList();
+  }
+
+  @protected
+  List<AttachmentMetaData> dco_decode_list_attachment_meta_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_attachment_meta_data).toList();
   }
 
   @protected
@@ -3407,8 +3430,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   LoginEntryData dco_decode_login_entry_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 12)
-      throw Exception('unexpected arr length: expect 12 but see ${arr.length}');
+    if (arr.length != 13)
+      throw Exception('unexpected arr length: expect 13 but see ${arr.length}');
     return LoginEntryData(
       id: dco_decode_String(arr[0]),
       createdAt: dco_decode_String(arr[1]),
@@ -3420,8 +3443,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       password: dco_decode_String(arr[7]),
       notes: dco_decode_opt_String(arr[8]),
       customFields: dco_decode_list_custom_field_data(arr[9]),
-      appId: dco_decode_opt_String(arr[10]),
-      email: dco_decode_opt_String(arr[11]),
+      attachments: dco_decode_list_attachment_meta_data(arr[10]),
+      appId: dco_decode_opt_String(arr[11]),
+      email: dco_decode_opt_String(arr[12]),
     );
   }
 
@@ -3447,8 +3471,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   NoteEntryData dco_decode_note_entry_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 7)
-      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
+    if (arr.length != 8)
+      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
     return NoteEntryData(
       id: dco_decode_String(arr[0]),
       createdAt: dco_decode_String(arr[1]),
@@ -3457,6 +3481,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       title: dco_decode_String(arr[4]),
       content: dco_decode_String(arr[5]),
       customFields: dco_decode_list_custom_field_data(arr[6]),
+      attachments: dco_decode_list_attachment_meta_data(arr[7]),
     );
   }
 
@@ -3753,6 +3778,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  AttachmentMetaData sse_decode_attachment_meta_data(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_uuid = sse_decode_String(deserializer);
+    var var_name = sse_decode_String(deserializer);
+    var var_kind = sse_decode_String(deserializer);
+    var var_size = sse_decode_u_64(deserializer);
+    return AttachmentMetaData(
+      uuid: var_uuid,
+      name: var_name,
+      kind: var_kind,
+      size: var_size,
+    );
+  }
+
+  @protected
   bool sse_decode_bool(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getUint8() != 0;
@@ -3913,6 +3955,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_transactionPassword = sse_decode_opt_String(deserializer);
     var var_notes = sse_decode_opt_String(deserializer);
     var var_customFields = sse_decode_list_custom_field_data(deserializer);
+    var var_attachments = sse_decode_list_attachment_meta_data(deserializer);
     return CardEntryData(
       id: var_id,
       createdAt: var_createdAt,
@@ -3932,6 +3975,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       transactionPassword: var_transactionPassword,
       notes: var_notes,
       customFields: var_customFields,
+      attachments: var_attachments,
     );
   }
 
@@ -3971,6 +4015,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_folder = sse_decode_String(deserializer);
     var var_title = sse_decode_String(deserializer);
     var var_fields = sse_decode_list_custom_field_data(deserializer);
+    var var_attachments = sse_decode_list_attachment_meta_data(deserializer);
     return CustomEntryData(
       id: var_id,
       createdAt: var_createdAt,
@@ -3978,6 +4023,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       folder: var_folder,
       title: var_title,
       fields: var_fields,
+      attachments: var_attachments,
     );
   }
 
@@ -4169,6 +4215,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_phone = sse_decode_opt_String(deserializer);
     var var_address = sse_decode_opt_String(deserializer);
     var var_customFields = sse_decode_list_custom_field_data(deserializer);
+    var var_attachments = sse_decode_list_attachment_meta_data(deserializer);
     return IdentityEntryData(
       id: var_id,
       createdAt: var_createdAt,
@@ -4180,6 +4227,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       phone: var_phone,
       address: var_address,
       customFields: var_customFields,
+      attachments: var_attachments,
     );
   }
 
@@ -4242,6 +4290,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var ans_ = <AddedEntryItem>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(sse_decode_added_entry_item(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<AttachmentMetaData> sse_decode_list_attachment_meta_data(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <AttachmentMetaData>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_attachment_meta_data(deserializer));
     }
     return ans_;
   }
@@ -4550,6 +4612,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_password = sse_decode_String(deserializer);
     var var_notes = sse_decode_opt_String(deserializer);
     var var_customFields = sse_decode_list_custom_field_data(deserializer);
+    var var_attachments = sse_decode_list_attachment_meta_data(deserializer);
     var var_appId = sse_decode_opt_String(deserializer);
     var var_email = sse_decode_opt_String(deserializer);
     return LoginEntryData(
@@ -4563,6 +4626,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       password: var_password,
       notes: var_notes,
       customFields: var_customFields,
+      attachments: var_attachments,
       appId: var_appId,
       email: var_email,
     );
@@ -4605,6 +4669,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_title = sse_decode_String(deserializer);
     var var_content = sse_decode_String(deserializer);
     var var_customFields = sse_decode_list_custom_field_data(deserializer);
+    var var_attachments = sse_decode_list_attachment_meta_data(deserializer);
     return NoteEntryData(
       id: var_id,
       createdAt: var_createdAt,
@@ -4613,6 +4678,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       title: var_title,
       content: var_content,
       customFields: var_customFields,
+      attachments: var_attachments,
     );
   }
 
@@ -4930,6 +4996,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_attachment_meta_data(
+    AttachmentMetaData self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.uuid, serializer);
+    sse_encode_String(self.name, serializer);
+    sse_encode_String(self.kind, serializer);
+    sse_encode_u_64(self.size, serializer);
+  }
+
+  @protected
   void sse_encode_bool(bool self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint8(self ? 1 : 0);
@@ -5097,6 +5175,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.transactionPassword, serializer);
     sse_encode_opt_String(self.notes, serializer);
     sse_encode_list_custom_field_data(self.customFields, serializer);
+    sse_encode_list_attachment_meta_data(self.attachments, serializer);
   }
 
   @protected
@@ -5134,6 +5213,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.folder, serializer);
     sse_encode_String(self.title, serializer);
     sse_encode_list_custom_field_data(self.fields, serializer);
+    sse_encode_list_attachment_meta_data(self.attachments, serializer);
   }
 
   @protected
@@ -5298,6 +5378,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.phone, serializer);
     sse_encode_opt_String(self.address, serializer);
     sse_encode_list_custom_field_data(self.customFields, serializer);
+    sse_encode_list_attachment_meta_data(self.attachments, serializer);
   }
 
   @protected
@@ -5344,6 +5425,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_added_entry_item(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_attachment_meta_data(
+    List<AttachmentMetaData> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_attachment_meta_data(item, serializer);
     }
   }
 
@@ -5625,6 +5718,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.password, serializer);
     sse_encode_opt_String(self.notes, serializer);
     sse_encode_list_custom_field_data(self.customFields, serializer);
+    sse_encode_list_attachment_meta_data(self.attachments, serializer);
     sse_encode_opt_String(self.appId, serializer);
     sse_encode_opt_String(self.email, serializer);
   }
@@ -5658,6 +5752,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.title, serializer);
     sse_encode_String(self.content, serializer);
     sse_encode_list_custom_field_data(self.customFields, serializer);
+    sse_encode_list_attachment_meta_data(self.attachments, serializer);
   }
 
   @protected

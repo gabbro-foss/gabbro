@@ -23,6 +23,18 @@ pub struct CustomFieldData {
     pub hidden: bool,
 }
 
+/// Attachment metadata as seen by Flutter. The bytes never ride in an entry
+/// DTO — they cross the bridge only through the dedicated attachment calls —
+/// so opening an entry stays fast however large its attachments are.
+pub struct AttachmentMetaData {
+    pub uuid: String,
+    pub name: String,
+    /// MIME type (e.g. "image/png", "application/pdf").
+    pub kind: String,
+    /// Byte length of the stored data.
+    pub size: u64,
+}
+
 /// A recovery-history record for Flutter: a value replaced during sync, kept so
 /// the user can restore it. `value` is plaintext — Flutter masks secret fields.
 pub struct HistoryRecordData {
@@ -46,6 +58,7 @@ pub struct LoginEntryData {
     pub password: String,
     pub notes: Option<String>,
     pub custom_fields: Vec<CustomFieldData>,
+    pub attachments: Vec<AttachmentMetaData>,
     /// Android application id for native-app autofill matching; `None` if unset.
     pub app_id: Option<String>,
     /// Email/identifier routed to email-typed fields; `None` if unset.
@@ -61,6 +74,7 @@ pub struct NoteEntryData {
     pub title: String,
     pub content: String,
     pub custom_fields: Vec<CustomFieldData>,
+    pub attachments: Vec<AttachmentMetaData>,
 }
 
 /// An identity entry as seen by Flutter.
@@ -75,6 +89,7 @@ pub struct IdentityEntryData {
     pub phone: Option<String>,
     pub address: Option<String>,
     pub custom_fields: Vec<CustomFieldData>,
+    pub attachments: Vec<AttachmentMetaData>,
 }
 
 /// A card entry as seen by Flutter.
@@ -97,6 +112,7 @@ pub struct CardEntryData {
     pub transaction_password: Option<String>,
     pub notes: Option<String>,
     pub custom_fields: Vec<CustomFieldData>,
+    pub attachments: Vec<AttachmentMetaData>,
 }
 
 /// A file entry as seen by Flutter.
@@ -119,6 +135,7 @@ pub struct CustomEntryData {
     pub folder: String,
     pub title: String,
     pub fields: Vec<CustomFieldData>,
+    pub attachments: Vec<AttachmentMetaData>,
 }
 
 /// An entry flagged for user-consent deletion during vault merge.
@@ -275,6 +292,16 @@ fn login_entry_to_data(e: &LoginEntry) -> LoginEntryData {
         password: e.password.clone(),
         notes: e.notes.clone(),
         custom_fields: e.custom_fields.iter().map(custom_field_to_data).collect(),
+        attachments: e
+            .attachments
+            .iter()
+            .map(|a| AttachmentMetaData {
+                uuid: a.uuid.clone(),
+                name: a.name.clone(),
+                kind: a.kind.clone(),
+                size: a.data.len() as u64,
+            })
+            .collect(),
         app_id: e.app_id.clone(),
         email: e.email.clone(),
     }

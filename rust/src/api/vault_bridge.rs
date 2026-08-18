@@ -9,8 +9,8 @@
 use std::path::PathBuf;
 
 use crate::api::vault::{
-    CardEntryData, CustomEntryData, CustomFieldData, FileEntryData, IdentityEntryData,
-    LoginEntryData, NoteEntryData,
+    AttachmentMetaData, CardEntryData, CustomEntryData, CustomFieldData, FileEntryData,
+    IdentityEntryData, LoginEntryData, NoteEntryData,
 };
 use crate::vault::entry::{
     CardEntry, CustomEntry, CustomField, EntryMeta, FileEntry, IdentityEntry, LoginEntry,
@@ -50,6 +50,18 @@ pub enum VaultEntryData {
 
 // ── Conversion: internal VaultEntry → VaultEntryData DTO ─────────────────────
 
+// Metadata only — the bytes stay behind the bridge (see AttachmentMetaData).
+fn attachment_meta(atts: &[crate::vault::entry::EntryAttachment]) -> Vec<AttachmentMetaData> {
+    atts.iter()
+        .map(|a| AttachmentMetaData {
+            uuid: a.uuid.clone(),
+            name: a.name.clone(),
+            kind: a.kind.clone(),
+            size: a.data.len() as u64,
+        })
+        .collect()
+}
+
 // Takes a reference to avoid moving out of a type that implements Drop
 // (via ZeroizeOnDrop). All fields are cloned explicitly.
 fn vault_entry_to_data(entry: &VaultEntry) -> VaultEntryData {
@@ -73,6 +85,7 @@ fn vault_entry_to_data(entry: &VaultEntry) -> VaultEntryData {
                     hidden: f.hidden,
                 })
                 .collect(),
+            attachments: attachment_meta(&e.attachments),
             app_id: e.app_id.clone(),
             email: e.email.clone(),
         }),
@@ -92,6 +105,7 @@ fn vault_entry_to_data(entry: &VaultEntry) -> VaultEntryData {
                     hidden: f.hidden,
                 })
                 .collect(),
+            attachments: attachment_meta(&e.attachments),
         }),
         VaultEntry::Identity(e) => VaultEntryData::Identity(IdentityEntryData {
             id: e.meta.id.clone(),
@@ -112,6 +126,7 @@ fn vault_entry_to_data(entry: &VaultEntry) -> VaultEntryData {
                     hidden: f.hidden,
                 })
                 .collect(),
+            attachments: attachment_meta(&e.attachments),
         }),
         VaultEntry::Card(e) => VaultEntryData::Card(CardEntryData {
             id: e.meta.id.clone(),
@@ -140,6 +155,7 @@ fn vault_entry_to_data(entry: &VaultEntry) -> VaultEntryData {
                     hidden: f.hidden,
                 })
                 .collect(),
+            attachments: attachment_meta(&e.attachments),
         }),
         VaultEntry::File(e) => VaultEntryData::File(FileEntryData {
             id: e.meta.id.clone(),
@@ -174,6 +190,7 @@ fn vault_entry_to_data(entry: &VaultEntry) -> VaultEntryData {
                     hidden: f.hidden,
                 })
                 .collect(),
+            attachments: attachment_meta(&e.attachments),
         }),
     }
 }
@@ -1997,6 +2014,7 @@ mod tests {
                     hidden: true,
                 },
             ],
+            attachments: vec![],
         });
 
         let entry = vault_entry_from_data(data).unwrap();
@@ -2127,6 +2145,7 @@ mod tests {
                 title: String::from("Temp note"),
                 content: String::from("to be deleted"),
                 custom_fields: vec![],
+                attachments: vec![],
             },
         )))
         .unwrap();
@@ -2140,6 +2159,139 @@ mod tests {
             0,
             "entry must be gone after delete"
         );
+
+        lock_vault().unwrap();
+        let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
+    }
+
+    // Scenario 2 (attachments task) — red first: Flutter can only show an
+    // attachment if its metadata rides in the entry DTO. Bytes stay behind
+    // the bridge; only uuid/name/kind/size cross.
+    #[test]
+    #[serial]
+    fn get_entry_exposes_attachment_metadata_on_all_five_types() {
+        use crate::api::vault::save_vault;
+        use crate::vault::entry::VaultEntry as InternalEntry;
+        use crate::vault::entry::{
+            CardEntry, CustomEntry, EntryAttachment, EntryMeta, IdentityEntry, LoginEntry,
+            NoteEntry,
+        };
+        use std::env::temp_dir;
+
+        fn att() -> Vec<EntryAttachment> {
+            vec![EntryAttachment {
+                uuid: String::from("att-1"),
+                name: String::from("passport.pdf"),
+                kind: String::from("application/pdf"),
+                data: vec![9, 9, 9, 9],
+            }]
+        }
+        fn m(id: &str) -> EntryMeta {
+            EntryMeta {
+                field_times: Default::default(),
+                history: Vec::new(),
+                id: String::from(id),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::new(),
+            }
+        }
+        fn check(got: &[crate::api::vault::AttachmentMetaData]) {
+            assert_eq!(got.len(), 1);
+            assert_eq!(got[0].uuid, "att-1");
+            assert_eq!(got[0].name, "passport.pdf");
+            assert_eq!(got[0].kind, "application/pdf");
+            assert_eq!(got[0].size, 4, "size is the byte length, bytes never cross");
+        }
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_attachment_metadata.gabbro");
+        let pass = b"attachment-metadata-pass";
+        let mut body = VaultBody::empty();
+        body.entries.push(InternalEntry::Login(LoginEntry {
+            meta: m("id-login"),
+            title: String::from("L"),
+            url: String::new(),
+            username: String::new(),
+            password: String::new(),
+            notes: None,
+            custom_fields: vec![],
+            attachments: att(),
+            app_id: None,
+            email: None,
+        }));
+        body.entries.push(InternalEntry::Note(NoteEntry {
+            meta: m("id-note"),
+            title: String::from("N"),
+            content: String::new(),
+            custom_fields: vec![],
+            attachments: att(),
+        }));
+        body.entries.push(InternalEntry::Identity(IdentityEntry {
+            meta: m("id-identity"),
+            first_name: String::from("F"),
+            last_name: String::from("L"),
+            email: String::new(),
+            phone: None,
+            address: None,
+            custom_fields: vec![],
+            attachments: att(),
+        }));
+        body.entries.push(InternalEntry::Card(
+            CardEntry::new(
+                m("id-card"),
+                None,
+                String::from("active"),
+                String::from("C H"),
+                String::from("4111111111111111"),
+                String::from("12/30"),
+                String::from("123"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                vec![],
+                att(),
+            )
+            .unwrap(),
+        ));
+        body.entries.push(InternalEntry::Custom(CustomEntry {
+            meta: m("id-custom"),
+            title: String::from("X"),
+            fields: Default::default(),
+            attachments: att(),
+        }));
+        save_vault(&body, pass, &path).unwrap();
+        run(unlock_vault(
+            pass.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
+
+        match get_entry(String::from("id-login")).unwrap() {
+            VaultEntryData::Login(d) => check(&d.attachments),
+            _ => panic!("expected login"),
+        }
+        match get_entry(String::from("id-note")).unwrap() {
+            VaultEntryData::Note(d) => check(&d.attachments),
+            _ => panic!("expected note"),
+        }
+        match get_entry(String::from("id-identity")).unwrap() {
+            VaultEntryData::Identity(d) => check(&d.attachments),
+            _ => panic!("expected identity"),
+        }
+        match get_entry(String::from("id-card")).unwrap() {
+            VaultEntryData::Card(d) => check(&d.attachments),
+            _ => panic!("expected card"),
+        }
+        match get_entry(String::from("id-custom")).unwrap() {
+            VaultEntryData::Custom(d) => check(&d.attachments),
+            _ => panic!("expected custom"),
+        }
 
         lock_vault().unwrap();
         let _ = std::fs::remove_file(&path);
@@ -2195,6 +2347,7 @@ mod tests {
                 title: String::from("Edited"),
                 content: String::from("edited"),
                 custom_fields: vec![],
+                attachments: vec![],
             }),
             None,
         ))
@@ -2243,6 +2396,7 @@ mod tests {
                 title: String::from("Original title"),
                 content: String::from("original content"),
                 custom_fields: vec![],
+                attachments: vec![],
             },
         )))
         .unwrap();
@@ -2258,6 +2412,7 @@ mod tests {
                 title: String::from("Updated title"),
                 content: String::from("updated content"),
                 custom_fields: vec![],
+                attachments: vec![],
             }),
             None,
         ))
@@ -2302,6 +2457,7 @@ mod tests {
                 title: String::from("Note 1"),
                 content: String::from("content 1"),
                 custom_fields: vec![],
+                attachments: vec![],
             },
         )))
         .unwrap();
@@ -2314,6 +2470,7 @@ mod tests {
                 title: String::from("Note 2"),
                 content: String::from("content 2"),
                 custom_fields: vec![],
+                attachments: vec![],
             },
         )))
         .unwrap();
@@ -2505,6 +2662,7 @@ mod tests {
                     value: String::from("LN-9876"),
                     hidden: false,
                 }],
+                attachments: vec![],
             },
         )))
         .unwrap();
@@ -3238,6 +3396,7 @@ mod tests {
                     hidden: false,
                 })
                 .collect(),
+            attachments: vec![],
         })
     }
 

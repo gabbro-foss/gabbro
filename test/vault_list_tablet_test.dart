@@ -45,6 +45,7 @@ VaultEntryData _fakeLoginEntry() => VaultEntryData.login(
     password: 'secret',
     notes: null,
     customFields: [],
+    attachments: const [],
     createdAt: '2025-01-01T00:00:00Z',
     updatedAt: '2025-01-01T00:00:00Z',
     folder: 'Personal',

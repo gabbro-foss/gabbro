@@ -79,6 +79,7 @@ void main() {
       password: newPassword,
       notes: current.notes,
       customFields: current.customFields,
+      attachments: const [],
     );
   }
 

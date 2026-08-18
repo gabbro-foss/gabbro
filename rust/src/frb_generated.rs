@@ -2864,6 +2864,22 @@ impl SseDecode for crate::api::vault::AddedEntryItem {
     }
 }
 
+impl SseDecode for crate::api::vault::AttachmentMetaData {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_uuid = <String>::sse_decode(deserializer);
+        let mut var_name = <String>::sse_decode(deserializer);
+        let mut var_kind = <String>::sse_decode(deserializer);
+        let mut var_size = <u64>::sse_decode(deserializer);
+        return crate::api::vault::AttachmentMetaData {
+            uuid: var_uuid,
+            name: var_name,
+            kind: var_kind,
+            size: var_size,
+        };
+    }
+}
+
 impl SseDecode for bool {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2925,6 +2941,8 @@ impl SseDecode for crate::api::vault::CardEntryData {
         let mut var_notes = <Option<String>>::sse_decode(deserializer);
         let mut var_customFields =
             <Vec<crate::api::vault::CustomFieldData>>::sse_decode(deserializer);
+        let mut var_attachments =
+            <Vec<crate::api::vault::AttachmentMetaData>>::sse_decode(deserializer);
         return crate::api::vault::CardEntryData {
             id: var_id,
             created_at: var_createdAt,
@@ -2944,6 +2962,7 @@ impl SseDecode for crate::api::vault::CardEntryData {
             transaction_password: var_transactionPassword,
             notes: var_notes,
             custom_fields: var_customFields,
+            attachments: var_attachments,
         };
     }
 }
@@ -2987,6 +3006,8 @@ impl SseDecode for crate::api::vault::CustomEntryData {
         let mut var_folder = <String>::sse_decode(deserializer);
         let mut var_title = <String>::sse_decode(deserializer);
         let mut var_fields = <Vec<crate::api::vault::CustomFieldData>>::sse_decode(deserializer);
+        let mut var_attachments =
+            <Vec<crate::api::vault::AttachmentMetaData>>::sse_decode(deserializer);
         return crate::api::vault::CustomEntryData {
             id: var_id,
             created_at: var_createdAt,
@@ -2994,6 +3015,7 @@ impl SseDecode for crate::api::vault::CustomEntryData {
             folder: var_folder,
             title: var_title,
             fields: var_fields,
+            attachments: var_attachments,
         };
     }
 }
@@ -3205,6 +3227,8 @@ impl SseDecode for crate::api::vault::IdentityEntryData {
         let mut var_address = <Option<String>>::sse_decode(deserializer);
         let mut var_customFields =
             <Vec<crate::api::vault::CustomFieldData>>::sse_decode(deserializer);
+        let mut var_attachments =
+            <Vec<crate::api::vault::AttachmentMetaData>>::sse_decode(deserializer);
         return crate::api::vault::IdentityEntryData {
             id: var_id,
             created_at: var_createdAt,
@@ -3216,6 +3240,7 @@ impl SseDecode for crate::api::vault::IdentityEntryData {
             phone: var_phone,
             address: var_address,
             custom_fields: var_customFields,
+            attachments: var_attachments,
         };
     }
 }
@@ -3309,6 +3334,20 @@ impl SseDecode for Vec<crate::api::vault::AddedEntryItem> {
         let mut ans_ = Vec::with_capacity(len_ as usize);
         for idx_ in 0..len_ {
             ans_.push(<crate::api::vault::AddedEntryItem>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::api::vault::AttachmentMetaData> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::vault::AttachmentMetaData>::sse_decode(
                 deserializer,
             ));
         }
@@ -3616,6 +3655,8 @@ impl SseDecode for crate::api::vault::LoginEntryData {
         let mut var_notes = <Option<String>>::sse_decode(deserializer);
         let mut var_customFields =
             <Vec<crate::api::vault::CustomFieldData>>::sse_decode(deserializer);
+        let mut var_attachments =
+            <Vec<crate::api::vault::AttachmentMetaData>>::sse_decode(deserializer);
         let mut var_appId = <Option<String>>::sse_decode(deserializer);
         let mut var_email = <Option<String>>::sse_decode(deserializer);
         return crate::api::vault::LoginEntryData {
@@ -3629,6 +3670,7 @@ impl SseDecode for crate::api::vault::LoginEntryData {
             password: var_password,
             notes: var_notes,
             custom_fields: var_customFields,
+            attachments: var_attachments,
             app_id: var_appId,
             email: var_email,
         };
@@ -3676,6 +3718,8 @@ impl SseDecode for crate::api::vault::NoteEntryData {
         let mut var_content = <String>::sse_decode(deserializer);
         let mut var_customFields =
             <Vec<crate::api::vault::CustomFieldData>>::sse_decode(deserializer);
+        let mut var_attachments =
+            <Vec<crate::api::vault::AttachmentMetaData>>::sse_decode(deserializer);
         return crate::api::vault::NoteEntryData {
             id: var_id,
             created_at: var_createdAt,
@@ -3684,6 +3728,7 @@ impl SseDecode for crate::api::vault::NoteEntryData {
             title: var_title,
             content: var_content,
             custom_fields: var_customFields,
+            attachments: var_attachments,
         };
     }
 }
@@ -4335,6 +4380,29 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::vault::AddedEntryItem>
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::vault::AttachmentMetaData {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.uuid.into_into_dart().into_dart(),
+            self.name.into_into_dart().into_dart(),
+            self.kind.into_into_dart().into_dart(),
+            self.size.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::vault::AttachmentMetaData
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::vault::AttachmentMetaData>
+    for crate::api::vault::AttachmentMetaData
+{
+    fn into_into_dart(self) -> crate::api::vault::AttachmentMetaData {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::api::vault::BroughtOverItem {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -4402,6 +4470,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::vault::CardEntryData {
             self.transaction_password.into_into_dart().into_dart(),
             self.notes.into_into_dart().into_dart(),
             self.custom_fields.into_into_dart().into_dart(),
+            self.attachments.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -4472,6 +4541,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::vault::CustomEntryData {
             self.folder.into_into_dart().into_dart(),
             self.title.into_into_dart().into_dart(),
             self.fields.into_into_dart().into_dart(),
+            self.attachments.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -4770,6 +4840,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::vault::IdentityEntryData {
             self.phone.into_into_dart().into_dart(),
             self.address.into_into_dart().into_dart(),
             self.custom_fields.into_into_dart().into_dart(),
+            self.attachments.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -4889,6 +4960,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::vault::LoginEntryData {
             self.password.into_into_dart().into_dart(),
             self.notes.into_into_dart().into_dart(),
             self.custom_fields.into_into_dart().into_dart(),
+            self.attachments.into_into_dart().into_dart(),
             self.app_id.into_into_dart().into_dart(),
             self.email.into_into_dart().into_dart(),
         ]
@@ -4944,6 +5016,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::vault::NoteEntryData {
             self.title.into_into_dart().into_dart(),
             self.content.into_into_dart().into_dart(),
             self.custom_fields.into_into_dart().into_dart(),
+            self.attachments.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -5323,6 +5396,16 @@ impl SseEncode for crate::api::vault::AddedEntryItem {
     }
 }
 
+impl SseEncode for crate::api::vault::AttachmentMetaData {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.uuid, serializer);
+        <String>::sse_encode(self.name, serializer);
+        <String>::sse_encode(self.kind, serializer);
+        <u64>::sse_encode(self.size, serializer);
+    }
+}
+
 impl SseEncode for bool {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -5371,6 +5454,7 @@ impl SseEncode for crate::api::vault::CardEntryData {
         <Option<String>>::sse_encode(self.transaction_password, serializer);
         <Option<String>>::sse_encode(self.notes, serializer);
         <Vec<crate::api::vault::CustomFieldData>>::sse_encode(self.custom_fields, serializer);
+        <Vec<crate::api::vault::AttachmentMetaData>>::sse_encode(self.attachments, serializer);
     }
 }
 
@@ -5402,6 +5486,7 @@ impl SseEncode for crate::api::vault::CustomEntryData {
         <String>::sse_encode(self.folder, serializer);
         <String>::sse_encode(self.title, serializer);
         <Vec<crate::api::vault::CustomFieldData>>::sse_encode(self.fields, serializer);
+        <Vec<crate::api::vault::AttachmentMetaData>>::sse_encode(self.attachments, serializer);
     }
 }
 
@@ -5545,6 +5630,7 @@ impl SseEncode for crate::api::vault::IdentityEntryData {
         <Option<String>>::sse_encode(self.phone, serializer);
         <Option<String>>::sse_encode(self.address, serializer);
         <Vec<crate::api::vault::CustomFieldData>>::sse_encode(self.custom_fields, serializer);
+        <Vec<crate::api::vault::AttachmentMetaData>>::sse_encode(self.attachments, serializer);
     }
 }
 
@@ -5626,6 +5712,16 @@ impl SseEncode for Vec<crate::api::vault::AddedEntryItem> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <crate::api::vault::AddedEntryItem>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::api::vault::AttachmentMetaData> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::vault::AttachmentMetaData>::sse_encode(item, serializer);
         }
     }
 }
@@ -5853,6 +5949,7 @@ impl SseEncode for crate::api::vault::LoginEntryData {
         <String>::sse_encode(self.password, serializer);
         <Option<String>>::sse_encode(self.notes, serializer);
         <Vec<crate::api::vault::CustomFieldData>>::sse_encode(self.custom_fields, serializer);
+        <Vec<crate::api::vault::AttachmentMetaData>>::sse_encode(self.attachments, serializer);
         <Option<String>>::sse_encode(self.app_id, serializer);
         <Option<String>>::sse_encode(self.email, serializer);
     }
@@ -5885,6 +5982,7 @@ impl SseEncode for crate::api::vault::NoteEntryData {
         <String>::sse_encode(self.title, serializer);
         <String>::sse_encode(self.content, serializer);
         <Vec<crate::api::vault::CustomFieldData>>::sse_encode(self.custom_fields, serializer);
+        <Vec<crate::api::vault::AttachmentMetaData>>::sse_encode(self.attachments, serializer);
     }
 }
 

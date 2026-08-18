@@ -15,6 +15,7 @@ LoginEntryData _loginEntry() => LoginEntryData(
       password: '',
       notes: null,
       customFields: [],
+      attachments: const [],
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
@@ -110,6 +111,7 @@ void main() {
       cvv: '123',
       status: 'active',
       customFields: [],
+      attachments: const [],
       pin: null,
     );
     await tester.pumpWidget(

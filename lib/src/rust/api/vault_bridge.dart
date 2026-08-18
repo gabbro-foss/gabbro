@@ -9,7 +9,7 @@ import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 import 'vault.dart';
 part 'vault_bridge.freezed.dart';
 
-// These functions are ignored because they are not marked as `pub`: `vault_entry_from_data`, `vault_entry_to_data`
+// These functions are ignored because they are not marked as `pub`: `attachment_meta`, `vault_entry_from_data`, `vault_entry_to_data`
 
 /// Decrypt the vault at `path` and store it in the session.
 ///

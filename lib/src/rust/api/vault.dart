@@ -6,7 +6,7 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `add_days_to_timestamp`, `changed_field_keys`, `custom_field_to_data`, `days_from_ymd`, `days_to_ymd`, `entry_custom_fields_mut`, `entry_id`, `entry_meta_mut`, `entry_meta`, `is_expired`, `is_leap`, `item_keys`, `login_entry_to_data`, `mask_entry`, `purge_expired_history`, `remove_entry_item_by_key`, `set_entry_field_by_key`, `set_entry_scalar`, `write_sha256_companion`
+// These functions are ignored because they are not marked as `pub`: `add_days_to_timestamp`, `changed_field_keys`, `custom_field_to_data`, `days_from_ymd`, `days_to_ymd`, `entry_attachments_mut`, `entry_attachments`, `entry_custom_fields_mut`, `entry_id`, `entry_meta_mut`, `entry_meta`, `is_expired`, `is_leap`, `item_keys`, `login_entry_to_data`, `mask_entry`, `purge_expired_history`, `remove_entry_item_by_key`, `set_entry_field_by_key`, `set_entry_scalar`, `write_sha256_companion`
 // These functions are ignored (category: IgnoreBecauseExplicitAttribute): `add_yubikey_to_vault`, `build_passphrase_only_bytes`, `change_passphrase_with_keys`, `change_passphrase`, `delete_entry`, `delete_whole_vault`, `export_vault_preserving`, `export_vault`, `list_entries`, `load_vault_with_key_record`, `load_vault`, `remove_yubikey_from_vault`, `reseal_vault_body`, `save_vault_with_keys`, `save_vault`, `sha256_line`, `update_entry`
 
 /// Creates a new login entry with a generated UUID and current timestamp.
@@ -59,6 +59,41 @@ class AddedEntryItem {
           runtimeType == other.runtimeType &&
           id == other.id &&
           title == other.title;
+}
+
+/// Attachment metadata as seen by Flutter. The bytes never ride in an entry
+/// DTO — they cross the bridge only through the dedicated attachment calls —
+/// so opening an entry stays fast however large its attachments are.
+class AttachmentMetaData {
+  final String uuid;
+  final String name;
+
+  /// MIME type (e.g. "image/png", "application/pdf").
+  final String kind;
+
+  /// Byte length of the stored data.
+  final BigInt size;
+
+  const AttachmentMetaData({
+    required this.uuid,
+    required this.name,
+    required this.kind,
+    required this.size,
+  });
+
+  @override
+  int get hashCode =>
+      uuid.hashCode ^ name.hashCode ^ kind.hashCode ^ size.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AttachmentMetaData &&
+          runtimeType == other.runtimeType &&
+          uuid == other.uuid &&
+          name == other.name &&
+          kind == other.kind &&
+          size == other.size;
 }
 
 /// A non-conflicting value brought over from the incoming vault during sync: the
@@ -124,6 +159,7 @@ class CardEntryData {
   final String? transactionPassword;
   final String? notes;
   final List<CustomFieldData> customFields;
+  final List<AttachmentMetaData> attachments;
 
   const CardEntryData({
     required this.id,
@@ -144,6 +180,7 @@ class CardEntryData {
     this.transactionPassword,
     this.notes,
     required this.customFields,
+    required this.attachments,
   });
 
   @override
@@ -165,7 +202,8 @@ class CardEntryData {
       bankName.hashCode ^
       transactionPassword.hashCode ^
       notes.hashCode ^
-      customFields.hashCode;
+      customFields.hashCode ^
+      attachments.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -189,7 +227,8 @@ class CardEntryData {
           bankName == other.bankName &&
           transactionPassword == other.transactionPassword &&
           notes == other.notes &&
-          customFields == other.customFields;
+          customFields == other.customFields &&
+          attachments == other.attachments;
 }
 
 /// A custom entry as seen by Flutter.
@@ -200,6 +239,7 @@ class CustomEntryData {
   final String folder;
   final String title;
   final List<CustomFieldData> fields;
+  final List<AttachmentMetaData> attachments;
 
   const CustomEntryData({
     required this.id,
@@ -208,6 +248,7 @@ class CustomEntryData {
     required this.folder,
     required this.title,
     required this.fields,
+    required this.attachments,
   });
 
   @override
@@ -217,7 +258,8 @@ class CustomEntryData {
       updatedAt.hashCode ^
       folder.hashCode ^
       title.hashCode ^
-      fields.hashCode;
+      fields.hashCode ^
+      attachments.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -229,7 +271,8 @@ class CustomEntryData {
           updatedAt == other.updatedAt &&
           folder == other.folder &&
           title == other.title &&
-          fields == other.fields;
+          fields == other.fields &&
+          attachments == other.attachments;
 }
 
 /// A custom field as seen by Flutter.
@@ -422,6 +465,7 @@ class IdentityEntryData {
   final String? phone;
   final String? address;
   final List<CustomFieldData> customFields;
+  final List<AttachmentMetaData> attachments;
 
   const IdentityEntryData({
     required this.id,
@@ -434,6 +478,7 @@ class IdentityEntryData {
     this.phone,
     this.address,
     required this.customFields,
+    required this.attachments,
   });
 
   @override
@@ -447,7 +492,8 @@ class IdentityEntryData {
       email.hashCode ^
       phone.hashCode ^
       address.hashCode ^
-      customFields.hashCode;
+      customFields.hashCode ^
+      attachments.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -463,7 +509,8 @@ class IdentityEntryData {
           email == other.email &&
           phone == other.phone &&
           address == other.address &&
-          customFields == other.customFields;
+          customFields == other.customFields &&
+          attachments == other.attachments;
 }
 
 /// A login entry as seen by Flutter.
@@ -481,6 +528,7 @@ class LoginEntryData {
   final String password;
   final String? notes;
   final List<CustomFieldData> customFields;
+  final List<AttachmentMetaData> attachments;
 
   /// Android application id for native-app autofill matching; `None` if unset.
   final String? appId;
@@ -499,6 +547,7 @@ class LoginEntryData {
     required this.password,
     this.notes,
     required this.customFields,
+    required this.attachments,
     this.appId,
     this.email,
   });
@@ -515,6 +564,7 @@ class LoginEntryData {
       password.hashCode ^
       notes.hashCode ^
       customFields.hashCode ^
+      attachments.hashCode ^
       appId.hashCode ^
       email.hashCode;
 
@@ -533,6 +583,7 @@ class LoginEntryData {
           password == other.password &&
           notes == other.notes &&
           customFields == other.customFields &&
+          attachments == other.attachments &&
           appId == other.appId &&
           email == other.email;
 }
@@ -615,6 +666,7 @@ class NoteEntryData {
   final String title;
   final String content;
   final List<CustomFieldData> customFields;
+  final List<AttachmentMetaData> attachments;
 
   const NoteEntryData({
     required this.id,
@@ -624,6 +676,7 @@ class NoteEntryData {
     required this.title,
     required this.content,
     required this.customFields,
+    required this.attachments,
   });
 
   @override
@@ -634,7 +687,8 @@ class NoteEntryData {
       folder.hashCode ^
       title.hashCode ^
       content.hashCode ^
-      customFields.hashCode;
+      customFields.hashCode ^
+      attachments.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -647,7 +701,8 @@ class NoteEntryData {
           folder == other.folder &&
           title == other.title &&
           content == other.content &&
-          customFields == other.customFields;
+          customFields == other.customFields &&
+          attachments == other.attachments;
 }
 
 /// An entry flagged for user-consent deletion during vault merge.
