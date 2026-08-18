@@ -1097,6 +1097,20 @@ class AppLocalizationsCs extends AppLocalizations {
   String get fieldCustomFields => 'Vlastní pole';
 
   @override
+  String get fieldAttachments => 'Přílohy';
+
+  @override
+  String get addAttachment => 'Přidat přílohu';
+
+  @override
+  String get tooltipRemoveAttachment => 'Odebrat přílohu';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return 'Odebrat «$name»?';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (volitelné)';
   }

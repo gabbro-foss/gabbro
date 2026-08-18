@@ -1095,6 +1095,20 @@ class AppLocalizationsLv extends AppLocalizations {
   String get fieldCustomFields => 'Pielāgotie lauki';
 
   @override
+  String get fieldAttachments => 'Pielikumi';
+
+  @override
+  String get addAttachment => 'Pievienot pielikumu';
+
+  @override
+  String get tooltipRemoveAttachment => 'Noņemt pielikumu';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return 'Noņemt \"$name\"?';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (neobligāts)';
   }

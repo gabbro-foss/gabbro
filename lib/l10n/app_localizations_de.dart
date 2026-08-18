@@ -1100,6 +1100,20 @@ class AppLocalizationsDe extends AppLocalizations {
   String get fieldCustomFields => 'Benutzerdefinierte Felder';
 
   @override
+  String get fieldAttachments => 'Anhänge';
+
+  @override
+  String get addAttachment => 'Anhang hinzufügen';
+
+  @override
+  String get tooltipRemoveAttachment => 'Anhang entfernen';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return '«$name» entfernen?';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (optional)';
   }

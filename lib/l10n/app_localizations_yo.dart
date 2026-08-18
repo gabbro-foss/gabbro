@@ -1095,6 +1095,20 @@ class AppLocalizationsYo extends AppLocalizations {
   String get fieldCustomFields => 'Awọn aaye aṣa';
 
   @override
+  String get fieldAttachments => 'Àwọn àfikún fáìlì';
+
+  @override
+  String get addAttachment => 'Fi àfikún fáìlì kún';
+
+  @override
+  String get tooltipRemoveAttachment => 'Yọ àfikún fáìlì kúrò';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return 'Yọ «$name» kúrò?';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (aṣayan)';
   }

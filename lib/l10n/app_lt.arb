@@ -440,6 +440,15 @@
   "fieldLabel": "Žyma",
   "fieldValue": "Reikšmė",
   "fieldCustomFields": "Pasirinktiniai laukai",
+  "fieldAttachments": "Priedai",
+  "addAttachment": "Pridėti priedą",
+  "tooltipRemoveAttachment": "Pašalinti priedą",
+  "removeAttachmentConfirm": "Pašalinti «{name}»?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "fieldLabelOptional": "{label} (nebūtinas)",
   "@fieldLabelOptional": {
     "placeholders": {

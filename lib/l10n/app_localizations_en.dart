@@ -1093,6 +1093,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fieldCustomFields => 'Custom fields';
 
   @override
+  String get fieldAttachments => 'Attachments';
+
+  @override
+  String get addAttachment => 'Add attachment';
+
+  @override
+  String get tooltipRemoveAttachment => 'Remove attachment';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return 'Remove \"$name\"?';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (optional)';
   }

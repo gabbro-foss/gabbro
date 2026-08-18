@@ -1098,6 +1098,20 @@ class AppLocalizationsNl extends AppLocalizations {
   String get fieldCustomFields => 'Aangepaste velden';
 
   @override
+  String get fieldAttachments => 'Bijlagen';
+
+  @override
+  String get addAttachment => 'Bijlage toevoegen';
+
+  @override
+  String get tooltipRemoveAttachment => 'Bijlage verwijderen';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return '\"$name\" verwijderen?';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (optioneel)';
   }

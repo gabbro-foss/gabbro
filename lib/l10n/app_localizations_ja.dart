@@ -1081,6 +1081,20 @@ class AppLocalizationsJa extends AppLocalizations {
   String get fieldCustomFields => 'カスタムフィールド';
 
   @override
+  String get fieldAttachments => '添付ファイル';
+
+  @override
+  String get addAttachment => '添付ファイルを追加';
+
+  @override
+  String get tooltipRemoveAttachment => '添付ファイルを削除';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return '「$name」を削除しますか?';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (任意)';
   }

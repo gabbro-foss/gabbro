@@ -440,6 +440,15 @@
   "fieldLabel": "标签",
   "fieldValue": "值",
   "fieldCustomFields": "自定义字段",
+  "fieldAttachments": "附件",
+  "addAttachment": "添加附件",
+  "tooltipRemoveAttachment": "移除附件",
+  "removeAttachmentConfirm": "移除«{name}»？",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "fieldLabelOptional": "{label}（可选）",
   "@fieldLabelOptional": {
     "placeholders": {

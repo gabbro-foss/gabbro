@@ -440,6 +440,15 @@
   "fieldLabel": "Bezeichnung",
   "fieldValue": "Wert",
   "fieldCustomFields": "Benutzerdefinierte Felder",
+  "fieldAttachments": "Anhänge",
+  "addAttachment": "Anhang hinzufügen",
+  "tooltipRemoveAttachment": "Anhang entfernen",
+  "removeAttachmentConfirm": "«{name}» entfernen?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "fieldLabelOptional": "{label} (optional)",
   "@fieldLabelOptional": {
     "placeholders": {

@@ -440,6 +440,15 @@
   "fieldLabel": "Tunniste",
   "fieldValue": "Arvo",
   "fieldCustomFields": "Mukautetut kentät",
+  "fieldAttachments": "Liitteet",
+  "addAttachment": "Lisää liite",
+  "tooltipRemoveAttachment": "Poista liite",
+  "removeAttachmentConfirm": "Poistetaanko \"{name}\"?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "fieldLabelOptional": "{label} (valinnainen)",
   "@fieldLabelOptional": {
     "placeholders": {

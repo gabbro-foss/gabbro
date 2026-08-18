@@ -1101,6 +1101,20 @@ class AppLocalizationsUk extends AppLocalizations {
   String get fieldCustomFields => 'Власні поля';
 
   @override
+  String get fieldAttachments => 'Вкладення';
+
+  @override
+  String get addAttachment => 'Додати вкладення';
+
+  @override
+  String get tooltipRemoveAttachment => 'Видалити вкладення';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return 'Видалити «$name»?';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (необов\'язково)';
   }

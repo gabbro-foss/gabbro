@@ -440,6 +440,15 @@
   "fieldLabel": "Etykieta",
   "fieldValue": "Wartość",
   "fieldCustomFields": "Pola niestandardowe",
+  "fieldAttachments": "Załączniki",
+  "addAttachment": "Dodaj załącznik",
+  "tooltipRemoveAttachment": "Usuń załącznik",
+  "removeAttachmentConfirm": "Usunąć «{name}»?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "fieldLabelOptional": "{label} (opcjonalnie)",
   "@fieldLabelOptional": {
     "placeholders": {

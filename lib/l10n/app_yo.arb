@@ -440,6 +440,15 @@
   "fieldLabel": "Aami",
   "fieldValue": "Iye",
   "fieldCustomFields": "Awọn aaye aṣa",
+  "fieldAttachments": "Àwọn àfikún fáìlì",
+  "addAttachment": "Fi àfikún fáìlì kún",
+  "tooltipRemoveAttachment": "Yọ àfikún fáìlì kúrò",
+  "removeAttachmentConfirm": "Yọ «{name}» kúrò?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "fieldLabelOptional": "{label} (aṣayan)",
   "@fieldLabelOptional": {
     "placeholders": {

@@ -440,6 +440,15 @@
   "fieldLabel": "Метка",
   "fieldValue": "Значение",
   "fieldCustomFields": "Пользовательские поля",
+  "fieldAttachments": "Вложения",
+  "addAttachment": "Добавить вложение",
+  "tooltipRemoveAttachment": "Удалить вложение",
+  "removeAttachmentConfirm": "Удалить «{name}»?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "fieldLabelOptional": "{label} (необязательно)",
   "@fieldLabelOptional": {
     "placeholders": {

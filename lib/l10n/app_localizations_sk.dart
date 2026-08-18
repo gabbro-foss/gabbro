@@ -1098,6 +1098,20 @@ class AppLocalizationsSk extends AppLocalizations {
   String get fieldCustomFields => 'Vlastné polia';
 
   @override
+  String get fieldAttachments => 'Prílohy';
+
+  @override
+  String get addAttachment => 'Pridať prílohu';
+
+  @override
+  String get tooltipRemoveAttachment => 'Odstrániť prílohu';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return 'Odstrániť «$name»?';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (voliteľné)';
   }

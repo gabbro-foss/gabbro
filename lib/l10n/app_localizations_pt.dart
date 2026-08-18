@@ -1095,6 +1095,20 @@ class AppLocalizationsPt extends AppLocalizations {
   String get fieldCustomFields => 'Campos personalizados';
 
   @override
+  String get fieldAttachments => 'Anexos';
+
+  @override
+  String get addAttachment => 'Adicionar anexo';
+
+  @override
+  String get tooltipRemoveAttachment => 'Remover anexo';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return 'Remover \"$name\"?';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (opcional)';
   }
@@ -3295,6 +3309,20 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get fieldCustomFields => 'Campos personalizados';
 
   @override
+  String get fieldAttachments => 'Anexos';
+
+  @override
+  String get addAttachment => 'Adicionar anexo';
+
+  @override
+  String get tooltipRemoveAttachment => 'Remover anexo';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return 'Remover \"$name\"?';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (opcional)';
   }
@@ -5490,6 +5518,20 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get fieldCustomFields => 'Campos personalizados';
+
+  @override
+  String get fieldAttachments => 'Anexos';
+
+  @override
+  String get addAttachment => 'Adicionar anexo';
+
+  @override
+  String get tooltipRemoveAttachment => 'Remover anexo';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return 'Remover \"$name\"?';
+  }
 
   @override
   String fieldLabelOptional(String label) {

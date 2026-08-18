@@ -440,6 +440,15 @@
   "fieldLabel": "Etiketa",
   "fieldValue": "Balioa",
   "fieldCustomFields": "Eremu pertsonalizatuak",
+  "fieldAttachments": "Eranskinak",
+  "addAttachment": "Gehitu eranskina",
+  "tooltipRemoveAttachment": "Kendu eranskina",
+  "removeAttachmentConfirm": "«{name}» kendu?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "fieldLabelOptional": "{label} (aukerakoa)",
   "@fieldLabelOptional": {
     "placeholders": {

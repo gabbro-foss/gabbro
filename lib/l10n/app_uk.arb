@@ -440,6 +440,15 @@
   "fieldLabel": "Мітка",
   "fieldValue": "Значення",
   "fieldCustomFields": "Власні поля",
+  "fieldAttachments": "Вкладення",
+  "addAttachment": "Додати вкладення",
+  "tooltipRemoveAttachment": "Видалити вкладення",
+  "removeAttachmentConfirm": "Видалити «{name}»?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "fieldLabelOptional": "{label} (необов'язково)",
   "@fieldLabelOptional": {
     "placeholders": {

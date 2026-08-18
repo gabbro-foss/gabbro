@@ -440,6 +440,15 @@
   "fieldLabel": "Ετικέτα",
   "fieldValue": "Τιμή",
   "fieldCustomFields": "Προσαρμοσμένα πεδία",
+  "fieldAttachments": "Συνημμένα",
+  "addAttachment": "Προσθήκη συνημμένου",
+  "tooltipRemoveAttachment": "Αφαίρεση συνημμένου",
+  "removeAttachmentConfirm": "Αφαίρεση «{name}»;",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "fieldLabelOptional": "{label} (προαιρετικό)",
   "@fieldLabelOptional": {
     "placeholders": {

@@ -440,6 +440,15 @@
   "fieldLabel": "Etiķete",
   "fieldValue": "Vērtība",
   "fieldCustomFields": "Pielāgotie lauki",
+  "fieldAttachments": "Pielikumi",
+  "addAttachment": "Pievienot pielikumu",
+  "tooltipRemoveAttachment": "Noņemt pielikumu",
+  "removeAttachmentConfirm": "Noņemt \"{name}\"?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "fieldLabelOptional": "{label} (neobligāts)",
   "@fieldLabelOptional": {
     "placeholders": {

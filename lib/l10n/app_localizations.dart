@@ -2161,6 +2161,30 @@ abstract class AppLocalizations {
   /// **'Custom fields'**
   String get fieldCustomFields;
 
+  /// No description provided for @fieldAttachments.
+  ///
+  /// In en, this message translates to:
+  /// **'Attachments'**
+  String get fieldAttachments;
+
+  /// No description provided for @addAttachment.
+  ///
+  /// In en, this message translates to:
+  /// **'Add attachment'**
+  String get addAttachment;
+
+  /// No description provided for @tooltipRemoveAttachment.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove attachment'**
+  String get tooltipRemoveAttachment;
+
+  /// No description provided for @removeAttachmentConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove \"{name}\"?'**
+  String removeAttachmentConfirm(String name);
+
   /// No description provided for @fieldLabelOptional.
   ///
   /// In en, this message translates to:

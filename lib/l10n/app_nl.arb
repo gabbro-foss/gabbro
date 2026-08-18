@@ -440,6 +440,15 @@
   "fieldLabel": "Label",
   "fieldValue": "Waarde",
   "fieldCustomFields": "Aangepaste velden",
+  "fieldAttachments": "Bijlagen",
+  "addAttachment": "Bijlage toevoegen",
+  "tooltipRemoveAttachment": "Bijlage verwijderen",
+  "removeAttachmentConfirm": "\"{name}\" verwijderen?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "fieldLabelOptional": "{label} (optioneel)",
   "@fieldLabelOptional": {
     "placeholders": {

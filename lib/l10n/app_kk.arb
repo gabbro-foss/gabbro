@@ -440,6 +440,15 @@
   "fieldLabel": "Жапсырма",
   "fieldValue": "Мән",
   "fieldCustomFields": "Арнаулы өрістер",
+  "fieldAttachments": "Тіркемелер",
+  "addAttachment": "Тіркеме қосу",
+  "tooltipRemoveAttachment": "Тіркемені өшіру",
+  "removeAttachmentConfirm": "«{name}» өшіру керек пе?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "fieldLabelOptional": "{label} (міндетті емес)",
   "@fieldLabelOptional": {
     "placeholders": {

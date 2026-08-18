@@ -440,6 +440,15 @@
   "fieldLabel": "Etiqueta",
   "fieldValue": "Valor",
   "fieldCustomFields": "Campos personalizados",
+  "fieldAttachments": "Adjuntos",
+  "addAttachment": "Añadir adjunto",
+  "tooltipRemoveAttachment": "Quitar adjunto",
+  "removeAttachmentConfirm": "¿Quitar «{name}»?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "fieldLabelOptional": "{label} (opcional)",
   "@fieldLabelOptional": {
     "placeholders": {

@@ -440,6 +440,15 @@
   "fieldLabel": "Felirat",
   "fieldValue": "Érték",
   "fieldCustomFields": "Egyéni mezők",
+  "fieldAttachments": "Mellékletek",
+  "addAttachment": "Melléklet hozzáadása",
+  "tooltipRemoveAttachment": "Melléklet eltávolítása",
+  "removeAttachmentConfirm": "«{name}» eltávolítása?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "fieldLabelOptional": "{label} (opcionális)",
   "@fieldLabelOptional": {
     "placeholders": {

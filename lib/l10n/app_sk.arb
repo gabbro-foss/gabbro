@@ -440,6 +440,15 @@
   "fieldLabel": "Štítok",
   "fieldValue": "Hodnota",
   "fieldCustomFields": "Vlastné polia",
+  "fieldAttachments": "Prílohy",
+  "addAttachment": "Pridať prílohu",
+  "tooltipRemoveAttachment": "Odstrániť prílohu",
+  "removeAttachmentConfirm": "Odstrániť «{name}»?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "fieldLabelOptional": "{label} (voliteľné)",
   "@fieldLabelOptional": {
     "placeholders": {

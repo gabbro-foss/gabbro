@@ -440,6 +440,15 @@
   "fieldLabel": "Etiket",
   "fieldValue": "Værdi",
   "fieldCustomFields": "Brugerdefinerede felter",
+  "fieldAttachments": "Vedhæftninger",
+  "addAttachment": "Tilføj vedhæftning",
+  "tooltipRemoveAttachment": "Fjern vedhæftning",
+  "removeAttachmentConfirm": "Fjern \"{name}\"?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "fieldLabelOptional": "{label} (valgfrit)",
   "@fieldLabelOptional": {
     "placeholders": {

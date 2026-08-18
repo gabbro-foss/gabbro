@@ -1100,6 +1100,20 @@ class AppLocalizationsSl extends AppLocalizations {
   String get fieldCustomFields => 'Polja po meri';
 
   @override
+  String get fieldAttachments => 'Priloge';
+
+  @override
+  String get addAttachment => 'Dodaj prilogo';
+
+  @override
+  String get tooltipRemoveAttachment => 'Odstrani prilogo';
+
+  @override
+  String removeAttachmentConfirm(String name) {
+    return 'Odstrani «$name»?';
+  }
+
+  @override
   String fieldLabelOptional(String label) {
     return '$label (neobvezno)';
   }

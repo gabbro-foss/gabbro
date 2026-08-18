@@ -440,6 +440,15 @@
   "fieldLabel": "Etikett",
   "fieldValue": "Verdi",
   "fieldCustomFields": "Egendefinerte felt",
+  "fieldAttachments": "Vedlegg",
+  "addAttachment": "Legg til vedlegg",
+  "tooltipRemoveAttachment": "Fjern vedlegg",
+  "removeAttachmentConfirm": "Fjern \"{name}\"?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "fieldLabelOptional": "{label} (valgfritt)",
   "@fieldLabelOptional": {
     "placeholders": {

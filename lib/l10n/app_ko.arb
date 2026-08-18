@@ -440,6 +440,15 @@
   "fieldLabel": "레이블",
   "fieldValue": "값",
   "fieldCustomFields": "사용자 정의 필드",
+  "fieldAttachments": "첨부 파일",
+  "addAttachment": "첨부 파일 추가",
+  "tooltipRemoveAttachment": "첨부 파일 제거",
+  "removeAttachmentConfirm": "«{name}»을(를) 제거하시겠습니까?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "fieldLabelOptional": "{label} (선택사항)",
   "@fieldLabelOptional": {
     "placeholders": {

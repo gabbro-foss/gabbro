@@ -588,6 +588,15 @@
   "fieldLabel": "Label",
   "fieldValue": "Value",
   "fieldCustomFields": "Custom fields",
+  "fieldAttachments": "Attachments",
+  "addAttachment": "Add attachment",
+  "tooltipRemoveAttachment": "Remove attachment",
+  "removeAttachmentConfirm": "Remove \"{name}\"?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "fieldLabelOptional": "{label} (optional)",
   "@fieldLabelOptional": {
     "placeholders": {

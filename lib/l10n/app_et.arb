@@ -440,6 +440,15 @@
   "fieldLabel": "Silt",
   "fieldValue": "Väärtus",
   "fieldCustomFields": "Kohandatud väljad",
+  "fieldAttachments": "Manused",
+  "addAttachment": "Lisa manus",
+  "tooltipRemoveAttachment": "Eemalda manus",
+  "removeAttachmentConfirm": "Eemalda \"{name}\"?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "fieldLabelOptional": "{label} (valikuline)",
   "@fieldLabelOptional": {
     "placeholders": {

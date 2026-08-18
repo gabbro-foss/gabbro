@@ -440,6 +440,15 @@
   "fieldLabel": "Oznaka",
   "fieldValue": "Vrednost",
   "fieldCustomFields": "Polja po meri",
+  "fieldAttachments": "Priloge",
+  "addAttachment": "Dodaj prilogo",
+  "tooltipRemoveAttachment": "Odstrani prilogo",
+  "removeAttachmentConfirm": "Odstrani «{name}»?",
+  "@removeAttachmentConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "fieldLabelOptional": "{label} (neobvezno)",
   "@fieldLabelOptional": {
     "placeholders": {
