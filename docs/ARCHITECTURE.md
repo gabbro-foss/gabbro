@@ -173,8 +173,8 @@ anywhere (all screens per `test/screen_catalogue.dart`, a11y, l10n, Rust backend
       everything (refusing there would destroy data)
   9. [x] sync review + recovery history show filename, not uuid; keep/delete prompt
          carries the name via a new `PendingItemDeleteItem.label`
-  10. [ ] real-FFI: add -> lock -> unlock -> extract, byte-compare
-  11. [ ] l10n x37; overflow/a11y via the screen-catalog sweep
+  10. [x] real-FFI: add -> lock -> unlock -> extract -> remove, byte-compare
+  11. [x] l10n x37 (5 keys); overflow/a11y via the screen-catalog sweep
 - [ ] Hardware pass
 
 ---
