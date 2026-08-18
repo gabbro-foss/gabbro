@@ -2481,6 +2481,97 @@ mod tests {
         let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
+    // Scenario 8b (attachments task) — red first: the 4th in-app add is
+    // refused (count cap 3). Import/merge are exempt, so an over-cap entry
+    // must still extract — refusing there would destroy imported data.
+    #[test]
+    #[serial]
+    fn add_attachment_refuses_a_fourth_but_overcap_entries_still_extract() {
+        use crate::api::vault::save_vault;
+        use crate::vault::entry::VaultEntry as InternalEntry;
+        use crate::vault::entry::{EntryAttachment, EntryMeta, NoteEntry};
+        use std::env::temp_dir;
+
+        fn att(n: u8) -> EntryAttachment {
+            EntryAttachment {
+                uuid: format!("att-{n}"),
+                name: format!("f{n}.bin"),
+                kind: String::from("application/octet-stream"),
+                data: vec![n],
+            }
+        }
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_attachment_count_cap.gabbro");
+        let pass = b"attachment-count-cap-pass";
+        let mut body = VaultBody::empty();
+        // Entry at the cap (3), and one OVER the cap as an import would leave it.
+        body.entries.push(InternalEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                field_times: Default::default(),
+                history: Vec::new(),
+                id: String::from("id-at-cap"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::new(),
+            },
+            title: String::from("T"),
+            content: String::new(),
+            custom_fields: vec![],
+            attachments: vec![att(1), att(2), att(3)],
+        }));
+        body.entries.push(InternalEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                field_times: Default::default(),
+                history: Vec::new(),
+                id: String::from("id-over-cap"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::new(),
+            },
+            title: String::from("T"),
+            content: String::new(),
+            custom_fields: vec![],
+            attachments: vec![att(1), att(2), att(3), att(4), att(5)],
+        }));
+        save_vault(&body, pass, &path).unwrap();
+        run(unlock_vault(
+            pass.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
+
+        assert!(
+            run(add_attachment(
+                String::from("id-at-cap"),
+                String::from("fourth.bin"),
+                String::from("application/octet-stream"),
+                vec![9],
+            ))
+            .is_err(),
+            "a fourth in-app add must be refused"
+        );
+        match get_entry(String::from("id-at-cap")).unwrap() {
+            VaultEntryData::Note(d) => assert_eq!(d.attachments.len(), 3, "nothing added"),
+            _ => panic!("expected note"),
+        }
+
+        // The over-cap entry (import/merge product) is fully readable.
+        match get_entry(String::from("id-over-cap")).unwrap() {
+            VaultEntryData::Note(d) => assert_eq!(d.attachments.len(), 5),
+            _ => panic!("expected note"),
+        }
+        assert_eq!(
+            extract_attachment(String::from("id-over-cap"), String::from("att-5")).unwrap(),
+            vec![5],
+            "over-cap attachments still extract"
+        );
+
+        lock_vault().unwrap();
+        let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
+    }
+
     // Scenario 4 (attachments task) — red first: extraction must hand back the
     // exact stored bytes; a wrong uuid or a locked vault errors, never junk.
     #[test]

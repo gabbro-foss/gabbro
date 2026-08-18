@@ -467,6 +467,10 @@ pub fn session_update_entry(updated: VaultEntry, expiry_days: Option<u32>) -> Re
 /// Size-capped like Enpass import — the same limit keeps a vault loadable on a
 /// phone. A `File` entry takes none: the file IS its payload. Stamps
 /// `attachments:<uuid>` in field_times so the addition syncs to other devices.
+/// In-app adds stop at this many attachments per entry. Import and merge are
+/// exempt: refusing there would destroy data that already exists elsewhere.
+pub const ENTRY_ATTACHMENT_MAX_COUNT: usize = 3;
+
 pub fn session_add_attachment(
     id: &str,
     name: &str,
@@ -490,6 +494,11 @@ pub fn session_add_attachment(
             .ok_or_else(|| format!("No entry found with id: {id}"))?;
         let atts = crate::api::vault::entry_attachments_mut(entry)
             .ok_or("A File entry takes no attachments")?;
+        if atts.len() >= ENTRY_ATTACHMENT_MAX_COUNT {
+            return Err(format!(
+                "Entry already has {ENTRY_ATTACHMENT_MAX_COUNT} attachments"
+            ));
+        }
         atts.push(crate::vault::entry::EntryAttachment {
             uuid: uuid.clone(),
             name: name.to_string(),

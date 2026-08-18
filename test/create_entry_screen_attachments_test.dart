@@ -21,12 +21,13 @@ NoteEntryData _noteWith(List<AttachmentMetaData> attachments) => NoteEntryData(
   attachments: attachments,
 );
 
-AttachmentMetaData _att({String name = 'passport.pdf'}) => AttachmentMetaData(
-  uuid: 'att-1',
-  name: name,
-  kind: 'application/pdf',
-  size: BigInt.from(2048),
-);
+AttachmentMetaData _att({String name = 'passport.pdf', String uuid = 'att-1'}) =>
+    AttachmentMetaData(
+      uuid: uuid,
+      name: name,
+      kind: 'application/pdf',
+      size: BigInt.from(2048),
+    );
 
 Widget _editScreen(
   VaultEntryData existing, {
@@ -140,6 +141,68 @@ void main() {
 
     expect(removed, isEmpty);
     expect(find.textContaining('passport.pdf'), findsOneWidget);
+  });
+
+  testWidgets('the add button hides at the 3-attachment cap', (tester) async {
+    await tester.pumpWidget(
+      _editScreen(
+        VaultEntryData.note(
+          _noteWith([
+            _att(uuid: 'a1', name: 'one.pdf'),
+            _att(uuid: 'a2', name: 'two.pdf'),
+            _att(uuid: 'a3', name: 'three.pdf'),
+          ]),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('three.pdf'), findsOneWidget);
+    expect(find.text('Add attachment'), findsNothing);
+  });
+
+  testWidgets('an over-cap entry (import/merge) still lists every attachment', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _editScreen(
+        VaultEntryData.note(
+          _noteWith(
+            List.generate(5, (i) => _att(uuid: 'a$i', name: 'file$i.pdf')),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    for (var i = 0; i < 5; i++) {
+      expect(find.textContaining('file$i.pdf'), findsOneWidget);
+    }
+    expect(find.text('Add attachment'), findsNothing);
+  });
+
+  testWidgets('a staged pick counts toward the cap', (tester) async {
+    await tester.pumpWidget(
+      testApp(
+        CreateEntryScreen(
+          entryType: 'Note',
+          onCreateEntry: (_) async => 'id',
+          onGetEntry: (_) => VaultEntryData.note(_noteWith([])),
+          pickFile: () async =>
+              (name: 'staged.txt', bytes: Uint8List.fromList([1])),
+          onAddAttachment: (a, b, c, d) async => 'u',
+          onRemoveAttachment: (a, b) async {},
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    for (var i = 0; i < 3; i++) {
+      await tester.ensureVisible(find.text('Add attachment'));
+      await tester.tap(find.text('Add attachment'));
+      await tester.pumpAndSettle();
+    }
+    expect(find.text('Add attachment'), findsNothing);
   });
 
   testWidgets('an oversized pick shows a localized error and adds nothing', (

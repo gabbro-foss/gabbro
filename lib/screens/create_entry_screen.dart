@@ -29,6 +29,11 @@ Future<PickedFile?> _defaultPickFile() => GabbroFilePicker.pickFileWithData();
 /// localized and instant; Rust still enforces its own cap on every add.
 const int kAttachmentMaxBytes = 25 * 1024 * 1024;
 
+/// Mirrors the Rust-side count cap (`ENTRY_ATTACHMENT_MAX_COUNT`): the Add
+/// button hides at the cap. Import/merge can exceed it; those entries still
+/// list and extract everything — only adding more is off.
+const int kAttachmentMaxCount = 3;
+
 Future<String> _defaultAddAttachment(
   String entryId,
   String name,
@@ -1763,14 +1768,16 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             onRemove: () => setState(() => _pendingAttachments.removeAt(i)),
           ),
         ),
-        Align(
-          alignment: AlignmentDirectional.centerStart,
-          child: TextButton.icon(
-            icon: const Icon(Icons.attach_file),
-            onPressed: _isSaving ? null : _addAttachmentFlow,
-            label: Text(l.addAttachment),
+        if (_attachments.length + _pendingAttachments.length <
+            kAttachmentMaxCount)
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: TextButton.icon(
+              icon: const Icon(Icons.attach_file),
+              onPressed: _isSaving ? null : _addAttachmentFlow,
+              label: Text(l.addAttachment),
+            ),
           ),
-        ),
       ],
     );
   }
