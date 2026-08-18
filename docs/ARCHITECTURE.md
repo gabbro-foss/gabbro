@@ -171,7 +171,8 @@ anywhere (all screens per `test/screen_catalogue.dart`, a11y, l10n, Rust backend
   8b. [x] Attachment count cap 3, in-app adds only: 4th add refused in Rust, Add button
       hidden at >=3; import/merge exempt — an over-cap entry still lists and extracts
       everything (refusing there would destroy data)
-  9. [ ] sync review + recovery history show filename, not uuid (updates the pin)
+  9. [x] sync review + recovery history show filename, not uuid; keep/delete prompt
+         carries the name via a new `PendingItemDeleteItem.label`
   10. [ ] real-FFI: add -> lock -> unlock -> extract, byte-compare
   11. [ ] l10n x37; overflow/a11y via the screen-catalog sweep
 - [ ] Hardware pass
