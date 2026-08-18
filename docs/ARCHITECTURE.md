@@ -159,7 +159,7 @@ anywhere (all screens per `test/screen_catalogue.dart`, a11y, l10n, Rust backend
       attachment mutation via dedicated bridge calls.
 - [ ] Implement (red → green per scenario):
   1. [x] bridge edit preserves attachments, no `del:` tombstones (the bug fix)
-  2. [ ] DTOs expose attachment metadata (uuid, name, kind, size), all five types
+  2. [x] DTOs expose attachment metadata (uuid, name, kind, size), all five types
   3. [ ] `add_attachment` persists; rejects > `ENPASS_ATTACHMENT_MAX_BYTES`
   4. [ ] `extract_attachment` returns exact bytes; errors on unknown uuid / locked
   5. [ ] `remove_attachment` deletes + stamps `del:` tombstone (removal syncs)
