@@ -128,68 +128,31 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**Allow attachments for all entry types.** Rust already stores, diffs and merges
-`attachments` on Login/Note/Identity/Card/Custom (`FileEntry` has none — it is a file), but the
-field never crosses the bridge, so a user cannot add or extract one. Only Enpass import fills it:
-an imported attachment is invisible and unrecoverable in the app.
+**Attachments for all entry types — implementation DONE, close-out pending.**
+Branch `allow_attachments` (30 commits on master @ aeb6629). Shipped on the branch:
+attachment metadata in the five entry DTOs; `add_attachment` (25 MB size cap, count
+cap 3 for in-app adds — import/merge exempt) / `extract_attachment` /
+`remove_attachment` (tombstoned); edit/create screen section; detail-screen extract;
+filenames (not uuids) in sync review + recovery history; 5 l10n keys x37; real-FFI
+round-trip suite; 3 bug/UX fixes found en route (edit wiped attachments + synced the
+loss; stale detail after save-less edit back; "No changes to save." after
+attachment-only edits). Both hardware passes green (Linux 2026-08-18, Android
+emulator 2026-08-18).
 
-Scope (agreed 2026-08-18): add + extract only (no in-app viewer); a **list** of
-attachments per entry, matching Rust's `Vec<EntryAttachment>` (revised from
-one-per-entry after code review); in-app add enforces the same per-attachment size cap
-as Enpass import — without it one huge attachment makes the vault unloadable on a phone; covers
-imported attachments and ones added in-app to new or existing entries; no regression
-anywhere (all screens per `test/screen_catalogue.dart`, a11y, l10n, Rust backend).
+Remaining (gate was RUNNING when the session closed — read its result from
+`gabbro/.scratchpad` or ask):
 
-- [x] Review the one-attachment rule against what Rust actually stores → list, UI follows Rust
-- [x] Impact analysis (screens, bridge, sync/merge, import)
-- [x] Verify wiring in code → **bug found:** editing any entry in the app wipes its
-      stored attachments (`vault_entry_from_data` rebuilds with `attachments: vec![]`,
-      `update_entry` replaces the entry and stamps `del:attachments:<uuid>` tombstones,
-      so the deletion also syncs to other devices). Fixing this is part of this task.
-- [x] Bridge design decided: attachment **metadata** (uuid, name, kind, size) rides in the
-      entry DTOs; bytes cross the FFI only on demand (`add_attachment`/`extract_attachment`),
-      so opening an entry never hauls 25 MB across the bridge. In-app add reuses
-      `ENPASS_ATTACHMENT_MAX_BYTES`, enforced in Rust.
-- [x] Net: pinned green (bytes survive save/lock/unlock; merge carries bytes intact;
-      recovery-history labels `attachments:` rows)
-- [x] **Fix the edit-wipes-attachments bug** — `update_entry` copies stored attachments
-      before diffing (stored entry is source of truth); red-then-green 2026-08-18
-- [x] Canon-TDD scenario list agreed (2026-08-18). Design: `update_entry` never touches
-      attachments (stored entry is source of truth, like history/field_times); all
-      attachment mutation via dedicated bridge calls.
-- [ ] Implement (red → green per scenario):
-  1. [x] bridge edit preserves attachments, no `del:` tombstones (the bug fix)
-  2. [x] DTOs expose attachment metadata (uuid, name, kind, size), all five types
-  3. [x] `add_attachment` persists; rejects > `ENPASS_ATTACHMENT_MAX_BYTES`
-  4. [x] `extract_attachment` returns exact bytes; errors on unknown uuid / locked
-  5. [x] `remove_attachment` deletes + stamps `del:` tombstone (removal syncs)
-  6. [x] create/edit screen: attachments section; pick-during-create persists
-         (edit mode applies add/remove immediately, like YubiKey management)
-  7. [x] entry detail: extract per row via the File-entry save dialog, byte-equal
-  8. [x] oversized pick -> localized error, nothing added (Dart pre-check mirrors the
-         Rust cap; Rust still enforces its own)
-  8b. [x] Attachment count cap 3, in-app adds only: 4th add refused in Rust, Add button
-      hidden at >=3; import/merge exempt — an over-cap entry still lists and extracts
-      everything (refusing there would destroy data)
-  9. [x] sync review + recovery history show filename, not uuid; keep/delete prompt
-         carries the name via a new `PendingItemDeleteItem.label`
-  10. [x] real-FFI: add -> lock -> unlock -> extract -> remove, byte-compare
-  11. [x] l10n x37 (5 keys); overflow/a11y via the screen-catalog sweep
-- [x] **Fix stale detail after save-less edit back** (found writing hardware matrix v2,
-      2026-08-18): edit-mode attachment adds persist immediately, but backing out of
-      edit without a review-save left the detail screen on its stale entry — the new
-      attachment invisible until the entry was reopened. Fix: re-read the entry when
-      the edit route returns null (`entry_detail_screen.dart`), red test first.
-- [x] **Fix Review-after-attachment-only-edit UX** (hardware pass 1 step 7): "No
-      changes to save." after an attachment add read as failure. Review with
-      attachment-only changes now returns to detail silently; snackbar only when
-      truly nothing changed. Red-then-green; hardware check in pass 2.
-- [x] Hardware pass, Linux (2026-08-18): both passes green — add/cap/remove/extract,
-      oversized refusal, Enpass import visible + extractable, edit preserves, silent
-      review return
-- [x] Hardware pass, Android emulator (2026-08-18): all 10 steps green (one matrix
-      expectation corrected: sub-KB sizes show 0.0 KB, matching the File-entry format)
-- [ ] Full gate (`gabbro_test`) + test-count table update
+- [ ] Gate red -> fix on the branch.
+- [ ] Gate green -> merge: master has NOT moved (merge-base == master tip), so
+      `git checkout master && git merge --no-ff allow_attachments` yields a tree
+      byte-identical to what the gate tested — verify with
+      `git diff master allow_attachments --stat` (must be empty) after merging;
+      no gate re-run needed then.
+- [ ] Update the Testing table counts from the gate output (Flutter now 2347/10s,
+      real-FFI 16; Rust count from the gate log).
+- [ ] New release (maintainer decided 2026-08-18): follow BUILD_AND_RELEASE.md,
+      next tag v0.1.0-alpha.21. No dep bumps this branch — no `--warm`.
+- [ ] Delete this section's completed text when the release is out.
 
 ---
 
