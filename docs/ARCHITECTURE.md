@@ -128,9 +128,7 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**Release v0.1.0-alpha.21.** Attachments work is merged to master; gate ALL GREEN
-2026-08-18. Follow BUILD_AND_RELEASE.md — no dep bumps, so no `--warm`.
-Delete this section once the release is published.
+_(empty — pick the next item from the Bikeshed)_
 
 ---
 
