@@ -141,11 +141,34 @@ imported attachments and ones added in-app to new or existing entries; no regres
 anywhere (all screens per `test/screen_catalogue.dart`, a11y, l10n, Rust backend).
 
 - [x] Review the one-attachment rule against what Rust actually stores → list, UI follows Rust
-- [ ] Impact analysis (screens, bridge, sync/merge, import)
-- [ ] Verify wiring in code
-- [ ] Net: pin current behaviour green, augment where thin
-- [ ] Canon-TDD scenario list agreed
-- [ ] Implement (red → green per scenario)
+- [x] Impact analysis (screens, bridge, sync/merge, import)
+- [x] Verify wiring in code → **bug found:** editing any entry in the app wipes its
+      stored attachments (`vault_entry_from_data` rebuilds with `attachments: vec![]`,
+      `update_entry` replaces the entry and stamps `del:attachments:<uuid>` tombstones,
+      so the deletion also syncs to other devices). Fixing this is part of this task.
+- [x] Bridge design decided: attachment **metadata** (uuid, name, kind, size) rides in the
+      entry DTOs; bytes cross the FFI only on demand (`add_attachment`/`extract_attachment`),
+      so opening an entry never hauls 25 MB across the bridge. In-app add reuses
+      `ENPASS_ATTACHMENT_MAX_BYTES`, enforced in Rust.
+- [x] Net: pinned green (bytes survive save/lock/unlock; merge carries bytes intact;
+      recovery-history labels `attachments:` rows)
+- [x] **Fix the edit-wipes-attachments bug** — `update_entry` copies stored attachments
+      before diffing (stored entry is source of truth); red-then-green 2026-08-18
+- [x] Canon-TDD scenario list agreed (2026-08-18). Design: `update_entry` never touches
+      attachments (stored entry is source of truth, like history/field_times); all
+      attachment mutation via dedicated bridge calls.
+- [ ] Implement (red → green per scenario):
+  1. [x] bridge edit preserves attachments, no `del:` tombstones (the bug fix)
+  2. [ ] DTOs expose attachment metadata (uuid, name, kind, size), all five types
+  3. [ ] `add_attachment` persists; rejects > `ENPASS_ATTACHMENT_MAX_BYTES`
+  4. [ ] `extract_attachment` returns exact bytes; errors on unknown uuid / locked
+  5. [ ] `remove_attachment` deletes + stamps `del:` tombstone (removal syncs)
+  6. [ ] create/edit screen: attachments section; pick-during-create persists
+  7. [ ] entry detail: extract per row via the File-entry save dialog, byte-equal
+  8. [ ] oversized pick -> localized error, nothing added
+  9. [ ] sync review + recovery history show filename, not uuid (updates the pin)
+  10. [ ] real-FFI: add -> lock -> unlock -> extract, byte-compare
+  11. [ ] l10n x37; overflow/a11y via the screen-catalog sweep
 - [ ] Hardware pass
 
 ---
