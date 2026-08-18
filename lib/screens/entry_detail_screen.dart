@@ -49,6 +49,7 @@ String formatTimestamp(
 Future<void> _defaultDelete(String id) => deleteEntry(id: id);
 Future<Uint8List> _defaultExtractAttachment(String entryId, String uuid) =>
     extractAttachment(entryId: entryId, uuid: uuid);
+VaultEntryData _defaultGetEntry(String id) => getEntry(id: id);
 Future<UrlOpenResult> _defaultLaunchUrl(String url) =>
     GabbroUrlOpener.open(url);
 
@@ -103,6 +104,11 @@ class EntryDetailScreen extends StatefulWidget {
   final Future<Uint8List> Function(String entryId, String uuid)
   onExtractAttachment;
 
+  /// Test seam: re-read the entry after the edit screen returns without a
+  /// review-save. Edit-mode attachment adds/removes persist immediately, so
+  /// the stale in-memory entry must be refreshed or they stay invisible.
+  final VaultEntryData Function(String id)? onGetEntry;
+
   /// Extra bottom padding below the scrollable body, on top of the normal
   /// content padding. The tablet two-pane layout passes this so the detail
   /// pane's last item clears the Scaffold-level FAB that floats over its
@@ -130,6 +136,7 @@ class EntryDetailScreen extends StatefulWidget {
     this.onEdited,
     this.exportFilePicker,
     this.onExtractAttachment = _defaultExtractAttachment,
+    this.onGetEntry,
     this.bottomReserve = 0,
   }) : isAndroid = isAndroid ?? Platform.isAndroid;
 
@@ -367,6 +374,17 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
               if (updated != null && mounted) {
                 setState(() => _entry = updated);
                 widget.onEdited?.call();
+              } else if (mounted) {
+                // No review-save, but edit-mode attachment adds/removes have
+                // already persisted — re-read or they stay invisible here.
+                try {
+                  final fresh = (widget.onGetEntry ?? _defaultGetEntry)(
+                    _entryId(),
+                  );
+                  setState(() => _entry = fresh);
+                } catch (_) {
+                  // Keep the current view if the re-read fails (e.g. locked).
+                }
               }
             },
           ),

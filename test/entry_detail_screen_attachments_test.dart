@@ -35,6 +35,7 @@ AttachmentMetaData _att() => AttachmentMetaData(
 Widget _buildScreen(
   VaultEntryData entry, {
   Future<Uint8List> Function(String id, String uuid)? onExtractAttachment,
+  VaultEntryData Function(String id)? onGetEntry,
 }) => testApp(
   EntryDetailScreen(
     entry: entry,
@@ -46,6 +47,7 @@ Widget _buildScreen(
     onFetchHistory: (_) async => const [],
     onExtractAttachment:
         onExtractAttachment ?? (a, b) async => Uint8List.fromList([0]),
+    onGetEntry: onGetEntry,
   ),
 );
 
@@ -69,6 +71,32 @@ void main() {
 
     expect(find.text('Attachments'), findsNothing);
   });
+
+  testWidgets(
+    'backing out of edit without saving still refreshes the attachment list',
+    (tester) async {
+      // Edit-mode attachment adds persist immediately; if the detail screen
+      // keeps its stale entry after a save-less back, the user cannot see
+      // (or extract) what they just attached until they reopen the entry.
+      await tester.pumpWidget(
+        _buildScreen(
+          VaultEntryData.note(_noteWith([])),
+          onGetEntry: (_) => VaultEntryData.note(_noteWith([_att()])),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Attachments'), findsNothing);
+
+      await tester.tap(find.byTooltip('Edit entry'));
+      await tester.pumpAndSettle();
+      // Back out of the edit screen without saving.
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+
+      expect(find.text('Attachments'), findsOneWidget);
+      expect(find.textContaining('passport.pdf'), findsOneWidget);
+    },
+  );
 
   testWidgets('saving an attachment writes the extracted bytes', (
     tester,
