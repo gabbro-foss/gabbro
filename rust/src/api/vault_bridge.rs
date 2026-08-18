@@ -501,6 +501,14 @@ pub async fn add_attachment(
     session::session_add_attachment(&entry_id, &name, &kind, data)
 }
 
+/// Return an attachment's raw bytes for saving to disk.
+///
+/// The only path besides `add_attachment` where attachment bytes cross the
+/// bridge — on demand, when the user extracts. Read-only, synchronous.
+pub fn extract_attachment(entry_id: String, uuid: String) -> Result<Vec<u8>, String> {
+    session::session_extract_attachment(&entry_id, &uuid)
+}
+
 /// Remove an entry by UUID and persist.
 ///
 /// Async — triggers a full vault save.
@@ -2462,6 +2470,67 @@ mod tests {
         }
 
         lock_vault().unwrap();
+        let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
+    }
+
+    // Scenario 4 (attachments task) — red first: extraction must hand back the
+    // exact stored bytes; a wrong uuid or a locked vault errors, never junk.
+    #[test]
+    #[serial]
+    fn extract_attachment_returns_exact_bytes_and_errors() {
+        use crate::api::vault::save_vault;
+        use crate::vault::entry::VaultEntry as InternalEntry;
+        use crate::vault::entry::{EntryAttachment, EntryMeta, NoteEntry};
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_extract_attachment.gabbro");
+        let pass = b"extract-attachment-pass";
+        let bytes = vec![5u8, 6, 7, 8, 9];
+        let mut body = VaultBody::empty();
+        body.entries.push(InternalEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                field_times: Default::default(),
+                history: Vec::new(),
+                id: String::from("id-x"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::new(),
+            },
+            title: String::from("T"),
+            content: String::new(),
+            custom_fields: vec![],
+            attachments: vec![EntryAttachment {
+                uuid: String::from("att-1"),
+                name: String::from("scan.png"),
+                kind: String::from("image/png"),
+                data: bytes.clone(),
+            }],
+        }));
+        save_vault(&body, pass, &path).unwrap();
+        run(unlock_vault(
+            pass.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
+
+        assert_eq!(
+            extract_attachment(String::from("id-x"), String::from("att-1")).unwrap(),
+            bytes,
+            "exact stored bytes"
+        );
+        assert!(
+            extract_attachment(String::from("id-x"), String::from("no-such")).is_err(),
+            "unknown uuid errors"
+        );
+
+        lock_vault().unwrap();
+        assert!(
+            extract_attachment(String::from("id-x"), String::from("att-1")).is_err(),
+            "locked vault errors"
+        );
+
         let _ = std::fs::remove_file(&path);
         let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }

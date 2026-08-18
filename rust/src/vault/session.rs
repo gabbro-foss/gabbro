@@ -515,6 +515,22 @@ pub fn session_add_attachment(
     Ok(uuid)
 }
 
+/// Return an attachment's raw bytes. Read-only — no save.
+pub fn session_extract_attachment(id: &str, uuid: &str) -> Result<Vec<u8>, String> {
+    let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+    let session = session.as_ref().ok_or("Vault is locked")?;
+    let entry = session
+        .entries
+        .iter()
+        .find(|e| entry_id(e) == id)
+        .ok_or_else(|| format!("No entry found with id: {id}"))?;
+    crate::api::vault::entry_attachments(entry)
+        .iter()
+        .find(|a| a.uuid == uuid)
+        .map(|a| a.data.clone())
+        .ok_or_else(|| format!("No attachment found with uuid: {uuid}"))
+}
+
 /// Remove an entry by UUID and persist.
 ///
 /// Async — triggers a full vault save.

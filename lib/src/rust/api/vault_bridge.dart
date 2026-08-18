@@ -108,6 +108,18 @@ Future<String> addAttachment({
   data: data,
 );
 
+/// Return an attachment's raw bytes for saving to disk.
+///
+/// The only path besides `add_attachment` where attachment bytes cross the
+/// bridge — on demand, when the user extracts. Read-only, synchronous.
+Future<Uint8List> extractAttachment({
+  required String entryId,
+  required String uuid,
+}) => RustLib.instance.api.crateApiVaultBridgeExtractAttachment(
+  entryId: entryId,
+  uuid: uuid,
+);
+
 /// Remove an entry by UUID and persist.
 ///
 /// Async — triggers a full vault save.
