@@ -130,8 +130,23 @@ resolved but never applied — inert, emits no warning.
 
 **Allow attachments for all entry types.** Rust already stores, diffs and merges
 `attachments` on Login/Note/Identity/Card/Custom (`FileEntry` has none — it is a file), but the
-field never crosses the bridge, so a user cannot add or view one. Only Enpass import fills it:
+field never crosses the bridge, so a user cannot add or extract one. Only Enpass import fills it:
 an imported attachment is invisible and unrecoverable in the app.
+
+Scope (agreed 2026-08-18): add + extract only (no in-app viewer); a **list** of
+attachments per entry, matching Rust's `Vec<EntryAttachment>` (revised from
+one-per-entry after code review); in-app add enforces the same per-attachment size cap
+as Enpass import — without it one huge attachment makes the vault unloadable on a phone; covers
+imported attachments and ones added in-app to new or existing entries; no regression
+anywhere (all screens per `test/screen_catalogue.dart`, a11y, l10n, Rust backend).
+
+- [x] Review the one-attachment rule against what Rust actually stores → list, UI follows Rust
+- [ ] Impact analysis (screens, bridge, sync/merge, import)
+- [ ] Verify wiring in code
+- [ ] Net: pin current behaviour green, augment where thin
+- [ ] Canon-TDD scenario list agreed
+- [ ] Implement (red → green per scenario)
+- [ ] Hardware pass
 
 ---
 
