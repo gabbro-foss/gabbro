@@ -148,12 +148,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
 
-- **Investigate CLI option for automatic syncing.** Allow users to use a companion CLI
-  tool to set up automatic vault export -> sync -> import? Investigate if possible and
-  what it entails. Triggers must be time-based (every day/hour/other) or event-based
-  (on edit/save/close/other), and the solution agnostic of sync method (rsync,
-  syncthing, other).
-
 ### Housekeeping
 - **Delete `purgeLegacyRecentApps` at v1.0** (`MainActivity.kt` + `LegacyPurgeTest.kt`) — the one-shot cleanup of the removed suggestion-chip store. No pre-1.0 install will still be upgrading by then.
 
