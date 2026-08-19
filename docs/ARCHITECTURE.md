@@ -128,7 +128,7 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-_(empty — pick the next item from the Bikeshed)_
+- appimages vs snaps: investigate if gabbro can be distributed on one of them, (flathub sadly refuse AI applications so that's no longer an option). The aim is easy updates on Linux Mint and debian based distros.
 
 ---
 
@@ -147,9 +147,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
-
-### Distribution
-- Flathub vs appimages vs snaps: investigate if gabbro can be distributed on one of them, preferably flathub for easy update on Linux Mint.
 
 ### Housekeeping
 - **Delete `purgeLegacyRecentApps` at v1.0** (`MainActivity.kt` + `LegacyPurgeTest.kt`) — the one-shot cleanup of the removed suggestion-chip store. No pre-1.0 install will still be upgrading by then.
