@@ -169,17 +169,36 @@ PATH; your AUR helper resolves the dependencies and updates it with the rest of
 your system. `gabbro-bin` repackages the official release build — it does not
 recompile from source.
 
-#### Debian / Linux Mint — `.deb`
+#### Debian / Linux Mint — APT repository
 
-Download `gabbro_<version>_amd64.deb` from the Releases page, then:
+Add the repo once; every later release then arrives through `apt upgrade` and
+Mint's Update Manager. Install the signing key, add the source, install:
 
 ```bash
-sudo apt install ./gabbro_<version>_amd64.deb
+sudo install -d /etc/apt/keyrings && sudo curl -fsSL https://gabbro-foss.github.io/gabbro-apt/gabbro-archive-keyring.gpg -o /etc/apt/keyrings/gabbro.gpg
+```
+
+```bash
+sudo tee /etc/apt/sources.list.d/gabbro.sources >/dev/null <<'EOF'
+Types: deb
+URIs: https://gabbro-foss.github.io/gabbro-apt
+Suites: stable
+Components: main
+Architectures: amd64
+Signed-By: /etc/apt/keyrings/gabbro.gpg
+EOF
+```
+
+```bash
+sudo apt update && sudo apt install gabbro
 ```
 
 Installs system-wide to `/usr` with a menu entry and the `gabbro` command; `apt`
-resolves the dependencies. There is no auto-update — install the new `.deb` when a
-release lands (it upgrades in place).
+resolves the dependencies.
+
+One-off alternative (no auto-update): download `gabbro_<version>_amd64.deb` from
+the Releases page, then `sudo apt install ./gabbro_<version>_amd64.deb`. It
+upgrades in place when you install a newer one.
 
 #### Any distribution — portable tarball
 
@@ -190,15 +209,23 @@ tar -xzf gabbro-<version>-linux-x86_64.tar.gz
 
 Self-contained: place `bundle/` anywhere and run it in place. No root — but also no
 menu entry and no `gabbro` on your PATH; that system integration is what the
-packages add.
+packages add. Nothing resolves dependencies for you either — install the runtime
+libraries the packages would have pulled in:
+
+- **Arch:** `sudo pacman -S --needed libfido2 libcbor pcsclite gtk3 xdg-desktop-portal xdg-desktop-portal-gtk`
+- **Debian / Mint:** `sudo apt install libfido2-1 libcbor0.10 libpcsclite1 libgtk-3-0t64 xdg-desktop-portal xdg-desktop-portal-gtk`
 
 #### Uninstall
 
 | Installed via | Remove with |
 |---|---|
 | AUR | `sudo pacman -Rns gabbro-bin` |
-| `.deb` | `sudo apt remove gabbro` |
+| APT / `.deb` | `sudo apt remove gabbro` |
 | tarball | delete the `bundle/` folder |
+
+If you added the APT repo, also delete `/etc/apt/sources.list.d/gabbro.sources`
+and `/etc/apt/keyrings/gabbro.gpg`. If you bound a custom shortcut for auto-type,
+remove it too — it would now point at a deleted binary and silently do nothing.
 
 **Your vaults and settings are not removed** — they live in
 `~/.local/share/app.gabbro.gabbro/` (vaults) and `~/.config/gabbro/` (settings),
@@ -294,6 +321,29 @@ gpg --verify gabbro_<version>_amd64.deb.asc gabbro_<version>_amd64.deb
 
 The AUR package needs no separate check: its `PKGBUILD` pins the release tarball's
 SHA-256, so installing it verifies against the same signed tarball above.
+
+#### File dialogs on bare window managers and in sandboxes
+
+Native file dialogs go through the XDG desktop portal over the DBus session bus.
+If the portal cannot be reached, Gabbro does not crash — dialogs degrade to a
+message inviting you to type the path instead.
+
+- **Bare window managers** (e.g. qtile) install the portal but never start it.
+  Start it from session init, e.g. in `~/.xinitrc`: `/usr/lib/xdg-desktop-portal &`.
+- **Hand-rolled `bwrap` sandboxes** must forward the Wayland socket (or no window
+  appears at all) and the session bus (or the portal is unreachable):
+
+  ```
+  bwrap … \
+    --ro-bind "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" \
+    --setenv WAYLAND_DISPLAY "$WAYLAND_DISPLAY" \
+    --ro-bind "$XDG_RUNTIME_DIR/bus" "$XDG_RUNTIME_DIR/bus" \
+    --setenv DBUS_SESSION_BUS_ADDRESS "$DBUS_SESSION_BUS_ADDRESS" \
+    …
+  ```
+
+  `xdg-desktop-portal` plus a backend such as `xdg-desktop-portal-gtk` must be
+  running in the session.
 
 ### Android
 
