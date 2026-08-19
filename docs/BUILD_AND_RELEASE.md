@@ -118,20 +118,15 @@ repackages the signed tarball into a `.deb` (no compile) and regenerates the APT
 index in `../gabbro-apt/`. Optional `.deb` validation: add `apt-get install -y lintian`
 + `lintian ./*.deb` + `apt-get install -y ./*.deb` inside the container.
 
-**One-time setup** (**not live yet**, delete this paragraph once done): create
-`gabbro-foss/gabbro-apt`, enable Pages on its default branch, clone it to
-`../gabbro-apt/`, then build the tree and keyring. apt accepts the ed25519 release key
-(verified 2026-08-19 on trixie apt 3.0.3 and ubuntu:24.04 apt 2.8.3, Mint 22's base):
-
-```bash
-mkdir -p ../gabbro-apt/pool ../gabbro-apt/dists/stable/main/binary-amd64 && gpg --export 47754EEE7F9AABFC > ../gabbro-apt/gabbro-archive-keyring.gpg
-```
-
-State of `../gabbro-apt/` after a release. `pool/` holds only the current `.deb` (Pages
-caps a site at 1 GB); older versions stay on the Releases page:
+The APT clone is a sibling of `gabbro/`, at `../gabbro-apt/` (GitHub Pages serves it at
+https://gabbro-foss.github.io/gabbro-apt). apt accepts its ed25519 signing key (verified
+2026-08-19 on trixie apt 3.0.3 and ubuntu:24.04 apt 2.8.3, Mint 22's base). State after
+a release; `pool/` holds only the current `.deb` (Pages caps a site at 1 GB), older
+versions stay on the Releases page:
 
 ```
 ../gabbro-apt/
+├── README.md
 ├── gabbro-archive-keyring.gpg
 ├── pool/gabbro_<debver>_amd64.deb
 └── dists/stable/{InRelease,Release,Release.gpg,main/binary-amd64/{Packages,Packages.gz}}

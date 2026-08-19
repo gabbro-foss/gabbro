@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- APT repository for Debian/Mint: add it once, later releases arrive via `apt upgrade` / Update Manager.
+
 ## [0.1.0-alpha.21] – 2026-08-18
 
 ### Added

@@ -128,17 +128,7 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-- **Stand up the APT repo** so Mint and Debian users get updates in their Update Manager
-  instead of fetching a `.deb` by hand. Steps: [BUILD_AND_RELEASE.md](BUILD_AND_RELEASE.md)
-  one-time setup in `### Debian .deb + APT index`, publish step in `### APT publish`.
-  Not live yet.
 
-  Decided 2026-08-19, having ruled out the alternatives. AppImage: the user still has to
-  notice a new version and fetch it, and on Mint 22 it needs `libfuse2t64` installed before
-  it runs at all. Snap: Mint pins `snapd` off by default. PPA: Launchpad builds from source
-  and rejects a prebuilt `.deb`. Debian archive: needs a sponsor plus a fully offline
-  vendored build. Flathub: bans AI-assisted code. Non-Debian distros are left to whoever
-  wants to package them.
 
 ---
 
