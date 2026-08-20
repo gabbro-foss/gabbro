@@ -81,9 +81,9 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2349 | 10 |
+| Flutter (`flutter test`) | 2362 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 16 | 0 |
-| Android (`./gradlew :app:testDebugUnitTest`) | 160 | 15 |
+| Android (`./gradlew :app:testDebugUnitTest`) | 170 | 15 |
 
 **Real-FFI suites run under plain `dart test`, never `flutter drive` (non-negotiable):** they test
 Dart -> FFI -> crypto -> disk, touch no UI, and so need no window. Needs the release cdylib (debug
@@ -181,13 +181,14 @@ resolved but never applied — inert, emits no warning.
       - [x] K12 done in Rust: full W3C response JSON assembled + golden-tested
             (`registration_response_json` / `assertion_response_json`; Kotlin
             relays strings verbatim)
-      - [ ] K7 service + capabilities registered in the manifest
-      - [ ] K8 begin-get locked -> unlock action, never an empty list
-      - [ ] K9 begin-get unlocked -> one entry per match
-      - [ ] K10 begin-create -> save-in-Gabbro entry -> create activity
-      - [ ] K11 caller validation: asset-link proof or allowlisted browser
-      - [ ] dep `androidx.credentials:credentials:1.6.0` + lockfile + osv-scan
-      - [ ] hardware pass on an API 34+ emulator before any Android commit
+      - [x] K7-K11 Robolectric-green (10 tests), UNCOMMITTED until the hardware
+            pass: service + capabilities, unlock action when locked, entries per
+            match, save entry, caller validation (vendored gstatic browser
+            allowlist incl. Brave/Vanadium; fail-closed asset links)
+      - [x] Flutter phase-2 UI: `passkeyUnlockMain` + consent screen, l10n x37,
+            a11y catalogued, About attributes `p256`; full suite 2362 green
+      - [ ] dep lockfile + osv-scan (run at Android commit time)
+      - [ ] hardware pass on an API 34+ emulator, then commit Android+Flutter
     - [ ] Linux: uhid virtual FIDO2 daemon (CTAPHID framing + CTAP2 commands)
 
 ---
