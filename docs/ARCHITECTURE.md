@@ -73,7 +73,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 769 | 17 |
+| Rust (`cargo test -q`) | 774 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 13 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2347 | 10 |
+| Flutter (`flutter test`) | 2349 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 16 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 160 | 15 |
 
@@ -163,11 +163,11 @@ resolved but never applied — inert, emits no warning.
       - [x] D14 bridge DTO both directions + `create_entry` refusal + update
             preserves key material (caught a missing update arm)
       - [x] D15 `entry_to_summary` renders a Passkey
-      - [ ] D16 REOPENED (maintainer ruling 2026-08-20): passkey sync must use
-            the standard granular machinery, zero irregularities — per-field
-            merge + conflicts + history for text fields; key material rides the
-            File-`data` pattern (one atomic base64 field, masked in UI); extend
-            the fuzzer oracle; replace the whole-entry-LWW pin red-first
+      - [x] D16 passkey sync = standard granular machinery: per-field merge +
+            conflicts + brought-over for text fields; key material is one atomic
+            "credential" field on the File-`data` pattern (base64 on the
+            resolution path, `<binary>` in sync review + recovery history);
+            fuzzer generates passkeys (14-entry base), convergence green
       - [x] B9 compat gate: v12 goldens with passkey canary, 13/13 green;
             maintainer adds the manual `test_data/migration_vaults/` v12 vault
             post-release
