@@ -583,6 +583,23 @@ fn changed_field_keys(old: &VaultEntry, new: &VaultEntry) -> Vec<String> {
             }
             diff_attachments(&o.attachments, &n.attachments, &mut out);
         }
+        (VaultEntry::Passkey(o), VaultEntry::Passkey(n)) => {
+            push_if(&mut out, "rp_id", o.rp_id != n.rp_id);
+            push_if(&mut out, "user_name", o.user_name != n.user_name);
+            push_if(
+                &mut out,
+                "user_display_name",
+                o.user_display_name != n.user_display_name,
+            );
+            push_if(&mut out, "notes", o.notes != n.notes);
+            // Key material is one atomic sync field — see credential_blob().
+            push_if(
+                &mut out,
+                "credential",
+                o.credential_blob() != n.credential_blob(),
+            );
+            diff_custom(&o.custom_fields, &n.custom_fields, &mut out);
+        }
         _ => {}
     }
     out
@@ -720,10 +737,14 @@ fn set_entry_scalar(entry: &mut VaultEntry, key: &str, value: &str) {
             "user_name" => e.user_name = s,
             "user_display_name" => e.user_display_name = s,
             "notes" => e.notes = Some(s),
-            // Key material (private_key, credential_id, user_handle,
-            // public_key_cose, algorithm) is immutable after registration —
-            // a credential with different key material is a different
-            // credential, so it never rides the field-merge path.
+            // The atomic key-material block rides the resolution path as
+            // base64, like File "data". A malformed value leaves it untouched.
+            "credential" => {
+                use base64::Engine;
+                if let Ok(blob) = base64::engine::general_purpose::STANDARD.decode(&s) {
+                    let _ = e.apply_credential_blob(&blob);
+                }
+            }
             _ => {}
         },
     }
@@ -3366,6 +3387,48 @@ mod tests {
         let _ = std::fs::remove_file(&export);
         let _ = std::fs::remove_file(&hash_path);
         let _ = std::fs::remove_file(source.with_extension("gabbro.sha256"));
+    }
+
+    #[test]
+    fn changed_field_keys_covers_passkey_fields() {
+        use crate::vault::entry::PasskeyEntry;
+        let base = || PasskeyEntry {
+            meta: crate::vault::entry::EntryMeta::default(),
+            rp_id: String::from("example.com"),
+            user_name: String::from("user@example.com"),
+            user_display_name: String::from("Sample User"),
+            user_handle: vec![7; 16],
+            credential_id: vec![7; 32],
+            private_key: vec![7; 32],
+            public_key_cose: vec![7; 77],
+            algorithm: -7,
+            notes: None,
+            custom_fields: vec![],
+        };
+        let old = VaultEntry::Passkey(base());
+
+        let mut notes_edit = base();
+        notes_edit.notes = Some(String::from("edited"));
+        assert_eq!(
+            changed_field_keys(&old, &VaultEntry::Passkey(notes_edit)),
+            vec![String::from("notes")],
+            "a notes edit must stamp, or granular sync silently drops it"
+        );
+
+        let mut rekey = base();
+        rekey.private_key = vec![8; 32];
+        assert_eq!(
+            changed_field_keys(&old, &VaultEntry::Passkey(rekey)),
+            vec![String::from("credential")],
+            "any key-material change stamps the one atomic credential key"
+        );
+
+        let mut rename = base();
+        rename.user_name = String::from("other@example.com");
+        assert_eq!(
+            changed_field_keys(&old, &VaultEntry::Passkey(rename)),
+            vec![String::from("user_name")]
+        );
     }
 
     #[test]

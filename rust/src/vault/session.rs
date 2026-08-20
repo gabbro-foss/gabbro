@@ -1352,7 +1352,7 @@ fn entry_display_title(entry: &VaultEntry) -> String {
 use crate::api::vault::{FieldConflictItem, PendingItemDeleteItem};
 use crate::vault::entry::{
     CardEntry, CustomEntry, EntryAttachment, EntryMeta, FileEntry, IdentityEntry, LoginEntry,
-    NoteEntry,
+    NoteEntry, PasskeyEntry,
 };
 
 #[derive(Clone, Copy)]
@@ -1795,6 +1795,43 @@ pub(crate) fn merge_entry_pair(
                 title: m.pick_str("title", &l.title, &i.title),
                 fields,
                 attachments: m.merge_attachments(&l.attachments, &i.attachments),
+            })
+        }
+        (VaultEntry::Passkey(l), VaultEntry::Passkey(i)) => {
+            // Text fields merge like any entry. The key-material block is ONE
+            // atomic field ("credential"): it rides the resolution path as
+            // base64 like File `data`, and the winning side supplies every
+            // byte — half a credential signs for nobody.
+            use base64::Engine;
+            let b64 = base64::engine::general_purpose::STANDARD;
+            let l_blob = l.credential_blob();
+            let i_blob = i.credential_blob();
+            let side = m.decide(
+                "credential",
+                l_blob == i_blob,
+                &b64.encode(&l_blob),
+                &b64.encode(&i_blob),
+            );
+            let src = match side {
+                Side::Local => l,
+                Side::Incoming => i,
+            };
+            VaultEntry::Passkey(PasskeyEntry {
+                meta: lm.clone(),
+                rp_id: m.pick_str("rp_id", &l.rp_id, &i.rp_id),
+                user_name: m.pick_str("user_name", &l.user_name, &i.user_name),
+                user_display_name: m.pick_str(
+                    "user_display_name",
+                    &l.user_display_name,
+                    &i.user_display_name,
+                ),
+                user_handle: src.user_handle.clone(),
+                credential_id: src.credential_id.clone(),
+                private_key: src.private_key.clone(),
+                public_key_cose: src.public_key_cose.clone(),
+                algorithm: src.algorithm,
+                notes: m.pick_opt("notes", &l.notes, &i.notes),
+                custom_fields: m.merge_custom(&l.custom_fields, &i.custom_fields),
             })
         }
         // Same id, different type (defensive): fall back to whole-entry LWW.
@@ -8156,7 +8193,7 @@ mod export_sync_tests {
 // ── Multi-device sync fuzz proof (granular sync, v9) ──────────────────────────
 //
 // Deterministic fuzzer for the field-level merge. Each pass starts from a fixed
-// 12-entry base (all 6 types), forks 3 device copies, and applies random divergent
+// 14-entry base (all 7 types), forks 3 device copies, and applies random divergent
 // edits/adds/deletes with globally-unique timestamps across EVERY mergeable field:
 // scalars (title, password, notes, card fields, ...), custom k:v pairs, AND
 // attachments. The copies are then converged in two random orders. Invariants:
@@ -8171,7 +8208,7 @@ mod sync_fuzz {
     use super::*;
     use crate::vault::entry::{
         CardEntry, CustomEntry, CustomField, EntryAttachment, FileEntry, IdentityEntry, LoginEntry,
-        NoteEntry,
+        NoteEntry, PasskeyEntry,
     };
     use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
@@ -8233,10 +8270,13 @@ mod sync_fuzz {
             ],
             VaultEntry::File(_) => &["filename", "data", "notes"],
             VaultEntry::Custom(_) => &["title"],
-            // No granular scalars yet: Passkey pairs ride the whole-entry LWW
-            // fallback in merge_entry_pair. Extending the fuzzer to generate
-            // passkeys forces this whole oracle to take a position first.
-            VaultEntry::Passkey(_) => &[],
+            VaultEntry::Passkey(_) => &[
+                "rp_id",
+                "user_name",
+                "user_display_name",
+                "notes",
+                "credential",
+            ],
         }
     }
 
@@ -8291,7 +8331,16 @@ mod sync_fuzz {
                 "title" => x.title.clone(),
                 _ => unreachable!(),
             },
-            VaultEntry::Passkey(_) => unreachable!("Passkey has no granular scalars"),
+            VaultEntry::Passkey(x) => match key {
+                "rp_id" => x.rp_id.clone(),
+                "user_name" => x.user_name.clone(),
+                "user_display_name" => x.user_display_name.clone(),
+                "notes" => opt_repr(&x.notes),
+                // Whole-block repr: the merge decides on the full blob, so the
+                // oracle's equality must match blob equality exactly.
+                "credential" => format!("{:?}", x.credential_blob()),
+                _ => unreachable!(),
+            },
         }
     }
 
@@ -8348,7 +8397,16 @@ mod sync_fuzz {
                 "title" => x.title = s,
                 _ => unreachable!(),
             },
-            VaultEntry::Passkey(_) => unreachable!("Passkey has no granular scalars"),
+            VaultEntry::Passkey(x) => match key {
+                "rp_id" => x.rp_id = s,
+                "user_name" => x.user_name = s,
+                "user_display_name" => x.user_display_name = s,
+                "notes" => x.notes = some,
+                // Mutate one component of the atomic block (like File "data"
+                // takes raw bytes); the merge still moves the block whole.
+                "credential" => x.private_key = value.as_bytes().to_vec(),
+                _ => unreachable!(),
+            },
         }
     }
 
@@ -8566,6 +8624,19 @@ mod sync_fuzz {
                 title: String::from("C"),
                 fields,
                 attachments: att(),
+            }));
+            out.push(VaultEntry::Passkey(PasskeyEntry {
+                meta: blank_meta(&format!("passkey-{i}")),
+                rp_id: String::from("example.com"),
+                user_name: String::from("u@example.com"),
+                user_display_name: String::from("U"),
+                user_handle: vec![0x11; 16],
+                credential_id: vec![0x22; 32],
+                private_key: vec![0x33; 32],
+                public_key_cose: vec![0x44; 77],
+                algorithm: -7,
+                notes: None,
+                custom_fields: pairs(),
             }));
         }
         // Stamp every base field at ts=1 so the oracle is pure max-timestamp.
@@ -9234,20 +9305,87 @@ mod passkey_tests {
         assert!(!s.search_blob.contains('\u{7}'));
     }
 
+    fn stamped(mut e: VaultEntry, stamps: &[(&str, u64)]) -> VaultEntry {
+        let m = meta_of_mut(&mut e);
+        for (k, t) in stamps {
+            m.field_times.insert((*k).to_string(), *t);
+        }
+        e
+    }
+
+    // Maintainer ruling 2026-08-20: passkeys use the standard granular sync,
+    // zero irregularities. Text fields merge per-field with edit-stamps and
+    // conflicts; the key-material block ("credential") moves atomically, like
+    // File `data`, because half a credential signs for nobody.
+
     #[test]
-    fn passkey_pair_merges_whole_entry_newer_side_wins() {
-        // Until granular passkey merge is a deliberate decision, a same-id
-        // Passkey pair rides the whole-entry newest-wins fallback: silent,
-        // no conflicts, nothing brought over.
-        let older = passkey("2025-01-01T00:00:00Z", Some("older"), 1);
-        let newer = passkey("2026-06-01T00:00:00Z", Some("newer"), 2);
+    fn passkey_merges_fields_independently_like_any_entry() {
+        let mut local = passkey("2026-01-02T00:00:00Z", Some("local note"), 7);
+        if let VaultEntry::Passkey(e) = &mut local {
+            e.notes = Some(String::from("edited note"));
+        }
+        let local = stamped(local, &[("notes", 10)]);
 
-        let (merged, conflicts, pending, brought) = merge_entry_pair(&older, &newer);
-        assert_eq!(merged, newer, "incoming newer: incoming wins wholesale");
-        assert!(conflicts.is_empty() && pending.is_empty() && brought.is_empty());
+        let mut incoming = passkey("2026-01-03T00:00:00Z", Some("a note"), 7);
+        if let VaultEntry::Passkey(e) = &mut incoming {
+            e.user_name = String::from("renamed@example.com");
+        }
+        let incoming = stamped(incoming, &[("user_name", 11)]);
 
-        let (merged, conflicts, _, _) = merge_entry_pair(&newer, &older);
-        assert_eq!(merged, newer, "incoming older: local wins wholesale");
-        assert!(conflicts.is_empty());
+        let (merged, conflicts, _pending, brought) = merge_entry_pair(&local, &incoming);
+        match &merged {
+            VaultEntry::Passkey(e) => {
+                assert_eq!(e.notes.as_deref(), Some("edited note"), "local edit kept");
+                assert_eq!(e.user_name, "renamed@example.com", "incoming edit kept");
+                assert_eq!(e.private_key, vec![7u8; 32], "untouched key material");
+            }
+            _ => panic!("expected a Passkey"),
+        }
+        assert!(conflicts.is_empty(), "independent edits are not a conflict");
+        assert_eq!(brought.len(), 1, "the incoming rename surfaces for review");
+        assert_eq!(brought[0].field, "user_name");
+    }
+
+    #[test]
+    fn passkey_both_editing_notes_is_a_conflict() {
+        let mut local = passkey("2026-01-02T00:00:00Z", None, 7);
+        if let VaultEntry::Passkey(e) = &mut local {
+            e.notes = Some(String::from("mine"));
+        }
+        let local = stamped(local, &[("notes", 10)]);
+
+        let mut incoming = passkey("2026-01-03T00:00:00Z", None, 7);
+        if let VaultEntry::Passkey(e) = &mut incoming {
+            e.notes = Some(String::from("theirs"));
+        }
+        let incoming = stamped(incoming, &[("notes", 11)]);
+
+        let (_merged, conflicts, _pending, _brought) = merge_entry_pair(&local, &incoming);
+        assert_eq!(conflicts.len(), 1, "both edited notes: user must resolve");
+        assert_eq!(conflicts[0].field, "notes");
+    }
+
+    #[test]
+    fn passkey_credential_block_moves_atomically() {
+        // Incoming re-registered the credential (all key material differs,
+        // stamped); the merged entry must carry the incoming block whole —
+        // never a mix of old and new bytes.
+        let local = passkey("2026-01-02T00:00:00Z", None, 7);
+        let incoming = stamped(
+            passkey("2026-01-03T00:00:00Z", None, 9),
+            &[("credential", 20)],
+        );
+
+        let (merged, conflicts, _pending, _brought) = merge_entry_pair(&local, &incoming);
+        match &merged {
+            VaultEntry::Passkey(e) => {
+                assert_eq!(e.private_key, vec![9u8; 32]);
+                assert_eq!(e.credential_id, vec![9u8; 32]);
+                assert_eq!(e.public_key_cose, vec![9u8; 77]);
+                assert_eq!(e.user_handle, vec![9u8; 16]);
+            }
+            _ => panic!("expected a Passkey"),
+        }
+        assert!(conflicts.is_empty(), "only incoming edited: no conflict");
     }
 }

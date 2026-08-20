@@ -348,6 +348,64 @@ pub struct PasskeyEntry {
     pub custom_fields: Vec<CustomField>,
 }
 
+impl PasskeyEntry {
+    /// The immutable key-material block as one byte string — the sync merge's
+    /// atomic "credential" field (rides the resolution path as base64, like
+    /// File `data`). Half a credential signs for nobody, so it never splits.
+    /// Length-prefixed so no two field splits produce the same bytes.
+    pub fn credential_blob(&self) -> Vec<u8> {
+        let mut out = Vec::new();
+        for part in [
+            &self.credential_id,
+            &self.private_key,
+            &self.public_key_cose,
+            &self.user_handle,
+        ] {
+            out.extend_from_slice(&(part.len() as u16).to_be_bytes());
+            out.extend_from_slice(part);
+        }
+        out.extend_from_slice(&self.algorithm.to_be_bytes());
+        out
+    }
+
+    /// Apply a blob produced by [`Self::credential_blob`]. Malformed input is
+    /// refused and leaves the entry untouched.
+    pub fn apply_credential_blob(&mut self, blob: &[u8]) -> Result<(), String> {
+        fn take(blob: &[u8], pos: &mut usize) -> Result<Vec<u8>, String> {
+            let len_end = pos
+                .checked_add(2)
+                .filter(|&e| e <= blob.len())
+                .ok_or("credential blob truncated at length prefix")?;
+            let len = u16::from_be_bytes([blob[*pos], blob[*pos + 1]]) as usize;
+            let end = len_end
+                .checked_add(len)
+                .filter(|&e| e <= blob.len())
+                .ok_or("credential blob truncated at field")?;
+            let out = blob[len_end..end].to_vec();
+            *pos = end;
+            Ok(out)
+        }
+        let mut pos = 0usize;
+        let credential_id = take(blob, &mut pos)?;
+        let private_key = take(blob, &mut pos)?;
+        let public_key_cose = take(blob, &mut pos)?;
+        let user_handle = take(blob, &mut pos)?;
+        let alg_bytes: [u8; 8] = blob
+            .get(pos..pos + 8)
+            .and_then(|s| s.try_into().ok())
+            .ok_or("credential blob truncated at algorithm")?;
+        if pos + 8 != blob.len() {
+            return Err(String::from("credential blob has trailing bytes"));
+        }
+        self.credential_id = credential_id;
+        self.private_key = private_key;
+        self.public_key_cose = public_key_cose;
+        self.user_handle = user_handle;
+        self.algorithm = i64::from_be_bytes(alg_bytes);
+        Ok(())
+    }
+}
+
 /// A single vault entry — wraps all seven entry types into one enum.
 ///
 /// This is the type that gets serialized to JSON and encrypted into
@@ -1030,6 +1088,39 @@ mod tests {
         let json = serde_json::to_string(&entry).unwrap();
         let back: PasskeyEntry = serde_json::from_str(&json).unwrap();
         assert_eq!(entry, back);
+    }
+
+    #[test]
+    fn passkey_credential_blob_round_trips() {
+        let source = sample_passkey();
+        let mut target = sample_passkey();
+        target.credential_id = vec![1; 16];
+        target.private_key = vec![2; 32];
+        target.public_key_cose = vec![3; 77];
+        target.user_handle = vec![4; 8];
+        target.algorithm = -8;
+
+        target
+            .apply_credential_blob(&source.credential_blob())
+            .unwrap();
+        assert_eq!(target.credential_id, source.credential_id);
+        assert_eq!(target.private_key, source.private_key);
+        assert_eq!(target.public_key_cose, source.public_key_cose);
+        assert_eq!(target.user_handle, source.user_handle);
+        assert_eq!(target.algorithm, source.algorithm);
+    }
+
+    #[test]
+    fn passkey_malformed_credential_blob_is_refused_untouched() {
+        let mut e = sample_passkey();
+        let before = e.clone();
+        let blob = e.credential_blob();
+        assert!(e.apply_credential_blob(&blob[..blob.len() - 1]).is_err());
+        assert!(e.apply_credential_blob(&[]).is_err());
+        let mut trailing = blob.clone();
+        trailing.push(0);
+        assert!(e.apply_credential_blob(&trailing).is_err());
+        assert_eq!(e, before, "a refused blob must change nothing");
     }
 
     #[test]

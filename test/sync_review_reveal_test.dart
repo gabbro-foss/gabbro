@@ -64,6 +64,28 @@ void main() {
       expect(find.textContaining('RAWINCOMINGBASE64'), findsNothing);
     });
 
+    testWidgets('a passkey credential clash shows <binary>, never key material', (
+      tester,
+    ) async {
+      await openReview(
+        tester,
+        _summary(
+          fieldConflicts: [
+            const FieldConflictItem(
+              id: 'x',
+              title: 'example.com',
+              field: 'credential',
+              localValue: 'LOCALKEYBLOB64',
+              incomingValue: 'INCOMINGKEYBLOB64',
+            ),
+          ],
+        ),
+      );
+      expect(find.textContaining('<binary>'), findsWidgets);
+      expect(find.textContaining('LOCALKEYBLOB64'), findsNothing);
+      expect(find.textContaining('INCOMINGKEYBLOB64'), findsNothing);
+    });
+
     testWidgets('a secret conflict field is masked by default', (tester) async {
       await openReview(
         tester,

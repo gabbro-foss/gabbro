@@ -238,8 +238,9 @@ const _secretFields = {'password', 'cvv', 'pin', 'transaction_password'};
 bool _isSecret(String field) => _secretFields.contains(field);
 
 /// Binary fields whose value rides the resolution path as base64 (File
-/// contents). They must never render their raw value — always `<binary>`.
-bool _isBinary(String field) => field == 'data';
+/// contents, passkey key material). They must never render their raw value —
+/// always `<binary>`.
+bool _isBinary(String field) => field == 'data' || field == 'credential';
 
 /// Show the one-by-one review and return the user's decisions, or null if there
 /// is nothing to review. Non-dismissible: the user steps to the end.
