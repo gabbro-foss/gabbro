@@ -262,6 +262,29 @@ fn b64url_encode(bytes: &[u8]) -> String {
     base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(bytes)
 }
 
+/// Placeholder `clientDataJSON` (b64url of `{}`) for the privileged-browser
+/// path: the browser substitutes its own client data, but strict W3C response
+/// parsers require the member to exist.
+fn placeholder_client_data() -> String {
+    b64url_encode(b"{}")
+}
+
+/// SubjectPublicKeyInfo DER wrapping the ES256 key from our pinned 77-byte
+/// COSE layout (x at 10..42, y at 45..77) — the `response.publicKey` easy
+/// accessor. Constant P-256 prefix, no ASN.1 dependency.
+fn spki_from_cose(cose: &[u8]) -> Vec<u8> {
+    const P256_SPKI_PREFIX: [u8; 26] = [
+        0x30, 0x59, 0x30, 0x13, 0x06, 0x07, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x02, 0x01, 0x06, 0x08,
+        0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07, 0x03, 0x42, 0x00,
+    ];
+    let mut out = Vec::with_capacity(91);
+    out.extend_from_slice(&P256_SPKI_PREFIX);
+    out.push(0x04);
+    out.extend_from_slice(&cose[10..42]);
+    out.extend_from_slice(&cose[45..77]);
+    out
+}
+
 /// Register a passkey and return the complete W3C `RegistrationResponseJSON`
 /// the caller sends back verbatim. `client_data_json_b64url` is included when
 /// the provider built the client data itself (native-app flow); privileged
@@ -272,13 +295,16 @@ pub fn registration_response_json(
 ) -> Result<String, String> {
     let parts = register_passkey(request_json)?;
     let id = b64url_encode(&parts.credential_id);
-    let mut response = serde_json::json!({
+    // Every member the W3C RegistrationResponseJSON shape requires — browsers
+    // parse this strictly, and a missing member fails the whole ceremony.
+    let response = serde_json::json!({
+        "clientDataJSON": client_data_json_b64url.unwrap_or_else(placeholder_client_data),
         "attestationObject": b64url_encode(&attestation_object(&parts.auth_data)),
+        "authenticatorData": b64url_encode(&parts.auth_data),
+        "publicKey": b64url_encode(&spki_from_cose(&parts.public_key_cose)),
+        "publicKeyAlgorithm": ES256,
         "transports": ["internal", "hybrid"],
     });
-    if let Some(cdj) = client_data_json_b64url {
-        response["clientDataJSON"] = serde_json::Value::String(cdj);
-    }
     let v = serde_json::json!({
         "id": id,
         "rawId": id,
@@ -301,12 +327,14 @@ pub fn assertion_response_json(
     client_data_hash_b64url: Option<String>,
 ) -> Result<String, String> {
     use sha2::{Digest, Sha256};
-    let (hash, include_cdj) = match (client_data_json_b64url, client_data_hash_b64url) {
+    let (hash, cdj_member) = match (client_data_json_b64url, client_data_hash_b64url) {
         (Some(cdj), None) => {
             let raw = b64url("clientDataJSON", &cdj)?;
-            (Sha256::digest(&raw).to_vec(), Some(cdj))
+            (Sha256::digest(&raw).to_vec(), cdj)
         }
-        (None, Some(h)) => (b64url("clientDataHash", &h)?, None),
+        // Privileged caller: it substitutes its own clientDataJSON, but the
+        // member must exist for strict parsers — placeholder, never absent.
+        (None, Some(h)) => (b64url("clientDataHash", &h)?, placeholder_client_data()),
         _ => {
             return Err(String::from(
                 "exactly one of clientDataJSON or clientDataHash is required",
@@ -315,14 +343,12 @@ pub fn assertion_response_json(
     };
     let parts = sign_passkey_assertion(entry_id, &hash)?;
     let id = b64url_encode(&parts.credential_id);
-    let mut response = serde_json::json!({
+    let response = serde_json::json!({
+        "clientDataJSON": cdj_member,
         "authenticatorData": b64url_encode(&parts.auth_data),
         "signature": b64url_encode(&parts.signature_der),
         "userHandle": b64url_encode(&parts.user_handle),
     });
-    if let Some(cdj) = include_cdj {
-        response["clientDataJSON"] = serde_json::Value::String(cdj);
-    }
     let v = serde_json::json!({
         "id": id,
         "rawId": id,
@@ -652,9 +678,11 @@ mod tests {
 
     #[test]
     #[serial]
-    fn assertion_response_with_caller_hash_omits_client_data() {
-        // Privileged browsers hand us a pre-computed hash and fill in their own
-        // clientDataJSON; ours must not appear.
+    fn assertion_response_with_caller_hash_uses_placeholder_client_data() {
+        // Privileged browsers hand us a pre-computed hash and substitute their
+        // own clientDataJSON — but the field must still be present as a
+        // placeholder, or the browser's strict JSON parse fails (Android
+        // credential-provider docs; S23 "unknown error").
         let path = with_unlocked_vault("assert_hash");
         register_passkey(&creation_json()).unwrap();
         let matches = passkeys_for_request(&assertion_json("example.com")).unwrap();
@@ -662,12 +690,61 @@ mod tests {
 
         let resp = assertion_response_json(&matches[0].entry_id, None, Some(hash.clone())).unwrap();
         let v: serde_json::Value = serde_json::from_str(&resp).unwrap();
-        assert!(v["response"].get("clientDataJSON").is_none());
+        assert_eq!(v["response"]["clientDataJSON"], "e30", "b64url of '{{}}'");
         assert!(v["response"]["signature"].as_str().is_some());
 
         // Exactly one client-data source is required.
         assert!(assertion_response_json(&matches[0].entry_id, None, None).is_err());
 
+        cleanup(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn registration_response_json_carries_the_easy_accessors() {
+        // Browsers parse RegistrationResponseJSON strictly: authenticatorData,
+        // publicKey and publicKeyAlgorithm are required members. Brave on the
+        // S23 rejected a response without them ("unknown error" on the site).
+        let path = with_unlocked_vault("reg_accessors");
+        let resp = registration_response_json(&creation_json(), None).unwrap();
+        let v: serde_json::Value = serde_json::from_str(&resp).unwrap();
+        let b64 = &base64::engine::general_purpose::URL_SAFE_NO_PAD;
+
+        let auth_data = b64
+            .decode(v["response"]["authenticatorData"].as_str().unwrap())
+            .unwrap();
+        let att = b64
+            .decode(v["response"]["attestationObject"].as_str().unwrap())
+            .unwrap();
+        assert!(
+            att.windows(auth_data.len()).any(|w| w == &auth_data[..]),
+            "authenticatorData must be the attestationObject's embedded auth data"
+        );
+
+        assert_eq!(v["response"]["publicKeyAlgorithm"], -7);
+        let spki = b64
+            .decode(v["response"]["publicKey"].as_str().unwrap())
+            .unwrap();
+        assert_eq!(spki.len(), 91, "P-256 SubjectPublicKeyInfo DER");
+        // The SPKI wraps the same uncompressed point the COSE key carries
+        // (pinned 77-byte layout closing the auth data).
+        let cose = &auth_data[auth_data.len() - 77..];
+        assert_eq!(spki[26], 0x04);
+        assert_eq!(&spki[27..59], &cose[10..42]);
+        assert_eq!(&spki[59..91], &cose[45..77]);
+
+        cleanup(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn registration_response_without_client_data_uses_placeholder() {
+        // Privileged-browser path: the field must exist as a placeholder, not
+        // be absent (the browser replaces it with its own client data).
+        let path = with_unlocked_vault("reg_placeholder");
+        let resp = registration_response_json(&creation_json(), None).unwrap();
+        let v: serde_json::Value = serde_json::from_str(&resp).unwrap();
+        assert_eq!(v["response"]["clientDataJSON"], "e30", "b64url of '{{}}'");
         cleanup(&path);
     }
 
