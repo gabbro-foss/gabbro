@@ -179,26 +179,47 @@ resolved but never applied — inert, emits no warning.
           (R1-R6 + K12 in Rust; K7-K11 Robolectric x10; Flutter 2363 incl.
           consent screen `passkeyUnlockMain`, l10n x37 FIDO terms, a11y
           catalogued; Dart bridge regenerated; lockfile + osv-scan clean).
-          **Hardware-UNVERIFIED — S23 run FAILED at registration:**
-      - What worked on the S23 (Brave, no Google account): Gabbro appears in
-        the create sheet; picking it launches `GabbroPasskeyCreateActivity`;
-        the provider service returns valid picker responses (logcat:
-        "Remote provider responded with a valid response").
-      - The failure: the activity's Flutter engine runs ~10s, then the
-        activity finishes WITHOUT setting any result -> browser reports
-        TYPE_USER_CANCELED, webauthn.io shows "unknown error". No crash in
-        logcat (no AndroidRuntime/FATAL for the process).
-      - Debug NEXT: what the consent flow did in those 10s. Prime suspects:
-        an exception inside the `approve` MethodChannel handler
-        (`performOperation()` is uncatched Kotlin), or the consent screen
-        never rendered and the user backed out. Reproduce with
-        `adb logcat` filtered on the app pid + `E/flutter` + `System.err`
-        DURING the tap (the -d buffer was too noisy after the fact).
+          Hardware state 2026-08-20 (S23, Brave, release): CREATE + signed-in
+          AUTH pass end to end — register, vault entry, authenticate. The old
+          registration failure was our response JSON missing spec-required
+          members; fixed red-first in `passkey_bridge.rs` (placeholder
+          `clientDataJSON` = b64url `{}` on the clientDataHash path per the
+          Android credential-provider guide, plus `authenticatorData`,
+          `publicKey` SPKI DER, `publicKeyAlgorithm` accessors); 17/17 lib
+          tests green, clippy green. Provider activities log tag
+          `GabbroPasskey` (R8-safe; grep `"GabbroPasskey:"` with the colon).
+          Remaining, in order:
+      - [ ] Locked-vault flow (matrix 5/6 FAIL): an AuthenticationAction tap
+            carries NO get request — logged `get refuse: no get request in
+            intent`; the site shows "unknown error". Contract (Android
+            credential-provider guide, verified): the unlock activity must
+            unlock, rebuild the picker rows, return them via
+            `PendingIntentHandler.setBeginGetCredentialResponse`, and finish
+            — never a GetCredentialResponse. Retrieve the request with
+            `retrieveBeginGetCredentialRequest` when
+            `retrieveProviderGetCredentialRequest` is null.
+            Approved design: unlock flow leaves the session open (else the
+            follow-up row tap demands a second unlock) and stamps rebuilt
+            rows with an EXTRA_RELOCK_AFTER extra; the follow-up get flow
+            relocks after signing, so Gabbro ends locked.
+            Approved canon-TDD list (red-first, in order):
+        - [ ] K13 Robolectric: `buildBeginGetResponse(relockAfter=true)`
+              stamps row intents; the service path stays unstamped
+        - [ ] D1 flutter: unlock-mode passkey app shows UnlockScreen only;
+              on unlock it calls approve then finish — no consent, no relock
+        - [ ] D2 flutter: get-mode with the relock flag calls onLock after
+              approve even when alreadyUnlocked
+        - [ ] activity glue (retrieve fallback + setBeginGetCredentialResponse)
+              has no JVM seam — compile + hardware matrix only
+      - [ ] Matrix 7 defect: passkey notes edit persists, but the review
+            screen does not show the notes change. Uninvestigated.
+      - [ ] Before merge: asset-links fallback fetches on the main thread ->
+            NetworkOnMainThreadException, so a native-app (non-browser)
+            caller can only ever be refused. Move the fetch off-main.
+      - [ ] Rerun the full matrix (in `.scratchpad`) after the fixes
       - Emulator is NOT a viable test bed: GMS-free image -> Chromium
         browsers bypass CredMan; Play image without Google sign-in -> GMS
         keeps 3P providers disabled. S23 only.
-      - Matrix (8 steps, gate first) in `.scratchpad`; maintainer runs it.
-      - [ ] hardware pass green on the S23, end to end
     - [ ] Linux: uhid virtual FIDO2 daemon (CTAPHID framing + CTAP2 commands)
     - Session note 2026-08-20: maintainer doubts the branch survives; nothing
       pushed; no CHANGELOG entry until the feature actually works. Full gate
@@ -219,6 +240,8 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Features and UI/UX
+- **Passkey filter card** — if the passkey provider ships, the vault list needs a
+  filter card for the Passkey entry type.
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
