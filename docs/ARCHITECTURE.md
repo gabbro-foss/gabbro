@@ -73,7 +73,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 745 | 17 |
+| Rust (`cargo test -q`) | 748 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 11 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -139,7 +139,7 @@ resolved but never applied — inert, emits no warning.
   - Plan with sources: `docs/PASSKEY_INVESTIGATION.md` (Android Credential Manager
     provider; Linux virtual FIDO2 authenticator over uhid, no extension).
   - Approved sequence:
-    - [ ] Amend ADR-009 (supersede the ban; old decision stays summarised)
+    - [x] Amend ADR-009 (supersede the ban; old decision stays summarised)
     - [ ] Rust core: `Passkey` entry type, new vault VERSION (corpus vault +
           fixtures), ES256/COSE/authenticatorData/signing ops
     - [ ] Android: `CredentialProviderService` + unlock/consent activities +
