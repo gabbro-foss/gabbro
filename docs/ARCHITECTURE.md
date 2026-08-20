@@ -185,8 +185,11 @@ resolved but never applied — inert, emits no warning.
             pass: service + capabilities, unlock action when locked, entries per
             match, save entry, caller validation (vendored gstatic browser
             allowlist incl. Brave/Vanadium; fail-closed asset links)
-      - [x] Flutter phase-2 UI: `passkeyUnlockMain` + consent screen, l10n x37,
-            a11y catalogued, About attributes `p256`; full suite 2362 green
+      - [x] Flutter phase-2 UI: `passkeyUnlockMain` + consent screen, l10n x37
+            (FIDO official terms: "passkey" loanword; native ja/ko/zh), a11y
+            catalogued, About attributes `p256`
+      - [x] Dart bridge regenerated for the Passkey type; detail view, editor
+            (folder+notes), list icon/label; full suite 2363 green
       - [ ] dep lockfile + osv-scan (run at Android commit time)
       - [ ] hardware pass on an API 34+ emulator, then commit Android+Flutter
     - [ ] Linux: uhid virtual FIDO2 daemon (CTAPHID framing + CTAP2 commands)
