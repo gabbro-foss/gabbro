@@ -258,6 +258,82 @@ pub fn sign_passkey_assertion(
     })
 }
 
+fn b64url_encode(bytes: &[u8]) -> String {
+    base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(bytes)
+}
+
+/// Register a passkey and return the complete W3C `RegistrationResponseJSON`
+/// the caller sends back verbatim. `client_data_json_b64url` is included when
+/// the provider built the client data itself (native-app flow); privileged
+/// browsers supply their own and pass `None`.
+pub fn registration_response_json(
+    request_json: &str,
+    client_data_json_b64url: Option<&str>,
+) -> Result<String, String> {
+    let parts = register_passkey(request_json)?;
+    let id = b64url_encode(&parts.credential_id);
+    let mut response = serde_json::json!({
+        "attestationObject": b64url_encode(&attestation_object(&parts.auth_data)),
+        "transports": ["internal", "hybrid"],
+    });
+    if let Some(cdj) = client_data_json_b64url {
+        response["clientDataJSON"] = serde_json::Value::String(cdj.to_string());
+    }
+    let v = serde_json::json!({
+        "id": id,
+        "rawId": id,
+        "type": "public-key",
+        "authenticatorAttachment": "platform",
+        "response": response,
+        "clientExtensionResults": {},
+    });
+    serde_json::to_string(&v).map_err(|e| e.to_string())
+}
+
+/// Sign and return the complete W3C `AuthenticationResponseJSON`.
+///
+/// Exactly one client-data source: the provider-built clientDataJSON (native
+/// apps — we hash it ourselves and include it), or the caller's pre-computed
+/// hash (privileged browsers — they attach their own clientDataJSON).
+pub fn assertion_response_json(
+    entry_id: &str,
+    client_data_json_b64url: Option<&str>,
+    client_data_hash_b64url: Option<&str>,
+) -> Result<String, String> {
+    use sha2::{Digest, Sha256};
+    let (hash, include_cdj) = match (client_data_json_b64url, client_data_hash_b64url) {
+        (Some(cdj), None) => {
+            let raw = b64url("clientDataJSON", cdj)?;
+            (Sha256::digest(&raw).to_vec(), Some(cdj.to_string()))
+        }
+        (None, Some(h)) => (b64url("clientDataHash", h)?, None),
+        _ => {
+            return Err(String::from(
+                "exactly one of clientDataJSON or clientDataHash is required",
+            ))
+        }
+    };
+    let parts = sign_passkey_assertion(entry_id, &hash)?;
+    let id = b64url_encode(&parts.credential_id);
+    let mut response = serde_json::json!({
+        "authenticatorData": b64url_encode(&parts.auth_data),
+        "signature": b64url_encode(&parts.signature_der),
+        "userHandle": b64url_encode(&parts.user_handle),
+    });
+    if let Some(cdj) = include_cdj {
+        response["clientDataJSON"] = serde_json::Value::String(cdj);
+    }
+    let v = serde_json::json!({
+        "id": id,
+        "rawId": id,
+        "type": "public-key",
+        "authenticatorAttachment": "platform",
+        "response": response,
+        "clientExtensionResults": {},
+    });
+    serde_json::to_string(&v).map_err(|e| e.to_string())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -496,6 +572,103 @@ mod tests {
         let _ = lock_vault();
         let err = passkeys_for_request(&assertion_json("example.com")).unwrap_err();
         assert!(err.contains("locked"), "got: {err}");
+    }
+
+    // ── Full W3C response JSON (what Kotlin relays verbatim) ─────────────────
+
+    #[test]
+    #[serial]
+    fn registration_response_json_matches_the_w3c_shape() {
+        let path = with_unlocked_vault("reg_response");
+        let cdj_raw =
+            br#"{"type":"webauthn.create","challenge":"Y2hhbGxlbmdlLWJ5dGVz","origin":"https://example.com"}"#;
+        let cdj = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(cdj_raw);
+
+        let resp = registration_response_json(&creation_json(), Some(&cdj)).unwrap();
+        let v: serde_json::Value = serde_json::from_str(&resp).unwrap();
+
+        assert_eq!(v["type"], "public-key");
+        assert_eq!(v["authenticatorAttachment"], "platform");
+        assert_eq!(v["id"], v["rawId"]);
+        let raw_id = base64::engine::general_purpose::URL_SAFE_NO_PAD
+            .decode(v["rawId"].as_str().unwrap())
+            .expect("rawId is base64url");
+        assert_eq!(raw_id.len(), 32);
+        assert_eq!(v["response"]["clientDataJSON"], cdj.as_str());
+        let att = base64::engine::general_purpose::URL_SAFE_NO_PAD
+            .decode(v["response"]["attestationObject"].as_str().unwrap())
+            .expect("attestationObject is base64url");
+        assert!(att.starts_with(&[0xa3, 0x63, b'f', b'm', b't', 0x64, b'n', b'o', b'n', b'e']));
+        let transports: Vec<&str> = v["response"]["transports"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|t| t.as_str().unwrap())
+            .collect();
+        assert!(transports.contains(&"internal") && transports.contains(&"hybrid"));
+        assert!(v["clientExtensionResults"].as_object().unwrap().is_empty());
+
+        cleanup(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn assertion_response_json_signature_verifies_over_client_data() {
+        use p256::ecdsa::signature::Verifier;
+        use sha2::{Digest, Sha256};
+        let path = with_unlocked_vault("assert_response");
+        register_passkey(&creation_json()).unwrap();
+        let matches = passkeys_for_request(&assertion_json("example.com")).unwrap();
+
+        let cdj_raw =
+            br#"{"type":"webauthn.get","challenge":"Y2hhbGxlbmdlLWJ5dGVz","origin":"https://example.com"}"#;
+        let cdj = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(cdj_raw);
+
+        let resp = assertion_response_json(&matches[0].entry_id, Some(&cdj), None).unwrap();
+        let v: serde_json::Value = serde_json::from_str(&resp).unwrap();
+
+        assert_eq!(v["type"], "public-key");
+        assert_eq!(v["response"]["clientDataJSON"], cdj.as_str());
+        assert_eq!(
+            v["response"]["userHandle"],
+            base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(b"user-handle")
+        );
+
+        let b64 = &base64::engine::general_purpose::URL_SAFE_NO_PAD;
+        let auth_data = b64
+            .decode(v["response"]["authenticatorData"].as_str().unwrap())
+            .unwrap();
+        let sig_der = b64
+            .decode(v["response"]["signature"].as_str().unwrap())
+            .unwrap();
+        let mut msg = auth_data.clone();
+        msg.extend_from_slice(&Sha256::digest(cdj_raw));
+        let vk = verifying_key_from_cose(&register_cose_of(&matches[0].entry_id));
+        let sig = p256::ecdsa::Signature::from_der(&sig_der).unwrap();
+        assert!(vk.verify(&msg, &sig).is_ok());
+
+        cleanup(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn assertion_response_with_caller_hash_omits_client_data() {
+        // Privileged browsers hand us a pre-computed hash and fill in their own
+        // clientDataJSON; ours must not appear.
+        let path = with_unlocked_vault("assert_hash");
+        register_passkey(&creation_json()).unwrap();
+        let matches = passkeys_for_request(&assertion_json("example.com")).unwrap();
+        let hash = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode([0x42u8; 32]);
+
+        let resp = assertion_response_json(&matches[0].entry_id, None, Some(&hash)).unwrap();
+        let v: serde_json::Value = serde_json::from_str(&resp).unwrap();
+        assert!(v["response"].get("clientDataJSON").is_none());
+        assert!(v["response"]["signature"].as_str().is_some());
+
+        // Exactly one client-data source is required.
+        assert!(assertion_response_json(&matches[0].entry_id, None, None).is_err());
+
+        cleanup(&path);
     }
 
     /// Fetch the stored COSE public key of an entry via the bridge DTO's b64
