@@ -3,6 +3,7 @@ package app.gabbro.gabbro
 import android.os.Build
 import android.os.Bundle
 import android.util.Base64
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.credentials.CreatePublicKeyCredentialRequest
 import androidx.credentials.GetPublicKeyCredentialOption
@@ -35,6 +36,10 @@ abstract class GabbroPasskeyActivity : GabbroUnlockHostActivity() {
     companion object {
         const val EXTRA_ENTRY_ID = "app.gabbro.gabbro.EXTRA_PASSKEY_ENTRY_ID"
         private const val CHANNEL = "app.gabbro.gabbro/passkey"
+
+        // Field-debuggable by design: caller identity, branch taken and refusal
+        // reasons are public material; never log request JSON or user names.
+        internal const val TAG = "GabbroPasskey"
     }
 
     internal val allowlist: PrivilegedBrowserAllowlist by lazy {
@@ -49,6 +54,7 @@ abstract class GabbroPasskeyActivity : GabbroUnlockHostActivity() {
         super.configureFlutterEngine(flutterEngine)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
             .setMethodCallHandler { call, result ->
+                Log.i(TAG, "channel: ${call.method}")
                 when (call.method) {
                     "isUnlocked" -> result.success(RustBridge.isVaultUnlocked())
                     // Dart asks what to show on the consent line.
@@ -126,6 +132,7 @@ class GabbroPasskeyCreateActivity : GabbroPasskeyActivity() {
         requestJson = request.requestJson
         clientDataHash = request.clientDataHash
         callingAppInfo = provider.callingAppInfo
+        Log.i(TAG, "create onCreate: caller=${provider.callingAppInfo.packageName} cdh=${clientDataHash != null}")
     }
 
     override fun requestInfo(): Map<String, String> = mapOf(
@@ -142,6 +149,12 @@ class GabbroPasskeyCreateActivity : GabbroPasskeyActivity() {
         val info = callingAppInfo ?: return refuse("caller unknown")
         val cert = callerCertSha256(info) ?: return refuse("caller certificate unreadable")
         val rpId = requestInfo()["rpId"].orEmpty()
+        Log.i(
+            TAG,
+            "create op: caller=${info.packageName} cert=$cert " +
+                "privileged=${allowlist.isPrivileged(info.packageName, cert)} " +
+                "cdh=${clientDataHash != null} rpId=$rpId",
+        )
         val responseJson: String
         if (clientDataHash != null && allowlist.isPrivileged(info.packageName, cert)) {
             // Privileged browser: it attaches its own clientDataJSON.
@@ -175,10 +188,12 @@ class GabbroPasskeyCreateActivity : GabbroPasskeyActivity() {
             result, CreatePublicKeyCredentialResponse(responseJson)
         )
         setResult(RESULT_OK, result)
+        Log.i(TAG, "create result set (${responseJson.length} chars)")
         // No finish() here: Dart locks a session it opened, then calls "finish".
     }
 
     override fun refuse(reason: String) {
+        Log.i(TAG, "create refuse: $reason")
         val result = android.content.Intent()
         PendingIntentHandler.setCreateCredentialException(
             result, CreateCredentialUnknownException(reason)
@@ -209,6 +224,7 @@ class GabbroPasskeyGetActivity : GabbroPasskeyActivity() {
         requestJson = option.requestJson
         clientDataHash = option.clientDataHash
         callingAppInfo = provider.callingAppInfo
+        Log.i(TAG, "get onCreate: caller=${provider.callingAppInfo.packageName} cdh=${clientDataHash != null}")
     }
 
     override fun requestInfo(): Map<String, String> = mapOf(
@@ -223,6 +239,12 @@ class GabbroPasskeyGetActivity : GabbroPasskeyActivity() {
         val info = callingAppInfo ?: return refuse("caller unknown")
         val cert = callerCertSha256(info) ?: return refuse("caller certificate unreadable")
         val rpId = requestInfo()["rpId"].orEmpty()
+        Log.i(
+            TAG,
+            "get op: caller=${info.packageName} cert=$cert " +
+                "privileged=${allowlist.isPrivileged(info.packageName, cert)} " +
+                "cdh=${clientDataHash != null} rpId=$rpId",
+        )
 
         // Resolve the entry: the picker tap carries it; the unlock path re-queries.
         val entryId = intent.getStringExtra(EXTRA_ENTRY_ID) ?: run {
@@ -266,10 +288,12 @@ class GabbroPasskeyGetActivity : GabbroPasskeyActivity() {
             result, GetCredentialResponse(PublicKeyCredential(responseJson))
         )
         setResult(RESULT_OK, result)
+        Log.i(TAG, "get result set (${responseJson.length} chars)")
         // No finish() here: Dart locks a session it opened, then calls "finish".
     }
 
     override fun refuse(reason: String) {
+        Log.i(TAG, "get refuse: $reason")
         val result = android.content.Intent()
         PendingIntentHandler.setGetCredentialException(
             result, GetCredentialUnknownException(reason)
