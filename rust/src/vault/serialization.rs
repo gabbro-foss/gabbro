@@ -377,6 +377,17 @@ mod tests {
     }
 
     #[test]
+    fn unknown_entry_variant_returns_a_clean_error() {
+        // What this binary would see if body JSON ever carried an entry type it
+        // does not know (e.g. written by a future format): a clean error, never
+        // a panic. The VERSION check in file_format.rs is the real shield; this
+        // pins the failure mode behind it.
+        let bytes = br#"{"entries":[{"SomeFutureType":{"meta":{"id":"x","created_at":"","updated_at":"","folder":""}}}],"folders":[]}"#;
+        let err = deserialize_vault_body(bytes).unwrap_err();
+        assert!(err.contains("unknown variant"), "got: {err}");
+    }
+
+    #[test]
     fn deserialize_folds_previous_password_into_history() {
         // A v8-shaped Login carrying the old single-slot previous_password must
         // surface as a one-per-field meta.history record after load - lossless

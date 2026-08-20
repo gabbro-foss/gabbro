@@ -60,6 +60,24 @@ fn login_identifier<'a>(username: &'a str, email: Option<&'a str>) -> &'a str {
     }
 }
 
+/// Build the keysym sequence for an entry. The single place that decides which
+/// entry types may auto-type: Login builds, everything else is refused. The
+/// match is deliberately exhaustive — a new entry type must take this decision
+/// here, and in the per-variant tests below.
+fn login_sequence(entry: &VaultEntry) -> Result<Zeroizing<Vec<u32>>, FillError> {
+    match entry {
+        VaultEntry::Login(e) => {
+            let user = login_identifier(&e.username, e.email.as_deref());
+            Ok(Zeroizing::new(build_sequence(user, &e.password)))
+        }
+        VaultEntry::Note(_)
+        | VaultEntry::Identity(_)
+        | VaultEntry::Card(_)
+        | VaultEntry::File(_)
+        | VaultEntry::Custom(_) => Err(FillError::NotLogin),
+    }
+}
+
 /// Whether the currently active window is the one we captured -- the
 /// wrong-window safeguard. `None` (no active window) never matches, so we never
 /// type a secret into nothing.
@@ -78,13 +96,7 @@ pub fn fill(window_id: Window, entry_id: &str) -> Result<(), FillError> {
     // borrow its fields (no extra copies) and scrub the built keysym list, which
     // also carries the secret, via Zeroizing.
     let entry = get_entry(entry_id).map_err(FillError::Session)?;
-    let seq = match &entry {
-        VaultEntry::Login(e) => {
-            let user = login_identifier(&e.username, e.email.as_deref());
-            Zeroizing::new(build_sequence(user, &e.password))
-        }
-        _ => return Err(FillError::NotLogin),
-    };
+    let seq = login_sequence(&entry)?;
 
     let (conn, screen) = x11rb::connect(None)?;
     let root = conn.setup().roots[screen].root;
@@ -157,6 +169,115 @@ mod tests {
     #[test]
     fn identifier_is_empty_when_username_and_email_both_empty() {
         assert_eq!(login_identifier("", Some("")), "");
+    }
+
+    // ── Which entry types may auto-type ──────────────────────────────────────
+    // `login_sequence` is the single classifier: Login builds a keysym
+    // sequence, every other variant is refused. Pinned per variant so a new
+    // entry type must take this decision explicitly, not inherit a wildcard.
+
+    use crate::vault::entry::{
+        CardEntry, CustomEntry, EntryMeta, FileEntry, IdentityEntry, LoginEntry, NoteEntry,
+    };
+
+    fn sample_login(username: &str, password: &str) -> VaultEntry {
+        VaultEntry::Login(LoginEntry {
+            meta: EntryMeta::default(),
+            title: String::new(),
+            url: String::new(),
+            username: username.into(),
+            password: password.into(),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            app_id: None,
+            email: None,
+        })
+    }
+
+    fn non_login_variants() -> Vec<(&'static str, VaultEntry)> {
+        vec![
+            (
+                "Note",
+                VaultEntry::Note(NoteEntry {
+                    meta: EntryMeta::default(),
+                    title: String::new(),
+                    content: String::new(),
+                    custom_fields: vec![],
+                    attachments: vec![],
+                }),
+            ),
+            (
+                "Identity",
+                VaultEntry::Identity(IdentityEntry {
+                    meta: EntryMeta::default(),
+                    first_name: String::new(),
+                    last_name: String::new(),
+                    email: String::new(),
+                    phone: None,
+                    address: None,
+                    custom_fields: vec![],
+                    attachments: vec![],
+                }),
+            ),
+            (
+                "Card",
+                VaultEntry::Card(CardEntry {
+                    meta: EntryMeta::default(),
+                    card_name: None,
+                    status: String::new(),
+                    cardholder_name: String::new(),
+                    card_number: String::new(),
+                    expiry: String::new(),
+                    cvv: String::new(),
+                    credit_limit: None,
+                    card_account_number: None,
+                    payment_network: None,
+                    pin: None,
+                    bank_name: None,
+                    transaction_password: None,
+                    notes: None,
+                    custom_fields: vec![],
+                    attachments: vec![],
+                }),
+            ),
+            (
+                "File",
+                VaultEntry::File(FileEntry {
+                    meta: EntryMeta::default(),
+                    filename: String::new(),
+                    data: vec![],
+                    notes: None,
+                    custom_fields: vec![],
+                }),
+            ),
+            (
+                "Custom",
+                VaultEntry::Custom(CustomEntry {
+                    meta: EntryMeta::default(),
+                    title: String::new(),
+                    fields: Default::default(),
+                    attachments: vec![],
+                }),
+            ),
+        ]
+    }
+
+    #[test]
+    fn a_login_entry_builds_a_sequence() {
+        let seq = login_sequence(&sample_login("alice", "pw")).expect("login must build");
+        assert!(!seq.is_empty());
+    }
+
+    #[test]
+    fn every_non_login_variant_is_refused_as_not_login() {
+        for (name, entry) in non_login_variants() {
+            match login_sequence(&entry) {
+                Err(FillError::NotLogin) => {}
+                Err(other) => panic!("{name}: expected NotLogin, got {other:?}"),
+                Ok(_) => panic!("{name}: expected NotLogin, got a sequence"),
+            }
+        }
     }
 
     // ── No fill error may carry secret material to stdout ────────────────────
