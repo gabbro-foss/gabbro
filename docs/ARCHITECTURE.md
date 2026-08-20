@@ -46,7 +46,7 @@ gabbro/
 │   ├── src/rust/         # Auto-generated bridge (do not edit)
 │   └── *.dart            # main, app_paths (GabbroPaths), settings, text_scale, control_scale, gabbro_contrast (high-contrast theme flag), vault_registry, safe_file_picker, gabbro_file_picker (dialog facade), linux_file_picker (XDG portal client), android_file_picker (picker channel client), autotype_listener, autotype_target, clipboard_clear
 ├── rust/src/
-│   ├── api/              # Bridge surface: vault, vault_bridge, import, *_generator, fido_bridge, autofill_bridge, autotype_bridge, entropy, types
+│   ├── api/              # Bridge surface: vault, vault_bridge, import, *_generator, fido_bridge, passkey_bridge, autofill_bridge, autotype_bridge, entropy, types
 │   ├── crypto/           # Internal (not bridge-exposed): kdf, hkdf, aes_gcm, vault_crypto
 │   ├── vault/            # Domain model: entry, file_format, io, serialization, session
 │   ├── fido/             # FIDO2/libfido2 FFI (Linux only)
@@ -73,7 +73,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 774 | 17 |
+| Rust (`cargo test -q`) | 786 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 13 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -176,12 +176,8 @@ resolved but never applied — inert, emits no warning.
       - [ ] challenge vault: reissue at v12 when the format lands (old crack-me
             vaults stay — red herrings are deliberate)
     - [ ] Android provider. Approved TDD list (red-first, in order):
-      - [ ] R1 parse creation request JSON; refuse unsupported algorithms
-      - [ ] R2 register: vault entry + attestation response parts
-      - [ ] R3 parse sign-in request JSON
-      - [ ] R4 assert: match entries by RP ID, sign, response parts
-      - [ ] R5 locked vault: distinct "locked" error for both flows
-      - [ ] R6 RP ID matching is exact-only (pinned)
+      - [x] R1-R6 done (`api/passkey_bridge.rs`): parse/refuse, register with
+            attestation object, exact-rp match + allow-list, sign, locked errors
       - [ ] K7 service + capabilities registered in the manifest
       - [ ] K8 begin-get locked -> unlock action, never an empty list
       - [ ] K9 begin-get unlocked -> one entry per match
