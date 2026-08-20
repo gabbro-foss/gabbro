@@ -73,7 +73,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 748 | 17 |
+| Rust (`cargo test -q`) | 752 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 11 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -145,11 +145,14 @@ resolved but never applied — inert, emits no warning.
           Net (done): autotype classifier exhaustive + per-variant refusal pinned;
           unknown-variant body JSON errors cleanly; l10n/a11y nets verified sufficient.
           Canon-TDD list (red-first, in order):
-      - [ ] A1 `PasskeyEntry` serde round-trip, all fields
-      - [ ] A2 missing optional fields parse (`#[serde(default)]`)
-      - [ ] A3 `content_hash` stable / per-field mutation / type tag
-      - [ ] A4 zeroize on drop
-      - [ ] A5 autotype classifier: `Passkey` refuses as `NotLogin`
+      - [x] A1 `PasskeyEntry` serde round-trip, all fields
+      - [x] A2 missing optional fields parse (`#[serde(default)]`)
+      - [x] A3 `content_hash` stable / per-field mutation / type tag
+      - [x] A4 zeroize on drop
+      - [x] A5 autotype classifier: `Passkey` refuses as `NotLogin`
+      - A-phase decisions: private key never crosses the bridge (DTO carries no
+        key material; `update_entry` restores from stored, `create_entry`
+        refuses Passkey DTOs); sync = whole-entry LWW until D16.
       - [ ] B6 fresh seal writes VERSION 12
       - [ ] B7 v11 opens, re-seals as v12
       - [ ] B8 v10 refused; v13 (too-new) refused
