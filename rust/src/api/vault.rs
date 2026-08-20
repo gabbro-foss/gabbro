@@ -901,6 +901,12 @@ pub fn update_entry(
         (_, VaultEntry::Custom(ref mut e)) => {
             e.meta.updated_at = now;
         }
+        // No secret snapshot: passkey key material is immutable after
+        // registration (and restored from the stored entry above), so only
+        // the edit timestamp moves.
+        (_, VaultEntry::Passkey(ref mut e)) => {
+            e.meta.updated_at = now;
+        }
         _ => return Err(String::from("Entry type mismatch during update")),
     }
 
@@ -3360,5 +3366,55 @@ mod tests {
         let _ = std::fs::remove_file(&export);
         let _ = std::fs::remove_file(&hash_path);
         let _ = std::fs::remove_file(source.with_extension("gabbro.sha256"));
+    }
+
+    #[test]
+    fn update_entry_preserves_passkey_key_material() {
+        use crate::vault::entry::PasskeyEntry;
+        // The DTO carries no key bytes, so an app edit arrives with empty key
+        // material; losing it would destroy the credential. The stored entry is
+        // the source of truth, exactly like attachments.
+        let passkey = |notes: Option<String>, keys: u8| {
+            VaultEntry::Passkey(PasskeyEntry {
+                meta: crate::vault::entry::EntryMeta {
+                    field_times: Default::default(),
+                    history: Vec::new(),
+                    id: String::from("pk-1"),
+                    created_at: String::from("2026-01-01T00:00:00Z"),
+                    updated_at: String::from("2026-01-01T00:00:00Z"),
+                    folder: String::new(),
+                },
+                rp_id: String::from("example.com"),
+                user_name: String::from("user@example.com"),
+                user_display_name: String::from("Sample User"),
+                user_handle: vec![keys; 16],
+                credential_id: vec![keys; 32],
+                private_key: vec![keys; 32],
+                public_key_cose: vec![keys; 77],
+                algorithm: -7,
+                notes,
+                custom_fields: vec![],
+            })
+        };
+        let mut entries = vec![passkey(None, 7)];
+        // The DTO path arrives with empty key material; model that.
+        let mut edited = passkey(Some(String::from("edited")), 0);
+        if let VaultEntry::Passkey(e) = &mut edited {
+            e.user_handle.clear();
+            e.credential_id.clear();
+            e.private_key.clear();
+            e.public_key_cose.clear();
+        }
+        update_entry(&mut entries, edited, None).unwrap();
+        match &entries[0] {
+            VaultEntry::Passkey(e) => {
+                assert_eq!(e.notes.as_deref(), Some("edited"), "the edit lands");
+                assert_eq!(e.private_key, vec![7u8; 32], "key material survives");
+                assert_eq!(e.credential_id, vec![7u8; 32]);
+                assert_eq!(e.user_handle, vec![7u8; 16]);
+                assert_eq!(e.public_key_cose, vec![7u8; 77]);
+            }
+            _ => panic!("expected a Passkey entry"),
+        }
     }
 }

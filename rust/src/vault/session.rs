@@ -9193,3 +9193,61 @@ mod read_only_unlock_tests {
         let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 }
+
+#[cfg(test)]
+mod passkey_tests {
+    use super::*;
+    use crate::vault::entry::PasskeyEntry;
+
+    fn passkey(updated_at: &str, notes: Option<&str>, keys: u8) -> VaultEntry {
+        VaultEntry::Passkey(PasskeyEntry {
+            meta: EntryMeta {
+                field_times: Default::default(),
+                history: Vec::new(),
+                id: String::from("pk-1"),
+                created_at: String::from("2026-01-01T00:00:00Z"),
+                updated_at: updated_at.to_string(),
+                folder: String::new(),
+            },
+            rp_id: String::from("example.com"),
+            user_name: String::from("user@example.com"),
+            user_display_name: String::from("Sample User"),
+            user_handle: vec![keys; 16],
+            credential_id: vec![keys; 32],
+            private_key: vec![keys; 32],
+            public_key_cose: vec![keys; 77],
+            algorithm: -7,
+            notes: notes.map(String::from),
+            custom_fields: vec![],
+        })
+    }
+
+    #[test]
+    fn passkey_summary_shows_type_and_rp_id_without_key_material() {
+        let s = entry_to_summary(&passkey("2026-01-01T00:00:00Z", Some("a note"), 7));
+        assert_eq!(s.entry_type, "Passkey");
+        assert_eq!(s.title, "example.com");
+        assert!(s.search_blob.contains("user@example.com"));
+        assert!(s.search_blob.contains("a note"));
+        // 32 bytes of 0x07 would render as repeated "\u{7}" — the blob must
+        // carry no trace of key bytes in any encoding it could plausibly take.
+        assert!(!s.search_blob.contains('\u{7}'));
+    }
+
+    #[test]
+    fn passkey_pair_merges_whole_entry_newer_side_wins() {
+        // Until granular passkey merge is a deliberate decision, a same-id
+        // Passkey pair rides the whole-entry newest-wins fallback: silent,
+        // no conflicts, nothing brought over.
+        let older = passkey("2025-01-01T00:00:00Z", Some("older"), 1);
+        let newer = passkey("2026-06-01T00:00:00Z", Some("newer"), 2);
+
+        let (merged, conflicts, pending, brought) = merge_entry_pair(&older, &newer);
+        assert_eq!(merged, newer, "incoming newer: incoming wins wholesale");
+        assert!(conflicts.is_empty() && pending.is_empty() && brought.is_empty());
+
+        let (merged, conflicts, _, _) = merge_entry_pair(&newer, &older);
+        assert_eq!(merged, newer, "incoming older: local wins wholesale");
+        assert!(conflicts.is_empty());
+    }
+}

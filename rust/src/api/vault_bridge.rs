@@ -3980,4 +3980,98 @@ mod tests {
         let back = vault_entry_to_data(&entry);
         assert_eq!(dto_field_labels(&back), vec!["One", "Two", "Four", "Five"]);
     }
+
+    // ── Passkey DTO: key material never crosses the bridge ───────────────────
+
+    fn sample_passkey_internal() -> VaultEntry {
+        VaultEntry::Passkey(PasskeyEntry {
+            meta: EntryMeta {
+                field_times: Default::default(),
+                history: Vec::new(),
+                id: String::from("pk-1"),
+                created_at: String::from("2026-01-01T00:00:00Z"),
+                updated_at: String::from("2026-01-01T00:00:00Z"),
+                folder: String::new(),
+            },
+            rp_id: String::from("example.com"),
+            user_name: String::from("user@example.com"),
+            user_display_name: String::from("Sample User"),
+            user_handle: vec![0xAA; 16],
+            credential_id: vec![9; 32],
+            private_key: vec![7; 32],
+            public_key_cose: vec![0xDD; 77],
+            algorithm: -7,
+            notes: Some(String::from("a note")),
+            custom_fields: vec![],
+        })
+    }
+
+    #[test]
+    fn passkey_to_data_carries_display_fields_and_b64_credential_id_only() {
+        use base64::Engine;
+        let data = vault_entry_to_data(&sample_passkey_internal());
+        match data {
+            VaultEntryData::Passkey(d) => {
+                assert_eq!(d.rp_id, "example.com");
+                assert_eq!(d.user_name, "user@example.com");
+                assert_eq!(d.notes.as_deref(), Some("a note"));
+                let decoded = base64::engine::general_purpose::URL_SAFE_NO_PAD
+                    .decode(&d.credential_id_b64)
+                    .expect("credential id is base64url");
+                assert_eq!(decoded, vec![9u8; 32]);
+                // No key-material fields exist on the DTO type — this test
+                // documents that the private key stays behind the bridge.
+            }
+            _ => panic!("expected a Passkey DTO"),
+        }
+    }
+
+    #[test]
+    fn passkey_from_data_builds_empty_key_material() {
+        let d = PasskeyEntryData {
+            id: String::from("pk-1"),
+            created_at: String::from("2026-01-01T00:00:00Z"),
+            updated_at: String::from("2026-01-01T00:00:00Z"),
+            folder: String::new(),
+            rp_id: String::from("example.com"),
+            user_name: String::from("user@example.com"),
+            user_display_name: String::from("Sample User"),
+            credential_id_b64: String::from("ignored-on-the-way-in"),
+            notes: None,
+            custom_fields: vec![],
+        };
+        let entry = vault_entry_from_data(VaultEntryData::Passkey(d)).unwrap();
+        match &entry {
+            VaultEntry::Passkey(e) => {
+                assert!(e.private_key.is_empty());
+                assert!(e.credential_id.is_empty());
+                assert!(e.user_handle.is_empty());
+                assert!(e.public_key_cose.is_empty());
+            }
+            _ => panic!("expected a Passkey entry"),
+        }
+    }
+
+    #[test]
+    fn create_entry_refuses_a_passkey_dto() {
+        let d = PasskeyEntryData {
+            id: String::new(),
+            created_at: String::new(),
+            updated_at: String::new(),
+            folder: String::new(),
+            rp_id: String::from("example.com"),
+            user_name: String::new(),
+            user_display_name: String::new(),
+            credential_id_b64: String::new(),
+            notes: None,
+            custom_fields: vec![],
+        };
+        let result = tokio::runtime::Runtime::new()
+            .expect("test runtime")
+            .block_on(create_entry(VaultEntryData::Passkey(d)));
+        match result {
+            Err(err) => assert!(err.contains("provider flow"), "got: {err}"),
+            Ok(_) => panic!("create_entry must refuse a Passkey DTO"),
+        }
+    }
 }
