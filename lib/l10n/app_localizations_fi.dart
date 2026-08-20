@@ -104,6 +104,16 @@ class AppLocalizationsFi extends AppLocalizations {
       'Mikään tallennettu kirjautuminen ei vastaa tätä sovellusta tai sivustoa.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Luodaanko passkey sivustolle $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Kirjaudutaanko sivustolle $site passkeyllä?';
+  }
+
+  @override
   String get add => 'Lisää';
 
   @override
@@ -666,6 +676,9 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get entryTypeCustom => 'Mukautettu';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {

@@ -104,6 +104,16 @@ class AppLocalizationsBg extends AppLocalizations {
       'Няма запазен вход, който да съответства на това приложение или сайт.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Да се създаде ли passkey за $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Вход в $site с вашия passkey?';
+  }
+
+  @override
   String get add => 'Добави';
 
   @override
@@ -666,6 +676,9 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get entryTypeCustom => 'Персонализиран';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {

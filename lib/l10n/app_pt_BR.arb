@@ -923,5 +923,10 @@
   "hintSearch": "Filtra as entradas conforme você digita",
   "hintFolderSelector": "Filtra as entradas por pasta",
   "hintFilterChip": "Ativa ou desativa este filtro de categoria",
-  "hintEntryRow": "Abre esta entrada"
+  "hintEntryRow": "Abre esta entrada",
+  "entryTypePasskey": "Passkey",
+  "passkeyCreatePrompt": "Criar uma passkey para {site}?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "Fazer login em {site} com sua passkey?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

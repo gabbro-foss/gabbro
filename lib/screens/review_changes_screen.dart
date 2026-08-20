@@ -45,6 +45,7 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
         VaultEntryData_Card(:final field0) => field0.id,
         VaultEntryData_File(:final field0) => field0.id,
         VaultEntryData_Custom(:final field0) => field0.id,
+        VaultEntryData_Passkey(:final field0) => field0.id,
       };
       final refreshed = getEntry(id: id);
       if (mounted) Navigator.of(context).pop(refreshed);

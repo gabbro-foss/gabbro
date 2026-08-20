@@ -101,6 +101,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get autofillNoMatchBody => 'このアプリまたはサイトに一致する保存済みのログインはありません。';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return '$site のパスキーを作成しますか？';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'パスキーで $site にログインしますか？';
+  }
+
+  @override
   String get add => '追加';
 
   @override
@@ -657,6 +667,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get entryTypeCustom => 'カスタム';
+
+  @override
+  String get entryTypePasskey => 'パスキー';
 
   @override
   String errorPrefix(String error) {

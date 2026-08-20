@@ -922,5 +922,10 @@
   "hintSearch": "입력하는 대로 항목을 필터링합니다",
   "hintFolderSelector": "폴더별로 항목을 필터링합니다",
   "hintFilterChip": "이 범주 필터를 켜거나 끕니다",
-  "hintEntryRow": "이 항목을 엽니다"
+  "hintEntryRow": "이 항목을 엽니다",
+  "entryTypePasskey": "패스키",
+  "passkeyCreatePrompt": "{site}의 패스키를 만들까요?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "패스키로 {site}에 로그인할까요?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

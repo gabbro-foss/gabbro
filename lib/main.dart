@@ -17,6 +17,7 @@ import 'package:gabbro/screens/adopt_vault_screen.dart';
 import 'package:gabbro/screens/manage_vaults_screen.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/screens/save_confirm_screen.dart';
+import 'package:gabbro/screens/passkey_consent_screen.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/screens/vault_list_screen.dart'
     show
@@ -294,6 +295,168 @@ Future<void> showAutofillNoMatchDialog(
   );
   onLock?.call();
   await channel.invokeMethod('cancel');
+}
+
+/// Passkey provider entrypoint (Android). The OS routes a passkey picker tap
+/// into GabbroPasskeyCreateActivity / GabbroPasskeyGetActivity, which run this:
+/// unlock if needed (full UnlockScreen flow), then the consent screen naming
+/// the requesting site. Approve hands the operation to the native side; the
+/// keys never enter Dart.
+@pragma('vm:entry-point')
+Future<void> passkeyUnlockMain() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await RustLib.init();
+  await initNfcCapability();
+  final registry = await VaultRegistry.load();
+  final lastUsed = registry.lastUsed;
+  final String initialVaultPath;
+  if (lastUsed != null) {
+    initialVaultPath = lastUsed.path;
+  } else {
+    final dataDir = await GabbroPaths.dataDir();
+    initialVaultPath = '$dataDir/gabbro.gabbro';
+  }
+  final settings = await AppSettings.load();
+  const channel = MethodChannel('app.gabbro.gabbro/passkey');
+  final alreadyUnlocked = await channel.invokeMethod<bool>('isUnlocked') ?? false;
+  final info =
+      await channel.invokeMethod<Map<Object?, Object?>>('getRequestInfo') ?? {};
+  runApp(buildPasskeyApp(
+    settings: settings,
+    registry: registry,
+    initialVaultPath: initialVaultPath,
+    alreadyUnlocked: alreadyUnlocked,
+    isCreate: info['mode'] == 'create',
+    rpId: (info['rpId'] as String?) ?? '',
+    userName: (info['userName'] as String?) ?? '',
+  ));
+}
+
+/// The passkey consent app. Locked -> UnlockScreen first (this flow then owns
+/// the session and locks it again before finishing, like the autofill unlock —
+/// RT-5); unlocked -> straight to consent.
+Widget buildPasskeyApp({
+  required AppSettings settings,
+  required VaultRegistry registry,
+  required String initialVaultPath,
+  required bool alreadyUnlocked,
+  required bool isCreate,
+  required String rpId,
+  required String userName,
+  MethodChannel channel = const MethodChannel('app.gabbro.gabbro/passkey'),
+  Future<void> Function(List<int>, String) onUnlock = defaultUnlock,
+  void Function() onLock = lockVault,
+}) =>
+    _PasskeyApp(
+      settings: settings,
+      registry: registry,
+      initialVaultPath: initialVaultPath,
+      alreadyUnlocked: alreadyUnlocked,
+      isCreate: isCreate,
+      rpId: rpId,
+      userName: userName,
+      channel: channel,
+      onUnlock: onUnlock,
+      onLock: onLock,
+    );
+
+class _PasskeyApp extends StatefulWidget {
+  final AppSettings settings;
+  final VaultRegistry registry;
+  final String initialVaultPath;
+  final bool alreadyUnlocked;
+  final bool isCreate;
+  final String rpId;
+  final String userName;
+  final MethodChannel channel;
+  final Future<void> Function(List<int>, String) onUnlock;
+  final void Function() onLock;
+
+  const _PasskeyApp({
+    required this.settings,
+    required this.registry,
+    required this.initialVaultPath,
+    required this.alreadyUnlocked,
+    required this.isCreate,
+    required this.rpId,
+    required this.userName,
+    required this.channel,
+    required this.onUnlock,
+    required this.onLock,
+  });
+
+  @override
+  State<_PasskeyApp> createState() => _PasskeyAppState();
+}
+
+class _PasskeyAppState extends State<_PasskeyApp> {
+  late String _vaultPath = widget.initialVaultPath;
+  late bool _unlocked = widget.alreadyUnlocked;
+  // This flow only locks a session it opened itself (RT-5).
+  late final bool _weUnlock = !widget.alreadyUnlocked;
+
+  String? _aliasFor(String path) {
+    for (final r in widget.registry.records) {
+      if (r.path == path) return r.alias;
+    }
+    return null;
+  }
+
+  Future<void> _approve() async {
+    await widget.channel.invokeMethod('approve');
+    if (_weUnlock) widget.onLock();
+    await widget.channel.invokeMethod('finish');
+  }
+
+  Future<void> _cancel() async {
+    if (_weUnlock && _unlocked) widget.onLock();
+    await widget.channel.invokeMethod('cancel');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hc = widget.settings.highContrast;
+    final mq = MediaQuery.of(context);
+    return MediaQuery(
+      data: mq.copyWith(
+        textScaler: TextScaler.linear(
+          clampToDevice(widget.settings.textScale, mq.size.shortestSide),
+        ),
+      ),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        localizationsDelegates: gabbroLocalizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: widget.settings.language == LanguageChoice.system
+            ? null
+            : localeFor(widget.settings.language),
+        themeMode: themeModeFor(widget.settings.theme),
+        theme: gabbroLightTheme(highContrast: hc),
+        darkTheme: gabbroDarkTheme(highContrast: hc),
+        home: _unlocked
+            ? PasskeyConsentScreen(
+                isCreate: widget.isCreate,
+                rpId: widget.rpId,
+                userName: widget.userName,
+                onApprove: _approve,
+                onCancel: _cancel,
+              )
+            : UnlockScreen(
+                key: ValueKey(_vaultPath),
+                vaultPath: _vaultPath,
+                vaultAlias: _aliasFor(_vaultPath),
+                registry: widget.registry,
+                onVaultSwitch: (path, alias) =>
+                    setState(() => _vaultPath = path),
+                onUnlock: widget.onUnlock,
+                onUnlocked: () async => setState(() => _unlocked = true),
+                blockPassphraseCopyPaste:
+                    widget.settings.blockPassphraseCopyPaste,
+                onQuit: _cancel,
+              ),
+      ),
+    );
+  }
 }
 
 /// Autofill SAVE entrypoint (Android). The OS launches `SaveActivity` after the

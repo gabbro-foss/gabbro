@@ -104,6 +104,16 @@ class AppLocalizationsSk extends AppLocalizations {
       'Žiadne uložené prihlásenie nezodpovedá tejto aplikácii ani webu.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Vytvoriť passkey pre $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Prihlásiť sa na $site pomocou passkey?';
+  }
+
+  @override
   String get add => 'Pridať';
 
   @override
@@ -665,6 +675,9 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get entryTypeCustom => 'Vlastné';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {

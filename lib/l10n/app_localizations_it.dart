@@ -104,6 +104,16 @@ class AppLocalizationsIt extends AppLocalizations {
       'Nessun accesso salvato corrisponde a questa app o sito.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Creare una passkey per $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Accedere a $site con la tua passkey?';
+  }
+
+  @override
   String get add => 'Aggiungi';
 
   @override
@@ -665,6 +675,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get entryTypeCustom => 'Personalizzato';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {

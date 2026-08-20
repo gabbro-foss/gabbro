@@ -923,5 +923,10 @@
   "hintSearch": "Filtert de items terwijl u typt",
   "hintFolderSelector": "Filtert de items op map",
   "hintFilterChip": "Schakelt dit categoriefilter in of uit",
-  "hintEntryRow": "Opent dit item"
+  "hintEntryRow": "Opent dit item",
+  "entryTypePasskey": "Passkey",
+  "passkeyCreatePrompt": "Passkey maken voor {site}?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "Inloggen bij {site} met je passkey?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

@@ -104,6 +104,16 @@ class AppLocalizationsSv extends AppLocalizations {
       'Ingen sparad inloggning matchar den här appen eller webbplatsen.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Vill du skapa en passkey för $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Vill du logga in på $site med din passkey?';
+  }
+
+  @override
   String get add => 'Lägg till';
 
   @override
@@ -664,6 +674,9 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get entryTypeCustom => 'Anpassad';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {

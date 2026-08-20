@@ -189,6 +189,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     VaultEntryData_Card(:final field0) => field0.id,
     VaultEntryData_File(:final field0) => field0.id,
     VaultEntryData_Custom(:final field0) => field0.id,
+    VaultEntryData_Passkey(:final field0) => field0.id,
   };
 
   Future<void> _confirmDelete(BuildContext context) async {
@@ -364,6 +365,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                 VaultEntryData_Card() => 'Card',
                 VaultEntryData_File() => 'File',
                 VaultEntryData_Custom() => 'Custom',
+                VaultEntryData_Passkey() => 'Passkey',
               };
               final updated = await Navigator.of(context).push<VaultEntryData>(
                 MaterialPageRoute(
@@ -419,6 +421,8 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       field0.cardName ?? field0.cardholderName,
     VaultEntryData_File(:final field0) => field0.filename,
     VaultEntryData_Custom(:final field0) => field0.title,
+    VaultEntryData_Passkey(:final field0) =>
+      field0.rpId.isNotEmpty ? field0.rpId : l.noTitleFallback,
   };
 
   Widget _buildBody(AppLocalizations l) => switch (_entry) {
@@ -428,6 +432,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     VaultEntryData_Card(:final field0) => _cardView(field0, l),
     VaultEntryData_File(:final field0) => _fileView(field0, l),
     VaultEntryData_Custom(:final field0) => _customView(field0, l),
+    VaultEntryData_Passkey(:final field0) => _passkeyView(field0, l),
   };
 
   // ── Entry type views ─────────────────────────────────────────────────────────
@@ -705,6 +710,40 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
           icon: const Icon(Icons.download_outlined),
           label: Text(l.exportFileTitle),
         ),
+        _timestampsRow(e.createdAt, e.updatedAt, e.folder, l),
+      ],
+    );
+  }
+
+  Widget _passkeyView(PasskeyEntryData e, AppLocalizations l) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _urlField(e.rpId, l),
+        _field(l.fieldUsername, e.userName, l),
+        if (e.notes != null && e.notes!.isNotEmpty)
+          _field(l.reviewFieldNotes, e.notes!, l),
+        if (e.customFields.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          _sectionHeader(l.fieldCustomFields),
+          ...e.customFields.map(
+            (f) => f.hidden
+                ? _toggleField(
+                    label: f.label,
+                    value: f.value,
+                    obscured: !_revealedFields.contains(f.label),
+                    onToggle: () => setState(() {
+                      if (_revealedFields.contains(f.label)) {
+                        _revealedFields.remove(f.label);
+                      } else {
+                        _revealedFields.add(f.label);
+                      }
+                    }),
+                    l: l,
+                  )
+                : _field(f.label, f.value, l),
+          ),
+        ],
         _timestampsRow(e.createdAt, e.updatedAt, e.folder, l),
       ],
     );

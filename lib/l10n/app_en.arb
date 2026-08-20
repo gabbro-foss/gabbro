@@ -66,6 +66,20 @@
   "@autofillNoMatchBody": {
     "description": "Body of the autofill no-match dialog, advising the user to paste credentials manually."
   },
+  "passkeyCreatePrompt": "Create a passkey for {site}?",
+  "@passkeyCreatePrompt": {
+    "description": "Consent prompt when a website or app asks to save a new passkey in the vault. {site} is the domain.",
+    "placeholders": {
+      "site": {"type": "String"}
+    }
+  },
+  "passkeySignInPrompt": "Sign in to {site} with your passkey?",
+  "@passkeySignInPrompt": {
+    "description": "Consent prompt when a website or app asks to sign in with a stored passkey. {site} is the domain.",
+    "placeholders": {
+      "site": {"type": "String"}
+    }
+  },
   "add": "Add",
   "remove": "Remove",
   "rename": "Rename",
@@ -281,6 +295,7 @@
   "entryTypeIdentity": "Identity",
   "entryTypeFile": "File",
   "entryTypeCustom": "Custom",
+  "entryTypePasskey": "Passkey",
   "errorPrefix": "Error: {error}",
   "@errorPrefix": {
     "placeholders": {

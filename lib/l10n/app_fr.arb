@@ -922,5 +922,10 @@
   "hintSearch": "Filtre les entrées au fur et à mesure de la saisie",
   "hintFolderSelector": "Filtre les entrées par dossier",
   "hintFilterChip": "Active ou désactive ce filtre de catégorie",
-  "hintEntryRow": "Ouvre cette entrée"
+  "hintEntryRow": "Ouvre cette entrée",
+  "entryTypePasskey": "Passkey",
+  "passkeyCreatePrompt": "Créer une passkey pour {site} ?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "Se connecter à {site} avec votre passkey ?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

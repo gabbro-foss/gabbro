@@ -104,6 +104,16 @@ class AppLocalizationsSr extends AppLocalizations {
       'Ниједна сачувана пријава не одговара овој апликацији или сајту.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Направити passkey за $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Пријавити се на $site помоћу passkey-а?';
+  }
+
+  @override
   String get add => 'Додај';
 
   @override
@@ -664,6 +674,9 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get entryTypeCustom => 'Прилагођено';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {
@@ -2316,6 +2329,16 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
       'Nijedna sačuvana prijava ne odgovara ovoj aplikaciji ili sajtu.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Napraviti passkey za $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Prijaviti se na $site pomoću passkeya?';
+  }
+
+  @override
   String get add => 'Dodaj';
 
   @override
@@ -2877,6 +2900,9 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get entryTypeCustom => 'Prilagođeno';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {

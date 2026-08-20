@@ -104,6 +104,16 @@ class AppLocalizationsFr extends AppLocalizations {
       'Aucun identifiant enregistré ne correspond à cette application ou à ce site.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Créer une passkey pour $site ?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Se connecter à $site avec votre passkey ?';
+  }
+
+  @override
   String get add => 'Ajouter';
 
   @override
@@ -666,6 +676,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get entryTypeCustom => 'Personnalisé';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {

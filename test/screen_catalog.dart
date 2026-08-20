@@ -7,6 +7,7 @@ import 'package:gabbro/main.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/vault_registry.dart';
 import 'package:gabbro/screens/about_screen.dart';
+import 'package:gabbro/screens/passkey_consent_screen.dart';
 import 'package:gabbro/screens/adopt_vault_screen.dart';
 import 'package:gabbro/screens/alphabet_index_bar.dart';
 import 'package:gabbro/screens/csv_mapping_screen.dart';
@@ -145,6 +146,13 @@ Widget vaultListScreen() => VaultListScreen(
 // Headless-instantiable screens. Platform-channel defaults are seamed out so a
 // MissingPluginException can't masquerade as a layout overflow or a11y failure.
 final Map<String, Widget Function()> screens = {
+  'passkey_consent': () => PasskeyConsentScreen(
+    isCreate: true,
+    rpId: 'example.com',
+    userName: 'user@example.com',
+    onApprove: () {},
+    onCancel: () {},
+  ),
   'about': () => const AboutScreen(),
   'help': () => const HelpScreen(),
   'keyboard_shortcuts': () => const KeyboardShortcutsListScreen(),
@@ -536,6 +544,7 @@ const Map<String, String> tabletOnly = {
 /// inferred from the map key, so the coverage guard cannot be satisfied by a
 /// coincidental name match.
 const Map<String, String> covers = {
+  'passkey_consent': 'passkey_consent_screen',
   'about': 'about_screen',
   'help': 'help_screen',
   'keyboard_shortcuts': 'keyboard_shortcuts_list_screen',
@@ -610,5 +619,5 @@ List<String> uiSources() =>
 // renamed folder) would otherwise leave `missing` empty and pass while checking
 // nothing. Adding a screen or widget fails here first: the new file must be
 // swept or waived deliberately.
-const screenFileCount = 28;
+const screenFileCount = 29;
 const widgetFileCount = 12;

@@ -104,6 +104,16 @@ class AppLocalizationsHu extends AppLocalizations {
       'Egyetlen mentett bejelentkezés sem felel meg ennek az alkalmazásnak vagy webhelynek.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Létrehoz egy passkey-t ehhez: $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Bejelentkezik ide: $site a passkey-jével?';
+  }
+
+  @override
   String get add => 'Hozzáadás';
 
   @override
@@ -664,6 +674,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get entryTypeCustom => 'Egyéni';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {

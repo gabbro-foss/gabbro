@@ -922,5 +922,10 @@
   "hintSearch": "Sarrerak iragazten ditu idatzi ahala",
   "hintFolderSelector": "Sarrerak karpetaka iragazten ditu",
   "hintFilterChip": "Kategoria-iragazki hau aktibatu edo desaktibatzen du",
-  "hintEntryRow": "Sarrera hau irekitzen du"
+  "hintEntryRow": "Sarrera hau irekitzen du",
+  "entryTypePasskey": "Passkey",
+  "passkeyCreatePrompt": "{site} gunerako passkey bat sortu?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "{site} gunean saioa hasi zure passkey-arekin?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

@@ -104,6 +104,16 @@ class AppLocalizationsYo extends AppLocalizations {
       'Kò sí ìwọlé tí a fipamọ́ tí ó bá ohun-èlò tàbí ojú-òpó yìí mu.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Ṣẹ̀dá passkey fún $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Wọlé sí $site pẹ̀lú passkey rẹ?';
+  }
+
+  @override
   String get add => 'Fi kun';
 
   @override
@@ -665,6 +675,9 @@ class AppLocalizationsYo extends AppLocalizations {
 
   @override
   String get entryTypeCustom => 'Aṣa';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {

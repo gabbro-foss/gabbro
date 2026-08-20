@@ -923,5 +923,10 @@
   "hintSearch": "Filtruje záznamy během psaní",
   "hintFolderSelector": "Filtruje záznamy podle složky",
   "hintFilterChip": "Zapne nebo vypne tento filtr kategorie",
-  "hintEntryRow": "Otevře tento záznam"
+  "hintEntryRow": "Otevře tento záznam",
+  "entryTypePasskey": "Passkey",
+  "passkeyCreatePrompt": "Vytvořit passkey pro {site}?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "Přihlásit se k {site} pomocí passkey?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

@@ -99,6 +99,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get autofillNoMatchBody => '没有与此应用或网站匹配的已保存登录信息。';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return '要为 $site 创建通行密钥吗？';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return '要使用通行密钥登录 $site 吗？';
+  }
+
+  @override
   String get add => '添加';
 
   @override
@@ -653,6 +663,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get entryTypeCustom => '自定义';
+
+  @override
+  String get entryTypePasskey => '通行密钥';
 
   @override
   String errorPrefix(String error) {
@@ -2214,6 +2227,16 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get autofillNoMatchBody => '没有与此应用或网站匹配的已保存登录信息。';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return '要为 $site 创建通行密钥吗？';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return '要使用通行密钥登录 $site 吗？';
+  }
+
+  @override
   String get add => '添加';
 
   @override
@@ -2768,6 +2791,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get entryTypeCustom => '自定义';
+
+  @override
+  String get entryTypePasskey => '通行密钥';
 
   @override
   String errorPrefix(String error) {
@@ -4329,6 +4355,16 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get autofillNoMatchBody => '沒有與此應用程式或網站相符的已儲存登入資訊。';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return '要為 $site 建立通行密鑰嗎？';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return '要使用通行密鑰登入 $site 嗎？';
+  }
+
+  @override
   String get add => '新增';
 
   @override
@@ -4883,6 +4919,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get entryTypeCustom => '自訂';
+
+  @override
+  String get entryTypePasskey => '通行密鑰';
 
   @override
   String errorPrefix(String error) {

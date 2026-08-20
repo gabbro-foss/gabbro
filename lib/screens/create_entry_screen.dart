@@ -106,6 +106,9 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   bool _passwordObscured = true;
   late final TextEditingController _loginNotesController;
   late final TextEditingController _appIdController;
+  // Passkey edits touch notes + folder only; identity and key material are
+  // fixed at registration.
+  final TextEditingController _passkeyNotesController = TextEditingController();
   final List<_CustomFieldState> _loginCustomFields = [];
   final FocusNode _loginTitleFocus = FocusNode();
   final FocusNode _urlFocus = FocusNode();
@@ -216,6 +219,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       VaultEntryData_Card(:final field0) => field0.folder,
       VaultEntryData_File(:final field0) => field0.folder,
       VaultEntryData_Custom(:final field0) => field0.folder,
+      VaultEntryData_Passkey(:final field0) => field0.folder,
     };
   }
 
@@ -248,6 +252,11 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       _passwordController = TextEditingController();
       _loginNotesController = TextEditingController();
       _appIdController = TextEditingController();
+    }
+
+    // ── Passkey ────────────────────────────────────────────────────────────
+    if (e case VaultEntryData_Passkey(:final field0)) {
+      _passkeyNotesController.text = field0.notes ?? '';
     }
 
     // ── Note ───────────────────────────────────────────────────────────────
@@ -623,6 +632,23 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   /// Returns null if the entry type is not supported.
   VaultEntryData? _buildUpdated() {
     switch (widget.existing) {
+      case VaultEntryData_Passkey(:final field0):
+        return VaultEntryData.passkey(
+          PasskeyEntryData(
+            id: field0.id,
+            createdAt: field0.createdAt,
+            updatedAt: '',
+            folder: _selectedFolder,
+            rpId: field0.rpId,
+            userName: field0.userName,
+            userDisplayName: field0.userDisplayName,
+            credentialIdB64: field0.credentialIdB64,
+            notes: _passkeyNotesController.text.isEmpty
+                ? null
+                : _passkeyNotesController.text,
+            customFields: field0.customFields,
+          ),
+        );
       case VaultEntryData_Login(:final field0):
         return VaultEntryData.login(
           LoginEntryData(
@@ -1050,6 +1076,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       'Card' => l.entryTypeCard,
       'File' => l.entryTypeFile,
       'Custom' => l.entryTypeCustom,
+      'Passkey' => l.entryTypePasskey,
       _ => widget.entryType,
     };
     return _isEditing ? l.editEntryTitle(type) : l.createEntryTitle(type);
@@ -1063,8 +1090,40 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       'Card' => _cardFields(l),
       'File' => _fileFields(l),
       'Custom' => _customEntryFields(l),
+      'Passkey' => _passkeyFields(l),
       _ => [Text(l.entryTypeNotSupported)],
     };
+  }
+
+  // ── Passkey fields (edit-only: registered by the provider flow) ──────────────
+
+  List<Widget> _passkeyFields(AppLocalizations l) {
+    final existing = widget.existing;
+    if (existing is! VaultEntryData_Passkey) {
+      return [Text(l.entryTypeNotSupported)];
+    }
+    final e = existing.field0;
+    return [
+      _folderPicker(),
+      const SizedBox(height: 12),
+      TextFormField(
+        initialValue: e.rpId,
+        readOnly: true,
+        decoration: InputDecoration(labelText: l.fieldUrl),
+      ),
+      const SizedBox(height: 12),
+      TextFormField(
+        initialValue: e.userName,
+        readOnly: true,
+        decoration: InputDecoration(labelText: l.fieldUsername),
+      ),
+      const SizedBox(height: 12),
+      TextFormField(
+        controller: _passkeyNotesController,
+        decoration: InputDecoration(labelText: l.fieldNotes),
+        maxLines: 3,
+      ),
+    ];
   }
 
   // ── Login fields ─────────────────────────────────────────────────────────────

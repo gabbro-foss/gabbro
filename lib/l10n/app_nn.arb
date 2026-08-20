@@ -923,5 +923,10 @@
   "hintSearch": "Filtrerer oppføringane medan du skriv",
   "hintFolderSelector": "Filtrerer oppføringane etter mappe",
   "hintFilterChip": "Slår dette kategorifilteret av eller på",
-  "hintEntryRow": "Opnar denne oppføringa"
+  "hintEntryRow": "Opnar denne oppføringa",
+  "entryTypePasskey": "Passkey",
+  "passkeyCreatePrompt": "Vil du opprette ein passkey for {site}?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "Vil du logge på {site} med passkeyen din?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

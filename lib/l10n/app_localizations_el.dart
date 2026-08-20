@@ -105,6 +105,16 @@ class AppLocalizationsEl extends AppLocalizations {
       'Κανένα αποθηκευμένο στοιχείο σύνδεσης δεν ταιριάζει με αυτήν την εφαρμογή ή τον ιστότοπο.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Δημιουργία passkey για το $site;';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Σύνδεση στο $site με το passkey σας;';
+  }
+
+  @override
   String get add => 'Προσθήκη';
 
   @override
@@ -668,6 +678,9 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get entryTypeCustom => 'Προσαρμοσμένο';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {

@@ -343,6 +343,18 @@ abstract class AppLocalizations {
   /// **'No saved login matches this app or site.'**
   String get autofillNoMatchBody;
 
+  /// Consent prompt when a website or app asks to save a new passkey in the vault. {site} is the domain.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a passkey for {site}?'**
+  String passkeyCreatePrompt(String site);
+
+  /// Consent prompt when a website or app asks to sign in with a stored passkey. {site} is the domain.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to {site} with your passkey?'**
+  String passkeySignInPrompt(String site);
+
   /// No description provided for @add.
   ///
   /// In en, this message translates to:
@@ -1434,6 +1446,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Custom'**
   String get entryTypeCustom;
+
+  /// No description provided for @entryTypePasskey.
+  ///
+  /// In en, this message translates to:
+  /// **'Passkey'**
+  String get entryTypePasskey;
 
   /// No description provided for @errorPrefix.
   ///

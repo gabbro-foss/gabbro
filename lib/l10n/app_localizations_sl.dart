@@ -104,6 +104,16 @@ class AppLocalizationsSl extends AppLocalizations {
       'Nobena shranjena prijava se ne ujema s to aplikacijo ali spletnim mestom.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Ali želite ustvariti passkey za $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Ali se želite prijaviti v $site s passkeyem?';
+  }
+
+  @override
   String get add => 'Dodaj';
 
   @override
@@ -665,6 +675,9 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get entryTypeCustom => 'Po meri';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {

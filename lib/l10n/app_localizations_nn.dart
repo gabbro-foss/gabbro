@@ -104,6 +104,16 @@ class AppLocalizationsNn extends AppLocalizations {
       'Inga lagra innlogging samsvarar med denne appen eller dette nettstadet.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Vil du opprette ein passkey for $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Vil du logge på $site med passkeyen din?';
+  }
+
+  @override
   String get add => 'Legg til';
 
   @override
@@ -664,6 +674,9 @@ class AppLocalizationsNn extends AppLocalizations {
 
   @override
   String get entryTypeCustom => 'Eigendefinert';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {

@@ -923,5 +923,10 @@
   "hintSearch": "Gépelés közben szűri a bejegyzéseket",
   "hintFolderSelector": "Mappa szerint szűri a bejegyzéseket",
   "hintFilterChip": "Be- vagy kikapcsolja ezt a kategóriaszűrőt",
-  "hintEntryRow": "Megnyitja ezt a bejegyzést"
+  "hintEntryRow": "Megnyitja ezt a bejegyzést",
+  "entryTypePasskey": "Passkey",
+  "passkeyCreatePrompt": "Létrehoz egy passkey-t ehhez: {site}?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "Bejelentkezik ide: {site} a passkey-jével?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

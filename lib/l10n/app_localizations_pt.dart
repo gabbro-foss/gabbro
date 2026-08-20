@@ -104,6 +104,16 @@ class AppLocalizationsPt extends AppLocalizations {
       'Nenhuma credencial guardada corresponde a esta aplicação ou site.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Criar uma passkey para $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Iniciar sessão em $site com a sua passkey?';
+  }
+
+  @override
   String get add => 'Adicionar';
 
   @override
@@ -665,6 +675,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get entryTypeCustom => 'Personalizado';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {
@@ -2323,6 +2336,16 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
       'Nenhum login salvo corresponde a este app ou site.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Criar uma passkey para $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Fazer login em $site com sua passkey?';
+  }
+
+  @override
   String get add => 'Adicionar';
 
   @override
@@ -2884,6 +2907,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get entryTypeCustom => 'Personalizado';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {
@@ -4539,6 +4565,16 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
       'Nenhuma credencial guardada corresponde a esta aplicação ou site.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Criar uma passkey para $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Iniciar sessão em $site com a sua passkey?';
+  }
+
+  @override
   String get add => 'Adicionar';
 
   @override
@@ -5100,6 +5136,9 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get entryTypeCustom => 'Personalizado';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {

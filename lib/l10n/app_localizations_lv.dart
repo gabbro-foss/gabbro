@@ -104,6 +104,16 @@ class AppLocalizationsLv extends AppLocalizations {
       'Neviena saglabātā pieteikšanās neatbilst šai lietotnei vai vietnei.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Vai izveidot passkey vietnei $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Vai pierakstīties vietnē $site ar passkey?';
+  }
+
+  @override
   String get add => 'Pievienot';
 
   @override
@@ -664,6 +674,9 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get entryTypeCustom => 'Pielāgots';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {

@@ -104,6 +104,16 @@ class AppLocalizationsEt extends AppLocalizations {
       'Ükski salvestatud sisselogimine ei vasta sellele rakendusele ega saidile.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Kas luua saidile $site passkey?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Kas logida saiti $site sisse oma passkey abil?';
+  }
+
+  @override
   String get add => 'Lisa';
 
   @override
@@ -665,6 +675,9 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get entryTypeCustom => 'Kohandatud';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {

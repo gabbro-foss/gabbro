@@ -923,5 +923,10 @@
   "hintSearch": "Suodattaa merkinnät kirjoittaessasi",
   "hintFolderSelector": "Suodattaa merkinnät kansion mukaan",
   "hintFilterChip": "Ottaa tämän luokkasuodattimen käyttöön tai poistaa sen käytöstä",
-  "hintEntryRow": "Avaa tämän merkinnän"
+  "hintEntryRow": "Avaa tämän merkinnän",
+  "entryTypePasskey": "Passkey",
+  "passkeyCreatePrompt": "Luodaanko passkey sivustolle {site}?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "Kirjaudutaanko sivustolle {site} passkeyllä?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

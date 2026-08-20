@@ -923,5 +923,10 @@
   "hintSearch": "Filtrerer posterne, mens du skriver",
   "hintFolderSelector": "Filtrerer posterne efter mappe",
   "hintFilterChip": "Slår dette kategorifilter til eller fra",
-  "hintEntryRow": "Åbner denne post"
+  "hintEntryRow": "Åbner denne post",
+  "entryTypePasskey": "Passkey",
+  "passkeyCreatePrompt": "Vil du oprette en passkey til {site}?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "Vil du logge ind på {site} med din passkey?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

@@ -46,4 +46,34 @@ object RustBridge {
      * is not a Login entry.
      */
     external fun getEntry(id: String): String
+
+    // ── Passkey provider (rust/src/api/passkey_bridge.rs) ────────────────────
+    // All three return either the documented success JSON or {"error": "..."}
+    // — check for the "error" key first. A locked vault reports an error
+    // containing "locked".
+
+    /**
+     * Vault passkeys answering a WebAuthn sign-in request (exact rp match,
+     * allow-list honoured). Success shape:
+     * `{"matches":[{"entryId","rpId","userName","userDisplayName","credentialIdB64"}]}`
+     */
+    external fun passkeysForRequest(requestJson: String): String
+
+    /**
+     * Mint + store a passkey for a creation request; returns the complete W3C
+     * RegistrationResponseJSON. Pass the provider-built clientDataJSON
+     * (base64url) or null when a privileged browser attaches its own.
+     */
+    external fun registerPasskey(requestJson: String, clientDataJsonB64: String?): String
+
+    /**
+     * Sign a challenge with a stored passkey; returns the complete W3C
+     * AuthenticationResponseJSON. Exactly one of clientDataJsonB64 (we hash it)
+     * or clientDataHashB64 (privileged caller pre-hashed) — other null.
+     */
+    external fun signPasskeyAssertion(
+        entryId: String,
+        clientDataJsonB64: String?,
+        clientDataHashB64: String?,
+    ): String
 }

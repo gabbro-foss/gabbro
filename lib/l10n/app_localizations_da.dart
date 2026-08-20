@@ -104,6 +104,16 @@ class AppLocalizationsDa extends AppLocalizations {
       'Ingen gemt login matcher denne app eller dette websted.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Vil du oprette en passkey til $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Vil du logge ind på $site med din passkey?';
+  }
+
+  @override
   String get add => 'Tilføj';
 
   @override
@@ -663,6 +673,9 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get entryTypeCustom => 'Brugerdefineret';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {

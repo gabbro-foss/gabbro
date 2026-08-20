@@ -104,6 +104,16 @@ class AppLocalizationsEu extends AppLocalizations {
       'Ez dago aplikazio edo gune honekin bat datorren gordetako sarrerarik.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return '$site gunerako passkey bat sortu?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return '$site gunean saioa hasi zure passkey-arekin?';
+  }
+
+  @override
   String get add => 'Gehitu';
 
   @override
@@ -665,6 +675,9 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get entryTypeCustom => 'Pertsonalizatua';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {

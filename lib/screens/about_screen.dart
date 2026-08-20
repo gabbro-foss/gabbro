@@ -348,6 +348,11 @@ const _kComponents = [
     url: 'https://github.com/indexmap-rs/indexmap',
   ),
   _Component(
+    name: 'p256',
+    licence: 'Apache-2.0 / MIT',
+    url: 'https://github.com/RustCrypto/elliptic-curves',
+  ),
+  _Component(
     name: 'intl',
     licence: 'BSD-3-Clause',
     url: 'https://github.com/dart-lang/i18n',

@@ -104,6 +104,16 @@ class AppLocalizationsLt extends AppLocalizations {
       'Nėra išsaugoto prisijungimo, atitinkančio šią programą ar svetainę.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Sukurti passkey svetainei $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Prisijungti prie $site naudojant passkey?';
+  }
+
+  @override
   String get add => 'Pridėti';
 
   @override
@@ -666,6 +676,9 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get entryTypeCustom => 'Pasirinktinis';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {

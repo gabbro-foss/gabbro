@@ -104,6 +104,16 @@ class AppLocalizationsNl extends AppLocalizations {
       'Geen opgeslagen login komt overeen met deze app of site.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Passkey maken voor $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Inloggen bij $site met je passkey?';
+  }
+
+  @override
   String get add => 'Toevoegen';
 
   @override
@@ -665,6 +675,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get entryTypeCustom => 'Aangepast';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {

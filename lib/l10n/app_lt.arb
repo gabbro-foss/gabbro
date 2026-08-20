@@ -923,5 +923,10 @@
   "hintSearch": "Filtruoja įrašus jums rašant",
   "hintFolderSelector": "Filtruoja įrašus pagal aplanką",
   "hintFilterChip": "Įjungia arba išjungia šį kategorijos filtrą",
-  "hintEntryRow": "Atidaro šį įrašą"
+  "hintEntryRow": "Atidaro šį įrašą",
+  "entryTypePasskey": "Passkey",
+  "passkeyCreatePrompt": "Sukurti passkey svetainei {site}?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "Prisijungti prie {site} naudojant passkey?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

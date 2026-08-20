@@ -104,6 +104,16 @@ class AppLocalizationsEs extends AppLocalizations {
       'Ningún inicio de sesión guardado coincide con esta app o sitio.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return '¿Crear una passkey para $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return '¿Iniciar sesión en $site con tu passkey?';
+  }
+
+  @override
   String get add => 'Añadir';
 
   @override
@@ -665,6 +675,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get entryTypeCustom => 'Personalizado';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {

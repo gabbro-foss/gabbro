@@ -819,6 +819,7 @@ class _VaultListScreenState extends State<VaultListScreen>
     'Identity' => Icons.person_outline,
     'Card' => Icons.credit_card_outlined,
     'File' => Icons.insert_drive_file_outlined,
+    'Passkey' => Icons.key_outlined,
     _ => Icons.tune,
   };
 
@@ -835,6 +836,7 @@ class _VaultListScreenState extends State<VaultListScreen>
         'Card' => l.entryTypeCard,
         'File' => l.entryTypeFile,
         'Custom' => l.entryTypeCustom,
+        'Passkey' => l.entryTypePasskey,
         _ => entryType,
       };
 

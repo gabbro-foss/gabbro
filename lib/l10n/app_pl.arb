@@ -923,5 +923,10 @@
   "hintSearch": "Filtruje wpisy podczas pisania",
   "hintFolderSelector": "Filtruje wpisy według folderu",
   "hintFilterChip": "Włącza lub wyłącza ten filtr kategorii",
-  "hintEntryRow": "Otwiera ten wpis"
+  "hintEntryRow": "Otwiera ten wpis",
+  "entryTypePasskey": "Passkey",
+  "passkeyCreatePrompt": "Utworzyć passkey dla {site}?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "Zalogować się w {site} za pomocą passkey?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

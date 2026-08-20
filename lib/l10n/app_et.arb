@@ -923,5 +923,10 @@
   "hintSearch": "Filtreerib kirjeid kirjutamise ajal",
   "hintFolderSelector": "Filtreerib kirjeid kausta järgi",
   "hintFilterChip": "Lülitab selle kategooriafiltri sisse või välja",
-  "hintEntryRow": "Avab selle kirje"
+  "hintEntryRow": "Avab selle kirje",
+  "entryTypePasskey": "Passkey",
+  "passkeyCreatePrompt": "Kas luua saidile {site} passkey?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "Kas logida saiti {site} sisse oma passkey abil?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

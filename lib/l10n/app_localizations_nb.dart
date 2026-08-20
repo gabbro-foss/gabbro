@@ -104,6 +104,16 @@ class AppLocalizationsNb extends AppLocalizations {
       'Ingen lagret pålogging samsvarer med denne appen eller dette nettstedet.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Vil du opprette en passkey for $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Vil du logge på $site med passkeyen din?';
+  }
+
+  @override
   String get add => 'Legg til';
 
   @override
@@ -664,6 +674,9 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get entryTypeCustom => 'Egendefinert';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {

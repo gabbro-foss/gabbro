@@ -922,5 +922,10 @@
   "hintSearch": "輸入時篩選項目",
   "hintFolderSelector": "依資料夾篩選項目",
   "hintFilterChip": "開啟或關閉此類別篩選",
-  "hintEntryRow": "開啟此項目"
+  "hintEntryRow": "開啟此項目",
+  "entryTypePasskey": "通行密鑰",
+  "passkeyCreatePrompt": "要為 {site} 建立通行密鑰嗎？",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "要使用通行密鑰登入 {site} 嗎？",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

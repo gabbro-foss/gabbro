@@ -7,6 +7,7 @@ import 'api/autotype_bridge.dart';
 import 'api/entropy.dart';
 import 'api/fido_bridge.dart';
 import 'api/import.dart';
+import 'api/passkey_bridge.dart';
 import 'api/passphrase_generator.dart';
 import 'api/password_generator.dart';
 import 'api/simple.dart';
@@ -32,6 +33,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   AddedEntryItem dco_decode_added_entry_item(dynamic raw);
+
+  @protected
+  AssertionParts dco_decode_assertion_parts(dynamic raw);
+
+  @protected
+  AssertionRequest dco_decode_assertion_request(dynamic raw);
 
   @protected
   AttachmentMetaData dco_decode_attachment_meta_data(dynamic raw);
@@ -69,6 +76,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   NoteEntryData dco_decode_box_autoadd_note_entry_data(dynamic raw);
 
   @protected
+  PasskeyEntryData dco_decode_box_autoadd_passkey_entry_data(dynamic raw);
+
+  @protected
   PassphraseConfig dco_decode_box_autoadd_passphrase_config(dynamic raw);
 
   @protected
@@ -88,6 +98,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   CardEntryData dco_decode_card_entry_data(dynamic raw);
+
+  @protected
+  CreationRequest dco_decode_creation_request(dynamic raw);
 
   @protected
   CsvImportConfigData dco_decode_csv_import_config_data(dynamic raw);
@@ -189,6 +202,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<List<String>> dco_decode_list_list_String(dynamic raw);
 
   @protected
+  List<Uint8List> dco_decode_list_list_prim_u_8_strict(dynamic raw);
+
+  @protected
+  List<PasskeyMatchData> dco_decode_list_passkey_match_data(dynamic raw);
+
+  @protected
   List<PendingDeleteItem> dco_decode_list_pending_delete_item(dynamic raw);
 
   @protected
@@ -256,6 +275,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   int? dco_decode_opt_box_autoadd_u_32(dynamic raw);
 
   @protected
+  PasskeyEntryData dco_decode_passkey_entry_data(dynamic raw);
+
+  @protected
+  PasskeyMatchData dco_decode_passkey_match_data(dynamic raw);
+
+  @protected
   PassphraseConfig dco_decode_passphrase_config(dynamic raw);
 
   @protected
@@ -269,6 +294,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   (String, String) dco_decode_record_string_string(dynamic raw);
+
+  @protected
+  RegistrationParts dco_decode_registration_parts(dynamic raw);
 
   @protected
   SkippedEntryData dco_decode_skipped_entry_data(dynamic raw);
@@ -327,6 +355,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   AddedEntryItem sse_decode_added_entry_item(SseDeserializer deserializer);
 
   @protected
+  AssertionParts sse_decode_assertion_parts(SseDeserializer deserializer);
+
+  @protected
+  AssertionRequest sse_decode_assertion_request(SseDeserializer deserializer);
+
+  @protected
   AttachmentMetaData sse_decode_attachment_meta_data(
     SseDeserializer deserializer,
   );
@@ -380,6 +414,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  PasskeyEntryData sse_decode_box_autoadd_passkey_entry_data(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   PassphraseConfig sse_decode_box_autoadd_passphrase_config(
     SseDeserializer deserializer,
   );
@@ -407,6 +446,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   CardEntryData sse_decode_card_entry_data(SseDeserializer deserializer);
+
+  @protected
+  CreationRequest sse_decode_creation_request(SseDeserializer deserializer);
 
   @protected
   CsvImportConfigData sse_decode_csv_import_config_data(
@@ -544,6 +586,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<List<String>> sse_decode_list_list_String(SseDeserializer deserializer);
 
   @protected
+  List<Uint8List> sse_decode_list_list_prim_u_8_strict(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<PasskeyMatchData> sse_decode_list_passkey_match_data(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   List<PendingDeleteItem> sse_decode_list_pending_delete_item(
     SseDeserializer deserializer,
   );
@@ -629,6 +681,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   int? sse_decode_opt_box_autoadd_u_32(SseDeserializer deserializer);
 
   @protected
+  PasskeyEntryData sse_decode_passkey_entry_data(SseDeserializer deserializer);
+
+  @protected
+  PasskeyMatchData sse_decode_passkey_match_data(SseDeserializer deserializer);
+
+  @protected
   PassphraseConfig sse_decode_passphrase_config(SseDeserializer deserializer);
 
   @protected
@@ -648,6 +706,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   (String, String) sse_decode_record_string_string(
     SseDeserializer deserializer,
   );
+
+  @protected
+  RegistrationParts sse_decode_registration_parts(SseDeserializer deserializer);
 
   @protected
   SkippedEntryData sse_decode_skipped_entry_data(SseDeserializer deserializer);
@@ -715,6 +776,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_assertion_parts(
+    AssertionParts self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_assertion_request(
+    AssertionRequest self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_attachment_meta_data(
     AttachmentMetaData self,
     SseSerializer serializer,
@@ -778,6 +851,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_box_autoadd_passkey_entry_data(
+    PasskeyEntryData self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_passphrase_config(
     PassphraseConfig self,
     SseSerializer serializer,
@@ -812,6 +891,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_card_entry_data(CardEntryData self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_creation_request(
+    CreationRequest self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_csv_import_config_data(
@@ -988,6 +1073,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_list_prim_u_8_strict(
+    List<Uint8List> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_passkey_match_data(
+    List<PasskeyMatchData> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_list_pending_delete_item(
     List<PendingDeleteItem> self,
     SseSerializer serializer,
@@ -1093,6 +1190,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_opt_box_autoadd_u_32(int? self, SseSerializer serializer);
 
   @protected
+  void sse_encode_passkey_entry_data(
+    PasskeyEntryData self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_passkey_match_data(
+    PasskeyMatchData self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_passphrase_config(
     PassphraseConfig self,
     SseSerializer serializer,
@@ -1119,6 +1228,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_record_string_string(
     (String, String) self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_registration_parts(
+    RegistrationParts self,
     SseSerializer serializer,
   );
 

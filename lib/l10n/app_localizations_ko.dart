@@ -101,6 +101,16 @@ class AppLocalizationsKo extends AppLocalizations {
   String get autofillNoMatchBody => '이 앱 또는 사이트와 일치하는 저장된 로그인이 없습니다.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return '$site의 패스키를 만들까요?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return '패스키로 $site에 로그인할까요?';
+  }
+
+  @override
   String get add => '추가';
 
   @override
@@ -657,6 +667,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get entryTypeCustom => '사용자 정의';
+
+  @override
+  String get entryTypePasskey => '패스키';
 
   @override
   String errorPrefix(String error) {

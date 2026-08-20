@@ -104,6 +104,16 @@ class AppLocalizationsKk extends AppLocalizations {
       'Бұл қолданбаға немесе сайтқа сәйкес келетін сақталған кіру деректері жоқ.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return '$site үшін passkey жасау керек пе?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return '$site сайтына passkey арқылы кіресіз бе?';
+  }
+
+  @override
   String get add => 'Қосу';
 
   @override
@@ -664,6 +674,9 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get entryTypeCustom => 'Арнаулы';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {

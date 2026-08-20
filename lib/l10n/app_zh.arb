@@ -922,5 +922,10 @@
   "hintSearch": "输入时筛选条目",
   "hintFolderSelector": "按文件夹筛选条目",
   "hintFilterChip": "打开或关闭此类别筛选",
-  "hintEntryRow": "打开此条目"
+  "hintEntryRow": "打开此条目",
+  "entryTypePasskey": "通行密钥",
+  "passkeyCreatePrompt": "要为 {site} 创建通行密钥吗？",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "要使用通行密钥登录 {site} 吗？",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

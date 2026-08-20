@@ -94,6 +94,7 @@ Widget _buildScreen(
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 void main() {
+  passkeyTests();
   group('formatTimestamp', () {
     setUpAll(() => initializeDateFormatting('en'));
 
@@ -1271,4 +1272,34 @@ EdgeInsets bodyScrollPadding(WidgetTester tester) {
     ),
   );
   return scroll.padding as EdgeInsets;
+}
+// ── Passkey entries ───────────────────────────────────────────────────────────
+
+PasskeyEntryData _passkeyEntry({String? notes}) => PasskeyEntryData(
+      id: 'pk-id-1',
+      createdAt: '2026-01-01T00:00:00Z',
+      updatedAt: '2026-01-01T00:00:00Z',
+      folder: '',
+      rpId: 'webauthn.example.com',
+      userName: 'user@example.com',
+      userDisplayName: 'Sample User',
+      credentialIdB64: 'Y3JlZC1pZA',
+      notes: notes,
+      customFields: const [],
+    );
+
+void passkeyTests() {
+  testWidgets('passkey detail shows the site and account, no key material', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _buildScreen(VaultEntryData.passkey(_passkeyEntry(notes: 'a note'))),
+    );
+    await tester.pumpAndSettle();
+    expect(find.textContaining('webauthn.example.com'), findsWidgets);
+    expect(find.text('user@example.com'), findsOneWidget);
+    expect(find.text('a note'), findsOneWidget);
+    expect(find.textContaining('Y3JlZC1pZA'), findsNothing,
+        reason: 'credential material never renders in the detail view');
+  });
 }

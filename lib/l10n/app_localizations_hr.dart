@@ -104,6 +104,16 @@ class AppLocalizationsHr extends AppLocalizations {
       'Nijedna spremljena prijava ne odgovara ovoj aplikaciji ili web-mjestu.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Izraditi passkey za $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Prijaviti se na $site pomoću passkeya?';
+  }
+
+  @override
   String get add => 'Dodaj';
 
   @override
@@ -665,6 +675,9 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get entryTypeCustom => 'Prilagođeno';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {

@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="autofill_unlock_label">Unlock Gabbro to autofill</string>
+    <string name="passkey_provider_subtitle">Passkeys</string>
+    <string name="passkey_unlock_label">Unlock Gabbro to use passkeys</string>
+    <string name="passkey_save_label">Save passkey in Gabbro</string>
 </resources>

@@ -104,6 +104,16 @@ class AppLocalizationsPl extends AppLocalizations {
       'Żadne zapisane dane logowania nie pasują do tej aplikacji ani witryny.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Utworzyć passkey dla $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Zalogować się w $site za pomocą passkey?';
+  }
+
+  @override
   String get add => 'Dodaj';
 
   @override
@@ -666,6 +676,9 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get entryTypeCustom => 'Niestandardowy';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {

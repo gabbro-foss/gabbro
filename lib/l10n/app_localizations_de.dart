@@ -105,6 +105,16 @@ class AppLocalizationsDe extends AppLocalizations {
       'Keine gespeicherte Anmeldung passt zu dieser App oder Website.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Passkey für $site erstellen?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Mit Ihrem Passkey bei $site anmelden?';
+  }
+
+  @override
   String get add => 'Hinzufügen';
 
   @override
@@ -666,6 +676,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get entryTypeCustom => 'Benutzerdefiniert';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {

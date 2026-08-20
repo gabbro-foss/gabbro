@@ -923,5 +923,10 @@
   "hintSearch": "Фільтрує записи під час введення",
   "hintFolderSelector": "Фільтрує записи за папкою",
   "hintFilterChip": "Вмикає або вимикає цей фільтр категорії",
-  "hintEntryRow": "Відкриває цей запис"
+  "hintEntryRow": "Відкриває цей запис",
+  "entryTypePasskey": "Passkey",
+  "passkeyCreatePrompt": "Створити passkey для {site}?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "Увійти на {site} за допомогою passkey?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

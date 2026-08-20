@@ -268,7 +268,7 @@ fn b64url_encode(bytes: &[u8]) -> String {
 /// browsers supply their own and pass `None`.
 pub fn registration_response_json(
     request_json: &str,
-    client_data_json_b64url: Option<&str>,
+    client_data_json_b64url: Option<String>,
 ) -> Result<String, String> {
     let parts = register_passkey(request_json)?;
     let id = b64url_encode(&parts.credential_id);
@@ -277,7 +277,7 @@ pub fn registration_response_json(
         "transports": ["internal", "hybrid"],
     });
     if let Some(cdj) = client_data_json_b64url {
-        response["clientDataJSON"] = serde_json::Value::String(cdj.to_string());
+        response["clientDataJSON"] = serde_json::Value::String(cdj);
     }
     let v = serde_json::json!({
         "id": id,
@@ -297,16 +297,16 @@ pub fn registration_response_json(
 /// hash (privileged browsers — they attach their own clientDataJSON).
 pub fn assertion_response_json(
     entry_id: &str,
-    client_data_json_b64url: Option<&str>,
-    client_data_hash_b64url: Option<&str>,
+    client_data_json_b64url: Option<String>,
+    client_data_hash_b64url: Option<String>,
 ) -> Result<String, String> {
     use sha2::{Digest, Sha256};
     let (hash, include_cdj) = match (client_data_json_b64url, client_data_hash_b64url) {
         (Some(cdj), None) => {
-            let raw = b64url("clientDataJSON", cdj)?;
-            (Sha256::digest(&raw).to_vec(), Some(cdj.to_string()))
+            let raw = b64url("clientDataJSON", &cdj)?;
+            (Sha256::digest(&raw).to_vec(), Some(cdj))
         }
-        (None, Some(h)) => (b64url("clientDataHash", h)?, None),
+        (None, Some(h)) => (b64url("clientDataHash", &h)?, None),
         _ => {
             return Err(String::from(
                 "exactly one of clientDataJSON or clientDataHash is required",
@@ -584,7 +584,7 @@ mod tests {
             br#"{"type":"webauthn.create","challenge":"Y2hhbGxlbmdlLWJ5dGVz","origin":"https://example.com"}"#;
         let cdj = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(cdj_raw);
 
-        let resp = registration_response_json(&creation_json(), Some(&cdj)).unwrap();
+        let resp = registration_response_json(&creation_json(), Some(cdj.clone())).unwrap();
         let v: serde_json::Value = serde_json::from_str(&resp).unwrap();
 
         assert_eq!(v["type"], "public-key");
@@ -624,7 +624,7 @@ mod tests {
             br#"{"type":"webauthn.get","challenge":"Y2hhbGxlbmdlLWJ5dGVz","origin":"https://example.com"}"#;
         let cdj = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(cdj_raw);
 
-        let resp = assertion_response_json(&matches[0].entry_id, Some(&cdj), None).unwrap();
+        let resp = assertion_response_json(&matches[0].entry_id, Some(cdj.clone()), None).unwrap();
         let v: serde_json::Value = serde_json::from_str(&resp).unwrap();
 
         assert_eq!(v["type"], "public-key");
@@ -660,7 +660,7 @@ mod tests {
         let matches = passkeys_for_request(&assertion_json("example.com")).unwrap();
         let hash = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode([0x42u8; 32]);
 
-        let resp = assertion_response_json(&matches[0].entry_id, None, Some(&hash)).unwrap();
+        let resp = assertion_response_json(&matches[0].entry_id, None, Some(hash.clone())).unwrap();
         let v: serde_json::Value = serde_json::from_str(&resp).unwrap();
         assert!(v["response"].get("clientDataJSON").is_none());
         assert!(v["response"]["signature"].as_str().is_some());
@@ -686,5 +686,97 @@ mod tests {
         sec1.extend_from_slice(&cose[10..42]);
         sec1.extend_from_slice(&cose[45..77]);
         p256::ecdsa::VerifyingKey::from_sec1_bytes(&sec1).expect("valid point")
+    }
+}
+
+/// JNI surface for GabbroCredentialProviderService — same pattern as
+/// `autofill_bridge::jni`: Kotlin passes JSON strings through, errors come back
+/// as `{"error": "..."}` (check for the "error" key before using a result).
+#[cfg(target_os = "android")]
+pub mod jni_glue {
+    use jni::objects::{JClass, JString};
+    use jni::JNIEnv;
+
+    fn error_json(msg: &str) -> String {
+        serde_json::json!({ "error": msg }).to_string()
+    }
+
+    fn get_string(env: &mut JNIEnv, s: &JString) -> Option<String> {
+        env.get_string(s).ok().map(Into::into)
+    }
+
+    fn reply<'local>(env: &JNIEnv<'local>, s: String) -> JString<'local> {
+        env.new_string(&s).unwrap_or_else(|_| {
+            env.new_string("{\"error\":\"jni allocation failed\"}")
+                .expect("failed to allocate fallback JString")
+        })
+    }
+
+    /// `{"matches": [{"entryId", "rpId", "userName", "userDisplayName",
+    /// "credentialIdB64"}]}` or `{"error": "..."}` (locked vault included).
+    #[no_mangle]
+    pub extern "system" fn Java_app_gabbro_gabbro_RustBridge_passkeysForRequest<'local>(
+        mut env: JNIEnv<'local>,
+        _class: JClass<'local>,
+        request_json: JString<'local>,
+    ) -> JString<'local> {
+        let Some(req) = get_string(&mut env, &request_json) else {
+            return reply(&env, error_json("bad request string"));
+        };
+        let out = match super::passkeys_for_request(&req) {
+            Ok(matches) => {
+                let items: Vec<serde_json::Value> = matches
+                    .iter()
+                    .map(|m| {
+                        serde_json::json!({
+                            "entryId": m.entry_id,
+                            "rpId": m.rp_id,
+                            "userName": m.user_name,
+                            "userDisplayName": m.user_display_name,
+                            "credentialIdB64": super::b64url_encode(&m.credential_id),
+                        })
+                    })
+                    .collect();
+                serde_json::json!({ "matches": items }).to_string()
+            }
+            Err(e) => error_json(&e),
+        };
+        reply(&env, out)
+    }
+
+    /// The W3C RegistrationResponseJSON, or `{"error": "..."}`. Pass the
+    /// provider-built clientDataJSON (base64url) or null for privileged callers.
+    #[no_mangle]
+    pub extern "system" fn Java_app_gabbro_gabbro_RustBridge_registerPasskey<'local>(
+        mut env: JNIEnv<'local>,
+        _class: JClass<'local>,
+        request_json: JString<'local>,
+        client_data_json_b64: JString<'local>,
+    ) -> JString<'local> {
+        let Some(req) = get_string(&mut env, &request_json) else {
+            return reply(&env, error_json("bad request string"));
+        };
+        let cdj = get_string(&mut env, &client_data_json_b64);
+        let out = super::registration_response_json(&req, cdj).unwrap_or_else(|e| error_json(&e));
+        reply(&env, out)
+    }
+
+    /// The W3C AuthenticationResponseJSON, or `{"error": "..."}`. Exactly one
+    /// of clientDataJSON / clientDataHash (both base64url, other null).
+    #[no_mangle]
+    pub extern "system" fn Java_app_gabbro_gabbro_RustBridge_signPasskeyAssertion<'local>(
+        mut env: JNIEnv<'local>,
+        _class: JClass<'local>,
+        entry_id: JString<'local>,
+        client_data_json_b64: JString<'local>,
+        client_data_hash_b64: JString<'local>,
+    ) -> JString<'local> {
+        let Some(id) = get_string(&mut env, &entry_id) else {
+            return reply(&env, error_json("bad entry id string"));
+        };
+        let cdj = get_string(&mut env, &client_data_json_b64);
+        let hash = get_string(&mut env, &client_data_hash_b64);
+        let out = super::assertion_response_json(&id, cdj, hash).unwrap_or_else(|e| error_json(&e));
+        reply(&env, out)
     }
 }

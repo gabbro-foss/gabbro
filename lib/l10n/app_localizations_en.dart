@@ -103,6 +103,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get autofillNoMatchBody => 'No saved login matches this app or site.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Create a passkey for $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Sign in to $site with your passkey?';
+  }
+
+  @override
   String get add => 'Add';
 
   @override
@@ -663,6 +673,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get entryTypeCustom => 'Custom';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {

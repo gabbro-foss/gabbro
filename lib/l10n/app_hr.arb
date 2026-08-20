@@ -922,5 +922,10 @@
   "hintSearch": "Filtrira unose dok tipkate",
   "hintFolderSelector": "Filtrira unose po mapi",
   "hintFilterChip": "Uključuje ili isključuje ovaj filtar kategorije",
-  "hintEntryRow": "Otvara ovaj unos"
+  "hintEntryRow": "Otvara ovaj unos",
+  "entryTypePasskey": "Passkey",
+  "passkeyCreatePrompt": "Izraditi passkey za {site}?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "Prijaviti se na {site} pomoću passkeya?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

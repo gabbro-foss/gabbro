@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Capabilities Gabbro registers with the Credential Manager: passkeys only.
+    Passwords stay with GabbroAutofillService — one credential store, one
+    delivery path each, no double-listing in the system picker.
+-->
+<credential-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:settingsSubtitle="@string/passkey_provider_subtitle">
+    <capabilities>
+        <capability name="androidx.credentials.TYPE_PUBLIC_KEY_CREDENTIAL" />
+    </capabilities>
+</credential-provider>

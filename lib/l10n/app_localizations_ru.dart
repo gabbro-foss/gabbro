@@ -104,6 +104,16 @@ class AppLocalizationsRu extends AppLocalizations {
       'Нет сохранённого входа, соответствующего этому приложению или сайту.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Создать passkey для $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Войти на $site с помощью passkey?';
+  }
+
+  @override
   String get add => 'Добавить';
 
   @override
@@ -665,6 +675,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get entryTypeCustom => 'Пользовательский';
+
+  @override
+  String get entryTypePasskey => 'Passkey';
 
   @override
   String errorPrefix(String error) {

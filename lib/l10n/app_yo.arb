@@ -922,5 +922,10 @@
   "hintSearch": "Ṣe ayẹwo awọn titẹ sii bi o ṣe ń tẹ",
   "hintFolderSelector": "Ṣe ayẹwo awọn titẹ sii nipa folda",
   "hintFilterChip": "Tan tabi pa asẹ ẹka yii",
-  "hintEntryRow": "Ṣi titẹ sii yii"
+  "hintEntryRow": "Ṣi titẹ sii yii",
+  "entryTypePasskey": "Passkey",
+  "passkeyCreatePrompt": "Ṣẹ̀dá passkey fún {site}?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "Wọlé sí {site} pẹ̀lú passkey rẹ?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }
