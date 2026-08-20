@@ -1,0 +1,193 @@
+//! WebAuthn authenticator crypto for the passkey provider (ADR-009).
+//!
+//! Platform-independent core shared by the Android Credential Manager provider
+//! and the Linux virtual FIDO2 authenticator: ES256 key generation, COSE_Key
+//! encoding, authenticatorData assembly, and assertion signing. The private key
+//! never leaves this module except as vault-entry bytes; relying parties only
+//! ever receive the public key and signatures.
+
+// TODO(passkey provider): remove when the registration/assertion session flow
+// consumes this module — until then only its tests do, and `mod crypto` is
+// crate-private, so every item counts as dead code.
+#![allow(dead_code)]
+
+use p256::ecdsa::signature::Signer;
+use p256::ecdsa::{Signature, SigningKey};
+use rand::rngs::OsRng;
+use rand::RngCore;
+use sha2::{Digest, Sha256};
+use zeroize::{Zeroize, ZeroizeOnDrop, Zeroizing};
+
+#[derive(Debug, thiserror::Error)]
+pub enum WebAuthnError {
+    /// The stored private key bytes do not form a valid P-256 scalar.
+    #[error("invalid passkey private key")]
+    InvalidPrivateKey,
+}
+
+/// A freshly generated ES256 credential key pair, vault-entry-ready.
+#[derive(Zeroize, ZeroizeOnDrop)]
+pub struct Es256KeyPair {
+    /// P-256 private scalar, 32 bytes.
+    pub private_key: Vec<u8>,
+    /// WebAuthn COSE_Key (EC2/ES256/P-256), the pinned 77-byte CBOR layout.
+    pub public_key_cose: Vec<u8>,
+}
+
+/// Generate an ES256 (P-256) key pair for a new passkey.
+pub fn generate_es256() -> Es256KeyPair {
+    let mut bytes = Zeroizing::new([0u8; 32]);
+    let sk = loop {
+        OsRng.fill_bytes(bytes.as_mut());
+        // Rejects 0 and values >= the group order; retry odds ~2^-128.
+        if let Ok(sk) = SigningKey::from_slice(bytes.as_ref()) {
+            break sk;
+        }
+    };
+    let point = sk.verifying_key().to_sec1_point(false);
+    let x = point.x().expect("an uncompressed SEC1 point carries x");
+    let y = point.y().expect("an uncompressed SEC1 point carries y");
+    // CBOR map(5): {1: 2 (kty EC2), 3: -7 (ES256), -1: 1 (P-256), -2: x, -3: y}.
+    let mut cose = Vec::with_capacity(77);
+    cose.extend_from_slice(&[0xa5, 0x01, 0x02, 0x03, 0x26, 0x20, 0x01]);
+    cose.push(0x21);
+    cose.extend_from_slice(&[0x58, 0x20]);
+    cose.extend_from_slice(x);
+    cose.push(0x22);
+    cose.extend_from_slice(&[0x58, 0x20]);
+    cose.extend_from_slice(y);
+    Es256KeyPair {
+        private_key: bytes.to_vec(),
+        public_key_cose: cose,
+    }
+}
+
+/// authenticatorData for an assertion: rpIdHash(32) || flags(1) || counter(4).
+///
+/// Flags UP|UV|BE|BS (0x1d): presence and verification are satisfied by the
+/// vault unlock + per-operation consent, and a vault passkey is by definition
+/// synced (backup eligible and backed up). Counter stays 0 — the sanctioned
+/// constant for synced passkeys.
+pub fn assertion_authenticator_data(rp_id: &str) -> Vec<u8> {
+    let mut ad = Vec::with_capacity(37);
+    ad.extend_from_slice(&Sha256::digest(rp_id.as_bytes()));
+    ad.push(0x1d);
+    ad.extend_from_slice(&0u32.to_be_bytes());
+    ad
+}
+
+/// Sign `authenticatorData || clientDataHash` with the entry's private key.
+/// Returns the DER-encoded ECDSA signature WebAuthn expects for ES256.
+pub fn sign_assertion(
+    private_key: &[u8],
+    authenticator_data: &[u8],
+    client_data_hash: &[u8],
+) -> Result<Vec<u8>, WebAuthnError> {
+    let sk = SigningKey::from_slice(private_key).map_err(|_| WebAuthnError::InvalidPrivateKey)?;
+    let mut message = Vec::with_capacity(authenticator_data.len() + client_data_hash.len());
+    message.extend_from_slice(authenticator_data);
+    message.extend_from_slice(client_data_hash);
+    let sig: Signature = sk.sign(&message);
+    message.zeroize();
+    Ok(sig.to_der().as_bytes().to_vec())
+}
+
+/// Mint a credential id: 32 random bytes, unique per registration.
+pub fn new_credential_id() -> Vec<u8> {
+    let mut id = vec![0u8; 32];
+    OsRng.fill_bytes(&mut id);
+    id
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn es256_keygen_returns_a_32_byte_private_scalar() {
+        let kp = generate_es256();
+        assert_eq!(kp.private_key.len(), 32);
+    }
+
+    #[test]
+    fn es256_public_key_encodes_as_a_webauthn_cose_ec2_map() {
+        // Canonical CTAP2 COSE_Key for ES256/P-256, CBOR map of 5 entries:
+        //   {1: 2 (kty EC2), 3: -7 (ES256), -1: 1 (P-256), -2: x, -3: y}
+        // Fixed layout, 77 bytes. Offsets pinned so any encoder change that
+        // would break relying parties fails here first.
+        let kp = generate_es256();
+        let c = &kp.public_key_cose;
+        assert_eq!(c.len(), 77);
+        assert_eq!(&c[..8], &[0xa5, 0x01, 0x02, 0x03, 0x26, 0x20, 0x01, 0x21]);
+        assert_eq!(&c[8..10], &[0x58, 0x20], "x is a 32-byte bstr");
+        assert_eq!(c[42], 0x22, "label -3 (y) follows x");
+        assert_eq!(&c[43..45], &[0x58, 0x20], "y is a 32-byte bstr");
+    }
+
+    #[test]
+    fn keygen_is_not_deterministic() {
+        let a = generate_es256();
+        let b = generate_es256();
+        assert_ne!(a.private_key, b.private_key);
+        assert_ne!(a.public_key_cose, b.public_key_cose);
+    }
+
+    #[test]
+    fn authenticator_data_pins_rp_hash_flags_and_zero_counter() {
+        use sha2::{Digest, Sha256};
+        let ad = assertion_authenticator_data("example.com");
+        assert_eq!(ad.len(), 37, "rpIdHash(32) + flags(1) + counter(4)");
+        assert_eq!(&ad[..32], Sha256::digest(b"example.com").as_slice());
+        // UP (0x01) + UV (0x04) + BE (0x08) + BS (0x10) = 0x1d: user present,
+        // verified by the vault unlock, and the credential is synced (backup
+        // eligible + backed up) — the truthful flags for a vault passkey.
+        assert_eq!(ad[32], 0x1d);
+        // Constant zero counter — the WebAuthn-sanctioned value for synced
+        // passkeys; relying parties must tolerate it.
+        assert_eq!(&ad[33..37], &[0, 0, 0, 0]);
+    }
+
+    #[test]
+    fn assertion_signature_verifies_against_the_public_key() {
+        use p256::ecdsa::signature::Verifier;
+        let kp = generate_es256();
+        let auth_data = assertion_authenticator_data("example.com");
+        let client_data_hash = [0x42u8; 32];
+
+        let der = sign_assertion(&kp.private_key, &auth_data, &client_data_hash)
+            .expect("signing with a freshly generated key must succeed");
+
+        // Verify over exactly authenticatorData || clientDataHash — what the
+        // relying party reconstructs.
+        let vk = verifying_key_from_cose(&kp.public_key_cose);
+        let mut message = auth_data.clone();
+        message.extend_from_slice(&client_data_hash);
+        let sig = p256::ecdsa::Signature::from_der(&der).expect("DER signature");
+        assert!(vk.verify(&message, &sig).is_ok());
+    }
+
+    #[test]
+    fn sign_assertion_refuses_a_malformed_private_key() {
+        let auth_data = assertion_authenticator_data("example.com");
+        assert!(sign_assertion(&[0u8; 31], &auth_data, &[0u8; 32]).is_err());
+        assert!(sign_assertion(&[0u8; 32], &auth_data, &[0u8; 32]).is_err());
+    }
+
+    #[test]
+    fn credential_ids_are_32_random_bytes_and_unique() {
+        let a = new_credential_id();
+        let b = new_credential_id();
+        assert_eq!(a.len(), 32);
+        assert_eq!(b.len(), 32);
+        assert_ne!(a, b);
+    }
+
+    /// Test-only COSE decoder: extracts x||y from the pinned 77-byte layout the
+    /// encoder test above locks down.
+    fn verifying_key_from_cose(cose: &[u8]) -> p256::ecdsa::VerifyingKey {
+        let mut sec1 = vec![0x04u8];
+        sec1.extend_from_slice(&cose[10..42]);
+        sec1.extend_from_slice(&cose[45..77]);
+        p256::ecdsa::VerifyingKey::from_sec1_bytes(&sec1).expect("COSE carries a valid point")
+    }
+}

@@ -7,3 +7,4 @@ pub mod aes_gcm;
 pub mod hkdf;
 pub mod kdf;
 pub mod vault_crypto;
+pub mod webauthn;
