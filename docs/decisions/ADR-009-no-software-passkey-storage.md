@@ -1,67 +1,56 @@
-# ADR-009: No Software Passkey Storage
+# ADR-009: Software Passkey Storage
 
 ## Status
 
-Accepted
+Accepted (amended 2026-08-20; original decision reversed — see history below)
 
 ## Date
 
-2026-05-15 (created); 2026-06-22 (edited)
+2026-05-15 (created); 2026-06-22 (edited); 2026-08-20 (amended)
 
 ## Context
 
 Passkey managers such as Bitwarden store FIDO2 private keys encrypted in the
-vault, acting as a software authenticator — intercepting WebAuthn credential
-creation, generating the key pair in software, and storing the private key in
-the encrypted vault. The question arose whether Gabbro should do the same.
+vault, acting as a software authenticator: generating the key pair in software
+and serving WebAuthn credential creation/assertion from the vault.
 
 ## Decision
 
-Gabbro will not implement software passkey storage, now or in future versions.
+Gabbro will implement software passkey storage: a `Passkey` vault entry type
+served by an Android Credential Manager provider and a Linux virtual FIDO2
+authenticator (uhid). No browser extension on any platform (ADR-008 stands).
+Plan and sources: [PASSKEY_INVESTIGATION.md](../PASSKEY_INVESTIGATION.md).
 
 ## Rationale
 
-Gabbro supports and strongly recommends a FIDO2 hardware key (YubiKey) for vault
-access (ADR-010), though a passphrase-only vault is also allowed. A user who opts
-into hardware-key protection already possesses a passkey authenticator that is
-strictly stronger than software storage.
+- Vault passkeys sync, back up, and have no slot cap; a YubiKey caps at 25
+  passkeys (firmware 5.0-5.6.x) or 100 (5.7+).
+- The choice mirrors app unlock: hardware (AAL3, NIST SP 800-63B-4) remains the
+  stronger option and stays fully supported; vault storage (AAL2) is the
+  user's informed trade-off, not a replacement. Users who want hardware-bound
+  passkeys keep registering them on their YubiKeys directly.
+- Extension-free provider paths now exist on both target platforms, removing
+  the original implementation-cost objection's largest component.
 
-The security distinction is codified in NIST SP 800-63B-4, which defines
-Authenticator Assurance Levels (AALs):
+## History (original decision, 2026-05-15, reversed)
 
-> "Since syncable authenticators require the private key to be exportable,
-> syncable authenticators SHALL NOT be used at AAL3. Cryptography used by
-> verifiers at AAL3 SHALL be validated at FIPS 140 Level 1 or higher.
-> Hardware-based authenticators and verifiers at AAL3 SHOULD resist relevant
-> side-channel attacks."
->
-> — NIST SP 800-63B-4, Section 4.3
-
-In plain terms: hardware-bound passkeys qualify for AAL3, the highest assurance
-level. Synced or software-stored passkeys are capped at AAL2 because the private
-key must be exportable to function. A software passkey stored in Gabbro's vault,
-however well-encrypted, lives in the same threat model as the vault itself — it
-does not provide the hardware-isolation guarantee a YubiKey does.
-
-Yubico's own documentation confirms that hardware security keys isolate
-cryptographic keys from the host OS and software, protecting them from most
-forms of compromise — a property that software storage cannot replicate.
-
-Adding software passkey storage would therefore offer Gabbro's users a *weaker*
-credential type than the hardware they already own and are required to possess.
-
-**Implementation cost** is also high: Android `CredentialManager` API
-(Android 14+), CTAP2 protocol handling, and browser extension integration for
-desktop — with no net security benefit for the target user.
+The original ADR-009 rejected software passkey storage permanently: a YubiKey
+owner already holds a strictly stronger (AAL3) authenticator, vault-stored
+keys live in the vault's own threat model, and the implementation cost
+(CredentialManager, CTAP2, browser extension) bought no net security for the
+target user. Reversed because the no-cap/sync/backup benefit stands on its
+own, the flows need no extension, and hardware remains recommended for those
+who prefer it. Full original text: git history of this file.
 
 ## Consequences
 
-- No `Passkey` entry type.
-- No `CredentialManager` integration.
-- This decision is permanent, not deferred.
+- New `Passkey` entry type; new vault format VERSION.
+- Android `CredentialProviderService` integration; Linux uhid daemon.
+- Vault-stored passkeys are AAL2 by definition; documented honestly (README /
+  SECURITY.md) — Gabbro never claims hardware-equivalent passkey security.
 
 ## References
 
 - NIST SP 800-63B-4: <https://pages.nist.gov/800-63-4/sp800-63b.html>
-- Yubico on FIDO2 and AAL3: <https://www.yubico.com/authentication-standards/fido2/>
-- ADR-005: YubiKey / FIDO2 hardware authentication requirement
+- YubiKey passkey capacity: <https://docs.yubico.com/hardware/yubikey-guidance/best-practices/all-faq-passkeys.html>
+- ADR-008 (no browser extension), ADR-010 (YubiKey vault unlock)
