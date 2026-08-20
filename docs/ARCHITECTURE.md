@@ -175,8 +175,21 @@ resolved but never applied — inert, emits no warning.
             (table updated); gate needs `--warm`
       - [ ] challenge vault: reissue at v12 when the format lands (old crack-me
             vaults stay — red herrings are deliberate)
-    - [ ] Android: `CredentialProviderService` + unlock/consent activities +
-          caller validation (asset links, privileged-browser allowlist)
+    - [ ] Android provider. Approved TDD list (red-first, in order):
+      - [ ] R1 parse creation request JSON; refuse unsupported algorithms
+      - [ ] R2 register: vault entry + attestation response parts
+      - [ ] R3 parse sign-in request JSON
+      - [ ] R4 assert: match entries by RP ID, sign, response parts
+      - [ ] R5 locked vault: distinct "locked" error for both flows
+      - [ ] R6 RP ID matching is exact-only (pinned)
+      - [ ] K7 service + capabilities registered in the manifest
+      - [ ] K8 begin-get locked -> unlock action, never an empty list
+      - [ ] K9 begin-get unlocked -> one entry per match
+      - [ ] K10 begin-create -> save-in-Gabbro entry -> create activity
+      - [ ] K11 caller validation: asset-link proof or allowlisted browser
+      - [ ] K12 golden test: response JSON matches the W3C shape
+      - [ ] dep `androidx.credentials:credentials:1.6.0` + lockfile + osv-scan
+      - [ ] hardware pass on an API 34+ emulator before any Android commit
     - [ ] Linux: uhid virtual FIDO2 daemon (CTAPHID framing + CTAP2 commands)
 
 ---
