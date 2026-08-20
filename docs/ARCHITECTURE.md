@@ -175,24 +175,35 @@ resolved but never applied — inert, emits no warning.
             (table updated); gate needs `--warm`
       - [ ] challenge vault: reissue at v12 when the format lands (old crack-me
             vaults stay — red herrings are deliberate)
-    - [ ] Android provider. Approved TDD list (red-first, in order):
-      - [x] R1-R6 done (`api/passkey_bridge.rs`): parse/refuse, register with
-            attestation object, exact-rp match + allow-list, sign, locked errors
-      - [x] K12 done in Rust: full W3C response JSON assembled + golden-tested
-            (`registration_response_json` / `assertion_response_json`; Kotlin
-            relays strings verbatim)
-      - [x] K7-K11 Robolectric-green (10 tests), UNCOMMITTED until the hardware
-            pass: service + capabilities, unlock action when locked, entries per
-            match, save entry, caller validation (vendored gstatic browser
-            allowlist incl. Brave/Vanadium; fail-closed asset links)
-      - [x] Flutter phase-2 UI: `passkeyUnlockMain` + consent screen, l10n x37
-            (FIDO official terms: "passkey" loanword; native ja/ko/zh), a11y
-            catalogued, About attributes `p256`
-      - [x] Dart bridge regenerated for the Passkey type; detail view, editor
-            (folder+notes), list icon/label; full suite 2363 green
-      - [ ] dep lockfile + osv-scan (run at Android commit time)
-      - [ ] hardware pass on an API 34+ emulator, then commit Android+Flutter
+    - [ ] Android provider. All code committed; every local suite green
+          (R1-R6 + K12 in Rust; K7-K11 Robolectric x10; Flutter 2363 incl.
+          consent screen `passkeyUnlockMain`, l10n x37 FIDO terms, a11y
+          catalogued; Dart bridge regenerated; lockfile + osv-scan clean).
+          **Hardware-UNVERIFIED — S23 run FAILED at registration:**
+      - What worked on the S23 (Brave, no Google account): Gabbro appears in
+        the create sheet; picking it launches `GabbroPasskeyCreateActivity`;
+        the provider service returns valid picker responses (logcat:
+        "Remote provider responded with a valid response").
+      - The failure: the activity's Flutter engine runs ~10s, then the
+        activity finishes WITHOUT setting any result -> browser reports
+        TYPE_USER_CANCELED, webauthn.io shows "unknown error". No crash in
+        logcat (no AndroidRuntime/FATAL for the process).
+      - Debug NEXT: what the consent flow did in those 10s. Prime suspects:
+        an exception inside the `approve` MethodChannel handler
+        (`performOperation()` is uncatched Kotlin), or the consent screen
+        never rendered and the user backed out. Reproduce with
+        `adb logcat` filtered on the app pid + `E/flutter` + `System.err`
+        DURING the tap (the -d buffer was too noisy after the fact).
+      - Emulator is NOT a viable test bed: GMS-free image -> Chromium
+        browsers bypass CredMan; Play image without Google sign-in -> GMS
+        keeps 3P providers disabled. S23 only.
+      - Matrix (8 steps, gate first) in `.scratchpad`; maintainer runs it.
+      - [ ] hardware pass green on the S23, end to end
     - [ ] Linux: uhid virtual FIDO2 daemon (CTAPHID framing + CTAP2 commands)
+    - Session note 2026-08-20: maintainer doubts the branch survives; nothing
+      pushed; no CHANGELOG entry until the feature actually works. Full gate
+      (`gabbro_test --warm`) NOT run since `p256` + `androidx.credentials`
+      landed — required before any merge.
 
 ---
 
