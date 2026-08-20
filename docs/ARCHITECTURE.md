@@ -73,7 +73,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 786 | 17 |
+| Rust (`cargo test -q`) | 789 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 13 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -178,12 +178,14 @@ resolved but never applied — inert, emits no warning.
     - [ ] Android provider. Approved TDD list (red-first, in order):
       - [x] R1-R6 done (`api/passkey_bridge.rs`): parse/refuse, register with
             attestation object, exact-rp match + allow-list, sign, locked errors
+      - [x] K12 done in Rust: full W3C response JSON assembled + golden-tested
+            (`registration_response_json` / `assertion_response_json`; Kotlin
+            relays strings verbatim)
       - [ ] K7 service + capabilities registered in the manifest
       - [ ] K8 begin-get locked -> unlock action, never an empty list
       - [ ] K9 begin-get unlocked -> one entry per match
       - [ ] K10 begin-create -> save-in-Gabbro entry -> create activity
       - [ ] K11 caller validation: asset-link proof or allowlisted browser
-      - [ ] K12 golden test: response JSON matches the W3C shape
       - [ ] dep `androidx.credentials:credentials:1.6.0` + lockfile + osv-scan
       - [ ] hardware pass on an API 34+ emulator before any Android commit
     - [ ] Linux: uhid virtual FIDO2 daemon (CTAPHID framing + CTAP2 commands)
