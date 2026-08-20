@@ -141,7 +141,27 @@ resolved but never applied — inert, emits no warning.
   - Approved sequence:
     - [x] Amend ADR-009 (supersede the ban; old decision stays summarised)
     - [ ] Rust core: `Passkey` entry type, new vault VERSION (corpus vault +
-          fixtures), ES256/COSE/authenticatorData/signing ops
+          fixtures), ES256/COSE/authenticatorData/signing ops.
+          Net (done): autotype classifier exhaustive + per-variant refusal pinned;
+          unknown-variant body JSON errors cleanly; l10n/a11y nets verified sufficient.
+          Canon-TDD list (red-first, in order):
+      - [ ] A1 `PasskeyEntry` serde round-trip, all fields
+      - [ ] A2 missing optional fields parse (`#[serde(default)]`)
+      - [ ] A3 `content_hash` stable / per-field mutation / type tag
+      - [ ] A4 zeroize on drop
+      - [ ] A5 autotype classifier: `Passkey` refuses as `NotLogin`
+      - [ ] B6 fresh seal writes VERSION 12
+      - [ ] B7 v11 opens, re-seals as v12
+      - [ ] B8 v10 refused; v13 (too-new) refused
+      - [ ] B9 compat gate: v12 corpus vault + frozen fixtures (v11 stays)
+      - [ ] C10 ES256 keygen -> COSE_Key
+      - [ ] C11 authenticatorData: RP ID hash, UP/UV/BE/BS flags, counter 0
+      - [ ] C12 signature over authenticatorData || clientDataHash verifies
+      - [ ] C13 credential ID: 32 random bytes, unique
+      - [ ] D14 bridge DTO round-trip both directions
+      - [ ] D15 `entry_to_summary` renders a Passkey
+      - [ ] D16 Passkey survives the sync walk
+      - [ ] dep: `p256` + `deny.toml` allow-list; gate needs `--warm`
     - [ ] Android: `CredentialProviderService` + unlock/consent activities +
           caller validation (asset links, privileged-browser allowlist)
     - [ ] Linux: uhid virtual FIDO2 daemon (CTAPHID framing + CTAP2 commands)
