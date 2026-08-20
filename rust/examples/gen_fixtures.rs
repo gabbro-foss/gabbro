@@ -55,6 +55,7 @@ async fn main() {
         load_vault_with_key_record(FIXTURE_PASSPHRASE, YK1_HMAC, YK1_CRED, &mk_path)
             .expect("open multi-key fixture with YK1");
     body.entries.push(canary_entry());
+    body.entries.push(canary_passkey_entry());
     reseal_vault_body(&body, &master, &mk_path).expect("re-seal multi-key fixture with canary");
     // Verify the canary actually serialises into the body we just sealed.
     let _ = serialize_vault_body(&body).expect("serialize canary body");
