@@ -16,6 +16,8 @@ that let the 2026-06-08 brick through).
 | `v10_multikey_2keys.gabbro` | 10 | `master` | passphrase + YK1 + YK2 | refusal input |
 | `v11_passphrase.gabbro` | 11 | ADR-018 (vault key from Argon2id via HKDF, no KEM) | passphrase only | open/migrate |
 | `v11_multikey_2keys.gabbro` | 11 | same | passphrase + YK1 + YK2 | open/migrate |
+| `v12_passphrase.gabbro` | 12 | ADR-009 (Passkey entry type; header unchanged) | passphrase only, + passkey canary | open |
+| `v12_multikey_2keys.gabbro` | 12 | same | passphrase + YK1 + YK2, + passkey canary | open |
 
 (Table grows as the harness grows — see the test list at the top of
 `../vault_backward_compat.rs`.)

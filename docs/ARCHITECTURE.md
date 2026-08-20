@@ -73,8 +73,8 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 763 | 17 |
-| Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 11 | 0 |
+| Rust (`cargo test -q`) | 769 | 17 |
+| Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 13 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust sync-walk batched apply (`cargo test --release --lib sync_walk_batched_apply_matches_checker -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -160,13 +160,13 @@ resolved but never applied — inert, emits no warning.
       - [x] C11 authenticatorData: RP ID hash, UP/UV/BE/BS flags, counter 0
       - [x] C12 signature over authenticatorData || clientDataHash verifies
       - [x] C13 credential ID: 32 random bytes, unique
-      - [ ] D14 bridge DTO round-trip both directions
-      - [ ] D15 `entry_to_summary` renders a Passkey
-      - [ ] D16 Passkey survives the sync walk
-      - [ ] B9 (moved after D: fixtures freeze the format, so generate last)
-            compat gate: v12 fixtures incl. a Passkey in the canary body, extend
-            gate tests, v11/v10 fixtures stay; maintainer adds the manual
-            `test_data/migration_vaults/` v12 vault post-release
+      - [x] D14 bridge DTO both directions + `create_entry` refusal + update
+            preserves key material (caught a missing update arm)
+      - [x] D15 `entry_to_summary` renders a Passkey
+      - [x] D16 Passkey merge = whole-entry newest-wins, pinned
+      - [x] B9 compat gate: v12 goldens with passkey canary, 13/13 green;
+            maintainer adds the manual `test_data/migration_vaults/` v12 vault
+            post-release
       - [x] dep: `p256` 0.14 added; `cargo deny` licenses pass, duplicates 6->8
             (table updated); gate needs `--warm`
       - [ ] challenge vault: reissue at v12 when the format lands (old crack-me
