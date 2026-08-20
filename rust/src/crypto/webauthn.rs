@@ -6,11 +6,6 @@
 //! never leaves this module except as vault-entry bytes; relying parties only
 //! ever receive the public key and signatures.
 
-// TODO(passkey provider): remove when the registration/assertion session flow
-// consumes this module — until then only its tests do, and `mod crypto` is
-// crate-private, so every item counts as dead code.
-#![allow(dead_code)]
-
 use p256::ecdsa::signature::Signer;
 use p256::ecdsa::{Signature, SigningKey};
 use rand::rngs::OsRng;
@@ -74,6 +69,51 @@ pub fn assertion_authenticator_data(rp_id: &str) -> Vec<u8> {
     ad.push(0x1d);
     ad.extend_from_slice(&0u32.to_be_bytes());
     ad
+}
+
+/// authenticatorData for a registration: the assertion layout plus the AT flag
+/// and attested credential data (zero AAGUID, credential id, COSE key).
+pub fn registration_authenticator_data(
+    rp_id: &str,
+    credential_id: &[u8],
+    public_key_cose: &[u8],
+) -> Vec<u8> {
+    let mut ad = Vec::with_capacity(37 + 16 + 2 + credential_id.len() + public_key_cose.len());
+    ad.extend_from_slice(&Sha256::digest(rp_id.as_bytes()));
+    // UP|UV|AT|BE|BS: assertion flags plus "attested credential data included".
+    ad.push(0x5d);
+    ad.extend_from_slice(&0u32.to_be_bytes());
+    ad.extend_from_slice(&[0u8; 16]); // zero AAGUID: "none" attestation
+    ad.extend_from_slice(&(credential_id.len() as u16).to_be_bytes());
+    ad.extend_from_slice(credential_id);
+    ad.extend_from_slice(public_key_cose);
+    ad
+}
+
+/// The WebAuthn attestation object: canonical CBOR
+/// `{"fmt": "none", "attStmt": {}, "authData": <bytes>}`.
+pub fn attestation_object(auth_data: &[u8]) -> Vec<u8> {
+    let mut out = Vec::with_capacity(auth_data.len() + 32);
+    out.push(0xa3); // map(3)
+    out.extend_from_slice(&[0x63, b'f', b'm', b't']); // text(3) "fmt"
+    out.extend_from_slice(&[0x64, b'n', b'o', b'n', b'e']); // text(4) "none"
+    out.extend_from_slice(&[0x67, b'a', b't', b't', b'S', b't', b'm', b't']); // text(7)
+    out.push(0xa0); // empty map
+    out.extend_from_slice(&[0x68, b'a', b'u', b't', b'h', b'D', b'a', b't', b'a']); // text(8)
+                                                                                    // byte string, length in the shortest CBOR form that covers real sizes
+    match auth_data.len() {
+        n if n < 24 => out.push(0x40 + n as u8),
+        n if n < 256 => {
+            out.push(0x58);
+            out.push(n as u8);
+        }
+        n => {
+            out.push(0x59);
+            out.extend_from_slice(&(n as u16).to_be_bytes());
+        }
+    }
+    out.extend_from_slice(auth_data);
+    out
 }
 
 /// Sign `authenticatorData || clientDataHash` with the entry's private key.

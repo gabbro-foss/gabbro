@@ -3,6 +3,7 @@ pub mod autotype_bridge;
 pub mod entropy;
 pub mod fido_bridge;
 pub mod import;
+pub mod passkey_bridge;
 pub mod passphrase_generator;
 pub mod password_generator;
 pub mod simple;

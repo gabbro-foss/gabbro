@@ -415,6 +415,23 @@ pub fn session_entry_content_hashes() -> Result<std::collections::HashSet<[u8; 3
 ///
 /// Used by bulk operations (e.g. import) that add many entries and
 /// want to save once at the end rather than once per entry.
+/// Clones of every Passkey entry whose rp_id matches EXACTLY. Clones carry key
+/// material — they exist only for the passkey provider flow and zeroize on drop.
+pub fn session_passkeys_for_rp(
+    rp_id: &str,
+) -> Result<Vec<crate::vault::entry::PasskeyEntry>, String> {
+    let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+    let session = session.as_ref().ok_or("Vault is locked")?;
+    Ok(session
+        .entries
+        .iter()
+        .filter_map(|e| match e {
+            VaultEntry::Passkey(p) if p.rp_id == rp_id => Some(p.clone()),
+            _ => None,
+        })
+        .collect())
+}
+
 pub fn session_add_entry_no_save(entry: VaultEntry) -> Result<(), String> {
     let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     let session = session.as_mut().ok_or("Vault is locked")?;
