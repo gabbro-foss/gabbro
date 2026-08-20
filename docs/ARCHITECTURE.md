@@ -73,7 +73,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 752 | 17 |
+| Rust (`cargo test -q`) | 763 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 11 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -113,7 +113,7 @@ warnings are not noise.**
 | "Kotlin does not yet support 25 JDK target, falling back to JVM_24" | Flutter SDK's own unpinned Gradle modules | Upstream; appeared with the Java-25 JBR (2026-08-11). Our `:app` is pinned to JVM 21 (netted). Clears when Kotlin adds the 25 target. |
 | JVM restricted-method (`System::load`) | Gradle `native-platform` jar | Gradle's own jar. Did NOT clear at 9.3.1 (still ships `0.22-milestone-29`); Java 25 warns on it every run. Blocks at a future Java. No action. |
 | `cargo deny` no-license-field: `allo-isolate` | `flutter_rust_bridge` dep | Fixed on their master; await release. `[[licenses.clarify]]` is inert — don't retry. |
-| `cargo deny` duplicates x6 | `argon2`->`digest`, `jni`->`libloading`, `bindgen`->`shlex` | Upstream pins. Was x7; RT-3 took the `hybrid-array` duplicate with `ml-kem`. The crate itself stays (`sha2`/`hkdf` -> `digest` need it). |
+| `cargo deny` duplicates x8 | `argon2`->`digest`, `jni`->`libloading`, `bindgen`->`shlex`, `p256`->`rand_core`+`getrandom` | Upstream pins. Was x6; `p256` (passkeys) added the `rand_core 0.10`/`getrandom 0.4` pair beside `rand 0.8`'s. |
 | KGP via `buildscript` classpath | `url_launcher_android` | Did not reproduce 2026-08-06; re-check before acting. |
 
 **AGP note:** every module, `rust_lib_gabbro` included, loads AGP **8.11.1**. The
@@ -153,18 +153,24 @@ resolved but never applied — inert, emits no warning.
       - A-phase decisions: private key never crosses the bridge (DTO carries no
         key material; `update_entry` restores from stored, `create_entry`
         refuses Passkey DTOs); sync = whole-entry LWW until D16.
-      - [ ] B6 fresh seal writes VERSION 12
-      - [ ] B7 v11 opens, re-seals as v12
-      - [ ] B8 v10 refused; v13 (too-new) refused
-      - [ ] B9 compat gate: v12 corpus vault + frozen fixtures (v11 stays)
-      - [ ] C10 ES256 keygen -> COSE_Key
-      - [ ] C11 authenticatorData: RP ID hash, UP/UV/BE/BS flags, counter 0
-      - [ ] C12 signature over authenticatorData || clientDataHash verifies
-      - [ ] C13 credential ID: 32 random bytes, unique
+      - [x] B6 fresh seal writes VERSION 12
+      - [x] B7 v11 opens, re-seals as v12 (unit + gate rotation, auto-adapts)
+      - [x] B8 v10 refused; v13 (too-new) refused
+      - [x] C10 ES256 keygen -> COSE_Key (pinned 77-byte layout, `crypto/webauthn.rs`)
+      - [x] C11 authenticatorData: RP ID hash, UP/UV/BE/BS flags, counter 0
+      - [x] C12 signature over authenticatorData || clientDataHash verifies
+      - [x] C13 credential ID: 32 random bytes, unique
       - [ ] D14 bridge DTO round-trip both directions
       - [ ] D15 `entry_to_summary` renders a Passkey
       - [ ] D16 Passkey survives the sync walk
-      - [ ] dep: `p256` + `deny.toml` allow-list; gate needs `--warm`
+      - [ ] B9 (moved after D: fixtures freeze the format, so generate last)
+            compat gate: v12 fixtures incl. a Passkey in the canary body, extend
+            gate tests, v11/v10 fixtures stay; maintainer adds the manual
+            `test_data/migration_vaults/` v12 vault post-release
+      - [x] dep: `p256` 0.14 added; `cargo deny` licenses pass, duplicates 6->8
+            (table updated); gate needs `--warm`
+      - [ ] challenge vault: reissue at v12 when the format lands (old crack-me
+            vaults stay — red herrings are deliberate)
     - [ ] Android: `CredentialProviderService` + unlock/consent activities +
           caller validation (asset links, privileged-browser allowlist)
     - [ ] Linux: uhid virtual FIDO2 daemon (CTAPHID framing + CTAP2 commands)
