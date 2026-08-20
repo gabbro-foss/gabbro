@@ -10,11 +10,11 @@ use std::path::PathBuf;
 
 use crate::api::vault::{
     AttachmentMetaData, CardEntryData, CustomEntryData, CustomFieldData, FileEntryData,
-    IdentityEntryData, LoginEntryData, NoteEntryData,
+    IdentityEntryData, LoginEntryData, NoteEntryData, PasskeyEntryData,
 };
 use crate::vault::entry::{
     CardEntry, CustomEntry, CustomField, EntryMeta, FileEntry, IdentityEntry, LoginEntry,
-    NoteEntry, VaultEntry,
+    NoteEntry, PasskeyEntry, VaultEntry,
 };
 use crate::vault::session;
 
@@ -46,6 +46,7 @@ pub enum VaultEntryData {
     Card(CardEntryData),
     File(FileEntryData),
     Custom(CustomEntryData),
+    Passkey(PasskeyEntryData),
 }
 
 // ── Conversion: internal VaultEntry → VaultEntryData DTO ─────────────────────
@@ -192,6 +193,30 @@ fn vault_entry_to_data(entry: &VaultEntry) -> VaultEntryData {
                 .collect(),
             attachments: attachment_meta(&e.attachments),
         }),
+        VaultEntry::Passkey(e) => {
+            use base64::Engine;
+            VaultEntryData::Passkey(PasskeyEntryData {
+                id: e.meta.id.clone(),
+                created_at: e.meta.created_at.clone(),
+                updated_at: e.meta.updated_at.clone(),
+                folder: e.meta.folder.clone(),
+                rp_id: e.rp_id.clone(),
+                user_name: e.user_name.clone(),
+                user_display_name: e.user_display_name.clone(),
+                credential_id_b64: base64::engine::general_purpose::URL_SAFE_NO_PAD
+                    .encode(&e.credential_id),
+                notes: e.notes.clone(),
+                custom_fields: e
+                    .custom_fields
+                    .iter()
+                    .map(|f| CustomFieldData {
+                        label: f.label.clone(),
+                        value: f.value.clone(),
+                        hidden: f.hidden,
+                    })
+                    .collect(),
+            })
+        }
     }
 }
 
@@ -359,6 +384,37 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
                 .collect(),
             attachments: vec![],
         })),
+        // Key material is deliberately absent from the DTO: it is restored from
+        // the stored entry by `update_entry` (like attachments). An entry built
+        // here alone is not a usable credential — `create_entry` refuses it.
+        VaultEntryData::Passkey(d) => Ok(VaultEntry::Passkey(PasskeyEntry {
+            meta: EntryMeta {
+                field_times: Default::default(),
+                history: Vec::new(),
+                id: d.id,
+                created_at: d.created_at,
+                updated_at: d.updated_at,
+                folder: d.folder,
+            },
+            rp_id: d.rp_id,
+            user_name: d.user_name,
+            user_display_name: d.user_display_name,
+            user_handle: vec![],
+            credential_id: vec![],
+            private_key: vec![],
+            public_key_cose: vec![],
+            algorithm: -7,
+            notes: d.notes,
+            custom_fields: d
+                .custom_fields
+                .into_iter()
+                .map(|f| CustomField {
+                    label: f.label,
+                    value: f.value,
+                    hidden: f.hidden,
+                })
+                .collect(),
+        })),
     }
 }
 
@@ -437,6 +493,13 @@ pub fn get_entry(id: String) -> Result<VaultEntryData, String> {
 pub async fn create_entry(entry: VaultEntryData) -> Result<EntrySummaryData, String> {
     use crate::api::vault::chrono_now;
     use crate::vault::entry::new_entry_id;
+    // A passkey minted here would carry no key material — an unusable
+    // credential. Passkeys are created only by the provider registration flow.
+    if matches!(entry, VaultEntryData::Passkey(_)) {
+        return Err(String::from(
+            "Passkeys are created by the passkey provider flow, not the editor",
+        ));
+    }
     let mut internal = vault_entry_from_data(entry)?;
     let now = chrono_now();
     let id = new_entry_id();
@@ -469,6 +532,12 @@ pub async fn create_entry(entry: VaultEntryData) -> Result<EntrySummaryData, Str
             e.meta.updated_at = now;
         }
         VaultEntry::Custom(ref mut e) => {
+            e.meta.id = id;
+            e.meta.created_at = now.clone();
+            e.meta.updated_at = now;
+        }
+        // Unreachable: refused above, before conversion.
+        VaultEntry::Passkey(ref mut e) => {
             e.meta.id = id;
             e.meta.created_at = now.clone();
             e.meta.updated_at = now;

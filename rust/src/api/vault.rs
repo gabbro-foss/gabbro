@@ -138,6 +138,24 @@ pub struct CustomEntryData {
     pub attachments: Vec<AttachmentMetaData>,
 }
 
+/// A passkey entry as seen by Flutter. Key material never rides in this DTO —
+/// the private key stays behind the bridge (signing happens in Rust), and
+/// `update_entry` restores it from the stored entry, like attachments.
+pub struct PasskeyEntryData {
+    pub id: String,
+    pub created_at: String,
+    pub updated_at: String,
+    pub folder: String,
+    /// Relying-party id (e.g. "example.com") — the site this passkey signs for.
+    pub rp_id: String,
+    pub user_name: String,
+    pub user_display_name: String,
+    /// Base64url credential id — display/identification only, not editable.
+    pub credential_id_b64: String,
+    pub notes: Option<String>,
+    pub custom_fields: Vec<CustomFieldData>,
+}
+
 /// An entry flagged for user-consent deletion during vault merge.
 ///
 /// Returned when an incoming vault contains a tombstone that matches a local
@@ -373,6 +391,7 @@ fn entry_id(entry: &VaultEntry) -> &str {
         VaultEntry::Card(e) => &e.meta.id,
         VaultEntry::File(e) => &e.meta.id,
         VaultEntry::Custom(e) => &e.meta.id,
+        VaultEntry::Passkey(e) => &e.meta.id,
     }
 }
 
@@ -395,6 +414,7 @@ fn entry_meta(entry: &VaultEntry) -> &crate::vault::entry::EntryMeta {
         VaultEntry::Card(e) => &e.meta,
         VaultEntry::File(e) => &e.meta,
         VaultEntry::Custom(e) => &e.meta,
+        VaultEntry::Passkey(e) => &e.meta,
     }
 }
 
@@ -406,6 +426,7 @@ pub(crate) fn entry_meta_mut(entry: &mut VaultEntry) -> &mut crate::vault::entry
         VaultEntry::Card(e) => &mut e.meta,
         VaultEntry::File(e) => &mut e.meta,
         VaultEntry::Custom(e) => &mut e.meta,
+        VaultEntry::Passkey(e) => &mut e.meta,
     }
 }
 
@@ -418,6 +439,7 @@ pub(crate) fn entry_attachments(entry: &VaultEntry) -> &[crate::vault::entry::En
         VaultEntry::Card(e) => &e.attachments,
         VaultEntry::Custom(e) => &e.attachments,
         VaultEntry::File(_) => &[],
+        VaultEntry::Passkey(_) => &[],
     }
 }
 
@@ -431,6 +453,7 @@ pub(crate) fn entry_attachments_mut(
         VaultEntry::Card(e) => Some(&mut e.attachments),
         VaultEntry::Custom(e) => Some(&mut e.attachments),
         VaultEntry::File(_) => None,
+        VaultEntry::Passkey(_) => None,
     }
 }
 
@@ -606,6 +629,9 @@ fn item_keys(entry: &VaultEntry) -> std::collections::HashSet<String> {
             }
             add_att(&mut keys, &e.attachments);
         }
+        VaultEntry::Passkey(e) => {
+            add_custom(&mut keys, &e.custom_fields);
+        }
     }
     keys
 }
@@ -622,6 +648,7 @@ fn entry_custom_fields_mut(
         VaultEntry::Card(e) => Some(&mut e.custom_fields),
         VaultEntry::File(e) => Some(&mut e.custom_fields),
         VaultEntry::Custom(_) => None,
+        VaultEntry::Passkey(e) => Some(&mut e.custom_fields),
     }
 }
 
@@ -688,6 +715,17 @@ fn set_entry_scalar(entry: &mut VaultEntry, key: &str, value: &str) {
                 e.title = s;
             }
         }
+        VaultEntry::Passkey(e) => match key {
+            "rp_id" => e.rp_id = s,
+            "user_name" => e.user_name = s,
+            "user_display_name" => e.user_display_name = s,
+            "notes" => e.notes = Some(s),
+            // Key material (private_key, credential_id, user_handle,
+            // public_key_cose, algorithm) is immutable after registration —
+            // a credential with different key material is a different
+            // credential, so it never rides the field-merge path.
+            _ => {}
+        },
     }
 }
 
@@ -756,6 +794,7 @@ pub(crate) fn remove_entry_item_by_key(entry: &mut VaultEntry, key: &str) {
             VaultEntry::Card(e) => Some(&mut e.attachments),
             VaultEntry::Custom(e) => Some(&mut e.attachments),
             VaultEntry::File(_) => None,
+            VaultEntry::Passkey(_) => None,
         };
         if let Some(atts) = atts {
             atts.retain(|a| a.uuid != uuid);
@@ -793,6 +832,16 @@ pub fn update_entry(
     // wipe them and stamp `del:attachments:<uuid>` tombstones that sync the loss.
     if let Some(dst) = entry_attachments_mut(&mut updated) {
         *dst = entry_attachments(&entries[pos]).to_vec();
+    }
+
+    // Passkey key material is not round-tripped by Flutter either — the private
+    // key never crosses the bridge — so the stored entry is the source of truth.
+    if let (VaultEntry::Passkey(dst), VaultEntry::Passkey(src)) = (&mut updated, &entries[pos]) {
+        dst.user_handle = src.user_handle.clone();
+        dst.credential_id = src.credential_id.clone();
+        dst.private_key = src.private_key.clone();
+        dst.public_key_cose = src.public_key_cose.clone();
+        dst.algorithm = src.algorithm;
     }
 
     // Per-field change-times (granular sync, v9). Flutter does not round-trip

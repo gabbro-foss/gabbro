@@ -196,6 +196,7 @@ fn entry_id(entry: &VaultEntry) -> &str {
         VaultEntry::Card(e) => &e.meta.id,
         VaultEntry::File(e) => &e.meta.id,
         VaultEntry::Custom(e) => &e.meta.id,
+        VaultEntry::Passkey(e) => &e.meta.id,
     }
 }
 
@@ -322,6 +323,30 @@ fn entry_to_summary(entry: &VaultEntry) -> EntrySummaryData {
                 id: e.meta.id.clone(),
                 entry_type: String::from("Custom"),
                 title: e.title.clone(),
+                folder: e.meta.folder.clone(),
+                search_blob: make_blob(&parts),
+            }
+        }
+        VaultEntry::Passkey(e) => {
+            // Key material never enters the search blob: the blob is held
+            // decrypted for the lifetime of the unlocked session.
+            let mut parts: Vec<&str> = vec![
+                &e.rp_id,
+                &e.user_name,
+                &e.user_display_name,
+                e.notes.as_deref().unwrap_or(""),
+            ];
+            push_custom_fields(&mut parts, &e.custom_fields);
+            EntrySummaryData {
+                id: e.meta.id.clone(),
+                entry_type: String::from("Passkey"),
+                title: if !e.rp_id.is_empty() {
+                    e.rp_id.clone()
+                } else if !e.user_name.is_empty() {
+                    e.user_name.clone()
+                } else {
+                    e.meta.id.clone()
+                },
                 folder: e.meta.folder.clone(),
                 search_blob: make_blob(&parts),
             }
@@ -990,6 +1015,7 @@ pub fn session_rename_folder(old_name: String, new_name: String) -> Result<(), S
                 VaultEntry::Card(e) => &mut e.meta.folder,
                 VaultEntry::File(e) => &mut e.meta.folder,
                 VaultEntry::Custom(e) => &mut e.meta.folder,
+                VaultEntry::Passkey(e) => &mut e.meta.folder,
             };
             if *folder == old_name {
                 *folder = new_name.clone();
@@ -1036,6 +1062,7 @@ pub fn session_delete_folder(name: String, reassign_to: Option<String>) -> Resul
                 VaultEntry::Card(e) => &mut e.meta.folder,
                 VaultEntry::File(e) => &mut e.meta.folder,
                 VaultEntry::Custom(e) => &mut e.meta.folder,
+                VaultEntry::Passkey(e) => &mut e.meta.folder,
             };
             if *folder == name {
                 *folder = target.clone();
@@ -1074,6 +1101,7 @@ pub fn session_assign_folder_to_entries(ids: &[String], folder: String) -> Resul
                 VaultEntry::Card(e) => (&e.meta.id, &mut e.meta.folder),
                 VaultEntry::File(e) => (&e.meta.id, &mut e.meta.folder),
                 VaultEntry::Custom(e) => (&e.meta.id, &mut e.meta.folder),
+                VaultEntry::Passkey(e) => (&e.meta.id, &mut e.meta.folder),
             };
             if ids.contains(id) {
                 *f = folder.clone();
@@ -1279,6 +1307,7 @@ fn entry_folder(entry: &VaultEntry) -> &str {
         VaultEntry::Card(e) => &e.meta.folder,
         VaultEntry::File(e) => &e.meta.folder,
         VaultEntry::Custom(e) => &e.meta.folder,
+        VaultEntry::Passkey(e) => &e.meta.folder,
     }
 }
 
@@ -1306,6 +1335,15 @@ fn entry_display_title(entry: &VaultEntry) -> String {
             .to_string(),
         VaultEntry::File(e) => e.filename.clone(),
         VaultEntry::Custom(e) => e.title.clone(),
+        VaultEntry::Passkey(e) => {
+            if !e.rp_id.is_empty() {
+                e.rp_id.clone()
+            } else if !e.user_name.is_empty() {
+                e.user_name.clone()
+            } else {
+                e.meta.id.clone()
+            }
+        }
     }
 }
 
@@ -1331,6 +1369,7 @@ fn meta_of(e: &VaultEntry) -> &EntryMeta {
         VaultEntry::Card(x) => &x.meta,
         VaultEntry::File(x) => &x.meta,
         VaultEntry::Custom(x) => &x.meta,
+        VaultEntry::Passkey(x) => &x.meta,
     }
 }
 
@@ -1342,6 +1381,7 @@ fn meta_of_mut(e: &mut VaultEntry) -> &mut EntryMeta {
         VaultEntry::Card(x) => &mut x.meta,
         VaultEntry::File(x) => &mut x.meta,
         VaultEntry::Custom(x) => &mut x.meta,
+        VaultEntry::Passkey(x) => &mut x.meta,
     }
 }
 
@@ -8193,6 +8233,10 @@ mod sync_fuzz {
             ],
             VaultEntry::File(_) => &["filename", "data", "notes"],
             VaultEntry::Custom(_) => &["title"],
+            // No granular scalars yet: Passkey pairs ride the whole-entry LWW
+            // fallback in merge_entry_pair. Extending the fuzzer to generate
+            // passkeys forces this whole oracle to take a position first.
+            VaultEntry::Passkey(_) => &[],
         }
     }
 
@@ -8247,6 +8291,7 @@ mod sync_fuzz {
                 "title" => x.title.clone(),
                 _ => unreachable!(),
             },
+            VaultEntry::Passkey(_) => unreachable!("Passkey has no granular scalars"),
         }
     }
 
@@ -8303,11 +8348,12 @@ mod sync_fuzz {
                 "title" => x.title = s,
                 _ => unreachable!(),
             },
+            VaultEntry::Passkey(_) => unreachable!("Passkey has no granular scalars"),
         }
     }
 
     fn has_attachments(e: &VaultEntry) -> bool {
-        !matches!(e, VaultEntry::File(_))
+        !matches!(e, VaultEntry::File(_) | VaultEntry::Passkey(_))
     }
     fn att_vec(e: &VaultEntry) -> &[EntryAttachment] {
         match e {
@@ -8317,6 +8363,7 @@ mod sync_fuzz {
             VaultEntry::Card(x) => &x.attachments,
             VaultEntry::Custom(x) => &x.attachments,
             VaultEntry::File(_) => &[],
+            VaultEntry::Passkey(_) => &[],
         }
     }
     fn att_vec_mut(e: &mut VaultEntry) -> &mut Vec<EntryAttachment> {
@@ -8327,6 +8374,7 @@ mod sync_fuzz {
             VaultEntry::Card(x) => &mut x.attachments,
             VaultEntry::Custom(x) => &mut x.attachments,
             VaultEntry::File(_) => unreachable!(),
+            VaultEntry::Passkey(_) => unreachable!(),
         }
     }
     fn attachment_name(e: &VaultEntry, uuid: &str) -> Option<String> {
@@ -8362,6 +8410,7 @@ mod sync_fuzz {
             VaultEntry::Identity(x) => collect(&x.custom_fields, &mut m),
             VaultEntry::Card(x) => collect(&x.custom_fields, &mut m),
             VaultEntry::File(x) => collect(&x.custom_fields, &mut m),
+            VaultEntry::Passkey(x) => collect(&x.custom_fields, &mut m),
         }
         m
     }
@@ -8377,6 +8426,7 @@ mod sync_fuzz {
             VaultEntry::Identity(x) => &mut x.custom_fields,
             VaultEntry::Card(x) => &mut x.custom_fields,
             VaultEntry::File(x) => &mut x.custom_fields,
+            VaultEntry::Passkey(x) => &mut x.custom_fields,
             VaultEntry::Custom(_) => unreachable!(),
         }
     }

@@ -176,6 +176,7 @@ fn migrate_folders(mut entries: Vec<VaultEntry>) -> Vec<VaultEntry> {
             VaultEntry::Card(e) => &mut e.meta.folder,
             VaultEntry::File(e) => &mut e.meta.folder,
             VaultEntry::Custom(e) => &mut e.meta.folder,
+            VaultEntry::Passkey(e) => &mut e.meta.folder,
         };
         if folder == "Personal" {
             *folder = String::new();

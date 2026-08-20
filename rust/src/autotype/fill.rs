@@ -70,11 +70,14 @@ fn login_sequence(entry: &VaultEntry) -> Result<Zeroizing<Vec<u32>>, FillError> 
             let user = login_identifier(&e.username, e.email.as_deref());
             Ok(Zeroizing::new(build_sequence(user, &e.password)))
         }
+        // Passkeys sign WebAuthn challenges; they have no text to type into a
+        // form, so auto-type refuses them like every other non-Login type.
         VaultEntry::Note(_)
         | VaultEntry::Identity(_)
         | VaultEntry::Card(_)
         | VaultEntry::File(_)
-        | VaultEntry::Custom(_) => Err(FillError::NotLogin),
+        | VaultEntry::Custom(_)
+        | VaultEntry::Passkey(_) => Err(FillError::NotLogin),
     }
 }
 
@@ -178,6 +181,7 @@ mod tests {
 
     use crate::vault::entry::{
         CardEntry, CustomEntry, EntryMeta, FileEntry, IdentityEntry, LoginEntry, NoteEntry,
+        PasskeyEntry,
     };
 
     fn sample_login(username: &str, password: &str) -> VaultEntry {
@@ -258,6 +262,22 @@ mod tests {
                     title: String::new(),
                     fields: Default::default(),
                     attachments: vec![],
+                }),
+            ),
+            (
+                "Passkey",
+                VaultEntry::Passkey(PasskeyEntry {
+                    meta: EntryMeta::default(),
+                    rp_id: String::new(),
+                    user_name: String::new(),
+                    user_display_name: String::new(),
+                    user_handle: vec![],
+                    credential_id: vec![],
+                    private_key: vec![],
+                    public_key_cose: vec![],
+                    algorithm: -7,
+                    notes: None,
+                    custom_fields: vec![],
                 }),
             ),
         ]
