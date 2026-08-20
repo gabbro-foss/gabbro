@@ -57,7 +57,7 @@ gabbro/
 ├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + crash-safety (kill mid-write) + frozen golden fixtures (FIXTURES.md)
 ├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, AppPaths (paths channel), GabbroPicker (picker channel), BiometricHelper + BiometricStore (per-vault; + Robolectric tests)
 ├── linux/packaging/      # Desktop integration: render_icons.sh (icon tree); aur/ (AUR gabbro-bin PKGBUILD; .SRCINFO is generated in the AUR clone), deb/ (build-deb.sh -> binary .deb)
-├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, VAULT_SYNC, AUTOTYPE_AND_AUTOFILL, AI_*; decisions/ (ADRs); artefacts/
+├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, VAULT_SYNC, AUTOTYPE_AND_AUTOFILL, PASSKEY_INVESTIGATION, AI_*; decisions/ (ADRs); artefacts/
 ├── test/  integration_test/          # Flutter widget/unit + Linux real-FFI suites (dart test)
 ├── test_data/            # Sample import files + migration_vaults/ (refusal corpus at floor v11, one vault per VERSION + MIGRATION_TESTS.md + test_matrix.md)
 ├── assets/               # fonts, images, help/ (public_suffix_list.dat is an Android asset)
@@ -128,7 +128,23 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-
+- **Passkey provider**: store website passkeys (WebAuthn discoverable credentials) in
+  the vault so they sync/back up. Distinct from the YubiKey (which unlocks the app);
+  tradeoff — website private keys would live in the vault, not in hardware. Upside —
+  no slot cap (a YubiKey holds 25–100 passkeys).
+  Investigation phase, on branch `passkey_investigation_and_implementation`:
+  - Conflicts with ADR-008 (no browser extension — stands, Linux must be extension-free)
+    and ADR-009 (no software passkey storage — under reconsideration). Both ADRs stay
+    untouched until the investigation concludes.
+  - Plan with sources: `docs/PASSKEY_INVESTIGATION.md` (Android Credential Manager
+    provider; Linux virtual FIDO2 authenticator over uhid, no extension).
+  - Approved sequence:
+    - [ ] Amend ADR-009 (supersede the ban; old decision stays summarised)
+    - [ ] Rust core: `Passkey` entry type, new vault VERSION (corpus vault +
+          fixtures), ES256/COSE/authenticatorData/signing ops
+    - [ ] Android: `CredentialProviderService` + unlock/consent activities +
+          caller validation (asset links, privileged-browser allowlist)
+    - [ ] Linux: uhid virtual FIDO2 daemon (CTAPHID framing + CTAP2 commands)
 
 ---
 
@@ -156,9 +172,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 
 ### V2+ / Defer
 - **Linux biometric unlock** (laptop fingerprint readers, e.g. libfido2/PAM or `fprintd`). Fits the current per-device model unchanged: Linux would just get its own local per-vault secret store; the vault file carries no biometric state, so nothing else changes.
-- **Passkey provider**: store website passkeys (WebAuthn discoverable credentials) in
-  the vault so they sync/back up. Distinct from the YubiKey (which unlocks the app);
-  tradeoff — website private keys would live in the vault, not in hardware.
 - **Windows support.**
 - **Yubico partnership.**
 - **Donation/sustainability model**: GitHub Sponsors is live; Monero possible later (a large, dedicated effort). Liberapay ruled out (2026-07-22 — Stripe forces business-type onboarding for individuals and has suspended Liberapay-linked accounts; no PayPal). Don't re-propose Liberapay.
