@@ -163,7 +163,11 @@ resolved but never applied — inert, emits no warning.
       - [x] D14 bridge DTO both directions + `create_entry` refusal + update
             preserves key material (caught a missing update arm)
       - [x] D15 `entry_to_summary` renders a Passkey
-      - [x] D16 Passkey merge = whole-entry newest-wins, pinned
+      - [ ] D16 REOPENED (maintainer ruling 2026-08-20): passkey sync must use
+            the standard granular machinery, zero irregularities — per-field
+            merge + conflicts + history for text fields; key material rides the
+            File-`data` pattern (one atomic base64 field, masked in UI); extend
+            the fuzzer oracle; replace the whole-entry-LWW pin red-first
       - [x] B9 compat gate: v12 goldens with passkey canary, 13/13 green;
             maintainer adds the manual `test_data/migration_vaults/` v12 vault
             post-release
