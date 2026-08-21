@@ -59,6 +59,17 @@ pub fn fido_list_devices() -> Result<Vec<String>, String> {
             if info.is_null() {
                 continue;
             }
+            // Never list our own virtual authenticator (the Linux passkey
+            // daemon): offering Gabbro to itself would park the unlock tap
+            // on a device that never answers.
+            #[cfg(target_os = "linux")]
+            {
+                let vendor = fido_dev_info_vendor(info) as u16 as u32;
+                let product = fido_dev_info_product(info) as u16 as u32;
+                if vendor == crate::uhid::VENDOR_ID && product == crate::uhid::PRODUCT_ID {
+                    continue;
+                }
+            }
             let path_ptr = fido_dev_info_path(info);
             if path_ptr.is_null() {
                 continue;
@@ -192,6 +203,39 @@ pub async fn fido_get_hmac_secret_any(
 mod tests {
     use super::*;
     use serial_test::serial;
+
+    #[test]
+    #[cfg(target_os = "linux")]
+    #[serial]
+    #[ignore = "creates a real uhid device; needs the dev udev rule"]
+    fn fido_list_devices_filters_our_virtual_authenticator() {
+        // With the virtual key up, the unlock scan must not list it —
+        // otherwise Gabbro offers ITSELF as an unlock key and the tap waits
+        // on a device that never answers.
+        use std::io::Write;
+        use std::os::unix::fs::OpenOptionsExt;
+        let mut dev = std::fs::OpenOptions::new()
+            .read(true)
+            .write(true)
+            .custom_flags(libc::O_NONBLOCK)
+            .open("/dev/uhid")
+            .expect("open /dev/uhid (is the dev udev rule in place?)");
+        dev.write_all(&crate::uhid::create2_event())
+            .expect("create device");
+        let ours = crate::uhid::test_wait_for("our hidraw node", crate::uhid::test_find_our_hidraw);
+        // Wait until the node is accessible (fido_id/uaccess applied), so the
+        // scan below is deterministic — then scan exactly once.
+        let _ = crate::uhid::test_wait_for("hidraw to become accessible", || {
+            std::fs::OpenOptions::new().read(true).open(&ours).ok()
+        });
+        let ours = ours.to_string_lossy().to_string();
+
+        let listed = fido_list_devices().expect("fido_list_devices");
+        assert!(
+            !listed.contains(&ours),
+            "Gabbro must not offer itself as an unlock key: {listed:?}"
+        );
+    }
 
     #[test]
     #[cfg(not(target_os = "android"))]

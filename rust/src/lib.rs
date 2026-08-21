@@ -11,4 +11,6 @@ pub mod fido;
 mod frb_generated;
 mod hardening;
 pub mod import;
+#[cfg(target_os = "linux")]
+pub mod uhid;
 pub mod vault;
