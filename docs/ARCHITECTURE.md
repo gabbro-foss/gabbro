@@ -227,41 +227,31 @@ resolved but never applied — inert, emits no warning.
         - Group D netted portion COMPLETE (20a, 20b-i, 20b-ii, 21a). The
           fd/thread glue below moved to group E (B): written right before it
           is hardware-tested, never straddling a commit unverified.
-      - TDD list E approved (hardware matrix; release build, mock vault,
-        matrix lands in `.scratchpad` when reached). Glue folded in from D,
-        written then immediately matrix-verified:
-        - [~] G1 (was 20b-iii). `passkey_daemon.rs` runtime (fd + Ctaphid +
-              pump thread) + `api::passkey_daemon_bridge` start/respond/stop
-              (StreamSink) + Dart `UhidPasskeyDevice`. WRITTEN, compiles +
-              clippy + codegen + analyze clean; matrix-verified in 23-28.
-        - [~] G2 (was 21b). KEEPALIVE every ~100ms in the pump thread while a
-              request is in flight. WRITTEN (part of G1); matrix-verified.
-        - [x] G3a. consent dialog + chooser (`widgets/passkey_consent_dialog`,
-              showPasskeyConsent); 3 widget tests green, in the screen catalog
-              (a11y + overflow sweeps cover it, no new l10n key — chooser
-              reuses passkeySignInPrompt)
-        - [~] G3b (was 22). main.dart wiring: _startPasskeyDaemon() in main()
-              (Linux, test-safe like autotype), consent via top-level
-              rootNavigatorKey; quit closes the fd -> kernel unplugs. WRITTEN,
-              analyze clean, 277 GabbroApp-pumping tests unregressed by the
-              navigator-key promotion; matrix-verified in 23-28.
-        - BLOCKED 2026-08-21: release build crashes at RustLib.init with a
-          content-hash mismatch (Dart 1820626220 vs Rust 966061856). On disk
-          the ONLY frb_generated.rs = 1820626220 (matches Dart), yet the built
-          .so runs 966061856 and `nm -D` shows ZERO frbgen/wire__ symbols in
-          it. Cleared cargokit_build + bundle .so and full-rebuilt: SAME hash.
-          So the compiled crate is not the current frb_generated.rs (or wire
-          layer excluded). NOT yet root-caused. Next: confirm nm sees wire
-          symbols in a KNOWN-GOOD older .so (rule out nm false signal); check
-          cargo fingerprint / a second target; try `flutter clean` full. Until
-          fixed, the daemon cannot run and 23-28 cannot start.
-        - [ ] 23. step-0 probe: browser enumerates the virtual key at all
-        - [ ] 24. Chromium + webauthn.io: create -> consent -> entry stored
-        - [ ] 25. Chromium + webauthn.io: sign-in accepted
-        - [ ] 26. Firefox: one create or sign-in
-        - [ ] 27. locked: sign-in refused, no consent, no unlock prompt
-        - [ ] 28. no self-damage: YubiKey unlock, passphrase unlock,
-              auto-type fill — all unchanged with the device up
+      - TDD list E (hardware matrix in `.scratchpad`; release build, mock
+        vault). Glue G1-G3 committed (454f8205); matrix state 2026-08-21:
+        - [x] Content-hash crash: stale dev lib — FRB's Linux loader prefers
+              `<CWD>/rust/target/release/lib*.so` over the bundle; rebuild
+              with `cargo build --release --lib`, verify via
+              `frb_get_rust_content_hash` (dlopen), never `nm` (FRB exports
+              only frb_* dispatchers, no per-fn wire symbols).
+        - [x] Pump bug (matrix find: device enumerated, Brave offered only
+              Cancel): /dev/uhid writes must be INPUT2-wrapped and hidraw's
+              report-number byte stripped. Fixed red-first; pinned by ignored
+              test `passkey_daemon::tests::real_uhid_pump_answers_init_via_hidraw`.
+              UNCOMMITTED at session end — commit first next session.
+        - [x] 23-25 verified in Brave: create + consent + entry stored,
+              KEEPALIVE (5 s wait ok), sign-in; allowList narrowing correct
+              (username filled -> only that account offered).
+        - [ ] 26 Firefox: one create or sign-in (maintainer installs
+              Firefox for this; Chrome/Chromium stay out).
+        - [ ] FOUND: entry list does not refresh when the daemon stores a
+              passkey — user sees nothing and thinks create failed (entry IS
+              stored; list caught up on later interaction). Red widget test
+              first, then the fix.
+        - [ ] chooser retest: webauthn.io Authenticate with EMPTY username
+              -> consent dialog lists both accounts, tap one signs in.
+        - [ ] 27 locked refusal; 28 no self-damage (YubiKey unlock,
+              passphrase unlock, auto-type — unchanged with device up).
     - [ ] Passkey filter card on the vault list (part of the feature, not an
           afterthought): a11y + l10n (37 locales) considered up-front
     - [ ] hardware + full gate green -> merge to master
