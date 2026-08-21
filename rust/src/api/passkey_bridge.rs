@@ -105,10 +105,26 @@ pub use crate::crypto::webauthn::attestation_object;
 /// and return the public parts for the response. Fails when the vault is
 /// locked — the caller shows the unlock flow and retries.
 pub fn register_passkey(request_json: &str) -> Result<RegistrationParts, String> {
+    let req = parse_creation_request(request_json)?;
+    register_passkey_parts(
+        &req.rp_id,
+        req.user_name,
+        req.user_display_name,
+        req.user_handle,
+    )
+}
+
+/// Core registration shared by the Android (W3C JSON) and Linux (CTAP2 CBOR)
+/// paths: mint the key, store the vault entry, return the public parts.
+pub fn register_passkey_parts(
+    rp_id: &str,
+    user_name: String,
+    user_display_name: String,
+    user_handle: Vec<u8>,
+) -> Result<RegistrationParts, String> {
     use crate::crypto::webauthn;
     use crate::vault::entry::{EntryMeta, PasskeyEntry, VaultEntry};
 
-    let req = parse_creation_request(request_json)?;
     let kp = webauthn::generate_es256();
     let credential_id = webauthn::new_credential_id();
     let private_key = kp.private_key.clone();
@@ -124,10 +140,10 @@ pub fn register_passkey(request_json: &str) -> Result<RegistrationParts, String>
             updated_at: now,
             folder: String::new(),
         },
-        rp_id: req.rp_id.clone(),
-        user_name: req.user_name,
-        user_display_name: req.user_display_name,
-        user_handle: req.user_handle,
+        rp_id: rp_id.to_string(),
+        user_name,
+        user_display_name,
+        user_handle,
         credential_id: credential_id.clone(),
         private_key,
         public_key_cose: public_key_cose.clone(),
@@ -138,7 +154,7 @@ pub fn register_passkey(request_json: &str) -> Result<RegistrationParts, String>
     crate::vault::session::session_create_entry(entry)?;
 
     let auth_data =
-        webauthn::registration_authenticator_data(&req.rp_id, &credential_id, &public_key_cose);
+        webauthn::registration_authenticator_data(rp_id, &credential_id, &public_key_cose);
     Ok(RegistrationParts {
         credential_id,
         auth_data,

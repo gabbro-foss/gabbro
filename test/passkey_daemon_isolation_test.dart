@@ -10,11 +10,11 @@ import 'package:flutter_test/flutter_test.dart';
 // Daemon sources are the ones the plan names: uhid transport + CTAPHID
 // framing. The sweeps arm themselves the moment such a file or module lands.
 
-final RegExp _daemonPattern = RegExp('uhid|ctaphid', caseSensitive: false);
+final RegExp _daemonPattern = RegExp('uhid|ctaphid|ctap2', caseSensitive: false);
 
 /// A `mod` declaration whose name marks it as daemon code.
 final RegExp _daemonMod = RegExp(
-  r'^\s*(?:pub\s+)?mod\s+\w*(?:uhid|ctaphid)\w*',
+  r'^\s*(?:pub\s+)?mod\s+\w*(?:uhid|ctaphid|ctap2)\w*',
   caseSensitive: false,
 );
 

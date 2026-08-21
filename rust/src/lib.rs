@@ -3,6 +3,8 @@ pub mod api;
 pub mod autotype;
 mod crypto;
 #[cfg(target_os = "linux")]
+pub mod ctap2;
+#[cfg(target_os = "linux")]
 pub mod ctaphid;
 #[cfg(not(target_os = "android"))]
 pub mod fido;
