@@ -38,7 +38,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 966061856;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1875363821;
 
 // Section: executor
 
@@ -2398,6 +2398,112 @@ fn wire__crate__api__passkey_bridge__parse_creation_request_impl(
         },
     )
 }
+fn wire__crate__api__passkey_daemon_bridge__passkey_denied_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "passkey_denied",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, ()>((move || {
+                    let output_ok =
+                        Result::<_, ()>::Ok(crate::api::passkey_daemon_bridge::passkey_denied())?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__passkey_daemon_bridge__passkey_perform_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "passkey_perform",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_payload = <Vec<u8>>::sse_decode(&mut deserializer);
+            let api_account_index = <usize>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, ()>((move || {
+                    let output_ok =
+                        Result::<_, ()>::Ok(crate::api::passkey_daemon_bridge::passkey_perform(
+                            api_payload,
+                            api_account_index,
+                        ))?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__passkey_daemon_bridge__passkey_plan_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "passkey_plan",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_payload = <Vec<u8>>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, ()>((move || {
+                    let output_ok = Result::<_, ()>::Ok(
+                        crate::api::passkey_daemon_bridge::passkey_plan(api_payload),
+                    )?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
 fn wire__crate__api__passkey_bridge__passkeys_for_request_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -2529,6 +2635,47 @@ fn wire__crate__api__passkey_bridge__register_passkey_impl(
                 transform_result_sse::<_, String>((move || {
                     let output_ok =
                         crate::api::passkey_bridge::register_passkey(&api_request_json)?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__passkey_bridge__register_passkey_parts_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "register_passkey_parts",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_rp_id = <String>::sse_decode(&mut deserializer);
+            let api_user_name = <String>::sse_decode(&mut deserializer);
+            let api_user_display_name = <String>::sse_decode(&mut deserializer);
+            let api_user_handle = <Vec<u8>>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::api::passkey_bridge::register_passkey_parts(
+                        &api_rp_id,
+                        api_user_name,
+                        api_user_display_name,
+                        api_user_handle,
+                    )?;
                     Ok(output_ok)
                 })())
             }
@@ -4219,6 +4366,17 @@ impl SseDecode for Option<u32> {
     }
 }
 
+impl SseDecode for Option<Vec<u8>> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<Vec<u8>>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
 impl SseDecode for crate::api::vault::PasskeyEntryData {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -4262,6 +4420,22 @@ impl SseDecode for crate::api::passkey_bridge::PasskeyMatchData {
             user_name: var_userName,
             user_display_name: var_userDisplayName,
             credential_id: var_credentialId,
+        };
+    }
+}
+
+impl SseDecode for crate::api::passkey_daemon_bridge::PasskeyPlan {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_immediateResponse = <Option<Vec<u8>>>::sse_decode(deserializer);
+        let mut var_isCreate = <bool>::sse_decode(deserializer);
+        let mut var_rpId = <String>::sse_decode(deserializer);
+        let mut var_accounts = <Vec<String>>::sse_decode(deserializer);
+        return crate::api::passkey_daemon_bridge::PasskeyPlan {
+            immediate_response: var_immediateResponse,
+            is_create: var_isCreate,
+            rp_id: var_rpId,
+            accounts: var_accounts,
         };
     }
 }
@@ -4786,94 +4960,118 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        64 => wire__crate__api__passkey_bridge__passkeys_for_request_impl(
+        64 => wire__crate__api__passkey_daemon_bridge__passkey_denied_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        65 => wire__crate__api__passphrase_generator__passphrase_entropy_bits_impl(
+        65 => wire__crate__api__passkey_daemon_bridge__passkey_perform_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        67 => wire__crate__api__passkey_bridge__register_passkey_impl(
+        66 => wire__crate__api__passkey_daemon_bridge__passkey_plan_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        68 => wire__crate__api__passkey_bridge__registration_response_json_impl(
+        67 => wire__crate__api__passkey_bridge__passkeys_for_request_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        69 => wire__crate__api__vault_bridge__remove_attachment_impl(
+        68 => wire__crate__api__passphrase_generator__passphrase_entropy_bits_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        70 => {
+        70 => wire__crate__api__passkey_bridge__register_passkey_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        71 => wire__crate__api__passkey_bridge__register_passkey_parts_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        72 => wire__crate__api__passkey_bridge__registration_response_json_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        73 => wire__crate__api__vault_bridge__remove_attachment_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        74 => {
             wire__crate__api__vault_bridge__remove_yubikey_impl(port, ptr, rust_vec_len, data_len)
         }
-        71 => wire__crate__api__vault_bridge__rename_folder_impl(port, ptr, rust_vec_len, data_len),
-        72 => {
+        75 => wire__crate__api__vault_bridge__rename_folder_impl(port, ptr, rust_vec_len, data_len),
+        76 => {
             wire__crate__api__vault_bridge__restore_history_impl(port, ptr, rust_vec_len, data_len)
         }
-        73 => wire__crate__api__vault_bridge__restore_vault_backup_impl(
+        77 => wire__crate__api__vault_bridge__restore_vault_backup_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        74 => wire__crate__api__vault_bridge__restore_vault_from_file_impl(
+        78 => wire__crate__api__vault_bridge__restore_vault_from_file_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        75 => {
+        79 => {
             wire__crate__api__simple__set_process_dumpable_impl(port, ptr, rust_vec_len, data_len)
         }
-        76 => {
+        80 => {
             wire__crate__api__vault_bridge__set_vault_alias_impl(port, ptr, rust_vec_len, data_len)
         }
-        77 => wire__crate__api__vault_bridge__set_yubikey_alias_impl(
+        81 => wire__crate__api__vault_bridge__set_yubikey_alias_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        78 => wire__crate__api__passkey_bridge__sign_passkey_assertion_impl(
+        82 => wire__crate__api__passkey_bridge__sign_passkey_assertion_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        80 => wire__crate__api__vault_bridge__unlock_vault_impl(port, ptr, rust_vec_len, data_len),
-        81 => wire__crate__api__vault_bridge__unlock_vault_with_yubikey_impl(
+        84 => wire__crate__api__vault_bridge__unlock_vault_impl(port, ptr, rust_vec_len, data_len),
+        85 => wire__crate__api__vault_bridge__unlock_vault_with_yubikey_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        82 => wire__crate__api__vault_bridge__update_entry_impl(port, ptr, rust_vec_len, data_len),
-        83 => wire__crate__api__vault_bridge__vault_backup_usable_impl(
+        86 => wire__crate__api__vault_bridge__update_entry_impl(port, ptr, rust_vec_len, data_len),
+        87 => wire__crate__api__vault_bridge__vault_backup_usable_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        84 => wire__crate__api__vault_bridge__vault_format_too_new_impl(
+        88 => wire__crate__api__vault_bridge__vault_format_too_new_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        85 => wire__crate__api__vault_bridge__vault_format_too_old_impl(
+        89 => wire__crate__api__vault_bridge__vault_format_too_old_impl(
             port,
             ptr,
             rust_vec_len,
@@ -4913,8 +5111,8 @@ fn pde_ffi_dispatcher_sync_impl(
             wire__crate__api__vault_bridge__list_yubikey_aliases_impl(ptr, rust_vec_len, data_len)
         }
         56 => wire__crate__api__vault_bridge__lock_vault_impl(ptr, rust_vec_len, data_len),
-        66 => wire__crate__api__vault_bridge__read_vault_header_impl(ptr, rust_vec_len, data_len),
-        79 => wire__crate__api__import__sniff_csv_file_impl(ptr, rust_vec_len, data_len),
+        69 => wire__crate__api__vault_bridge__read_vault_header_impl(ptr, rust_vec_len, data_len),
+        83 => wire__crate__api__import__sniff_csv_file_impl(ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -5714,6 +5912,29 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::passkey_bridge::PasskeyMatchD
     for crate::api::passkey_bridge::PasskeyMatchData
 {
     fn into_into_dart(self) -> crate::api::passkey_bridge::PasskeyMatchData {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::passkey_daemon_bridge::PasskeyPlan {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.immediate_response.into_into_dart().into_dart(),
+            self.is_create.into_into_dart().into_dart(),
+            self.rp_id.into_into_dart().into_dart(),
+            self.accounts.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::passkey_daemon_bridge::PasskeyPlan
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::passkey_daemon_bridge::PasskeyPlan>
+    for crate::api::passkey_daemon_bridge::PasskeyPlan
+{
+    fn into_into_dart(self) -> crate::api::passkey_daemon_bridge::PasskeyPlan {
         self
     }
 }
@@ -6787,6 +7008,16 @@ impl SseEncode for Option<u32> {
     }
 }
 
+impl SseEncode for Option<Vec<u8>> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <Vec<u8>>::sse_encode(value, serializer);
+        }
+    }
+}
+
 impl SseEncode for crate::api::vault::PasskeyEntryData {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -6811,6 +7042,16 @@ impl SseEncode for crate::api::passkey_bridge::PasskeyMatchData {
         <String>::sse_encode(self.user_name, serializer);
         <String>::sse_encode(self.user_display_name, serializer);
         <Vec<u8>>::sse_encode(self.credential_id, serializer);
+    }
+}
+
+impl SseEncode for crate::api::passkey_daemon_bridge::PasskeyPlan {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Option<Vec<u8>>>::sse_encode(self.immediate_response, serializer);
+        <bool>::sse_encode(self.is_create, serializer);
+        <String>::sse_encode(self.rp_id, serializer);
+        <Vec<String>>::sse_encode(self.accounts, serializer);
     }
 }
 

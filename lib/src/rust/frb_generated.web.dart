@@ -11,6 +11,7 @@ import 'api/entropy.dart';
 import 'api/fido_bridge.dart';
 import 'api/import.dart';
 import 'api/passkey_bridge.dart';
+import 'api/passkey_daemon_bridge.dart';
 import 'api/passphrase_generator.dart';
 import 'api/password_generator.dart';
 import 'api/simple.dart';
@@ -277,10 +278,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   int? dco_decode_opt_box_autoadd_u_32(dynamic raw);
 
   @protected
+  Uint8List? dco_decode_opt_list_prim_u_8_strict(dynamic raw);
+
+  @protected
   PasskeyEntryData dco_decode_passkey_entry_data(dynamic raw);
 
   @protected
   PasskeyMatchData dco_decode_passkey_match_data(dynamic raw);
+
+  @protected
+  PasskeyPlan dco_decode_passkey_plan(dynamic raw);
 
   @protected
   PassphraseConfig dco_decode_passphrase_config(dynamic raw);
@@ -683,10 +690,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   int? sse_decode_opt_box_autoadd_u_32(SseDeserializer deserializer);
 
   @protected
+  Uint8List? sse_decode_opt_list_prim_u_8_strict(SseDeserializer deserializer);
+
+  @protected
   PasskeyEntryData sse_decode_passkey_entry_data(SseDeserializer deserializer);
 
   @protected
   PasskeyMatchData sse_decode_passkey_match_data(SseDeserializer deserializer);
+
+  @protected
+  PasskeyPlan sse_decode_passkey_plan(SseDeserializer deserializer);
 
   @protected
   PassphraseConfig sse_decode_passphrase_config(SseDeserializer deserializer);
@@ -1192,6 +1205,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_opt_box_autoadd_u_32(int? self, SseSerializer serializer);
 
   @protected
+  void sse_encode_opt_list_prim_u_8_strict(
+    Uint8List? self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_passkey_entry_data(
     PasskeyEntryData self,
     SseSerializer serializer,
@@ -1202,6 +1221,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     PasskeyMatchData self,
     SseSerializer serializer,
   );
+
+  @protected
+  void sse_encode_passkey_plan(PasskeyPlan self, SseSerializer serializer);
 
   @protected
   void sse_encode_passphrase_config(

@@ -6,7 +6,7 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `b64url_encode`, `b64url`
+// These functions are ignored because they are not marked as `pub`: `b64url_encode`, `b64url`, `placeholder_client_data`, `spki_from_cose`
 // These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `RawCreationOptions`, `RawDescriptor`, `RawParam`, `RawRequestOptions`, `RawRp`, `RawUser`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `fmt`, `fmt`, `fmt`, `fmt`
 
@@ -26,6 +26,20 @@ Future<RegistrationParts> registerPasskey({required String requestJson}) =>
     RustLib.instance.api.crateApiPasskeyBridgeRegisterPasskey(
       requestJson: requestJson,
     );
+
+/// Core registration shared by the Android (W3C JSON) and Linux (CTAP2 CBOR)
+/// paths: mint the key, store the vault entry, return the public parts.
+Future<RegistrationParts> registerPasskeyParts({
+  required String rpId,
+  required String userName,
+  required String userDisplayName,
+  required List<int> userHandle,
+}) => RustLib.instance.api.crateApiPasskeyBridgeRegisterPasskeyParts(
+  rpId: rpId,
+  userName: userName,
+  userDisplayName: userDisplayName,
+  userHandle: userHandle,
+);
 
 /// Parse a W3C `PublicKeyCredentialRequestOptions` JSON string. A missing rpId
 /// is refused: without it there is nothing safe to match credentials against.

@@ -32,37 +32,248 @@ pub trait Consent {
     fn choose_account(&self, rp_id: &str, user_names: &[String]) -> Option<usize>;
 }
 
-/// Handle one CTAP2 request; returns the response ready for CTAPHID framing.
-pub fn handle_request(payload: &[u8], consent: &dyn Consent) -> Vec<u8> {
+/// What the daemon should do with a request before any signing. Either ask
+/// the user (Dart shows the consent screen) or send these bytes straight back
+/// (locked vault, no match, malformed — no user choice applies).
+pub enum RequestPlan {
+    Ask {
+        is_create: bool,
+        rp_id: String,
+        accounts: Vec<String>,
+    },
+    Respond(Vec<u8>),
+}
+
+/// First half of the Dart-driven seam: parse and locate accounts, no crypto.
+/// Ask when a user choice applies; Respond with the CTAP bytes otherwise
+/// (locked, malformed, unsupported algorithm, no matching credential).
+pub fn describe_request(payload: &[u8]) -> RequestPlan {
     match payload.first() {
-        Some(&CMD_GET_INFO) => get_info(),
-        Some(&CMD_MAKE_CREDENTIAL) => make_credential(&payload[1..], consent),
-        Some(&CMD_GET_ASSERTION) => get_assertion(&payload[1..], consent),
+        // getInfo carries no user choice — answer straight away.
+        Some(&CMD_GET_INFO) => RequestPlan::Respond(get_info()),
+        Some(&CMD_MAKE_CREDENTIAL) => match parse_create(&payload[1..]) {
+            Ok(c) => RequestPlan::Ask {
+                is_create: true,
+                rp_id: c.rp_id,
+                accounts: vec![c.user_name],
+            },
+            Err(bytes) => RequestPlan::Respond(bytes),
+        },
+        Some(&CMD_GET_ASSERTION) => match assertion_matches(&payload[1..]) {
+            Ok((rp_id, matches)) => RequestPlan::Ask {
+                is_create: false,
+                rp_id,
+                accounts: matches.iter().map(|e| e.user_name.clone()).collect(),
+            },
+            Err(bytes) => RequestPlan::Respond(bytes),
+        },
+        _ => RequestPlan::Respond(vec![CTAP1_ERR_INVALID_COMMAND]),
+    }
+}
+
+/// Second half: perform a user-approved request. `account_index` selects among
+/// the accounts `describe_request` listed (ignored for a create). Re-parses
+/// from the same payload, so describe and perform never disagree.
+pub fn perform_approved(payload: &[u8], account_index: usize) -> Vec<u8> {
+    match payload.first() {
+        Some(&CMD_MAKE_CREDENTIAL) => match parse_create(&payload[1..]) {
+            Ok(c) => perform_create(c),
+            Err(bytes) => bytes,
+        },
+        Some(&CMD_GET_ASSERTION) => match assertion_matches(&payload[1..]) {
+            Ok((_, mut matches)) if account_index < matches.len() => {
+                perform_assert(matches.swap_remove(account_index), &c_hash(&payload[1..]))
+            }
+            Ok(_) => vec![CTAP2_ERR_NO_CREDENTIALS],
+            Err(bytes) => bytes,
+        },
         _ => vec![CTAP1_ERR_INVALID_COMMAND],
     }
 }
 
-/// authenticatorGetAssertion: consent, then sign with the stored key via the
-/// same core the Android provider uses. Exact rp_id match only.
-fn get_assertion(body: &[u8], consent: &dyn Consent) -> Vec<u8> {
-    // Locked vault: flat refusal before anything else (no unlock flow).
+/// The response for a user who cancelled at the consent screen.
+pub fn denied_response() -> Vec<u8> {
+    vec![CTAP2_ERR_OPERATION_DENIED]
+}
+
+/// Handle one CTAP2 request end to end (Rust drives consent via the trait —
+/// used by tests and any in-process caller). getInfo needs no user choice;
+/// everything else goes through the same describe -> consent -> perform seam
+/// the Dart daemon uses.
+pub fn handle_request(payload: &[u8], consent: &dyn Consent) -> Vec<u8> {
+    if payload.first() == Some(&CMD_GET_INFO) {
+        return get_info();
+    }
+    match describe_request(payload) {
+        RequestPlan::Respond(bytes) => bytes,
+        RequestPlan::Ask {
+            is_create,
+            rp_id,
+            accounts,
+        } => {
+            let approved = if is_create {
+                consent.approve_create(&rp_id, &accounts[0]).then_some(0)
+            } else if accounts.len() == 1 {
+                consent.approve_assert(&rp_id, &accounts[0]).then_some(0)
+            } else {
+                consent.choose_account(&rp_id, &accounts)
+            };
+            match approved {
+                Some(i) => perform_approved(payload, i),
+                None => denied_response(),
+            }
+        }
+    }
+}
+
+/// Text field of a CBOR map under a text key.
+fn text_field<'a>(map: &'a [(Value, Value)], key: &str) -> Option<&'a str> {
+    map.iter()
+        .find(|(k, _)| k.as_text() == Some(key))
+        .and_then(|(_, v)| v.as_text())
+}
+
+/// Integer-keyed entry of a CBOR map.
+fn int_key(map: &[(Value, Value)], key: i128) -> Option<&Value> {
+    map.iter()
+        .find(|(k, _)| matches!(k, Value::Integer(i) if i128::from(*i) == key))
+        .map(|(_, v)| v)
+}
+
+/// The fields a makeCredential needs, validated. The exclude-list is left in
+/// the raw request and checked in `perform_create` (after consent).
+struct CreateFields {
+    rp_id: String,
+    user_name: String,
+    display_name: String,
+    user_handle: Vec<u8>,
+    raw: Vec<(Value, Value)>,
+}
+
+/// Parse and validate a makeCredential body. Err carries the CTAP response
+/// bytes to send when no user choice applies (locked, malformed, missing
+/// param, unsupported algorithm).
+fn parse_create(body: &[u8]) -> Result<CreateFields, Vec<u8>> {
     if !crate::vault::session::is_vault_unlocked() {
-        return vec![CTAP2_ERR_OPERATION_DENIED];
+        return Err(vec![CTAP2_ERR_OPERATION_DENIED]);
     }
     let Ok(Value::Map(req)) = ciborium::de::from_reader::<Value, _>(body) else {
-        return vec![CTAP2_ERR_INVALID_CBOR];
+        return Err(vec![CTAP2_ERR_INVALID_CBOR]);
     };
-    let (Some(rp_id), Some(Value::Bytes(hash))) =
-        (int_key(&req, 1).and_then(|v| v.as_text()), int_key(&req, 2))
+    let (Some(Value::Map(rp)), Some(Value::Map(user)), Some(Value::Array(params))) =
+        (int_key(&req, 2), int_key(&req, 3), int_key(&req, 4))
     else {
-        return vec![CTAP2_ERR_MISSING_PARAMETER];
+        return Err(vec![CTAP2_ERR_MISSING_PARAMETER]);
     };
-    let mut matches = match crate::vault::session::session_passkeys_for_rp(rp_id) {
-        Ok(m) => m,
+    let Some(rp_id) = text_field(rp, "id") else {
+        return Err(vec![CTAP2_ERR_MISSING_PARAMETER]);
+    };
+    let (Some(user_name), Some(Value::Bytes(user_handle))) = (
+        text_field(user, "name"),
+        user.iter()
+            .find(|(k, _)| k.as_text() == Some("id"))
+            .map(|(_, v)| v),
+    ) else {
+        return Err(vec![CTAP2_ERR_MISSING_PARAMETER]);
+    };
+    let display_name = text_field(user, "displayName").unwrap_or(user_name);
+    // The site must accept ES256; refusing here beats minting an unusable key.
+    let es256_ok = params.iter().any(|p| {
+        p.as_map().is_some_and(|m| {
+            m.iter().any(|(k, v)| {
+                k.as_text() == Some("alg") && matches!(v, Value::Integer(i) if i128::from(*i) == -7)
+            })
+        })
+    });
+    if !es256_ok {
+        return Err(vec![CTAP2_ERR_UNSUPPORTED_ALGORITHM]);
+    }
+    Ok(CreateFields {
+        rp_id: rp_id.to_string(),
+        user_name: user_name.to_string(),
+        display_name: display_name.to_string(),
+        user_handle: user_handle.clone(),
+        raw: req,
+    })
+}
+
+/// Register an approved credential and build the makeCredential response.
+fn perform_create(c: CreateFields) -> Vec<u8> {
+    // excludeList (key 5): the site refuses a duplicate for this account.
+    // Checked after consent — the user-presence gate the spec demands, so a
+    // background process cannot silently probe which sites the user is on.
+    if let Some(Value::Array(exclude)) = int_key(&c.raw, 5) {
+        let ours = match crate::vault::session::session_passkeys_for_rp(&c.rp_id) {
+            Ok(m) => m,
+            Err(_) => return vec![CTAP2_ERR_OPERATION_DENIED],
+        };
+        let excluded = exclude.iter().any(|d| {
+            d.as_map().is_some_and(|m| {
+                m.iter().any(|(k, v)| {
+                    k.as_text() == Some("id")
+                        && matches!(v, Value::Bytes(b) if ours.iter().any(|e| e.credential_id == *b))
+                })
+            })
+        });
+        if excluded {
+            return vec![CTAP2_ERR_CREDENTIAL_EXCLUDED];
+        }
+    }
+
+    let parts = match crate::api::passkey_bridge::register_passkey_parts(
+        &c.rp_id,
+        c.user_name,
+        c.display_name,
+        c.user_handle,
+    ) {
+        Ok(p) => p,
         Err(_) => return vec![CTAP2_ERR_OPERATION_DENIED],
     };
-    // allowList (key 3): the site names the credentials it will accept —
-    // its choice wins, so the user is never signed into the wrong account.
+    let map = Value::Map(vec![
+        (Value::Integer(1.into()), Value::Text("none".into())),
+        (Value::Integer(2.into()), Value::Bytes(parts.auth_data)),
+        (Value::Integer(3.into()), Value::Map(vec![])),
+    ]);
+    let mut out = vec![CTAP2_OK];
+    ciborium::ser::into_writer(&map, &mut out).expect("in-memory CBOR write cannot fail");
+    out
+}
+
+/// The clientDataHash from a getAssertion body (key 2), or empty if absent.
+fn c_hash(body: &[u8]) -> Vec<u8> {
+    let Ok(Value::Map(req)) = ciborium::de::from_reader::<Value, _>(body) else {
+        return Vec::new();
+    };
+    match int_key(&req, 2) {
+        Some(Value::Bytes(h)) => h.clone(),
+        _ => Vec::new(),
+    }
+}
+
+/// The accounts that answer a getAssertion, after the site's allow-list. Err
+/// carries the CTAP bytes for locked/malformed/no-match (no user choice).
+#[allow(clippy::type_complexity)]
+fn assertion_matches(
+    body: &[u8],
+) -> Result<(String, Vec<crate::vault::entry::PasskeyEntry>), Vec<u8>> {
+    if !crate::vault::session::is_vault_unlocked() {
+        return Err(vec![CTAP2_ERR_OPERATION_DENIED]);
+    }
+    let Ok(Value::Map(req)) = ciborium::de::from_reader::<Value, _>(body) else {
+        return Err(vec![CTAP2_ERR_INVALID_CBOR]);
+    };
+    let Some(rp_id) = int_key(&req, 1).and_then(|v| v.as_text()) else {
+        return Err(vec![CTAP2_ERR_MISSING_PARAMETER]);
+    };
+    if int_key(&req, 2).and_then(|v| v.as_bytes()).is_none() {
+        return Err(vec![CTAP2_ERR_MISSING_PARAMETER]);
+    }
+    let mut matches = match crate::vault::session::session_passkeys_for_rp(rp_id) {
+        Ok(m) => m,
+        Err(_) => return Err(vec![CTAP2_ERR_OPERATION_DENIED]),
+    };
+    // allowList (key 3): the site names the credentials it will accept — its
+    // choice wins, so the user is never signed into the wrong account.
     if let Some(Value::Array(allow)) = int_key(&req, 3) {
         if !allow.is_empty() {
             matches.retain(|e| {
@@ -77,30 +288,18 @@ fn get_assertion(body: &[u8], consent: &dyn Consent) -> Vec<u8> {
             });
         }
     }
-    // One account: yes/no consent. Several: the user picks, like Android's
-    // system picker — never a silent first-match.
-    let pk = match matches.len() {
-        0 => return vec![CTAP2_ERR_NO_CREDENTIALS],
-        1 => {
-            let pk = &matches[0];
-            if !consent.approve_assert(rp_id, &pk.user_name) {
-                return vec![CTAP2_ERR_OPERATION_DENIED];
-            }
-            pk
-        }
-        _ => {
-            let names: Vec<String> = matches.iter().map(|e| e.user_name.clone()).collect();
-            match consent.choose_account(rp_id, &names) {
-                Some(i) if i < matches.len() => &matches[i],
-                _ => return vec![CTAP2_ERR_OPERATION_DENIED],
-            }
-        }
-    };
+    if matches.is_empty() {
+        return Err(vec![CTAP2_ERR_NO_CREDENTIALS]);
+    }
+    Ok((rp_id.to_string(), matches))
+}
+
+/// Sign an approved assertion and build the getAssertion response.
+fn perform_assert(pk: crate::vault::entry::PasskeyEntry, hash: &[u8]) -> Vec<u8> {
     let parts = match crate::api::passkey_bridge::sign_passkey_assertion(&pk.meta.id, hash) {
         Ok(p) => p,
         Err(_) => return vec![CTAP2_ERR_OPERATION_DENIED],
     };
-
     let map = Value::Map(vec![
         (
             Value::Integer(1.into()),
@@ -122,106 +321,6 @@ fn get_assertion(body: &[u8], consent: &dyn Consent) -> Vec<u8> {
                 Value::Bytes(parts.user_handle),
             )]),
         ),
-    ]);
-    let mut out = vec![CTAP2_OK];
-    ciborium::ser::into_writer(&map, &mut out).expect("in-memory CBOR write cannot fail");
-    out
-}
-
-/// Text field of a CBOR map under a text key.
-fn text_field<'a>(map: &'a [(Value, Value)], key: &str) -> Option<&'a str> {
-    map.iter()
-        .find(|(k, _)| k.as_text() == Some(key))
-        .and_then(|(_, v)| v.as_text())
-}
-
-/// Integer-keyed entry of a CBOR map.
-fn int_key(map: &[(Value, Value)], key: i128) -> Option<&Value> {
-    map.iter()
-        .find(|(k, _)| matches!(k, Value::Integer(i) if i128::from(*i) == key))
-        .map(|(_, v)| v)
-}
-
-/// authenticatorMakeCredential: consent, then the same core registration the
-/// Android provider uses; the private key never leaves the vault layer.
-fn make_credential(body: &[u8], consent: &dyn Consent) -> Vec<u8> {
-    // Locked vault: flat refusal before anything else — no unlock flow on
-    // Linux, and no consent screen for an operation that cannot happen.
-    if !crate::vault::session::is_vault_unlocked() {
-        return vec![CTAP2_ERR_OPERATION_DENIED];
-    }
-    let Ok(Value::Map(req)) = ciborium::de::from_reader::<Value, _>(body) else {
-        return vec![CTAP2_ERR_INVALID_CBOR];
-    };
-    let (Some(Value::Map(rp)), Some(Value::Map(user)), Some(Value::Array(params))) =
-        (int_key(&req, 2), int_key(&req, 3), int_key(&req, 4))
-    else {
-        return vec![CTAP2_ERR_MISSING_PARAMETER];
-    };
-    let Some(rp_id) = text_field(rp, "id") else {
-        return vec![CTAP2_ERR_MISSING_PARAMETER];
-    };
-    let (Some(user_name), Some(Value::Bytes(user_handle))) = (
-        text_field(user, "name"),
-        user.iter()
-            .find(|(k, _)| k.as_text() == Some("id"))
-            .map(|(_, v)| v),
-    ) else {
-        return vec![CTAP2_ERR_MISSING_PARAMETER];
-    };
-    let display_name = text_field(user, "displayName").unwrap_or(user_name);
-
-    // The site must accept ES256; refusing here beats minting an unusable key.
-    let es256_ok = params.iter().any(|p| {
-        p.as_map().is_some_and(|m| {
-            m.iter().any(|(k, v)| {
-                k.as_text() == Some("alg") && matches!(v, Value::Integer(i) if i128::from(*i) == -7)
-            })
-        })
-    });
-    if !es256_ok {
-        return vec![CTAP2_ERR_UNSUPPORTED_ALGORITHM];
-    }
-
-    if !consent.approve_create(rp_id, user_name) {
-        return vec![CTAP2_ERR_OPERATION_DENIED];
-    }
-
-    // excludeList (key 5): the site refuses a duplicate for this account.
-    // Checked after consent — the user-presence gate the spec demands, so a
-    // background process cannot silently probe which sites the user is on.
-    if let Some(Value::Array(exclude)) = int_key(&req, 5) {
-        let ours = match crate::vault::session::session_passkeys_for_rp(rp_id) {
-            Ok(m) => m,
-            Err(_) => return vec![CTAP2_ERR_OPERATION_DENIED],
-        };
-        let excluded = exclude.iter().any(|d| {
-            d.as_map().is_some_and(|m| {
-                m.iter().any(|(k, v)| {
-                    k.as_text() == Some("id")
-                        && matches!(v, Value::Bytes(b) if ours.iter().any(|e| e.credential_id == *b))
-                })
-            })
-        });
-        if excluded {
-            return vec![CTAP2_ERR_CREDENTIAL_EXCLUDED];
-        }
-    }
-
-    let parts = match crate::api::passkey_bridge::register_passkey_parts(
-        rp_id,
-        user_name.to_string(),
-        display_name.to_string(),
-        user_handle.clone(),
-    ) {
-        Ok(p) => p,
-        Err(_) => return vec![CTAP2_ERR_OPERATION_DENIED],
-    };
-
-    let map = Value::Map(vec![
-        (Value::Integer(1.into()), Value::Text("none".into())),
-        (Value::Integer(2.into()), Value::Bytes(parts.auth_data)),
-        (Value::Integer(3.into()), Value::Map(vec![])),
     ]);
     let mut out = vec![CTAP2_OK];
     ciborium::ser::into_writer(&map, &mut out).expect("in-memory CBOR write cannot fail");
@@ -334,6 +433,147 @@ mod tests {
         let mut out = vec![cmd];
         ciborium::ser::into_writer(v, &mut out).unwrap();
         out
+    }
+
+    // ── Dart-driven seam (20a): describe -> consent -> perform ──────────────
+
+    #[test]
+    #[serial]
+    fn describe_a_create_asks_with_the_site_and_account() {
+        let path = with_unlocked_vault("desc_create");
+        match describe_request(&request(0x01, &make_credential_value())) {
+            RequestPlan::Ask {
+                is_create,
+                rp_id,
+                accounts,
+            } => {
+                assert!(is_create);
+                assert_eq!(rp_id, "example.com");
+                assert_eq!(accounts, vec!["user@example.com".to_string()]);
+            }
+            RequestPlan::Respond(_) => panic!("a valid create must ask the user"),
+        }
+        cleanup(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn describe_an_assertion_lists_the_matching_accounts() {
+        let path = with_unlocked_vault("desc_assert");
+        let _ = handle_request(
+            &request(0x01, &make_credential_value_named("a@example.com", b"h1")),
+            &Approve,
+        );
+        let _ = handle_request(
+            &request(0x01, &make_credential_value_named("b@example.com", b"h2")),
+            &Approve,
+        );
+        match describe_request(&request(
+            0x02,
+            &get_assertion_value("example.com", &[0x22; 32]),
+        )) {
+            RequestPlan::Ask {
+                is_create,
+                accounts,
+                ..
+            } => {
+                assert!(!is_create);
+                assert_eq!(accounts.len(), 2, "both accounts offered");
+            }
+            RequestPlan::Respond(_) => panic!("matches must ask the user"),
+        }
+        cleanup(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn describe_responds_immediately_when_no_user_choice_applies() {
+        // Locked, no-match, and garbage never reach a consent screen — the
+        // daemon just sends these bytes back.
+        let _ = lock_vault();
+        let RequestPlan::Respond(locked) =
+            describe_request(&request(0x01, &make_credential_value()))
+        else {
+            panic!("locked must respond, not ask")
+        };
+        assert_eq!(locked, vec![0x27], "OPERATION_DENIED");
+
+        let path = with_unlocked_vault("desc_respond");
+        let RequestPlan::Respond(nomatch) = describe_request(&request(
+            0x02,
+            &get_assertion_value("nobody.example", &[0x22; 32]),
+        )) else {
+            panic!("no match must respond, not ask")
+        };
+        assert_eq!(nomatch, vec![0x2e], "NO_CREDENTIALS");
+
+        let RequestPlan::Respond(garbage) = describe_request(&[0x01, 0xff, 0xff]) else {
+            panic!("garbage must respond, not ask")
+        };
+        assert_eq!(garbage, vec![0x12], "INVALID_CBOR");
+        cleanup(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn perform_approved_create_matches_the_trait_path() {
+        let path = with_unlocked_vault("perf_create");
+        let resp = perform_approved(&request(0x01, &make_credential_value()), 0);
+        assert_eq!(resp.first(), Some(&0x00), "CTAP2_OK");
+        let stored = list_entry_summaries()
+            .unwrap()
+            .into_iter()
+            .any(|s| s.entry_type == "Passkey");
+        assert!(stored, "approved create stores the entry");
+        cleanup(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn perform_approved_assert_signs_the_chosen_account() {
+        use p256::ecdsa::signature::Verifier;
+        let path = with_unlocked_vault("perf_assert");
+        let make = handle_request(
+            &request(
+                0x01,
+                &make_credential_value_named("only@example.com", b"h1"),
+            ),
+            &Approve,
+        );
+        let Value::Map(mmap) = ciborium::de::from_reader::<Value, _>(&make[1..]).unwrap() else {
+            panic!("map")
+        };
+        let Value::Bytes(mad) = map_get(&mmap, 2) else {
+            panic!("bytes")
+        };
+        let cose = mad[87..164].to_vec();
+
+        let hash = [0x22u8; 32];
+        let resp = perform_approved(
+            &request(0x02, &get_assertion_value("example.com", &hash)),
+            0,
+        );
+        assert_eq!(resp.first(), Some(&0x00), "CTAP2_OK");
+        let Value::Map(map) = ciborium::de::from_reader::<Value, _>(&resp[1..]).unwrap() else {
+            panic!("map")
+        };
+        let Value::Bytes(ad) = map_get(&map, 2) else {
+            panic!("bytes")
+        };
+        let Value::Bytes(sig) = map_get(&map, 3) else {
+            panic!("bytes")
+        };
+        let mut msg = ad.clone();
+        msg.extend_from_slice(&hash);
+        let vk = verifying_key_from_cose(&cose);
+        let sig = p256::ecdsa::Signature::from_der(sig).unwrap();
+        assert!(vk.verify(&msg, &sig).is_ok(), "the site accepts the login");
+        cleanup(&path);
+    }
+
+    #[test]
+    fn denied_response_is_the_operation_denied_status() {
+        assert_eq!(denied_response(), vec![0x27]);
     }
 
     /// authenticatorMakeCredential request map (CTAP 2.1 §6.1 keys).

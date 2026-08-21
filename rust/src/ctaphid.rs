@@ -10,7 +10,10 @@ const FRAME_INIT: u8 = 0x80;
 const CMD_PING: u8 = 0x01;
 const CMD_INIT: u8 = 0x06;
 const CMD_CBOR: u8 = 0x10;
+const CMD_KEEPALIVE: u8 = 0x3b;
 const CMD_ERROR: u8 = 0x3f;
+/// KEEPALIVE status: the authenticator is still processing (waiting on the user).
+const KEEPALIVE_PROCESSING: u8 = 0x01;
 const ERR_INVALID_COMMAND: u8 = 0x01;
 const ERR_INVALID_SEQ: u8 = 0x04;
 const ERR_CHANNEL_BUSY: u8 = 0x06;
@@ -144,6 +147,13 @@ impl Ctaphid {
     pub fn take_message(&mut self) -> Option<(u32, u8, Vec<u8>)> {
         self.complete.take()
     }
+}
+
+/// A single CTAPHID_KEEPALIVE packet on `cid` with status "processing" (0x01):
+/// sent every ~100ms while a request waits on the user, so the browser does
+/// not time the operation out mid-consent.
+pub fn keepalive_processing(cid: u32) -> [u8; 64] {
+    encode_message(cid, CMD_KEEPALIVE, &[KEEPALIVE_PROCESSING])[0]
 }
 
 /// Encode one outbound message as 64-byte reports: an init packet
@@ -448,5 +458,14 @@ mod tests {
         assert_eq!(out[0][4], 0x80 | 0x3f, "CTAPHID_ERROR");
         assert_eq!(out[0][7], 0x01, "ERR_INVALID_COMMAND");
         assert!(hid.take_message().is_none());
+    }
+
+    #[test]
+    fn keepalive_processing_frames_a_single_status_packet() {
+        let k = keepalive_processing(0x0102_0304);
+        assert_eq!(&k[0..4], &[1, 2, 3, 4], "on the request's channel");
+        assert_eq!(k[4], 0x80 | 0x3b, "CTAPHID_KEEPALIVE");
+        assert_eq!(u16::from_be_bytes([k[5], k[6]]), 1, "one status byte");
+        assert_eq!(k[7], 0x01, "status: processing (waiting on the user)");
     }
 }
