@@ -148,7 +148,61 @@ resolved but never applied — inert, emits no warning.
     CredMan; Play image without Google sign-in -> 3P providers disabled).
     S23 only.
   - No CHANGELOG entry until the feature ships. Remaining, in order:
+    - Regression net before daemon code (a11y/l10n need no new net: catalog
+      count guard + showDialog ban + 37-locale ARB sweep already catch any
+      new dialog):
+      - [x] Android-bytes pins green: RFC 6979 determinism + attestation-object
+            CBOR goldens (`rust/src/crypto/webauthn.rs`; 9 passed 2026-08-21)
+      - [x] auto-type/daemon isolation guard green
+            (`test/passkey_daemon_isolation_test.dart`; 3 passed 2026-08-21)
+      - [ ] `fido_list_devices` filters the daemon's fixed VID/PID — else the
+            YubiKey unlock offers Gabbro to itself; lands with the VID/PID pick
+      - [ ] Linux hardware matrix line: auto-type fill with the virtual FIDO
+            device up
     - [ ] Linux: uhid virtual FIDO2 daemon (CTAPHID framing + CTAP2 commands)
+      - TDD list A approved (CTAPHID framing, pure bytes, module `ctaphid`):
+        - [ ] 1. INIT: echo 8-byte nonce, allocate fresh CID, caps CBOR|NMSG
+        - [ ] 2. reply <= 57 bytes: one packet, correct BCNT
+        - [ ] 3. reply > 57 bytes: seq-numbered continuations, round-trips
+        - [ ] 4. multi-packet request reassembles
+        - [ ] 5. PING echoes verbatim
+        - [ ] 6. unknown command -> ERROR INVALID_COMMAND
+        - [ ] 7. foreign CID -> INVALID_CHANNEL; bad seq -> INVALID_SEQ
+        - [ ] 8. MSG (U2F) -> INVALID_COMMAND (NMSG advertised)
+      - TDD list B approved (CTAP2 commands on the vault session; NO unlock
+        flow on Linux — locked vault = flat refusal, only getInfo answers):
+        - [ ] 9. getInfo: versions, zero AAGUID, options rk/uv/up true
+        - [ ] 10. makeCredential + consent -> attestation, entry stored
+        - [ ] 11. makeCredential, consent denied -> OPERATION_DENIED
+        - [ ] 12. locked vault -> OPERATION_DENIED for create and assert,
+              nothing minted or signed, no unlock prompt
+        - [ ] 13. getAssertion + consent -> verified signature, flags 0x1d
+        - [ ] 14. getAssertion, no match -> NO_CREDENTIALS
+        - [ ] 15. excludeList hit -> CREDENTIAL_EXCLUDED
+        - [ ] 16. malformed CBOR -> INVALID_CBOR, no panic
+      - TDD list C approved (uhid transport + unlock filter; device exists
+        while the app runs, locked vault answers only getInfo):
+        - [ ] 17. UHID_CREATE2: verified F1D0 descriptor, bus USB, fixed
+              VID/PID (0x1209:0x0001 until a permanent PID is registered)
+        - [ ] 18. loopback over real /dev/uhid: INIT in -> reply out (needs
+              the dev udev rule; root-only today)
+        - [ ] 19. fido_list_devices drops our VID/PID -> YubiKey and
+              passphrase unlock unaffected (closes the net item)
+      - TDD list D approved (app wiring):
+        - [ ] 20. consent screen shows on Linux (site, create/sign-in,
+              approve/cancel routed back); a11y/l10n nets auto-cover
+        - [ ] 21. KEEPALIVE sent while consent waits, else browsers time out
+        - [ ] 22. daemon thread starts/stops with the app; clean device
+              removal on quit
+      - TDD list E approved (hardware matrix; release build, mock vault,
+        matrix lands in `.scratchpad` when reached):
+        - [ ] 23. step-0 probe: browser enumerates the virtual key at all
+        - [ ] 24. Chromium + webauthn.io: create -> consent -> entry stored
+        - [ ] 25. Chromium + webauthn.io: sign-in accepted
+        - [ ] 26. Firefox: one create or sign-in
+        - [ ] 27. locked: sign-in refused, no consent, no unlock prompt
+        - [ ] 28. no self-damage: YubiKey unlock, passphrase unlock,
+              auto-type fill — all unchanged with the device up
     - [ ] Passkey filter card on the vault list (part of the feature, not an
           afterthought): a11y + l10n (37 locales) considered up-front
     - [ ] hardware + full gate green -> merge to master
