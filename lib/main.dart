@@ -9,6 +9,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:gabbro/app_paths.dart';
 import 'package:gabbro/autotype_listener.dart';
 import 'package:gabbro/autotype_target.dart';
+import 'package:gabbro/passkey_daemon.dart';
+import 'package:gabbro/widgets/passkey_consent_dialog.dart';
 import 'package:gabbro/clipboard_clear.dart';
 import 'package:gabbro/gabbro_contrast.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
@@ -669,6 +671,7 @@ Future<void> main() async {
   final settings = await AppSettings.load();
   if (Platform.isLinux) {
     await _startAutotypeListener();
+    _startPasskeyDaemon();
   }
   runApp(
     GabbroApp(
@@ -711,6 +714,32 @@ Future<void> _onAutotypeTrigger() async {
     await autotypeFill(windowId: window.id, entryId: id);
   } catch (e) {
     debugPrint('autotype: fill failed: $e');
+  }
+}
+
+/// The app-wide navigator, so the passkey daemon (started before the app
+/// mounts) can show its consent dialog over whatever screen is up.
+final rootNavigatorKey = GlobalKey<NavigatorState>();
+
+/// Start the Linux passkey provider (ADR-009). Rust owns the uhid device and
+/// streams each request; consent shows as an in-app dialog when the user is
+/// focused on Gabbro (no forced window raise — see docs). Best-effort: a
+/// failure (missing udev rule, no device) just leaves the provider inactive,
+/// it never blocks launch. The process owns the device for its whole life;
+/// quitting closes the fd and the kernel unplugs it.
+void _startPasskeyDaemon() {
+  try {
+    final device = UhidPasskeyDevice();
+    PasskeyDaemon(
+      device: device,
+      onConsent: (request) async {
+        final context = rootNavigatorKey.currentContext;
+        if (context == null) return null; // no UI yet -> treat as cancel
+        return showPasskeyConsent(context, request);
+      },
+    ).run();
+  } catch (e) {
+    debugPrint('passkey: daemon failed to start: $e');
   }
 }
 
@@ -956,7 +985,9 @@ class _GabbroAppState extends State<GabbroApp>
   @override
   VaultRegistry get registry => _registry;
 
-  final _navigatorKey = GlobalKey<NavigatorState>();
+  // The app-wide key (top-level), so the passkey daemon can show consent over
+  // the running app. GabbroApp is the only live instance at runtime.
+  final _navigatorKey = rootNavigatorKey;
 
   Timer? _foregroundTimer;
   Timer? _backgroundTimer;

@@ -27,6 +27,22 @@ Future<Uint8List> passkeyPerform({
 Future<Uint8List> passkeyDenied() =>
     RustLib.instance.api.crateApiPasskeyDaemonBridgePasskeyDenied();
 
+/// Start the Linux passkey daemon: create the uhid device and stream each
+/// complete CTAP2 request (command byte + CBOR) to Dart. Rust keeps the
+/// request alive with KEEPALIVE until `passkey_daemon_respond`.
+Stream<Uint8List> passkeyDaemonStart() =>
+    RustLib.instance.api.crateApiPasskeyDaemonBridgePasskeyDaemonStart();
+
+/// Hand a finished CTAP2 response (or the denied bytes) back to the daemon.
+Future<void> passkeyDaemonRespond({required List<int> response}) => RustLib
+    .instance
+    .api
+    .crateApiPasskeyDaemonBridgePasskeyDaemonRespond(response: response);
+
+/// Stop the daemon and unplug the virtual device.
+Future<void> passkeyDaemonStop() =>
+    RustLib.instance.api.crateApiPasskeyDaemonBridgePasskeyDaemonStop();
+
 /// What the daemon should do with one CTAP2 request. When `immediate_response`
 /// is set the daemon frames those bytes straight back (getInfo, locked vault,
 /// no match, malformed); otherwise it shows the consent dialog for `rp_id`,

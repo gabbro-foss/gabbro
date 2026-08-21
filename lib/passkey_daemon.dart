@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'src/rust/api/passkey_daemon_bridge.dart';
@@ -89,3 +90,27 @@ Future<PasskeyPlan> _defaultPlan(List<int> payload) =>
 Future<Uint8List> _defaultPerform(List<int> payload, int accountIndex) =>
     passkeyPerform(payload: payload, accountIndex: BigInt.from(accountIndex));
 Future<Uint8List> _defaultDenied() => passkeyDenied();
+
+/// The real device: the Rust daemon owns `/dev/uhid` and streams complete
+/// CTAP2 requests; responses go back through the bridge. Matrix-only (needs
+/// the native library and a real uhid device), so it carries no unit test —
+/// the orchestration it feeds is covered by [PasskeyDaemon]'s tests.
+class UhidPasskeyDevice implements PasskeyDevice {
+  UhidPasskeyDevice() : _requests = StreamIterator(passkeyDaemonStart());
+
+  final StreamIterator<Uint8List> _requests;
+
+  @override
+  Future<Uint8List?> nextRequest() async =>
+      await _requests.moveNext() ? _requests.current : null;
+
+  @override
+  Future<void> sendResponse(Uint8List response) =>
+      passkeyDaemonRespond(response: response);
+
+  /// Stop the daemon and unplug the virtual device.
+  Future<void> dispose() async {
+    await _requests.cancel();
+    await passkeyDaemonStop();
+  }
+}

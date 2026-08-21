@@ -38,6 +38,8 @@ import 'package:gabbro/widgets/generator_widget.dart';
 import 'package:gabbro/widgets/password_breakdown_sheet.dart';
 import 'package:gabbro/widgets/sync_review.dart';
 import 'package:gabbro/widgets/gabbro_dialog.dart';
+import 'package:gabbro/widgets/passkey_consent_dialog.dart';
+import 'package:gabbro/passkey_daemon.dart';
 import 'package:gabbro/widgets/sync_method_dialog.dart';
 import 'package:gabbro/widgets/url_link.dart';
 import 'package:gabbro/screens/import_failures_dialog.dart';
@@ -530,6 +532,15 @@ final Map<String, Future<void> Function(BuildContext)> dialogs = {
       rawFields: [('card_number', '4111111111111111')],
     ),
   ]),
+  // Several accounts: the chooser list, the widest layout this dialog reaches.
+  'passkey_consent_dialog': (ctx) => showPasskeyConsent(
+    ctx,
+    PasskeyRequest(
+      isCreate: false,
+      rpId: 'example.com',
+      accounts: const ['first.user@example.com', 'second.user@example.com'],
+    ),
+  ),
 };
 
 // Entries that only exist above a width breakpoint. Probing them narrower than
@@ -574,6 +585,7 @@ const Map<String, String> covers = {
   'sync_method_dialog': 'sync_method_dialog',
   'import_skipped_dialog': 'import_skipped_dialog',
   'import_failures_dialog': 'import_failures_dialog',
+  'passkey_consent_dialog': 'passkey_consent_dialog',
   'alphabet_index_bar': 'alphabet_index_bar',
   'save_confirm': 'save_confirm_screen',
   'review_changes': 'review_changes_screen',
@@ -620,4 +632,4 @@ List<String> uiSources() =>
 // nothing. Adding a screen or widget fails here first: the new file must be
 // swept or waived deliberately.
 const screenFileCount = 29;
-const widgetFileCount = 12;
+const widgetFileCount = 13;

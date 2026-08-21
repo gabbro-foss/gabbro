@@ -8,6 +8,8 @@
 
 #[cfg(target_os = "linux")]
 use crate::ctap2::{self, RequestPlan};
+#[cfg(target_os = "linux")]
+use crate::frb_generated::StreamSink;
 
 /// What the daemon should do with one CTAP2 request. When `immediate_response`
 /// is set the daemon frames those bytes straight back (getInfo, locked vault,
@@ -55,6 +57,28 @@ pub fn passkey_perform(payload: Vec<u8>, account_index: usize) -> Vec<u8> {
 #[cfg(target_os = "linux")]
 pub fn passkey_denied() -> Vec<u8> {
     ctap2::denied_response()
+}
+
+/// Start the Linux passkey daemon: create the uhid device and stream each
+/// complete CTAP2 request (command byte + CBOR) to Dart. Rust keeps the
+/// request alive with KEEPALIVE until `passkey_daemon_respond`.
+#[cfg(target_os = "linux")]
+pub fn passkey_daemon_start(sink: StreamSink<Vec<u8>>) -> Result<(), String> {
+    crate::passkey_daemon::start(move |payload| {
+        let _ = sink.add(payload);
+    })
+}
+
+/// Hand a finished CTAP2 response (or the denied bytes) back to the daemon.
+#[cfg(target_os = "linux")]
+pub fn passkey_daemon_respond(response: Vec<u8>) -> Result<(), String> {
+    crate::passkey_daemon::respond(response)
+}
+
+/// Stop the daemon and unplug the virtual device.
+#[cfg(target_os = "linux")]
+pub fn passkey_daemon_stop() {
+    crate::passkey_daemon::stop()
 }
 
 #[cfg(all(test, target_os = "linux"))]
