@@ -203,14 +203,38 @@ resolved but never applied — inert, emits no warning.
               rule + modules-load.d installed on this box
         - [x] 19. fido_list_devices drops our VID/PID -> YubiKey and
               passphrase unlock unaffected (closes the net item)
-      - TDD list D approved (app wiring):
-        - [ ] 20. consent screen shows on Linux (site, create/sign-in,
-              approve/cancel routed back); a11y/l10n nets auto-cover
-        - [ ] 21. KEEPALIVE sent while consent waits, else browsers time out
-        - [ ] 22. daemon thread starts/stops with the app; clean device
-              removal on quit
+      - TDD list D approved (app wiring; Dart drives the loop and calls Rust,
+        like autotype — the ctap2 Consent trait cannot be driven from Dart):
+        - [x] 20a. split handle_request: describe_request/perform_approved/
+              denied_response; handle_request layered on top, 12 ctap2 tests
+              stayed green (18 total)
+        - Design (decided): consent is an in-app GabbroDialog, NOT a new
+          window and NOT the Android app-wrapper screen. NO forced raise
+          (tiling WMs + all Wayland refuse it) — daemon holds the request on
+          KEEPALIVE, sets an advisory urgency hint, dialog shows when the user
+          focuses Gabbro. Chooser (16c) needs a select-list; approve/cancel
+          for one account.
+        - [x] 20b-i. `api::passkey_daemon_bridge` (passkey_plan/passkey_perform/
+              passkey_denied); 5 tests green, FFI regenerated, binding clean
+        - [x] 20b-ii. `PasskeyDaemon` (`lib/passkey_daemon.dart`), device +
+              consent + bridge fns injected; 4 orchestration tests green
+        - Decided: Rust owns the uhid fd + CTAPHID state + KEEPALIVE timer
+          thread (one `crate::api` object, next_request/send_response); the
+          Dart PasskeyDevice is a thin wrapper. Keeps KEEPALIVE off the Dart
+          event loop during the consent wait.
+        - [x] 21a. ctaphid::keepalive_processing frames a KEEPALIVE(0x3b)
+              status-processing packet; unit test green
+        - Group D netted portion COMPLETE (20a, 20b-i, 20b-ii, 21a). The
+          fd/thread glue below moved to group E (B): written right before it
+          is hardware-tested, never straddling a commit unverified.
       - TDD list E approved (hardware matrix; release build, mock vault,
-        matrix lands in `.scratchpad` when reached):
+        matrix lands in `.scratchpad` when reached). Glue folded in from D,
+        written then immediately matrix-verified:
+        - [ ] G1 (was 20b-iii). Rust uhid device object (fd + Ctaphid +
+              next_request/send_response) + Dart PasskeyDevice wrapper
+        - [ ] G2 (was 21b). KEEPALIVE pump every ~100ms while consent pends
+        - [ ] G3 (was 22). daemon starts/stops with the app; clean device
+              removal on quit; consent dialog + account chooser in main.dart
         - [ ] 23. step-0 probe: browser enumerates the virtual key at all
         - [ ] 24. Chromium + webauthn.io: create -> consent -> entry stored
         - [ ] 25. Chromium + webauthn.io: sign-in accepted
