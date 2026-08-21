@@ -120,9 +120,11 @@ fn pump(shared: Arc<Mutex<Shared>>, running: Arc<AtomicBool>, on_request: impl F
             };
 
             // 1. Write a response Dart handed back, framed on its channel.
+            //    /dev/uhid accepts only uhid_event structs: every report must
+            //    go through input2_event, a raw packet write is EINVAL.
             if let (Some(resp), Some(cid)) = (s.pending_response.take(), s.inflight_cid) {
                 for packet in ctaphid::encode_message(cid, 0x10, &resp) {
-                    if s.dev.write_all(&packet).is_err() {
+                    if s.dev.write_all(&uhid::input2_event(&packet)).is_err() {
                         return;
                     }
                 }
@@ -136,7 +138,7 @@ fn pump(shared: Arc<Mutex<Shared>>, running: Arc<AtomicBool>, on_request: impl F
                 Ok(Some(report)) => {
                     did_work = true;
                     for out in s.hid.handle_report(&report) {
-                        if s.dev.write_all(&out).is_err() {
+                        if s.dev.write_all(&uhid::input2_event(&out)).is_err() {
                             return;
                         }
                     }
@@ -153,7 +155,8 @@ fn pump(shared: Arc<Mutex<Shared>>, running: Arc<AtomicBool>, on_request: impl F
             // 3. Keep the in-flight request alive while the user decides.
             if s.inflight_cid.is_some() && last_keepalive.elapsed() >= KEEPALIVE_EVERY {
                 if let Some(cid) = s.inflight_cid {
-                    let _ = s.dev.write_all(&ctaphid::keepalive_processing(cid));
+                    let keepalive = ctaphid::keepalive_processing(cid);
+                    let _ = s.dev.write_all(&uhid::input2_event(&keepalive));
                 }
                 last_keepalive = Instant::now();
             }
@@ -176,14 +179,70 @@ fn pump(shared: Arc<Mutex<Shared>>, running: Arc<AtomicBool>, on_request: impl F
 fn read_event(dev: &mut std::fs::File, buf: &mut [u8]) -> Result<Option<[u8; 64]>, ()> {
     match dev.read(buf) {
         Ok(n) => match uhid::parse_output(&buf[..n]) {
+            // hidraw prepends the report number (0); strip it when present or
+            // the whole CTAPHID frame parses one byte shifted.
             Some(report) if report.len() >= 64 => {
                 let mut r = [0u8; 64];
-                r.copy_from_slice(&report[..64]);
+                match report.len() {
+                    65 => r.copy_from_slice(&report[1..65]),
+                    _ => r.copy_from_slice(&report[..64]),
+                }
                 Ok(Some(r))
             }
             _ => Ok(None),
         },
         Err(e) if e.kind() == std::io::ErrorKind::WouldBlock => Ok(None),
         Err(_) => Err(()),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::uhid::{test_find_our_hidraw as find_our_hidraw, test_wait_for as wait_for};
+
+    // The whole pump over the real kernel pipe, host side only: start() owns
+    // /dev/uhid, we speak through hidraw exactly as a browser would. Pins that
+    // pump writes are INPUT2-wrapped and the hidraw report-number byte is
+    // stripped — either miss and the device enumerates but never answers
+    // (Brave offers only Cancel; found in the 2026-08-21 hardware matrix).
+    #[test]
+    #[ignore = "needs the dev udev rule on /dev/uhid; real hardware pipe"]
+    fn real_uhid_pump_answers_init_via_hidraw() {
+        use std::io::{Read, Write};
+        use std::os::unix::fs::OpenOptionsExt;
+
+        start(|_| {}).expect("daemon starts");
+
+        let hidraw = wait_for("our hidraw node to appear", find_our_hidraw);
+        let mut host = wait_for("hidraw node to become accessible", || {
+            std::fs::OpenOptions::new()
+                .read(true)
+                .write(true)
+                .custom_flags(libc::O_NONBLOCK)
+                .open(&hidraw)
+                .ok()
+        });
+
+        // Browser writes INIT: report number 0 + the 64-byte report.
+        let mut init = [0u8; 65];
+        init[1..5].copy_from_slice(&0xffff_ffffu32.to_be_bytes());
+        init[5] = 0x80 | 0x06;
+        init[7] = 8;
+        init[8..16].copy_from_slice(b"pumptest");
+        host.write_all(&init).expect("host writes INIT via hidraw");
+
+        let mut resp = [0u8; 64];
+        wait_for("the INIT response on hidraw", || {
+            match host.read(&mut resp) {
+                Ok(n) if n >= 17 => Some(()),
+                _ => None,
+            }
+        });
+        stop();
+
+        assert_eq!(&resp[0..4], &0xffff_ffffu32.to_be_bytes(), "broadcast CID");
+        assert_eq!(resp[4], 0x80 | 0x06, "INIT response");
+        assert_eq!(&resp[7..15], b"pumptest", "nonce echoed through the pump");
     }
 }
