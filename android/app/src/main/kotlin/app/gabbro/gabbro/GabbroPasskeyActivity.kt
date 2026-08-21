@@ -35,6 +35,11 @@ abstract class GabbroPasskeyActivity : GabbroUnlockHostActivity() {
 
     companion object {
         const val EXTRA_ENTRY_ID = "app.gabbro.gabbro.EXTRA_PASSKEY_ENTRY_ID"
+
+        // Stamped on picker rows rebuilt after an in-flow unlock: that unlock
+        // left the session open, so the row's get flow must relock when done —
+        // Gabbro ends locked, exactly as the user left it.
+        const val EXTRA_RELOCK_AFTER = "app.gabbro.gabbro.EXTRA_PASSKEY_RELOCK_AFTER"
         private const val CHANNEL = "app.gabbro.gabbro/passkey"
 
         // Field-debuggable by design: caller identity, branch taken and refusal
@@ -104,13 +109,18 @@ abstract class GabbroPasskeyActivity : GabbroUnlockHostActivity() {
         return Base64.encodeToString(digest, Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP)
     }
 
-    /** Blocking fetch of a site's assetlinks.json; null on any failure (refuses). */
-    protected fun fetchAssetLinks(url: String): String? = runCatching {
+    /**
+     * Blocking fetch of a site's assetlinks.json; null on any failure
+     * (refuses). The network call runs off-main via [runOffMain] — on the
+     * main thread Android would throw NetworkOnMainThreadException and every
+     * native-app caller would be refused.
+     */
+    protected fun fetchAssetLinks(url: String): String? = runOffMain {
         val conn = java.net.URL(url).openConnection() as HttpsURLConnection
         conn.connectTimeout = 5000
         conn.readTimeout = 5000
         conn.inputStream.bufferedReader().use { it.readText() }
-    }.getOrNull()
+    }
 }
 
 /** Creation flow: mint + store, return the registration response. */
@@ -211,13 +221,33 @@ class GabbroPasskeyGetActivity : GabbroPasskeyActivity() {
     private var clientDataHash: ByteArray? = null
     private var callingAppInfo: CallingAppInfo? = null
 
+    // The picker's "Unlock Gabbro" action: it carries no get request, only the
+    // original begin request. This activity can then only unlock and hand
+    // rebuilt picker rows back to the OS — never a signed credential.
+    private var unlockMode = false
+    private var beginOptions: List<androidx.credentials.provider.BeginGetPublicKeyCredentialOption> =
+        emptyList()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val provider = PendingIntentHandler.retrieveProviderGetCredentialRequest(intent)
-        val option = provider?.credentialOptions
-            ?.filterIsInstance<GetPublicKeyCredentialOption>()
-            ?.firstOrNull()
-        if (provider == null || option == null) {
+        if (provider == null) {
+            val begin = PendingIntentHandler.retrieveBeginGetCredentialRequest(intent)
+            val options = begin?.beginGetCredentialOptions
+                ?.filterIsInstance<androidx.credentials.provider.BeginGetPublicKeyCredentialOption>()
+            if (options.isNullOrEmpty()) {
+                refuse("no get request in intent")
+                return
+            }
+            unlockMode = true
+            beginOptions = options
+            Log.i(TAG, "get onCreate: unlock mode, ${options.size} option(s)")
+            return
+        }
+        val option = provider.credentialOptions
+            .filterIsInstance<GetPublicKeyCredentialOption>()
+            .firstOrNull()
+        if (option == null) {
             refuse("no get request in intent")
             return
         }
@@ -227,15 +257,31 @@ class GabbroPasskeyGetActivity : GabbroPasskeyActivity() {
         Log.i(TAG, "get onCreate: caller=${provider.callingAppInfo.packageName} cdh=${clientDataHash != null}")
     }
 
-    override fun requestInfo(): Map<String, String> = mapOf(
-        "mode" to "get",
-        "rpId" to (runCatching {
-            org.json.JSONObject(requestJson).getString("rpId")
-        }.getOrNull() ?: ""),
-        "userName" to "",
-    )
+    override fun requestInfo(): Map<String, String> =
+        if (unlockMode) mapOf("mode" to "unlock", "rpId" to "", "userName" to "")
+        else mapOf(
+            "mode" to "get",
+            "rpId" to (runCatching {
+                org.json.JSONObject(requestJson).getString("rpId")
+            }.getOrNull() ?: ""),
+            "userName" to "",
+            "relockAfter" to intent.getBooleanExtra(EXTRA_RELOCK_AFTER, false).toString(),
+        )
+
+    /** Unlock mode: return rebuilt rows, stamped to relock after their get. */
+    private fun performUnlockRefresh() {
+        val response = buildBeginGetResponse(this, beginOptions, relockAfter = true) {
+            RustBridge.passkeysForRequest(it)
+        }
+        val result = android.content.Intent()
+        PendingIntentHandler.setBeginGetCredentialResponse(result, response)
+        setResult(RESULT_OK, result)
+        Log.i(TAG, "unlock result set: ${response.credentialEntries.size} row(s)")
+        // No finish() here: Dart calls "finish", mirroring the other flows.
+    }
 
     override fun performOperation() {
+        if (unlockMode) return performUnlockRefresh()
         val info = callingAppInfo ?: return refuse("caller unknown")
         val cert = callerCertSha256(info) ?: return refuse("caller certificate unreadable")
         val rpId = requestInfo()["rpId"].orEmpty()
@@ -294,6 +340,12 @@ class GabbroPasskeyGetActivity : GabbroPasskeyActivity() {
 
     override fun refuse(reason: String) {
         Log.i(TAG, "get refuse: $reason")
+        if (unlockMode) {
+            // No get request to answer; a plain cancel keeps the picker usable.
+            setResult(RESULT_CANCELED)
+            finish()
+            return
+        }
         val result = android.content.Intent()
         PendingIntentHandler.setGetCredentialException(
             result, GetCredentialUnknownException(reason)

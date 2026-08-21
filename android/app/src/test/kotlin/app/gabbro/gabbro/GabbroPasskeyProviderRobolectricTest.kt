@@ -74,6 +74,35 @@ class GabbroPasskeyProviderRobolectricTest {
         assertEquals(0, response.authenticationActions.size)
     }
 
+    // ── K13: post-unlock rebuilt rows carry the relock stamp ─────────────────
+
+    private val oneMatch = """{"matches": [
+        {"entryId": "e1", "rpId": "example.com", "userName": "a@example.com",
+         "userDisplayName": "A", "credentialIdB64": "YQ"}
+    ]}"""
+
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+    @Test
+    fun `relockAfter stamps row intents and the service path stays unstamped`() {
+        val stamped = buildBeginGetResponse(
+            context, listOf(option(requestJson)), relockAfter = true
+        ) { oneMatch }
+        val stampedIntent = org.robolectric.Shadows.shadowOf(
+            (stamped.credentialEntries.single()
+                as androidx.credentials.provider.PublicKeyCredentialEntry).pendingIntent
+        ).savedIntent
+        assertTrue(
+            stampedIntent.getBooleanExtra(GabbroPasskeyActivity.EXTRA_RELOCK_AFTER, false)
+        )
+
+        val service = buildBeginGetResponse(context, listOf(option(requestJson))) { oneMatch }
+        val serviceIntent = org.robolectric.Shadows.shadowOf(
+            (service.credentialEntries.single()
+                as androidx.credentials.provider.PublicKeyCredentialEntry).pendingIntent
+        ).savedIntent
+        assertFalse(serviceIntent.hasExtra(GabbroPasskeyActivity.EXTRA_RELOCK_AFTER))
+    }
+
     // ── K10: create flow offers the save row ─────────────────────────────────
 
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
@@ -149,6 +178,23 @@ class GabbroPasskeyProviderRobolectricTest {
             "android:apk-key-hash:keyhash",
             (decision as CallerDecision.VerifiedApp).origin,
         )
+    }
+
+    // ── Off-main fetch: a network call on the caller's thread would throw
+    // NetworkOnMainThreadException, so a native-app caller could only ever be
+    // refused. The runner must execute the block on another thread. ──────────
+
+    @Test
+    fun `runOffMain executes the block on another thread and returns its value`() {
+        val caller = Thread.currentThread().name
+        val ranOn = runOffMain { Thread.currentThread().name }
+        assertNotNull(ranOn)
+        assertFalse("block must not run on the calling thread", ranOn == caller)
+    }
+
+    @Test
+    fun `runOffMain returns null when the block throws`() {
+        assertEquals(null, runOffMain<String> { throw RuntimeException("boom") })
     }
 
     // ── Bridge envelope parsing ──────────────────────────────────────────────

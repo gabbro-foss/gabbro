@@ -329,12 +329,20 @@ Future<void> passkeyUnlockMain() async {
     isCreate: info['mode'] == 'create',
     rpId: (info['rpId'] as String?) ?? '',
     userName: (info['userName'] as String?) ?? '',
+    isUnlockOnly: info['mode'] == 'unlock',
+    relockAfter: info['relockAfter'] == 'true',
   ));
 }
 
 /// The passkey consent app. Locked -> UnlockScreen first (this flow then owns
 /// the session and locks it again before finishing, like the autofill unlock —
 /// RT-5); unlocked -> straight to consent.
+///
+/// [isUnlockOnly]: the picker's "Unlock Gabbro" action. Unlock, approve (Kotlin
+/// rebuilds the picker rows), finish — no consent, and the session stays open
+/// so the follow-up row tap needs no second unlock. [relockAfter]: that row tap
+/// (stamped by Kotlin); the flow locks on the way out even though it did not
+/// open the session, so Gabbro ends locked as the user left it.
 Widget buildPasskeyApp({
   required AppSettings settings,
   required VaultRegistry registry,
@@ -343,6 +351,8 @@ Widget buildPasskeyApp({
   required bool isCreate,
   required String rpId,
   required String userName,
+  bool isUnlockOnly = false,
+  bool relockAfter = false,
   MethodChannel channel = const MethodChannel('app.gabbro.gabbro/passkey'),
   Future<void> Function(List<int>, String) onUnlock = defaultUnlock,
   void Function() onLock = lockVault,
@@ -355,6 +365,8 @@ Widget buildPasskeyApp({
       isCreate: isCreate,
       rpId: rpId,
       userName: userName,
+      isUnlockOnly: isUnlockOnly,
+      relockAfter: relockAfter,
       channel: channel,
       onUnlock: onUnlock,
       onLock: onLock,
@@ -368,6 +380,8 @@ class _PasskeyApp extends StatefulWidget {
   final bool isCreate;
   final String rpId;
   final String userName;
+  final bool isUnlockOnly;
+  final bool relockAfter;
   final MethodChannel channel;
   final Future<void> Function(List<int>, String) onUnlock;
   final void Function() onLock;
@@ -380,6 +394,8 @@ class _PasskeyApp extends StatefulWidget {
     required this.isCreate,
     required this.rpId,
     required this.userName,
+    required this.isUnlockOnly,
+    required this.relockAfter,
     required this.channel,
     required this.onUnlock,
     required this.onLock,
@@ -404,13 +420,20 @@ class _PasskeyAppState extends State<_PasskeyApp> {
 
   Future<void> _approve() async {
     await widget.channel.invokeMethod('approve');
-    if (_weUnlock) widget.onLock();
+    if (_weUnlock || widget.relockAfter) widget.onLock();
     await widget.channel.invokeMethod('finish');
   }
 
   Future<void> _cancel() async {
-    if (_weUnlock && _unlocked) widget.onLock();
+    if ((_weUnlock || widget.relockAfter) && _unlocked) widget.onLock();
     await widget.channel.invokeMethod('cancel');
+  }
+
+  /// Unlock-only: Kotlin rebuilds the picker rows on "approve"; the session
+  /// stays open for the follow-up row tap (which carries the relock stamp).
+  Future<void> _approveUnlockOnly() async {
+    await widget.channel.invokeMethod('approve');
+    await widget.channel.invokeMethod('finish');
   }
 
   @override
@@ -433,7 +456,7 @@ class _PasskeyAppState extends State<_PasskeyApp> {
         themeMode: themeModeFor(widget.settings.theme),
         theme: gabbroLightTheme(highContrast: hc),
         darkTheme: gabbroDarkTheme(highContrast: hc),
-        home: _unlocked
+        home: _unlocked && !widget.isUnlockOnly
             ? PasskeyConsentScreen(
                 isCreate: widget.isCreate,
                 rpId: widget.rpId,
@@ -449,7 +472,9 @@ class _PasskeyAppState extends State<_PasskeyApp> {
                 onVaultSwitch: (path, alias) =>
                     setState(() => _vaultPath = path),
                 onUnlock: widget.onUnlock,
-                onUnlocked: () async => setState(() => _unlocked = true),
+                onUnlocked: widget.isUnlockOnly
+                    ? _approveUnlockOnly
+                    : () async => setState(() => _unlocked = true),
                 blockPassphraseCopyPaste:
                     widget.settings.blockPassphraseCopyPaste,
                 onQuit: _cancel,

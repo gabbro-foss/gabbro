@@ -181,3 +181,16 @@ internal fun buildClientDataJson(type: String, challengeB64: String, origin: Str
 /** The `challenge` field of a WebAuthn request JSON, or null. */
 internal fun challengeFromRequestJson(requestJson: String): String? =
     runCatching { JSONObject(requestJson).getString("challenge") }.getOrNull()
+
+/**
+ * Run `block` on a worker thread and wait for its result; null if it throws.
+ * Android kills a network call made on the main thread
+ * (NetworkOnMainThreadException), which made every native-app caller's
+ * asset-links check fail — and so refused callers the site actually vouches
+ * for. The wait is bounded by the block's own timeouts.
+ */
+internal fun <T> runOffMain(block: () -> T): T? = runCatching {
+    val task = java.util.concurrent.FutureTask(block)
+    Thread(task, "gabbro-offmain").start()
+    task.get()
+}.getOrNull()

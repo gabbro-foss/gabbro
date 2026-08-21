@@ -75,9 +75,15 @@ class GabbroCredentialProviderService : CredentialProviderService() {
 /** Distinct request codes per entry keep every PendingIntent unique. */
 private var nextRequestCode = 1000
 
-private fun pendingIntentFor(context: Context, cls: Class<*>, entryId: String?): PendingIntent {
+private fun pendingIntentFor(
+    context: Context,
+    cls: Class<*>,
+    entryId: String?,
+    relockAfter: Boolean = false,
+): PendingIntent {
     val intent = Intent(context, cls)
     if (entryId != null) intent.putExtra(GabbroPasskeyActivity.EXTRA_ENTRY_ID, entryId)
+    if (relockAfter) intent.putExtra(GabbroPasskeyActivity.EXTRA_RELOCK_AFTER, true)
     return PendingIntent.getActivity(
         context,
         nextRequestCode++,
@@ -95,6 +101,7 @@ private fun pendingIntentFor(context: Context, cls: Class<*>, entryId: String?):
 internal fun buildBeginGetResponse(
     context: Context,
     options: List<BeginGetPublicKeyCredentialOption>,
+    relockAfter: Boolean = false,
     rustMatches: (String) -> String,
 ): BeginGetCredentialResponse {
     val entries = ArrayList<CredentialEntry>()
@@ -118,7 +125,9 @@ internal fun buildBeginGetResponse(
                         PublicKeyCredentialEntry.Builder(
                             context,
                             m.userName,
-                            pendingIntentFor(context, GabbroPasskeyGetActivity::class.java, m.entryId),
+                            pendingIntentFor(
+                                context, GabbroPasskeyGetActivity::class.java, m.entryId, relockAfter
+                            ),
                             option,
                         )
                             .setDisplayName(m.userDisplayName)
