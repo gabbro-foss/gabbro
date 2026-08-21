@@ -175,15 +175,25 @@ resolved but never applied — inert, emits no warning.
         - [x] 8. MSG (U2F) -> INVALID_COMMAND (NMSG advertised)
       - TDD list B approved (CTAP2 commands on the vault session; NO unlock
         flow on Linux — locked vault = flat refusal, only getInfo answers):
-        - [ ] 9. getInfo: versions, zero AAGUID, options rk/uv/up true
-        - [ ] 10. makeCredential + consent -> attestation, entry stored
-        - [ ] 11. makeCredential, consent denied -> OPERATION_DENIED
-        - [ ] 12. locked vault -> OPERATION_DENIED for create and assert,
-              nothing minted or signed, no unlock prompt
-        - [ ] 13. getAssertion + consent -> verified signature, flags 0x1d
-        - [ ] 14. getAssertion, no match -> NO_CREDENTIALS
-        - [ ] 15. excludeList hit -> CREDENTIAL_EXCLUDED
-        - [ ] 16. malformed CBOR -> INVALID_CBOR, no panic
+        - [x] 9. getInfo: versions, zero AAGUID, options rk/uv/up true
+        - [x] 10. makeCredential + consent -> attestation, entry stored
+              (Android path re-verified: 17 bridge tests green after the
+              register_passkey_parts extraction)
+        - [x] 11. makeCredential, consent denied -> OPERATION_DENIED
+        - [x] 12. locked vault -> OPERATION_DENIED for create and assert,
+              nothing minted or signed, no consent screen shown (create
+              pinned; assert case pinned within item 13)
+        - [x] 13. getAssertion + consent -> verified signature, flags 0x1d
+              (incl. the assert side of 12; allowList narrowing not yet
+              honoured on the CTAP2 path — raised at group B wrap)
+        - [x] 14. getAssertion, no match -> NO_CREDENTIALS
+        - [x] 15. excludeList hit -> CREDENTIAL_EXCLUDED (after consent —
+              blocks silent has-account probing)
+        - [x] 16. malformed CBOR -> INVALID_CBOR, no panic
+        - [x] 16b. allowList honoured: named credential wins; named-but-absent
+              -> NO_CREDENTIALS (Android parity)
+        - [x] 16c. empty allowList + several accounts -> consent offers the
+              account list, user picks or cancels (dialog lands with 20)
       - TDD list C approved (uhid transport + unlock filter; device exists
         while the app runs, locked vault answers only getInfo):
         - [ ] 17. UHID_CREATE2: verified F1D0 descriptor, bus USB, fixed
