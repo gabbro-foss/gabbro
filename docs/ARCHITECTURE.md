@@ -81,9 +81,9 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2362 | 10 |
+| Flutter (`flutter test`) | 2370 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 16 | 0 |
-| Android (`./gradlew :app:testDebugUnitTest`) | 170 | 15 |
+| Android (`./gradlew :app:testDebugUnitTest`) | 173 | 15 |
 
 **Real-FFI suites run under plain `dart test`, never `flutter drive` (non-negotiable):** they test
 Dart -> FFI -> crypto -> disk, touch no UI, and so need no window. Needs the release cdylib (debug
@@ -175,56 +175,19 @@ resolved but never applied — inert, emits no warning.
             (table updated); gate needs `--warm`
       - [ ] challenge vault: reissue at v12 when the format lands (old crack-me
             vaults stay — red herrings are deliberate)
-    - [ ] Android provider. All code committed; every local suite green
-          (R1-R6 + K12 in Rust; K7-K11 Robolectric x10; Flutter 2363 incl.
-          consent screen `passkeyUnlockMain`, l10n x37 FIDO terms, a11y
-          catalogued; Dart bridge regenerated; lockfile + osv-scan clean).
-          Hardware state 2026-08-20 (S23, Brave, release): CREATE + signed-in
-          AUTH pass end to end — register, vault entry, authenticate. The old
-          registration failure was our response JSON missing spec-required
-          members; fixed red-first in `passkey_bridge.rs` (placeholder
-          `clientDataJSON` = b64url `{}` on the clientDataHash path per the
-          Android credential-provider guide, plus `authenticatorData`,
-          `publicKey` SPKI DER, `publicKeyAlgorithm` accessors); 17/17 lib
-          tests green, clippy green. Provider activities log tag
-          `GabbroPasskey` (R8-safe; grep `"GabbroPasskey:"` with the colon).
-          Remaining, in order:
-      - [ ] Locked-vault flow (matrix 5/6 FAIL): an AuthenticationAction tap
-            carries NO get request — logged `get refuse: no get request in
-            intent`; the site shows "unknown error". Contract (Android
-            credential-provider guide, verified): the unlock activity must
-            unlock, rebuild the picker rows, return them via
-            `PendingIntentHandler.setBeginGetCredentialResponse`, and finish
-            — never a GetCredentialResponse. Retrieve the request with
-            `retrieveBeginGetCredentialRequest` when
-            `retrieveProviderGetCredentialRequest` is null.
-            Approved design: unlock flow leaves the session open (else the
-            follow-up row tap demands a second unlock) and stamps rebuilt
-            rows with an EXTRA_RELOCK_AFTER extra; the follow-up get flow
-            relocks after signing, so Gabbro ends locked.
-            Approved canon-TDD list (red-first, in order):
-        - [ ] K13 Robolectric: `buildBeginGetResponse(relockAfter=true)`
-              stamps row intents; the service path stays unstamped
-        - [ ] D1 flutter: unlock-mode passkey app shows UnlockScreen only;
-              on unlock it calls approve then finish — no consent, no relock
-        - [ ] D2 flutter: get-mode with the relock flag calls onLock after
-              approve even when alreadyUnlocked
-        - [ ] activity glue (retrieve fallback + setBeginGetCredentialResponse)
-              has no JVM seam — compile + hardware matrix only
-      - [ ] Matrix 7 defect: passkey notes edit persists, but the review
-            screen does not show the notes change. Uninvestigated.
-      - [ ] Before merge: asset-links fallback fetches on the main thread ->
-            NetworkOnMainThreadException, so a native-app (non-browser)
-            caller can only ever be refused. Move the fetch off-main.
-      - [ ] Rerun the full matrix (in `.scratchpad`) after the fixes
+    - [x] Android provider — DONE, hardware-verified 2026-08-21 (S23, Brave,
+          release): full 8-step matrix pass — register, vault entry,
+          signed-in auth, locked-vault auth (AuthenticationAction ->
+          `setBeginGetCredentialResponse` row refresh, relock-after stamp;
+          Gabbro ends locked), review diff, persistence. Provider log tag
+          `GabbroPasskey` (grep `"GabbroPasskey:"` with the colon).
       - Emulator is NOT a viable test bed: GMS-free image -> Chromium
         browsers bypass CredMan; Play image without Google sign-in -> GMS
         keeps 3P providers disabled. S23 only.
     - [ ] Linux: uhid virtual FIDO2 daemon (CTAPHID framing + CTAP2 commands)
-    - Session note 2026-08-20: maintainer doubts the branch survives; nothing
-      pushed; no CHANGELOG entry until the feature actually works. Full gate
-      (`gabbro_test --warm`) NOT run since `p256` + `androidx.credentials`
-      landed — required before any merge.
+    - Branch not pushed; no CHANGELOG entry until the feature ships (Linux
+      leg open). Full gate (`gabbro_test --warm`) NOT run since `p256` +
+      `androidx.credentials` landed — required before any merge.
 
 ---
 
