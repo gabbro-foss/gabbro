@@ -161,14 +161,18 @@ resolved but never applied — inert, emits no warning.
             device up
     - [ ] Linux: uhid virtual FIDO2 daemon (CTAPHID framing + CTAP2 commands)
       - TDD list A approved (CTAPHID framing, pure bytes, module `ctaphid`):
-        - [ ] 1. INIT: echo 8-byte nonce, allocate fresh CID, caps CBOR|NMSG
-        - [ ] 2. reply <= 57 bytes: one packet, correct BCNT
-        - [ ] 3. reply > 57 bytes: seq-numbered continuations, round-trips
-        - [ ] 4. multi-packet request reassembles
-        - [ ] 5. PING echoes verbatim
-        - [ ] 6. unknown command -> ERROR INVALID_COMMAND
-        - [ ] 7. foreign CID -> INVALID_CHANNEL; bad seq -> INVALID_SEQ
-        - [ ] 8. MSG (U2F) -> INVALID_COMMAND (NMSG advertised)
+        - [x] 1. INIT: echo 8-byte nonce, allocate fresh CID, caps CBOR|NMSG
+        - [x] 2. reply <= 57 bytes: one packet, correct BCNT
+        - [x] 3. reply > 57 bytes: seq-numbered continuations, round-trips
+        - [x] 4. multi-packet request reassembles
+        - [x] 5. PING echoes verbatim
+        - [x] 6. unknown command -> ERROR INVALID_COMMAND
+        - [x] 7. corrected to spec (CTAP 2.1 s11.2): 7a message on a
+              never-allocated CID -> INVALID_CHANNEL; 7b message while
+              another is mid-assembly -> CHANNEL_BUSY; 7c wrong seq ->
+              INVALID_SEQ, message aborted; 7d stray continuation ->
+              ignored, no reply
+        - [x] 8. MSG (U2F) -> INVALID_COMMAND (NMSG advertised)
       - TDD list B approved (CTAP2 commands on the vault session; NO unlock
         flow on Linux — locked vault = flat refusal, only getInfo answers):
         - [ ] 9. getInfo: versions, zero AAGUID, options rk/uv/up true
