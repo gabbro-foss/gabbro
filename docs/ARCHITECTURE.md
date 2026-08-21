@@ -155,8 +155,8 @@ resolved but never applied — inert, emits no warning.
             CBOR goldens (`rust/src/crypto/webauthn.rs`; 9 passed 2026-08-21)
       - [x] auto-type/daemon isolation guard green
             (`test/passkey_daemon_isolation_test.dart`; 3 passed 2026-08-21)
-      - [ ] `fido_list_devices` filters the daemon's fixed VID/PID — else the
-            YubiKey unlock offers Gabbro to itself; lands with the VID/PID pick
+      - [x] `fido_list_devices` filters the daemon's fixed VID/PID
+            (0x1209:0x0001); proven against a real uhid device 2026-08-21
       - [ ] Linux hardware matrix line: auto-type fill with the virtual FIDO
             device up
     - [ ] Linux: uhid virtual FIDO2 daemon (CTAPHID framing + CTAP2 commands)
@@ -196,11 +196,12 @@ resolved but never applied — inert, emits no warning.
               account list, user picks or cancels (dialog lands with 20)
       - TDD list C approved (uhid transport + unlock filter; device exists
         while the app runs, locked vault answers only getInfo):
-        - [ ] 17. UHID_CREATE2: verified F1D0 descriptor, bus USB, fixed
+        - [x] 17. UHID_CREATE2: verified F1D0 descriptor, bus USB, fixed
               VID/PID (0x1209:0x0001 until a permanent PID is registered)
-        - [ ] 18. loopback over real /dev/uhid: INIT in -> reply out (needs
-              the dev udev rule; root-only today)
-        - [ ] 19. fido_list_devices drops our VID/PID -> YubiKey and
+        - [x] 18. loopback over real /dev/uhid: INIT in -> reply out, both
+              ends (hidraw host side incl. fido_id/uaccess chain); dev udev
+              rule + modules-load.d installed on this box
+        - [x] 19. fido_list_devices drops our VID/PID -> YubiKey and
               passphrase unlock unaffected (closes the net item)
       - TDD list D approved (app wiring):
         - [ ] 20. consent screen shows on Linux (site, create/sign-in,
