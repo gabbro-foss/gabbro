@@ -175,8 +175,9 @@ resolved but never applied — inert, emits no warning.
             post-release
       - [x] dep: `p256` 0.14 added; `cargo deny` licenses pass, duplicates 6->8
             (table updated); gate needs `--warm`
-      - [ ] challenge vault: reissue at v12 when the format lands (old crack-me
-            vaults stay — red herrings are deliberate)
+      - [ ] challenge vault: reissue at v12 — LAST step, on master after the
+            merge (which needs Linux done + hardware + full gate green); old
+            crack-me vaults stay — red herrings are deliberate
     - [x] Android provider — DONE, hardware-verified 2026-08-21 (S23, Brave,
           release): full 8-step matrix pass — register, vault entry,
           signed-in auth, locked-vault auth (AuthenticationAction ->
@@ -187,9 +188,10 @@ resolved but never applied — inert, emits no warning.
         browsers bypass CredMan; Play image without Google sign-in -> GMS
         keeps 3P providers disabled. S23 only.
     - [ ] Linux: uhid virtual FIDO2 daemon (CTAPHID framing + CTAP2 commands)
-    - Branch not pushed; no CHANGELOG entry until the feature ships (Linux
-      leg open). Full gate ALL GREEN 2026-08-21 (post `p256` +
-      `androidx.credentials`; caught 3 stale v11 test pins, fixed).
+    - Branch pushed 2026-08-21 (backup only, NOT merged); no CHANGELOG entry
+      until the feature ships (Linux leg open). Full gate ALL GREEN
+      2026-08-21 (post `p256` + `androidx.credentials`; caught 3 stale v11
+      test pins, fixed).
 
 ---
 
