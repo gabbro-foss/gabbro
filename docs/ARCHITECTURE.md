@@ -230,11 +230,31 @@ resolved but never applied — inert, emits no warning.
       - TDD list E approved (hardware matrix; release build, mock vault,
         matrix lands in `.scratchpad` when reached). Glue folded in from D,
         written then immediately matrix-verified:
-        - [ ] G1 (was 20b-iii). Rust uhid device object (fd + Ctaphid +
-              next_request/send_response) + Dart PasskeyDevice wrapper
-        - [ ] G2 (was 21b). KEEPALIVE pump every ~100ms while consent pends
-        - [ ] G3 (was 22). daemon starts/stops with the app; clean device
-              removal on quit; consent dialog + account chooser in main.dart
+        - [~] G1 (was 20b-iii). `passkey_daemon.rs` runtime (fd + Ctaphid +
+              pump thread) + `api::passkey_daemon_bridge` start/respond/stop
+              (StreamSink) + Dart `UhidPasskeyDevice`. WRITTEN, compiles +
+              clippy + codegen + analyze clean; matrix-verified in 23-28.
+        - [~] G2 (was 21b). KEEPALIVE every ~100ms in the pump thread while a
+              request is in flight. WRITTEN (part of G1); matrix-verified.
+        - [x] G3a. consent dialog + chooser (`widgets/passkey_consent_dialog`,
+              showPasskeyConsent); 3 widget tests green, in the screen catalog
+              (a11y + overflow sweeps cover it, no new l10n key — chooser
+              reuses passkeySignInPrompt)
+        - [~] G3b (was 22). main.dart wiring: _startPasskeyDaemon() in main()
+              (Linux, test-safe like autotype), consent via top-level
+              rootNavigatorKey; quit closes the fd -> kernel unplugs. WRITTEN,
+              analyze clean, 277 GabbroApp-pumping tests unregressed by the
+              navigator-key promotion; matrix-verified in 23-28.
+        - BLOCKED 2026-08-21: release build crashes at RustLib.init with a
+          content-hash mismatch (Dart 1820626220 vs Rust 966061856). On disk
+          the ONLY frb_generated.rs = 1820626220 (matches Dart), yet the built
+          .so runs 966061856 and `nm -D` shows ZERO frbgen/wire__ symbols in
+          it. Cleared cargokit_build + bundle .so and full-rebuilt: SAME hash.
+          So the compiled crate is not the current frb_generated.rs (or wire
+          layer excluded). NOT yet root-caused. Next: confirm nm sees wire
+          symbols in a KNOWN-GOOD older .so (rule out nm false signal); check
+          cargo fingerprint / a second target; try `flutter clean` full. Until
+          fixed, the daemon cannot run and 23-28 cannot start.
         - [ ] 23. step-0 probe: browser enumerates the virtual key at all
         - [ ] 24. Chromium + webauthn.io: create -> consent -> entry stored
         - [ ] 25. Chromium + webauthn.io: sign-in accepted
