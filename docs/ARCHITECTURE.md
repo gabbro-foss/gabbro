@@ -149,6 +149,8 @@ resolved but never applied — inert, emits no warning.
     S23 only.
   - No CHANGELOG entry until the feature ships. Remaining, in order:
     - [ ] Linux: uhid virtual FIDO2 daemon (CTAPHID framing + CTAP2 commands)
+    - [ ] Passkey filter card on the vault list (part of the feature, not an
+          afterthought): a11y + l10n (37 locales) considered up-front
     - [ ] hardware + full gate green -> merge to master
     - [ ] challenge vault: reissue at v12 — LAST, on master after the merge
           (old crack-me vaults stay — red herrings are deliberate)
@@ -167,8 +169,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Features and UI/UX
-- **Passkey filter card** — if the passkey provider ships, the vault list needs a
-  filter card for the Passkey entry type.
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
