@@ -20,7 +20,7 @@ Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
 
 **Vault file format:** `.gabbro` binary. Plaintext header (magic, version, Argon2id params + salt, HKDF salt, nonce) + AES-256-GCM encrypted body (JSON-serialised entries). Self-contained; auth tag detects tampering.
 
-**Vault entries:** 6 types — Login (displayed as "Password" in UI), Note, Identity, Card, File, Custom. Common fields: UUID, created, modified, folder, tags, favourite. No TOTP — YubiKey covers 2FA; keeping them separate is more secure.
+**Vault entries:** 7 types — Login (displayed as "Password" in UI), Note, Identity, Card, File, Custom, Passkey (created only by the passkey provider flows, never by hand; edit covers notes/folder/custom fields). Common fields: UUID, created, modified, folder, tags, favourite. No TOTP — YubiKey covers 2FA; keeping them separate is more secure.
 
 **Password generator:** classic (32–256 chars) and passphrase (4–20 words, many languages, EFF-style wordlists embedded at compile time). Classic mode is script-aware (Latin/Greek/Cyrillic pools). All generation in Rust.
 
@@ -47,7 +47,7 @@ gabbro/
 │   └── *.dart            # main, app_paths (GabbroPaths), settings, text_scale, control_scale, gabbro_contrast (high-contrast theme flag), vault_registry, safe_file_picker, gabbro_file_picker (dialog facade), linux_file_picker (XDG portal client), android_file_picker (picker channel client), autotype_listener, autotype_target, clipboard_clear
 ├── rust/src/
 │   ├── api/              # Bridge surface: vault, vault_bridge, import, *_generator, fido_bridge, passkey_bridge, autofill_bridge, autotype_bridge, entropy, types
-│   ├── crypto/           # Internal (not bridge-exposed): kdf, hkdf, aes_gcm, vault_crypto
+│   ├── crypto/           # Internal (not bridge-exposed): kdf, hkdf, aes_gcm, vault_crypto, webauthn
 │   ├── vault/            # Domain model: entry, file_format, io, serialization, session
 │   ├── fido/             # FIDO2/libfido2 FFI (Linux only)
 │   ├── import/           # enpass, bitwarden, google_pm, dashlane, csv
@@ -55,7 +55,7 @@ gabbro/
 │   ├── autotype/         # Linux auto-type (ADR-017): keysym, XTEST inject, active-window read, trigger IPC, sequences, fill orchestration (Linux-only)
 │   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics, crash_writer, autotype_{spike,window,trigger} (diagnostics), gabbro-autotype (shipped trigger client); wordlist gen; gen_fixtures
 ├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + crash-safety (kill mid-write) + frozen golden fixtures (FIXTURES.md)
-├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, AppPaths (paths channel), GabbroPicker (picker channel), BiometricHelper + BiometricStore (per-vault; + Robolectric tests)
+├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, GabbroCredentialProviderService + GabbroPasskeyActivity (passkey provider; testable core in PasskeyProvider.kt), TapFlow, YubiKeyManager, AppPaths (paths channel), GabbroPicker (picker channel), BiometricHelper + BiometricStore (per-vault; + Robolectric tests)
 ├── linux/packaging/      # Desktop integration: render_icons.sh (icon tree); aur/ (AUR gabbro-bin PKGBUILD; .SRCINFO is generated in the AUR clone), deb/ (build-deb.sh -> binary .deb)
 ├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, VAULT_SYNC, AUTOTYPE_AND_AUTOFILL, PASSKEY_INVESTIGATION, AI_*; decisions/ (ADRs); artefacts/
 ├── test/  integration_test/          # Flutter widget/unit + Linux real-FFI suites (dart test)
@@ -132,66 +132,26 @@ resolved but never applied — inert, emits no warning.
 
 - **Passkey provider**: store website passkeys (WebAuthn discoverable credentials) in
   the vault so they sync/back up. Distinct from the YubiKey (which unlocks the app);
-  tradeoff — website private keys would live in the vault, not in hardware. Upside —
+  tradeoff — website private keys live in the vault, not in hardware. Upside —
   no slot cap (a YubiKey holds 25–100 passkeys).
-  Investigation phase, on branch `passkey_investigation_and_implementation`:
-  - Conflicts with ADR-008 (no browser extension — stands, Linux must be extension-free)
-    and ADR-009 (no software passkey storage — under reconsideration). Both ADRs stay
-    untouched until the investigation concludes.
-  - Plan with sources: `docs/PASSKEY_INVESTIGATION.md` (Android Credential Manager
-    provider; Linux virtual FIDO2 authenticator over uhid, no extension).
-  - Approved sequence:
-    - [x] Amend ADR-009 (supersede the ban; old decision stays summarised)
-    - [ ] Rust core: `Passkey` entry type, new vault VERSION (corpus vault +
-          fixtures), ES256/COSE/authenticatorData/signing ops.
-          Net (done): autotype classifier exhaustive + per-variant refusal pinned;
-          unknown-variant body JSON errors cleanly; l10n/a11y nets verified sufficient.
-          Canon-TDD list (red-first, in order):
-      - [x] A1 `PasskeyEntry` serde round-trip, all fields
-      - [x] A2 missing optional fields parse (`#[serde(default)]`)
-      - [x] A3 `content_hash` stable / per-field mutation / type tag
-      - [x] A4 zeroize on drop
-      - [x] A5 autotype classifier: `Passkey` refuses as `NotLogin`
-      - A-phase decisions: private key never crosses the bridge (DTO carries no
-        key material; `update_entry` restores from stored, `create_entry`
-        refuses Passkey DTOs); sync = whole-entry LWW until D16.
-      - [x] B6 fresh seal writes VERSION 12
-      - [x] B7 v11 opens, re-seals as v12 (unit + gate rotation, auto-adapts)
-      - [x] B8 v10 refused; v13 (too-new) refused
-      - [x] C10 ES256 keygen -> COSE_Key (pinned 77-byte layout, `crypto/webauthn.rs`)
-      - [x] C11 authenticatorData: RP ID hash, UP/UV/BE/BS flags, counter 0
-      - [x] C12 signature over authenticatorData || clientDataHash verifies
-      - [x] C13 credential ID: 32 random bytes, unique
-      - [x] D14 bridge DTO both directions + `create_entry` refusal + update
-            preserves key material (caught a missing update arm)
-      - [x] D15 `entry_to_summary` renders a Passkey
-      - [x] D16 passkey sync = standard granular machinery: per-field merge +
-            conflicts + brought-over for text fields; key material is one atomic
-            "credential" field on the File-`data` pattern (base64 on the
-            resolution path, `<binary>` in sync review + recovery history);
-            fuzzer generates passkeys (14-entry base), convergence green
-      - [x] B9 compat gate: v12 goldens with passkey canary, 13/13 green;
-            maintainer adds the manual `test_data/migration_vaults/` v12 vault
-            post-release
-      - [x] dep: `p256` 0.14 added; `cargo deny` licenses pass, duplicates 6->8
-            (table updated); gate needs `--warm`
-      - [ ] challenge vault: reissue at v12 — LAST step, on master after the
-            merge (which needs Linux done + hardware + full gate green); old
-            crack-me vaults stay — red herrings are deliberate
-    - [x] Android provider — DONE, hardware-verified 2026-08-21 (S23, Brave,
-          release): full 8-step matrix pass — register, vault entry,
-          signed-in auth, locked-vault auth (AuthenticationAction ->
-          `setBeginGetCredentialResponse` row refresh, relock-after stamp;
-          Gabbro ends locked), review diff, persistence. Provider log tag
-          `GabbroPasskey` (grep `"GabbroPasskey:"` with the colon).
-      - Emulator is NOT a viable test bed: GMS-free image -> Chromium
-        browsers bypass CredMan; Play image without Google sign-in -> GMS
-        keeps 3P providers disabled. S23 only.
+  Branch `passkey_investigation_and_implementation`, pushed 2026-08-21 (backup
+  only, NOT merged). Plan with sources: `docs/PASSKEY_INVESTIGATION.md`.
+  - Done: Rust core (Passkey entry type, vault VERSION 12, ES256/COSE/signing,
+    granular sync, compat gate) and Android provider (hardware-verified
+    2026-08-21, S23 full 8-step matrix incl. locked-vault flow). Full gate
+    ALL GREEN 2026-08-21. ADR-009 amended; ADR-008 stands — Linux must be
+    extension-free.
+  - Key decisions: the private key never crosses the bridge (`create_entry`
+    refuses Passkey DTOs; update restores key material from stored); provider
+    log tag `GabbroPasskey` (grep `"GabbroPasskey:"` with the colon).
+  - Android testing: emulator NOT viable (GMS-free image -> browsers bypass
+    CredMan; Play image without Google sign-in -> 3P providers disabled).
+    S23 only.
+  - No CHANGELOG entry until the feature ships. Remaining, in order:
     - [ ] Linux: uhid virtual FIDO2 daemon (CTAPHID framing + CTAP2 commands)
-    - Branch pushed 2026-08-21 (backup only, NOT merged); no CHANGELOG entry
-      until the feature ships (Linux leg open). Full gate ALL GREEN
-      2026-08-21 (post `p256` + `androidx.credentials`; caught 3 stale v11
-      test pins, fixed).
+    - [ ] hardware + full gate green -> merge to master
+    - [ ] challenge vault: reissue at v12 — LAST, on master after the merge
+          (old crack-me vaults stay — red herrings are deliberate)
 
 ---
 

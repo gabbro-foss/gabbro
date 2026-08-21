@@ -7,7 +7,8 @@ and serves them to browsers/apps, so they sync and back up like any entry.
 **ADR situation (both left untouched until this investigation concludes):**
 - ADR-008 (no browser extension, ever): stands. Both platform plans below are
   extension-free and use no Native Messaging.
-- ADR-009 (no software passkey storage, "permanent"): under reconsideration. New
+- ADR-009 (software passkey storage): AMENDED 2026-08-20 — the ban is
+  reversed; this was the deciding argument. New
   argument: a YubiKey caps at 25 passkeys (firmware 5.0-5.6.x) or 100 (5.7+); the
   vault has no cap. Vault passkeys are AAL2, hardware is AAL3 (NIST SP 800-63B-4) -
   users keep the choice, as with app unlock today.
@@ -108,9 +109,8 @@ like a plugged-in YubiKey - zero browser config, zero extension.
   right long-term shape, but today its browser wiring is itself an extension and no
   browser or desktop ships it. Track; revisit if browsers adopt the portal natively.
 
-## Open decisions (in order)
+## Open decisions (in order) — all DECIDED
 
-1. ADR-009: supersede or amend? Blocks everything else.
-2. Platform order: Android (small, first-party API, proven pattern) vs Linux
-   (larger, novel daemon, no prior art among password managers).
-3. Vault format: new entry type = new VERSION -> migration corpus vault + fixtures.
+1. ADR-009: amended 2026-08-20 (ban reversed, history kept in the ADR).
+2. Platform order: Android first (done, hardware-verified 2026-08-21), Linux second.
+3. Vault format: VERSION 12 (Passkey entries) — corpus + fixtures landed.
