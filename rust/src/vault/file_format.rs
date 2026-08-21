@@ -26,7 +26,8 @@
 //! | Body length            | 8            |
 //! | Body (ciphertext)      | variable     |
 //!
-//! VERSION 11 is the only readable format: the vault key is derived straight from the
+//! VERSION 12 (adds Passkey entries) is the write format; v11 also opens and is
+//! re-sealed as v12 on the next save. The vault key is derived straight from the
 //! Argon2id output via HKDF (ADR-018), and the AES-256-GCM body is sealed with the
 //! serialised header as AAD, so any change to a plaintext header field (alias, YubiKey
 //! records, Argon2id params) fails body decryption with an authentication error.
@@ -38,7 +39,7 @@
 //! path — see [`VERSION_MIN_READABLE`] and docs/VAULT_UPGRADE_PATH.md. The per-version
 //! history lives in git and CHANGELOG.md.
 //!
-//! Reads v11 only; always writes VERSION 11.
+//! Reads v11–v12; always writes VERSION 12.
 
 use crate::crypto::kdf::Argon2idParams;
 

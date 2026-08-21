@@ -473,11 +473,11 @@ mod tests {
     }
 
     #[test]
-    fn seal_vault_produces_version_11() {
+    fn seal_vault_produces_current_version() {
         let sealed = seal_vault(b"pass", b"data", None).unwrap();
         assert_eq!(
-            sealed.version, 11,
-            "new vaults are sealed as VERSION 11 (vault key derived straight from Argon2id)"
+            sealed.version, VERSION,
+            "new vaults are sealed at the current VERSION"
         );
     }
 
@@ -720,14 +720,14 @@ mod tests {
     }
 
     #[test]
-    fn seal_vault_with_keys_produces_version_11() {
-        // C2: the multi-key seal path is at VERSION 11 too, not just passphrase-only
-        // (seal_vault_produces_version_11).
+    fn seal_vault_with_keys_produces_current_version() {
+        // C2: the multi-key seal path tracks the current VERSION too, not just
+        // passphrase-only (seal_vault_produces_current_version).
         let keys = two_test_keys();
         let sealed = seal_vault_with_keys(b"passphrase", &keys, b"data", None).unwrap();
         assert_eq!(
-            sealed.version, 11,
-            "new multi-key vaults are sealed as VERSION 11"
+            sealed.version, VERSION,
+            "new multi-key vaults are sealed at the current VERSION"
         );
     }
 
