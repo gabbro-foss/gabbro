@@ -214,6 +214,50 @@ mod tests {
     }
 
     #[test]
+    fn signing_is_deterministic_so_repeat_requests_emit_identical_bytes() {
+        // RFC 6979 nonces: the same key + message must always produce the same
+        // DER signature. Pins the Android-visible bytes against a silent switch
+        // to randomised ECDSA while the core is reworked for the Linux daemon.
+        let kp = generate_es256();
+        let ad = assertion_authenticator_data("example.com");
+        let a = sign_assertion(&kp.private_key, &ad, &[0x42u8; 32]).unwrap();
+        let b = sign_assertion(&kp.private_key, &ad, &[0x42u8; 32]).unwrap();
+        assert_eq!(a, b);
+    }
+
+    // Hand-derived from RFC 8949: map(3), text keys "fmt"/"attStmt"/"authData",
+    // "none", empty map. Independent of the encoder under test.
+    const ATT_OBJ_PREFIX: &[u8] = b"\xa3\x63fmt\x64none\x67attStmt\xa0\x68authData";
+
+    #[test]
+    fn attestation_object_golden_pins_all_three_cbor_length_encodings() {
+        // < 24 bytes: length lives in the initial byte (0x40 + n).
+        let small = attestation_object(&[1, 2, 3]);
+        assert_eq!(small, [ATT_OBJ_PREFIX, &[0x43, 1, 2, 3]].concat());
+
+        // 24..=255 bytes: 0x58 + one length byte (the real ~164-byte case).
+        let mid_payload = [0xAB; 100];
+        let mid = attestation_object(&mid_payload);
+        assert_eq!(
+            mid,
+            [ATT_OBJ_PREFIX, &[0x58, 100], mid_payload.as_slice()].concat()
+        );
+
+        // >= 256 bytes: 0x59 + two length bytes, big-endian.
+        let large_payload = [0xCD; 300];
+        let large = attestation_object(&large_payload);
+        assert_eq!(
+            large,
+            [
+                ATT_OBJ_PREFIX,
+                &[0x59, 0x01, 0x2C],
+                large_payload.as_slice()
+            ]
+            .concat()
+        );
+    }
+
+    #[test]
     fn credential_ids_are_32_random_bytes_and_unique() {
         let a = new_credential_id();
         let b = new_credential_id();
