@@ -73,7 +73,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 789 | 17 |
+| Rust (`cargo test -q`) | 791 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 13 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -188,8 +188,8 @@ resolved but never applied — inert, emits no warning.
         keeps 3P providers disabled. S23 only.
     - [ ] Linux: uhid virtual FIDO2 daemon (CTAPHID framing + CTAP2 commands)
     - Branch not pushed; no CHANGELOG entry until the feature ships (Linux
-      leg open). Full gate (`gabbro_test --warm`) NOT run since `p256` +
-      `androidx.credentials` landed — required before any merge.
+      leg open). Full gate ALL GREEN 2026-08-21 (post `p256` +
+      `androidx.credentials`; caught 3 stale v11 test pins, fixed).
 
 ---
 
