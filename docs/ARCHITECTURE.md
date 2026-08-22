@@ -148,12 +148,44 @@ resolved but never applied — inert, emits no warning.
   Information; plan archive: `docs/PASSKEY_INVESTIGATION.md`. Remaining:
   - [ ] uhid packaging: without the `uhid` module loaded and a `uaccess`
         udev rule, Gabbro cannot open `/dev/uhid` and Linux passkeys
-        silently do nothing. Ship `linux/packaging/udev/70-gabbro-uhid.rules`
-        + `modules-load.d` conf, installed by the `.deb` and the AUR
-        PKGBUILD; README manual step for tarball users. Install scripts
-        (deb postinst / AUR .install) must also `modprobe uhid` +
-        `udevadm control --reload` — the files alone only take effect after
-        a reboot.
+        silently do nothing. **Plan agreed 2026-08-22 (net + canon-TDD
+        below); no code written yet.**
+    - Findings (verified): `rust/src/passkey_daemon.rs:56` opens
+      `/dev/uhid` (no module = ENOENT, no rule = EACCES). Working dev-box
+      reference: rule `KERNEL=="uhid", SUBSYSTEM=="misc", TAG+="uaccess"`
+      (`/etc/udev/rules.d/70-gabbro-uhid-dev.rules`) + conf line `uhid`
+      (`/etc/modules-load.d/gabbro-uhid-dev.conf`). `build-deb.sh` and
+      `PKGBUILD` ship no udev/modules-load files today; both embed the
+      `.desktop` inline; `build-deb.sh` reads repo files via `REPO_ROOT`.
+    - Decisions: canonical one-liners at
+      `linux/packaging/udev/70-gabbro-uhid.rules` +
+      `linux/packaging/modules-load.d/gabbro-uhid.conf`. Packages install
+      under `/usr/lib/{udev/rules.d,modules-load.d}` — package-owned, so
+      `apt remove` / `pacman -Rns` roll them back with no scriptlet.
+      deb postinst / AUR `.install` post_install+post_upgrade:
+      `udevadm control --reload` + `modprobe uhid` +
+      `udevadm trigger --name-match=uhid`, each `|| true` (containers).
+      deb postrm / post_remove: reload only. Release tarball unchanged;
+      README gets tarball install (two `sudo tee` one-liners + reload +
+      modprobe) and uninstall (rm both + reload; `modprobe -r uhid`
+      optional) steps. New `linux/packaging/aur/gabbro-bin.install`;
+      BUILD_AND_RELEASE AUR step gains "copy it to the AUR clone".
+    - Net first (`test/linux_packaging_test.dart`, content pins — no
+      dpkg-deb on Arch — green against CURRENT scripts, commit before any
+      script edit): build-deb.sh stages bundle to `/usr/lib/gabbro` +
+      exec bit, `/usr/bin/gabbro` wrapper, icons + desktop staging,
+      holder read from LICENSE, control name/Depends, version transform
+      `0.1.0-alpha.N` -> `0.1.0~alpha.N-1`, `--tarball`/`--bundle`/`--out`
+      args; PKGBUILD source URLs from `_pkgver`, same staging,
+      provides/conflicts/`!strip !debug`, LICENSE install; desktop entry
+      byte-identical across both scripts.
+    - Then red (canon-TDD, same file): (1) canonical rule file tags
+      `KERNEL=="uhid"` with `uaccess`; (2) conf is exactly `uhid`;
+      (3) build-deb.sh stages both + postinst reload/modprobe/trigger +
+      postrm reload; (4) PKGBUILD installs both, `install=` declared,
+      `.install` hooks as decided; (5) anti-drift: rule + conf lines
+      byte-identical across canonical files, PKGBUILD, README;
+      (6) README has tarball install AND uninstall steps.
   - [ ] in-app hint when the passkey daemon cannot start (missing uhid
         module / udev rule): today it fails silently and passkeys just
         don't appear in the browser — say why and point at the fix.
