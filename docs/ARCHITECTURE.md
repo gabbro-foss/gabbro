@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2398 | 10 |
+| Flutter (`flutter test`) | 2400 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 16 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 173 | 15 |
 
@@ -258,10 +258,11 @@ resolved but never applied — inert, emits no warning.
     - [x] Passkey filter chip on the vault list, green 2026-08-22 (order
           All/Password/Passkey/...; `entryTypePasskey` already in all 37 ARBs;
           chip row semantics inherited)
-    - [ ] FOUND (hardware 2026-08-22): passkey edit screen labels `url` and
-          `username` as "optional" but they are read-only (correct behaviour,
-          wrong label) — user is invited to edit fields that refuse input.
-          Fix labels before merge.
+    - [x] Passkey edit optional-label fix (bf7a8a3c): read-only URL/Username
+          now plain labels (`reviewFieldUrl` reused + `passkeyFieldUsername`
+          derived in 37 ARBs); bg "Потребителско ime" mixed-script typo fixed
+          in passing. Net + label tests in
+          `test/create_entry_passkey_edit_test.dart`.
     - [ ] hardware + full gate green -> merge to master
     - [ ] challenge vault: reissue at v12 — LAST, on master after the merge
           (old crack-me vaults stay — red herrings are deliberate)
