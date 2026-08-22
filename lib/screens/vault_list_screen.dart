@@ -242,6 +242,12 @@ bool Function()? vaultRegionActive;
 /// handler as Ctrl+L. `allFields` picks normal (false) vs all-fields (true) mode.
 void Function({required bool allFields})? focusVaultSearch;
 
+/// Set by the active vault list so the passkey daemon can reload it after
+/// storing an entry — the user is watching the list during a create and
+/// otherwise concludes it failed. Null when no vault list is mounted (the
+/// next mount loads fresh anyway).
+void Function()? reloadVaultList;
+
 /// Set by the active vault list so the GLOBAL Ctrl+N handler (main.dart) can open
 /// the new-entry type picker from anywhere. The region Tab-cycle excludes the
 /// FAB, so this is the keyboard path to create an entry. No-op when null.
@@ -712,6 +718,7 @@ class _VaultListScreenState extends State<VaultListScreen>
     openNewEntry = _handleNewEntryShortcut;
     openVaultMenu = _handleMenuShortcut;
     quitVault = _handleQuitShortcut;
+    reloadVaultList = _loadEntries;
     _yubikeyRecords = widget.yubikeyRecords ?? _detectYubikeyRecords();
     _loadEntries();
     _chipScrollController.addListener(_updateChevrons);
@@ -747,6 +754,7 @@ class _VaultListScreenState extends State<VaultListScreen>
     if (openNewEntry == _handleNewEntryShortcut) openNewEntry = null;
     if (openVaultMenu == _handleMenuShortcut) openVaultMenu = null;
     if (quitVault == _handleQuitShortcut) quitVault = null;
+    if (reloadVaultList == _loadEntries) reloadVaultList = null;
     WidgetsBinding.instance.removeObserver(this);
     _searchController.dispose();
     _searchFocus.dispose();

@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart' show debugPrint;
+
+import 'screens/vault_list_screen.dart' show reloadVaultList;
 import 'src/rust/api/passkey_daemon_bridge.dart';
 
 /// The transport the daemon reads requests from and writes responses to. The
@@ -81,6 +84,16 @@ class PasskeyDaemon {
           ? await _denied()
           : await _perform(payload, choice);
       await device.sendResponse(response);
+      // An approved perform changed the vault (entry stored or metadata
+      // touched); the mounted list must show it while the user watches. The
+      // response is already out and a UI failure must not kill the daemon.
+      if (choice != null) {
+        try {
+          reloadVaultList?.call();
+        } catch (e) {
+          debugPrint('passkey: list refresh failed: $e');
+        }
+      }
     }
   }
 }
