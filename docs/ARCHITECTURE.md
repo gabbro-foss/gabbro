@@ -243,19 +243,10 @@ resolved but never applied — inert, emits no warning.
               (username filled -> only that account offered).
         - [ ] 26 Firefox: one create or sign-in (maintainer installs
               Firefox for this; Chrome/Chromium stay out).
-        - [ ] Entry-list refresh on daemon store (user thinks create failed;
-              entry IS stored). Net green 2026-08-22 (daemon loop 4, resume
-              reload 1). Approved TDD list, in order:
-          - [ ] R1. approved create -> visible list shows the new entry,
-                no interaction
-          - [ ] R2. cancelled consent -> no reload
-          - [ ] R3. immediate-response request (getInfo/locked/no-match) ->
-                no reload
-          - [ ] R4. approved sign-in -> refreshes too
-          - [ ] R5. list not mounted at perform -> no crash; current on
-                next mount
-          - [ ] R6. throwing refresh never breaks the loop -> CTAP response
-                still written
+        - [x] Entry-list refresh on daemon store: R1-R6 all green 2026-08-22
+              (`test/vault_list_daemon_refresh_test.dart`, 6 tests; daemon
+              fires the `reloadVaultList` hook after an approved perform).
+              Hardware line pending in the next matrix pass.
         - [ ] chooser retest: webauthn.io Authenticate with EMPTY username
               -> consent dialog lists both accounts, tap one signs in.
         - [ ] 27 locked refusal; 28 no self-damage (YubiKey unlock,
