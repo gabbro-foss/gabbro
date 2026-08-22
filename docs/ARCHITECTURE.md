@@ -246,11 +246,18 @@ resolved but never applied — inert, emits no warning.
         - [x] Entry-list refresh on daemon store: R1-R6 all green 2026-08-22
               (`test/vault_list_daemon_refresh_test.dart`, 6 tests; daemon
               fires the `reloadVaultList` hook after an approved perform).
-              Hardware line pending in the next matrix pass.
-        - [ ] chooser retest: webauthn.io Authenticate with EMPTY username
-              -> consent dialog lists both accounts, tap one signs in.
-        - [ ] 27 locked refusal; 28 no self-damage (YubiKey unlock,
-              passphrase unlock, auto-type — unchanged with device up).
+              Hardware-verified in matrix D1 rows 2-3 (2026-08-22).
+        - [x] Matrix pass D1 (Brave) 2026-08-22, 8/8 pass: instant refresh,
+              chooser with empty username, filter chip, locked refusal (27),
+              passphrase unlock unaffected. Remaining for pass D2: auto-type
+              with device up, Firefox (26), device gone on quit (rest of 28).
+        - [ ] FOUND (D1 row 5b, root-caused 2026-08-22): Brave's silent
+              allowList pre-flight (`getAssertion` options.up=false) raises a
+              consent dialog because ctap2 ignores options.up -> sign-in with
+              a filled username needs two clicks. Approved TDD list:
+          - [x] S1-S3 green 2026-08-22 (ctap2 silent path + webauthn silent
+                authData 0x18; committed ed1da4a2)
+          - [ ] S4. hardware: d3 retest, one click
     - [x] Passkey filter chip on the vault list, green 2026-08-22 (order
           All/Password/Passkey/...; `entryTypePasskey` already in all 37 ARBs;
           chip row semantics inherited)
