@@ -238,16 +238,24 @@ resolved but never applied — inert, emits no warning.
               Cancel): /dev/uhid writes must be INPUT2-wrapped and hidraw's
               report-number byte stripped. Fixed red-first; pinned by ignored
               test `passkey_daemon::tests::real_uhid_pump_answers_init_via_hidraw`.
-              UNCOMMITTED at session end — commit first next session.
         - [x] 23-25 verified in Brave: create + consent + entry stored,
               KEEPALIVE (5 s wait ok), sign-in; allowList narrowing correct
               (username filled -> only that account offered).
         - [ ] 26 Firefox: one create or sign-in (maintainer installs
               Firefox for this; Chrome/Chromium stay out).
-        - [ ] FOUND: entry list does not refresh when the daemon stores a
-              passkey — user sees nothing and thinks create failed (entry IS
-              stored; list caught up on later interaction). Red widget test
-              first, then the fix.
+        - [ ] Entry-list refresh on daemon store (user thinks create failed;
+              entry IS stored). Net green 2026-08-22 (daemon loop 4, resume
+              reload 1). Approved TDD list, in order:
+          - [ ] R1. approved create -> visible list shows the new entry,
+                no interaction
+          - [ ] R2. cancelled consent -> no reload
+          - [ ] R3. immediate-response request (getInfo/locked/no-match) ->
+                no reload
+          - [ ] R4. approved sign-in -> refreshes too
+          - [ ] R5. list not mounted at perform -> no crash; current on
+                next mount
+          - [ ] R6. throwing refresh never breaks the loop -> CTAP response
+                still written
         - [ ] chooser retest: webauthn.io Authenticate with EMPTY username
               -> consent dialog lists both accounts, tap one signs in.
         - [ ] 27 locked refusal; 28 no self-damage (YubiKey unlock,
