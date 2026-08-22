@@ -84,6 +84,12 @@ Keywords=password;vault;passphrase;security;
 StartupWMClass=app.gabbro.gabbro
 DESK
 
+# uhid rule + modules-load conf: without them Gabbro cannot open /dev/uhid and
+# Linux passkeys silently do nothing. Package-owned paths under /usr/lib, so
+# removal rolls them back with no scriptlet.
+install -Dm644 "$REPO_ROOT/linux/packaging/udev/70-gabbro-uhid.rules" "$root/usr/lib/udev/rules.d/70-gabbro-uhid.rules"
+install -Dm644 "$REPO_ROOT/linux/packaging/modules-load.d/gabbro-uhid.conf" "$root/usr/lib/modules-load.d/gabbro-uhid.conf"
+
 # Debian doc dir: a DEP-5 copyright that keeps the maintainer copyright line but points at
 # the system GPL-3 text (don't duplicate it), plus a minimal changelog. The holder is read
 # from the repo LICENSE so this script carries no personal name.
@@ -141,6 +147,22 @@ Description: Quantum-resistant password manager
  AES-256-GCM. A FIDO2/WebAuthn hardware key (e.g. YubiKey) is supported but not
  required. Includes an optional Linux auto-type helper.
 CTRL
+
+# Activate the uhid rule + module now so passkeys work without a reboot; each
+# step tolerates containers (no udev/modprobe running).
+cat > "$root/DEBIAN/postinst" <<'POSTINST'
+#!/bin/sh
+set -e
+udevadm control --reload || true
+modprobe uhid || true
+udevadm trigger --name-match=uhid || true
+POSTINST
+cat > "$root/DEBIAN/postrm" <<'POSTRM'
+#!/bin/sh
+set -e
+udevadm control --reload || true
+POSTRM
+chmod 755 "$root/DEBIAN/postinst" "$root/DEBIAN/postrm"
 
 # --- build ---
 deb_name="gabbro_${deb_ver}_amd64.deb"

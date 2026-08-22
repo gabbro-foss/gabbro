@@ -215,6 +215,16 @@ libraries the packages would have pulled in:
 - **Arch:** `sudo pacman -S --needed libfido2 libcbor pcsclite gtk3 xdg-desktop-portal xdg-desktop-portal-gtk`
 - **Debian / Mint:** `sudo apt install libfido2-1 libcbor0.10 libpcsclite1 libgtk-3-0t64 xdg-desktop-portal xdg-desktop-portal-gtk`
 
+Website passkeys need `/dev/uhid` access; the AUR and APT packages set this up
+for you, the tarball does not. Without it, passkeys silently do nothing while
+everything else works. One-time setup (skip if you don't use passkeys):
+
+```bash
+echo 'KERNEL=="uhid", SUBSYSTEM=="misc", TAG+="uaccess"' | sudo tee /etc/udev/rules.d/70-gabbro-uhid.rules
+echo 'uhid' | sudo tee /etc/modules-load.d/gabbro-uhid.conf
+sudo udevadm control --reload && sudo modprobe uhid && sudo udevadm trigger --name-match=uhid
+```
+
 #### Uninstall
 
 | Installed via | Remove with |
@@ -224,7 +234,13 @@ libraries the packages would have pulled in:
 | tarball | delete the `bundle/` folder |
 
 If you added the APT repo, also delete `/etc/apt/sources.list.d/gabbro.sources`
-and `/etc/apt/keyrings/gabbro.gpg`. If you bound a custom shortcut for auto-type,
+and `/etc/apt/keyrings/gabbro.gpg`. If you did the tarball passkey setup,
+remove it too (optionally `sudo modprobe -r uhid` to unload the module until
+reboot):
+
+```bash
+sudo rm /etc/udev/rules.d/70-gabbro-uhid.rules /etc/modules-load.d/gabbro-uhid.conf && sudo udevadm control --reload
+``` If you bound a custom shortcut for auto-type,
 remove it too — it would now point at a deleted binary and silently do nothing.
 
 **Your vaults and settings are not removed** — they live in
