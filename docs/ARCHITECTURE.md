@@ -262,7 +262,8 @@ resolved but never applied — inert, emits no warning.
           now plain labels (`reviewFieldUrl` reused + `passkeyFieldUsername`
           derived in 37 ARBs); bg "Потребителско ime" mixed-script typo fixed
           in passing. Net + label tests in
-          `test/create_entry_passkey_edit_test.dart`.
+          `test/create_entry_passkey_edit_test.dart`. Hardware 5/5
+          (multi-language incl. bg) 2026-08-22.
     - [ ] hardware + full gate green -> merge to master
     - [ ] challenge vault: reissue at v12 — LAST, on master after the merge
           (old crack-me vaults stay — red herrings are deliberate)
