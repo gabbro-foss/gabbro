@@ -276,6 +276,11 @@ const _kComponents = [
     url: 'https://github.com/cfbao/ChineseWordDiceware',
   ),
   _Component(
+    name: 'ciborium',
+    licence: 'Apache-2.0',
+    url: 'https://github.com/enarx/ciborium',
+  ),
+  _Component(
     name: 'Dart',
     licence: 'BSD-3-Clause',
     url: 'https://github.com/dart-lang/sdk',
