@@ -717,9 +717,12 @@ Future<void> _onAutotypeTrigger() async {
   }
 }
 
-/// The app-wide navigator, so the passkey daemon (started before the app
-/// mounts) can show its consent dialog over whatever screen is up.
-final rootNavigatorKey = GlobalKey<NavigatorState>();
+/// The mounted GabbroApp's navigator, so the passkey daemon (started before
+/// the app mounts) can show its consent dialog over whatever screen is up.
+/// Null when no app is mounted — consent then no-ops as a cancel. Set by the
+/// app's State (per-instance key: a shared one silently broke the second
+/// GabbroApp pumped in a test, blinding the theme a11y net).
+GlobalKey<NavigatorState>? rootNavigatorKey;
 
 /// Start the Linux passkey provider (ADR-009). Rust owns the uhid device and
 /// streams each request; consent shows as an in-app dialog when the user is
@@ -733,7 +736,7 @@ void _startPasskeyDaemon() {
     PasskeyDaemon(
       device: device,
       onConsent: (request) async {
-        final context = rootNavigatorKey.currentContext;
+        final context = rootNavigatorKey?.currentContext;
         if (context == null) return null; // no UI yet -> treat as cancel
         return showPasskeyConsent(context, request);
       },
@@ -985,9 +988,9 @@ class _GabbroAppState extends State<GabbroApp>
   @override
   VaultRegistry get registry => _registry;
 
-  // The app-wide key (top-level), so the passkey daemon can show consent over
-  // the running app. GabbroApp is the only live instance at runtime.
-  final _navigatorKey = rootNavigatorKey;
+  // Per-instance; published to [rootNavigatorKey] while mounted so the passkey
+  // daemon can show consent over the running app.
+  final _navigatorKey = GlobalKey<NavigatorState>();
 
   Timer? _foregroundTimer;
   Timer? _backgroundTimer;
@@ -998,6 +1001,7 @@ class _GabbroAppState extends State<GabbroApp>
     super.initState();
     _settings = widget.settings;
     _registry = widget.registry;
+    rootNavigatorKey = _navigatorKey;
     WidgetsBinding.instance.addObserver(this);
     HardwareKeyboard.instance.addHandler(_onKeyEvent);
     _resetForegroundTimer();
@@ -1005,6 +1009,7 @@ class _GabbroAppState extends State<GabbroApp>
 
   @override
   void dispose() {
+    if (rootNavigatorKey == _navigatorKey) rootNavigatorKey = null;
     HardwareKeyboard.instance.removeHandler(_onKeyEvent);
     WidgetsBinding.instance.removeObserver(this);
     _foregroundTimer?.cancel();
