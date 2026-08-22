@@ -69,7 +69,7 @@ gabbro/
 │   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics, crash_writer, autotype_{spike,window,trigger} (diagnostics), gabbro-autotype (shipped trigger client); wordlist gen; gen_fixtures
 ├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + crash-safety (kill mid-write) + frozen golden fixtures (FIXTURES.md)
 ├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, GabbroCredentialProviderService + GabbroPasskeyActivity (passkey provider; testable core in PasskeyProvider.kt; vendored passkey_privileged_browsers.json in android assets), TapFlow, YubiKeyManager, AppPaths (paths channel), GabbroPicker (picker channel), BiometricHelper + BiometricStore (per-vault; + Robolectric tests)
-├── linux/packaging/      # Desktop integration: render_icons.sh (icon tree); aur/ (AUR gabbro-bin PKGBUILD; .SRCINFO is generated in the AUR clone), deb/ (build-deb.sh -> binary .deb)
+├── linux/packaging/      # Desktop integration: render_icons.sh (icon tree); aur/ (AUR gabbro-bin PKGBUILD + gabbro-bin.install; .SRCINFO is generated in the AUR clone), deb/ (build-deb.sh -> binary .deb), udev/ + modules-load.d/ (canonical uhid rule + conf for passkeys)
 ├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, VAULT_SYNC, AUTOTYPE_AND_AUTOFILL, PASSKEY_INVESTIGATION, AI_*; decisions/ (ADRs); artefacts/
 ├── test/  integration_test/          # Flutter widget/unit + Linux real-FFI suites (dart test)
 ├── test_data/            # Sample import files + migration_vaults/ (refusal corpus at floor v11, one vault per VERSION + MIGRATION_TESTS.md + test_matrix.md)
@@ -94,7 +94,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2412 | 10 |
+| Flutter (`flutter test`) | 2420 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 16 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 173 | 15 |
 
@@ -146,38 +146,10 @@ resolved but never applied — inert, emits no warning.
 - **Passkey provider — ship it.** Code, hardware (Linux + Android) and the
   full gate ALL GREEN 2026-08-22. Feature documented under General
   Information; plan archive: `docs/PASSKEY_INVESTIGATION.md`. Remaining:
-  - [ ] uhid packaging: without the `uhid` module loaded and a `uaccess`
-        udev rule, Gabbro cannot open `/dev/uhid` and Linux passkeys
-        silently do nothing. **Plan agreed 2026-08-22; net committed
-        2026-08-22 (`test/linux_packaging_test.dart`, 12 green); canon-TDD
-        list below is next.**
-    - Findings (verified): `rust/src/passkey_daemon.rs:56` opens
-      `/dev/uhid` (no module = ENOENT, no rule = EACCES). Working dev-box
-      reference: rule `KERNEL=="uhid", SUBSYSTEM=="misc", TAG+="uaccess"`
-      (`/etc/udev/rules.d/70-gabbro-uhid-dev.rules`) + conf line `uhid`
-      (`/etc/modules-load.d/gabbro-uhid-dev.conf`). `build-deb.sh` and
-      `PKGBUILD` ship no udev/modules-load files today; both embed the
-      `.desktop` inline; `build-deb.sh` reads repo files via `REPO_ROOT`.
-    - Decisions: canonical one-liners at
-      `linux/packaging/udev/70-gabbro-uhid.rules` +
-      `linux/packaging/modules-load.d/gabbro-uhid.conf`. Packages install
-      under `/usr/lib/{udev/rules.d,modules-load.d}` — package-owned, so
-      `apt remove` / `pacman -Rns` roll them back with no scriptlet.
-      deb postinst / AUR `.install` post_install+post_upgrade:
-      `udevadm control --reload` + `modprobe uhid` +
-      `udevadm trigger --name-match=uhid`, each `|| true` (containers).
-      deb postrm / post_remove: reload only. Release tarball unchanged;
-      README gets tarball install (two `sudo tee` one-liners + reload +
-      modprobe) and uninstall (rm both + reload; `modprobe -r uhid`
-      optional) steps. New `linux/packaging/aur/gabbro-bin.install`;
-      BUILD_AND_RELEASE AUR step gains "copy it to the AUR clone".
-    - Then red (canon-TDD, same file): (1) canonical rule file tags
-      `KERNEL=="uhid"` with `uaccess`; (2) conf is exactly `uhid`;
-      (3) build-deb.sh stages both + postinst reload/modprobe/trigger +
-      postrm reload; (4) PKGBUILD installs both, `install=` declared,
-      `.install` hooks as decided; (5) anti-drift: rule + conf lines
-      byte-identical across canonical files, PKGBUILD, README;
-      (6) README has tarball install AND uninstall steps.
+  - [ ] uhid packaging DONE in code + 20 content pins
+        (`test/linux_packaging_test.dart`) 2026-08-22. Remaining: verify
+        the `.deb` postinst on a real install at the next release
+        (content pins cannot prove it).
   - [ ] in-app hint when the passkey daemon cannot start (missing uhid
         module / udev rule): today it fails silently and passkeys just
         don't appear in the browser — say why and point at the fix.

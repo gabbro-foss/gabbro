@@ -244,7 +244,7 @@ control file, and the signature covers content, not the filename.
 ### AUR (`gabbro-bin`)
 
 The clone is a sibling of `gabbro/`, at `../gabbro-bin-aur/`, holding exactly
-`PKGBUILD` + `.SRCINFO` before and after this procedure (in between, `makepkg` adds
+`PKGBUILD` + `gabbro-bin.install` + `.SRCINFO` before and after this procedure (in between, `makepkg` adds
 `LICENSE`, the downloaded tarball and `src/`; step 5 removes them).
 
 1. Print the tarball hash. Run from `gabbro/`:
@@ -254,19 +254,19 @@ The clone is a sibling of `gabbro/`, at `../gabbro-bin-aur/`, holding exactly
    ```
 
 2. Edit `linux/packaging/aur/PKGBUILD`: set `pkgver` to the underscore form (e.g. `0.1.0_alpha.21`) and the **first** `sha256sums` entry to that hash (the second is LICENSE, changes only if LICENSE did). Commit and push it in `gabbro/`.
-3. Copy it across and check the published asset against the pinned sha; both source lines must say `Passed`. Run from `gabbro/`:
+3. Copy it across with the install hooks and check the published asset against the pinned sha; both source lines must say `Passed`. Run from `gabbro/`:
 
    ```bash
-   cp linux/packaging/aur/PKGBUILD ../gabbro-bin-aur/PKGBUILD && (cd ../gabbro-bin-aur && makepkg --verifysource)
+   cp linux/packaging/aur/PKGBUILD linux/packaging/aur/gabbro-bin.install ../gabbro-bin-aur/ && (cd ../gabbro-bin-aur && makepkg --verifysource)
    ```
 
 4. Regenerate `.SRCINFO` (generated, lives only in the clone) and push to the AUR:
 
    ```bash
-   cd ../gabbro-bin-aur && makepkg --printsrcinfo > .SRCINFO && git add PKGBUILD .SRCINFO && git commit -m "Update to $ver" && git push
+   cd ../gabbro-bin-aur && makepkg --printsrcinfo > .SRCINFO && git add PKGBUILD gabbro-bin.install .SRCINFO && git commit -m "Update to $ver" && git push
    ```
 
-5. Clean up, restoring the two-file state: `ls -a` must show only `.`, `..`, `.git`, `PKGBUILD`, `.SRCINFO`:
+5. Clean up, restoring the clone state: `ls -a` must show only `.`, `..`, `.git`, `PKGBUILD`, `gabbro-bin.install`, `.SRCINFO`:
 
    ```bash
    rm -f LICENSE gabbro-*-linux-x86_64.tar.gz && rm -rf src && ls -a
