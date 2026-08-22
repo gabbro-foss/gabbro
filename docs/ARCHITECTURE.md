@@ -94,7 +94,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2400 | 10 |
+| Flutter (`flutter test`) | 2412 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 16 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 173 | 15 |
 
@@ -148,8 +148,9 @@ resolved but never applied — inert, emits no warning.
   Information; plan archive: `docs/PASSKEY_INVESTIGATION.md`. Remaining:
   - [ ] uhid packaging: without the `uhid` module loaded and a `uaccess`
         udev rule, Gabbro cannot open `/dev/uhid` and Linux passkeys
-        silently do nothing. **Plan agreed 2026-08-22 (net + canon-TDD
-        below); no code written yet.**
+        silently do nothing. **Plan agreed 2026-08-22; net committed
+        2026-08-22 (`test/linux_packaging_test.dart`, 12 green); canon-TDD
+        list below is next.**
     - Findings (verified): `rust/src/passkey_daemon.rs:56` opens
       `/dev/uhid` (no module = ENOENT, no rule = EACCES). Working dev-box
       reference: rule `KERNEL=="uhid", SUBSYSTEM=="misc", TAG+="uaccess"`
@@ -170,15 +171,6 @@ resolved but never applied — inert, emits no warning.
       modprobe) and uninstall (rm both + reload; `modprobe -r uhid`
       optional) steps. New `linux/packaging/aur/gabbro-bin.install`;
       BUILD_AND_RELEASE AUR step gains "copy it to the AUR clone".
-    - Net first (`test/linux_packaging_test.dart`, content pins — no
-      dpkg-deb on Arch — green against CURRENT scripts, commit before any
-      script edit): build-deb.sh stages bundle to `/usr/lib/gabbro` +
-      exec bit, `/usr/bin/gabbro` wrapper, icons + desktop staging,
-      holder read from LICENSE, control name/Depends, version transform
-      `0.1.0-alpha.N` -> `0.1.0~alpha.N-1`, `--tarball`/`--bundle`/`--out`
-      args; PKGBUILD source URLs from `_pkgver`, same staging,
-      provides/conflicts/`!strip !debug`, LICENSE install; desktop entry
-      byte-identical across both scripts.
     - Then red (canon-TDD, same file): (1) canonical rule file tags
       `KERNEL=="uhid"` with `uaccess`; (2) conf is exactly `uhid`;
       (3) build-deb.sh stages both + postinst reload/modprobe/trigger +
