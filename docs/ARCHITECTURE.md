@@ -149,8 +149,51 @@ resolved but never applied — inert, emits no warning.
         udev rule, Gabbro cannot open `/dev/uhid` and Linux passkeys
         silently do nothing. Ship `linux/packaging/udev/70-gabbro-uhid.rules`
         + `modules-load.d` conf, installed by the `.deb` and the AUR
-        PKGBUILD; README manual step for tarball users. Bikeshed later: a
-        visible in-app hint when the daemon cannot start.
+        PKGBUILD; README manual step for tarball users. Install scripts
+        (deb postinst / AUR .install) must also `modprobe uhid` +
+        `udevadm control --reload` — the files alone only take effect after
+        a reboot.
+  - [ ] in-app hint when the passkey daemon cannot start (missing uhid
+        module / udev rule): today it fails silently and passkeys just
+        don't appear in the browser — say why and point at the fix.
+  - [ ] app passkeys need network (F1): without it every native-app passkey
+        request is refused (browsers unaffected — they validate against the
+        vendored signature list, offline). Locked decisions:
+        - network permission in the Android manifest only (no Linux change)
+        - `app_passkeys` toggle, OFF by default (informed opt-in)
+        - settings message: what the toggle does, why it needs network,
+          link to a future No-telemetry verification guide section in README
+        - About screen: sharper descriptor — no network unless app passkeys
+          are on, then only the login's own assetlinks fetch, no Gabbro
+          server exists
+        - network permission absent/revoked (e.g. GrapheneOS): everything
+          else works, only app passkeys refuse
+  - [ ] No-telemetry verification guide (promoted from Bikeshed; live
+        BEFORE this release — the `app_passkeys` settings message links to
+        it): README section proving the sharper claim — toggle off: zero
+        packets ever; toggle on, idle: zero; toggle on, app-passkey login:
+        exactly one assetlinks fetch to the login's own site; single network
+        call site in source (`fetchAssetLinks`), grep-able. Methods: ripgrep
+        scan, Wireshark/PCAPdroid, NetGuard.
+  - [ ] daemon-start failure is an unhandled async error (F2): the
+        `main.dart` catch only guards the synchronous start; the real
+        `/dev/uhid` failure arrives on the first async read and escapes it.
+        Red test first; must land as a clean "provider inactive". The
+        in-app hint item above hangs off this handler. Same work item (F4):
+        single-instance guard — exclusive flock on
+        `$XDG_RUNTIME_DIR/gabbro-passkey.lock` in daemon `start()` before
+        opening `/dev/uhid`, so a second instance gets a clean Err instead
+        of creating a duplicate virtual key.
+  - [ ] browser-list refresh at release (F5, Android only): the vendored
+        `passkey_privileged_browsers.json` ages — browsers released or
+        re-signed after the snapshot are refused passkeys until it is
+        re-vendored. Add a pre-flight step to BUILD_AND_RELEASE.md:
+        re-fetch Google's reference list, diff, commit.
+  - [ ] permanent USB product id (F3, Linux only): 0x1209:0x0001 is
+        pid.codes' shared TEST id, forbidden for released products; another
+        dev gadget with it could confuse the YubiKey filter. Register a
+        Gabbro PID via a pid.codes pull request (free for FOSS), then update
+        the constants in `rust/src/uhid.rs`.
   - [ ] merge `passkey_investigation_and_implementation` to master
   - [ ] challenge vault: reissue at v12 — LAST, on master after the merge
         (old crack-me vaults stay — red herrings are deliberate)
@@ -184,5 +227,4 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - **Windows support.**
 - **Yubico partnership.**
 - **Donation/sustainability model**: GitHub Sponsors is live; Monero possible later (a large, dedicated effort). Liberapay ruled out (2026-07-22 — Stripe forces business-type onboarding for individuals and has suspended Liberapay-linked accounts; no PayPal). Don't re-propose Liberapay.
-- **No-telemetry verification guide** (ripgrep scan, Wireshark, NetGuard).
 - **Support model** (GitHub Issues + SUPPORT.md for v1; revisit when user base exists).
