@@ -146,10 +146,6 @@ resolved but never applied — inert, emits no warning.
 - **Passkey provider — ship it.** Code, hardware (Linux + Android) and the
   full gate ALL GREEN 2026-08-22. Feature documented under General
   Information; plan archive: `docs/PASSKEY_INVESTIGATION.md`. Remaining:
-  - [ ] uhid packaging DONE in code + 20 content pins
-        (`test/linux_packaging_test.dart`) 2026-08-22. Remaining: verify
-        the `.deb` postinst on a real install at the next release
-        (content pins cannot prove it).
   - [ ] in-app hint when the passkey daemon cannot start (missing uhid
         module / udev rule): today it fails silently and passkeys just
         don't appear in the browser — say why and point at the fix.

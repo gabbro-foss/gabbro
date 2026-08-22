@@ -117,6 +117,9 @@ One `debian:trixie` container run (Arch has no `dpkg-deb` or `apt-ftparchive`)
 repackages the signed tarball into a `.deb` (no compile) and regenerates the APT
 index in `../gabbro-apt/`. Optional `.deb` validation: add `apt-get install -y lintian`
 + `lintian ./*.deb` + `apt-get install -y ./*.deb` inside the container.
+Container installs cannot prove the uhid udev rule activates (no udev, shared
+kernel; verified to that limit 2026-08-22) — after a release, confirm on one
+real Debian/Mint install that passkeys work without manual setup.
 
 The APT clone is a sibling of `gabbro/`, at `../gabbro-apt/` (GitHub Pages serves it at
 https://gabbro-foss.github.io/gabbro-apt). apt accepts its ed25519 signing key (verified
