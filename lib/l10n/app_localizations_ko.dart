@@ -1077,6 +1077,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get fieldUsername => '사용자 이름 (선택사항)';
 
   @override
+  String get passkeyFieldUsername => '사용자 이름';
+
+  @override
   String get fieldPassword => '비밀번호';
 
   @override

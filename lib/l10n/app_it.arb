@@ -434,6 +434,7 @@
   "fieldAndroidAppId": "ID app Android (facoltativo)",
   "fieldAndroidAppIdHelper": "Compila questo accesso in un'app Android. Funziona solo una corrispondenza esatta. Trova l'ID nel link Play Store dell'app, dopo id= (es. id=com.company.app).",
   "fieldUsername": "Nome utente (facoltativo)",
+  "passkeyFieldUsername": "Nome utente",
   "fieldPassword": "Password",
   "fieldSeparator": "Separatore",
   "fieldFolder": "Cartella",

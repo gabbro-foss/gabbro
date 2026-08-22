@@ -1099,6 +1099,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get fieldUsername => 'Όνομα χρήστη (προαιρετικό)';
 
   @override
+  String get passkeyFieldUsername => 'Όνομα χρήστη';
+
+  @override
   String get fieldPassword => 'Κωδικός';
 
   @override

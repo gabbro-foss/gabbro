@@ -2143,6 +2143,12 @@ abstract class AppLocalizations {
   /// **'Username (optional)'**
   String get fieldUsername;
 
+  /// No description provided for @passkeyFieldUsername.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get passkeyFieldUsername;
+
   /// No description provided for @fieldPassword.
   ///
   /// In en, this message translates to:

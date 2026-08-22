@@ -1092,6 +1092,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get fieldUsername => 'Felhasználónév (opcionális)';
 
   @override
+  String get passkeyFieldUsername => 'Felhasználónév';
+
+  @override
   String get fieldPassword => 'Jelszó';
 
   @override

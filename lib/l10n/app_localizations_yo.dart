@@ -1090,6 +1090,9 @@ class AppLocalizationsYo extends AppLocalizations {
   String get fieldUsername => 'Orukọ olumulo (aṣayan)';
 
   @override
+  String get passkeyFieldUsername => 'Orukọ olumulo';
+
+  @override
   String get fieldPassword => 'Ọrọ igbaniwọle';
 
   @override

@@ -1090,6 +1090,9 @@ class AppLocalizationsKk extends AppLocalizations {
   String get fieldUsername => 'Пайдаланушы аты (міндетті емес)';
 
   @override
+  String get passkeyFieldUsername => 'Пайдаланушы аты';
+
+  @override
   String get fieldPassword => 'Құпия сөз';
 
   @override

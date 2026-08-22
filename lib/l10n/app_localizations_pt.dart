@@ -1090,6 +1090,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get fieldUsername => 'Usuário (opcional)';
 
   @override
+  String get passkeyFieldUsername => 'Usuário';
+
+  @override
   String get fieldPassword => 'Senha';
 
   @override
@@ -3322,6 +3325,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get fieldUsername => 'Usuário (opcional)';
 
   @override
+  String get passkeyFieldUsername => 'Usuário';
+
+  @override
   String get fieldPassword => 'Senha';
 
   @override
@@ -5549,6 +5555,9 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get fieldUsername => 'Nome de utilizador (opcional)';
+
+  @override
+  String get passkeyFieldUsername => 'Nome de utilizador';
 
   @override
   String get fieldPassword => 'Palavra-passe';

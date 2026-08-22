@@ -1092,6 +1092,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get fieldUsername => 'Kasutajanimi (valikuline)';
 
   @override
+  String get passkeyFieldUsername => 'Kasutajanimi';
+
+  @override
   String get fieldPassword => 'Parool';
 
   @override

@@ -1092,6 +1092,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get fieldUsername => 'Uživatelské jméno (volitelné)';
 
   @override
+  String get passkeyFieldUsername => 'Uživatelské jméno';
+
+  @override
   String get fieldPassword => 'Heslo';
 
   @override

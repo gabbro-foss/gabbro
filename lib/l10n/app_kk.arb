@@ -434,6 +434,7 @@
   "fieldAndroidAppId": "Android қолданба идентификаторы (міндетті емес)",
   "fieldAndroidAppIdHelper": "Бұл кіру деректерін Android қолданбасында толтырады. Тек дәл сәйкестік жұмыс істейді. Идентификаторды қолданбаның Play Store сілтемесінен id= кейін табасыз (мысалы, id=com.company.app).",
   "fieldUsername": "Пайдаланушы аты (міндетті емес)",
+  "passkeyFieldUsername": "Пайдаланушы аты",
   "fieldPassword": "Құпия сөз",
   "fieldSeparator": "Бөлгіш",
   "fieldFolder": "Қалта",

@@ -1091,6 +1091,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get fieldUsername => 'Korisničko ime (neobavezno)';
 
   @override
+  String get passkeyFieldUsername => 'Korisničko ime';
+
+  @override
   String get fieldPassword => 'Lozinka';
 
   @override

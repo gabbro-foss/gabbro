@@ -434,6 +434,7 @@
   "fieldAndroidAppId": "Android aplikazioaren IDa (aukerakoa)",
   "fieldAndroidAppIdHelper": "Saio-hasiera hau Android aplikazio batean betetzen du. Bat-etortze zehatzak baino ez du funtzionatzen. Aurkitu IDa aplikazioaren Play Store estekan, id= ondoren (adib. id=com.company.app).",
   "fieldUsername": "Erabiltzaile-izena (aukerakoa)",
+  "passkeyFieldUsername": "Erabiltzaile-izena",
   "fieldPassword": "Pasahitza",
   "fieldSeparator": "Bereiztailea",
   "fieldFolder": "Karpeta",

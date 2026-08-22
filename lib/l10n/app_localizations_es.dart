@@ -1091,6 +1091,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get fieldUsername => 'Nombre de usuario (opcional)';
 
   @override
+  String get passkeyFieldUsername => 'Nombre de usuario';
+
+  @override
   String get fieldPassword => 'Contraseña';
 
   @override

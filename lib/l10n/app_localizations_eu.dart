@@ -1092,6 +1092,9 @@ class AppLocalizationsEu extends AppLocalizations {
   String get fieldUsername => 'Erabiltzaile-izena (aukerakoa)';
 
   @override
+  String get passkeyFieldUsername => 'Erabiltzaile-izena';
+
+  @override
   String get fieldPassword => 'Pasahitza';
 
   @override

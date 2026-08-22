@@ -1093,6 +1093,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get fieldUsername => 'Gebruikersnaam (optioneel)';
 
   @override
+  String get passkeyFieldUsername => 'Gebruikersnaam';
+
+  @override
   String get fieldPassword => 'Wachtwoord';
 
   @override

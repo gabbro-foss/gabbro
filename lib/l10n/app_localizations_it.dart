@@ -1092,6 +1092,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get fieldUsername => 'Nome utente (facoltativo)';
 
   @override
+  String get passkeyFieldUsername => 'Nome utente';
+
+  @override
   String get fieldPassword => 'Password';
 
   @override

@@ -1091,6 +1091,9 @@ class AppLocalizationsDa extends AppLocalizations {
   String get fieldUsername => 'Brugernavn (valgfrit)';
 
   @override
+  String get passkeyFieldUsername => 'Brugernavn';
+
+  @override
   String get fieldPassword => 'Adgangskode';
 
   @override

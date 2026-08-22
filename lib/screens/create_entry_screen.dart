@@ -1106,16 +1106,18 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     return [
       _folderPicker(),
       const SizedBox(height: 12),
+      // Read-only identity fields: plain labels, no "(optional)" — that
+      // invites input these fields refuse.
       TextFormField(
         initialValue: e.rpId,
         readOnly: true,
-        decoration: InputDecoration(labelText: l.fieldUrl),
+        decoration: InputDecoration(labelText: l.reviewFieldUrl),
       ),
       const SizedBox(height: 12),
       TextFormField(
         initialValue: e.userName,
         readOnly: true,
-        decoration: InputDecoration(labelText: l.fieldUsername),
+        decoration: InputDecoration(labelText: l.passkeyFieldUsername),
       ),
       const SizedBox(height: 12),
       TextFormField(

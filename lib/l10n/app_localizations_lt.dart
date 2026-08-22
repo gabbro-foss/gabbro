@@ -1093,6 +1093,9 @@ class AppLocalizationsLt extends AppLocalizations {
   String get fieldUsername => 'Vartotojo vardas (nebūtinas)';
 
   @override
+  String get passkeyFieldUsername => 'Vartotojo vardas';
+
+  @override
   String get fieldPassword => 'Slaptažodis';
 
   @override

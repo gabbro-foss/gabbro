@@ -1096,6 +1096,9 @@ class AppLocalizationsUk extends AppLocalizations {
   String get fieldUsername => 'Ім\'я користувача (необов\'язково)';
 
   @override
+  String get passkeyFieldUsername => 'Ім\'я користувача';
+
+  @override
   String get fieldPassword => 'Пароль';
 
   @override

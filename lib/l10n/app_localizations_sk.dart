@@ -1093,6 +1093,9 @@ class AppLocalizationsSk extends AppLocalizations {
   String get fieldUsername => 'Používateľské meno (voliteľné)';
 
   @override
+  String get passkeyFieldUsername => 'Používateľské meno';
+
+  @override
   String get fieldPassword => 'Heslo';
 
   @override

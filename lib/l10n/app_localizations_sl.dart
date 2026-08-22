@@ -1095,6 +1095,9 @@ class AppLocalizationsSl extends AppLocalizations {
   String get fieldUsername => 'Uporabniško ime (neobvezno)';
 
   @override
+  String get passkeyFieldUsername => 'Uporabniško ime';
+
+  @override
   String get fieldPassword => 'Geslo';
 
   @override

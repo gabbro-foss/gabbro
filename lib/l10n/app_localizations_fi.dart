@@ -1091,6 +1091,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get fieldUsername => 'Käyttäjänimi (valinnainen)';
 
   @override
+  String get passkeyFieldUsername => 'Käyttäjänimi';
+
+  @override
   String get fieldPassword => 'Salasana';
 
   @override

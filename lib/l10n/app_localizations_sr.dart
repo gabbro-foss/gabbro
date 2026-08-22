@@ -1091,6 +1091,9 @@ class AppLocalizationsSr extends AppLocalizations {
   String get fieldUsername => 'Корисничко име (необавезно)';
 
   @override
+  String get passkeyFieldUsername => 'Корисничко име';
+
+  @override
   String get fieldPassword => 'Лозинка';
 
   @override
@@ -3315,6 +3318,9 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get fieldUsername => 'Korisničko ime (neobavezno)';
+
+  @override
+  String get passkeyFieldUsername => 'Korisničko ime';
 
   @override
   String get fieldPassword => 'Lozinka';

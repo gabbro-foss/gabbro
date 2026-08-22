@@ -1095,6 +1095,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get fieldUsername => 'Имя пользователя (необязательно)';
 
   @override
+  String get passkeyFieldUsername => 'Имя пользователя';
+
+  @override
   String get fieldPassword => 'Пароль';
 
   @override

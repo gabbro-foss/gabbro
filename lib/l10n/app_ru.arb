@@ -434,6 +434,7 @@
   "fieldAndroidAppId": "Идентификатор приложения Android (необязательно)",
   "fieldAndroidAppIdHelper": "Заполняет эти данные для входа в приложении Android. Работает только точное совпадение. Найдите идентификатор в ссылке приложения в Play Store, после id= (напр. id=com.company.app).",
   "fieldUsername": "Имя пользователя (необязательно)",
+  "passkeyFieldUsername": "Имя пользователя",
   "fieldPassword": "Пароль",
   "fieldSeparator": "Разделитель",
   "fieldFolder": "Папка",

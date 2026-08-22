@@ -434,6 +434,7 @@
   "fieldAndroidAppId": "ИД Android апликације (опционо)",
   "fieldAndroidAppIdHelper": "Попуњава ову пријаву у Android апликацији. Ради само тачно подударање. ИД пронађите у вези апликације на Play Store-у, након ид= (нпр. ид=com.company.app).",
   "fieldUsername": "Корисничко име (необавезно)",
+  "passkeyFieldUsername": "Корисничко име",
   "fieldPassword": "Лозинка",
   "fieldSeparator": "Separator",
   "fieldFolder": "Мапа",

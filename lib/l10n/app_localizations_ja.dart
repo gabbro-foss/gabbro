@@ -1076,6 +1076,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get fieldUsername => 'ユーザー名 (任意)';
 
   @override
+  String get passkeyFieldUsername => 'ユーザー名';
+
+  @override
   String get fieldPassword => 'パスワード';
 
   @override

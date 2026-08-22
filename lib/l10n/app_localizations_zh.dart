@@ -1068,6 +1068,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get fieldUsername => '用户名（可选）';
 
   @override
+  String get passkeyFieldUsername => '用户名';
+
+  @override
   String get fieldPassword => '密码';
 
   @override
@@ -3196,6 +3199,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get fieldUsername => '用户名（可选）';
 
   @override
+  String get passkeyFieldUsername => '用户名';
+
+  @override
   String get fieldPassword => '密码';
 
   @override
@@ -5322,6 +5328,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get fieldUsername => '使用者名稱（選填）';
+
+  @override
+  String get passkeyFieldUsername => '使用者名稱';
 
   @override
   String get fieldPassword => '密碼';

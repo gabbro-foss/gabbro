@@ -1090,6 +1090,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get fieldUsername => 'Lietotājvārds (neobligāts)';
 
   @override
+  String get passkeyFieldUsername => 'Lietotājvārds';
+
+  @override
   String get fieldPassword => 'Parole';
 
   @override

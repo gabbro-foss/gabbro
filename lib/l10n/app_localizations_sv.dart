@@ -1091,6 +1091,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get fieldUsername => 'Användarnamn (valfritt)';
 
   @override
+  String get passkeyFieldUsername => 'Användarnamn';
+
+  @override
   String get fieldPassword => 'Lösenord';
 
   @override
