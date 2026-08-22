@@ -81,7 +81,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2396 | 10 |
+| Flutter (`flutter test`) | 2398 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 16 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 173 | 15 |
 
@@ -251,8 +251,9 @@ resolved but never applied — inert, emits no warning.
               -> consent dialog lists both accounts, tap one signs in.
         - [ ] 27 locked refusal; 28 no self-damage (YubiKey unlock,
               passphrase unlock, auto-type — unchanged with device up).
-    - [ ] Passkey filter card on the vault list (part of the feature, not an
-          afterthought): a11y + l10n (37 locales) considered up-front
+    - [x] Passkey filter chip on the vault list, green 2026-08-22 (order
+          All/Password/Passkey/...; `entryTypePasskey` already in all 37 ARBs;
+          chip row semantics inherited)
     - [ ] hardware + full gate green -> merge to master
     - [ ] challenge vault: reissue at v12 — LAST, on master after the merge
           (old crack-me vaults stay — red herrings are deliberate)
