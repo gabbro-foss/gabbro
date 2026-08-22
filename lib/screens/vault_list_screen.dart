@@ -410,6 +410,7 @@ class _VaultListScreenState extends State<VaultListScreen>
   static const _filters = [
     'All',
     'Password',
+    'Passkey',
     'Note',
     'Card',
     'Identity',
@@ -868,6 +869,7 @@ class _VaultListScreenState extends State<VaultListScreen>
   String _filterLabel(String f, AppLocalizations l) => switch (f) {
     'All' => l.entryTypeAll,
     'Password' => l.entryTypePassword,
+    'Passkey' => l.entryTypePasskey,
     'Note' => l.entryTypeNote,
     'Card' => l.entryTypeCard,
     'Identity' => l.entryTypeIdentity,
