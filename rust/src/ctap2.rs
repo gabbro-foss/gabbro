@@ -59,6 +59,20 @@ pub fn describe_request(payload: &[u8]) -> RequestPlan {
             },
             Err(bytes) => RequestPlan::Respond(bytes),
         },
+        // Silent authentication (CTAP 2.1 options.up=false): a browser
+        // pre-flight, answered with no user interaction — a consent dialog
+        // here costs the user a second click per sign-in. AllowList probes
+        // only: without one, answering would hand any site a signed
+        // assertion for a discoverable credential with zero user involvement.
+        Some(&CMD_GET_ASSERTION) if up_option_is_false(&payload[1..]) => {
+            match assertion_matches(&payload[1..]) {
+                Ok((_, mut matches)) if has_allow_list(&payload[1..]) => RequestPlan::Respond(
+                    perform_assert_silent(matches.swap_remove(0), &c_hash(&payload[1..])),
+                ),
+                Ok(_) => RequestPlan::Respond(vec![CTAP2_ERR_NO_CREDENTIALS]),
+                Err(bytes) => RequestPlan::Respond(bytes),
+            }
+        }
         Some(&CMD_GET_ASSERTION) => match assertion_matches(&payload[1..]) {
             Ok((rp_id, matches)) => RequestPlan::Ask {
                 is_create: false,
@@ -69,6 +83,26 @@ pub fn describe_request(payload: &[u8]) -> RequestPlan {
         },
         _ => RequestPlan::Respond(vec![CTAP1_ERR_INVALID_COMMAND]),
     }
+}
+
+/// True when the getAssertion request carries a non-empty allowList (key 3).
+fn has_allow_list(body: &[u8]) -> bool {
+    let Ok(Value::Map(req)) = ciborium::de::from_reader::<Value, _>(body) else {
+        return false;
+    };
+    matches!(int_key(&req, 3), Some(Value::Array(a)) if !a.is_empty())
+}
+
+/// True when the getAssertion options map (key 5) carries `up: false` —
+/// the CTAP 2.1 silent-authentication marker.
+fn up_option_is_false(body: &[u8]) -> bool {
+    let Ok(Value::Map(req)) = ciborium::de::from_reader::<Value, _>(body) else {
+        return false;
+    };
+    int_key(&req, 5)
+        .and_then(|v| v.as_map())
+        .and_then(|m| m.iter().find(|(k, _)| k.as_text() == Some("up")))
+        .is_some_and(|(_, v)| *v == Value::Bool(false))
 }
 
 /// Second half: perform a user-approved request. `account_index` selects among
@@ -300,26 +334,54 @@ fn perform_assert(pk: crate::vault::entry::PasskeyEntry, hash: &[u8]) -> Vec<u8>
         Ok(p) => p,
         Err(_) => return vec![CTAP2_ERR_OPERATION_DENIED],
     };
+    assertion_response(
+        parts.credential_id,
+        parts.auth_data,
+        parts.signature_der,
+        parts.user_handle,
+    )
+}
+
+/// Sign a silent assertion (options.up=false): same response shape, but the
+/// authenticator data carries no UP/UV claim and no user was consulted. The
+/// key never leaves this function.
+fn perform_assert_silent(pk: crate::vault::entry::PasskeyEntry, hash: &[u8]) -> Vec<u8> {
+    use crate::crypto::webauthn;
+    let auth_data = webauthn::silent_assertion_authenticator_data(&pk.rp_id);
+    let signature_der = match webauthn::sign_assertion(&pk.private_key, &auth_data, hash) {
+        Ok(s) => s,
+        Err(_) => return vec![CTAP2_ERR_OPERATION_DENIED],
+    };
+    assertion_response(
+        pk.credential_id.clone(),
+        auth_data,
+        signature_der,
+        pk.user_handle.clone(),
+    )
+}
+
+/// The CTAP2 getAssertion response map shared by the consented and silent
+/// paths.
+fn assertion_response(
+    credential_id: Vec<u8>,
+    auth_data: Vec<u8>,
+    signature_der: Vec<u8>,
+    user_handle: Vec<u8>,
+) -> Vec<u8> {
     let map = Value::Map(vec![
         (
             Value::Integer(1.into()),
             Value::Map(vec![
-                (
-                    Value::Text("id".into()),
-                    Value::Bytes(parts.credential_id.clone()),
-                ),
+                (Value::Text("id".into()), Value::Bytes(credential_id)),
                 (Value::Text("type".into()), Value::Text("public-key".into())),
             ]),
         ),
-        (Value::Integer(2.into()), Value::Bytes(parts.auth_data)),
-        (Value::Integer(3.into()), Value::Bytes(parts.signature_der)),
+        (Value::Integer(2.into()), Value::Bytes(auth_data)),
+        (Value::Integer(3.into()), Value::Bytes(signature_der)),
         // 0x04 user: spec-required for discoverable credentials; id only.
         (
             Value::Integer(4.into()),
-            Value::Map(vec![(
-                Value::Text("id".into()),
-                Value::Bytes(parts.user_handle),
-            )]),
+            Value::Map(vec![(Value::Text("id".into()), Value::Bytes(user_handle))]),
         ),
     ]);
     let mut out = vec![CTAP2_OK];
@@ -885,6 +947,73 @@ mod tests {
                 (Value::Text("id".into()), Value::Bytes(vec![0xEE; 32])),
                 (Value::Text("type".into()), Value::Text("public-key".into())),
             ])]),
+        ));
+        let resp = handle_request(&request(0x02, &Value::Map(req)), &NeverAsked);
+
+        assert_eq!(resp, vec![0x2e], "CTAP2_ERR_NO_CREDENTIALS");
+        cleanup(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn silent_up_false_allowlist_probe_answers_without_consent() {
+        // Brave pre-flights a filled-username sign-in with an allowList
+        // getAssertion carrying options.up=false (CTAP 2.1 silent
+        // authentication). It must be answered with no consent and with UP
+        // and UV clear — otherwise the user pays a second consent click for
+        // every such sign-in (matrix D1 row 5b).
+        let path = with_unlocked_vault("silent_probe");
+        let cred = minted_cred_id(&handle_request(
+            &request(
+                0x01,
+                &make_credential_value_named("user@example.com", b"h1"),
+            ),
+            &Approve,
+        ));
+
+        let Value::Map(mut req) = get_assertion_value("example.com", &[0x22; 32]) else {
+            panic!("request is a map")
+        };
+        req.push((
+            Value::Integer(3.into()),
+            Value::Array(vec![Value::Map(vec![
+                (Value::Text("id".into()), Value::Bytes(cred.clone())),
+                (Value::Text("type".into()), Value::Text("public-key".into())),
+            ])]),
+        ));
+        req.push((
+            Value::Integer(5.into()),
+            Value::Map(vec![(Value::Text("up".into()), Value::Bool(false))]),
+        ));
+        let resp = handle_request(&request(0x02, &Value::Map(req)), &NeverAsked);
+
+        assert_eq!(resp.first(), Some(&0x00), "CTAP2_OK status");
+        let Value::Map(map) = ciborium::de::from_reader::<Value, _>(&resp[1..]).unwrap() else {
+            panic!("getAssertion response is a map")
+        };
+        let Value::Bytes(ad) = map_get(&map, 2) else {
+            panic!("authData is bytes")
+        };
+        assert_eq!(ad[32] & 0x01, 0, "UP must be clear on a silent assertion");
+        assert_eq!(ad[32] & 0x04, 0, "UV must be clear on a silent assertion");
+        cleanup(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn silent_up_false_without_allowlist_refuses() {
+        // Silent authentication is for allowList probes only: without one,
+        // answering would hand any site a signed assertion for a discoverable
+        // credential with zero user involvement. NO_CREDENTIALS, no consent.
+        let path = with_unlocked_vault("silent_no_allowlist");
+        let _ = handle_request(&request(0x01, &make_credential_value()), &Approve);
+
+        let Value::Map(mut req) = get_assertion_value("example.com", &[0x22; 32]) else {
+            panic!("request is a map")
+        };
+        req.push((
+            Value::Integer(5.into()),
+            Value::Map(vec![(Value::Text("up".into()), Value::Bool(false))]),
         ));
         let resp = handle_request(&request(0x02, &Value::Map(req)), &NeverAsked);
 

@@ -64,9 +64,21 @@ pub fn generate_es256() -> Es256KeyPair {
 /// synced (backup eligible and backed up). Counter stays 0 — the sanctioned
 /// constant for synced passkeys.
 pub fn assertion_authenticator_data(rp_id: &str) -> Vec<u8> {
+    assertion_auth_data_with_flags(rp_id, 0x1d)
+}
+
+/// authenticatorData for a silent assertion (CTAP 2.1 `options.up=false`):
+/// BE|BS only (0x18) — no user presence or verification was performed, and
+/// claiming either on a browser pre-flight would be lying to the relying
+/// party.
+pub fn silent_assertion_authenticator_data(rp_id: &str) -> Vec<u8> {
+    assertion_auth_data_with_flags(rp_id, 0x18)
+}
+
+fn assertion_auth_data_with_flags(rp_id: &str, flags: u8) -> Vec<u8> {
     let mut ad = Vec::with_capacity(37);
     ad.extend_from_slice(&Sha256::digest(rp_id.as_bytes()));
-    ad.push(0x1d);
+    ad.push(flags);
     ad.extend_from_slice(&0u32.to_be_bytes());
     ad
 }
@@ -184,6 +196,18 @@ mod tests {
         assert_eq!(ad[32], 0x1d);
         // Constant zero counter — the WebAuthn-sanctioned value for synced
         // passkeys; relying parties must tolerate it.
+        assert_eq!(&ad[33..37], &[0, 0, 0, 0]);
+    }
+
+    #[test]
+    fn silent_authenticator_data_clears_up_and_uv() {
+        use sha2::{Digest, Sha256};
+        let ad = silent_assertion_authenticator_data("example.com");
+        assert_eq!(ad.len(), 37);
+        assert_eq!(&ad[..32], Sha256::digest(b"example.com").as_slice());
+        // BE + BS only (0x18): a silent probe performed no presence check
+        // and no verification, and must not claim either.
+        assert_eq!(ad[32], 0x18);
         assert_eq!(&ad[33..37], &[0, 0, 0, 0]);
     }
 
