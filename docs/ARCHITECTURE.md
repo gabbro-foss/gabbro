@@ -145,6 +145,12 @@ resolved but never applied — inert, emits no warning.
 - **Passkey provider — ship it.** Code, hardware (Linux + Android) and the
   full gate ALL GREEN 2026-08-22. Feature documented under General
   Information; plan archive: `docs/PASSKEY_INVESTIGATION.md`. Remaining:
+  - [ ] uhid packaging: without the `uhid` module loaded and a `uaccess`
+        udev rule, Gabbro cannot open `/dev/uhid` and Linux passkeys
+        silently do nothing. Ship `linux/packaging/udev/70-gabbro-uhid.rules`
+        + `modules-load.d` conf, installed by the `.deb` and the AUR
+        PKGBUILD; README manual step for tarball users. Bikeshed later: a
+        visible in-app hint when the daemon cannot start.
   - [ ] merge `passkey_investigation_and_implementation` to master
   - [ ] challenge vault: reissue at v12 — LAST, on master after the merge
         (old crack-me vaults stay — red herrings are deliberate)
