@@ -258,6 +258,10 @@ resolved but never applied — inert, emits no warning.
     - [x] Passkey filter chip on the vault list, green 2026-08-22 (order
           All/Password/Passkey/...; `entryTypePasskey` already in all 37 ARBs;
           chip row semantics inherited)
+    - [ ] FOUND (hardware 2026-08-22): passkey edit screen labels `url` and
+          `username` as "optional" but they are read-only (correct behaviour,
+          wrong label) — user is invited to edit fields that refuse input.
+          Fix labels before merge.
     - [ ] hardware + full gate green -> merge to master
     - [ ] challenge vault: reissue at v12 — LAST, on master after the merge
           (old crack-me vaults stay — red herrings are deliberate)
