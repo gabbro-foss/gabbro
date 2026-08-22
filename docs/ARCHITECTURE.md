@@ -16,6 +16,18 @@ Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
 
 **Authentication (app access):** Passphrase always; a FIDO2/WebAuthn hardware key (YubiKey) is strongly recommended but **not enforced** — a passphrase-only vault is the default. When keys are used: v1 Ed25519 (hardware constraint), target ML-DSA-44 once Yubico ships PQ-capable hardware (ADR-005), min 2 keys (primary + backup), max 4. Auto-lock: 30s default, configurable.
 
+**Passkey provider:** website passkeys (WebAuthn discoverable credentials) are
+vault entries (type Passkey, format v12) so they sync and back up; the tradeoff
+is website private keys in the vault instead of hardware, the upside no slot
+cap. Private keys never cross the FFI bridge (`create_entry` refuses Passkey
+DTOs; edits restore key material from stored). Android:
+`GabbroCredentialProviderService` via Credential Manager (log tag
+`GabbroPasskey:`; emulator not viable — hardware-test on the S23). Linux: an
+in-process uhid virtual FIDO2 key (VID/PID 0x1209:0x0001, filtered out of
+`fido_list_devices`) exists while the app runs; browsers speak CTAP2 to it,
+consent is an in-app dialog, a locked vault answers only getInfo, and silent
+allowList pre-flights (`options.up=false`) are answered without consent.
+
 **YubiKey NFC / NDEF OTP:** a YubiKey's OTP slot 1 (an NDEF URI) would open a browser when tapped on Android. Gabbro suppresses this via `NfcConfiguration().skipNdefCheck(true)` and by re-arming foreground dispatch after `stopNfcDiscovery`; OTP slot 1 can stay enabled (no `ykman` workaround).
 
 **Vault file format:** `.gabbro` binary. Plaintext header (magic, version, Argon2id params + salt, HKDF salt, nonce) + AES-256-GCM encrypted body (JSON-serialised entries). Self-contained; auth tag detects tampering.
@@ -73,7 +85,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 791 | 17 |
+| Rust (`cargo test -q`) | 835 | 20 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 13 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -130,143 +142,12 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-- **Passkey provider**: store website passkeys (WebAuthn discoverable credentials) in
-  the vault so they sync/back up. Distinct from the YubiKey (which unlocks the app);
-  tradeoff — website private keys live in the vault, not in hardware. Upside —
-  no slot cap (a YubiKey holds 25–100 passkeys).
-  Branch `passkey_investigation_and_implementation`, pushed 2026-08-21 (backup
-  only, NOT merged). Plan with sources: `docs/PASSKEY_INVESTIGATION.md`.
-  - Done: Rust core (Passkey entry type, vault VERSION 12, ES256/COSE/signing,
-    granular sync, compat gate) and Android provider (hardware-verified
-    2026-08-21, S23 full 8-step matrix incl. locked-vault flow). Full gate
-    ALL GREEN 2026-08-21. ADR-009 amended; ADR-008 stands — Linux must be
-    extension-free.
-  - Key decisions: the private key never crosses the bridge (`create_entry`
-    refuses Passkey DTOs; update restores key material from stored); provider
-    log tag `GabbroPasskey` (grep `"GabbroPasskey:"` with the colon).
-  - Android testing: emulator NOT viable (GMS-free image -> browsers bypass
-    CredMan; Play image without Google sign-in -> 3P providers disabled).
-    S23 only.
-  - No CHANGELOG entry until the feature ships. Remaining, in order:
-    - Regression net before daemon code (a11y/l10n need no new net: catalog
-      count guard + showDialog ban + 37-locale ARB sweep already catch any
-      new dialog):
-      - [x] Android-bytes pins green: RFC 6979 determinism + attestation-object
-            CBOR goldens (`rust/src/crypto/webauthn.rs`; 9 passed 2026-08-21)
-      - [x] auto-type/daemon isolation guard green
-            (`test/passkey_daemon_isolation_test.dart`; 3 passed 2026-08-21)
-      - [x] `fido_list_devices` filters the daemon's fixed VID/PID
-            (0x1209:0x0001); proven against a real uhid device 2026-08-21
-      - [x] Linux hardware matrix line: auto-type fill with the virtual FIDO
-            device up (D2 row 3, 2026-08-22)
-    - [ ] Linux: uhid virtual FIDO2 daemon (CTAPHID framing + CTAP2 commands)
-      - TDD list A approved (CTAPHID framing, pure bytes, module `ctaphid`):
-        - [x] 1. INIT: echo 8-byte nonce, allocate fresh CID, caps CBOR|NMSG
-        - [x] 2. reply <= 57 bytes: one packet, correct BCNT
-        - [x] 3. reply > 57 bytes: seq-numbered continuations, round-trips
-        - [x] 4. multi-packet request reassembles
-        - [x] 5. PING echoes verbatim
-        - [x] 6. unknown command -> ERROR INVALID_COMMAND
-        - [x] 7. corrected to spec (CTAP 2.1 s11.2): 7a message on a
-              never-allocated CID -> INVALID_CHANNEL; 7b message while
-              another is mid-assembly -> CHANNEL_BUSY; 7c wrong seq ->
-              INVALID_SEQ, message aborted; 7d stray continuation ->
-              ignored, no reply
-        - [x] 8. MSG (U2F) -> INVALID_COMMAND (NMSG advertised)
-      - TDD list B approved (CTAP2 commands on the vault session; NO unlock
-        flow on Linux — locked vault = flat refusal, only getInfo answers):
-        - [x] 9. getInfo: versions, zero AAGUID, options rk/uv/up true
-        - [x] 10. makeCredential + consent -> attestation, entry stored
-              (Android path re-verified: 17 bridge tests green after the
-              register_passkey_parts extraction)
-        - [x] 11. makeCredential, consent denied -> OPERATION_DENIED
-        - [x] 12. locked vault -> OPERATION_DENIED for create and assert,
-              nothing minted or signed, no consent screen shown (create
-              pinned; assert case pinned within item 13)
-        - [x] 13. getAssertion + consent -> verified signature, flags 0x1d
-              (incl. the assert side of 12; allowList narrowing not yet
-              honoured on the CTAP2 path — raised at group B wrap)
-        - [x] 14. getAssertion, no match -> NO_CREDENTIALS
-        - [x] 15. excludeList hit -> CREDENTIAL_EXCLUDED (after consent —
-              blocks silent has-account probing)
-        - [x] 16. malformed CBOR -> INVALID_CBOR, no panic
-        - [x] 16b. allowList honoured: named credential wins; named-but-absent
-              -> NO_CREDENTIALS (Android parity)
-        - [x] 16c. empty allowList + several accounts -> consent offers the
-              account list, user picks or cancels (dialog lands with 20)
-      - TDD list C approved (uhid transport + unlock filter; device exists
-        while the app runs, locked vault answers only getInfo):
-        - [x] 17. UHID_CREATE2: verified F1D0 descriptor, bus USB, fixed
-              VID/PID (0x1209:0x0001 until a permanent PID is registered)
-        - [x] 18. loopback over real /dev/uhid: INIT in -> reply out, both
-              ends (hidraw host side incl. fido_id/uaccess chain); dev udev
-              rule + modules-load.d installed on this box
-        - [x] 19. fido_list_devices drops our VID/PID -> YubiKey and
-              passphrase unlock unaffected (closes the net item)
-      - TDD list D approved (app wiring; Dart drives the loop and calls Rust,
-        like autotype — the ctap2 Consent trait cannot be driven from Dart):
-        - [x] 20a. split handle_request: describe_request/perform_approved/
-              denied_response; handle_request layered on top, 12 ctap2 tests
-              stayed green (18 total)
-        - Design (decided): consent is an in-app GabbroDialog, NOT a new
-          window and NOT the Android app-wrapper screen. NO forced raise
-          (tiling WMs + all Wayland refuse it) — daemon holds the request on
-          KEEPALIVE, sets an advisory urgency hint, dialog shows when the user
-          focuses Gabbro. Chooser (16c) needs a select-list; approve/cancel
-          for one account.
-        - [x] 20b-i. `api::passkey_daemon_bridge` (passkey_plan/passkey_perform/
-              passkey_denied); 5 tests green, FFI regenerated, binding clean
-        - [x] 20b-ii. `PasskeyDaemon` (`lib/passkey_daemon.dart`), device +
-              consent + bridge fns injected; 4 orchestration tests green
-        - Decided: Rust owns the uhid fd + CTAPHID state + KEEPALIVE timer
-          thread (one `crate::api` object, next_request/send_response); the
-          Dart PasskeyDevice is a thin wrapper. Keeps KEEPALIVE off the Dart
-          event loop during the consent wait.
-        - [x] 21a. ctaphid::keepalive_processing frames a KEEPALIVE(0x3b)
-              status-processing packet; unit test green
-        - Group D netted portion COMPLETE (20a, 20b-i, 20b-ii, 21a). The
-          fd/thread glue below moved to group E (B): written right before it
-          is hardware-tested, never straddling a commit unverified.
-      - TDD list E (hardware matrix in `.scratchpad`; release build, mock
-        vault). Glue G1-G3 committed (454f8205); matrix state 2026-08-21:
-        - [x] Content-hash crash: stale dev lib — FRB's Linux loader prefers
-              `<CWD>/rust/target/release/lib*.so` over the bundle; rebuild
-              with `cargo build --release --lib`, verify via
-              `frb_get_rust_content_hash` (dlopen), never `nm` (FRB exports
-              only frb_* dispatchers, no per-fn wire symbols).
-        - [x] Pump bug (matrix find: device enumerated, Brave offered only
-              Cancel): /dev/uhid writes must be INPUT2-wrapped and hidraw's
-              report-number byte stripped. Fixed red-first; pinned by ignored
-              test `passkey_daemon::tests::real_uhid_pump_answers_init_via_hidraw`.
-        - [x] 23-25 verified in Brave: create + consent + entry stored,
-              KEEPALIVE (5 s wait ok), sign-in; allowList narrowing correct
-              (username filled -> only that account offered).
-        - [x] 26 Firefox sign-in via chooser (D2 row 4, 2026-08-22).
-        - [x] Entry-list refresh on daemon store: R1-R6 all green 2026-08-22
-              (`test/vault_list_daemon_refresh_test.dart`, 6 tests; daemon
-              fires the `reloadVaultList` hook after an approved perform).
-              Hardware-verified in matrix D1 rows 2-3 (2026-08-22).
-        - [x] Matrix pass D1 (Brave) 2026-08-22, 8/8 pass: instant refresh,
-              chooser with empty username, filter chip, locked refusal (27),
-              passphrase unlock unaffected. Pass D2 6/6 (2026-08-22):
-              auto-type with device up, Firefox chooser sign-in, device gone
-              on quit — closes 26 and 28. Hardware DONE for the daemon.
-        - [x] D1 row 5b (two clicks per filled-username sign-in) fixed:
-              silent allowList pre-flight answered without consent
-              (ed1da4a2); hardware-retested one-click 2026-08-22, chooser
-              unchanged.
-    - [x] Passkey filter chip on the vault list, green 2026-08-22 (order
-          All/Password/Passkey/...; `entryTypePasskey` already in all 37 ARBs;
-          chip row semantics inherited)
-    - [x] Passkey edit optional-label fix (bf7a8a3c): read-only URL/Username
-          now plain labels (`reviewFieldUrl` reused + `passkeyFieldUsername`
-          derived in 37 ARBs); bg "Потребителско ime" mixed-script typo fixed
-          in passing. Net + label tests in
-          `test/create_entry_passkey_edit_test.dart`. Hardware 5/5
-          (multi-language incl. bg) 2026-08-22.
-    - [ ] hardware + full gate green -> merge to master
-    - [ ] challenge vault: reissue at v12 — LAST, on master after the merge
-          (old crack-me vaults stay — red herrings are deliberate)
+- **Passkey provider — ship it.** Code, hardware (Linux + Android) and the
+  full gate ALL GREEN 2026-08-22. Feature documented under General
+  Information; plan archive: `docs/PASSKEY_INVESTIGATION.md`. Remaining:
+  - [ ] merge `passkey_investigation_and_implementation` to master
+  - [ ] challenge vault: reissue at v12 — LAST, on master after the merge
+        (old crack-me vaults stay — red herrings are deliberate)
 
 ---
 

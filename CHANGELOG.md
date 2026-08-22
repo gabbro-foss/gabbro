@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Passkey provider.** Website passkeys (WebAuthn) can now live in the vault, so they sync and back up with everything else. Android: Gabbro registers as a credential provider. Linux: while Gabbro runs, browsers see it as a security key (a virtual FIDO2 device); create and sign-in are approved in an in-app dialog. New Passkey entry type and a Passkey filter chip on the vault list. Vault format v12; v11 vaults still open.
 - APT repository for Debian/Mint: add it once, later releases arrive via `apt upgrade` / Update Manager.
 
 ## [0.1.0-alpha.21] – 2026-08-18
