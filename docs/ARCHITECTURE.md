@@ -251,13 +251,10 @@ resolved but never applied — inert, emits no warning.
               chooser with empty username, filter chip, locked refusal (27),
               passphrase unlock unaffected. Remaining for pass D2: auto-type
               with device up, Firefox (26), device gone on quit (rest of 28).
-        - [ ] FOUND (D1 row 5b, root-caused 2026-08-22): Brave's silent
-              allowList pre-flight (`getAssertion` options.up=false) raises a
-              consent dialog because ctap2 ignores options.up -> sign-in with
-              a filled username needs two clicks. Approved TDD list:
-          - [x] S1-S3 green 2026-08-22 (ctap2 silent path + webauthn silent
-                authData 0x18; committed ed1da4a2)
-          - [ ] S4. hardware: d3 retest, one click
+        - [x] D1 row 5b (two clicks per filled-username sign-in) fixed:
+              silent allowList pre-flight answered without consent
+              (ed1da4a2); hardware-retested one-click 2026-08-22, chooser
+              unchanged.
     - [x] Passkey filter chip on the vault list, green 2026-08-22 (order
           All/Password/Passkey/...; `entryTypePasskey` already in all 37 ARBs;
           chip row semantics inherited)
