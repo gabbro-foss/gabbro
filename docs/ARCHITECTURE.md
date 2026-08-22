@@ -157,8 +157,8 @@ resolved but never applied — inert, emits no warning.
             (`test/passkey_daemon_isolation_test.dart`; 3 passed 2026-08-21)
       - [x] `fido_list_devices` filters the daemon's fixed VID/PID
             (0x1209:0x0001); proven against a real uhid device 2026-08-21
-      - [ ] Linux hardware matrix line: auto-type fill with the virtual FIDO
-            device up
+      - [x] Linux hardware matrix line: auto-type fill with the virtual FIDO
+            device up (D2 row 3, 2026-08-22)
     - [ ] Linux: uhid virtual FIDO2 daemon (CTAPHID framing + CTAP2 commands)
       - TDD list A approved (CTAPHID framing, pure bytes, module `ctaphid`):
         - [x] 1. INIT: echo 8-byte nonce, allocate fresh CID, caps CBOR|NMSG
@@ -241,16 +241,16 @@ resolved but never applied — inert, emits no warning.
         - [x] 23-25 verified in Brave: create + consent + entry stored,
               KEEPALIVE (5 s wait ok), sign-in; allowList narrowing correct
               (username filled -> only that account offered).
-        - [ ] 26 Firefox: one create or sign-in (maintainer installs
-              Firefox for this; Chrome/Chromium stay out).
+        - [x] 26 Firefox sign-in via chooser (D2 row 4, 2026-08-22).
         - [x] Entry-list refresh on daemon store: R1-R6 all green 2026-08-22
               (`test/vault_list_daemon_refresh_test.dart`, 6 tests; daemon
               fires the `reloadVaultList` hook after an approved perform).
               Hardware-verified in matrix D1 rows 2-3 (2026-08-22).
         - [x] Matrix pass D1 (Brave) 2026-08-22, 8/8 pass: instant refresh,
               chooser with empty username, filter chip, locked refusal (27),
-              passphrase unlock unaffected. Remaining for pass D2: auto-type
-              with device up, Firefox (26), device gone on quit (rest of 28).
+              passphrase unlock unaffected. Pass D2 6/6 (2026-08-22):
+              auto-type with device up, Firefox chooser sign-in, device gone
+              on quit — closes 26 and 28. Hardware DONE for the daemon.
         - [x] D1 row 5b (two clicks per filled-username sign-in) fixed:
               silent allowList pre-flight answered without consent
               (ed1da4a2); hardware-retested one-click 2026-08-22, chooser
