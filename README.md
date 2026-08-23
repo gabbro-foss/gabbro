@@ -143,16 +143,23 @@ tap open in your browser, not through Gabbro.
 
 Check it yourself:
 
-1. **Source.** One hit, in the assetlinks fetch:
+1. **Source.** Clone the repo, then scan it (plain grep, preinstalled everywhere):
 
    ```bash
-   grep -rn "openConnection\|HttpClient\|reqwest\|TcpStream" lib/ rust/src/ android/app/src/main
+   git clone https://github.com/gabbro-foss/gabbro.git && cd gabbro && grep -rn "openConnection\|HttpClient\|reqwest\|TcpStream" lib/ rust/src/ android/app/src/main
+   ```
+
+   Expected output — exactly one line, the assetlinks fetch:
+
+   ```
+   android/app/src/main/kotlin/app/gabbro/gabbro/GabbroPasskeyActivity.kt:119:        val conn = java.net.URL(url).openConnection() as HttpsURLConnection
    ```
 
 2. **On the wire.** Capture Gabbro's traffic with
-   [PCAPdroid](https://github.com/emanuele-f/PCAPdroid) (Android) or Wireshark
-   (Linux). Toggle off: zero packets, always. Toggle on, idle: zero. Toggle
-   on, app-passkey login: exactly one HTTPS request, to the login's own site.
+   [PCAPdroid](https://github.com/emanuele-f/PCAPdroid) (Android) or
+   [Wireshark](https://www.wireshark.org/) (Linux). Toggle off: zero packets,
+   always. Toggle on, idle: zero. Toggle on, app-passkey login: exactly one
+   HTTPS request, to the login's own site.
 
 3. **Deny and see.** Block Gabbro's network with NetGuard or GrapheneOS's
    Network permission: everything keeps working except app passkeys, which
