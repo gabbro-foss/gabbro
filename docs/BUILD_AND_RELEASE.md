@@ -44,7 +44,22 @@ bottom, in one shell (`ver` and `deb` carry through).**
    ver=$(sed -n 's/^version: *//p' pubspec.yaml | cut -d+ -f1) && echo "$ver"
    ```
 
-4. Run the full gate green. It covers every suite; nothing else needs running by hand. Use `--warm` if any dependency changed since the last run:
+4. Refresh the vendored privileged-browser list. A stale list refuses passkeys to
+   browsers released or re-signed since the snapshot:
+
+   ```bash
+   curl -fsS https://www.gstatic.com/gpm-passkeys-privileged-apps/apps.json -o /tmp/gpm_apps.json && \
+   diff <(jq -S .apps /tmp/gpm_apps.json) <(jq -S .apps android/app/src/main/assets/passkey_privileged_browsers.json) >/dev/null && echo UNCHANGED || \
+   (jq --arg c "Privileged browsers trusted to assert their own web origin for passkey calls. Vendored $(date +%F) from Google's reference list (https://www.gstatic.com/gpm-passkeys-privileged-apps/apps.json), same JSON shape. A browser absent here falls back to app-identity validation and will be refused for web rp_ids." '{_comment: $c, apps: .apps}' /tmp/gpm_apps.json > /tmp/gpm_vendored.json && \
+    mv /tmp/gpm_vendored.json android/app/src/main/assets/passkey_privileged_browsers.json)
+   ```
+
+   `UNCHANGED`: move on. Otherwise review `git diff`; the gate in the next step
+   re-tests the parser against the refreshed file. Same recipe as
+   [MAINTENANCE.md](MAINTENANCE.md#privileged-browser-list-android-passkeys) — keep the
+   two in sync.
+
+5. Run the full gate green. It covers every suite; nothing else needs running by hand. Use `--warm` if any dependency changed since the last run:
 
    ```bash
    ./gabbro_test
@@ -54,7 +69,7 @@ bottom, in one shell (`ver` and `deb` carry through).**
    - Fuzzer failure? Reproduce from the printed seed + op log, minimise, add the sequence to `vault_backward_compat.rs`. Widen with `GABBRO_FUZZ_CASES=64`.
    - Ignored Rust + Kotlin tests are hardware-only (YubiKey, biometric, AndroidKeyStore).
 
-5. Record the build toolchain (output order: Flutter, Rust, AGP, Kotlin, Java; no NDK: `ndkVersion = flutter.ndkVersion`, so the Flutter version determines it):
+6. Record the build toolchain (output order: Flutter, Rust, AGP, Kotlin, Java; no NDK: `ndkVersion = flutter.ndkVersion`, so the Flutter version determines it):
 
    ```bash
    flutter --version | head -1 && rustc --version && grep -oP '(com\.android\.application|org\.jetbrains\.kotlin\.android)"\) version "\K[^"]+' android/settings.gradle.kts && grep -oP 'VERSION_\K[0-9]+' android/app/build.gradle.kts | head -1
@@ -64,7 +79,7 @@ bottom, in one shell (`ver` and `deb` carry through).**
 
    *Built with Flutter 3.47.0, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21.*
 
-6. Commit and push the version + CHANGELOG bump.
+7. Commit and push the version + CHANGELOG bump (and the browser list, if step 4 changed it).
 
 **Build:**
 

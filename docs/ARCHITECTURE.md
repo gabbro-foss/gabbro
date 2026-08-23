@@ -162,11 +162,6 @@ resolved but never applied — inert, emits no warning.
     - [ ] wait for pid.codes review (external; F5 proceeds meanwhile)
     - [ ] PID granted: TDD the constants in `rust/src/uhid.rs`, hardware-verify
           on Linux, drop this whole item
-  - [ ] browser-list refresh at release (F5, Android only): the vendored
-        `passkey_privileged_browsers.json` ages — browsers released or
-        re-signed after the snapshot are refused passkeys until it is
-        re-vendored. Add a pre-flight step to BUILD_AND_RELEASE.md:
-        re-fetch Google's reference list, diff, commit.
   - [ ] merge `passkey_investigation_and_implementation` to master
   - [ ] challenge vault: reissue at v12 — LAST, on master after the merge
         (old crack-me vaults stay — red herrings are deliberate)

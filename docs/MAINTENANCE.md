@@ -17,6 +17,25 @@ how to update, and how often. Re-commit after updating (never fetched at build/r
 - **Cadence:** every few releases, or when a real site is reported mis-matched.
 - **Version:** tracked by the `// VERSION:` header inside the file.
 
+## Privileged browser list (Android passkeys)
+
+- **What:** browsers trusted to assert their own web origin for passkeys. A browser
+  released or re-signed after the snapshot is refused passkeys until re-vendored.
+- **Where:** `android/app/src/main/assets/passkey_privileged_browsers.json`
+- **Source:** https://www.gstatic.com/gpm-passkeys-privileged-apps/apps.json (Google's reference list).
+- **Refresh** (temp-file-then-move: a failed download can never truncate the shipped asset):
+  ```bash
+  curl -fsS https://www.gstatic.com/gpm-passkeys-privileged-apps/apps.json -o /tmp/gpm_apps.json && \
+  diff <(jq -S .apps /tmp/gpm_apps.json) <(jq -S .apps android/app/src/main/assets/passkey_privileged_browsers.json) >/dev/null && echo UNCHANGED || \
+  (jq --arg c "Privileged browsers trusted to assert their own web origin for passkey calls. Vendored $(date +%F) from Google's reference list (https://www.gstatic.com/gpm-passkeys-privileged-apps/apps.json), same JSON shape. A browser absent here falls back to app-identity validation and will be refused for web rp_ids." '{_comment: $c, apps: .apps}' /tmp/gpm_apps.json > /tmp/gpm_vendored.json && \
+   mv /tmp/gpm_vendored.json android/app/src/main/assets/passkey_privileged_browsers.json)
+  ```
+  `UNCHANGED`: done. Otherwise review `git diff`, run the Android unit leg
+  (`./gradlew :app:testDebugUnitTest`) and commit.
+- **Cadence:** every release (BUILD_AND_RELEASE.md pre-flight inlines this same
+  recipe — keep the two in sync), plus periodically if no release ships for months.
+- **Version:** the vendored date in the file's `_comment`.
+
 ## Dependencies (lockfile pins)
 
 - **What:** Dart/Flutter deps pinned by `pubspec.lock`; Rust by `Cargo.lock`. Pinned so a build
