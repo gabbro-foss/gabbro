@@ -149,12 +149,6 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-- **Permanent USB product id (F3, Linux only).** 0x1209:0x0001 is pid.codes'
-  shared TEST id; another dev gadget with it could confuse the YubiKey filter.
-  PR opened 2026-08-23 requesting 0x1209:0x6ABB:
-  https://github.com/pidcodes/pidcodes.github.com/pull/1265 — awaiting external
-  review (volunteer-run, can take months; not release-blocking). On grant: TDD
-  the constants in `rust/src/uhid.rs`, hardware-verify on Linux.
 
 ---
 
@@ -175,6 +169,11 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
 
 ### Housekeeping
+- **Permanent USB product id (Linux passkeys).** 0x1209:0x0001 is pid.codes'
+  shared TEST id; another dev gadget with it could confuse the YubiKey filter.
+  PR requesting 0x1209:0x6ABB awaits external review (volunteer-run, can take
+  months; not release-blocking): https://github.com/pidcodes/pidcodes.github.com/pull/1265
+  On grant: TDD the constants in `rust/src/uhid.rs`, hardware-verify on Linux.
 - **Delete `purgeLegacyRecentApps` at v1.0** (`MainActivity.kt` + `LegacyPurgeTest.kt`) — the one-shot cleanup of the removed suggestion-chip store. No pre-1.0 install will still be upgrading by then.
 
 ### Security (pre-v1)
