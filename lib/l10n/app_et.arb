@@ -434,6 +434,7 @@
   "fieldAndroidAppId": "Androidi rakenduse ID (valikuline)",
   "fieldAndroidAppIdHelper": "Täidab selle sisselogimise Androidi rakenduses. Töötab ainult täpne vaste. Leia ID rakenduse Play Store'i lingilt pärast id= (nt id=com.company.app).",
   "fieldUsername": "Kasutajanimi (valikuline)",
+  "passkeyFieldUsername": "Kasutajanimi",
   "fieldPassword": "Parool",
   "fieldSeparator": "Eraldaja",
   "fieldFolder": "Kaust",
@@ -649,7 +650,7 @@
   "aboutLicenceBody": "Gabbro on vaba ja avatud lähtekoodiga tarkvara, litsentseeritud GNU General Public License v3.0 only (GPL-3.0-only) alusel.\n\nSa võid seda tarkvara vabalt kasutada, uurida ja levitada selle litsentsi tingimuste kohaselt.",
   "aboutOwnerRole": "Projekti omanik, arhitekt ja peaaren daja:",
   "aboutAiPartner": "Tehisintellekti arenduspartner:",
-  "aboutNoTelemetry": "Gabbro ei tee ühtegi väljuvat võrguühendust. Telemetria puudub, analüütika puudub, kontod puuduvad.",
+  "aboutNoTelemetry": "Telemetria, analüütika, kontod ja Gabbro server puuduvad. Gabbro ei loo üldse võrguühendusi — välja arvatud siis, kui lülitad sisse rakenduste passkey-d: siis on ainus ühendus üks allalaadimine sisselogimise kohta, saidi enda rakenduste kontrollifail.",
 
   "strengthTierTerrible": "Kohutav",
   "strengthTierWeak": "Nõrk",
@@ -923,5 +924,18 @@
   "hintSearch": "Filtreerib kirjeid kirjutamise ajal",
   "hintFolderSelector": "Filtreerib kirjeid kausta järgi",
   "hintFilterChip": "Lülitab selle kategooriafiltri sisse või välja",
-  "hintEntryRow": "Avab selle kirje"
+  "hintEntryRow": "Avab selle kirje",
+  "entryTypePasskey": "Passkey",
+  "passkeyHintModuleMissing": "Passkey-d ei ole aktiivsed: kerneli moodul uhid on laadimata. Vaata passkey seadistussamme README failis.",
+  "passkeyHintNoAccess": "Passkey-d ei ole aktiivsed: Gabbrol puudub ligipääs seadmele /dev/uhid (udev reegel puudub). Vaata passkey seadistussamme README failis.",
+  "passkeyHintOther": "Passkey-d ei ole aktiivsed: virtuaalset turvavõtit ei õnnestunud käivitada. Vaata passkey seadistussamme README failis.",
+  "passkeyHintDontShowAgain": "Ära enam näita",
+  "sectionAppPasskeys": "Rakenduste passkey-d",
+  "appPasskeysDescription": "Luba Android-rakendustel passkey-dega sisse logida. Iga sisselogimine teeb ühe võrgupäringu: laadib saidi enda rakenduste kontrollifaili, et veenduda rakenduse ehtsuses. Muid võrguühendusi Gabbro kunagi ei loo — vaata „Verify no telemetry“ README failis.",
+  "appPasskeysTitle": "Luba rakenduste passkey-d",
+  "appPasskeysNote": "Kui väljas või võrgujuurdepääs on keelatud, keeldutakse ainult rakenduste sisselogimistest — brauserite passkey-d võrku kunagi ei kasuta.",
+  "passkeyCreatePrompt": "Kas luua saidile {site} passkey?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "Kas logida saiti {site} sisse oma passkey abil?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

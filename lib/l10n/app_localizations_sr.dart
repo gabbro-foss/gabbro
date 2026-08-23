@@ -104,6 +104,45 @@ class AppLocalizationsSr extends AppLocalizations {
       'Ниједна сачувана пријава не одговара овој апликацији или сајту.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Направити passkey за $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Пријавити се на $site помоћу passkey-а?';
+  }
+
+  @override
+  String get passkeyHintModuleMissing =>
+      'Passkey нису активни: модул језгра uhid није учитан. Погледајте кораке за подешавање passkey у README.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkey нису активни: Gabbro нема приступ /dev/uhid (недостаје udev правило). Погледајте кораке за подешавање passkey у README.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkey нису активни: виртуелни сигурносни кључ није могао да се покрене. Погледајте кораке за подешавање passkey у README.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Не приказуј поново';
+
+  @override
+  String get sectionAppPasskeys => 'Passkey за апликације';
+
+  @override
+  String get appPasskeysDescription =>
+      'Дозволите Android апликацијама пријаву помоћу passkey. Свака пријава прави један мрежни захтев: преузима датотеку за проверу апликација са самог сајта да провери да је апликација изворна. Gabbro никада не успоставља ниједну другу мрежну везу — погледајте „Verify no telemetry“ у README.';
+
+  @override
+  String get appPasskeysTitle => 'Дозволи passkey за апликације';
+
+  @override
+  String get appPasskeysNote =>
+      'Када је искључено, или када је мрежни приступ ускраћен, одбијају се само пријаве из апликација — passkey у прегледачима никада не користе мрежу.';
+
+  @override
   String get add => 'Додај';
 
   @override
@@ -666,6 +705,9 @@ class AppLocalizationsSr extends AppLocalizations {
   String get entryTypeCustom => 'Прилагођено';
 
   @override
+  String get entryTypePasskey => 'Passkey';
+
+  @override
   String errorPrefix(String error) {
     return 'Грешка: $error';
   }
@@ -1076,6 +1118,9 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get fieldUsername => 'Корисничко име (необавезно)';
+
+  @override
+  String get passkeyFieldUsername => 'Корисничко име';
 
   @override
   String get fieldPassword => 'Лозинка';
@@ -1508,7 +1553,7 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro не успоставља никакве одлазне мрежне везе. Нема телеметрије, аналитике ни налога.';
+      'Нема телеметрије, аналитике, налога ни Gabbro сервера. Gabbro уопште не успоставља мрежне везе — осим ако укључите passkey за апликације: тада је једина веза једно преузимање по пријави, датотека за проверу апликација самог сајта.';
 
   @override
   String get strengthTierTerrible => 'Ужасно';
@@ -2316,6 +2361,45 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
       'Nijedna sačuvana prijava ne odgovara ovoj aplikaciji ili sajtu.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Napraviti passkey za $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Prijaviti se na $site pomoću passkeya?';
+  }
+
+  @override
+  String get passkeyHintModuleMissing =>
+      'Passkey nisu aktivni: modul jezgra uhid nije učitan. Pogledajte korake za podešavanje passkey u README.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkey nisu aktivni: Gabbro nema pristup /dev/uhid (nedostaje udev pravilo). Pogledajte korake za podešavanje passkey u README.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkey nisu aktivni: virtuelni sigurnosni ključ nije mogao da se pokrene. Pogledajte korake za podešavanje passkey u README.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Ne prikazuj ponovo';
+
+  @override
+  String get sectionAppPasskeys => 'Passkey za aplikacije';
+
+  @override
+  String get appPasskeysDescription =>
+      'Dozvolite Android aplikacijama prijavu pomoću passkey. Svaka prijava pravi jedan mrežni zahtev: preuzima datoteku za proveru aplikacija sa samog sajta da proveri da je aplikacija izvorna. Gabbro nikada ne uspostavlja nijednu drugu mrežnu vezu — pogledajte „Verify no telemetry“ u README.';
+
+  @override
+  String get appPasskeysTitle => 'Dozvoli passkey za aplikacije';
+
+  @override
+  String get appPasskeysNote =>
+      'Kada je isključeno, ili kada je mrežni pristup uskraćen, odbijaju se samo prijave iz aplikacija — passkey u pregledačima nikada ne koriste mrežu.';
+
+  @override
   String get add => 'Dodaj';
 
   @override
@@ -2879,6 +2963,9 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   String get entryTypeCustom => 'Prilagođeno';
 
   @override
+  String get entryTypePasskey => 'Passkey';
+
+  @override
   String errorPrefix(String error) {
     return 'Greška: $error';
   }
@@ -3289,6 +3376,9 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get fieldUsername => 'Korisničko ime (neobavezno)';
+
+  @override
+  String get passkeyFieldUsername => 'Korisničko ime';
 
   @override
   String get fieldPassword => 'Lozinka';
@@ -3721,7 +3811,7 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro ne uspostavlja nikakve odlazne mrežne veze. Nema telemetrije, analitike ni naloga.';
+      'Nema telemetrije, analitike, naloga ni Gabbro servera. Gabbro uopšte ne uspostavlja mrežne veze — osim ako uključite passkey za aplikacije: tada je jedina veza jedno preuzimanje po prijavi, datoteka za proveru aplikacija samog sajta.';
 
   @override
   String get strengthTierTerrible => 'Užasno';

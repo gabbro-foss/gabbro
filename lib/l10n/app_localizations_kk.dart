@@ -104,6 +104,45 @@ class AppLocalizationsKk extends AppLocalizations {
       'Бұл қолданбаға немесе сайтқа сәйкес келетін сақталған кіру деректері жоқ.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return '$site үшін passkey жасау керек пе?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return '$site сайтына passkey арқылы кіресіз бе?';
+  }
+
+  @override
+  String get passkeyHintModuleMissing =>
+      'Passkey белсенді емес: uhid ядро модулі жүктелмеген. README ішіндегі passkey орнату қадамдарын қараңыз.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkey белсенді емес: Gabbro /dev/uhid құрылғысына қатынаса алмайды (udev ережесі жоқ). README ішіндегі passkey орнату қадамдарын қараңыз.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkey белсенді емес: виртуалды қауіпсіздік кілті іске қосылмады. README ішіндегі passkey орнату қадамдарын қараңыз.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Қайта көрсетпеу';
+
+  @override
+  String get sectionAppPasskeys => 'Қолданба passkey-лері';
+
+  @override
+  String get appPasskeysDescription =>
+      'Android қолданбаларына passkey арқылы кіруге рұқсат беру. Әр кіру бір ғана желілік сұрау жасайды: сайттың өз қолданба тексеру файлын жүктеп, қолданбаның түпнұсқа екенін тексереді. Gabbro бұдан басқа ешқашан желіге қосылмайды — README ішіндегі «Verify no telemetry» бөлімін қараңыз.';
+
+  @override
+  String get appPasskeysTitle => 'Қолданба passkey-леріне рұқсат беру';
+
+  @override
+  String get appPasskeysNote =>
+      'Өшірулі болғанда немесе желіге қатынас берілмегенде тек қолданбалардан кіру қабылданбайды — браузерлердегі passkey желіні ешқашан пайдаланбайды.';
+
+  @override
   String get add => 'Қосу';
 
   @override
@@ -666,6 +705,9 @@ class AppLocalizationsKk extends AppLocalizations {
   String get entryTypeCustom => 'Арнаулы';
 
   @override
+  String get entryTypePasskey => 'Passkey';
+
+  @override
   String errorPrefix(String error) {
     return 'Қате: $error';
   }
@@ -1075,6 +1117,9 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get fieldUsername => 'Пайдаланушы аты (міндетті емес)';
+
+  @override
+  String get passkeyFieldUsername => 'Пайдаланушы аты';
 
   @override
   String get fieldPassword => 'Құпия сөз';
@@ -1505,7 +1550,7 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro ешқандай сыртқы желі қосылымын орнатпайды. Телеметрия, аналитика немесе аккаунттар жоқ.';
+      'Телеметрия, аналитика, аккаунттар және Gabbro сервері жоқ. Gabbro желіге мүлдем қосылмайды — тек қолданба passkey-лерін қоссаңыз: онда жалғыз қосылым — әр кіру сайын бір жүктеу, сайттың өз қолданба тексеру файлы.';
 
   @override
   String get strengthTierTerrible => 'Өте нашар';

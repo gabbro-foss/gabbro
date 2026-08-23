@@ -105,6 +105,45 @@ class AppLocalizationsEl extends AppLocalizations {
       'Κανένα αποθηκευμένο στοιχείο σύνδεσης δεν ταιριάζει με αυτήν την εφαρμογή ή τον ιστότοπο.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Δημιουργία passkey για το $site;';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Σύνδεση στο $site με το passkey σας;';
+  }
+
+  @override
+  String get passkeyHintModuleMissing =>
+      'Τα passkey είναι ανενεργά: το άρθρωμα πυρήνα uhid δεν είναι φορτωμένο. Δείτε τα βήματα ρύθμισης passkey στο README.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Τα passkey είναι ανενεργά: το Gabbro δεν έχει πρόσβαση στο /dev/uhid (λείπει ο κανόνας udev). Δείτε τα βήματα ρύθμισης passkey στο README.';
+
+  @override
+  String get passkeyHintOther =>
+      'Τα passkey είναι ανενεργά: το εικονικό κλειδί ασφαλείας δεν μπόρεσε να ξεκινήσει. Δείτε τα βήματα ρύθμισης passkey στο README.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Να μην εμφανιστεί ξανά';
+
+  @override
+  String get sectionAppPasskeys => 'Passkey εφαρμογών';
+
+  @override
+  String get appPasskeysDescription =>
+      'Επιτρέψτε σε εφαρμογές Android να συνδέονται με passkey. Κάθε σύνδεση κάνει ένα μόνο αίτημα δικτύου: κατεβάζει το αρχείο επαλήθευσης εφαρμογών του ίδιου του ιστότοπου για να ελέγξει ότι η εφαρμογή είναι γνήσια. Το Gabbro δεν κάνει ποτέ άλλη σύνδεση δικτύου — δείτε «Verify no telemetry» στο README.';
+
+  @override
+  String get appPasskeysTitle => 'Να επιτρέπονται passkey εφαρμογών';
+
+  @override
+  String get appPasskeysNote =>
+      'Όταν είναι ανενεργό, ή όταν η πρόσβαση δικτύου απορρίπτεται, απορρίπτονται μόνο οι συνδέσεις εφαρμογών — τα passkey στα προγράμματα περιήγησης δεν χρησιμοποιούν ποτέ το δίκτυο.';
+
+  @override
   String get add => 'Προσθήκη';
 
   @override
@@ -670,6 +709,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get entryTypeCustom => 'Προσαρμοσμένο';
 
   @override
+  String get entryTypePasskey => 'Passkey';
+
+  @override
   String errorPrefix(String error) {
     return 'Σφάλμα: $error';
   }
@@ -1084,6 +1126,9 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get fieldUsername => 'Όνομα χρήστη (προαιρετικό)';
+
+  @override
+  String get passkeyFieldUsername => 'Όνομα χρήστη';
 
   @override
   String get fieldPassword => 'Κωδικός';
@@ -1517,7 +1562,7 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Το Gabbro δεν δημιουργεί κανένα εξερχόμενο σύνδεσμο δικτύου. Χωρίς τηλεμετρία, αναλυτικά ή λογαριασμούς.';
+      'Χωρίς τηλεμετρία, αναλυτικά, λογαριασμούς ή διακομιστή Gabbro. Το Gabbro δεν κάνει καμία απολύτως σύνδεση δικτύου — εκτός αν ενεργοποιήσετε τα passkey εφαρμογών: τότε η μόνη σύνδεση είναι μία λήψη ανά σύνδεση εφαρμογής, το αρχείο επαλήθευσης εφαρμογών του ίδιου του ιστότοπου.';
 
   @override
   String get strengthTierTerrible => 'Τρομερό';

@@ -434,6 +434,7 @@
   "fieldAndroidAppId": "Αναγνωριστικό εφαρμογής Android (προαιρετικό)",
   "fieldAndroidAppIdHelper": "Συμπληρώνει αυτά τα στοιχεία σύνδεσης σε μια εφαρμογή Android. Λειτουργεί μόνο ακριβής αντιστοίχιση. Βρείτε το αναγνωριστικό στον σύνδεσμο Play Store της εφαρμογής, μετά το id= (π.χ. id=com.company.app).",
   "fieldUsername": "Όνομα χρήστη (προαιρετικό)",
+  "passkeyFieldUsername": "Όνομα χρήστη",
   "fieldPassword": "Κωδικός",
   "fieldSeparator": "Διαχωριστής",
   "fieldFolder": "Φάκελος",
@@ -649,7 +650,7 @@
   "aboutLicenceBody": "Το Gabbro είναι ελεύθερο λογισμικό ανοιχτού κώδικα, αδειοδοτημένο υπό GNU General Public License v3.0 only (GPL-3.0-only).\n\nΈχετε την ελευθερία να χρησιμοποιείτε, να μελετάτε και να διανέμετε αυτή την εφαρμογή υπό τους όρους της άδειας.",
   "aboutOwnerRole": "Ιδιοκτήτης έργου, αρχιτέκτονας και κύριος προγραμματιστής:",
   "aboutAiPartner": "Συνεργάτης AI ανάπτυξης:",
-  "aboutNoTelemetry": "Το Gabbro δεν δημιουργεί κανένα εξερχόμενο σύνδεσμο δικτύου. Χωρίς τηλεμετρία, αναλυτικά ή λογαριασμούς.",
+  "aboutNoTelemetry": "Χωρίς τηλεμετρία, αναλυτικά, λογαριασμούς ή διακομιστή Gabbro. Το Gabbro δεν κάνει καμία απολύτως σύνδεση δικτύου — εκτός αν ενεργοποιήσετε τα passkey εφαρμογών: τότε η μόνη σύνδεση είναι μία λήψη ανά σύνδεση εφαρμογής, το αρχείο επαλήθευσης εφαρμογών του ίδιου του ιστότοπου.",
 
   "strengthTierTerrible": "Τρομερό",
   "strengthTierWeak": "Αδύναμο",
@@ -922,5 +923,18 @@
   "hintSearch": "Φιλτράρει τις καταχωρίσεις καθώς πληκτρολογείτε",
   "hintFolderSelector": "Φιλτράρει τις καταχωρίσεις ανά φάκελο",
   "hintFilterChip": "Ενεργοποιεί ή απενεργοποιεί αυτό το φίλτρο κατηγορίας",
-  "hintEntryRow": "Ανοίγει αυτήν την καταχώριση"
+  "hintEntryRow": "Ανοίγει αυτήν την καταχώριση",
+  "entryTypePasskey": "Passkey",
+  "passkeyHintModuleMissing": "Τα passkey είναι ανενεργά: το άρθρωμα πυρήνα uhid δεν είναι φορτωμένο. Δείτε τα βήματα ρύθμισης passkey στο README.",
+  "passkeyHintNoAccess": "Τα passkey είναι ανενεργά: το Gabbro δεν έχει πρόσβαση στο /dev/uhid (λείπει ο κανόνας udev). Δείτε τα βήματα ρύθμισης passkey στο README.",
+  "passkeyHintOther": "Τα passkey είναι ανενεργά: το εικονικό κλειδί ασφαλείας δεν μπόρεσε να ξεκινήσει. Δείτε τα βήματα ρύθμισης passkey στο README.",
+  "passkeyHintDontShowAgain": "Να μην εμφανιστεί ξανά",
+  "sectionAppPasskeys": "Passkey εφαρμογών",
+  "appPasskeysDescription": "Επιτρέψτε σε εφαρμογές Android να συνδέονται με passkey. Κάθε σύνδεση κάνει ένα μόνο αίτημα δικτύου: κατεβάζει το αρχείο επαλήθευσης εφαρμογών του ίδιου του ιστότοπου για να ελέγξει ότι η εφαρμογή είναι γνήσια. Το Gabbro δεν κάνει ποτέ άλλη σύνδεση δικτύου — δείτε «Verify no telemetry» στο README.",
+  "appPasskeysTitle": "Να επιτρέπονται passkey εφαρμογών",
+  "appPasskeysNote": "Όταν είναι ανενεργό, ή όταν η πρόσβαση δικτύου απορρίπτεται, απορρίπτονται μόνο οι συνδέσεις εφαρμογών — τα passkey στα προγράμματα περιήγησης δεν χρησιμοποιούν ποτέ το δίκτυο.",
+  "passkeyCreatePrompt": "Δημιουργία passkey για το {site};",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "Σύνδεση στο {site} με το passkey σας;",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

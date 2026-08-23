@@ -104,6 +104,45 @@ class AppLocalizationsLv extends AppLocalizations {
       'Neviena saglabātā pieteikšanās neatbilst šai lietotnei vai vietnei.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Vai izveidot passkey vietnei $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Vai pierakstīties vietnē $site ar passkey?';
+  }
+
+  @override
+  String get passkeyHintModuleMissing =>
+      'Passkey nav aktīvas: kodola modulis uhid nav ielādēts. Skatiet passkey iestatīšanas soļus README failā.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkey nav aktīvas: Gabbro nevar piekļūt /dev/uhid (trūkst udev noteikuma). Skatiet passkey iestatīšanas soļus README failā.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkey nav aktīvas: virtuālo drošības atslēgu neizdevās palaist. Skatiet passkey iestatīšanas soļus README failā.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Vairs nerādīt';
+
+  @override
+  String get sectionAppPasskeys => 'Lietotņu passkey';
+
+  @override
+  String get appPasskeysDescription =>
+      'Atļaut Android lietotnēm pierakstīties ar passkey. Katra pierakstīšanās veic vienu tīkla pieprasījumu: lejupielādē pašas vietnes lietotņu pārbaudes failu, lai pārliecinātos, ka lietotne ir īsta. Nekādu citu tīkla savienojumu Gabbro nekad neveido — skatiet „Verify no telemetry” README failā.';
+
+  @override
+  String get appPasskeysTitle => 'Atļaut lietotņu passkey';
+
+  @override
+  String get appPasskeysNote =>
+      'Kad izslēgts vai tīkla piekļuve liegta, tiek noraidītas tikai lietotņu pierakstīšanās — passkey pārlūkos tīklu nekad neizmanto.';
+
+  @override
   String get add => 'Pievienot';
 
   @override
@@ -666,6 +705,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get entryTypeCustom => 'Pielāgots';
 
   @override
+  String get entryTypePasskey => 'Passkey';
+
+  @override
   String errorPrefix(String error) {
     return 'Kļūda: $error';
   }
@@ -1075,6 +1117,9 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get fieldUsername => 'Lietotājvārds (neobligāts)';
+
+  @override
+  String get passkeyFieldUsername => 'Lietotājvārds';
 
   @override
   String get fieldPassword => 'Parole';
@@ -1507,7 +1552,7 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro neveic nekādus izejošos tīkla savienojumus. Bez telemetrijas, bez analītikas, bez kontiem.';
+      'Bez telemetrijas, bez analītikas, bez kontiem, bez Gabbro servera. Gabbro vispār neveido tīkla savienojumus — ja vien neieslēdzat lietotņu passkey: tad vienīgais savienojums ir viena lejupielāde uz pierakstīšanos, pašas vietnes lietotņu pārbaudes fails.';
 
   @override
   String get strengthTierTerrible => 'Briesmīga';

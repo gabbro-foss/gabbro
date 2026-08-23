@@ -643,6 +643,8 @@ sealed class VaultEntryData with _$VaultEntryData {
   const factory VaultEntryData.file(FileEntryData field0) = VaultEntryData_File;
   const factory VaultEntryData.custom(CustomEntryData field0) =
       VaultEntryData_Custom;
+  const factory VaultEntryData.passkey(PasskeyEntryData field0) =
+      VaultEntryData_Passkey;
 }
 
 /// Vault header data returned by `read_vault_header`.

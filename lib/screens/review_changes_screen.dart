@@ -45,6 +45,7 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
         VaultEntryData_Card(:final field0) => field0.id,
         VaultEntryData_File(:final field0) => field0.id,
         VaultEntryData_Custom(:final field0) => field0.id,
+        VaultEntryData_Passkey(:final field0) => field0.id,
       };
       final refreshed = getEntry(id: id);
       if (mounted) Navigator.of(context).pop(refreshed);
@@ -297,6 +298,23 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
             ? field0.customFields.length
             : u.customFields.length;
         for (var i = 0; i < fileLen; i++) {
+          final label = i < u.customFields.length
+              ? u.customFields[i].label
+              : field0.customFields[i].label;
+          final before = i < field0.customFields.length ? field0.customFields[i].value : '';
+          final after = i < u.customFields.length ? u.customFields[i].value : '';
+          _addDiff(diffs, label, before, after);
+        }
+      case (VaultEntryData_Passkey(:final field0),
+            VaultEntryData_Passkey(field0: final u)):
+        // Only notes, folder and custom fields are editable; identity and key
+        // material never change.
+        _addDiff(diffs, l.reviewFieldNotes, field0.notes ?? '', u.notes ?? '');
+        _addDiff(diffs, l.fieldFolder, field0.folder, u.folder);
+        final passkeyLen = field0.customFields.length > u.customFields.length
+            ? field0.customFields.length
+            : u.customFields.length;
+        for (var i = 0; i < passkeyLen; i++) {
           final label = i < u.customFields.length
               ? u.customFields[i].label
               : field0.customFields[i].label;

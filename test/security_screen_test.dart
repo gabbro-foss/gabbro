@@ -427,6 +427,42 @@ void main() {
 
   // ── Vault list section removed (ADR-014) ──────────────────────────────────
 
+  group('app passkeys (F1, Android only)', () {
+    testWidgets('section is hidden off Android', (tester) async {
+      await tester.pumpWidget(_buildScreen());
+      expect(find.text('App passkeys'), findsNothing);
+    });
+
+    testWidgets('toggle shows on Android, off by default', (tester) async {
+      await tester.pumpWidget(_buildScreen(isAndroid: true));
+      await tester.scrollUntilVisible(find.text('Allow app passkeys'), 100);
+      final tile = tester.widget<SwitchListTile>(
+        find.widgetWithText(SwitchListTile, 'Allow app passkeys'),
+      );
+      expect(tile.value, isFalse);
+    });
+
+    testWidgets('description names the README guide section', (tester) async {
+      await tester.pumpWidget(_buildScreen(isAndroid: true));
+      await tester.scrollUntilVisible(
+        find.textContaining('Verify no telemetry'),
+        100,
+      );
+      expect(find.textContaining('Verify no telemetry'), findsOneWidget);
+    });
+
+    testWidgets('toggling reports appPasskeys true', (tester) async {
+      AppSettings? updated;
+      await tester.pumpWidget(
+        _buildScreen(isAndroid: true, onUpdate: (s) => updated = s),
+      );
+      await tester.scrollUntilVisible(find.text('Allow app passkeys'), 100);
+      await tester.tap(find.text('Allow app passkeys'));
+      await tester.pumpAndSettle();
+      expect(updated?.appPasskeys, isTrue);
+    });
+  });
+
   group('Vault list section removed (ADR-014)', () {
     testWidgets('no Vault list section is rendered', (tester) async {
       await tester.pumpWidget(_buildScreen());

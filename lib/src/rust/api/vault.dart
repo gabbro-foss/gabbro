@@ -705,6 +705,68 @@ class NoteEntryData {
           attachments == other.attachments;
 }
 
+/// A passkey entry as seen by Flutter. Key material never rides in this DTO —
+/// the private key stays behind the bridge (signing happens in Rust), and
+/// `update_entry` restores it from the stored entry, like attachments.
+class PasskeyEntryData {
+  final String id;
+  final String createdAt;
+  final String updatedAt;
+  final String folder;
+
+  /// Relying-party id (e.g. "example.com") — the site this passkey signs for.
+  final String rpId;
+  final String userName;
+  final String userDisplayName;
+
+  /// Base64url credential id — display/identification only, not editable.
+  final String credentialIdB64;
+  final String? notes;
+  final List<CustomFieldData> customFields;
+
+  const PasskeyEntryData({
+    required this.id,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.folder,
+    required this.rpId,
+    required this.userName,
+    required this.userDisplayName,
+    required this.credentialIdB64,
+    this.notes,
+    required this.customFields,
+  });
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      createdAt.hashCode ^
+      updatedAt.hashCode ^
+      folder.hashCode ^
+      rpId.hashCode ^
+      userName.hashCode ^
+      userDisplayName.hashCode ^
+      credentialIdB64.hashCode ^
+      notes.hashCode ^
+      customFields.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PasskeyEntryData &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          createdAt == other.createdAt &&
+          updatedAt == other.updatedAt &&
+          folder == other.folder &&
+          rpId == other.rpId &&
+          userName == other.userName &&
+          userDisplayName == other.userDisplayName &&
+          credentialIdB64 == other.credentialIdB64 &&
+          notes == other.notes &&
+          customFields == other.customFields;
+}
+
 /// An entry flagged for user-consent deletion during vault merge.
 ///
 /// Returned when an incoming vault contains a tombstone that matches a local

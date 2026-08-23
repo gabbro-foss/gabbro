@@ -434,6 +434,7 @@
   "fieldAndroidAppId": "ИД Android апликације (опционо)",
   "fieldAndroidAppIdHelper": "Попуњава ову пријаву у Android апликацији. Ради само тачно подударање. ИД пронађите у вези апликације на Play Store-у, након ид= (нпр. ид=com.company.app).",
   "fieldUsername": "Корисничко име (необавезно)",
+  "passkeyFieldUsername": "Корисничко име",
   "fieldPassword": "Лозинка",
   "fieldSeparator": "Separator",
   "fieldFolder": "Мапа",
@@ -649,7 +650,7 @@
   "aboutLicenceBody": "Gabbro је слободан софтвер отвореног кода, лиценциран под GNU Генерал Public License в3.0 онлy (GPL-3.0-онлy).\n\nИмате слободу да користите, проучавате и дистрибуирате ову апликацију према условима наведене лиценце.",
   "aboutOwnerRole": "Власник пројекта, архитект и главни програмер:",
   "aboutAiPartner": "АИ развојни партнер:",
-  "aboutNoTelemetry": "Gabbro не успоставља никакве одлазне мрежне везе. Нема телеметрије, аналитике ни налога.",
+  "aboutNoTelemetry": "Нема телеметрије, аналитике, налога ни Gabbro сервера. Gabbro уопште не успоставља мрежне везе — осим ако укључите passkey за апликације: тада је једина веза једно преузимање по пријави, датотека за проверу апликација самог сајта.",
 
   "strengthTierTerrible": "Ужасно",
   "strengthTierWeak": "Слабо",
@@ -922,5 +923,18 @@
   "hintSearch": "Филтрира уносе док куцате",
   "hintFolderSelector": "Филтрира уносе по мапи",
   "hintFilterChip": "Укључује или искључује овај филтер категорије",
-  "hintEntryRow": "Отвара овај унос"
+  "hintEntryRow": "Отвара овај унос",
+  "entryTypePasskey": "Passkey",
+  "passkeyHintModuleMissing": "Passkey нису активни: модул језгра uhid није учитан. Погледајте кораке за подешавање passkey у README.",
+  "passkeyHintNoAccess": "Passkey нису активни: Gabbro нема приступ /dev/uhid (недостаје udev правило). Погледајте кораке за подешавање passkey у README.",
+  "passkeyHintOther": "Passkey нису активни: виртуелни сигурносни кључ није могао да се покрене. Погледајте кораке за подешавање passkey у README.",
+  "passkeyHintDontShowAgain": "Не приказуј поново",
+  "sectionAppPasskeys": "Passkey за апликације",
+  "appPasskeysDescription": "Дозволите Android апликацијама пријаву помоћу passkey. Свака пријава прави један мрежни захтев: преузима датотеку за проверу апликација са самог сајта да провери да је апликација изворна. Gabbro никада не успоставља ниједну другу мрежну везу — погледајте „Verify no telemetry“ у README.",
+  "appPasskeysTitle": "Дозволи passkey за апликације",
+  "appPasskeysNote": "Када је искључено, или када је мрежни приступ ускраћен, одбијају се само пријаве из апликација — passkey у прегледачима никада не користе мрежу.",
+  "passkeyCreatePrompt": "Направити passkey за {site}?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "Пријавити се на {site} помоћу passkey-а?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

@@ -7,6 +7,7 @@ import 'package:gabbro/main.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/vault_registry.dart';
 import 'package:gabbro/screens/about_screen.dart';
+import 'package:gabbro/screens/passkey_consent_screen.dart';
 import 'package:gabbro/screens/adopt_vault_screen.dart';
 import 'package:gabbro/screens/alphabet_index_bar.dart';
 import 'package:gabbro/screens/csv_mapping_screen.dart';
@@ -37,6 +38,9 @@ import 'package:gabbro/widgets/generator_widget.dart';
 import 'package:gabbro/widgets/password_breakdown_sheet.dart';
 import 'package:gabbro/widgets/sync_review.dart';
 import 'package:gabbro/widgets/gabbro_dialog.dart';
+import 'package:gabbro/widgets/passkey_consent_dialog.dart';
+import 'package:gabbro/widgets/passkey_hint_banner.dart';
+import 'package:gabbro/passkey_daemon.dart';
 import 'package:gabbro/widgets/sync_method_dialog.dart';
 import 'package:gabbro/widgets/url_link.dart';
 import 'package:gabbro/screens/import_failures_dialog.dart';
@@ -145,6 +149,13 @@ Widget vaultListScreen() => VaultListScreen(
 // Headless-instantiable screens. Platform-channel defaults are seamed out so a
 // MissingPluginException can't masquerade as a layout overflow or a11y failure.
 final Map<String, Widget Function()> screens = {
+  'passkey_consent': () => PasskeyConsentScreen(
+    isCreate: true,
+    rpId: 'example.com',
+    userName: 'user@example.com',
+    onApprove: () {},
+    onCancel: () {},
+  ),
   'about': () => const AboutScreen(),
   'help': () => const HelpScreen(),
   'keyboard_shortcuts': () => const KeyboardShortcutsListScreen(),
@@ -276,6 +287,14 @@ final Map<String, Widget Function()> screens = {
       onChanged: (_) {},
       previewText: 'A preview line long enough to stress the row at max text',
       semanticLabel: 'Text size',
+    ),
+  ),
+  // moduleMissing carries the longest reason text the banner ever shows.
+  'passkey_hint_banner': () => Scaffold(
+    body: PasskeyHintBanner(
+      reason: PasskeyFailureReason.moduleMissing,
+      onDismiss: () {},
+      onDismissForever: () {},
     ),
   ),
   'path_field': () => Scaffold(
@@ -522,6 +541,15 @@ final Map<String, Future<void> Function(BuildContext)> dialogs = {
       rawFields: [('card_number', '4111111111111111')],
     ),
   ]),
+  // Several accounts: the chooser list, the widest layout this dialog reaches.
+  'passkey_consent_dialog': (ctx) => showPasskeyConsent(
+    ctx,
+    PasskeyRequest(
+      isCreate: false,
+      rpId: 'example.com',
+      accounts: const ['first.user@example.com', 'second.user@example.com'],
+    ),
+  ),
 };
 
 // Entries that only exist above a width breakpoint. Probing them narrower than
@@ -536,6 +564,7 @@ const Map<String, String> tabletOnly = {
 /// inferred from the map key, so the coverage guard cannot be satisfied by a
 /// coincidental name match.
 const Map<String, String> covers = {
+  'passkey_consent': 'passkey_consent_screen',
   'about': 'about_screen',
   'help': 'help_screen',
   'keyboard_shortcuts': 'keyboard_shortcuts_list_screen',
@@ -565,6 +594,8 @@ const Map<String, String> covers = {
   'sync_method_dialog': 'sync_method_dialog',
   'import_skipped_dialog': 'import_skipped_dialog',
   'import_failures_dialog': 'import_failures_dialog',
+  'passkey_consent_dialog': 'passkey_consent_dialog',
+  'passkey_hint_banner': 'passkey_hint_banner',
   'alphabet_index_bar': 'alphabet_index_bar',
   'save_confirm': 'save_confirm_screen',
   'review_changes': 'review_changes_screen',
@@ -610,5 +641,5 @@ List<String> uiSources() =>
 // renamed folder) would otherwise leave `missing` empty and pass while checking
 // nothing. Adding a screen or widget fails here first: the new file must be
 // swept or waived deliberately.
-const screenFileCount = 28;
-const widgetFileCount = 12;
+const screenFileCount = 29;
+const widgetFileCount = 14;

@@ -66,6 +66,52 @@
   "@autofillNoMatchBody": {
     "description": "Body of the autofill no-match dialog, advising the user to paste credentials manually."
   },
+  "passkeyCreatePrompt": "Create a passkey for {site}?",
+  "@passkeyCreatePrompt": {
+    "description": "Consent prompt when a website or app asks to save a new passkey in the vault. {site} is the domain.",
+    "placeholders": {
+      "site": {"type": "String"}
+    }
+  },
+  "passkeySignInPrompt": "Sign in to {site} with your passkey?",
+  "@passkeySignInPrompt": {
+    "description": "Consent prompt when a website or app asks to sign in with a stored passkey. {site} is the domain.",
+    "placeholders": {
+      "site": {"type": "String"}
+    }
+  },
+  "passkeyHintModuleMissing": "Passkeys are inactive: the uhid kernel module is not loaded. See the passkey setup steps in the README.",
+  "@passkeyHintModuleMissing": {
+    "description": "Vault-list banner (Linux) when /dev/uhid does not exist because the uhid kernel module is not loaded."
+  },
+  "passkeyHintNoAccess": "Passkeys are inactive: Gabbro cannot access /dev/uhid (udev rule missing). See the passkey setup steps in the README.",
+  "@passkeyHintNoAccess": {
+    "description": "Vault-list banner (Linux) when /dev/uhid exists but the udev rule granting user access is missing."
+  },
+  "passkeyHintOther": "Passkeys are inactive: the virtual security key could not start. See the passkey setup steps in the README.",
+  "@passkeyHintOther": {
+    "description": "Vault-list banner (Linux) when the passkey provider failed to start for an unrecognised reason."
+  },
+  "passkeyHintDontShowAgain": "Don't show again",
+  "@passkeyHintDontShowAgain": {
+    "description": "Banner action that permanently hides the passkey hint (persisted in settings)."
+  },
+  "sectionAppPasskeys": "App passkeys",
+  "@sectionAppPasskeys": {
+    "description": "Security-screen section header for the Android app-passkey toggle (F1)."
+  },
+  "appPasskeysDescription": "Let Android apps sign in with passkeys. Each login makes one network request: it fetches the site's own app-verification file to check the app is genuine. Gabbro makes no other network connection, ever — see \"Verify no telemetry\" in the README.",
+  "@appPasskeysDescription": {
+    "description": "Explains the app-passkey toggle: what it does and the single network fetch it needs. Must keep the English README section name \"Verify no telemetry\" verbatim."
+  },
+  "appPasskeysTitle": "Allow app passkeys",
+  "@appPasskeysTitle": {
+    "description": "Label of the app-passkey switch on the security screen."
+  },
+  "appPasskeysNote": "When off, or when network access is denied, only app sign-ins refuse — passkeys in browsers never use the network.",
+  "@appPasskeysNote": {
+    "description": "Small note under the app-passkey switch describing the off/denied behaviour."
+  },
   "add": "Add",
   "remove": "Remove",
   "rename": "Rename",
@@ -281,6 +327,7 @@
   "entryTypeIdentity": "Identity",
   "entryTypeFile": "File",
   "entryTypeCustom": "Custom",
+  "entryTypePasskey": "Passkey",
   "errorPrefix": "Error: {error}",
   "@errorPrefix": {
     "placeholders": {
@@ -582,6 +629,7 @@
   "fieldAndroidAppId": "Android app ID (optional)",
   "fieldAndroidAppIdHelper": "Fills this login in an Android app. Only an exact match works. Find the ID in the app's Play Store link, after id= (e.g. id=com.company.app).",
   "fieldUsername": "Username (optional)",
+  "passkeyFieldUsername": "Username",
   "fieldPassword": "Password",
   "fieldSeparator": "Separator",
   "fieldFolder": "Folder",
@@ -808,7 +856,7 @@
   "aboutLicenceBody": "Gabbro is free and open source software, licensed under the GNU General Public License v3.0 only (GPL-3.0-only).\n\nYou are free to use, study, and redistribute this software under the terms of that licence.",
   "aboutOwnerRole": "Project owner, architect, and lead developer:",
   "aboutAiPartner": "AI development partner:",
-  "aboutNoTelemetry": "Gabbro makes no outbound network connections. No telemetry, no analytics, no accounts.",
+  "aboutNoTelemetry": "No telemetry, no analytics, no accounts, no Gabbro server. Gabbro makes no network connection at all, unless you turn on app passkeys — then the only connection ever made is one fetch per app login: that site's own app-verification file.",
 
   "strengthTierTerrible": "Terrible",
   "strengthTierWeak": "Weak",

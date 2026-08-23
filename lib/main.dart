@@ -9,6 +9,9 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:gabbro/app_paths.dart';
 import 'package:gabbro/autotype_listener.dart';
 import 'package:gabbro/autotype_target.dart';
+import 'package:gabbro/app_passkeys_flag.dart';
+import 'package:gabbro/passkey_daemon.dart';
+import 'package:gabbro/widgets/passkey_consent_dialog.dart';
 import 'package:gabbro/clipboard_clear.dart';
 import 'package:gabbro/gabbro_contrast.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
@@ -17,6 +20,7 @@ import 'package:gabbro/screens/adopt_vault_screen.dart';
 import 'package:gabbro/screens/manage_vaults_screen.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/screens/save_confirm_screen.dart';
+import 'package:gabbro/screens/passkey_consent_screen.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/screens/vault_list_screen.dart'
     show
@@ -30,6 +34,8 @@ import 'package:gabbro/screens/vault_list_screen.dart'
         openVaultMenu,
         quitVault;
 import 'package:gabbro/src/rust/api/autotype_bridge.dart';
+import 'package:gabbro/src/rust/api/passkey_daemon_bridge.dart'
+    show passkeyDaemonOpen;
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/frb_generated.dart';
@@ -296,6 +302,193 @@ Future<void> showAutofillNoMatchDialog(
   await channel.invokeMethod('cancel');
 }
 
+/// Passkey provider entrypoint (Android). The OS routes a passkey picker tap
+/// into GabbroPasskeyCreateActivity / GabbroPasskeyGetActivity, which run this:
+/// unlock if needed (full UnlockScreen flow), then the consent screen naming
+/// the requesting site. Approve hands the operation to the native side; the
+/// keys never enter Dart.
+@pragma('vm:entry-point')
+Future<void> passkeyUnlockMain() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await RustLib.init();
+  await initNfcCapability();
+  final registry = await VaultRegistry.load();
+  final lastUsed = registry.lastUsed;
+  final String initialVaultPath;
+  if (lastUsed != null) {
+    initialVaultPath = lastUsed.path;
+  } else {
+    final dataDir = await GabbroPaths.dataDir();
+    initialVaultPath = '$dataDir/gabbro.gabbro';
+  }
+  final settings = await AppSettings.load();
+  const channel = MethodChannel('app.gabbro.gabbro/passkey');
+  final alreadyUnlocked = await channel.invokeMethod<bool>('isUnlocked') ?? false;
+  final info =
+      await channel.invokeMethod<Map<Object?, Object?>>('getRequestInfo') ?? {};
+  runApp(buildPasskeyApp(
+    settings: settings,
+    registry: registry,
+    initialVaultPath: initialVaultPath,
+    alreadyUnlocked: alreadyUnlocked,
+    isCreate: info['mode'] == 'create',
+    rpId: (info['rpId'] as String?) ?? '',
+    userName: (info['userName'] as String?) ?? '',
+    isUnlockOnly: info['mode'] == 'unlock',
+    relockAfter: info['relockAfter'] == 'true',
+  ));
+}
+
+/// The passkey consent app. Locked -> UnlockScreen first (this flow then owns
+/// the session and locks it again before finishing, like the autofill unlock —
+/// RT-5); unlocked -> straight to consent.
+///
+/// [isUnlockOnly]: the picker's "Unlock Gabbro" action. Unlock, approve (Kotlin
+/// rebuilds the picker rows), finish — no consent, and the session stays open
+/// so the follow-up row tap needs no second unlock. [relockAfter]: that row tap
+/// (stamped by Kotlin); the flow locks on the way out even though it did not
+/// open the session, so Gabbro ends locked as the user left it.
+Widget buildPasskeyApp({
+  required AppSettings settings,
+  required VaultRegistry registry,
+  required String initialVaultPath,
+  required bool alreadyUnlocked,
+  required bool isCreate,
+  required String rpId,
+  required String userName,
+  bool isUnlockOnly = false,
+  bool relockAfter = false,
+  MethodChannel channel = const MethodChannel('app.gabbro.gabbro/passkey'),
+  Future<void> Function(List<int>, String) onUnlock = defaultUnlock,
+  void Function() onLock = lockVault,
+}) =>
+    _PasskeyApp(
+      settings: settings,
+      registry: registry,
+      initialVaultPath: initialVaultPath,
+      alreadyUnlocked: alreadyUnlocked,
+      isCreate: isCreate,
+      rpId: rpId,
+      userName: userName,
+      isUnlockOnly: isUnlockOnly,
+      relockAfter: relockAfter,
+      channel: channel,
+      onUnlock: onUnlock,
+      onLock: onLock,
+    );
+
+class _PasskeyApp extends StatefulWidget {
+  final AppSettings settings;
+  final VaultRegistry registry;
+  final String initialVaultPath;
+  final bool alreadyUnlocked;
+  final bool isCreate;
+  final String rpId;
+  final String userName;
+  final bool isUnlockOnly;
+  final bool relockAfter;
+  final MethodChannel channel;
+  final Future<void> Function(List<int>, String) onUnlock;
+  final void Function() onLock;
+
+  const _PasskeyApp({
+    required this.settings,
+    required this.registry,
+    required this.initialVaultPath,
+    required this.alreadyUnlocked,
+    required this.isCreate,
+    required this.rpId,
+    required this.userName,
+    required this.isUnlockOnly,
+    required this.relockAfter,
+    required this.channel,
+    required this.onUnlock,
+    required this.onLock,
+  });
+
+  @override
+  State<_PasskeyApp> createState() => _PasskeyAppState();
+}
+
+class _PasskeyAppState extends State<_PasskeyApp> {
+  late String _vaultPath = widget.initialVaultPath;
+  late bool _unlocked = widget.alreadyUnlocked;
+  // This flow only locks a session it opened itself (RT-5).
+  late final bool _weUnlock = !widget.alreadyUnlocked;
+
+  String? _aliasFor(String path) {
+    for (final r in widget.registry.records) {
+      if (r.path == path) return r.alias;
+    }
+    return null;
+  }
+
+  Future<void> _approve() async {
+    await widget.channel.invokeMethod('approve');
+    if (_weUnlock || widget.relockAfter) widget.onLock();
+    await widget.channel.invokeMethod('finish');
+  }
+
+  Future<void> _cancel() async {
+    if ((_weUnlock || widget.relockAfter) && _unlocked) widget.onLock();
+    await widget.channel.invokeMethod('cancel');
+  }
+
+  /// Unlock-only: Kotlin rebuilds the picker rows on "approve"; the session
+  /// stays open for the follow-up row tap (which carries the relock stamp).
+  Future<void> _approveUnlockOnly() async {
+    await widget.channel.invokeMethod('approve');
+    await widget.channel.invokeMethod('finish');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hc = widget.settings.highContrast;
+    final mq = MediaQuery.of(context);
+    return MediaQuery(
+      data: mq.copyWith(
+        textScaler: TextScaler.linear(
+          clampToDevice(widget.settings.textScale, mq.size.shortestSide),
+        ),
+      ),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        localizationsDelegates: gabbroLocalizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: widget.settings.language == LanguageChoice.system
+            ? null
+            : localeFor(widget.settings.language),
+        themeMode: themeModeFor(widget.settings.theme),
+        theme: gabbroLightTheme(highContrast: hc),
+        darkTheme: gabbroDarkTheme(highContrast: hc),
+        home: _unlocked && !widget.isUnlockOnly
+            ? PasskeyConsentScreen(
+                isCreate: widget.isCreate,
+                rpId: widget.rpId,
+                userName: widget.userName,
+                onApprove: _approve,
+                onCancel: _cancel,
+              )
+            : UnlockScreen(
+                key: ValueKey(_vaultPath),
+                vaultPath: _vaultPath,
+                vaultAlias: _aliasFor(_vaultPath),
+                registry: widget.registry,
+                onVaultSwitch: (path, alias) =>
+                    setState(() => _vaultPath = path),
+                onUnlock: widget.onUnlock,
+                onUnlocked: widget.isUnlockOnly
+                    ? _approveUnlockOnly
+                    : () async => setState(() => _unlocked = true),
+                blockPassphraseCopyPaste:
+                    widget.settings.blockPassphraseCopyPaste,
+                onQuit: _cancel,
+              ),
+      ),
+    );
+  }
+}
+
 /// Autofill SAVE entrypoint (Android). The OS launches `SaveActivity` after the
 /// user submits a login the vault lacks (or a changed password). Mirrors
 /// [autofillUnlockMain]'s shell: reuses [UnlockScreen] when the vault is locked,
@@ -481,7 +674,13 @@ Future<void> main() async {
   final settings = await AppSettings.load();
   if (Platform.isLinux) {
     await _startAutotypeListener();
+    // Fire-and-forget: failures land in the status notifier, never block launch.
+    unawaited(_startPasskeyDaemon());
   }
+  // Heal SharedPreferences drift (e.g. settings.jsonc restored from a backup):
+  // the credential provider reads the mirrored flag, not the file. Android-only
+  // inside; fire-and-forget.
+  unawaited(pushAppPasskeysFlag(settings.appPasskeys));
   runApp(
     GabbroApp(
       registry: registry,
@@ -523,6 +722,44 @@ Future<void> _onAutotypeTrigger() async {
     await autotypeFill(windowId: window.id, entryId: id);
   } catch (e) {
     debugPrint('autotype: fill failed: $e');
+  }
+}
+
+/// The mounted GabbroApp's navigator, so the passkey daemon (started before
+/// the app mounts) can show its consent dialog over whatever screen is up.
+/// Null when no app is mounted — consent then no-ops as a cancel. Set by the
+/// app's State (per-instance key: a shared one silently broke the second
+/// GabbroApp pumped in a test, blinding the theme a11y net).
+GlobalKey<NavigatorState>? rootNavigatorKey;
+
+/// Start the Linux passkey provider (ADR-009). Rust owns the uhid device and
+/// streams each request; consent shows as an in-app dialog when the user is
+/// focused on Gabbro (no forced window raise — see docs). Best-effort: a
+/// failure (missing uhid module / udev rule, second instance) never blocks
+/// launch — it lands in [reportPasskeyFailure], which the vault-list banner
+/// reads to tell the user why passkeys are inactive (F2). The process owns
+/// the device for its whole life; quitting closes the fd and the kernel
+/// unplugs it.
+Future<void> _startPasskeyDaemon() async {
+  try {
+    // The fallible half (flock, /dev/uhid, device create) is awaited here so
+    // its error is catchable; the stream fn below only attaches the pump —
+    // its Err would be lost on an unawaited FRB future.
+    await passkeyDaemonOpen();
+    final device = UhidPasskeyDevice();
+    unawaited(
+      PasskeyDaemon(
+        device: device,
+        onFailure: reportPasskeyFailure,
+        onConsent: (request) async {
+          final context = rootNavigatorKey?.currentContext;
+          if (context == null) return null; // no UI yet -> treat as cancel
+          return showPasskeyConsent(context, request);
+        },
+      ).run(),
+    );
+  } catch (e) {
+    reportPasskeyFailure(e);
   }
 }
 
@@ -768,6 +1005,8 @@ class _GabbroAppState extends State<GabbroApp>
   @override
   VaultRegistry get registry => _registry;
 
+  // Per-instance; published to [rootNavigatorKey] while mounted so the passkey
+  // daemon can show consent over the running app.
   final _navigatorKey = GlobalKey<NavigatorState>();
 
   Timer? _foregroundTimer;
@@ -779,6 +1018,7 @@ class _GabbroAppState extends State<GabbroApp>
     super.initState();
     _settings = widget.settings;
     _registry = widget.registry;
+    rootNavigatorKey = _navigatorKey;
     WidgetsBinding.instance.addObserver(this);
     HardwareKeyboard.instance.addHandler(_onKeyEvent);
     _resetForegroundTimer();
@@ -786,6 +1026,7 @@ class _GabbroAppState extends State<GabbroApp>
 
   @override
   void dispose() {
+    if (rootNavigatorKey == _navigatorKey) rootNavigatorKey = null;
     HardwareKeyboard.instance.removeHandler(_onKeyEvent);
     WidgetsBinding.instance.removeObserver(this);
     _foregroundTimer?.cancel();
@@ -1032,8 +1273,14 @@ class _GabbroAppState extends State<GabbroApp>
     // Optimistic: reflect the change in the UI immediately, then persist.
     // Settings are best-effort on disk; the live app state is the source of
     // truth for the session.
+    final changedAppPasskeys = updated.appPasskeys != _settings.appPasskeys;
     setState(() => _settings = updated);
     _resetForegroundTimer();
+    // The Android credential provider runs without Flutter and reads this
+    // flag from SharedPreferences; mirror it there before the file save.
+    if (changedAppPasskeys) {
+      unawaited(pushAppPasskeysFlag(updated.appPasskeys));
+    }
     await updated.save();
   }
 

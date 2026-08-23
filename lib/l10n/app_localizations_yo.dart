@@ -104,6 +104,45 @@ class AppLocalizationsYo extends AppLocalizations {
       'Kò sí ìwọlé tí a fipamọ́ tí ó bá ohun-èlò tàbí ojú-òpó yìí mu.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Ṣẹ̀dá passkey fún $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Wọlé sí $site pẹ̀lú passkey rẹ?';
+  }
+
+  @override
+  String get passkeyHintModuleMissing =>
+      'Passkey kò ṣiṣẹ́: mọ́júùlù kernel uhid kò tíì gbéwọlé. Wo àwọn ìgbésẹ̀ ìṣètò passkey nínú README.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkey kò ṣiṣẹ́: Gabbro kò lè wọlé sí /dev/uhid (òfin udev kò sí). Wo àwọn ìgbésẹ̀ ìṣètò passkey nínú README.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkey kò ṣiṣẹ́: kọ́kọ́rọ́ ààbò àfojúinú kò lè bẹ̀rẹ̀. Wo àwọn ìgbésẹ̀ ìṣètò passkey nínú README.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Má fi hàn mọ́';
+
+  @override
+  String get sectionAppPasskeys => 'Passkey àwọn àppù';
+
+  @override
+  String get appPasskeysDescription =>
+      'Jẹ́ kí àwọn àppù Android wọlé pẹ̀lú passkey. Ìwọlé kọ̀ọ̀kan ń ṣe ìbéèrè nẹ́tíwọ̀ọ̀kì kan ṣoṣo: ó ń gba fáìlì ìfẹ̀rí àppù ti sáìtì fúnra rẹ̀ láti ṣàyẹ̀wò pé àppù náà jẹ́ gidi. Gabbro kì í ṣe ìsopọ̀ nẹ́tíwọ̀ọ̀kì mìíràn láé — wo “Verify no telemetry” nínú README.';
+
+  @override
+  String get appPasskeysTitle => 'Gba passkey àwọn àppù láàyè';
+
+  @override
+  String get appPasskeysNote =>
+      'Nígbà tí ó bá wà ní pípa, tàbí tí a kọ̀ ààyè nẹ́tíwọ̀ọ̀kì, ìwọlé àwọn àppù nìkan ni a ń kọ̀ — passkey nínú àwọn aṣàwákiri kì í lo nẹ́tíwọ̀ọ̀kì láé.';
+
+  @override
   String get add => 'Fi kun';
 
   @override
@@ -667,6 +706,9 @@ class AppLocalizationsYo extends AppLocalizations {
   String get entryTypeCustom => 'Aṣa';
 
   @override
+  String get entryTypePasskey => 'Passkey';
+
+  @override
   String errorPrefix(String error) {
     return 'Aṣiṣe: $error';
   }
@@ -1075,6 +1117,9 @@ class AppLocalizationsYo extends AppLocalizations {
 
   @override
   String get fieldUsername => 'Orukọ olumulo (aṣayan)';
+
+  @override
+  String get passkeyFieldUsername => 'Orukọ olumulo';
 
   @override
   String get fieldPassword => 'Ọrọ igbaniwọle';
@@ -1501,7 +1546,7 @@ class AppLocalizationsYo extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro ko ṣe eyikeyi asopọ nẹtiwọki ita. Ko si telemetry, itupalẹ, tabi akanti.';
+      'Ko si telemetry, itupalẹ, akanti, tabi sáfà Gabbro. Gabbro ko ṣe asopọ nẹtiwọki rara — àyàfi tí o bá tan passkey àwọn àppù: nígbà náà asopọ kan ṣoṣo ni gbígba fáìlì ìfẹ̀rí àppù ti sáìtì fúnra rẹ̀, lẹ́ẹ̀kan fún ìwọlé kọ̀ọ̀kan.';
 
   @override
   String get strengthTierTerrible => 'Buru pupọ';

@@ -104,6 +104,45 @@ class AppLocalizationsHu extends AppLocalizations {
       'Egyetlen mentett bejelentkezés sem felel meg ennek az alkalmazásnak vagy webhelynek.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Létrehoz egy passkey-t ehhez: $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Bejelentkezik ide: $site a passkey-jével?';
+  }
+
+  @override
+  String get passkeyHintModuleMissing =>
+      'A passkey-k inaktívak: az uhid kernelmodul nincs betöltve. Lásd a passkey beállítási lépéseit a README-ben.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'A passkey-k inaktívak: a Gabbro nem fér hozzá a /dev/uhid eszközhöz (hiányzik az udev szabály). Lásd a passkey beállítási lépéseit a README-ben.';
+
+  @override
+  String get passkeyHintOther =>
+      'A passkey-k inaktívak: a virtuális biztonsági kulcs nem tudott elindulni. Lásd a passkey beállítási lépéseit a README-ben.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Ne jelenjen meg többé';
+
+  @override
+  String get sectionAppPasskeys => 'Alkalmazás-passkey-k';
+
+  @override
+  String get appPasskeysDescription =>
+      'Engedélyezze az Android-alkalmazásoknak a passkey-es bejelentkezést. Minden bejelentkezés egyetlen hálózati kérést tesz: letölti az adott webhely saját alkalmazás-ellenőrző fájlját, és ellenőrzi, hogy az alkalmazás valódi-e. A Gabbro soha nem létesít más hálózati kapcsolatot — lásd a „Verify no telemetry” részt a README-ben.';
+
+  @override
+  String get appPasskeysTitle => 'Alkalmazás-passkey-k engedélyezése';
+
+  @override
+  String get appPasskeysNote =>
+      'Kikapcsolva, vagy megtagadott hálózati hozzáférés esetén csak az alkalmazásokból való bejelentkezések utasítódnak el — a böngészőbeli passkey-k soha nem használják a hálózatot.';
+
+  @override
   String get add => 'Hozzáadás';
 
   @override
@@ -666,6 +705,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get entryTypeCustom => 'Egyéni';
 
   @override
+  String get entryTypePasskey => 'Passkey';
+
+  @override
   String errorPrefix(String error) {
     return 'Hiba: $error';
   }
@@ -1077,6 +1119,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get fieldUsername => 'Felhasználónév (opcionális)';
+
+  @override
+  String get passkeyFieldUsername => 'Felhasználónév';
 
   @override
   String get fieldPassword => 'Jelszó';
@@ -1506,7 +1551,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'A Gabbro nem hoz létre kimenő hálózati kapcsolatokat. Nincs telemetria, nincs analitika, nincs fiók.';
+      'Nincs telemetria, analitika, fiók, sem Gabbro-szerver. A Gabbro egyáltalán nem létesít hálózati kapcsolatot — hacsak be nem kapcsolja az alkalmazás-passkey-ket: ekkor az egyetlen kapcsolat bejelentkezésenként egy letöltés, az adott webhely saját alkalmazás-ellenőrző fájlja.';
 
   @override
   String get strengthTierTerrible => 'Borzalmas';

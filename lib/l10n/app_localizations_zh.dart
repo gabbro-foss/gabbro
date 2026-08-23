@@ -99,6 +99,43 @@ class AppLocalizationsZh extends AppLocalizations {
   String get autofillNoMatchBody => '没有与此应用或网站匹配的已保存登录信息。';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return '要为 $site 创建通行密钥吗？';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return '要使用通行密钥登录 $site 吗？';
+  }
+
+  @override
+  String get passkeyHintModuleMissing =>
+      '通行密钥未启用：内核模块 uhid 未加载。请参阅 README 中的通行密钥设置步骤。';
+
+  @override
+  String get passkeyHintNoAccess =>
+      '通行密钥未启用：Gabbro 无法访问 /dev/uhid（缺少 udev 规则）。请参阅 README 中的通行密钥设置步骤。';
+
+  @override
+  String get passkeyHintOther => '通行密钥未启用：虚拟安全密钥无法启动。请参阅 README 中的通行密钥设置步骤。';
+
+  @override
+  String get passkeyHintDontShowAgain => '不再显示';
+
+  @override
+  String get sectionAppPasskeys => '应用通行密钥';
+
+  @override
+  String get appPasskeysDescription =>
+      '允许 Android 应用使用通行密钥登录。每次登录只发出一次网络请求：从该网站本身获取其应用验证文件，以确认应用是正版。除此之外 Gabbro 绝不进行任何网络连接——参阅 README 中的“Verify no telemetry”。';
+
+  @override
+  String get appPasskeysTitle => '允许应用通行密钥';
+
+  @override
+  String get appPasskeysNote => '关闭时，或网络访问被拒绝时，仅应用登录会被拒绝——浏览器中的通行密钥从不使用网络。';
+
+  @override
   String get add => '添加';
 
   @override
@@ -655,6 +692,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get entryTypeCustom => '自定义';
 
   @override
+  String get entryTypePasskey => '通行密钥';
+
+  @override
   String errorPrefix(String error) {
     return '错误：$error';
   }
@@ -1053,6 +1093,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get fieldUsername => '用户名（可选）';
+
+  @override
+  String get passkeyFieldUsername => '用户名';
 
   @override
   String get fieldPassword => '密码';
@@ -1466,7 +1509,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aboutAiPartner => 'AI 开发合作伙伴：';
 
   @override
-  String get aboutNoTelemetry => 'Gabbro 不建立任何外部网络连接。无遥测、分析或账户。';
+  String get aboutNoTelemetry =>
+      '无遥测、分析、账户，也没有 Gabbro 服务器。Gabbro 完全不建立网络连接——除非你开启应用通行密钥：那时唯一的连接是每次应用登录获取一次该网站本身的应用验证文件。';
 
   @override
   String get strengthTierTerrible => '非常弱';
@@ -2214,6 +2258,43 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get autofillNoMatchBody => '没有与此应用或网站匹配的已保存登录信息。';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return '要为 $site 创建通行密钥吗？';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return '要使用通行密钥登录 $site 吗？';
+  }
+
+  @override
+  String get passkeyHintModuleMissing =>
+      '通行密钥未启用：内核模块 uhid 未加载。请参阅 README 中的通行密钥设置步骤。';
+
+  @override
+  String get passkeyHintNoAccess =>
+      '通行密钥未启用：Gabbro 无法访问 /dev/uhid（缺少 udev 规则）。请参阅 README 中的通行密钥设置步骤。';
+
+  @override
+  String get passkeyHintOther => '通行密钥未启用：虚拟安全密钥无法启动。请参阅 README 中的通行密钥设置步骤。';
+
+  @override
+  String get passkeyHintDontShowAgain => '不再显示';
+
+  @override
+  String get sectionAppPasskeys => '应用通行密钥';
+
+  @override
+  String get appPasskeysDescription =>
+      '允许 Android 应用使用通行密钥登录。每次登录只发出一次网络请求：从该网站本身获取其应用验证文件，以确认应用是正版。除此之外 Gabbro 绝不进行任何网络连接——参阅 README 中的“Verify no telemetry”。';
+
+  @override
+  String get appPasskeysTitle => '允许应用通行密钥';
+
+  @override
+  String get appPasskeysNote => '关闭时，或网络访问被拒绝时，仅应用登录会被拒绝——浏览器中的通行密钥从不使用网络。';
+
+  @override
   String get add => '添加';
 
   @override
@@ -2770,6 +2851,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get entryTypeCustom => '自定义';
 
   @override
+  String get entryTypePasskey => '通行密钥';
+
+  @override
   String errorPrefix(String error) {
     return '错误：$error';
   }
@@ -3168,6 +3252,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get fieldUsername => '用户名（可选）';
+
+  @override
+  String get passkeyFieldUsername => '用户名';
 
   @override
   String get fieldPassword => '密码';
@@ -3581,7 +3668,8 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get aboutAiPartner => 'AI 开发合作伙伴：';
 
   @override
-  String get aboutNoTelemetry => 'Gabbro 不建立任何外部网络连接。无遥测、分析或账户。';
+  String get aboutNoTelemetry =>
+      '无遥测、分析、账户，也没有 Gabbro 服务器。Gabbro 完全不建立网络连接——除非你开启应用通行密钥：那时唯一的连接是每次应用登录获取一次该网站本身的应用验证文件。';
 
   @override
   String get strengthTierTerrible => '非常弱';
@@ -4329,6 +4417,43 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get autofillNoMatchBody => '沒有與此應用程式或網站相符的已儲存登入資訊。';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return '要為 $site 建立通行密鑰嗎？';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return '要使用通行密鑰登入 $site 嗎？';
+  }
+
+  @override
+  String get passkeyHintModuleMissing =>
+      '通行密鑰未啟用：核心模組 uhid 未載入。請參閱 README 中的通行密鑰設定步驟。';
+
+  @override
+  String get passkeyHintNoAccess =>
+      '通行密鑰未啟用：Gabbro 無法存取 /dev/uhid（缺少 udev 規則）。請參閱 README 中的通行密鑰設定步驟。';
+
+  @override
+  String get passkeyHintOther => '通行密鑰未啟用：虛擬安全金鑰無法啟動。請參閱 README 中的通行密鑰設定步驟。';
+
+  @override
+  String get passkeyHintDontShowAgain => '不要再顯示';
+
+  @override
+  String get sectionAppPasskeys => '應用程式通行密鑰';
+
+  @override
+  String get appPasskeysDescription =>
+      '允許 Android 應用程式使用通行密鑰登入。每次登入只發出一次網路請求：從該網站本身取得其應用程式驗證檔案，以確認應用程式是正版。除此之外 Gabbro 絕不進行任何網路連線——請參閱 README 中的「Verify no telemetry」。';
+
+  @override
+  String get appPasskeysTitle => '允許應用程式通行密鑰';
+
+  @override
+  String get appPasskeysNote => '關閉時，或網路存取被拒時，僅應用程式登入會被拒絕——瀏覽器中的通行密鑰從不使用網路。';
+
+  @override
   String get add => '新增';
 
   @override
@@ -4885,6 +5010,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get entryTypeCustom => '自訂';
 
   @override
+  String get entryTypePasskey => '通行密鑰';
+
+  @override
   String errorPrefix(String error) {
     return '錯誤：$error';
   }
@@ -5283,6 +5411,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get fieldUsername => '使用者名稱（選填）';
+
+  @override
+  String get passkeyFieldUsername => '使用者名稱';
 
   @override
   String get fieldPassword => '密碼';
@@ -5696,7 +5827,8 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get aboutAiPartner => 'AI 開發合作夥伴：';
 
   @override
-  String get aboutNoTelemetry => 'Gabbro 不建立任何外部網路連線。無遙測、分析或帳戶。';
+  String get aboutNoTelemetry =>
+      '無遙測、分析、帳戶，也沒有 Gabbro 伺服器。Gabbro 完全不建立網路連線——除非你開啟應用程式通行密鑰：屆時唯一的連線是每次應用程式登入取得一次該網站本身的應用程式驗證檔案。';
 
   @override
   String get strengthTierTerrible => '非常弱';

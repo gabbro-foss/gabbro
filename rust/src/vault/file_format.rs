@@ -26,7 +26,8 @@
 //! | Body length            | 8            |
 //! | Body (ciphertext)      | variable     |
 //!
-//! VERSION 11 is the only readable format: the vault key is derived straight from the
+//! VERSION 12 (adds Passkey entries) is the write format; v11 also opens and is
+//! re-sealed as v12 on the next save. The vault key is derived straight from the
 //! Argon2id output via HKDF (ADR-018), and the AES-256-GCM body is sealed with the
 //! serialised header as AAD, so any change to a plaintext header field (alias, YubiKey
 //! records, Argon2id params) fails body decryption with an authentication error.
@@ -38,7 +39,7 @@
 //! path — see [`VERSION_MIN_READABLE`] and docs/VAULT_UPGRADE_PATH.md. The per-version
 //! history lives in git and CHANGELOG.md.
 //!
-//! Reads v11 only; always writes VERSION 11.
+//! Reads v11–v12; always writes VERSION 12.
 
 use crate::crypto::kdf::Argon2idParams;
 
@@ -59,11 +60,15 @@ pub const MAGIC: &[u8; 6] = b"GABBRO";
 
 /// Current file format version (written by this build).
 ///
-/// VERSION 11 (ADR-018): the vault key is derived straight from the Argon2id output
-/// via HKDF, with no X25519 + ML-KEM layer; the header omits the ML-KEM ciphertext
-/// and X25519 ephemeral pubkey. Vaults v2–10 keep the legacy hybrid derivation on
-/// read and auto-migrate to v11 on unlock.
-pub const VERSION: u8 = 11;
+/// VERSION 12 (ADR-009): the body may contain `Passkey` entries; the header
+/// layout is unchanged from v11. The bump makes a v11 build refuse a
+/// passkey-carrying vault cleanly ("update Gabbro") instead of failing
+/// mid-JSON on an unknown entry type.
+///
+/// VERSION 11 (ADR-018): the vault key is derived straight from the Argon2id
+/// output via HKDF, with no X25519 + ML-KEM layer; the header omits the ML-KEM
+/// ciphertext and X25519 ephemeral pubkey.
+pub const VERSION: u8 = 12;
 
 /// Oldest version this build can still read.
 ///
@@ -429,10 +434,10 @@ mod tests {
     use crate::crypto::kdf::Argon2idParams;
 
     fn test_vault() -> SealedVault {
-        // v11 — the only readable format. RT-3 re-pinned this from v10 when the
-        // KEM-bearing formats stopped being readable.
+        // Tracks the current format; explicit-version fixtures (pinned_v11_vault)
+        // cover the frozen layouts.
         SealedVault {
-            version: 11,
+            version: VERSION,
             params: Argon2idParams {
                 m_cost: 65536,
                 t_cost: 25,
@@ -577,7 +582,7 @@ mod tests {
         assert_eq!(peek_version(&bytes).unwrap(), 10);
 
         // ...and a current vault reports its own version just the same.
-        assert_eq!(peek_version(&test_vault().to_bytes()).unwrap(), 11);
+        assert_eq!(peek_version(&test_vault().to_bytes()).unwrap(), VERSION);
     }
 
     #[test]
@@ -720,14 +725,49 @@ mod tests {
         assert_eq!(bytes.len(), 176);
     }
 
+    // ── VERSION 12 (Passkey entry type) ──────────────────────────────────────
+    // v12 changes nothing in the header layout; the bump exists so a v11 build
+    // refuses a vault that may contain Passkey entries instead of failing
+    // mid-JSON (see serialization::unknown_entry_variant_returns_a_clean_error).
+
     #[test]
-    fn current_version_is_11() {
-        assert_eq!(VERSION, 11);
+    fn current_version_is_12() {
+        assert_eq!(VERSION, 12);
         assert_eq!(
             test_vault().version,
             VERSION,
             "the fixture must track the current format"
         );
+    }
+
+    #[test]
+    fn version_byte_11_still_opens() {
+        let mut bytes = test_vault().to_bytes();
+        bytes[6] = 11;
+        assert!(SealedVault::from_bytes(&bytes).is_ok());
+    }
+
+    #[test]
+    fn version_byte_12_opens() {
+        let mut bytes = test_vault().to_bytes();
+        bytes[6] = 12;
+        assert!(SealedVault::from_bytes(&bytes).is_ok());
+    }
+
+    #[test]
+    fn version_byte_13_is_refused_as_too_new() {
+        let mut bytes = test_vault().to_bytes();
+        bytes[6] = 13;
+        let err = SealedVault::from_bytes(&bytes).unwrap_err();
+        assert!(err.contains("newer version of Gabbro"), "got: {err}");
+    }
+
+    #[test]
+    fn version_byte_10_is_refused_as_too_old() {
+        let mut bytes = test_vault().to_bytes();
+        bytes[6] = 10;
+        let err = SealedVault::from_bytes(&bytes).unwrap_err();
+        assert!(err.contains("file version not supported"), "got: {err}");
     }
 
     // ── header_aad tests ──────────────────────────────────────────────────────

@@ -101,6 +101,45 @@ class AppLocalizationsJa extends AppLocalizations {
   String get autofillNoMatchBody => 'このアプリまたはサイトに一致する保存済みのログインはありません。';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return '$site のパスキーを作成しますか？';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'パスキーで $site にログインしますか？';
+  }
+
+  @override
+  String get passkeyHintModuleMissing =>
+      'パスキーは無効です。カーネルモジュール uhid が読み込まれていません。README のパスキー設定手順をご覧ください。';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'パスキーは無効です。Gabbro が /dev/uhid にアクセスできません（udev ルールがありません）。README のパスキー設定手順をご覧ください。';
+
+  @override
+  String get passkeyHintOther =>
+      'パスキーは無効です。仮想セキュリティキーを起動できませんでした。README のパスキー設定手順をご覧ください。';
+
+  @override
+  String get passkeyHintDontShowAgain => '今後表示しない';
+
+  @override
+  String get sectionAppPasskeys => 'アプリのパスキー';
+
+  @override
+  String get appPasskeysDescription =>
+      'Android アプリでのパスキーによるサインインを許可します。サインインのたびにネットワークリクエストを 1 回だけ行い、サイト自身のアプリ検証ファイルを取得してアプリが本物か確認します。Gabbro がそれ以外にネットワーク接続を行うことは一切ありません。README の「Verify no telemetry」をご覧ください。';
+
+  @override
+  String get appPasskeysTitle => 'アプリのパスキーを許可';
+
+  @override
+  String get appPasskeysNote =>
+      'オフのとき、またはネットワークアクセスが拒否されているときは、アプリからのサインインだけが拒否されます。ブラウザーのパスキーはネットワークを一切使いません。';
+
+  @override
   String get add => '追加';
 
   @override
@@ -659,6 +698,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get entryTypeCustom => 'カスタム';
 
   @override
+  String get entryTypePasskey => 'パスキー';
+
+  @override
   String errorPrefix(String error) {
     return 'エラー: $error';
   }
@@ -1061,6 +1103,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get fieldUsername => 'ユーザー名 (任意)';
+
+  @override
+  String get passkeyFieldUsername => 'ユーザー名';
 
   @override
   String get fieldPassword => 'パスワード';
@@ -1478,7 +1523,8 @@ class AppLocalizationsJa extends AppLocalizations {
   String get aboutAiPartner => 'AI開発パートナー:';
 
   @override
-  String get aboutNoTelemetry => 'Gabbroは外部ネットワーク接続を行いません。テレメトリー、分析、アカウントなし。';
+  String get aboutNoTelemetry =>
+      'テレメトリー、分析、アカウント、Gabbro サーバーなし。Gabbro はネットワーク接続を一切行いません。ただしアプリのパスキーをオンにした場合のみ、ログインごとに 1 回、サイト自身のアプリ検証ファイルを取得します。';
 
   @override
   String get strengthTierTerrible => '非常に弱い';

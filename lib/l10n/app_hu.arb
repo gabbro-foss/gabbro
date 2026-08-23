@@ -434,6 +434,7 @@
   "fieldAndroidAppId": "Android-alkalmazás azonosító (nem kötelező)",
   "fieldAndroidAppIdHelper": "Kitölti ezt a bejelentkezést egy Android-alkalmazásban. Csak a pontos egyezés működik. Az azonosítót az alkalmazás Play Store-linkjében találja, az id= után (pl. id=com.company.app).",
   "fieldUsername": "Felhasználónév (opcionális)",
+  "passkeyFieldUsername": "Felhasználónév",
   "fieldPassword": "Jelszó",
   "fieldSeparator": "Elválasztó",
   "fieldFolder": "Mappa",
@@ -649,7 +650,7 @@
   "aboutLicenceBody": "A Gabbro szabad és nyílt forráskódú szoftver, a GNU General Public License v3.0 only (GPL-3.0-only) licence alatt.\n\nSzabadon felhasználhatod, tanulmányozhatod és terjesztheted ezt a szoftvert az adott licenc feltételei szerint.",
   "aboutOwnerRole": "Projekttulajdonos, tervező és vezető fejlesztő:",
   "aboutAiPartner": "MI fejlesztési partner:",
-  "aboutNoTelemetry": "A Gabbro nem hoz létre kimenő hálózati kapcsolatokat. Nincs telemetria, nincs analitika, nincs fiók.",
+  "aboutNoTelemetry": "Nincs telemetria, analitika, fiók, sem Gabbro-szerver. A Gabbro egyáltalán nem létesít hálózati kapcsolatot — hacsak be nem kapcsolja az alkalmazás-passkey-ket: ekkor az egyetlen kapcsolat bejelentkezésenként egy letöltés, az adott webhely saját alkalmazás-ellenőrző fájlja.",
 
   "strengthTierTerrible": "Borzalmas",
   "strengthTierWeak": "Gyenge",
@@ -923,5 +924,18 @@
   "hintSearch": "Gépelés közben szűri a bejegyzéseket",
   "hintFolderSelector": "Mappa szerint szűri a bejegyzéseket",
   "hintFilterChip": "Be- vagy kikapcsolja ezt a kategóriaszűrőt",
-  "hintEntryRow": "Megnyitja ezt a bejegyzést"
+  "hintEntryRow": "Megnyitja ezt a bejegyzést",
+  "entryTypePasskey": "Passkey",
+  "passkeyHintModuleMissing": "A passkey-k inaktívak: az uhid kernelmodul nincs betöltve. Lásd a passkey beállítási lépéseit a README-ben.",
+  "passkeyHintNoAccess": "A passkey-k inaktívak: a Gabbro nem fér hozzá a /dev/uhid eszközhöz (hiányzik az udev szabály). Lásd a passkey beállítási lépéseit a README-ben.",
+  "passkeyHintOther": "A passkey-k inaktívak: a virtuális biztonsági kulcs nem tudott elindulni. Lásd a passkey beállítási lépéseit a README-ben.",
+  "passkeyHintDontShowAgain": "Ne jelenjen meg többé",
+  "sectionAppPasskeys": "Alkalmazás-passkey-k",
+  "appPasskeysDescription": "Engedélyezze az Android-alkalmazásoknak a passkey-es bejelentkezést. Minden bejelentkezés egyetlen hálózati kérést tesz: letölti az adott webhely saját alkalmazás-ellenőrző fájlját, és ellenőrzi, hogy az alkalmazás valódi-e. A Gabbro soha nem létesít más hálózati kapcsolatot — lásd a „Verify no telemetry” részt a README-ben.",
+  "appPasskeysTitle": "Alkalmazás-passkey-k engedélyezése",
+  "appPasskeysNote": "Kikapcsolva, vagy megtagadott hálózati hozzáférés esetén csak az alkalmazásokból való bejelentkezések utasítódnak el — a böngészőbeli passkey-k soha nem használják a hálózatot.",
+  "passkeyCreatePrompt": "Létrehoz egy passkey-t ehhez: {site}?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "Bejelentkezik ide: {site} a passkey-jével?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

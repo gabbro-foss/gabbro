@@ -343,6 +343,66 @@ abstract class AppLocalizations {
   /// **'No saved login matches this app or site.'**
   String get autofillNoMatchBody;
 
+  /// Consent prompt when a website or app asks to save a new passkey in the vault. {site} is the domain.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a passkey for {site}?'**
+  String passkeyCreatePrompt(String site);
+
+  /// Consent prompt when a website or app asks to sign in with a stored passkey. {site} is the domain.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to {site} with your passkey?'**
+  String passkeySignInPrompt(String site);
+
+  /// Vault-list banner (Linux) when /dev/uhid does not exist because the uhid kernel module is not loaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Passkeys are inactive: the uhid kernel module is not loaded. See the passkey setup steps in the README.'**
+  String get passkeyHintModuleMissing;
+
+  /// Vault-list banner (Linux) when /dev/uhid exists but the udev rule granting user access is missing.
+  ///
+  /// In en, this message translates to:
+  /// **'Passkeys are inactive: Gabbro cannot access /dev/uhid (udev rule missing). See the passkey setup steps in the README.'**
+  String get passkeyHintNoAccess;
+
+  /// Vault-list banner (Linux) when the passkey provider failed to start for an unrecognised reason.
+  ///
+  /// In en, this message translates to:
+  /// **'Passkeys are inactive: the virtual security key could not start. See the passkey setup steps in the README.'**
+  String get passkeyHintOther;
+
+  /// Banner action that permanently hides the passkey hint (persisted in settings).
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t show again'**
+  String get passkeyHintDontShowAgain;
+
+  /// Security-screen section header for the Android app-passkey toggle (F1).
+  ///
+  /// In en, this message translates to:
+  /// **'App passkeys'**
+  String get sectionAppPasskeys;
+
+  /// Explains the app-passkey toggle: what it does and the single network fetch it needs. Must keep the English README section name "Verify no telemetry" verbatim.
+  ///
+  /// In en, this message translates to:
+  /// **'Let Android apps sign in with passkeys. Each login makes one network request: it fetches the site\'s own app-verification file to check the app is genuine. Gabbro makes no other network connection, ever — see \"Verify no telemetry\" in the README.'**
+  String get appPasskeysDescription;
+
+  /// Label of the app-passkey switch on the security screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow app passkeys'**
+  String get appPasskeysTitle;
+
+  /// Small note under the app-passkey switch describing the off/denied behaviour.
+  ///
+  /// In en, this message translates to:
+  /// **'When off, or when network access is denied, only app sign-ins refuse — passkeys in browsers never use the network.'**
+  String get appPasskeysNote;
+
   /// No description provided for @add.
   ///
   /// In en, this message translates to:
@@ -1435,6 +1495,12 @@ abstract class AppLocalizations {
   /// **'Custom'**
   String get entryTypeCustom;
 
+  /// No description provided for @entryTypePasskey.
+  ///
+  /// In en, this message translates to:
+  /// **'Passkey'**
+  String get entryTypePasskey;
+
   /// No description provided for @errorPrefix.
   ///
   /// In en, this message translates to:
@@ -2124,6 +2190,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Username (optional)'**
   String get fieldUsername;
+
+  /// No description provided for @passkeyFieldUsername.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get passkeyFieldUsername;
 
   /// No description provided for @fieldPassword.
   ///
@@ -2872,7 +2944,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutNoTelemetry.
   ///
   /// In en, this message translates to:
-  /// **'Gabbro makes no outbound network connections. No telemetry, no analytics, no accounts.'**
+  /// **'No telemetry, no analytics, no accounts, no Gabbro server. Gabbro makes no network connection at all, unless you turn on app passkeys — then the only connection ever made is one fetch per app login: that site\'s own app-verification file.'**
   String get aboutNoTelemetry;
 
   /// No description provided for @strengthTierTerrible.

@@ -8,7 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Passkey provider.** Website passkeys (WebAuthn) can now live in the vault, so they sync and back up with everything else. Android: Gabbro registers as a credential provider. Linux: while Gabbro runs, browsers see it as a security key (a virtual FIDO2 device); create and sign-in are approved in an in-app dialog. New Passkey entry type and a Passkey filter chip on the vault list. Vault format v12; v11 vaults still open.
 - APT repository for Debian/Mint: add it once, later releases arrive via `apt upgrade` / Update Manager.
+- The `.deb` and AUR packages now set up `/dev/uhid` access (udev rule + module load), so Linux passkeys work after install without manual steps; the README covers the same setup for tarball users.
+- Linux: when the passkey provider cannot start (uhid module missing, no `/dev/uhid` access, or a second Gabbro instance), the vault list now says so and points at the README fix — previously passkeys just silently never appeared in the browser. Dismissible per session or permanently.
+- Android: privileged-browser list refreshed from Google's reference list (adds Firefox Beta); now re-checked at every release.
+- Android: **App passkeys** toggle (Settings, off by default) lets native apps sign in with passkeys. Turning it on is the informed opt-in to Gabbro's only network use: one fetch per app login of that site's own app-verification file — see the new README section "Verify no telemetry". Off, or with network denied (GrapheneOS), only app sign-ins refuse; browser passkeys never use the network.
 
 ## [0.1.0-alpha.21] – 2026-08-18
 

@@ -44,7 +44,22 @@ bottom, in one shell (`ver` and `deb` carry through).**
    ver=$(sed -n 's/^version: *//p' pubspec.yaml | cut -d+ -f1) && echo "$ver"
    ```
 
-4. Run the full gate green. It covers every suite; nothing else needs running by hand. Use `--warm` if any dependency changed since the last run:
+4. Refresh the vendored privileged-browser list. A stale list refuses passkeys to
+   browsers released or re-signed since the snapshot:
+
+   ```bash
+   curl -fsS https://www.gstatic.com/gpm-passkeys-privileged-apps/apps.json -o /tmp/gpm_apps.json && \
+   diff <(jq -S .apps /tmp/gpm_apps.json) <(jq -S .apps android/app/src/main/assets/passkey_privileged_browsers.json) >/dev/null && echo UNCHANGED || \
+   (jq --arg c "Privileged browsers trusted to assert their own web origin for passkey calls. Vendored $(date +%F) from Google's reference list (https://www.gstatic.com/gpm-passkeys-privileged-apps/apps.json), same JSON shape. A browser absent here falls back to app-identity validation and will be refused for web rp_ids." '{_comment: $c, apps: .apps}' /tmp/gpm_apps.json > /tmp/gpm_vendored.json && \
+    mv /tmp/gpm_vendored.json android/app/src/main/assets/passkey_privileged_browsers.json)
+   ```
+
+   `UNCHANGED`: move on. Otherwise review `git diff`; the gate in the next step
+   re-tests the parser against the refreshed file. Same recipe as
+   [MAINTENANCE.md](MAINTENANCE.md#privileged-browser-list-android-passkeys) — keep the
+   two in sync.
+
+5. Run the full gate green. It covers every suite; nothing else needs running by hand. Use `--warm` if any dependency changed since the last run:
 
    ```bash
    ./gabbro_test
@@ -54,7 +69,7 @@ bottom, in one shell (`ver` and `deb` carry through).**
    - Fuzzer failure? Reproduce from the printed seed + op log, minimise, add the sequence to `vault_backward_compat.rs`. Widen with `GABBRO_FUZZ_CASES=64`.
    - Ignored Rust + Kotlin tests are hardware-only (YubiKey, biometric, AndroidKeyStore).
 
-5. Record the build toolchain (output order: Flutter, Rust, AGP, Kotlin, Java; no NDK: `ndkVersion = flutter.ndkVersion`, so the Flutter version determines it):
+6. Record the build toolchain (output order: Flutter, Rust, AGP, Kotlin, Java; no NDK: `ndkVersion = flutter.ndkVersion`, so the Flutter version determines it):
 
    ```bash
    flutter --version | head -1 && rustc --version && grep -oP '(com\.android\.application|org\.jetbrains\.kotlin\.android)"\) version "\K[^"]+' android/settings.gradle.kts && grep -oP 'VERSION_\K[0-9]+' android/app/build.gradle.kts | head -1
@@ -64,7 +79,7 @@ bottom, in one shell (`ver` and `deb` carry through).**
 
    *Built with Flutter 3.47.0, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21.*
 
-6. Commit and push the version + CHANGELOG bump.
+7. Commit and push the version + CHANGELOG bump (and the browser list, if step 4 changed it).
 
 **Build:**
 
@@ -117,6 +132,9 @@ One `debian:trixie` container run (Arch has no `dpkg-deb` or `apt-ftparchive`)
 repackages the signed tarball into a `.deb` (no compile) and regenerates the APT
 index in `../gabbro-apt/`. Optional `.deb` validation: add `apt-get install -y lintian`
 + `lintian ./*.deb` + `apt-get install -y ./*.deb` inside the container.
+Container installs cannot prove the uhid udev rule activates (no udev, shared
+kernel; verified to that limit 2026-08-22) — after a release, confirm on one
+real Debian/Mint install that passkeys work without manual setup.
 
 The APT clone is a sibling of `gabbro/`, at `../gabbro-apt/` (GitHub Pages serves it at
 https://gabbro-foss.github.io/gabbro-apt). apt accepts its ed25519 signing key (verified
@@ -244,7 +262,7 @@ control file, and the signature covers content, not the filename.
 ### AUR (`gabbro-bin`)
 
 The clone is a sibling of `gabbro/`, at `../gabbro-bin-aur/`, holding exactly
-`PKGBUILD` + `.SRCINFO` before and after this procedure (in between, `makepkg` adds
+`PKGBUILD` + `gabbro-bin.install` + `.SRCINFO` before and after this procedure (in between, `makepkg` adds
 `LICENSE`, the downloaded tarball and `src/`; step 5 removes them).
 
 1. Print the tarball hash. Run from `gabbro/`:
@@ -254,19 +272,19 @@ The clone is a sibling of `gabbro/`, at `../gabbro-bin-aur/`, holding exactly
    ```
 
 2. Edit `linux/packaging/aur/PKGBUILD`: set `pkgver` to the underscore form (e.g. `0.1.0_alpha.21`) and the **first** `sha256sums` entry to that hash (the second is LICENSE, changes only if LICENSE did). Commit and push it in `gabbro/`.
-3. Copy it across and check the published asset against the pinned sha; both source lines must say `Passed`. Run from `gabbro/`:
+3. Copy it across with the install hooks and check the published asset against the pinned sha; both source lines must say `Passed`. Run from `gabbro/`:
 
    ```bash
-   cp linux/packaging/aur/PKGBUILD ../gabbro-bin-aur/PKGBUILD && (cd ../gabbro-bin-aur && makepkg --verifysource)
+   cp linux/packaging/aur/PKGBUILD linux/packaging/aur/gabbro-bin.install ../gabbro-bin-aur/ && (cd ../gabbro-bin-aur && makepkg --verifysource)
    ```
 
 4. Regenerate `.SRCINFO` (generated, lives only in the clone) and push to the AUR:
 
    ```bash
-   cd ../gabbro-bin-aur && makepkg --printsrcinfo > .SRCINFO && git add PKGBUILD .SRCINFO && git commit -m "Update to $ver" && git push
+   cd ../gabbro-bin-aur && makepkg --printsrcinfo > .SRCINFO && git add PKGBUILD gabbro-bin.install .SRCINFO && git commit -m "Update to $ver" && git push
    ```
 
-5. Clean up, restoring the two-file state: `ls -a` must show only `.`, `..`, `.git`, `PKGBUILD`, `.SRCINFO`:
+5. Clean up, restoring the clone state: `ls -a` must show only `.`, `..`, `.git`, `PKGBUILD`, `gabbro-bin.install`, `.SRCINFO`:
 
    ```bash
    rm -f LICENSE gabbro-*-linux-x86_64.tar.gz && rm -rf src && ls -a

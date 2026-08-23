@@ -434,6 +434,7 @@
   "fieldAndroidAppId": "ID app Android (facoltativo)",
   "fieldAndroidAppIdHelper": "Compila questo accesso in un'app Android. Funziona solo una corrispondenza esatta. Trova l'ID nel link Play Store dell'app, dopo id= (es. id=com.company.app).",
   "fieldUsername": "Nome utente (facoltativo)",
+  "passkeyFieldUsername": "Nome utente",
   "fieldPassword": "Password",
   "fieldSeparator": "Separatore",
   "fieldFolder": "Cartella",
@@ -649,7 +650,7 @@
   "aboutLicenceBody": "Gabbro è software libero e open source, distribuito sotto la GNU General Public License v3.0 only (GPL-3.0-only).\n\nSei libero di usare, studiare e ridistribuire questo software secondo i termini di tale licenza.",
   "aboutOwnerRole": "Proprietario del progetto, architetto e sviluppatore principale:",
   "aboutAiPartner": "Partner di sviluppo IA:",
-  "aboutNoTelemetry": "Gabbro non effettua connessioni di rete in uscita. Niente telemetria, niente analitiche, niente account.",
+  "aboutNoTelemetry": "Niente telemetria, niente analitiche, niente account, nessun server Gabbro. Gabbro non effettua alcuna connessione di rete — a meno che non attivi le passkey delle app: allora l'unica connessione è un download per accesso, il file di verifica delle app del sito stesso.",
 
   "strengthTierTerrible": "Terribile",
   "strengthTierWeak": "Debole",
@@ -922,5 +923,18 @@
   "hintSearch": "Filtra le voci mentre digiti",
   "hintFolderSelector": "Filtra le voci per cartella",
   "hintFilterChip": "Attiva o disattiva questo filtro di categoria",
-  "hintEntryRow": "Apre questa voce"
+  "hintEntryRow": "Apre questa voce",
+  "entryTypePasskey": "Passkey",
+  "passkeyHintModuleMissing": "Le passkey non sono attive: il modulo del kernel uhid non è caricato. Vedi i passaggi di configurazione delle passkey nel README.",
+  "passkeyHintNoAccess": "Le passkey non sono attive: Gabbro non può accedere a /dev/uhid (regola udev mancante). Vedi i passaggi di configurazione delle passkey nel README.",
+  "passkeyHintOther": "Le passkey non sono attive: la chiave di sicurezza virtuale non si è avviata. Vedi i passaggi di configurazione delle passkey nel README.",
+  "passkeyHintDontShowAgain": "Non mostrare più",
+  "sectionAppPasskeys": "Passkey delle app",
+  "appPasskeysDescription": "Consenti alle app Android di accedere con le passkey. Ogni accesso effettua una sola richiesta di rete: scarica il file di verifica delle app del sito stesso per controllare che l'app sia autentica. Gabbro non stabilisce mai nessun'altra connessione di rete — vedi «Verify no telemetry» nel README.",
+  "appPasskeysTitle": "Consenti passkey delle app",
+  "appPasskeysNote": "Se disattivato, o se l'accesso alla rete è negato, vengono rifiutati solo gli accessi dalle app — le passkey nei browser non usano mai la rete.",
+  "passkeyCreatePrompt": "Creare una passkey per {site}?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "Accedere a {site} con la tua passkey?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

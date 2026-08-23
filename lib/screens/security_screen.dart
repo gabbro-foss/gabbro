@@ -370,6 +370,32 @@ class _SecurityScreenState extends State<SecurityScreen> {
                 const SizedBox(height: 32),
               ],
 
+              // ── App passkeys (Android only, F1) ───────────────────────
+              // Android grants INTERNET silently at install, so this toggle
+              // is the only informed opt-in the user ever gets.
+              if (widget.isAndroid) ...[
+                SectionHeader(label: l.sectionAppPasskeys),
+                const SizedBox(height: 4),
+                Text(
+                  l.appPasskeysDescription,
+                  style: const TextStyle(fontSize: 12),
+                ),
+                const SizedBox(height: 8),
+                SwitchListTile(
+                  title: Text(l.appPasskeysTitle),
+                  value: _settings.appPasskeys,
+                  onChanged: (v) =>
+                      _update(_settings.copyWith(appPasskeys: v)),
+                  contentPadding: EdgeInsets.zero,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  l.appPasskeysNote,
+                  style: const TextStyle(fontSize: 11),
+                ),
+                const SizedBox(height: 32),
+              ],
+
               // ── Clipboard clear ────────────────────────────────────────
               SectionHeader(label: l.sectionClipboardClear),
               const SizedBox(height: 4),

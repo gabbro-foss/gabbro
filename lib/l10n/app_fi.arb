@@ -434,6 +434,7 @@
   "fieldAndroidAppId": "Android-sovelluksen tunnus (valinnainen)",
   "fieldAndroidAppIdHelper": "Täyttää nämä kirjautumistiedot Android-sovelluksessa. Vain tarkka vastaavuus toimii. Löydät tunnuksen sovelluksen Play Store -linkistä kohdan id= jälkeen (esim. id=com.company.app).",
   "fieldUsername": "Käyttäjänimi (valinnainen)",
+  "passkeyFieldUsername": "Käyttäjänimi",
   "fieldPassword": "Salasana",
   "fieldSeparator": "Erotin",
   "fieldFolder": "Kansio",
@@ -649,7 +650,7 @@
   "aboutLicenceBody": "Gabbro on vapaa ja avoimen lähdekoodin ohjelmisto, lisensoitu GNU General Public License v3.0 only (GPL-3.0-only) -lisenssillä.\n\nVoit vapaasti käyttää, tutkia ja jakaa tätä ohjelmistoa kyseisen lisenssin ehtojen mukaisesti.",
   "aboutOwnerRole": "Projektin omistaja, arkkitehti ja pääkehittäjä:",
   "aboutAiPartner": "Tekoälykehityskumppani:",
-  "aboutNoTelemetry": "Gabbro ei tee lähtevisiä verkkoyhteyksiä. Ei telemetriaa, ei analytiikkaa, ei tilejä.",
+  "aboutNoTelemetry": "Ei telemetriaa, ei analytiikkaa, ei tilejä, ei Gabbro-palvelinta. Gabbro ei muodosta lainkaan verkkoyhteyksiä — paitsi jos otat sovellusten passkeyt käyttöön: silloin ainoa yhteys on yksi haku kirjautumista kohden, sivuston oma sovellusvarmennustiedosto.",
 
   "strengthTierTerrible": "Surkea",
   "strengthTierWeak": "Heikko",
@@ -923,5 +924,18 @@
   "hintSearch": "Suodattaa merkinnät kirjoittaessasi",
   "hintFolderSelector": "Suodattaa merkinnät kansion mukaan",
   "hintFilterChip": "Ottaa tämän luokkasuodattimen käyttöön tai poistaa sen käytöstä",
-  "hintEntryRow": "Avaa tämän merkinnän"
+  "hintEntryRow": "Avaa tämän merkinnän",
+  "entryTypePasskey": "Passkey",
+  "passkeyHintModuleMissing": "Passkeyt eivät ole käytössä: ytimen uhid-moduulia ei ole ladattu. Katso passkey-asennusohjeet README-tiedostosta.",
+  "passkeyHintNoAccess": "Passkeyt eivät ole käytössä: Gabbro ei pääse laitteeseen /dev/uhid (udev-sääntö puuttuu). Katso passkey-asennusohjeet README-tiedostosta.",
+  "passkeyHintOther": "Passkeyt eivät ole käytössä: virtuaalista turva-avainta ei voitu käynnistää. Katso passkey-asennusohjeet README-tiedostosta.",
+  "passkeyHintDontShowAgain": "Älä näytä uudelleen",
+  "sectionAppPasskeys": "Sovellusten passkeyt",
+  "appPasskeysDescription": "Salli Android-sovellusten kirjautua passkeyllä. Jokainen kirjautuminen tekee yhden verkkopyynnön: se hakee sivuston oman sovellusvarmennustiedoston ja tarkistaa, että sovellus on aito. Muita verkkoyhteyksiä Gabbro ei koskaan muodosta — katso ”Verify no telemetry” README-tiedostosta.",
+  "appPasskeysTitle": "Salli sovellusten passkeyt",
+  "appPasskeysNote": "Kun asetus on pois päältä tai verkkoyhteys on estetty, vain sovellusten kirjautumiset estyvät — selainten passkeyt eivät koskaan käytä verkkoa.",
+  "passkeyCreatePrompt": "Luodaanko passkey sivustolle {site}?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "Kirjaudutaanko sivustolle {site} passkeyllä?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

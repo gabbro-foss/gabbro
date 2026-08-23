@@ -434,6 +434,7 @@
   "fieldAndroidAppId": "ID de app de Android (opcional)",
   "fieldAndroidAppIdHelper": "Rellena este inicio de sesión en una app de Android. Solo funciona una coincidencia exacta. Encuentra el ID en el enlace de Play Store de la app, después de id= (p. ej. id=com.company.app).",
   "fieldUsername": "Nombre de usuario (opcional)",
+  "passkeyFieldUsername": "Nombre de usuario",
   "fieldPassword": "Contraseña",
   "fieldSeparator": "Separador",
   "fieldFolder": "Carpeta",
@@ -649,7 +650,7 @@
   "aboutLicenceBody": "Gabbro es software libre y de código abierto, distribuido bajo la GNU General Public License v3.0 only (GPL-3.0-only).\n\nEres libre de usar, estudiar y redistribuir este software según los términos de dicha licencia.",
   "aboutOwnerRole": "Propietario del proyecto, arquitecto y desarrollador principal:",
   "aboutAiPartner": "Socio de desarrollo IA:",
-  "aboutNoTelemetry": "Gabbro no realiza ninguna conexión de red saliente. Sin telemetría, sin analíticas, sin cuentas.",
+  "aboutNoTelemetry": "Sin telemetría, sin analíticas, sin cuentas, sin servidor de Gabbro. Gabbro no realiza ninguna conexión de red en absoluto — salvo que actives las passkeys de aplicaciones: entonces la única conexión es una descarga por inicio de sesión, el archivo de verificación de aplicaciones del propio sitio.",
 
   "strengthTierTerrible": "Terrible",
   "strengthTierWeak": "Débil",
@@ -922,5 +923,18 @@
   "hintSearch": "Filtra las entradas mientras escribes",
   "hintFolderSelector": "Filtra las entradas por carpeta",
   "hintFilterChip": "Activa o desactiva este filtro de categoría",
-  "hintEntryRow": "Abre esta entrada"
+  "hintEntryRow": "Abre esta entrada",
+  "entryTypePasskey": "Passkey",
+  "passkeyHintModuleMissing": "Las passkeys están inactivas: el módulo del núcleo uhid no está cargado. Consulta los pasos de configuración de passkeys en el README.",
+  "passkeyHintNoAccess": "Las passkeys están inactivas: Gabbro no puede acceder a /dev/uhid (falta la regla udev). Consulta los pasos de configuración de passkeys en el README.",
+  "passkeyHintOther": "Las passkeys están inactivas: la llave de seguridad virtual no pudo iniciarse. Consulta los pasos de configuración de passkeys en el README.",
+  "passkeyHintDontShowAgain": "No mostrar de nuevo",
+  "sectionAppPasskeys": "Passkeys de aplicaciones",
+  "appPasskeysDescription": "Permite que las aplicaciones Android inicien sesión con passkeys. Cada inicio de sesión hace una sola petición de red: descarga el archivo de verificación de aplicaciones del propio sitio para comprobar que la aplicación es auténtica. Gabbro nunca establece ninguna otra conexión de red — consulta «Verify no telemetry» en el README.",
+  "appPasskeysTitle": "Permitir passkeys de aplicaciones",
+  "appPasskeysNote": "Si está desactivado, o si se deniega el acceso a la red, solo se rechazan los inicios de sesión de aplicaciones — las passkeys en navegadores nunca usan la red.",
+  "passkeyCreatePrompt": "¿Crear una passkey para {site}?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "¿Iniciar sesión en {site} con tu passkey?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

@@ -138,6 +138,24 @@ pub struct CustomEntryData {
     pub attachments: Vec<AttachmentMetaData>,
 }
 
+/// A passkey entry as seen by Flutter. Key material never rides in this DTO —
+/// the private key stays behind the bridge (signing happens in Rust), and
+/// `update_entry` restores it from the stored entry, like attachments.
+pub struct PasskeyEntryData {
+    pub id: String,
+    pub created_at: String,
+    pub updated_at: String,
+    pub folder: String,
+    /// Relying-party id (e.g. "example.com") — the site this passkey signs for.
+    pub rp_id: String,
+    pub user_name: String,
+    pub user_display_name: String,
+    /// Base64url credential id — display/identification only, not editable.
+    pub credential_id_b64: String,
+    pub notes: Option<String>,
+    pub custom_fields: Vec<CustomFieldData>,
+}
+
 /// An entry flagged for user-consent deletion during vault merge.
 ///
 /// Returned when an incoming vault contains a tombstone that matches a local
@@ -373,6 +391,7 @@ fn entry_id(entry: &VaultEntry) -> &str {
         VaultEntry::Card(e) => &e.meta.id,
         VaultEntry::File(e) => &e.meta.id,
         VaultEntry::Custom(e) => &e.meta.id,
+        VaultEntry::Passkey(e) => &e.meta.id,
     }
 }
 
@@ -395,6 +414,7 @@ fn entry_meta(entry: &VaultEntry) -> &crate::vault::entry::EntryMeta {
         VaultEntry::Card(e) => &e.meta,
         VaultEntry::File(e) => &e.meta,
         VaultEntry::Custom(e) => &e.meta,
+        VaultEntry::Passkey(e) => &e.meta,
     }
 }
 
@@ -406,6 +426,7 @@ pub(crate) fn entry_meta_mut(entry: &mut VaultEntry) -> &mut crate::vault::entry
         VaultEntry::Card(e) => &mut e.meta,
         VaultEntry::File(e) => &mut e.meta,
         VaultEntry::Custom(e) => &mut e.meta,
+        VaultEntry::Passkey(e) => &mut e.meta,
     }
 }
 
@@ -418,6 +439,7 @@ pub(crate) fn entry_attachments(entry: &VaultEntry) -> &[crate::vault::entry::En
         VaultEntry::Card(e) => &e.attachments,
         VaultEntry::Custom(e) => &e.attachments,
         VaultEntry::File(_) => &[],
+        VaultEntry::Passkey(_) => &[],
     }
 }
 
@@ -431,6 +453,7 @@ pub(crate) fn entry_attachments_mut(
         VaultEntry::Card(e) => Some(&mut e.attachments),
         VaultEntry::Custom(e) => Some(&mut e.attachments),
         VaultEntry::File(_) => None,
+        VaultEntry::Passkey(_) => None,
     }
 }
 
@@ -560,6 +583,23 @@ fn changed_field_keys(old: &VaultEntry, new: &VaultEntry) -> Vec<String> {
             }
             diff_attachments(&o.attachments, &n.attachments, &mut out);
         }
+        (VaultEntry::Passkey(o), VaultEntry::Passkey(n)) => {
+            push_if(&mut out, "rp_id", o.rp_id != n.rp_id);
+            push_if(&mut out, "user_name", o.user_name != n.user_name);
+            push_if(
+                &mut out,
+                "user_display_name",
+                o.user_display_name != n.user_display_name,
+            );
+            push_if(&mut out, "notes", o.notes != n.notes);
+            // Key material is one atomic sync field — see credential_blob().
+            push_if(
+                &mut out,
+                "credential",
+                o.credential_blob() != n.credential_blob(),
+            );
+            diff_custom(&o.custom_fields, &n.custom_fields, &mut out);
+        }
         _ => {}
     }
     out
@@ -606,6 +646,9 @@ fn item_keys(entry: &VaultEntry) -> std::collections::HashSet<String> {
             }
             add_att(&mut keys, &e.attachments);
         }
+        VaultEntry::Passkey(e) => {
+            add_custom(&mut keys, &e.custom_fields);
+        }
     }
     keys
 }
@@ -622,6 +665,7 @@ fn entry_custom_fields_mut(
         VaultEntry::Card(e) => Some(&mut e.custom_fields),
         VaultEntry::File(e) => Some(&mut e.custom_fields),
         VaultEntry::Custom(_) => None,
+        VaultEntry::Passkey(e) => Some(&mut e.custom_fields),
     }
 }
 
@@ -688,6 +732,21 @@ fn set_entry_scalar(entry: &mut VaultEntry, key: &str, value: &str) {
                 e.title = s;
             }
         }
+        VaultEntry::Passkey(e) => match key {
+            "rp_id" => e.rp_id = s,
+            "user_name" => e.user_name = s,
+            "user_display_name" => e.user_display_name = s,
+            "notes" => e.notes = Some(s),
+            // The atomic key-material block rides the resolution path as
+            // base64, like File "data". A malformed value leaves it untouched.
+            "credential" => {
+                use base64::Engine;
+                if let Ok(blob) = base64::engine::general_purpose::STANDARD.decode(&s) {
+                    let _ = e.apply_credential_blob(&blob);
+                }
+            }
+            _ => {}
+        },
     }
 }
 
@@ -756,6 +815,7 @@ pub(crate) fn remove_entry_item_by_key(entry: &mut VaultEntry, key: &str) {
             VaultEntry::Card(e) => Some(&mut e.attachments),
             VaultEntry::Custom(e) => Some(&mut e.attachments),
             VaultEntry::File(_) => None,
+            VaultEntry::Passkey(_) => None,
         };
         if let Some(atts) = atts {
             atts.retain(|a| a.uuid != uuid);
@@ -793,6 +853,16 @@ pub fn update_entry(
     // wipe them and stamp `del:attachments:<uuid>` tombstones that sync the loss.
     if let Some(dst) = entry_attachments_mut(&mut updated) {
         *dst = entry_attachments(&entries[pos]).to_vec();
+    }
+
+    // Passkey key material is not round-tripped by Flutter either — the private
+    // key never crosses the bridge — so the stored entry is the source of truth.
+    if let (VaultEntry::Passkey(dst), VaultEntry::Passkey(src)) = (&mut updated, &entries[pos]) {
+        dst.user_handle = src.user_handle.clone();
+        dst.credential_id = src.credential_id.clone();
+        dst.private_key = src.private_key.clone();
+        dst.public_key_cose = src.public_key_cose.clone();
+        dst.algorithm = src.algorithm;
     }
 
     // Per-field change-times (granular sync, v9). Flutter does not round-trip
@@ -850,6 +920,12 @@ pub fn update_entry(
             e.meta.updated_at = now;
         }
         (_, VaultEntry::Custom(ref mut e)) => {
+            e.meta.updated_at = now;
+        }
+        // No secret snapshot: passkey key material is immutable after
+        // registration (and restored from the stored entry above), so only
+        // the edit timestamp moves.
+        (_, VaultEntry::Passkey(ref mut e)) => {
             e.meta.updated_at = now;
         }
         _ => return Err(String::from("Entry type mismatch during update")),
@@ -3311,5 +3387,97 @@ mod tests {
         let _ = std::fs::remove_file(&export);
         let _ = std::fs::remove_file(&hash_path);
         let _ = std::fs::remove_file(source.with_extension("gabbro.sha256"));
+    }
+
+    #[test]
+    fn changed_field_keys_covers_passkey_fields() {
+        use crate::vault::entry::PasskeyEntry;
+        let base = || PasskeyEntry {
+            meta: crate::vault::entry::EntryMeta::default(),
+            rp_id: String::from("example.com"),
+            user_name: String::from("user@example.com"),
+            user_display_name: String::from("Sample User"),
+            user_handle: vec![7; 16],
+            credential_id: vec![7; 32],
+            private_key: vec![7; 32],
+            public_key_cose: vec![7; 77],
+            algorithm: -7,
+            notes: None,
+            custom_fields: vec![],
+        };
+        let old = VaultEntry::Passkey(base());
+
+        let mut notes_edit = base();
+        notes_edit.notes = Some(String::from("edited"));
+        assert_eq!(
+            changed_field_keys(&old, &VaultEntry::Passkey(notes_edit)),
+            vec![String::from("notes")],
+            "a notes edit must stamp, or granular sync silently drops it"
+        );
+
+        let mut rekey = base();
+        rekey.private_key = vec![8; 32];
+        assert_eq!(
+            changed_field_keys(&old, &VaultEntry::Passkey(rekey)),
+            vec![String::from("credential")],
+            "any key-material change stamps the one atomic credential key"
+        );
+
+        let mut rename = base();
+        rename.user_name = String::from("other@example.com");
+        assert_eq!(
+            changed_field_keys(&old, &VaultEntry::Passkey(rename)),
+            vec![String::from("user_name")]
+        );
+    }
+
+    #[test]
+    fn update_entry_preserves_passkey_key_material() {
+        use crate::vault::entry::PasskeyEntry;
+        // The DTO carries no key bytes, so an app edit arrives with empty key
+        // material; losing it would destroy the credential. The stored entry is
+        // the source of truth, exactly like attachments.
+        let passkey = |notes: Option<String>, keys: u8| {
+            VaultEntry::Passkey(PasskeyEntry {
+                meta: crate::vault::entry::EntryMeta {
+                    field_times: Default::default(),
+                    history: Vec::new(),
+                    id: String::from("pk-1"),
+                    created_at: String::from("2026-01-01T00:00:00Z"),
+                    updated_at: String::from("2026-01-01T00:00:00Z"),
+                    folder: String::new(),
+                },
+                rp_id: String::from("example.com"),
+                user_name: String::from("user@example.com"),
+                user_display_name: String::from("Sample User"),
+                user_handle: vec![keys; 16],
+                credential_id: vec![keys; 32],
+                private_key: vec![keys; 32],
+                public_key_cose: vec![keys; 77],
+                algorithm: -7,
+                notes,
+                custom_fields: vec![],
+            })
+        };
+        let mut entries = vec![passkey(None, 7)];
+        // The DTO path arrives with empty key material; model that.
+        let mut edited = passkey(Some(String::from("edited")), 0);
+        if let VaultEntry::Passkey(e) = &mut edited {
+            e.user_handle.clear();
+            e.credential_id.clear();
+            e.private_key.clear();
+            e.public_key_cose.clear();
+        }
+        update_entry(&mut entries, edited, None).unwrap();
+        match &entries[0] {
+            VaultEntry::Passkey(e) => {
+                assert_eq!(e.notes.as_deref(), Some("edited"), "the edit lands");
+                assert_eq!(e.private_key, vec![7u8; 32], "key material survives");
+                assert_eq!(e.credential_id, vec![7u8; 32]);
+                assert_eq!(e.user_handle, vec![7u8; 16]);
+                assert_eq!(e.public_key_cose, vec![7u8; 77]);
+            }
+            _ => panic!("expected a Passkey entry"),
+        }
     }
 }

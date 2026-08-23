@@ -104,6 +104,45 @@ class AppLocalizationsRu extends AppLocalizations {
       'Нет сохранённого входа, соответствующего этому приложению или сайту.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Создать passkey для $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Войти на $site с помощью passkey?';
+  }
+
+  @override
+  String get passkeyHintModuleMissing =>
+      'Passkey неактивны: модуль ядра uhid не загружен. См. шаги настройки passkey в README.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkey неактивны: Gabbro не имеет доступа к /dev/uhid (отсутствует правило udev). См. шаги настройки passkey в README.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkey неактивны: не удалось запустить виртуальный ключ безопасности. См. шаги настройки passkey в README.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Больше не показывать';
+
+  @override
+  String get sectionAppPasskeys => 'Passkey приложений';
+
+  @override
+  String get appPasskeysDescription =>
+      'Разрешить приложениям Android входить по passkey. Каждый вход делает один сетевой запрос: загружается файл проверки приложений с самого сайта, чтобы убедиться, что приложение подлинное. Никаких других сетевых подключений Gabbro никогда не устанавливает — см. «Verify no telemetry» в README.';
+
+  @override
+  String get appPasskeysTitle => 'Разрешить passkey приложений';
+
+  @override
+  String get appPasskeysNote =>
+      'Когда выключено или доступ к сети запрещён, отклоняются только входы из приложений — passkey в браузерах никогда не используют сеть.';
+
+  @override
   String get add => 'Добавить';
 
   @override
@@ -667,6 +706,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get entryTypeCustom => 'Пользовательский';
 
   @override
+  String get entryTypePasskey => 'Passkey';
+
+  @override
   String errorPrefix(String error) {
     return 'Ошибка: $error';
   }
@@ -1080,6 +1122,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get fieldUsername => 'Имя пользователя (необязательно)';
+
+  @override
+  String get passkeyFieldUsername => 'Имя пользователя';
 
   @override
   String get fieldPassword => 'Пароль';
@@ -1510,7 +1555,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro не устанавливает исходящих сетевых соединений. Никакой телеметрии, аналитики и аккаунтов.';
+      'Никакой телеметрии, аналитики, аккаунтов и сервера Gabbro. Gabbro вообще не устанавливает сетевых соединений — если только вы не включите passkey приложений: тогда единственное соединение — одна загрузка на вход, файл проверки приложений самого сайта.';
 
   @override
   String get strengthTierTerrible => 'Ужасный';

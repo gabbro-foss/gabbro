@@ -434,6 +434,7 @@
   "fieldAndroidAppId": "Android 앱 ID(선택사항)",
   "fieldAndroidAppIdHelper": "이 로그인을 Android 앱에서 자동 입력합니다. 정확히 일치할 때만 작동합니다. 앱의 Play Store 링크에서 id= 뒤에 ID가 있습니다(예: id=com.company.app).",
   "fieldUsername": "사용자 이름 (선택사항)",
+  "passkeyFieldUsername": "사용자 이름",
   "fieldPassword": "비밀번호",
   "fieldSeparator": "구분자",
   "fieldFolder": "폴더",
@@ -649,7 +650,7 @@
   "aboutLicenceBody": "Gabbro는 GNU General Public License v3.0 only (GPL-3.0-only) 하에 라이선스된 무료 오픈소스 소프트웨어입니다.\n\n라이선스 조건에 따라 이 애플리케이션을 사용, 연구, 배포할 자유가 있습니다.",
   "aboutOwnerRole": "프로젝트 소유자, 아키텍트 및 주요 개발자:",
   "aboutAiPartner": "AI 개발 파트너:",
-  "aboutNoTelemetry": "Gabbro는 외부 네트워크 연결을 하지 않습니다. 원격 측정, 분석 또는 계정이 없습니다.",
+  "aboutNoTelemetry": "원격 측정, 분석, 계정, Gabbro 서버가 없습니다. Gabbro는 네트워크 연결을 전혀 하지 않습니다. 단, 앱 패스키를 켜면 로그인마다 한 번, 해당 사이트 자체의 앱 확인 파일만 가져옵니다.",
 
   "strengthTierTerrible": "매우 약함",
   "strengthTierWeak": "약함",
@@ -922,5 +923,18 @@
   "hintSearch": "입력하는 대로 항목을 필터링합니다",
   "hintFolderSelector": "폴더별로 항목을 필터링합니다",
   "hintFilterChip": "이 범주 필터를 켜거나 끕니다",
-  "hintEntryRow": "이 항목을 엽니다"
+  "hintEntryRow": "이 항목을 엽니다",
+  "entryTypePasskey": "패스키",
+  "passkeyHintModuleMissing": "패스키가 비활성 상태입니다. 커널 모듈 uhid가 로드되지 않았습니다. README의 패스키 설정 단계를 참조하세요.",
+  "passkeyHintNoAccess": "패스키가 비활성 상태입니다. Gabbro가 /dev/uhid에 접근할 수 없습니다(udev 규칙 없음). README의 패스키 설정 단계를 참조하세요.",
+  "passkeyHintOther": "패스키가 비활성 상태입니다. 가상 보안 키를 시작할 수 없습니다. README의 패스키 설정 단계를 참조하세요.",
+  "passkeyHintDontShowAgain": "다시 표시하지 않음",
+  "sectionAppPasskeys": "앱 패스키",
+  "appPasskeysDescription": "Android 앱이 패스키로 로그인하도록 허용합니다. 로그인할 때마다 네트워크 요청을 한 번만 보내 사이트 자체의 앱 확인 파일을 가져와 앱이 진짜인지 확인합니다. Gabbro는 그 외에는 어떤 네트워크 연결도 하지 않습니다. README의 “Verify no telemetry”를 참조하세요.",
+  "appPasskeysTitle": "앱 패스키 허용",
+  "appPasskeysNote": "꺼져 있거나 네트워크 접근이 거부되면 앱 로그인만 거부됩니다. 브라우저의 패스키는 네트워크를 전혀 사용하지 않습니다.",
+  "passkeyCreatePrompt": "{site}의 패스키를 만들까요?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "패스키로 {site}에 로그인할까요?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

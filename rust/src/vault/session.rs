@@ -196,6 +196,7 @@ fn entry_id(entry: &VaultEntry) -> &str {
         VaultEntry::Card(e) => &e.meta.id,
         VaultEntry::File(e) => &e.meta.id,
         VaultEntry::Custom(e) => &e.meta.id,
+        VaultEntry::Passkey(e) => &e.meta.id,
     }
 }
 
@@ -326,6 +327,30 @@ fn entry_to_summary(entry: &VaultEntry) -> EntrySummaryData {
                 search_blob: make_blob(&parts),
             }
         }
+        VaultEntry::Passkey(e) => {
+            // Key material never enters the search blob: the blob is held
+            // decrypted for the lifetime of the unlocked session.
+            let mut parts: Vec<&str> = vec![
+                &e.rp_id,
+                &e.user_name,
+                &e.user_display_name,
+                e.notes.as_deref().unwrap_or(""),
+            ];
+            push_custom_fields(&mut parts, &e.custom_fields);
+            EntrySummaryData {
+                id: e.meta.id.clone(),
+                entry_type: String::from("Passkey"),
+                title: if !e.rp_id.is_empty() {
+                    e.rp_id.clone()
+                } else if !e.user_name.is_empty() {
+                    e.user_name.clone()
+                } else {
+                    e.meta.id.clone()
+                },
+                folder: e.meta.folder.clone(),
+                search_blob: make_blob(&parts),
+            }
+        }
     }
 }
 
@@ -390,6 +415,23 @@ pub fn session_entry_content_hashes() -> Result<std::collections::HashSet<[u8; 3
 ///
 /// Used by bulk operations (e.g. import) that add many entries and
 /// want to save once at the end rather than once per entry.
+/// Clones of every Passkey entry whose rp_id matches EXACTLY. Clones carry key
+/// material — they exist only for the passkey provider flow and zeroize on drop.
+pub fn session_passkeys_for_rp(
+    rp_id: &str,
+) -> Result<Vec<crate::vault::entry::PasskeyEntry>, String> {
+    let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+    let session = session.as_ref().ok_or("Vault is locked")?;
+    Ok(session
+        .entries
+        .iter()
+        .filter_map(|e| match e {
+            VaultEntry::Passkey(p) if p.rp_id == rp_id => Some(p.clone()),
+            _ => None,
+        })
+        .collect())
+}
+
 pub fn session_add_entry_no_save(entry: VaultEntry) -> Result<(), String> {
     let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     let session = session.as_mut().ok_or("Vault is locked")?;
@@ -990,6 +1032,7 @@ pub fn session_rename_folder(old_name: String, new_name: String) -> Result<(), S
                 VaultEntry::Card(e) => &mut e.meta.folder,
                 VaultEntry::File(e) => &mut e.meta.folder,
                 VaultEntry::Custom(e) => &mut e.meta.folder,
+                VaultEntry::Passkey(e) => &mut e.meta.folder,
             };
             if *folder == old_name {
                 *folder = new_name.clone();
@@ -1036,6 +1079,7 @@ pub fn session_delete_folder(name: String, reassign_to: Option<String>) -> Resul
                 VaultEntry::Card(e) => &mut e.meta.folder,
                 VaultEntry::File(e) => &mut e.meta.folder,
                 VaultEntry::Custom(e) => &mut e.meta.folder,
+                VaultEntry::Passkey(e) => &mut e.meta.folder,
             };
             if *folder == name {
                 *folder = target.clone();
@@ -1074,6 +1118,7 @@ pub fn session_assign_folder_to_entries(ids: &[String], folder: String) -> Resul
                 VaultEntry::Card(e) => (&e.meta.id, &mut e.meta.folder),
                 VaultEntry::File(e) => (&e.meta.id, &mut e.meta.folder),
                 VaultEntry::Custom(e) => (&e.meta.id, &mut e.meta.folder),
+                VaultEntry::Passkey(e) => (&e.meta.id, &mut e.meta.folder),
             };
             if ids.contains(id) {
                 *f = folder.clone();
@@ -1279,6 +1324,7 @@ fn entry_folder(entry: &VaultEntry) -> &str {
         VaultEntry::Card(e) => &e.meta.folder,
         VaultEntry::File(e) => &e.meta.folder,
         VaultEntry::Custom(e) => &e.meta.folder,
+        VaultEntry::Passkey(e) => &e.meta.folder,
     }
 }
 
@@ -1306,6 +1352,15 @@ fn entry_display_title(entry: &VaultEntry) -> String {
             .to_string(),
         VaultEntry::File(e) => e.filename.clone(),
         VaultEntry::Custom(e) => e.title.clone(),
+        VaultEntry::Passkey(e) => {
+            if !e.rp_id.is_empty() {
+                e.rp_id.clone()
+            } else if !e.user_name.is_empty() {
+                e.user_name.clone()
+            } else {
+                e.meta.id.clone()
+            }
+        }
     }
 }
 
@@ -1314,7 +1369,7 @@ fn entry_display_title(entry: &VaultEntry) -> String {
 use crate::api::vault::{FieldConflictItem, PendingItemDeleteItem};
 use crate::vault::entry::{
     CardEntry, CustomEntry, EntryAttachment, EntryMeta, FileEntry, IdentityEntry, LoginEntry,
-    NoteEntry,
+    NoteEntry, PasskeyEntry,
 };
 
 #[derive(Clone, Copy)]
@@ -1331,6 +1386,7 @@ fn meta_of(e: &VaultEntry) -> &EntryMeta {
         VaultEntry::Card(x) => &x.meta,
         VaultEntry::File(x) => &x.meta,
         VaultEntry::Custom(x) => &x.meta,
+        VaultEntry::Passkey(x) => &x.meta,
     }
 }
 
@@ -1342,6 +1398,7 @@ fn meta_of_mut(e: &mut VaultEntry) -> &mut EntryMeta {
         VaultEntry::Card(x) => &mut x.meta,
         VaultEntry::File(x) => &mut x.meta,
         VaultEntry::Custom(x) => &mut x.meta,
+        VaultEntry::Passkey(x) => &mut x.meta,
     }
 }
 
@@ -1755,6 +1812,43 @@ pub(crate) fn merge_entry_pair(
                 title: m.pick_str("title", &l.title, &i.title),
                 fields,
                 attachments: m.merge_attachments(&l.attachments, &i.attachments),
+            })
+        }
+        (VaultEntry::Passkey(l), VaultEntry::Passkey(i)) => {
+            // Text fields merge like any entry. The key-material block is ONE
+            // atomic field ("credential"): it rides the resolution path as
+            // base64 like File `data`, and the winning side supplies every
+            // byte — half a credential signs for nobody.
+            use base64::Engine;
+            let b64 = base64::engine::general_purpose::STANDARD;
+            let l_blob = l.credential_blob();
+            let i_blob = i.credential_blob();
+            let side = m.decide(
+                "credential",
+                l_blob == i_blob,
+                &b64.encode(&l_blob),
+                &b64.encode(&i_blob),
+            );
+            let src = match side {
+                Side::Local => l,
+                Side::Incoming => i,
+            };
+            VaultEntry::Passkey(PasskeyEntry {
+                meta: lm.clone(),
+                rp_id: m.pick_str("rp_id", &l.rp_id, &i.rp_id),
+                user_name: m.pick_str("user_name", &l.user_name, &i.user_name),
+                user_display_name: m.pick_str(
+                    "user_display_name",
+                    &l.user_display_name,
+                    &i.user_display_name,
+                ),
+                user_handle: src.user_handle.clone(),
+                credential_id: src.credential_id.clone(),
+                private_key: src.private_key.clone(),
+                public_key_cose: src.public_key_cose.clone(),
+                algorithm: src.algorithm,
+                notes: m.pick_opt("notes", &l.notes, &i.notes),
+                custom_fields: m.merge_custom(&l.custom_fields, &i.custom_fields),
             })
         }
         // Same id, different type (defensive): fall back to whole-entry LWW.
@@ -8116,7 +8210,7 @@ mod export_sync_tests {
 // ── Multi-device sync fuzz proof (granular sync, v9) ──────────────────────────
 //
 // Deterministic fuzzer for the field-level merge. Each pass starts from a fixed
-// 12-entry base (all 6 types), forks 3 device copies, and applies random divergent
+// 14-entry base (all 7 types), forks 3 device copies, and applies random divergent
 // edits/adds/deletes with globally-unique timestamps across EVERY mergeable field:
 // scalars (title, password, notes, card fields, ...), custom k:v pairs, AND
 // attachments. The copies are then converged in two random orders. Invariants:
@@ -8131,7 +8225,7 @@ mod sync_fuzz {
     use super::*;
     use crate::vault::entry::{
         CardEntry, CustomEntry, CustomField, EntryAttachment, FileEntry, IdentityEntry, LoginEntry,
-        NoteEntry,
+        NoteEntry, PasskeyEntry,
     };
     use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
@@ -8193,6 +8287,13 @@ mod sync_fuzz {
             ],
             VaultEntry::File(_) => &["filename", "data", "notes"],
             VaultEntry::Custom(_) => &["title"],
+            VaultEntry::Passkey(_) => &[
+                "rp_id",
+                "user_name",
+                "user_display_name",
+                "notes",
+                "credential",
+            ],
         }
     }
 
@@ -8245,6 +8346,16 @@ mod sync_fuzz {
             },
             VaultEntry::Custom(x) => match key {
                 "title" => x.title.clone(),
+                _ => unreachable!(),
+            },
+            VaultEntry::Passkey(x) => match key {
+                "rp_id" => x.rp_id.clone(),
+                "user_name" => x.user_name.clone(),
+                "user_display_name" => x.user_display_name.clone(),
+                "notes" => opt_repr(&x.notes),
+                // Whole-block repr: the merge decides on the full blob, so the
+                // oracle's equality must match blob equality exactly.
+                "credential" => format!("{:?}", x.credential_blob()),
                 _ => unreachable!(),
             },
         }
@@ -8303,11 +8414,21 @@ mod sync_fuzz {
                 "title" => x.title = s,
                 _ => unreachable!(),
             },
+            VaultEntry::Passkey(x) => match key {
+                "rp_id" => x.rp_id = s,
+                "user_name" => x.user_name = s,
+                "user_display_name" => x.user_display_name = s,
+                "notes" => x.notes = some,
+                // Mutate one component of the atomic block (like File "data"
+                // takes raw bytes); the merge still moves the block whole.
+                "credential" => x.private_key = value.as_bytes().to_vec(),
+                _ => unreachable!(),
+            },
         }
     }
 
     fn has_attachments(e: &VaultEntry) -> bool {
-        !matches!(e, VaultEntry::File(_))
+        !matches!(e, VaultEntry::File(_) | VaultEntry::Passkey(_))
     }
     fn att_vec(e: &VaultEntry) -> &[EntryAttachment] {
         match e {
@@ -8317,6 +8438,7 @@ mod sync_fuzz {
             VaultEntry::Card(x) => &x.attachments,
             VaultEntry::Custom(x) => &x.attachments,
             VaultEntry::File(_) => &[],
+            VaultEntry::Passkey(_) => &[],
         }
     }
     fn att_vec_mut(e: &mut VaultEntry) -> &mut Vec<EntryAttachment> {
@@ -8327,6 +8449,7 @@ mod sync_fuzz {
             VaultEntry::Card(x) => &mut x.attachments,
             VaultEntry::Custom(x) => &mut x.attachments,
             VaultEntry::File(_) => unreachable!(),
+            VaultEntry::Passkey(_) => unreachable!(),
         }
     }
     fn attachment_name(e: &VaultEntry, uuid: &str) -> Option<String> {
@@ -8362,6 +8485,7 @@ mod sync_fuzz {
             VaultEntry::Identity(x) => collect(&x.custom_fields, &mut m),
             VaultEntry::Card(x) => collect(&x.custom_fields, &mut m),
             VaultEntry::File(x) => collect(&x.custom_fields, &mut m),
+            VaultEntry::Passkey(x) => collect(&x.custom_fields, &mut m),
         }
         m
     }
@@ -8377,6 +8501,7 @@ mod sync_fuzz {
             VaultEntry::Identity(x) => &mut x.custom_fields,
             VaultEntry::Card(x) => &mut x.custom_fields,
             VaultEntry::File(x) => &mut x.custom_fields,
+            VaultEntry::Passkey(x) => &mut x.custom_fields,
             VaultEntry::Custom(_) => unreachable!(),
         }
     }
@@ -8516,6 +8641,19 @@ mod sync_fuzz {
                 title: String::from("C"),
                 fields,
                 attachments: att(),
+            }));
+            out.push(VaultEntry::Passkey(PasskeyEntry {
+                meta: blank_meta(&format!("passkey-{i}")),
+                rp_id: String::from("example.com"),
+                user_name: String::from("u@example.com"),
+                user_display_name: String::from("U"),
+                user_handle: vec![0x11; 16],
+                credential_id: vec![0x22; 32],
+                private_key: vec![0x33; 32],
+                public_key_cose: vec![0x44; 77],
+                algorithm: -7,
+                notes: None,
+                custom_fields: pairs(),
             }));
         }
         // Stamp every base field at ts=1 so the oracle is pure max-timestamp.
@@ -9141,5 +9279,130 @@ mod read_only_unlock_tests {
 
         let _ = std::fs::remove_file(&path);
         let _ = std::fs::remove_file(format!("{}.bak", path.display()));
+    }
+}
+
+#[cfg(test)]
+mod passkey_tests {
+    use super::*;
+    use crate::vault::entry::PasskeyEntry;
+
+    fn passkey(updated_at: &str, notes: Option<&str>, keys: u8) -> VaultEntry {
+        VaultEntry::Passkey(PasskeyEntry {
+            meta: EntryMeta {
+                field_times: Default::default(),
+                history: Vec::new(),
+                id: String::from("pk-1"),
+                created_at: String::from("2026-01-01T00:00:00Z"),
+                updated_at: updated_at.to_string(),
+                folder: String::new(),
+            },
+            rp_id: String::from("example.com"),
+            user_name: String::from("user@example.com"),
+            user_display_name: String::from("Sample User"),
+            user_handle: vec![keys; 16],
+            credential_id: vec![keys; 32],
+            private_key: vec![keys; 32],
+            public_key_cose: vec![keys; 77],
+            algorithm: -7,
+            notes: notes.map(String::from),
+            custom_fields: vec![],
+        })
+    }
+
+    #[test]
+    fn passkey_summary_shows_type_and_rp_id_without_key_material() {
+        let s = entry_to_summary(&passkey("2026-01-01T00:00:00Z", Some("a note"), 7));
+        assert_eq!(s.entry_type, "Passkey");
+        assert_eq!(s.title, "example.com");
+        assert!(s.search_blob.contains("user@example.com"));
+        assert!(s.search_blob.contains("a note"));
+        // 32 bytes of 0x07 would render as repeated "\u{7}" — the blob must
+        // carry no trace of key bytes in any encoding it could plausibly take.
+        assert!(!s.search_blob.contains('\u{7}'));
+    }
+
+    fn stamped(mut e: VaultEntry, stamps: &[(&str, u64)]) -> VaultEntry {
+        let m = meta_of_mut(&mut e);
+        for (k, t) in stamps {
+            m.field_times.insert((*k).to_string(), *t);
+        }
+        e
+    }
+
+    // Maintainer ruling 2026-08-20: passkeys use the standard granular sync,
+    // zero irregularities. Text fields merge per-field with edit-stamps and
+    // conflicts; the key-material block ("credential") moves atomically, like
+    // File `data`, because half a credential signs for nobody.
+
+    #[test]
+    fn passkey_merges_fields_independently_like_any_entry() {
+        let mut local = passkey("2026-01-02T00:00:00Z", Some("local note"), 7);
+        if let VaultEntry::Passkey(e) = &mut local {
+            e.notes = Some(String::from("edited note"));
+        }
+        let local = stamped(local, &[("notes", 10)]);
+
+        let mut incoming = passkey("2026-01-03T00:00:00Z", Some("a note"), 7);
+        if let VaultEntry::Passkey(e) = &mut incoming {
+            e.user_name = String::from("renamed@example.com");
+        }
+        let incoming = stamped(incoming, &[("user_name", 11)]);
+
+        let (merged, conflicts, _pending, brought) = merge_entry_pair(&local, &incoming);
+        match &merged {
+            VaultEntry::Passkey(e) => {
+                assert_eq!(e.notes.as_deref(), Some("edited note"), "local edit kept");
+                assert_eq!(e.user_name, "renamed@example.com", "incoming edit kept");
+                assert_eq!(e.private_key, vec![7u8; 32], "untouched key material");
+            }
+            _ => panic!("expected a Passkey"),
+        }
+        assert!(conflicts.is_empty(), "independent edits are not a conflict");
+        assert_eq!(brought.len(), 1, "the incoming rename surfaces for review");
+        assert_eq!(brought[0].field, "user_name");
+    }
+
+    #[test]
+    fn passkey_both_editing_notes_is_a_conflict() {
+        let mut local = passkey("2026-01-02T00:00:00Z", None, 7);
+        if let VaultEntry::Passkey(e) = &mut local {
+            e.notes = Some(String::from("mine"));
+        }
+        let local = stamped(local, &[("notes", 10)]);
+
+        let mut incoming = passkey("2026-01-03T00:00:00Z", None, 7);
+        if let VaultEntry::Passkey(e) = &mut incoming {
+            e.notes = Some(String::from("theirs"));
+        }
+        let incoming = stamped(incoming, &[("notes", 11)]);
+
+        let (_merged, conflicts, _pending, _brought) = merge_entry_pair(&local, &incoming);
+        assert_eq!(conflicts.len(), 1, "both edited notes: user must resolve");
+        assert_eq!(conflicts[0].field, "notes");
+    }
+
+    #[test]
+    fn passkey_credential_block_moves_atomically() {
+        // Incoming re-registered the credential (all key material differs,
+        // stamped); the merged entry must carry the incoming block whole —
+        // never a mix of old and new bytes.
+        let local = passkey("2026-01-02T00:00:00Z", None, 7);
+        let incoming = stamped(
+            passkey("2026-01-03T00:00:00Z", None, 9),
+            &[("credential", 20)],
+        );
+
+        let (merged, conflicts, _pending, _brought) = merge_entry_pair(&local, &incoming);
+        match &merged {
+            VaultEntry::Passkey(e) => {
+                assert_eq!(e.private_key, vec![9u8; 32]);
+                assert_eq!(e.credential_id, vec![9u8; 32]);
+                assert_eq!(e.public_key_cose, vec![9u8; 77]);
+                assert_eq!(e.user_handle, vec![9u8; 16]);
+            }
+            _ => panic!("expected a Passkey"),
+        }
+        assert!(conflicts.is_empty(), "only incoming edited: no conflict");
     }
 }

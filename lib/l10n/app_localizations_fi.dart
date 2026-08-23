@@ -104,6 +104,45 @@ class AppLocalizationsFi extends AppLocalizations {
       'Mikään tallennettu kirjautuminen ei vastaa tätä sovellusta tai sivustoa.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Luodaanko passkey sivustolle $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Kirjaudutaanko sivustolle $site passkeyllä?';
+  }
+
+  @override
+  String get passkeyHintModuleMissing =>
+      'Passkeyt eivät ole käytössä: ytimen uhid-moduulia ei ole ladattu. Katso passkey-asennusohjeet README-tiedostosta.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkeyt eivät ole käytössä: Gabbro ei pääse laitteeseen /dev/uhid (udev-sääntö puuttuu). Katso passkey-asennusohjeet README-tiedostosta.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkeyt eivät ole käytössä: virtuaalista turva-avainta ei voitu käynnistää. Katso passkey-asennusohjeet README-tiedostosta.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Älä näytä uudelleen';
+
+  @override
+  String get sectionAppPasskeys => 'Sovellusten passkeyt';
+
+  @override
+  String get appPasskeysDescription =>
+      'Salli Android-sovellusten kirjautua passkeyllä. Jokainen kirjautuminen tekee yhden verkkopyynnön: se hakee sivuston oman sovellusvarmennustiedoston ja tarkistaa, että sovellus on aito. Muita verkkoyhteyksiä Gabbro ei koskaan muodosta — katso ”Verify no telemetry” README-tiedostosta.';
+
+  @override
+  String get appPasskeysTitle => 'Salli sovellusten passkeyt';
+
+  @override
+  String get appPasskeysNote =>
+      'Kun asetus on pois päältä tai verkkoyhteys on estetty, vain sovellusten kirjautumiset estyvät — selainten passkeyt eivät koskaan käytä verkkoa.';
+
+  @override
   String get add => 'Lisää';
 
   @override
@@ -668,6 +707,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get entryTypeCustom => 'Mukautettu';
 
   @override
+  String get entryTypePasskey => 'Passkey';
+
+  @override
   String errorPrefix(String error) {
     return 'Virhe: $error';
   }
@@ -1076,6 +1118,9 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get fieldUsername => 'Käyttäjänimi (valinnainen)';
+
+  @override
+  String get passkeyFieldUsername => 'Käyttäjänimi';
 
   @override
   String get fieldPassword => 'Salasana';
@@ -1507,7 +1552,7 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro ei tee lähtevisiä verkkoyhteyksiä. Ei telemetriaa, ei analytiikkaa, ei tilejä.';
+      'Ei telemetriaa, ei analytiikkaa, ei tilejä, ei Gabbro-palvelinta. Gabbro ei muodosta lainkaan verkkoyhteyksiä — paitsi jos otat sovellusten passkeyt käyttöön: silloin ainoa yhteys on yksi haku kirjautumista kohden, sivuston oma sovellusvarmennustiedosto.';
 
   @override
   String get strengthTierTerrible => 'Surkea';

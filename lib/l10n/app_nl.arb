@@ -434,6 +434,7 @@
   "fieldAndroidAppId": "Android-app-ID (optioneel)",
   "fieldAndroidAppIdHelper": "Vult deze login in in een Android-app. Alleen een exacte overeenkomst werkt. Vind de ID in de Play Store-link van de app, na id= (bijv. id=com.company.app).",
   "fieldUsername": "Gebruikersnaam (optioneel)",
+  "passkeyFieldUsername": "Gebruikersnaam",
   "fieldPassword": "Wachtwoord",
   "fieldSeparator": "Scheidingsteken",
   "fieldFolder": "Map",
@@ -649,7 +650,7 @@
   "aboutLicenceBody": "Gabbro is vrije en open-sourcesoftware, gelicenseerd onder de GNU General Public License v3.0 only (GPL-3.0-only).\n\nU bent vrij om deze software te gebruiken, te bestuderen en te herverdelen onder de voorwaarden van die licentie.",
   "aboutOwnerRole": "Projecteigenaar, architect en hoofdontwikkelaar:",
   "aboutAiPartner": "AI-ontwikkelingspartner:",
-  "aboutNoTelemetry": "Gabbro maakt geen uitgaande netwerkverbindingen. Geen telemetrie, geen analyses, geen accounts.",
+  "aboutNoTelemetry": "Geen telemetrie, geen analyses, geen accounts, geen Gabbro-server. Gabbro maakt helemaal geen netwerkverbinding — tenzij je app-passkeys inschakelt: dan is de enige verbinding één ophaalactie per app-aanmelding, het app-verificatiebestand van de site zelf.",
 
   "strengthTierTerrible": "Verschrikkelijk",
   "strengthTierWeak": "Zwak",
@@ -923,5 +924,18 @@
   "hintSearch": "Filtert de items terwijl u typt",
   "hintFolderSelector": "Filtert de items op map",
   "hintFilterChip": "Schakelt dit categoriefilter in of uit",
-  "hintEntryRow": "Opent dit item"
+  "hintEntryRow": "Opent dit item",
+  "entryTypePasskey": "Passkey",
+  "passkeyHintModuleMissing": "Passkeys zijn inactief: de kernelmodule uhid is niet geladen. Zie de stappen voor passkey-instelling in de README.",
+  "passkeyHintNoAccess": "Passkeys zijn inactief: Gabbro heeft geen toegang tot /dev/uhid (udev-regel ontbreekt). Zie de stappen voor passkey-instelling in de README.",
+  "passkeyHintOther": "Passkeys zijn inactief: de virtuele beveiligingssleutel kon niet starten. Zie de stappen voor passkey-instelling in de README.",
+  "passkeyHintDontShowAgain": "Niet meer tonen",
+  "sectionAppPasskeys": "App-passkeys",
+  "appPasskeysDescription": "Laat Android-apps inloggen met passkeys. Elke aanmelding doet één netwerkverzoek: het haalt het app-verificatiebestand van de site zelf op om te controleren of de app echt is. Gabbro maakt verder nooit een netwerkverbinding — zie “Verify no telemetry” in de README.",
+  "appPasskeysTitle": "App-passkeys toestaan",
+  "appPasskeysNote": "Wanneer uit, of wanneer netwerktoegang is geweigerd, worden alleen app-aanmeldingen geweigerd — passkeys in browsers gebruiken het netwerk nooit.",
+  "passkeyCreatePrompt": "Passkey maken voor {site}?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "Inloggen bij {site} met je passkey?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

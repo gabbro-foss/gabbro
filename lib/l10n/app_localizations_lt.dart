@@ -104,6 +104,45 @@ class AppLocalizationsLt extends AppLocalizations {
       'Nėra išsaugoto prisijungimo, atitinkančio šią programą ar svetainę.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Sukurti passkey svetainei $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Prisijungti prie $site naudojant passkey?';
+  }
+
+  @override
+  String get passkeyHintModuleMissing =>
+      'Passkey neaktyvūs: branduolio modulis uhid neįkeltas. Žr. passkey sąrankos žingsnius README faile.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkey neaktyvūs: Gabbro negali pasiekti /dev/uhid (trūksta udev taisyklės). Žr. passkey sąrankos žingsnius README faile.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkey neaktyvūs: virtualaus saugos rakto nepavyko paleisti. Žr. passkey sąrankos žingsnius README faile.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Daugiau nerodyti';
+
+  @override
+  String get sectionAppPasskeys => 'Programėlių passkey';
+
+  @override
+  String get appPasskeysDescription =>
+      'Leisti Android programėlėms prisijungti su passkey. Kiekvienas prisijungimas atlieka vieną tinklo užklausą: atsisiunčia pačios svetainės programėlių patikros failą ir patikrina, ar programėlė tikra. Jokio kito tinklo ryšio Gabbro niekada neužmezga — žr. „Verify no telemetry“ README faile.';
+
+  @override
+  String get appPasskeysTitle => 'Leisti programėlių passkey';
+
+  @override
+  String get appPasskeysNote =>
+      'Kai išjungta arba tinklo prieiga uždrausta, atmetami tik programėlių prisijungimai — naršyklių passkey tinklo niekada nenaudoja.';
+
+  @override
   String get add => 'Pridėti';
 
   @override
@@ -668,6 +707,9 @@ class AppLocalizationsLt extends AppLocalizations {
   String get entryTypeCustom => 'Pasirinktinis';
 
   @override
+  String get entryTypePasskey => 'Passkey';
+
+  @override
   String errorPrefix(String error) {
     return 'Klaida: $error';
   }
@@ -1078,6 +1120,9 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get fieldUsername => 'Vartotojo vardas (nebūtinas)';
+
+  @override
+  String get passkeyFieldUsername => 'Vartotojo vardas';
 
   @override
   String get fieldPassword => 'Slaptažodis';
@@ -1509,7 +1554,7 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro neatlieka jokių išeinančių tinklo jungčių. Jokios telemetrijos, jokios analitikos, jokių paskyrų.';
+      'Jokios telemetrijos, analitikos, paskyrų ar Gabbro serverio. Gabbro apskritai neužmezga tinklo ryšių — nebent įjungsite programėlių passkey: tada vienintelis ryšys yra vienas atsisiuntimas per prisijungimą, pačios svetainės programėlių patikros failas.';
 
   @override
   String get strengthTierTerrible => 'Siaubingas';

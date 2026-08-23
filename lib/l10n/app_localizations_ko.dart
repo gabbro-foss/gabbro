@@ -101,6 +101,45 @@ class AppLocalizationsKo extends AppLocalizations {
   String get autofillNoMatchBody => '이 앱 또는 사이트와 일치하는 저장된 로그인이 없습니다.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return '$site의 패스키를 만들까요?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return '패스키로 $site에 로그인할까요?';
+  }
+
+  @override
+  String get passkeyHintModuleMissing =>
+      '패스키가 비활성 상태입니다. 커널 모듈 uhid가 로드되지 않았습니다. README의 패스키 설정 단계를 참조하세요.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      '패스키가 비활성 상태입니다. Gabbro가 /dev/uhid에 접근할 수 없습니다(udev 규칙 없음). README의 패스키 설정 단계를 참조하세요.';
+
+  @override
+  String get passkeyHintOther =>
+      '패스키가 비활성 상태입니다. 가상 보안 키를 시작할 수 없습니다. README의 패스키 설정 단계를 참조하세요.';
+
+  @override
+  String get passkeyHintDontShowAgain => '다시 표시하지 않음';
+
+  @override
+  String get sectionAppPasskeys => '앱 패스키';
+
+  @override
+  String get appPasskeysDescription =>
+      'Android 앱이 패스키로 로그인하도록 허용합니다. 로그인할 때마다 네트워크 요청을 한 번만 보내 사이트 자체의 앱 확인 파일을 가져와 앱이 진짜인지 확인합니다. Gabbro는 그 외에는 어떤 네트워크 연결도 하지 않습니다. README의 “Verify no telemetry”를 참조하세요.';
+
+  @override
+  String get appPasskeysTitle => '앱 패스키 허용';
+
+  @override
+  String get appPasskeysNote =>
+      '꺼져 있거나 네트워크 접근이 거부되면 앱 로그인만 거부됩니다. 브라우저의 패스키는 네트워크를 전혀 사용하지 않습니다.';
+
+  @override
   String get add => '추가';
 
   @override
@@ -659,6 +698,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get entryTypeCustom => '사용자 정의';
 
   @override
+  String get entryTypePasskey => '패스키';
+
+  @override
   String errorPrefix(String error) {
     return '오류: $error';
   }
@@ -1062,6 +1104,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get fieldUsername => '사용자 이름 (선택사항)';
+
+  @override
+  String get passkeyFieldUsername => '사용자 이름';
 
   @override
   String get fieldPassword => '비밀번호';
@@ -1480,7 +1525,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro는 외부 네트워크 연결을 하지 않습니다. 원격 측정, 분석 또는 계정이 없습니다.';
+      '원격 측정, 분석, 계정, Gabbro 서버가 없습니다. Gabbro는 네트워크 연결을 전혀 하지 않습니다. 단, 앱 패스키를 켜면 로그인마다 한 번, 해당 사이트 자체의 앱 확인 파일만 가져옵니다.';
 
   @override
   String get strengthTierTerrible => '매우 약함';

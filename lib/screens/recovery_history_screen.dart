@@ -37,7 +37,7 @@ String _fieldLabel(String field) {
 }
 
 /// File contents are stored as base64 here; never show the raw value.
-bool _isBinary(String field) => field == 'data';
+bool _isBinary(String field) => field == 'data' || field == 'credential';
 
 class _RecoveryHistoryScreenState extends State<RecoveryHistoryScreen> {
   late final List<HistoryRecordData> _records = List.of(widget.records);

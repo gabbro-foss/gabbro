@@ -104,6 +104,45 @@ class AppLocalizationsEu extends AppLocalizations {
       'Ez dago aplikazio edo gune honekin bat datorren gordetako sarrerarik.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return '$site gunerako passkey bat sortu?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return '$site gunean saioa hasi zure passkey-arekin?';
+  }
+
+  @override
+  String get passkeyHintModuleMissing =>
+      'Passkeyak ez daude aktibo: uhid kernel modulua ez dago kargatuta. Ikusi passkeyak konfiguratzeko urratsak README fitxategian.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkeyak ez daude aktibo: Gabbrok ezin du /dev/uhid atzitu (udev araua falta da). Ikusi passkeyak konfiguratzeko urratsak README fitxategian.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkeyak ez daude aktibo: segurtasun-gako birtuala ezin izan da abiarazi. Ikusi passkeyak konfiguratzeko urratsak README fitxategian.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Ez erakutsi berriro';
+
+  @override
+  String get sectionAppPasskeys => 'Aplikazioen passkeyak';
+
+  @override
+  String get appPasskeysDescription =>
+      'Baimendu Android aplikazioei passkeyekin saioa hastea. Saio-hasiera bakoitzak sareko eskaera bakarra egiten du: gunearen beraren aplikazioak egiaztatzeko fitxategia deskargatzen du, aplikazioa benetakoa dela egiaztatzeko. Gabbrok ez du inoiz beste sare-konexiorik egiten — ikusi «Verify no telemetry» README fitxategian.';
+
+  @override
+  String get appPasskeysTitle => 'Baimendu aplikazioen passkeyak';
+
+  @override
+  String get appPasskeysNote =>
+      'Desaktibatuta dagoenean, edo sarerako sarbidea ukatuta dagoenean, aplikazioetako saio-hasierak bakarrik ukatzen dira — nabigatzaileetako passkeyek ez dute inoiz sarea erabiltzen.';
+
+  @override
   String get add => 'Gehitu';
 
   @override
@@ -667,6 +706,9 @@ class AppLocalizationsEu extends AppLocalizations {
   String get entryTypeCustom => 'Pertsonalizatua';
 
   @override
+  String get entryTypePasskey => 'Passkey';
+
+  @override
   String errorPrefix(String error) {
     return 'Errorea: $error';
   }
@@ -1077,6 +1119,9 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get fieldUsername => 'Erabiltzaile-izena (aukerakoa)';
+
+  @override
+  String get passkeyFieldUsername => 'Erabiltzaile-izena';
 
   @override
   String get fieldPassword => 'Pasahitza';
@@ -1508,7 +1553,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro-k ez du kanpoko sare-konexiorik ezartzen. Telemetriarik, analisiarik edo konturik ez.';
+      'Telemetriarik, analisirik, konturik eta Gabbro zerbitzaririk ez. Gabbrok ez du inolako sare-konexiorik egiten — aplikazioen passkeyak aktibatzen badituzu izan ezik: orduan konexio bakarra saio-hasiera bakoitzeko deskarga bat da, gunearen beraren aplikazioak egiaztatzeko fitxategia.';
 
   @override
   String get strengthTierTerrible => 'Oso ahula';

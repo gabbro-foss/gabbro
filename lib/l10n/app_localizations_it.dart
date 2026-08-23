@@ -104,6 +104,45 @@ class AppLocalizationsIt extends AppLocalizations {
       'Nessun accesso salvato corrisponde a questa app o sito.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Creare una passkey per $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Accedere a $site con la tua passkey?';
+  }
+
+  @override
+  String get passkeyHintModuleMissing =>
+      'Le passkey non sono attive: il modulo del kernel uhid non è caricato. Vedi i passaggi di configurazione delle passkey nel README.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Le passkey non sono attive: Gabbro non può accedere a /dev/uhid (regola udev mancante). Vedi i passaggi di configurazione delle passkey nel README.';
+
+  @override
+  String get passkeyHintOther =>
+      'Le passkey non sono attive: la chiave di sicurezza virtuale non si è avviata. Vedi i passaggi di configurazione delle passkey nel README.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Non mostrare più';
+
+  @override
+  String get sectionAppPasskeys => 'Passkey delle app';
+
+  @override
+  String get appPasskeysDescription =>
+      'Consenti alle app Android di accedere con le passkey. Ogni accesso effettua una sola richiesta di rete: scarica il file di verifica delle app del sito stesso per controllare che l\'app sia autentica. Gabbro non stabilisce mai nessun\'altra connessione di rete — vedi «Verify no telemetry» nel README.';
+
+  @override
+  String get appPasskeysTitle => 'Consenti passkey delle app';
+
+  @override
+  String get appPasskeysNote =>
+      'Se disattivato, o se l\'accesso alla rete è negato, vengono rifiutati solo gli accessi dalle app — le passkey nei browser non usano mai la rete.';
+
+  @override
   String get add => 'Aggiungi';
 
   @override
@@ -667,6 +706,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get entryTypeCustom => 'Personalizzato';
 
   @override
+  String get entryTypePasskey => 'Passkey';
+
+  @override
   String errorPrefix(String error) {
     return 'Errore: $error';
   }
@@ -1077,6 +1119,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get fieldUsername => 'Nome utente (facoltativo)';
+
+  @override
+  String get passkeyFieldUsername => 'Nome utente';
 
   @override
   String get fieldPassword => 'Password';
@@ -1509,7 +1554,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro non effettua connessioni di rete in uscita. Niente telemetria, niente analitiche, niente account.';
+      'Niente telemetria, niente analitiche, niente account, nessun server Gabbro. Gabbro non effettua alcuna connessione di rete — a meno che non attivi le passkey delle app: allora l\'unica connessione è un download per accesso, il file di verifica delle app del sito stesso.';
 
   @override
   String get strengthTierTerrible => 'Terribile';

@@ -100,6 +100,9 @@ dependencies {
     implementation("com.yubico.yubikit:android:3.1.0")
     implementation("com.yubico.yubikit:fido:3.1.0")
     implementation("androidx.biometric:biometric-ktx:1.2.0-alpha05")
+    // Passkey provider (Credential Manager). Framework-backed on API 34+;
+    // the service below simply never binds on older devices.
+    implementation("androidx.credentials:credentials:1.6.0")
     // SAF (Storage Access Framework) export: write/overwrite files inside a
     // user-granted directory tree, which raw POSIX paths can't do under scoped
     // storage. No new manifest permission — the grant comes from the folder picker.

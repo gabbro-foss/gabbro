@@ -434,6 +434,7 @@
   "fieldAndroidAppId": "Идентификатор приложения Android (необязательно)",
   "fieldAndroidAppIdHelper": "Заполняет эти данные для входа в приложении Android. Работает только точное совпадение. Найдите идентификатор в ссылке приложения в Play Store, после id= (напр. id=com.company.app).",
   "fieldUsername": "Имя пользователя (необязательно)",
+  "passkeyFieldUsername": "Имя пользователя",
   "fieldPassword": "Пароль",
   "fieldSeparator": "Разделитель",
   "fieldFolder": "Папка",
@@ -649,7 +650,7 @@
   "aboutLicenceBody": "Gabbro — это свободное программное обеспечение с открытым исходным кодом, лицензированное по GNU General Public License v3.0 only (GPL-3.0-only).\n\nВы можете свободно использовать, изучать и распространять это программное обеспечение в соответствии с условиями этой лицензии.",
   "aboutOwnerRole": "Владелец проекта, архитектор и ведущий разработчик:",
   "aboutAiPartner": "ИИ-партнёр по разработке:",
-  "aboutNoTelemetry": "Gabbro не устанавливает исходящих сетевых соединений. Никакой телеметрии, аналитики и аккаунтов.",
+  "aboutNoTelemetry": "Никакой телеметрии, аналитики, аккаунтов и сервера Gabbro. Gabbro вообще не устанавливает сетевых соединений — если только вы не включите passkey приложений: тогда единственное соединение — одна загрузка на вход, файл проверки приложений самого сайта.",
 
   "strengthTierTerrible": "Ужасный",
   "strengthTierWeak": "Слабый",
@@ -923,5 +924,18 @@
   "hintSearch": "Фильтрует записи по мере ввода",
   "hintFolderSelector": "Фильтрует записи по папке",
   "hintFilterChip": "Включает или отключает этот фильтр категории",
-  "hintEntryRow": "Открывает эту запись"
+  "hintEntryRow": "Открывает эту запись",
+  "entryTypePasskey": "Passkey",
+  "passkeyHintModuleMissing": "Passkey неактивны: модуль ядра uhid не загружен. См. шаги настройки passkey в README.",
+  "passkeyHintNoAccess": "Passkey неактивны: Gabbro не имеет доступа к /dev/uhid (отсутствует правило udev). См. шаги настройки passkey в README.",
+  "passkeyHintOther": "Passkey неактивны: не удалось запустить виртуальный ключ безопасности. См. шаги настройки passkey в README.",
+  "passkeyHintDontShowAgain": "Больше не показывать",
+  "sectionAppPasskeys": "Passkey приложений",
+  "appPasskeysDescription": "Разрешить приложениям Android входить по passkey. Каждый вход делает один сетевой запрос: загружается файл проверки приложений с самого сайта, чтобы убедиться, что приложение подлинное. Никаких других сетевых подключений Gabbro никогда не устанавливает — см. «Verify no telemetry» в README.",
+  "appPasskeysTitle": "Разрешить passkey приложений",
+  "appPasskeysNote": "Когда выключено или доступ к сети запрещён, отклоняются только входы из приложений — passkey в браузерах никогда не используют сеть.",
+  "passkeyCreatePrompt": "Создать passkey для {site}?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "Войти на {site} с помощью passkey?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

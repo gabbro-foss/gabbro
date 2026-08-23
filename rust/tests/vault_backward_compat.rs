@@ -20,11 +20,11 @@
 //! refusal is polite (clear error naming the upgrade path, file left byte-identical),
 //! so the documented recovery still works — see `docs/VAULT_UPGRADE_PATH.md`.
 //!
-//! Until VERSION 12 ships there is only one readable format, so this file's job is
-//! narrower than its name: hold v11 open forever, and refuse ≤v10 cleanly. The moment
-//! a v12 lands, v11 becomes the old format this harness protects — that is why the
-//! v11 goldens and this file stay. See `tests/fixtures/FIXTURES.md` for how each
-//! fixture was generated and how to add a fixture when a new VERSION ships.
+//! VERSION 12 (Passkey entries; header unchanged) landed: v11 is now the old
+//! format this harness holds open forever, v12 goldens carry a passkey canary on
+//! top of the login canary, and ≤v10 stays cleanly refused. See
+//! `tests/fixtures/FIXTURES.md` for how each fixture was generated and how to add
+//! a fixture when a new VERSION ships.
 //!
 //! Everything is driven through the real public bridge functions in
 //! `rust_lib_gabbro::api::vault` (the exact functions the Flutter app calls), so
@@ -174,6 +174,53 @@ fn v11_multikey_opens_with_each_registered_key() {
     );
     assert_opens_with(&p, YK1_HMAC, YK1_CRED, "YK1");
     assert_opens_with(&p, YK2_HMAC, YK2_CRED, "YK2");
+}
+
+/// Assert the decrypted body carries the passkey canary with its key material
+/// byte-identical — proof the v12 format round-trips a credential intact. A
+/// passkey that loses a byte of key material is a dead login on some website.
+fn assert_passkey_canary(body: &VaultBody) {
+    let found = body.entries.iter().any(|e| {
+        matches!(e, VaultEntry::Passkey(pe)
+            if pe.rp_id == PASSKEY_CANARY_RP_ID
+                && pe.private_key == PASSKEY_CANARY_PRIVATE_KEY
+                && pe.credential_id == vec![0x66u8; 32]
+                && pe.public_key_cose == vec![0x88u8; 77])
+    });
+    assert!(found, "body must contain the intact passkey canary");
+}
+
+#[test]
+fn v12_passphrase_opens_and_decrypts_both_canaries() {
+    // The first v12 golden: sealed by the build that shipped the Passkey entry
+    // type. Frozen so any future change that breaks v12 reads goes red here
+    // before it can brick a real vault full of website credentials.
+    let p = fixture("v12_passphrase.gabbro");
+    assert_eq!(
+        read_vault(&p).unwrap().version,
+        12,
+        "fixture must be VERSION 12"
+    );
+    let body = load_vault(FIXTURE_PASSPHRASE, &p)
+        .expect("current build must open the v12 passphrase-only golden vault");
+    assert_canary(&body);
+    assert_passkey_canary(&body);
+}
+
+#[test]
+fn v12_multikey_opens_with_each_registered_key_and_keeps_the_passkey() {
+    let p = fixture("v12_multikey_2keys.gabbro");
+    assert_eq!(
+        read_vault(&p).unwrap().version,
+        12,
+        "fixture must be VERSION 12"
+    );
+    assert_opens_with(&p, YK1_HMAC, YK1_CRED, "YK1");
+    assert_opens_with(&p, YK2_HMAC, YK2_CRED, "YK2");
+    let (body, _master, _wrapping) =
+        load_vault_with_key_record(FIXTURE_PASSPHRASE, YK1_HMAC, YK1_CRED, &p)
+            .expect("open v12 multikey with YK1");
+    assert_passkey_canary(&body);
 }
 
 // ── Floor v11: ≤v10 vaults are refused, never damaged ─────────────────────────

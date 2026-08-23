@@ -104,6 +104,45 @@ class AppLocalizationsSk extends AppLocalizations {
       'Žiadne uložené prihlásenie nezodpovedá tejto aplikácii ani webu.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Vytvoriť passkey pre $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Prihlásiť sa na $site pomocou passkey?';
+  }
+
+  @override
+  String get passkeyHintModuleMissing =>
+      'Passkey nie sú aktívne: modul jadra uhid nie je načítaný. Pozrite kroky nastavenia passkey v README.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkey nie sú aktívne: Gabbro nemá prístup k /dev/uhid (chýba pravidlo udev). Pozrite kroky nastavenia passkey v README.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkey nie sú aktívne: virtuálny bezpečnostný kľúč sa nepodarilo spustiť. Pozrite kroky nastavenia passkey v README.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Znova nezobrazovať';
+
+  @override
+  String get sectionAppPasskeys => 'Passkey pre aplikácie';
+
+  @override
+  String get appPasskeysDescription =>
+      'Povoľte aplikáciám pre Android prihlasovanie pomocou passkey. Každé prihlásenie vykoná jedinú sieťovú požiadavku: stiahne overovací súbor aplikácií priamo z daného webu a overí, že aplikácia je pravá. Žiadne iné sieťové pripojenie Gabbro nikdy nevytvára — pozrite „Verify no telemetry“ v README.';
+
+  @override
+  String get appPasskeysTitle => 'Povoliť passkey pre aplikácie';
+
+  @override
+  String get appPasskeysNote =>
+      'Keď je vypnuté, alebo je prístup k sieti odmietnutý, odmietajú sa len prihlásenia z aplikácií — passkey v prehliadačoch sieť nikdy nepoužívajú.';
+
+  @override
   String get add => 'Pridať';
 
   @override
@@ -667,6 +706,9 @@ class AppLocalizationsSk extends AppLocalizations {
   String get entryTypeCustom => 'Vlastné';
 
   @override
+  String get entryTypePasskey => 'Passkey';
+
+  @override
   String errorPrefix(String error) {
     return 'Chyba: $error';
   }
@@ -1078,6 +1120,9 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get fieldUsername => 'Používateľské meno (voliteľné)';
+
+  @override
+  String get passkeyFieldUsername => 'Používateľské meno';
 
   @override
   String get fieldPassword => 'Heslo';
@@ -1508,7 +1553,7 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro nevytvára žiadne odchádzajúce sieťové spojenia. Žiadna telemetria, analytiky ani účty.';
+      'Žiadna telemetria, analytiky, účty ani server Gabbro. Gabbro nevytvára vôbec žiadne sieťové spojenia — pokiaľ nezapnete passkey pre aplikácie: vtedy je jediným spojením jedno stiahnutie na prihlásenie, overovací súbor aplikácií daného webu.';
 
   @override
   String get strengthTierTerrible => 'Hrozné';

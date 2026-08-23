@@ -434,6 +434,7 @@
   "fieldAndroidAppId": "Android-App-ID (optional)",
   "fieldAndroidAppIdHelper": "Füllt diese Anmeldung in einer Android-App aus. Nur eine exakte Übereinstimmung funktioniert. Die ID finden Sie im Play-Store-Link der App nach id= (z. B. id=com.company.app).",
   "fieldUsername": "Benutzername (optional)",
+  "passkeyFieldUsername": "Benutzername",
   "fieldPassword": "Passwort",
   "fieldSeparator": "Trennzeichen",
   "fieldFolder": "Ordner",
@@ -649,7 +650,7 @@
   "aboutLicenceBody": "Gabbro ist freie und quelloffene Software, lizenziert unter der GNU General Public License v3.0 only (GPL-3.0-only).\n\nDiese Software darf gemäß den Bedingungen dieser Lizenz frei genutzt, studiert und weitergegeben werden.",
   "aboutOwnerRole": "Projektinhaber, Architekt und leitender Entwickler:",
   "aboutAiPartner": "KI-Entwicklungspartner:",
-  "aboutNoTelemetry": "Gabbro stellt keine ausgehenden Netzwerkverbindungen her. Keine Telemetrie, keine Analysen, keine Konten.",
+  "aboutNoTelemetry": "Keine Telemetrie, keine Analysen, keine Konten, kein Gabbro-Server. Gabbro stellt überhaupt keine Netzwerkverbindung her — außer Sie schalten App-Passkeys ein: dann ist die einzige Verbindung je ein Abruf pro App-Anmeldung, die App-Verifizierungsdatei der jeweiligen Website.",
 
   "strengthTierTerrible": "Schrecklich",
   "strengthTierWeak": "Schwach",
@@ -922,5 +923,18 @@
   "hintSearch": "Filtert die Einträge während der Eingabe",
   "hintFolderSelector": "Filtert die Einträge nach Ordner",
   "hintFilterChip": "Schaltet diesen Kategoriefilter ein oder aus",
-  "hintEntryRow": "Öffnet diesen Eintrag"
+  "hintEntryRow": "Öffnet diesen Eintrag",
+  "entryTypePasskey": "Passkey",
+  "passkeyHintModuleMissing": "Passkeys sind inaktiv: das Kernelmodul uhid ist nicht geladen. Siehe die Passkey-Einrichtungsschritte im README.",
+  "passkeyHintNoAccess": "Passkeys sind inaktiv: Gabbro hat keinen Zugriff auf /dev/uhid (udev-Regel fehlt). Siehe die Passkey-Einrichtungsschritte im README.",
+  "passkeyHintOther": "Passkeys sind inaktiv: der virtuelle Sicherheitsschlüssel konnte nicht starten. Siehe die Passkey-Einrichtungsschritte im README.",
+  "passkeyHintDontShowAgain": "Nicht mehr anzeigen",
+  "sectionAppPasskeys": "App-Passkeys",
+  "appPasskeysDescription": "Android-Apps die Anmeldung mit Passkeys erlauben. Jede Anmeldung stellt genau eine Netzwerkanfrage: Sie ruft die App-Verifizierungsdatei der Website selbst ab und prüft, ob die App echt ist. Sonst stellt Gabbro niemals eine Netzwerkverbindung her — siehe „Verify no telemetry“ im README.",
+  "appPasskeysTitle": "App-Passkeys erlauben",
+  "appPasskeysNote": "Wenn ausgeschaltet oder der Netzwerkzugriff verweigert ist, werden nur App-Anmeldungen abgelehnt — Passkeys im Browser nutzen das Netzwerk nie.",
+  "passkeyCreatePrompt": "Passkey für {site} erstellen?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "Mit Ihrem Passkey bei {site} anmelden?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

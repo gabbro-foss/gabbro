@@ -104,6 +104,45 @@ class AppLocalizationsNb extends AppLocalizations {
       'Ingen lagret pålogging samsvarer med denne appen eller dette nettstedet.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Vil du opprette en passkey for $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Vil du logge på $site med passkeyen din?';
+  }
+
+  @override
+  String get passkeyHintModuleMissing =>
+      'Passkeys er inaktive: kjernemodulen uhid er ikke lastet. Se trinnene for passkey-oppsett i README.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkeys er inaktive: Gabbro har ikke tilgang til /dev/uhid (udev-regel mangler). Se trinnene for passkey-oppsett i README.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkeys er inaktive: den virtuelle sikkerhetsnøkkelen kunne ikke starte. Se trinnene for passkey-oppsett i README.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Ikke vis igjen';
+
+  @override
+  String get sectionAppPasskeys => 'App-passkeys';
+
+  @override
+  String get appPasskeysDescription =>
+      'La Android-apper logge inn med passkeys. Hver innlogging gjør én nettverksforespørsel: den henter nettstedets egen app-verifiseringsfil for å sjekke at appen er ekte. Gabbro oppretter aldri noen annen nettverkstilkobling — se «Verify no telemetry» i README.';
+
+  @override
+  String get appPasskeysTitle => 'Tillat app-passkeys';
+
+  @override
+  String get appPasskeysNote =>
+      'Når av, eller når nettverkstilgang er nektet, avvises bare app-innlogginger — passkeys i nettlesere bruker aldri nettverket.';
+
+  @override
   String get add => 'Legg til';
 
   @override
@@ -666,6 +705,9 @@ class AppLocalizationsNb extends AppLocalizations {
   String get entryTypeCustom => 'Egendefinert';
 
   @override
+  String get entryTypePasskey => 'Passkey';
+
+  @override
   String errorPrefix(String error) {
     return 'Feil: $error';
   }
@@ -1077,6 +1119,9 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get fieldUsername => 'Brukernavn (valgfritt)';
+
+  @override
+  String get passkeyFieldUsername => 'Brukernavn';
 
   @override
   String get fieldPassword => 'Passord';
@@ -1504,7 +1549,7 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro gjør ingen utgående nettverkstilkoblinger. Ingen telemetri, ingen analyse, ingen kontoer.';
+      'Ingen telemetri, ingen analyse, ingen kontoer, ingen Gabbro-server. Gabbro gjør ingen nettverkstilkoblinger i det hele tatt — med mindre du slår på app-passkeys: da er den eneste tilkoblingen én henting per app-innlogging, nettstedets egen app-verifiseringsfil.';
 
   @override
   String get strengthTierTerrible => 'Forferdelig';

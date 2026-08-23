@@ -55,6 +55,21 @@ Widget _buildScreen(
       listFolders: listFolders,
     ));
 
+/// Taps a filter chip that may sit off-screen or under the row's left
+/// chevron fade edge (the Passkey chip pushed later chips out on a narrow
+/// surface): scroll it into view, nudge the row so the overlay clears it, tap.
+Future<void> _tapChip(WidgetTester tester, String label) async {
+  final chip = find.widgetWithText(FilterChip, label);
+  await tester.ensureVisible(chip);
+  await tester.pumpAndSettle();
+  await tester.drag(
+    find.ancestor(of: chip, matching: find.byType(SingleChildScrollView)).first,
+    const Offset(100, 0),
+  );
+  await tester.pumpAndSettle();
+  await tester.tap(chip);
+}
+
 void _setNarrow(WidgetTester tester) {
   tester.view.physicalSize = const Size(390, 844);
   tester.view.devicePixelRatio = 1.0;
@@ -65,6 +80,43 @@ void _setNarrow(WidgetTester tester) {
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 void main() {
+  testWidgets('the chip row offers every entry type in the agreed order',
+      (tester) async {
+    _setNarrow(tester);
+    await tester.pumpWidget(_buildScreen(_threeEntries));
+
+    final labels = tester
+        .widgetList<FilterChip>(find.byType(FilterChip))
+        .map((c) => ((c.label as Text).data))
+        .toList();
+    expect(labels, [
+      'All',
+      'Password',
+      'Passkey',
+      'Note',
+      'Card',
+      'Identity',
+      'File',
+      'Custom',
+    ]);
+  });
+
+  testWidgets('the Passkey chip shows only passkey entries', (tester) async {
+    _setNarrow(tester);
+    await tester.pumpWidget(_buildScreen(() => [
+          _entry('1', 'Quartz', 'Login'),
+          _entry('2', 'webauthn.io', 'Passkey'),
+          _entry('3', 'Muscovite', 'Note'),
+        ]));
+
+    await tester.tap(find.widgetWithText(FilterChip, 'Passkey'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('webauthn.io'), findsOneWidget);
+    expect(find.text('Quartz'), findsNothing);
+    expect(find.text('Muscovite'), findsNothing);
+  });
+
   testWidgets('all entries shown when search query is empty', (tester) async {
     _setNarrow(tester);
     await tester.pumpWidget(_buildScreen(_threeEntries));
@@ -127,7 +179,7 @@ void main() {
     _setNarrow(tester);
     await tester.pumpWidget(_buildScreen(_threeEntries));
 
-    await tester.tap(find.widgetWithText(FilterChip, 'Note'));
+    await _tapChip(tester, 'Note');
     await tester.pump();
 
     expect(
@@ -283,7 +335,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Also filter by Note type — Work has no notes
-    await tester.tap(find.widgetWithText(FilterChip, 'Note'));
+    await _tapChip(tester, 'Note');
     await tester.pump();
 
     expect(find.text('Quartz'), findsNothing);

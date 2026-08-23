@@ -87,4 +87,16 @@ void main() {
       reason: 'Kotlin and Java JVM targets must match',
     );
   });
+
+  test('manifest declares INTERNET exactly once, for app passkeys (F1)', () {
+    // Without it every native-app passkey login is refused even with the
+    // toggle on; declared twice would smell of an accidental re-add.
+    final manifest = File(
+      'android/app/src/main/AndroidManifest.xml',
+    ).readAsStringSync();
+    final hits = RegExp(
+      r'<uses-permission android:name="android\.permission\.INTERNET"\s*/>',
+    ).allMatches(manifest).length;
+    expect(hits, 1, reason: 'expected exactly one INTERNET uses-permission');
+  });
 }

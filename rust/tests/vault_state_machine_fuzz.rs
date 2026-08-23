@@ -231,7 +231,7 @@ fn random_op_sequences_preserve_unlockability() {
     // v11 is the oldest openable format, so it is the only fixture the fuzzer can
     // start from. Append the older format here if a future VERSION changes key
     // derivation and re-introduces a migration path worth fuzzing.
-    const FIXTURES: [&str; 1] = ["v11_multikey_2keys.gabbro"];
+    const FIXTURES: [&str; 1] = ["v12_multikey_2keys.gabbro"];
 
     for case in 0..cases {
         let fixture_name = FIXTURES[case % FIXTURES.len()];

@@ -434,6 +434,7 @@
   "fieldAndroidAppId": "Android programos ID (nebūtina)",
   "fieldAndroidAppIdHelper": "Užpildo šį prisijungimą Android programoje. Veikia tik tikslus atitikmuo. ID rasite programos Play Store nuorodoje po id= (pvz., id=com.company.app).",
   "fieldUsername": "Vartotojo vardas (nebūtinas)",
+  "passkeyFieldUsername": "Vartotojo vardas",
   "fieldPassword": "Slaptažodis",
   "fieldSeparator": "Skyriklis",
   "fieldFolder": "Aplankas",
@@ -649,7 +650,7 @@
   "aboutLicenceBody": "Gabbro yra nemokama atvirojo kodo programinė įranga, licencijuota pagal GNU General Public License v3.0 only (GPL-3.0-only).\n\nJūs galite laisvai naudoti, tyrinėti ir platinti šią programinę įrangą pagal tos licencijos sąlygas.",
   "aboutOwnerRole": "Projekto savininkas, architektas ir pagrindinis kūrėjas:",
   "aboutAiPartner": "DI kūrimo partneris:",
-  "aboutNoTelemetry": "Gabbro neatlieka jokių išeinančių tinklo jungčių. Jokios telemetrijos, jokios analitikos, jokių paskyrų.",
+  "aboutNoTelemetry": "Jokios telemetrijos, analitikos, paskyrų ar Gabbro serverio. Gabbro apskritai neužmezga tinklo ryšių — nebent įjungsite programėlių passkey: tada vienintelis ryšys yra vienas atsisiuntimas per prisijungimą, pačios svetainės programėlių patikros failas.",
 
   "strengthTierTerrible": "Siaubingas",
   "strengthTierWeak": "Silpnas",
@@ -923,5 +924,18 @@
   "hintSearch": "Filtruoja įrašus jums rašant",
   "hintFolderSelector": "Filtruoja įrašus pagal aplanką",
   "hintFilterChip": "Įjungia arba išjungia šį kategorijos filtrą",
-  "hintEntryRow": "Atidaro šį įrašą"
+  "hintEntryRow": "Atidaro šį įrašą",
+  "entryTypePasskey": "Passkey",
+  "passkeyHintModuleMissing": "Passkey neaktyvūs: branduolio modulis uhid neįkeltas. Žr. passkey sąrankos žingsnius README faile.",
+  "passkeyHintNoAccess": "Passkey neaktyvūs: Gabbro negali pasiekti /dev/uhid (trūksta udev taisyklės). Žr. passkey sąrankos žingsnius README faile.",
+  "passkeyHintOther": "Passkey neaktyvūs: virtualaus saugos rakto nepavyko paleisti. Žr. passkey sąrankos žingsnius README faile.",
+  "passkeyHintDontShowAgain": "Daugiau nerodyti",
+  "sectionAppPasskeys": "Programėlių passkey",
+  "appPasskeysDescription": "Leisti Android programėlėms prisijungti su passkey. Kiekvienas prisijungimas atlieka vieną tinklo užklausą: atsisiunčia pačios svetainės programėlių patikros failą ir patikrina, ar programėlė tikra. Jokio kito tinklo ryšio Gabbro niekada neužmezga — žr. „Verify no telemetry“ README faile.",
+  "appPasskeysTitle": "Leisti programėlių passkey",
+  "appPasskeysNote": "Kai išjungta arba tinklo prieiga uždrausta, atmetami tik programėlių prisijungimai — naršyklių passkey tinklo niekada nenaudoja.",
+  "passkeyCreatePrompt": "Sukurti passkey svetainei {site}?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "Prisijungti prie {site} naudojant passkey?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

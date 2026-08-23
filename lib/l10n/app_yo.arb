@@ -434,6 +434,7 @@
   "fieldAndroidAppId": "ID app Android (àṣàyàn)",
   "fieldAndroidAppIdHelper": "Ó kún ìwọlé yìí sínú app Android. Ìbámu pípé nìkan ló ń ṣiṣẹ́. Wá ID nínú ọ̀nà ìjápọ̀ Play Store ti app náà, lẹ́yìn id= (f.a. id=com.company.app).",
   "fieldUsername": "Orukọ olumulo (aṣayan)",
+  "passkeyFieldUsername": "Orukọ olumulo",
   "fieldPassword": "Ọrọ igbaniwọle",
   "fieldSeparator": "Iyapa",
   "fieldFolder": "Folda",
@@ -649,7 +650,7 @@
   "aboutLicenceBody": "Gabbro jẹ sọfitiwia orisun ṣiṣi ọfẹ, ti a fun ni iwe-aṣẹ labẹ GNU General Public License v3.0 only (GPL-3.0-only).\n\nO ni ominira lati lo, ṣe iwadi ati pin ẹrọ yii labẹ awọn ofin iwe-aṣẹ.",
   "aboutOwnerRole": "Oniwun iṣẹ akanṣe, ayaworan, ati olupilẹṣẹ akọkọ:",
   "aboutAiPartner": "Alabaṣepọ idagbasoke AI:",
-  "aboutNoTelemetry": "Gabbro ko ṣe eyikeyi asopọ nẹtiwọki ita. Ko si telemetry, itupalẹ, tabi akanti.",
+  "aboutNoTelemetry": "Ko si telemetry, itupalẹ, akanti, tabi sáfà Gabbro. Gabbro ko ṣe asopọ nẹtiwọki rara — àyàfi tí o bá tan passkey àwọn àppù: nígbà náà asopọ kan ṣoṣo ni gbígba fáìlì ìfẹ̀rí àppù ti sáìtì fúnra rẹ̀, lẹ́ẹ̀kan fún ìwọlé kọ̀ọ̀kan.",
 
   "strengthTierTerrible": "Buru pupọ",
   "strengthTierWeak": "Alailagbara",
@@ -922,5 +923,18 @@
   "hintSearch": "Ṣe ayẹwo awọn titẹ sii bi o ṣe ń tẹ",
   "hintFolderSelector": "Ṣe ayẹwo awọn titẹ sii nipa folda",
   "hintFilterChip": "Tan tabi pa asẹ ẹka yii",
-  "hintEntryRow": "Ṣi titẹ sii yii"
+  "hintEntryRow": "Ṣi titẹ sii yii",
+  "entryTypePasskey": "Passkey",
+  "passkeyHintModuleMissing": "Passkey kò ṣiṣẹ́: mọ́júùlù kernel uhid kò tíì gbéwọlé. Wo àwọn ìgbésẹ̀ ìṣètò passkey nínú README.",
+  "passkeyHintNoAccess": "Passkey kò ṣiṣẹ́: Gabbro kò lè wọlé sí /dev/uhid (òfin udev kò sí). Wo àwọn ìgbésẹ̀ ìṣètò passkey nínú README.",
+  "passkeyHintOther": "Passkey kò ṣiṣẹ́: kọ́kọ́rọ́ ààbò àfojúinú kò lè bẹ̀rẹ̀. Wo àwọn ìgbésẹ̀ ìṣètò passkey nínú README.",
+  "passkeyHintDontShowAgain": "Má fi hàn mọ́",
+  "sectionAppPasskeys": "Passkey àwọn àppù",
+  "appPasskeysDescription": "Jẹ́ kí àwọn àppù Android wọlé pẹ̀lú passkey. Ìwọlé kọ̀ọ̀kan ń ṣe ìbéèrè nẹ́tíwọ̀ọ̀kì kan ṣoṣo: ó ń gba fáìlì ìfẹ̀rí àppù ti sáìtì fúnra rẹ̀ láti ṣàyẹ̀wò pé àppù náà jẹ́ gidi. Gabbro kì í ṣe ìsopọ̀ nẹ́tíwọ̀ọ̀kì mìíràn láé — wo “Verify no telemetry” nínú README.",
+  "appPasskeysTitle": "Gba passkey àwọn àppù láàyè",
+  "appPasskeysNote": "Nígbà tí ó bá wà ní pípa, tàbí tí a kọ̀ ààyè nẹ́tíwọ̀ọ̀kì, ìwọlé àwọn àppù nìkan ni a ń kọ̀ — passkey nínú àwọn aṣàwákiri kì í lo nẹ́tíwọ̀ọ̀kì láé.",
+  "passkeyCreatePrompt": "Ṣẹ̀dá passkey fún {site}?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "Wọlé sí {site} pẹ̀lú passkey rẹ?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

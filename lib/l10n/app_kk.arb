@@ -434,6 +434,7 @@
   "fieldAndroidAppId": "Android қолданба идентификаторы (міндетті емес)",
   "fieldAndroidAppIdHelper": "Бұл кіру деректерін Android қолданбасында толтырады. Тек дәл сәйкестік жұмыс істейді. Идентификаторды қолданбаның Play Store сілтемесінен id= кейін табасыз (мысалы, id=com.company.app).",
   "fieldUsername": "Пайдаланушы аты (міндетті емес)",
+  "passkeyFieldUsername": "Пайдаланушы аты",
   "fieldPassword": "Құпия сөз",
   "fieldSeparator": "Бөлгіш",
   "fieldFolder": "Қалта",
@@ -649,7 +650,7 @@
   "aboutLicenceBody": "Gabbro — GNU General Public License v3.0 only (GPL-3.0-only) бойынша лицензиаланған еркін ашық бастапқы бағдарламалық жасақтама.\n\nЛицензия шарттары бойынша бұл қосымшаны пайдалануға, зерттеуге және таратуға еркіндігіңіз бар.",
   "aboutOwnerRole": "Жоба иесі, архитектор және бас әзірлеуші:",
   "aboutAiPartner": "AI әзірлеу серіктесі:",
-  "aboutNoTelemetry": "Gabbro ешқандай сыртқы желі қосылымын орнатпайды. Телеметрия, аналитика немесе аккаунттар жоқ.",
+  "aboutNoTelemetry": "Телеметрия, аналитика, аккаунттар және Gabbro сервері жоқ. Gabbro желіге мүлдем қосылмайды — тек қолданба passkey-лерін қоссаңыз: онда жалғыз қосылым — әр кіру сайын бір жүктеу, сайттың өз қолданба тексеру файлы.",
 
   "strengthTierTerrible": "Өте нашар",
   "strengthTierWeak": "Нашар",
@@ -922,5 +923,18 @@
   "hintSearch": "Терген кезде жазбаларды сүзеді",
   "hintFolderSelector": "Жазбаларды қалта бойынша сүзеді",
   "hintFilterChip": "Осы санат сүзгісін қосады немесе өшіреді",
-  "hintEntryRow": "Осы жазбаны ашады"
+  "hintEntryRow": "Осы жазбаны ашады",
+  "entryTypePasskey": "Passkey",
+  "passkeyHintModuleMissing": "Passkey белсенді емес: uhid ядро модулі жүктелмеген. README ішіндегі passkey орнату қадамдарын қараңыз.",
+  "passkeyHintNoAccess": "Passkey белсенді емес: Gabbro /dev/uhid құрылғысына қатынаса алмайды (udev ережесі жоқ). README ішіндегі passkey орнату қадамдарын қараңыз.",
+  "passkeyHintOther": "Passkey белсенді емес: виртуалды қауіпсіздік кілті іске қосылмады. README ішіндегі passkey орнату қадамдарын қараңыз.",
+  "passkeyHintDontShowAgain": "Қайта көрсетпеу",
+  "sectionAppPasskeys": "Қолданба passkey-лері",
+  "appPasskeysDescription": "Android қолданбаларына passkey арқылы кіруге рұқсат беру. Әр кіру бір ғана желілік сұрау жасайды: сайттың өз қолданба тексеру файлын жүктеп, қолданбаның түпнұсқа екенін тексереді. Gabbro бұдан басқа ешқашан желіге қосылмайды — README ішіндегі «Verify no telemetry» бөлімін қараңыз.",
+  "appPasskeysTitle": "Қолданба passkey-леріне рұқсат беру",
+  "appPasskeysNote": "Өшірулі болғанда немесе желіге қатынас берілмегенде тек қолданбалардан кіру қабылданбайды — браузерлердегі passkey желіні ешқашан пайдаланбайды.",
+  "passkeyCreatePrompt": "{site} үшін passkey жасау керек пе?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "{site} сайтына passkey арқылы кіресіз бе?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

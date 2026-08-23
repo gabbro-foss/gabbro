@@ -1,0 +1,3 @@
+# Gabbro passkey provider: let the seated user open /dev/uhid, which hosts the
+# in-process virtual FIDO2 key. Without it Linux passkeys silently do nothing.
+KERNEL=="uhid", SUBSYSTEM=="misc", TAG+="uaccess"

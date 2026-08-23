@@ -104,6 +104,45 @@ class AppLocalizationsEt extends AppLocalizations {
       'Ükski salvestatud sisselogimine ei vasta sellele rakendusele ega saidile.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Kas luua saidile $site passkey?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Kas logida saiti $site sisse oma passkey abil?';
+  }
+
+  @override
+  String get passkeyHintModuleMissing =>
+      'Passkey-d ei ole aktiivsed: kerneli moodul uhid on laadimata. Vaata passkey seadistussamme README failis.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkey-d ei ole aktiivsed: Gabbrol puudub ligipääs seadmele /dev/uhid (udev reegel puudub). Vaata passkey seadistussamme README failis.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkey-d ei ole aktiivsed: virtuaalset turvavõtit ei õnnestunud käivitada. Vaata passkey seadistussamme README failis.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Ära enam näita';
+
+  @override
+  String get sectionAppPasskeys => 'Rakenduste passkey-d';
+
+  @override
+  String get appPasskeysDescription =>
+      'Luba Android-rakendustel passkey-dega sisse logida. Iga sisselogimine teeb ühe võrgupäringu: laadib saidi enda rakenduste kontrollifaili, et veenduda rakenduse ehtsuses. Muid võrguühendusi Gabbro kunagi ei loo — vaata „Verify no telemetry“ README failis.';
+
+  @override
+  String get appPasskeysTitle => 'Luba rakenduste passkey-d';
+
+  @override
+  String get appPasskeysNote =>
+      'Kui väljas või võrgujuurdepääs on keelatud, keeldutakse ainult rakenduste sisselogimistest — brauserite passkey-d võrku kunagi ei kasuta.';
+
+  @override
   String get add => 'Lisa';
 
   @override
@@ -667,6 +706,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get entryTypeCustom => 'Kohandatud';
 
   @override
+  String get entryTypePasskey => 'Passkey';
+
+  @override
   String errorPrefix(String error) {
     return 'Viga: $error';
   }
@@ -1077,6 +1119,9 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get fieldUsername => 'Kasutajanimi (valikuline)';
+
+  @override
+  String get passkeyFieldUsername => 'Kasutajanimi';
 
   @override
   String get fieldPassword => 'Parool';
@@ -1507,7 +1552,7 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro ei tee ühtegi väljuvat võrguühendust. Telemetria puudub, analüütika puudub, kontod puuduvad.';
+      'Telemetria, analüütika, kontod ja Gabbro server puuduvad. Gabbro ei loo üldse võrguühendusi — välja arvatud siis, kui lülitad sisse rakenduste passkey-d: siis on ainus ühendus üks allalaadimine sisselogimise kohta, saidi enda rakenduste kontrollifail.';
 
   @override
   String get strengthTierTerrible => 'Kohutav';

@@ -104,6 +104,45 @@ class AppLocalizationsBg extends AppLocalizations {
       'Няма запазен вход, който да съответства на това приложение или сайт.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Да се създаде ли passkey за $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Вход в $site с вашия passkey?';
+  }
+
+  @override
+  String get passkeyHintModuleMissing =>
+      'Влизането с passkey е неактивно: модулът на ядрото uhid не е зареден. Вижте стъпките за настройка на passkey в README.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Влизането с passkey е неактивно: Gabbro няма достъп до /dev/uhid (липсва правило на udev). Вижте стъпките за настройка на passkey в README.';
+
+  @override
+  String get passkeyHintOther =>
+      'Влизането с passkey е неактивно: виртуалният ключ за сигурност не можа да стартира. Вижте стъпките за настройка на passkey в README.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Не показвай отново';
+
+  @override
+  String get sectionAppPasskeys => 'Passkey за приложения';
+
+  @override
+  String get appPasskeysDescription =>
+      'Позволете на приложения за Android да влизат с passkey. Всяко влизане прави една мрежова заявка: изтегля файла за проверка на приложения от самия сайт, за да провери, че приложението е автентично. Gabbro никога не прави друга мрежова връзка — вижте „Verify no telemetry“ в README.';
+
+  @override
+  String get appPasskeysTitle => 'Разрешаване на passkey за приложения';
+
+  @override
+  String get appPasskeysNote =>
+      'Когато е изключено или мрежовият достъп е отказан, се отказват само влизанията от приложения — passkey в браузърите никога не използват мрежата.';
+
+  @override
   String get add => 'Добави';
 
   @override
@@ -668,6 +707,9 @@ class AppLocalizationsBg extends AppLocalizations {
   String get entryTypeCustom => 'Персонализиран';
 
   @override
+  String get entryTypePasskey => 'Passkey';
+
+  @override
   String errorPrefix(String error) {
     return 'Грешка: $error';
   }
@@ -1077,7 +1119,10 @@ class AppLocalizationsBg extends AppLocalizations {
       'Попълва тези данни за вход в приложение за Android. Работи само точно съвпадение. Намерете ID във връзката на приложението в Play Store, след id= (напр. id=com.company.app).';
 
   @override
-  String get fieldUsername => 'Потребителско ime (незадължително)';
+  String get fieldUsername => 'Потребителско име (незадължително)';
+
+  @override
+  String get passkeyFieldUsername => 'Потребителско име';
 
   @override
   String get fieldPassword => 'Парола';
@@ -1509,7 +1554,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro не осъществява изходящи мрежови връзки. Без телеметрия, без аналитика, без акаунти.';
+      'Без телеметрия, без аналитика, без акаунти, без сървър на Gabbro. Gabbro изобщо не осъществява мрежови връзки — освен ако включите passkey за приложения: тогава единствената връзка е едно изтегляне на вход, файлът за проверка на приложения на самия сайт.';
 
   @override
   String get strengthTierTerrible => 'Ужасна';

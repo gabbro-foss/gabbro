@@ -319,7 +319,94 @@ impl Zeroize for CustomEntry {
 
 impl ZeroizeOnDrop for CustomEntry {}
 
-/// A single vault entry — wraps all six entry types into one enum.
+/// A website passkey — a WebAuthn discoverable credential (ADR-009).
+///
+/// The ES256 private key lives in the vault body, encrypted at rest like every
+/// other secret; relying parties only ever receive signatures, never the key.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
+pub struct PasskeyEntry {
+    pub meta: EntryMeta,
+    /// Relying-party id the credential is bound to (e.g. "example.com").
+    pub rp_id: String,
+    /// WebAuthn user.name — the account identifier the site shows (e.g. email).
+    pub user_name: String,
+    /// WebAuthn user.displayName.
+    pub user_display_name: String,
+    /// WebAuthn user.id exactly as the relying party issued it (<= 64 bytes).
+    pub user_handle: Vec<u8>,
+    /// Credential id minted at registration (32 random bytes).
+    pub credential_id: Vec<u8>,
+    /// ES256 (P-256) private scalar, 32 bytes.
+    pub private_key: Vec<u8>,
+    /// COSE_Key-encoded public key, as sent in the attestation object.
+    pub public_key_cose: Vec<u8>,
+    /// COSE algorithm identifier (-7 = ES256).
+    pub algorithm: i64,
+    #[serde(default)]
+    pub notes: Option<String>,
+    #[serde(default)]
+    pub custom_fields: Vec<CustomField>,
+}
+
+impl PasskeyEntry {
+    /// The immutable key-material block as one byte string — the sync merge's
+    /// atomic "credential" field (rides the resolution path as base64, like
+    /// File `data`). Half a credential signs for nobody, so it never splits.
+    /// Length-prefixed so no two field splits produce the same bytes.
+    pub fn credential_blob(&self) -> Vec<u8> {
+        let mut out = Vec::new();
+        for part in [
+            &self.credential_id,
+            &self.private_key,
+            &self.public_key_cose,
+            &self.user_handle,
+        ] {
+            out.extend_from_slice(&(part.len() as u16).to_be_bytes());
+            out.extend_from_slice(part);
+        }
+        out.extend_from_slice(&self.algorithm.to_be_bytes());
+        out
+    }
+
+    /// Apply a blob produced by [`Self::credential_blob`]. Malformed input is
+    /// refused and leaves the entry untouched.
+    pub fn apply_credential_blob(&mut self, blob: &[u8]) -> Result<(), String> {
+        fn take(blob: &[u8], pos: &mut usize) -> Result<Vec<u8>, String> {
+            let len_end = pos
+                .checked_add(2)
+                .filter(|&e| e <= blob.len())
+                .ok_or("credential blob truncated at length prefix")?;
+            let len = u16::from_be_bytes([blob[*pos], blob[*pos + 1]]) as usize;
+            let end = len_end
+                .checked_add(len)
+                .filter(|&e| e <= blob.len())
+                .ok_or("credential blob truncated at field")?;
+            let out = blob[len_end..end].to_vec();
+            *pos = end;
+            Ok(out)
+        }
+        let mut pos = 0usize;
+        let credential_id = take(blob, &mut pos)?;
+        let private_key = take(blob, &mut pos)?;
+        let public_key_cose = take(blob, &mut pos)?;
+        let user_handle = take(blob, &mut pos)?;
+        let alg_bytes: [u8; 8] = blob
+            .get(pos..pos + 8)
+            .and_then(|s| s.try_into().ok())
+            .ok_or("credential blob truncated at algorithm")?;
+        if pos + 8 != blob.len() {
+            return Err(String::from("credential blob has trailing bytes"));
+        }
+        self.credential_id = credential_id;
+        self.private_key = private_key;
+        self.public_key_cose = public_key_cose;
+        self.user_handle = user_handle;
+        self.algorithm = i64::from_be_bytes(alg_bytes);
+        Ok(())
+    }
+}
+
+/// A single vault entry — wraps all seven entry types into one enum.
 ///
 /// This is the type that gets serialized to JSON and encrypted into
 /// the vault body. A `Vec<VaultEntry>` represents the full vault contents.
@@ -332,6 +419,7 @@ pub enum VaultEntry {
     Card(CardEntry),
     File(FileEntry),
     Custom(CustomEntry),
+    Passkey(PasskeyEntry),
 }
 
 impl VaultEntry {
@@ -441,6 +529,19 @@ impl VaultEntry {
                     put_str(&mut h, &f.value);
                     h.update([f.hidden as u8]);
                 }
+            }
+            VaultEntry::Passkey(e) => {
+                put(&mut h, b"passkey");
+                put_str(&mut h, &e.rp_id);
+                put_str(&mut h, &e.user_name);
+                put_str(&mut h, &e.user_display_name);
+                put(&mut h, &e.user_handle);
+                put(&mut h, &e.credential_id);
+                put(&mut h, &e.private_key);
+                put(&mut h, &e.public_key_cose);
+                put(&mut h, &e.algorithm.to_le_bytes());
+                put_opt(&mut h, e.notes.as_ref());
+                put_custom_fields(&mut h, &e.custom_fields);
             }
         }
         h.finalize().into()
@@ -596,7 +697,7 @@ mod tests {
         assert_eq!(a.content_hash(), b.content_hash());
     }
 
-    /// The six sample entries, one per type, each built fresh.
+    /// The seven sample entries, one per type, each built fresh.
     fn one_of_each_type() -> Vec<(&'static str, VaultEntry)> {
         vec![
             ("Login", VaultEntry::Login(sample_login())),
@@ -605,6 +706,7 @@ mod tests {
             ("Card", VaultEntry::Card(sample_card())),
             ("File", VaultEntry::File(sample_file())),
             ("Custom", VaultEntry::Custom(sample_custom())),
+            ("Passkey", VaultEntry::Passkey(sample_passkey())),
         ]
     }
 
@@ -616,6 +718,7 @@ mod tests {
             VaultEntry::Card(e) => &mut e.meta,
             VaultEntry::File(e) => &mut e.meta,
             VaultEntry::Custom(e) => &mut e.meta,
+            VaultEntry::Passkey(e) => &mut e.meta,
         }
     }
 
@@ -722,6 +825,12 @@ mod tests {
         let mut custom = sample_custom();
         custom.title = shared.clone();
 
+        let mut passkey = sample_passkey();
+        passkey.rp_id = shared.clone();
+        passkey.user_name = shared.clone();
+        passkey.user_display_name = shared.clone();
+        passkey.notes = Some(shared.clone());
+
         let entries = [
             ("Login", VaultEntry::Login(login)),
             ("Note", VaultEntry::Note(note)),
@@ -729,6 +838,7 @@ mod tests {
             ("Card", VaultEntry::Card(card)),
             ("File", VaultEntry::File(file)),
             ("Custom", VaultEntry::Custom(custom)),
+            ("Passkey", VaultEntry::Passkey(passkey)),
         ];
 
         for (i, (name_a, a)) in entries.iter().enumerate() {
@@ -950,6 +1060,122 @@ mod tests {
         }"#;
         let meta: EntryMeta = serde_json::from_str(json).unwrap();
         assert!(meta.field_times.is_empty());
+    }
+
+    fn sample_passkey() -> PasskeyEntry {
+        PasskeyEntry {
+            meta: EntryMeta::default(),
+            rp_id: "example.com".into(),
+            user_name: "user@example.com".into(),
+            user_display_name: "Sample User".into(),
+            user_handle: vec![0xAA; 16],
+            credential_id: vec![0xBB; 32],
+            private_key: vec![0xCC; 32],
+            public_key_cose: vec![0xDD; 77],
+            algorithm: -7,
+            notes: Some("a note".into()),
+            custom_fields: vec![CustomField {
+                label: "origin".into(),
+                value: "imported".into(),
+                hidden: false,
+            }],
+        }
+    }
+
+    #[test]
+    fn passkey_entry_round_trips_through_json() {
+        let entry = sample_passkey();
+        let json = serde_json::to_string(&entry).unwrap();
+        let back: PasskeyEntry = serde_json::from_str(&json).unwrap();
+        assert_eq!(entry, back);
+    }
+
+    #[test]
+    fn passkey_credential_blob_round_trips() {
+        let source = sample_passkey();
+        let mut target = sample_passkey();
+        target.credential_id = vec![1; 16];
+        target.private_key = vec![2; 32];
+        target.public_key_cose = vec![3; 77];
+        target.user_handle = vec![4; 8];
+        target.algorithm = -8;
+
+        target
+            .apply_credential_blob(&source.credential_blob())
+            .unwrap();
+        assert_eq!(target.credential_id, source.credential_id);
+        assert_eq!(target.private_key, source.private_key);
+        assert_eq!(target.public_key_cose, source.public_key_cose);
+        assert_eq!(target.user_handle, source.user_handle);
+        assert_eq!(target.algorithm, source.algorithm);
+    }
+
+    #[test]
+    fn passkey_malformed_credential_blob_is_refused_untouched() {
+        let mut e = sample_passkey();
+        let before = e.clone();
+        let blob = e.credential_blob();
+        assert!(e.apply_credential_blob(&blob[..blob.len() - 1]).is_err());
+        assert!(e.apply_credential_blob(&[]).is_err());
+        let mut trailing = blob.clone();
+        trailing.push(0);
+        assert!(e.apply_credential_blob(&trailing).is_err());
+        assert_eq!(e, before, "a refused blob must change nothing");
+    }
+
+    #[test]
+    fn passkey_entry_zeroize_clears_key_material() {
+        let mut e = sample_passkey();
+        e.zeroize();
+        assert!(e.private_key.is_empty());
+        assert!(e.credential_id.is_empty());
+        assert!(e.user_handle.is_empty());
+        assert!(e.public_key_cose.is_empty());
+        assert!(e.rp_id.is_empty());
+        assert!(e.meta.id.is_empty());
+    }
+
+    #[test]
+    fn passkey_entry_parses_without_optional_fields() {
+        let mut value = serde_json::to_value(sample_passkey()).unwrap();
+        let map = value.as_object_mut().unwrap();
+        map.remove("notes");
+        map.remove("custom_fields");
+        let back: PasskeyEntry = serde_json::from_value(value).unwrap();
+        assert_eq!(back.notes, None);
+        assert!(back.custom_fields.is_empty());
+    }
+
+    #[test]
+    fn changing_any_passkey_field_changes_the_hash() {
+        let base = VaultEntry::Passkey(sample_passkey());
+        let m = |f: fn(&mut PasskeyEntry)| {
+            let mut e = sample_passkey();
+            f(&mut e);
+            VaultEntry::Passkey(e)
+        };
+        assert_each_mutation_changes_the_hash(
+            &base,
+            vec![
+                ("rp_id", m(|e| e.rp_id = String::from("other.example"))),
+                ("user_name", m(|e| e.user_name = String::from("other"))),
+                (
+                    "user_display_name",
+                    m(|e| e.user_display_name = String::from("Other")),
+                ),
+                ("user_handle", m(|e| e.user_handle = vec![0x11; 16])),
+                ("credential_id", m(|e| e.credential_id = vec![0x22; 32])),
+                ("private_key", m(|e| e.private_key = vec![0x33; 32])),
+                ("public_key_cose", m(|e| e.public_key_cose = vec![0x44; 77])),
+                ("algorithm", m(|e| e.algorithm = -8)),
+                ("notes", m(|e| e.notes = Some(String::from("other")))),
+                ("notes cleared", m(|e| e.notes = None)),
+                (
+                    "custom_fields",
+                    m(|e| e.custom_fields = vec![a_custom_field()]),
+                ),
+            ],
+        );
     }
 
     #[test]

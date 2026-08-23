@@ -176,6 +176,7 @@ fn migrate_folders(mut entries: Vec<VaultEntry>) -> Vec<VaultEntry> {
             VaultEntry::Card(e) => &mut e.meta.folder,
             VaultEntry::File(e) => &mut e.meta.folder,
             VaultEntry::Custom(e) => &mut e.meta.folder,
+            VaultEntry::Passkey(e) => &mut e.meta.folder,
         };
         if folder == "Personal" {
             *folder = String::new();
@@ -374,6 +375,17 @@ mod tests {
     fn invalid_bytes_returns_error() {
         let result = deserialize_vault_body(b"this is not json");
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn unknown_entry_variant_returns_a_clean_error() {
+        // What this binary would see if body JSON ever carried an entry type it
+        // does not know (e.g. written by a future format): a clean error, never
+        // a panic. The VERSION check in file_format.rs is the real shield; this
+        // pins the failure mode behind it.
+        let bytes = br#"{"entries":[{"SomeFutureType":{"meta":{"id":"x","created_at":"","updated_at":"","folder":""}}}],"folders":[]}"#;
+        let err = deserialize_vault_body(bytes).unwrap_err();
+        assert!(err.contains("unknown variant"), "got: {err}");
     }
 
     #[test]

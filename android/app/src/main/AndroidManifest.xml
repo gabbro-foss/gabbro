@@ -1,5 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.NFC" />
+    <!-- F1: app passkeys only — one assetlinks fetch per native-app login,
+         gated by the in-app opt-in toggle (README "Verify no telemetry").
+         Android grants this silently; the toggle is the user's consent. -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-feature android:name="android.hardware.nfc" android:required="false" />
     <!-- R-02 (AI_SECURITY_AUDIT_REVIEW.md): the vault and settings live in
          app-private storage and must never leave the device via the Android
@@ -75,6 +79,26 @@
         </service>
 
         <!--
+            GabbroCredentialProviderService — the passkey provider. The OS
+            offers Gabbro whenever any app or browser creates or uses a
+            passkey. Framework support starts at Android 14 (API 34); older
+            devices never bind it. BIND_CREDENTIAL_PROVIDER_SERVICE is
+            system-only, like the autofill permission above.
+        -->
+        <service
+            android:name=".GabbroCredentialProviderService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_CREDENTIAL_PROVIDER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.credentials.CredentialProviderService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.credentials.provider"
+                android:resource="@xml/passkey_provider_config" />
+        </service>
+
+        <!--
             UnlockActivity — shown by the OS when a fill request arrives and
             the vault is locked. A GabbroUnlockHostActivity subclass that runs
             the autofillUnlockMain entrypoint (reused UnlockScreen: vault picker,
@@ -83,6 +107,26 @@
         -->
         <activity
             android:name=".UnlockActivity"
+            android:exported="false"
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!--
+            Passkey phase-2 activities — the OS routes the user's picker tap
+            here via the provider service's PendingIntents. Flutter unlock +
+            consent (passkeyUnlockMain), then the WebAuthn operation in Rust.
+        -->
+        <activity
+            android:name=".GabbroPasskeyCreateActivity"
+            android:exported="false"
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".GabbroPasskeyGetActivity"
             android:exported="false"
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"

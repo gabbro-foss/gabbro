@@ -434,6 +434,7 @@
   "fieldAndroidAppId": "Android lietotnes ID (neobligāti)",
   "fieldAndroidAppIdHelper": "Aizpilda šo pieteikšanos Android lietotnē. Darbojas tikai precīza atbilstība. ID atrodiet lietotnes Play Store saitē aiz id= (piem., id=com.company.app).",
   "fieldUsername": "Lietotājvārds (neobligāts)",
+  "passkeyFieldUsername": "Lietotājvārds",
   "fieldPassword": "Parole",
   "fieldSeparator": "Atdalītājs",
   "fieldFolder": "Mape",
@@ -649,7 +650,7 @@
   "aboutLicenceBody": "Gabbro ir bezmaksas atvērtā pirmkoda programmatūra, licencēta ar GNU General Public License v3.0 only (GPL-3.0-only).\n\nJūs varat brīvi izmantot, pētīt un izplatīt šo programmatūru saskaņā ar šīs licences nosacījumiem.",
   "aboutOwnerRole": "Projekta īpašnieks, arhitekts un galvenais izstrādātājs:",
   "aboutAiPartner": "MI izstrādes partneris:",
-  "aboutNoTelemetry": "Gabbro neveic nekādus izejošos tīkla savienojumus. Bez telemetrijas, bez analītikas, bez kontiem.",
+  "aboutNoTelemetry": "Bez telemetrijas, bez analītikas, bez kontiem, bez Gabbro servera. Gabbro vispār neveido tīkla savienojumus — ja vien neieslēdzat lietotņu passkey: tad vienīgais savienojums ir viena lejupielāde uz pierakstīšanos, pašas vietnes lietotņu pārbaudes fails.",
 
   "strengthTierTerrible": "Briesmīga",
   "strengthTierWeak": "Vāja",
@@ -923,5 +924,18 @@
   "hintSearch": "Filtrē ierakstus rakstīšanas laikā",
   "hintFolderSelector": "Filtrē ierakstus pēc mapes",
   "hintFilterChip": "Ieslēdz vai izslēdz šo kategorijas filtru",
-  "hintEntryRow": "Atver šo ierakstu"
+  "hintEntryRow": "Atver šo ierakstu",
+  "entryTypePasskey": "Passkey",
+  "passkeyHintModuleMissing": "Passkey nav aktīvas: kodola modulis uhid nav ielādēts. Skatiet passkey iestatīšanas soļus README failā.",
+  "passkeyHintNoAccess": "Passkey nav aktīvas: Gabbro nevar piekļūt /dev/uhid (trūkst udev noteikuma). Skatiet passkey iestatīšanas soļus README failā.",
+  "passkeyHintOther": "Passkey nav aktīvas: virtuālo drošības atslēgu neizdevās palaist. Skatiet passkey iestatīšanas soļus README failā.",
+  "passkeyHintDontShowAgain": "Vairs nerādīt",
+  "sectionAppPasskeys": "Lietotņu passkey",
+  "appPasskeysDescription": "Atļaut Android lietotnēm pierakstīties ar passkey. Katra pierakstīšanās veic vienu tīkla pieprasījumu: lejupielādē pašas vietnes lietotņu pārbaudes failu, lai pārliecinātos, ka lietotne ir īsta. Nekādu citu tīkla savienojumu Gabbro nekad neveido — skatiet „Verify no telemetry” README failā.",
+  "appPasskeysTitle": "Atļaut lietotņu passkey",
+  "appPasskeysNote": "Kad izslēgts vai tīkla piekļuve liegta, tiek noraidītas tikai lietotņu pierakstīšanās — passkey pārlūkos tīklu nekad neizmanto.",
+  "passkeyCreatePrompt": "Vai izveidot passkey vietnei {site}?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "Vai pierakstīties vietnē {site} ar passkey?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

@@ -434,6 +434,7 @@
   "fieldAndroidAppId": "Android 應用程式 ID（選填）",
   "fieldAndroidAppIdHelper": "在 Android 應用程式中填入此登入資訊。僅完全相符時有效。在應用程式的 Play Store 連結中 id= 之後可找到此 ID（例如 id=com.company.app）。",
   "fieldUsername": "使用者名稱（選填）",
+  "passkeyFieldUsername": "使用者名稱",
   "fieldPassword": "密碼",
   "fieldSeparator": "分隔符",
   "fieldFolder": "資料夾",
@@ -649,7 +650,7 @@
   "aboutLicenceBody": "Gabbro 是在 GNU General Public License v3.0 only (GPL-3.0-only) 下授權的自由開源軟體。\n\n您有權在授權條款下使用、研究和散布此應用程式。",
   "aboutOwnerRole": "專案所有者、架構師和主要開發者：",
   "aboutAiPartner": "AI 開發合作夥伴：",
-  "aboutNoTelemetry": "Gabbro 不建立任何外部網路連線。無遙測、分析或帳戶。",
+  "aboutNoTelemetry": "無遙測、分析、帳戶，也沒有 Gabbro 伺服器。Gabbro 完全不建立網路連線——除非你開啟應用程式通行密鑰：屆時唯一的連線是每次應用程式登入取得一次該網站本身的應用程式驗證檔案。",
 
   "strengthTierTerrible": "非常弱",
   "strengthTierWeak": "弱",
@@ -922,5 +923,18 @@
   "hintSearch": "輸入時篩選項目",
   "hintFolderSelector": "依資料夾篩選項目",
   "hintFilterChip": "開啟或關閉此類別篩選",
-  "hintEntryRow": "開啟此項目"
+  "hintEntryRow": "開啟此項目",
+  "entryTypePasskey": "通行密鑰",
+  "passkeyHintModuleMissing": "通行密鑰未啟用：核心模組 uhid 未載入。請參閱 README 中的通行密鑰設定步驟。",
+  "passkeyHintNoAccess": "通行密鑰未啟用：Gabbro 無法存取 /dev/uhid（缺少 udev 規則）。請參閱 README 中的通行密鑰設定步驟。",
+  "passkeyHintOther": "通行密鑰未啟用：虛擬安全金鑰無法啟動。請參閱 README 中的通行密鑰設定步驟。",
+  "passkeyHintDontShowAgain": "不要再顯示",
+  "sectionAppPasskeys": "應用程式通行密鑰",
+  "appPasskeysDescription": "允許 Android 應用程式使用通行密鑰登入。每次登入只發出一次網路請求：從該網站本身取得其應用程式驗證檔案，以確認應用程式是正版。除此之外 Gabbro 絕不進行任何網路連線——請參閱 README 中的「Verify no telemetry」。",
+  "appPasskeysTitle": "允許應用程式通行密鑰",
+  "appPasskeysNote": "關閉時，或網路存取被拒時，僅應用程式登入會被拒絕——瀏覽器中的通行密鑰從不使用網路。",
+  "passkeyCreatePrompt": "要為 {site} 建立通行密鑰嗎？",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "要使用通行密鑰登入 {site} 嗎？",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

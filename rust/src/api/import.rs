@@ -185,6 +185,7 @@ fn entry_id_and_title(entry: &crate::vault::entry::VaultEntry) -> (String, Strin
         ),
         File(e) => (e.meta.id.clone(), e.filename.clone()),
         Custom(e) => (e.meta.id.clone(), e.title.clone()),
+        Passkey(e) => (e.meta.id.clone(), e.rp_id.clone()),
     }
 }
 

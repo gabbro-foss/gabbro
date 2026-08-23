@@ -434,6 +434,7 @@
   "fieldAndroidAppId": "Android aplikazioaren IDa (aukerakoa)",
   "fieldAndroidAppIdHelper": "Saio-hasiera hau Android aplikazio batean betetzen du. Bat-etortze zehatzak baino ez du funtzionatzen. Aurkitu IDa aplikazioaren Play Store estekan, id= ondoren (adib. id=com.company.app).",
   "fieldUsername": "Erabiltzaile-izena (aukerakoa)",
+  "passkeyFieldUsername": "Erabiltzaile-izena",
   "fieldPassword": "Pasahitza",
   "fieldSeparator": "Bereiztailea",
   "fieldFolder": "Karpeta",
@@ -649,7 +650,7 @@
   "aboutLicenceBody": "Gabbro kode irekiko software librea da, GNU General Public License v3.0 only (GPL-3.0-only) lizentziapean.\n\nLizentziaren baldintzen arabera aplikazio hau erabiltzeko, ikasteko eta banatzeko askatasuna duzu.",
   "aboutOwnerRole": "Proiektu-jabea, arkitektoa eta garatzaile nagusia:",
   "aboutAiPartner": "AI garapen-partnerra:",
-  "aboutNoTelemetry": "Gabbro-k ez du kanpoko sare-konexiorik ezartzen. Telemetriarik, analisiarik edo konturik ez.",
+  "aboutNoTelemetry": "Telemetriarik, analisirik, konturik eta Gabbro zerbitzaririk ez. Gabbrok ez du inolako sare-konexiorik egiten — aplikazioen passkeyak aktibatzen badituzu izan ezik: orduan konexio bakarra saio-hasiera bakoitzeko deskarga bat da, gunearen beraren aplikazioak egiaztatzeko fitxategia.",
 
   "strengthTierTerrible": "Oso ahula",
   "strengthTierWeak": "Ahula",
@@ -922,5 +923,18 @@
   "hintSearch": "Sarrerak iragazten ditu idatzi ahala",
   "hintFolderSelector": "Sarrerak karpetaka iragazten ditu",
   "hintFilterChip": "Kategoria-iragazki hau aktibatu edo desaktibatzen du",
-  "hintEntryRow": "Sarrera hau irekitzen du"
+  "hintEntryRow": "Sarrera hau irekitzen du",
+  "entryTypePasskey": "Passkey",
+  "passkeyHintModuleMissing": "Passkeyak ez daude aktibo: uhid kernel modulua ez dago kargatuta. Ikusi passkeyak konfiguratzeko urratsak README fitxategian.",
+  "passkeyHintNoAccess": "Passkeyak ez daude aktibo: Gabbrok ezin du /dev/uhid atzitu (udev araua falta da). Ikusi passkeyak konfiguratzeko urratsak README fitxategian.",
+  "passkeyHintOther": "Passkeyak ez daude aktibo: segurtasun-gako birtuala ezin izan da abiarazi. Ikusi passkeyak konfiguratzeko urratsak README fitxategian.",
+  "passkeyHintDontShowAgain": "Ez erakutsi berriro",
+  "sectionAppPasskeys": "Aplikazioen passkeyak",
+  "appPasskeysDescription": "Baimendu Android aplikazioei passkeyekin saioa hastea. Saio-hasiera bakoitzak sareko eskaera bakarra egiten du: gunearen beraren aplikazioak egiaztatzeko fitxategia deskargatzen du, aplikazioa benetakoa dela egiaztatzeko. Gabbrok ez du inoiz beste sare-konexiorik egiten — ikusi «Verify no telemetry» README fitxategian.",
+  "appPasskeysTitle": "Baimendu aplikazioen passkeyak",
+  "appPasskeysNote": "Desaktibatuta dagoenean, edo sarerako sarbidea ukatuta dagoenean, aplikazioetako saio-hasierak bakarrik ukatzen dira — nabigatzaileetako passkeyek ez dute inoiz sarea erabiltzen.",
+  "passkeyCreatePrompt": "{site} gunerako passkey bat sortu?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "{site} gunean saioa hasi zure passkey-arekin?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

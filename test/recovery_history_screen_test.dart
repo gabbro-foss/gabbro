@@ -122,6 +122,23 @@ void main() {
     expect(find.textContaining('RAWBASE64VALUE'), findsNothing);
   });
 
+  testWidgets('passkey credential history shows <binary>, not the key blob', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      testApp(
+        RecoveryHistoryScreen(
+          records: [_rec('credential', 'RAWKEYBLOB64')],
+          onRestore: (_) async {},
+          onDelete: (_) async {},
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.textContaining('<binary>'), findsOneWidget);
+    expect(find.textContaining('RAWKEYBLOB64'), findsNothing);
+  });
+
   testWidgets('Revert calls onRestore and removes the row', (tester) async {
     int? restored;
     await tester.pumpWidget(

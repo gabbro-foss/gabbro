@@ -276,6 +276,11 @@ const _kComponents = [
     url: 'https://github.com/cfbao/ChineseWordDiceware',
   ),
   _Component(
+    name: 'ciborium',
+    licence: 'Apache-2.0',
+    url: 'https://github.com/enarx/ciborium',
+  ),
+  _Component(
     name: 'Dart',
     licence: 'BSD-3-Clause',
     url: 'https://github.com/dart-lang/sdk',
@@ -346,6 +351,11 @@ const _kComponents = [
     name: 'indexmap',
     licence: 'Apache-2.0 / MIT',
     url: 'https://github.com/indexmap-rs/indexmap',
+  ),
+  _Component(
+    name: 'p256',
+    licence: 'Apache-2.0 / MIT',
+    url: 'https://github.com/RustCrypto/elliptic-curves',
   ),
   _Component(
     name: 'intl',

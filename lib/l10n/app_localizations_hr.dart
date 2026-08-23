@@ -104,6 +104,45 @@ class AppLocalizationsHr extends AppLocalizations {
       'Nijedna spremljena prijava ne odgovara ovoj aplikaciji ili web-mjestu.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Izraditi passkey za $site?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Prijaviti se na $site pomoću passkeya?';
+  }
+
+  @override
+  String get passkeyHintModuleMissing =>
+      'Passkey prijava nije aktivna: modul jezgre uhid nije učitan. Pogledajte korake za postavljanje passkeya u README-u.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkey prijava nije aktivna: Gabbro nema pristup /dev/uhid (nedostaje udev pravilo). Pogledajte korake za postavljanje passkeya u README-u.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkey prijava nije aktivna: virtualni sigurnosni ključ nije se mogao pokrenuti. Pogledajte korake za postavljanje passkeya u README-u.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Ne prikazuj ponovno';
+
+  @override
+  String get sectionAppPasskeys => 'Passkey za aplikacije';
+
+  @override
+  String get appPasskeysDescription =>
+      'Dopustite Android aplikacijama prijavu passkeyem. Svaka prijava radi jedan mrežni zahtjev: preuzima datoteku za provjeru aplikacija sa samog web-mjesta kako bi provjerila da je aplikacija izvorna. Gabbro nikada ne uspostavlja nijednu drugu mrežnu vezu — pogledajte „Verify no telemetry“ u README-u.';
+
+  @override
+  String get appPasskeysTitle => 'Dopusti passkey za aplikacije';
+
+  @override
+  String get appPasskeysNote =>
+      'Kad je isključeno, ili kad je mrežni pristup uskraćen, odbijaju se samo prijave iz aplikacija — passkey u preglednicima nikada ne koristi mrežu.';
+
+  @override
   String get add => 'Dodaj';
 
   @override
@@ -667,6 +706,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get entryTypeCustom => 'Prilagođeno';
 
   @override
+  String get entryTypePasskey => 'Passkey';
+
+  @override
   String errorPrefix(String error) {
     return 'Greška: $error';
   }
@@ -1076,6 +1118,9 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get fieldUsername => 'Korisničko ime (neobavezno)';
+
+  @override
+  String get passkeyFieldUsername => 'Korisničko ime';
 
   @override
   String get fieldPassword => 'Lozinka';
@@ -1505,7 +1550,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro ne uspostavlja nikakve odlazne mrežne veze. Nema telemetrije, analitike ni računa.';
+      'Nema telemetrije, analitike, računa ni Gabbro poslužitelja. Gabbro uopće ne uspostavlja mrežne veze — osim ako uključite passkey za aplikacije: tada je jedina veza jedno preuzimanje po prijavi, datoteka za provjeru aplikacija samog web-mjesta.';
 
   @override
   String get strengthTierTerrible => 'Užasno';

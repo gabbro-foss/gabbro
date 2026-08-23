@@ -81,11 +81,47 @@ fn canary_entry() -> rust_lib_gabbro::vault::entry::VaultEntry {
     })
 }
 
-/// The vault body every passphrase fixture seals: an empty vault plus the canary.
+// ── Passkey canary (v12+) ────────────────────────────────────────────────────
+// Fixed bytes prove the FORMAT round-trips key material intact; they are not a
+// signing-valid key pair. v11 fixtures are frozen without it.
+#[allow(dead_code)]
+const PASSKEY_CANARY_RP_ID: &str = "canary.example.test";
+#[allow(dead_code)]
+const PASSKEY_CANARY_PRIVATE_KEY: [u8; 32] = [0x55; 32];
+
+/// The canary passkey entry sealed into v12+ fixtures.
+#[allow(dead_code)]
+fn canary_passkey_entry() -> rust_lib_gabbro::vault::entry::VaultEntry {
+    use rust_lib_gabbro::vault::entry::{EntryMeta, PasskeyEntry, VaultEntry};
+    VaultEntry::Passkey(PasskeyEntry {
+        meta: EntryMeta {
+            field_times: Default::default(),
+            history: Vec::new(),
+            id: "00000000-0000-0000-0000-000000000002".to_string(),
+            created_at: "2026-01-01T00:00:00Z".to_string(),
+            updated_at: "2026-01-01T00:00:00Z".to_string(),
+            folder: String::new(),
+        },
+        rp_id: PASSKEY_CANARY_RP_ID.to_string(),
+        user_name: "fixture-user@example.test".to_string(),
+        user_display_name: "Fixture User".to_string(),
+        user_handle: vec![0x77; 16],
+        credential_id: vec![0x66; 32],
+        private_key: PASSKEY_CANARY_PRIVATE_KEY.to_vec(),
+        public_key_cose: vec![0x88; 77],
+        algorithm: -7,
+        notes: None,
+        custom_fields: vec![],
+    })
+}
+
+/// The vault body every passphrase fixture seals: an empty vault plus the
+/// canaries (login always; passkey from v12 on).
 #[allow(dead_code)]
 fn canary_body() -> rust_lib_gabbro::vault::serialization::VaultBody {
     let mut body = rust_lib_gabbro::vault::serialization::VaultBody::empty();
     body.entries.push(canary_entry());
+    body.entries.push(canary_passkey_entry());
     body
 }
 

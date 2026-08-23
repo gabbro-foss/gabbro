@@ -109,6 +109,24 @@ CustomEntryData _updatedCustomField() => CustomEntryData(
       attachments: const [],
     );
 
+PasskeyEntryData _passkey({
+  String? notes,
+  String folder = 'Personal',
+  List<CustomFieldData> customFields = const [],
+}) =>
+    PasskeyEntryData(
+      id: 'passkey-id-1',
+      rpId: 'example.com',
+      userName: 'user@example.com',
+      userDisplayName: 'User',
+      credentialIdB64: 'Y3JlZA',
+      notes: notes,
+      customFields: customFields,
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: folder,
+    );
+
 LoginEntryData _original() => LoginEntryData(
       id: 'test-id-1',
       title: 'Example',
@@ -790,5 +808,48 @@ void main() {
     expect(find.text('Folder'), findsOneWidget);
     expect(find.text('Work'), findsOneWidget);
     expect(find.text('Personal'), findsOneWidget);
+  });
+
+  // Matrix-7 defect: a Passkey notes edit saved fine but the review screen
+  // showed no diff at all (Passkey fell through _buildFieldDiffs' default).
+  testWidgets('Passkey notes change appears in diff', (tester) async {
+    await tester.pumpWidget(_buildReviewScreen(
+      original: VaultEntryData.passkey(_passkey(notes: 'old note')),
+      updated: VaultEntryData.passkey(_passkey(notes: 'new note')),
+    ));
+
+    expect(find.text('Other fields'), findsOneWidget);
+    expect(find.text('old note'), findsOneWidget);
+    expect(find.text('new note'), findsOneWidget);
+  });
+
+  testWidgets('Passkey folder change appears in diff', (tester) async {
+    await tester.pumpWidget(_buildReviewScreen(
+      original: VaultEntryData.passkey(_passkey(folder: 'Personal')),
+      updated: VaultEntryData.passkey(_passkey(folder: 'Work')),
+    ));
+
+    expect(find.text('Folder'), findsOneWidget);
+    expect(find.text('Personal'), findsOneWidget);
+    expect(find.text('Work'), findsOneWidget);
+  });
+
+  testWidgets('Passkey diff shows changed custom field', (tester) async {
+    await tester.pumpWidget(_buildReviewScreen(
+      original: VaultEntryData.passkey(_passkey(
+        customFields: [
+          CustomFieldData(label: 'Device', value: 'phone', hidden: false),
+        ],
+      )),
+      updated: VaultEntryData.passkey(_passkey(
+        customFields: [
+          CustomFieldData(label: 'Device', value: 'tablet', hidden: false),
+        ],
+      )),
+    ));
+
+    expect(find.text('Device'), findsOneWidget);
+    expect(find.text('phone'), findsOneWidget);
+    expect(find.text('tablet'), findsOneWidget);
   });
 }

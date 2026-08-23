@@ -132,6 +132,41 @@ a UX complement that allows a corruption check *before* opening the vault.
 
 ---
 
+## Verify no telemetry
+
+Gabbro has no server and phones nowhere. The one network call in the entire
+source is the Android app-passkey check: with the **App passkeys** toggle on
+(Settings, off by default), a passkey login from a native app fetches that
+site's own `https://<site>/.well-known/assetlinks.json` to verify the app —
+nothing else, ever. Linux builds contain no network code at all. Links you
+tap open in your browser, not through Gabbro.
+
+Check it yourself:
+
+1. **Source.** Clone the repo, then scan it (plain grep, preinstalled everywhere):
+
+   ```bash
+   git clone https://github.com/gabbro-foss/gabbro.git && cd gabbro && grep -rn "openConnection\|HttpClient\|reqwest\|TcpStream" lib/ rust/src/ android/app/src/main
+   ```
+
+   Expected output — exactly one line, the assetlinks fetch:
+
+   ```
+   android/app/src/main/kotlin/app/gabbro/gabbro/GabbroPasskeyActivity.kt:119:        val conn = java.net.URL(url).openConnection() as HttpsURLConnection
+   ```
+
+2. **On the wire.** Capture Gabbro's traffic with
+   [PCAPdroid](https://github.com/emanuele-f/PCAPdroid) (Android) or
+   [Wireshark](https://www.wireshark.org/) (Linux). Toggle off: zero packets,
+   always. Toggle on, idle: zero. Toggle on, app-passkey login: exactly one
+   HTTPS request, to the login's own site.
+
+3. **Deny and see.** Block Gabbro's network with NetGuard or GrapheneOS's
+   Network permission: everything keeps working except app passkeys, which
+   refuse.
+
+---
+
 ## Contributors
 
 - [Zabamund](https://github.com/Zabamund/) — project owner,
@@ -215,6 +250,16 @@ libraries the packages would have pulled in:
 - **Arch:** `sudo pacman -S --needed libfido2 libcbor pcsclite gtk3 xdg-desktop-portal xdg-desktop-portal-gtk`
 - **Debian / Mint:** `sudo apt install libfido2-1 libcbor0.10 libpcsclite1 libgtk-3-0t64 xdg-desktop-portal xdg-desktop-portal-gtk`
 
+Website passkeys need `/dev/uhid` access; the AUR and APT packages set this up
+for you, the tarball does not. Without it, passkeys silently do nothing while
+everything else works. One-time setup (skip if you don't use passkeys):
+
+```bash
+echo 'KERNEL=="uhid", SUBSYSTEM=="misc", TAG+="uaccess"' | sudo tee /etc/udev/rules.d/70-gabbro-uhid.rules
+echo 'uhid' | sudo tee /etc/modules-load.d/gabbro-uhid.conf
+sudo udevadm control --reload && sudo modprobe uhid && sudo udevadm trigger --name-match=uhid
+```
+
 #### Uninstall
 
 | Installed via | Remove with |
@@ -224,7 +269,13 @@ libraries the packages would have pulled in:
 | tarball | delete the `bundle/` folder |
 
 If you added the APT repo, also delete `/etc/apt/sources.list.d/gabbro.sources`
-and `/etc/apt/keyrings/gabbro.gpg`. If you bound a custom shortcut for auto-type,
+and `/etc/apt/keyrings/gabbro.gpg`. If you did the tarball passkey setup,
+remove it too (optionally `sudo modprobe -r uhid` to unload the module until
+reboot):
+
+```bash
+sudo rm /etc/udev/rules.d/70-gabbro-uhid.rules /etc/modules-load.d/gabbro-uhid.conf && sudo udevadm control --reload
+``` If you bound a custom shortcut for auto-type,
 remove it too — it would now point at a deleted binary and silently do nothing.
 
 **Your vaults and settings are not removed** — they live in

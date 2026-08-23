@@ -19,6 +19,7 @@ class MainActivity : GabbroUnlockHostActivity() {
 
     private companion object {
         const val EXPORT_CHANNEL = "app.gabbro.gabbro/export"
+        const val APP_PASSKEYS_CHANNEL = "app.gabbro.gabbro/app_passkeys"
     }
 
     // SAF directory picker: the result arrives asynchronously, so we stash the
@@ -55,6 +56,19 @@ class MainActivity : GabbroUnlockHostActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         // Registers the shared YubiKey + biometric channels and NFC suppression.
         super.configureFlutterEngine(flutterEngine)
+
+        // Mirrors the Dart app-passkeys toggle (F1) into SharedPreferences,
+        // where the Flutter-less credential provider reads it.
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, APP_PASSKEYS_CHANNEL)
+            .setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "setAppPasskeys" -> {
+                        AppPasskeysStore.set(this, call.arguments as? Boolean ?: false)
+                        result.success(null)
+                    }
+                    else -> result.notImplemented()
+                }
+            }
 
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, EXPORT_CHANNEL)
             .setMethodCallHandler { call, result ->

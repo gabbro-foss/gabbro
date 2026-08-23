@@ -434,6 +434,7 @@
   "fieldAndroidAppId": "Android-app-ID (valfritt)",
   "fieldAndroidAppIdHelper": "Fyller i den här inloggningen i en Android-app. Endast en exakt matchning fungerar. Hitta ID:t i appens Play Store-länk efter id= (t.ex. id=com.company.app).",
   "fieldUsername": "Användarnamn (valfritt)",
+  "passkeyFieldUsername": "Användarnamn",
   "fieldPassword": "Lösenord",
   "fieldSeparator": "Avgränsare",
   "fieldFolder": "Mapp",
@@ -649,7 +650,7 @@
   "aboutLicenceBody": "Gabbro är fri och öppen källkod-programvara, licensierad under GNU General Public License v3.0 only (GPL-3.0-only).\n\nDu är fri att använda, studera och distribuera denna programvara under villkoren i den licensen.",
   "aboutOwnerRole": "Projektägare, arkitekt och ledande utvecklare:",
   "aboutAiPartner": "AI-utvecklingspartner:",
-  "aboutNoTelemetry": "Gabbro gör inga utgående nätverksanslutningar. Ingen telemetri, ingen analys, inga konton.",
+  "aboutNoTelemetry": "Ingen telemetri, ingen analys, inga konton, ingen Gabbro-server. Gabbro gör inga nätverksanslutningar alls — såvida du inte slår på app-passkeys: då är den enda anslutningen en hämtning per app-inloggning, webbplatsens egen appverifieringsfil.",
 
   "strengthTierTerrible": "Fruktansvärt",
   "strengthTierWeak": "Svagt",
@@ -923,5 +924,18 @@
   "hintSearch": "Filtrerar posterna medan du skriver",
   "hintFolderSelector": "Filtrerar posterna efter mapp",
   "hintFilterChip": "Slår på eller av det här kategorifiltret",
-  "hintEntryRow": "Öppnar den här posten"
+  "hintEntryRow": "Öppnar den här posten",
+  "entryTypePasskey": "Passkey",
+  "passkeyHintModuleMissing": "Passkeys är inaktiva: kärnmodulen uhid är inte laddad. Se stegen för passkey-konfiguration i README.",
+  "passkeyHintNoAccess": "Passkeys är inaktiva: Gabbro har inte åtkomst till /dev/uhid (udev-regel saknas). Se stegen för passkey-konfiguration i README.",
+  "passkeyHintOther": "Passkeys är inaktiva: den virtuella säkerhetsnyckeln kunde inte starta. Se stegen för passkey-konfiguration i README.",
+  "passkeyHintDontShowAgain": "Visa inte igen",
+  "sectionAppPasskeys": "App-passkeys",
+  "appPasskeysDescription": "Låt Android-appar logga in med passkeys. Varje inloggning gör en enda nätverksförfrågan: den hämtar webbplatsens egen appverifieringsfil för att kontrollera att appen är äkta. Gabbro upprättar aldrig någon annan nätverksanslutning — se ”Verify no telemetry” i README.",
+  "appPasskeysTitle": "Tillåt app-passkeys",
+  "appPasskeysNote": "När av, eller när nätverksåtkomst nekas, avvisas bara app-inloggningar — passkeys i webbläsare använder aldrig nätverket.",
+  "passkeyCreatePrompt": "Vill du skapa en passkey för {site}?",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "Vill du logga in på {site} med din passkey?",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }

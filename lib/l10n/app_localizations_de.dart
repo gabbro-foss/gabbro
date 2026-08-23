@@ -105,6 +105,45 @@ class AppLocalizationsDe extends AppLocalizations {
       'Keine gespeicherte Anmeldung passt zu dieser App oder Website.';
 
   @override
+  String passkeyCreatePrompt(String site) {
+    return 'Passkey für $site erstellen?';
+  }
+
+  @override
+  String passkeySignInPrompt(String site) {
+    return 'Mit Ihrem Passkey bei $site anmelden?';
+  }
+
+  @override
+  String get passkeyHintModuleMissing =>
+      'Passkeys sind inaktiv: das Kernelmodul uhid ist nicht geladen. Siehe die Passkey-Einrichtungsschritte im README.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkeys sind inaktiv: Gabbro hat keinen Zugriff auf /dev/uhid (udev-Regel fehlt). Siehe die Passkey-Einrichtungsschritte im README.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkeys sind inaktiv: der virtuelle Sicherheitsschlüssel konnte nicht starten. Siehe die Passkey-Einrichtungsschritte im README.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Nicht mehr anzeigen';
+
+  @override
+  String get sectionAppPasskeys => 'App-Passkeys';
+
+  @override
+  String get appPasskeysDescription =>
+      'Android-Apps die Anmeldung mit Passkeys erlauben. Jede Anmeldung stellt genau eine Netzwerkanfrage: Sie ruft die App-Verifizierungsdatei der Website selbst ab und prüft, ob die App echt ist. Sonst stellt Gabbro niemals eine Netzwerkverbindung her — siehe „Verify no telemetry“ im README.';
+
+  @override
+  String get appPasskeysTitle => 'App-Passkeys erlauben';
+
+  @override
+  String get appPasskeysNote =>
+      'Wenn ausgeschaltet oder der Netzwerkzugriff verweigert ist, werden nur App-Anmeldungen abgelehnt — Passkeys im Browser nutzen das Netzwerk nie.';
+
+  @override
   String get add => 'Hinzufügen';
 
   @override
@@ -668,6 +707,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get entryTypeCustom => 'Benutzerdefiniert';
 
   @override
+  String get entryTypePasskey => 'Passkey';
+
+  @override
   String errorPrefix(String error) {
     return 'Fehler: $error';
   }
@@ -1080,6 +1122,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get fieldUsername => 'Benutzername (optional)';
+
+  @override
+  String get passkeyFieldUsername => 'Benutzername';
 
   @override
   String get fieldPassword => 'Passwort';
@@ -1512,7 +1557,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro stellt keine ausgehenden Netzwerkverbindungen her. Keine Telemetrie, keine Analysen, keine Konten.';
+      'Keine Telemetrie, keine Analysen, keine Konten, kein Gabbro-Server. Gabbro stellt überhaupt keine Netzwerkverbindung her — außer Sie schalten App-Passkeys ein: dann ist die einzige Verbindung je ein Abruf pro App-Anmeldung, die App-Verifizierungsdatei der jeweiligen Website.';
 
   @override
   String get strengthTierTerrible => 'Schrecklich';

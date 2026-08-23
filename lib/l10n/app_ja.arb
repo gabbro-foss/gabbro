@@ -434,6 +434,7 @@
   "fieldAndroidAppId": "Android アプリ ID（任意）",
   "fieldAndroidAppIdHelper": "このログイン情報を Android アプリで自動入力します。完全一致のみが機能します。ID はアプリの Play Store リンクの id= の後にあります（例: id=com.company.app）。",
   "fieldUsername": "ユーザー名 (任意)",
+  "passkeyFieldUsername": "ユーザー名",
   "fieldPassword": "パスワード",
   "fieldSeparator": "区切り文字",
   "fieldFolder": "フォルダ",
@@ -649,7 +650,7 @@
   "aboutLicenceBody": "GabbroはGNU General Public License v3.0 only (GPL-3.0-only)の下でライセンスされたフリーのオープンソースソフトウェアです。\n\nライセンスの条件の下で、このアプリケーションを使用、研究、配布する自由があります。",
   "aboutOwnerRole": "プロジェクトオーナー、アーキテクト、主要開発者:",
   "aboutAiPartner": "AI開発パートナー:",
-  "aboutNoTelemetry": "Gabbroは外部ネットワーク接続を行いません。テレメトリー、分析、アカウントなし。",
+  "aboutNoTelemetry": "テレメトリー、分析、アカウント、Gabbro サーバーなし。Gabbro はネットワーク接続を一切行いません。ただしアプリのパスキーをオンにした場合のみ、ログインごとに 1 回、サイト自身のアプリ検証ファイルを取得します。",
 
   "strengthTierTerrible": "非常に弱い",
   "strengthTierWeak": "弱い",
@@ -922,5 +923,18 @@
   "hintSearch": "入力するとエントリを絞り込みます",
   "hintFolderSelector": "フォルダでエントリを絞り込みます",
   "hintFilterChip": "このカテゴリフィルターのオンとオフを切り替えます",
-  "hintEntryRow": "このエントリを開きます"
+  "hintEntryRow": "このエントリを開きます",
+  "entryTypePasskey": "パスキー",
+  "passkeyHintModuleMissing": "パスキーは無効です。カーネルモジュール uhid が読み込まれていません。README のパスキー設定手順をご覧ください。",
+  "passkeyHintNoAccess": "パスキーは無効です。Gabbro が /dev/uhid にアクセスできません（udev ルールがありません）。README のパスキー設定手順をご覧ください。",
+  "passkeyHintOther": "パスキーは無効です。仮想セキュリティキーを起動できませんでした。README のパスキー設定手順をご覧ください。",
+  "passkeyHintDontShowAgain": "今後表示しない",
+  "sectionAppPasskeys": "アプリのパスキー",
+  "appPasskeysDescription": "Android アプリでのパスキーによるサインインを許可します。サインインのたびにネットワークリクエストを 1 回だけ行い、サイト自身のアプリ検証ファイルを取得してアプリが本物か確認します。Gabbro がそれ以外にネットワーク接続を行うことは一切ありません。README の「Verify no telemetry」をご覧ください。",
+  "appPasskeysTitle": "アプリのパスキーを許可",
+  "appPasskeysNote": "オフのとき、またはネットワークアクセスが拒否されているときは、アプリからのサインインだけが拒否されます。ブラウザーのパスキーはネットワークを一切使いません。",
+  "passkeyCreatePrompt": "{site} のパスキーを作成しますか？",
+  "@passkeyCreatePrompt": {"placeholders": {"site": {"type": "String"}}},
+  "passkeySignInPrompt": "パスキーで {site} にログインしますか？",
+  "@passkeySignInPrompt": {"placeholders": {"site": {"type": "String"}}}
 }
