@@ -94,9 +94,9 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2448 | 10 |
+| Flutter (`flutter test`) | 2464 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 17 | 0 |
-| Android (`./gradlew :app:testDebugUnitTest`) | 173 | 15 |
+| Android (`./gradlew :app:testDebugUnitTest`) | 178 | 15 |
 
 **Real-FFI suites run under plain `dart test`, never `flutter drive` (non-negotiable):** they test
 Dart -> FFI -> crypto -> disk, touch no UI, and so need no window. Needs the release cdylib (debug
@@ -171,12 +171,15 @@ resolved but never applied — inert, emits no warning.
               over `app.gabbro.gabbro/app_passkeys` on toggle change +
               app start (drift heal); `AppPasskeysStore.kt` persists it
               (absent = OFF); channel-mock + Robolectric tests green
-        - [ ] (5) Kotlin: toggle OFF or flag absent -> app refused
-              BEFORE any fetch (injected fetch must not be called);
-              browser path toggle-independent
-        - [ ] (6) Kotlin: toggle ON -> VerifiedApp path fetches
-        - [ ] (7) About screen: sharper descriptor; l10n all 37
-        - [ ] (8) manifest INTERNET permission + build-config net
+        - [x] (5) Kotlin: toggle OFF or flag absent -> app refused
+              BEFORE any fetch; browser path toggle-independent
+        - [x] (6) Kotlin: toggle ON -> VerifiedApp path fetches
+              (`decideCaller` takes `appPasskeysEnabled`, no default —
+              every caller must decide)
+        - [x] (7) About screen: sharper descriptor (names the one
+              exception + no Gabbro server); l10n all 37
+        - [x] (8) manifest INTERNET permission (declared once, F1
+              comment) + build-config net
         - [ ] (9) S23 hardware pass: real native-app passkey login
   - [ ] browser-list refresh at release (F5, Android only): the vendored
         `passkey_privileged_browsers.json` ages — browsers released or
