@@ -128,6 +128,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get passkeyHintDontShowAgain => 'Don\'t show again';
 
   @override
+  String get sectionAppPasskeys => 'App passkeys';
+
+  @override
+  String get appPasskeysDescription =>
+      'Let Android apps sign in with passkeys. Each login makes one network request: it fetches the site\'s own app-verification file to check the app is genuine. Gabbro makes no other network connection, ever — see \"Verify no telemetry\" in the README.';
+
+  @override
+  String get appPasskeysTitle => 'Allow app passkeys';
+
+  @override
+  String get appPasskeysNote =>
+      'When off, or when network access is denied, only app sign-ins refuse — passkeys in browsers never use the network.';
+
+  @override
   String get add => 'Add';
 
   @override

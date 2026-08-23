@@ -129,6 +129,20 @@ class AppLocalizationsCs extends AppLocalizations {
   String get passkeyHintDontShowAgain => 'Znovu nezobrazovat';
 
   @override
+  String get sectionAppPasskeys => 'Passkey pro aplikace';
+
+  @override
+  String get appPasskeysDescription =>
+      'Povolte aplikacím pro Android přihlašování pomocí passkey. Každé přihlášení provede jediný síťový požadavek: stáhne ověřovací soubor aplikací přímo z daného webu a ověří, že je aplikace pravá. Žádné jiné síťové připojení Gabbro nikdy nenavazuje — viz „Verify no telemetry“ v README.';
+
+  @override
+  String get appPasskeysTitle => 'Povolit passkey pro aplikace';
+
+  @override
+  String get appPasskeysNote =>
+      'Pokud je vypnuto nebo je odepřen přístup k síti, odmítají se pouze přihlášení z aplikací — passkey v prohlížečích síť nikdy nepoužívají.';
+
+  @override
   String get add => 'Přidat';
 
   @override

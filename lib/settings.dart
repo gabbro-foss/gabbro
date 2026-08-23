@@ -31,6 +31,12 @@ class AppSettings {
   /// every launch.
   final bool passkeyHintDismissed;
 
+  /// Allow native Android apps to use passkeys (F1). Needs one network fetch
+  /// per login (the site's own assetlinks.json); OFF by default because
+  /// Android grants INTERNET silently — this toggle is the informed opt-in.
+  /// Android-only; ignored on Linux.
+  final bool appPasskeys;
+
   /// Persisted SAF tree URI of the Android `.gabbro` export destination folder
   /// (`content://…/tree/…`). Empty until the user picks a folder. Lets export
   /// remember the sync folder across runs instead of re-picking each time.
@@ -50,6 +56,7 @@ class AppSettings {
     this.language = LanguageChoice.system,
     this.tabletListPaneWidth = 260.0,
     this.passkeyHintDismissed = false,
+    this.appPasskeys = false,
     this.androidExportFolderUri = '',
   });
 
@@ -70,6 +77,7 @@ class AppSettings {
     'language': language.name,
     'tablet_list_pane_width': tabletListPaneWidth,
     'passkey_hint_dismissed': passkeyHintDismissed,
+    'app_passkeys': appPasskeys,
     'android_export_folder_uri': androidExportFolderUri,
   };
 
@@ -102,6 +110,7 @@ class AppSettings {
               .clamp(180.0, 900.0) ??
           260.0,
       passkeyHintDismissed: json['passkey_hint_dismissed'] as bool? ?? false,
+      appPasskeys: json['app_passkeys'] as bool? ?? false,
       androidExportFolderUri: json['android_export_folder_uri'] as String? ?? '',
     );
   }
@@ -156,6 +165,7 @@ class AppSettings {
     LanguageChoice? language,
     double? tabletListPaneWidth,
     bool? passkeyHintDismissed,
+    bool? appPasskeys,
     String? androidExportFolderUri,
   }) => AppSettings(
     theme: theme ?? this.theme,
@@ -170,6 +180,7 @@ class AppSettings {
     language: language ?? this.language,
     tabletListPaneWidth: tabletListPaneWidth ?? this.tabletListPaneWidth,
     passkeyHintDismissed: passkeyHintDismissed ?? this.passkeyHintDismissed,
+    appPasskeys: appPasskeys ?? this.appPasskeys,
     androidExportFolderUri:
         androidExportFolderUri ?? this.androidExportFolderUri,
   );
@@ -260,6 +271,12 @@ class AppSettings {
   // again"). Linux only.
   // Options: true | false
   "passkey_hint_dismissed": $passkeyHintDismissed,
+
+  // Let native Android apps use passkeys. Each login fetches that site's own
+  // assetlinks.json to verify the app — the only network call Gabbro can make
+  // (see README, "Verify no telemetry"). Android only.
+  // Options: true | false
+  "app_passkeys": $appPasskeys,
 
   // Android export destination folder (SAF tree URI). Set automatically when you
   // pick an export folder; remembered so exports go straight there. Android only.

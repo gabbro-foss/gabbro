@@ -126,6 +126,20 @@ class AppLocalizationsJa extends AppLocalizations {
   String get passkeyHintDontShowAgain => '今後表示しない';
 
   @override
+  String get sectionAppPasskeys => 'アプリのパスキー';
+
+  @override
+  String get appPasskeysDescription =>
+      'Android アプリでのパスキーによるサインインを許可します。サインインのたびにネットワークリクエストを 1 回だけ行い、サイト自身のアプリ検証ファイルを取得してアプリが本物か確認します。Gabbro がそれ以外にネットワーク接続を行うことは一切ありません。README の「Verify no telemetry」をご覧ください。';
+
+  @override
+  String get appPasskeysTitle => 'アプリのパスキーを許可';
+
+  @override
+  String get appPasskeysNote =>
+      'オフのとき、またはネットワークアクセスが拒否されているときは、アプリからのサインインだけが拒否されます。ブラウザーのパスキーはネットワークを一切使いません。';
+
+  @override
   String get add => '追加';
 
   @override

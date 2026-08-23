@@ -129,6 +129,20 @@ class AppLocalizationsIt extends AppLocalizations {
   String get passkeyHintDontShowAgain => 'Non mostrare più';
 
   @override
+  String get sectionAppPasskeys => 'Passkey delle app';
+
+  @override
+  String get appPasskeysDescription =>
+      'Consenti alle app Android di accedere con le passkey. Ogni accesso effettua una sola richiesta di rete: scarica il file di verifica delle app del sito stesso per controllare che l\'app sia autentica. Gabbro non stabilisce mai nessun\'altra connessione di rete — vedi «Verify no telemetry» nel README.';
+
+  @override
+  String get appPasskeysTitle => 'Consenti passkey delle app';
+
+  @override
+  String get appPasskeysNote =>
+      'Se disattivato, o se l\'accesso alla rete è negato, vengono rifiutati solo gli accessi dalle app — le passkey nei browser non usano mai la rete.';
+
+  @override
   String get add => 'Aggiungi';
 
   @override

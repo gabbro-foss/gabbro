@@ -129,6 +129,20 @@ class AppLocalizationsYo extends AppLocalizations {
   String get passkeyHintDontShowAgain => 'Má fi hàn mọ́';
 
   @override
+  String get sectionAppPasskeys => 'Passkey àwọn àppù';
+
+  @override
+  String get appPasskeysDescription =>
+      'Jẹ́ kí àwọn àppù Android wọlé pẹ̀lú passkey. Ìwọlé kọ̀ọ̀kan ń ṣe ìbéèrè nẹ́tíwọ̀ọ̀kì kan ṣoṣo: ó ń gba fáìlì ìfẹ̀rí àppù ti sáìtì fúnra rẹ̀ láti ṣàyẹ̀wò pé àppù náà jẹ́ gidi. Gabbro kì í ṣe ìsopọ̀ nẹ́tíwọ̀ọ̀kì mìíràn láé — wo “Verify no telemetry” nínú README.';
+
+  @override
+  String get appPasskeysTitle => 'Gba passkey àwọn àppù láàyè';
+
+  @override
+  String get appPasskeysNote =>
+      'Nígbà tí ó bá wà ní pípa, tàbí tí a kọ̀ ààyè nẹ́tíwọ̀ọ̀kì, ìwọlé àwọn àppù nìkan ni a ń kọ̀ — passkey nínú àwọn aṣàwákiri kì í lo nẹ́tíwọ̀ọ̀kì láé.';
+
+  @override
   String get add => 'Fi kun';
 
   @override

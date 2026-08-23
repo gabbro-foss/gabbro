@@ -129,6 +129,20 @@ class AppLocalizationsEs extends AppLocalizations {
   String get passkeyHintDontShowAgain => 'No mostrar de nuevo';
 
   @override
+  String get sectionAppPasskeys => 'Passkeys de aplicaciones';
+
+  @override
+  String get appPasskeysDescription =>
+      'Permite que las aplicaciones Android inicien sesión con passkeys. Cada inicio de sesión hace una sola petición de red: descarga el archivo de verificación de aplicaciones del propio sitio para comprobar que la aplicación es auténtica. Gabbro nunca establece ninguna otra conexión de red — consulta «Verify no telemetry» en el README.';
+
+  @override
+  String get appPasskeysTitle => 'Permitir passkeys de aplicaciones';
+
+  @override
+  String get appPasskeysNote =>
+      'Si está desactivado, o si se deniega el acceso a la red, solo se rechazan los inicios de sesión de aplicaciones — las passkeys en navegadores nunca usan la red.';
+
+  @override
   String get add => 'Añadir';
 
   @override

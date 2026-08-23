@@ -130,6 +130,20 @@ class AppLocalizationsDe extends AppLocalizations {
   String get passkeyHintDontShowAgain => 'Nicht mehr anzeigen';
 
   @override
+  String get sectionAppPasskeys => 'App-Passkeys';
+
+  @override
+  String get appPasskeysDescription =>
+      'Android-Apps die Anmeldung mit Passkeys erlauben. Jede Anmeldung stellt genau eine Netzwerkanfrage: Sie ruft die App-Verifizierungsdatei der Website selbst ab und prüft, ob die App echt ist. Sonst stellt Gabbro niemals eine Netzwerkverbindung her — siehe „Verify no telemetry“ im README.';
+
+  @override
+  String get appPasskeysTitle => 'App-Passkeys erlauben';
+
+  @override
+  String get appPasskeysNote =>
+      'Wenn ausgeschaltet oder der Netzwerkzugriff verweigert ist, werden nur App-Anmeldungen abgelehnt — Passkeys im Browser nutzen das Netzwerk nie.';
+
+  @override
   String get add => 'Hinzufügen';
 
   @override

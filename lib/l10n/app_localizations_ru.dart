@@ -129,6 +129,20 @@ class AppLocalizationsRu extends AppLocalizations {
   String get passkeyHintDontShowAgain => 'Больше не показывать';
 
   @override
+  String get sectionAppPasskeys => 'Passkey приложений';
+
+  @override
+  String get appPasskeysDescription =>
+      'Разрешить приложениям Android входить по passkey. Каждый вход делает один сетевой запрос: загружается файл проверки приложений с самого сайта, чтобы убедиться, что приложение подлинное. Никаких других сетевых подключений Gabbro никогда не устанавливает — см. «Verify no telemetry» в README.';
+
+  @override
+  String get appPasskeysTitle => 'Разрешить passkey приложений';
+
+  @override
+  String get appPasskeysNote =>
+      'Когда выключено или доступ к сети запрещён, отклоняются только входы из приложений — passkey в браузерах никогда не используют сеть.';
+
+  @override
   String get add => 'Добавить';
 
   @override

@@ -126,6 +126,20 @@ class AppLocalizationsKo extends AppLocalizations {
   String get passkeyHintDontShowAgain => '다시 표시하지 않음';
 
   @override
+  String get sectionAppPasskeys => '앱 패스키';
+
+  @override
+  String get appPasskeysDescription =>
+      'Android 앱이 패스키로 로그인하도록 허용합니다. 로그인할 때마다 네트워크 요청을 한 번만 보내 사이트 자체의 앱 확인 파일을 가져와 앱이 진짜인지 확인합니다. Gabbro는 그 외에는 어떤 네트워크 연결도 하지 않습니다. README의 “Verify no telemetry”를 참조하세요.';
+
+  @override
+  String get appPasskeysTitle => '앱 패스키 허용';
+
+  @override
+  String get appPasskeysNote =>
+      '꺼져 있거나 네트워크 접근이 거부되면 앱 로그인만 거부됩니다. 브라우저의 패스키는 네트워크를 전혀 사용하지 않습니다.';
+
+  @override
   String get add => '추가';
 
   @override

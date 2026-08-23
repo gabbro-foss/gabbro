@@ -129,6 +129,20 @@ class AppLocalizationsEu extends AppLocalizations {
   String get passkeyHintDontShowAgain => 'Ez erakutsi berriro';
 
   @override
+  String get sectionAppPasskeys => 'Aplikazioen passkeyak';
+
+  @override
+  String get appPasskeysDescription =>
+      'Baimendu Android aplikazioei passkeyekin saioa hastea. Saio-hasiera bakoitzak sareko eskaera bakarra egiten du: gunearen beraren aplikazioak egiaztatzeko fitxategia deskargatzen du, aplikazioa benetakoa dela egiaztatzeko. Gabbrok ez du inoiz beste sare-konexiorik egiten — ikusi «Verify no telemetry» README fitxategian.';
+
+  @override
+  String get appPasskeysTitle => 'Baimendu aplikazioen passkeyak';
+
+  @override
+  String get appPasskeysNote =>
+      'Desaktibatuta dagoenean, edo sarerako sarbidea ukatuta dagoenean, aplikazioetako saio-hasierak bakarrik ukatzen dira — nabigatzaileetako passkeyek ez dute inoiz sarea erabiltzen.';
+
+  @override
   String get add => 'Gehitu';
 
   @override

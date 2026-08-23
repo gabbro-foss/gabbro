@@ -129,6 +129,20 @@ class AppLocalizationsLv extends AppLocalizations {
   String get passkeyHintDontShowAgain => 'Vairs nerādīt';
 
   @override
+  String get sectionAppPasskeys => 'Lietotņu passkey';
+
+  @override
+  String get appPasskeysDescription =>
+      'Atļaut Android lietotnēm pierakstīties ar passkey. Katra pierakstīšanās veic vienu tīkla pieprasījumu: lejupielādē pašas vietnes lietotņu pārbaudes failu, lai pārliecinātos, ka lietotne ir īsta. Nekādu citu tīkla savienojumu Gabbro nekad neveido — skatiet „Verify no telemetry” README failā.';
+
+  @override
+  String get appPasskeysTitle => 'Atļaut lietotņu passkey';
+
+  @override
+  String get appPasskeysNote =>
+      'Kad izslēgts vai tīkla piekļuve liegta, tiek noraidītas tikai lietotņu pierakstīšanās — passkey pārlūkos tīklu nekad neizmanto.';
+
+  @override
   String get add => 'Pievienot';
 
   @override

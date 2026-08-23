@@ -96,6 +96,22 @@
   "@passkeyHintDontShowAgain": {
     "description": "Banner action that permanently hides the passkey hint (persisted in settings)."
   },
+  "sectionAppPasskeys": "App passkeys",
+  "@sectionAppPasskeys": {
+    "description": "Security-screen section header for the Android app-passkey toggle (F1)."
+  },
+  "appPasskeysDescription": "Let Android apps sign in with passkeys. Each login makes one network request: it fetches the site's own app-verification file to check the app is genuine. Gabbro makes no other network connection, ever — see \"Verify no telemetry\" in the README.",
+  "@appPasskeysDescription": {
+    "description": "Explains the app-passkey toggle: what it does and the single network fetch it needs. Must keep the English README section name \"Verify no telemetry\" verbatim."
+  },
+  "appPasskeysTitle": "Allow app passkeys",
+  "@appPasskeysTitle": {
+    "description": "Label of the app-passkey switch on the security screen."
+  },
+  "appPasskeysNote": "When off, or when network access is denied, only app sign-ins refuse — passkeys in browsers never use the network.",
+  "@appPasskeysNote": {
+    "description": "Small note under the app-passkey switch describing the off/denied behaviour."
+  },
   "add": "Add",
   "remove": "Remove",
   "rename": "Rename",

@@ -129,6 +129,20 @@ class AppLocalizationsHu extends AppLocalizations {
   String get passkeyHintDontShowAgain => 'Ne jelenjen meg többé';
 
   @override
+  String get sectionAppPasskeys => 'Alkalmazás-passkey-k';
+
+  @override
+  String get appPasskeysDescription =>
+      'Engedélyezze az Android-alkalmazásoknak a passkey-es bejelentkezést. Minden bejelentkezés egyetlen hálózati kérést tesz: letölti az adott webhely saját alkalmazás-ellenőrző fájlját, és ellenőrzi, hogy az alkalmazás valódi-e. A Gabbro soha nem létesít más hálózati kapcsolatot — lásd a „Verify no telemetry” részt a README-ben.';
+
+  @override
+  String get appPasskeysTitle => 'Alkalmazás-passkey-k engedélyezése';
+
+  @override
+  String get appPasskeysNote =>
+      'Kikapcsolva, vagy megtagadott hálózati hozzáférés esetén csak az alkalmazásokból való bejelentkezések utasítódnak el — a böngészőbeli passkey-k soha nem használják a hálózatot.';
+
+  @override
   String get add => 'Hozzáadás';
 
   @override

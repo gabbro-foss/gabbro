@@ -129,6 +129,20 @@ class AppLocalizationsLt extends AppLocalizations {
   String get passkeyHintDontShowAgain => 'Daugiau nerodyti';
 
   @override
+  String get sectionAppPasskeys => 'Programėlių passkey';
+
+  @override
+  String get appPasskeysDescription =>
+      'Leisti Android programėlėms prisijungti su passkey. Kiekvienas prisijungimas atlieka vieną tinklo užklausą: atsisiunčia pačios svetainės programėlių patikros failą ir patikrina, ar programėlė tikra. Jokio kito tinklo ryšio Gabbro niekada neužmezga — žr. „Verify no telemetry“ README faile.';
+
+  @override
+  String get appPasskeysTitle => 'Leisti programėlių passkey';
+
+  @override
+  String get appPasskeysNote =>
+      'Kai išjungta arba tinklo prieiga uždrausta, atmetami tik programėlių prisijungimai — naršyklių passkey tinklo niekada nenaudoja.';
+
+  @override
   String get add => 'Pridėti';
 
   @override

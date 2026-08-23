@@ -321,6 +321,44 @@ void main() {
     });
   });
 
+  // ── appPasskeys ───────────────────────────────────────────────────────────
+
+  group('appPasskeys', () {
+    // Informed opt-in for native-app passkeys (F1): Android grants INTERNET
+    // silently, so this in-app toggle is the only ask the user ever gets.
+    test('defaults to false', () {
+      final s = AppSettings.fromJson({});
+      expect(s.appPasskeys, isFalse);
+    });
+
+    test('round-trips true through fromJson', () {
+      final s = AppSettings.fromJson({'app_passkeys': true});
+      expect(s.appPasskeys, isTrue);
+    });
+
+    test('serialises to toJson', () {
+      const s = AppSettings(appPasskeys: true);
+      expect(s.toJson()['app_passkeys'], isTrue);
+    });
+
+    test('survives the generated jsonc', () {
+      const s = AppSettings(appPasskeys: true);
+      final stripped = AppSettings.stripCommentsForTest(s.toJsoncForTest());
+      final reloaded = AppSettings.fromJson(
+        jsonDecode(stripped) as Map<String, dynamic>,
+      );
+      expect(reloaded.appPasskeys, isTrue);
+    });
+
+    test('copyWith overrides appPasskeys only', () {
+      const original = AppSettings();
+      final updated = original.copyWith(appPasskeys: true);
+      expect(updated.appPasskeys, isTrue);
+      expect(updated.theme, original.theme);
+      expect(updated.passkeyHintDismissed, original.passkeyHintDismissed);
+    });
+  });
+
   // ── show_vault_list removed (ADR-014) ─────────────────────────────────────
 
   group('show_vault_list removed (ADR-014)', () {

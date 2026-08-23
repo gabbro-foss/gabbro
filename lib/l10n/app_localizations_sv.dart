@@ -129,6 +129,20 @@ class AppLocalizationsSv extends AppLocalizations {
   String get passkeyHintDontShowAgain => 'Visa inte igen';
 
   @override
+  String get sectionAppPasskeys => 'App-passkeys';
+
+  @override
+  String get appPasskeysDescription =>
+      'Låt Android-appar logga in med passkeys. Varje inloggning gör en enda nätverksförfrågan: den hämtar webbplatsens egen appverifieringsfil för att kontrollera att appen är äkta. Gabbro upprättar aldrig någon annan nätverksanslutning — se ”Verify no telemetry” i README.';
+
+  @override
+  String get appPasskeysTitle => 'Tillåt app-passkeys';
+
+  @override
+  String get appPasskeysNote =>
+      'När av, eller när nätverksåtkomst nekas, avvisas bara app-inloggningar — passkeys i webbläsare använder aldrig nätverket.';
+
+  @override
   String get add => 'Lägg till';
 
   @override

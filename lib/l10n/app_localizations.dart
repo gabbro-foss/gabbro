@@ -379,6 +379,30 @@ abstract class AppLocalizations {
   /// **'Don\'t show again'**
   String get passkeyHintDontShowAgain;
 
+  /// Security-screen section header for the Android app-passkey toggle (F1).
+  ///
+  /// In en, this message translates to:
+  /// **'App passkeys'**
+  String get sectionAppPasskeys;
+
+  /// Explains the app-passkey toggle: what it does and the single network fetch it needs. Must keep the English README section name "Verify no telemetry" verbatim.
+  ///
+  /// In en, this message translates to:
+  /// **'Let Android apps sign in with passkeys. Each login makes one network request: it fetches the site\'s own app-verification file to check the app is genuine. Gabbro makes no other network connection, ever — see \"Verify no telemetry\" in the README.'**
+  String get appPasskeysDescription;
+
+  /// Label of the app-passkey switch on the security screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow app passkeys'**
+  String get appPasskeysTitle;
+
+  /// Small note under the app-passkey switch describing the off/denied behaviour.
+  ///
+  /// In en, this message translates to:
+  /// **'When off, or when network access is denied, only app sign-ins refuse — passkeys in browsers never use the network.'**
+  String get appPasskeysNote;
+
   /// No description provided for @add.
   ///
   /// In en, this message translates to:

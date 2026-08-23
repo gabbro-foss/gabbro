@@ -129,6 +129,20 @@ class AppLocalizationsSr extends AppLocalizations {
   String get passkeyHintDontShowAgain => 'Не приказуј поново';
 
   @override
+  String get sectionAppPasskeys => 'Passkey за апликације';
+
+  @override
+  String get appPasskeysDescription =>
+      'Дозволите Android апликацијама пријаву помоћу passkey. Свака пријава прави један мрежни захтев: преузима датотеку за проверу апликација са самог сајта да провери да је апликација изворна. Gabbro никада не успоставља ниједну другу мрежну везу — погледајте „Verify no telemetry“ у README.';
+
+  @override
+  String get appPasskeysTitle => 'Дозволи passkey за апликације';
+
+  @override
+  String get appPasskeysNote =>
+      'Када је искључено, или када је мрежни приступ ускраћен, одбијају се само пријаве из апликација — passkey у прегледачима никада не користе мрежу.';
+
+  @override
   String get add => 'Додај';
 
   @override
@@ -2370,6 +2384,20 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get passkeyHintDontShowAgain => 'Ne prikazuj ponovo';
+
+  @override
+  String get sectionAppPasskeys => 'Passkey za aplikacije';
+
+  @override
+  String get appPasskeysDescription =>
+      'Dozvolite Android aplikacijama prijavu pomoću passkey. Svaka prijava pravi jedan mrežni zahtev: preuzima datoteku za proveru aplikacija sa samog sajta da proveri da je aplikacija izvorna. Gabbro nikada ne uspostavlja nijednu drugu mrežnu vezu — pogledajte „Verify no telemetry“ u README.';
+
+  @override
+  String get appPasskeysTitle => 'Dozvoli passkey za aplikacije';
+
+  @override
+  String get appPasskeysNote =>
+      'Kada je isključeno, ili kada je mrežni pristup uskraćen, odbijaju se samo prijave iz aplikacija — passkey u pregledačima nikada ne koriste mrežu.';
 
   @override
   String get add => 'Dodaj';

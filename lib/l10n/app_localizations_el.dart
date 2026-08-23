@@ -130,6 +130,20 @@ class AppLocalizationsEl extends AppLocalizations {
   String get passkeyHintDontShowAgain => 'Να μην εμφανιστεί ξανά';
 
   @override
+  String get sectionAppPasskeys => 'Passkey εφαρμογών';
+
+  @override
+  String get appPasskeysDescription =>
+      'Επιτρέψτε σε εφαρμογές Android να συνδέονται με passkey. Κάθε σύνδεση κάνει ένα μόνο αίτημα δικτύου: κατεβάζει το αρχείο επαλήθευσης εφαρμογών του ίδιου του ιστότοπου για να ελέγξει ότι η εφαρμογή είναι γνήσια. Το Gabbro δεν κάνει ποτέ άλλη σύνδεση δικτύου — δείτε «Verify no telemetry» στο README.';
+
+  @override
+  String get appPasskeysTitle => 'Να επιτρέπονται passkey εφαρμογών';
+
+  @override
+  String get appPasskeysNote =>
+      'Όταν είναι ανενεργό, ή όταν η πρόσβαση δικτύου απορρίπτεται, απορρίπτονται μόνο οι συνδέσεις εφαρμογών — τα passkey στα προγράμματα περιήγησης δεν χρησιμοποιούν ποτέ το δίκτυο.';
+
+  @override
   String get add => 'Προσθήκη';
 
   @override

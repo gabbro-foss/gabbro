@@ -129,6 +129,20 @@ class AppLocalizationsSl extends AppLocalizations {
   String get passkeyHintDontShowAgain => 'Ne prikaži več';
 
   @override
+  String get sectionAppPasskeys => 'Passkey za aplikacije';
+
+  @override
+  String get appPasskeysDescription =>
+      'Dovolite aplikacijam Android prijavo s passkey. Vsaka prijava naredi eno samo omrežno zahtevo: prenese datoteko za preverjanje aplikacij s samega spletnega mesta in preveri, da je aplikacija pristna. Nobene druge omrežne povezave Gabbro nikoli ne vzpostavi — glejte „Verify no telemetry“ v README.';
+
+  @override
+  String get appPasskeysTitle => 'Dovoli passkey za aplikacije';
+
+  @override
+  String get appPasskeysNote =>
+      'Ko je izklopljeno, ali ko je omrežni dostop zavrnjen, se zavrnejo samo prijave iz aplikacij — passkey v brskalnikih nikoli ne uporabljajo omrežja.';
+
+  @override
   String get add => 'Dodaj';
 
   @override

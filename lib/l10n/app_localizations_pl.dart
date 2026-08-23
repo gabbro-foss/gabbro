@@ -129,6 +129,20 @@ class AppLocalizationsPl extends AppLocalizations {
   String get passkeyHintDontShowAgain => 'Nie pokazuj ponownie';
 
   @override
+  String get sectionAppPasskeys => 'Passkey aplikacji';
+
+  @override
+  String get appPasskeysDescription =>
+      'Pozwól aplikacjom Android logować się passkey. Każde logowanie wykonuje jedno żądanie sieciowe: pobiera plik weryfikacji aplikacji z samej witryny, aby sprawdzić, że aplikacja jest autentyczna. Poza tym Gabbro nigdy nie nawiązuje żadnego połączenia sieciowego — zobacz „Verify no telemetry” w README.';
+
+  @override
+  String get appPasskeysTitle => 'Zezwól na passkey aplikacji';
+
+  @override
+  String get appPasskeysNote =>
+      'Gdy wyłączone, lub gdy dostęp do sieci jest odmówiony, odrzucane są tylko logowania z aplikacji — passkey w przeglądarkach nigdy nie używają sieci.';
+
+  @override
   String get add => 'Dodaj';
 
   @override

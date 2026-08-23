@@ -129,6 +129,20 @@ class AppLocalizationsEt extends AppLocalizations {
   String get passkeyHintDontShowAgain => 'Ära enam näita';
 
   @override
+  String get sectionAppPasskeys => 'Rakenduste passkey-d';
+
+  @override
+  String get appPasskeysDescription =>
+      'Luba Android-rakendustel passkey-dega sisse logida. Iga sisselogimine teeb ühe võrgupäringu: laadib saidi enda rakenduste kontrollifaili, et veenduda rakenduse ehtsuses. Muid võrguühendusi Gabbro kunagi ei loo — vaata „Verify no telemetry“ README failis.';
+
+  @override
+  String get appPasskeysTitle => 'Luba rakenduste passkey-d';
+
+  @override
+  String get appPasskeysNote =>
+      'Kui väljas või võrgujuurdepääs on keelatud, keeldutakse ainult rakenduste sisselogimistest — brauserite passkey-d võrku kunagi ei kasuta.';
+
+  @override
   String get add => 'Lisa';
 
   @override

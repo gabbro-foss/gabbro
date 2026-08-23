@@ -123,6 +123,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get passkeyHintDontShowAgain => '不再显示';
 
   @override
+  String get sectionAppPasskeys => '应用通行密钥';
+
+  @override
+  String get appPasskeysDescription =>
+      '允许 Android 应用使用通行密钥登录。每次登录只发出一次网络请求：从该网站本身获取其应用验证文件，以确认应用是正版。除此之外 Gabbro 绝不进行任何网络连接——参阅 README 中的“Verify no telemetry”。';
+
+  @override
+  String get appPasskeysTitle => '允许应用通行密钥';
+
+  @override
+  String get appPasskeysNote => '关闭时，或网络访问被拒绝时，仅应用登录会被拒绝——浏览器中的通行密钥从不使用网络。';
+
+  @override
   String get add => '添加';
 
   @override
@@ -2268,6 +2281,19 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get passkeyHintDontShowAgain => '不再显示';
 
   @override
+  String get sectionAppPasskeys => '应用通行密钥';
+
+  @override
+  String get appPasskeysDescription =>
+      '允许 Android 应用使用通行密钥登录。每次登录只发出一次网络请求：从该网站本身获取其应用验证文件，以确认应用是正版。除此之外 Gabbro 绝不进行任何网络连接——参阅 README 中的“Verify no telemetry”。';
+
+  @override
+  String get appPasskeysTitle => '允许应用通行密钥';
+
+  @override
+  String get appPasskeysNote => '关闭时，或网络访问被拒绝时，仅应用登录会被拒绝——浏览器中的通行密钥从不使用网络。';
+
+  @override
   String get add => '添加';
 
   @override
@@ -4411,6 +4437,19 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get passkeyHintDontShowAgain => '不要再顯示';
+
+  @override
+  String get sectionAppPasskeys => '應用程式通行密鑰';
+
+  @override
+  String get appPasskeysDescription =>
+      '允許 Android 應用程式使用通行密鑰登入。每次登入只發出一次網路請求：從該網站本身取得其應用程式驗證檔案，以確認應用程式是正版。除此之外 Gabbro 絕不進行任何網路連線——請參閱 README 中的「Verify no telemetry」。';
+
+  @override
+  String get appPasskeysTitle => '允許應用程式通行密鑰';
+
+  @override
+  String get appPasskeysNote => '關閉時，或網路存取被拒時，僅應用程式登入會被拒絕——瀏覽器中的通行密鑰從不使用網路。';
 
   @override
   String get add => '新增';

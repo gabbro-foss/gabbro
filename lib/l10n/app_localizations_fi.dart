@@ -129,6 +129,20 @@ class AppLocalizationsFi extends AppLocalizations {
   String get passkeyHintDontShowAgain => 'Älä näytä uudelleen';
 
   @override
+  String get sectionAppPasskeys => 'Sovellusten passkeyt';
+
+  @override
+  String get appPasskeysDescription =>
+      'Salli Android-sovellusten kirjautua passkeyllä. Jokainen kirjautuminen tekee yhden verkkopyynnön: se hakee sivuston oman sovellusvarmennustiedoston ja tarkistaa, että sovellus on aito. Muita verkkoyhteyksiä Gabbro ei koskaan muodosta — katso ”Verify no telemetry” README-tiedostosta.';
+
+  @override
+  String get appPasskeysTitle => 'Salli sovellusten passkeyt';
+
+  @override
+  String get appPasskeysNote =>
+      'Kun asetus on pois päältä tai verkkoyhteys on estetty, vain sovellusten kirjautumiset estyvät — selainten passkeyt eivät koskaan käytä verkkoa.';
+
+  @override
   String get add => 'Lisää';
 
   @override

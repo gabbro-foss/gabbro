@@ -129,6 +129,20 @@ class AppLocalizationsKk extends AppLocalizations {
   String get passkeyHintDontShowAgain => 'Қайта көрсетпеу';
 
   @override
+  String get sectionAppPasskeys => 'Қолданба passkey-лері';
+
+  @override
+  String get appPasskeysDescription =>
+      'Android қолданбаларына passkey арқылы кіруге рұқсат беру. Әр кіру бір ғана желілік сұрау жасайды: сайттың өз қолданба тексеру файлын жүктеп, қолданбаның түпнұсқа екенін тексереді. Gabbro бұдан басқа ешқашан желіге қосылмайды — README ішіндегі «Verify no telemetry» бөлімін қараңыз.';
+
+  @override
+  String get appPasskeysTitle => 'Қолданба passkey-леріне рұқсат беру';
+
+  @override
+  String get appPasskeysNote =>
+      'Өшірулі болғанда немесе желіге қатынас берілмегенде тек қолданбалардан кіру қабылданбайды — браузерлердегі passkey желіні ешқашан пайдаланбайды.';
+
+  @override
   String get add => 'Қосу';
 
   @override

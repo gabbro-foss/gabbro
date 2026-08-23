@@ -129,6 +129,20 @@ class AppLocalizationsPt extends AppLocalizations {
   String get passkeyHintDontShowAgain => 'Não mostrar novamente';
 
   @override
+  String get sectionAppPasskeys => 'Passkeys de aplicações';
+
+  @override
+  String get appPasskeysDescription =>
+      'Permitir que aplicações Android iniciem sessão com passkeys. Cada início de sessão faz um único pedido de rede: transfere o ficheiro de verificação de aplicações do próprio site para confirmar que a aplicação é genuína. O Gabbro nunca estabelece nenhuma outra ligação de rede — veja «Verify no telemetry» no README.';
+
+  @override
+  String get appPasskeysTitle => 'Permitir passkeys de aplicações';
+
+  @override
+  String get appPasskeysNote =>
+      'Quando desativado, ou com o acesso à rede negado, apenas os inícios de sessão de aplicações são recusados — as passkeys nos navegadores nunca usam a rede.';
+
+  @override
   String get add => 'Adicionar';
 
   @override
@@ -2379,6 +2393,20 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get passkeyHintDontShowAgain => 'Não mostrar novamente';
 
   @override
+  String get sectionAppPasskeys => 'Passkeys de aplicações';
+
+  @override
+  String get appPasskeysDescription =>
+      'Permitir que aplicações Android iniciem sessão com passkeys. Cada início de sessão faz um único pedido de rede: transfere o ficheiro de verificação de aplicações do próprio site para confirmar que a aplicação é genuína. O Gabbro nunca estabelece nenhuma outra ligação de rede — veja «Verify no telemetry» no README.';
+
+  @override
+  String get appPasskeysTitle => 'Permitir passkeys de aplicações';
+
+  @override
+  String get appPasskeysNote =>
+      'Quando desativado, ou com o acesso à rede negado, apenas os inícios de sessão de aplicações são recusados — as passkeys nos navegadores nunca usam a rede.';
+
+  @override
   String get add => 'Adicionar';
 
   @override
@@ -4624,6 +4652,20 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get passkeyHintDontShowAgain => 'Não mostrar novamente';
+
+  @override
+  String get sectionAppPasskeys => 'Passkeys de aplicações';
+
+  @override
+  String get appPasskeysDescription =>
+      'Permitir que aplicações Android iniciem sessão com passkeys. Cada início de sessão faz um único pedido de rede: transfere o ficheiro de verificação de aplicações do próprio site para confirmar que a aplicação é genuína. O Gabbro nunca estabelece nenhuma outra ligação de rede — veja «Verify no telemetry» no README.';
+
+  @override
+  String get appPasskeysTitle => 'Permitir passkeys de aplicações';
+
+  @override
+  String get appPasskeysNote =>
+      'Quando desativado, ou com o acesso à rede negado, apenas os inícios de sessão de aplicações são recusados — as passkeys nos navegadores nunca usam a rede.';
 
   @override
   String get add => 'Adicionar';

@@ -9,6 +9,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:gabbro/app_paths.dart';
 import 'package:gabbro/autotype_listener.dart';
 import 'package:gabbro/autotype_target.dart';
+import 'package:gabbro/app_passkeys_flag.dart';
 import 'package:gabbro/passkey_daemon.dart';
 import 'package:gabbro/widgets/passkey_consent_dialog.dart';
 import 'package:gabbro/clipboard_clear.dart';
@@ -676,6 +677,10 @@ Future<void> main() async {
     // Fire-and-forget: failures land in the status notifier, never block launch.
     unawaited(_startPasskeyDaemon());
   }
+  // Heal SharedPreferences drift (e.g. settings.jsonc restored from a backup):
+  // the credential provider reads the mirrored flag, not the file. Android-only
+  // inside; fire-and-forget.
+  unawaited(pushAppPasskeysFlag(settings.appPasskeys));
   runApp(
     GabbroApp(
       registry: registry,
@@ -1268,8 +1273,14 @@ class _GabbroAppState extends State<GabbroApp>
     // Optimistic: reflect the change in the UI immediately, then persist.
     // Settings are best-effort on disk; the live app state is the source of
     // truth for the session.
+    final changedAppPasskeys = updated.appPasskeys != _settings.appPasskeys;
     setState(() => _settings = updated);
     _resetForegroundTimer();
+    // The Android credential provider runs without Flutter and reads this
+    // flag from SharedPreferences; mirror it there before the file save.
+    if (changedAppPasskeys) {
+      unawaited(pushAppPasskeysFlag(updated.appPasskeys));
+    }
     await updated.save();
   }
 
