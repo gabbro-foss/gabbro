@@ -180,7 +180,12 @@ resolved but never applied — inert, emits no warning.
               exception + no Gabbro server); l10n all 37
         - [x] (8) manifest INTERNET permission (declared once, F1
               comment) + build-config net
-        - [ ] (9) S23 hardware pass: real native-app passkey login
+        - [ ] (9) S23 hardware pass: a third-party app with native
+              passkey login (throwaway account; app named only in the
+              untracked matrix). Toggle off -> refused, zero packets
+              (PCAPdroid); toggle on -> passkey register + sign-in
+              work, exactly one assetlinks fetch to the login's own
+              site.
   - [ ] browser-list refresh at release (F5, Android only): the vendored
         `passkey_privileged_browsers.json` ages — browsers released or
         re-signed after the snapshot are refused passkeys until it is
