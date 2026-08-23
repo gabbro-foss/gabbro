@@ -157,7 +157,7 @@ resolved but never applied — inert, emits no warning.
         network-revoked = only app passkeys refuse. Existing nets green
         (allowlist, fail-closed, assetlinks parse, settings round-trip).
         Canon-TDD list, in order:
-        - [ ] (1) README no-telemetry guide FIRST (settings message
+        - [x] (1) README no-telemetry guide FIRST (settings message
               links to it): toggle off zero packets; on+idle zero;
               on+login exactly one assetlinks fetch to the login's own
               site; `fetchAssetLinks` single call site, grep-able;

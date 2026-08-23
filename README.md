@@ -132,6 +132,34 @@ a UX complement that allows a corruption check *before* opening the vault.
 
 ---
 
+## Verify no telemetry
+
+Gabbro has no server and phones nowhere. The one network call in the entire
+source is the Android app-passkey check: with the **App passkeys** toggle on
+(Settings, off by default), a passkey login from a native app fetches that
+site's own `https://<site>/.well-known/assetlinks.json` to verify the app —
+nothing else, ever. Linux builds contain no network code at all. Links you
+tap open in your browser, not through Gabbro.
+
+Check it yourself:
+
+1. **Source.** One hit, in the assetlinks fetch:
+
+   ```bash
+   grep -rn "openConnection\|HttpClient\|reqwest\|TcpStream" lib/ rust/src/ android/app/src/main
+   ```
+
+2. **On the wire.** Capture Gabbro's traffic with
+   [PCAPdroid](https://github.com/emanuele-f/PCAPdroid) (Android) or Wireshark
+   (Linux). Toggle off: zero packets, always. Toggle on, idle: zero. Toggle
+   on, app-passkey login: exactly one HTTPS request, to the login's own site.
+
+3. **Deny and see.** Block Gabbro's network with NetGuard or GrapheneOS's
+   Network permission: everything keeps working except app passkeys, which
+   refuse.
+
+---
+
 ## Contributors
 
 - [Zabamund](https://github.com/Zabamund/) — project owner,
