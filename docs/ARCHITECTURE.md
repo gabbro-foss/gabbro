@@ -22,7 +22,13 @@ is website private keys in the vault instead of hardware, the upside no slot
 cap. Private keys never cross the FFI bridge (`create_entry` refuses Passkey
 DTOs; edits restore key material from stored). Android:
 `GabbroCredentialProviderService` via Credential Manager (log tag
-`GabbroPasskey:`; emulator not viable — hardware-test on the S23). Linux: an
+`GabbroPasskey:`; emulator not viable — hardware-test on the S23). Native-app
+passkeys sit behind the `app_passkeys` toggle (OFF default, F1): on, each app
+login makes Gabbro's only network call — one assetlinks fetch to the login's
+own site (README "Verify no telemetry"); off or network-revoked, only app
+sign-ins refuse. The daemon bridge module compiles on every platform (inert
+stubs off Linux) because FRB's generated code references it unconditionally;
+a gate leg cargo-checks the Android target to pin that. Linux: an
 in-process uhid virtual FIDO2 key (VID/PID 0x1209:0x0001, filtered out of
 `fido_list_devices`) exists while the app runs; browsers speak CTAP2 to it,
 consent is an in-app dialog, a locked vault answers only getInfo, and silent
@@ -146,46 +152,6 @@ resolved but never applied — inert, emits no warning.
 - **Passkey provider — ship it.** Code, hardware (Linux + Android) and the
   full gate ALL GREEN 2026-08-22. Feature documented under General
   Information; plan archive: `docs/PASSKEY_INVESTIGATION.md`. Remaining:
-  - [ ] app passkeys need network (F1, IN PROGRESS 2026-08-23): without
-        it every native-app passkey request is refused (browsers
-        unaffected — offline allowlist). `decideCaller`
-        (`PasskeyProvider.kt`) already fails closed; the toggle reaches
-        the Flutter-less provider via SharedPreferences (BiometricStore
-        pattern), written over a MethodChannel. INTERNET is an
-        install-time permission — Android never prompts, so the in-app
-        toggle (OFF default) IS the informed opt-in; GrapheneOS
-        network-revoked = only app passkeys refuse. Existing nets green
-        (allowlist, fail-closed, assetlinks parse, settings round-trip).
-        Canon-TDD list, in order:
-        - [x] (1) README no-telemetry guide FIRST (settings message
-              links to it): toggle off zero packets; on+idle zero;
-              on+login exactly one assetlinks fetch to the login's own
-              site; `fetchAssetLinks` single call site, grep-able;
-              methods: ripgrep, Wireshark/PCAPdroid, NetGuard
-        - [x] (2) Dart: `app_passkeys` setting, default false,
-              round-trips settings.jsonc
-        - [x] (3) Dart: settings-screen toggle (Android-only), message =
-              what/why-network/points at the guide; l10n all 37; a11y
-              nets green
-        - [x] (4) flag plumbing: `lib/app_passkeys_flag.dart` pushes
-              over `app.gabbro.gabbro/app_passkeys` on toggle change +
-              app start (drift heal); `AppPasskeysStore.kt` persists it
-              (absent = OFF); channel-mock + Robolectric tests green
-        - [x] (5) Kotlin: toggle OFF or flag absent -> app refused
-              BEFORE any fetch; browser path toggle-independent
-        - [x] (6) Kotlin: toggle ON -> VerifiedApp path fetches
-              (`decideCaller` takes `appPasskeysEnabled`, no default —
-              every caller must decide)
-        - [x] (7) About screen: sharper descriptor (names the one
-              exception + no Gabbro server); l10n all 37
-        - [x] (8) manifest INTERNET permission (declared once, F1
-              comment) + build-config net
-        - [ ] (9) S23 hardware pass: a third-party app with native
-              passkey login (throwaway account; app named only in the
-              untracked matrix). Toggle off -> refused, zero packets
-              (PCAPdroid); toggle on -> passkey register + sign-in
-              work, exactly one assetlinks fetch to the login's own
-              site.
   - [ ] browser-list refresh at release (F5, Android only): the vendored
         `passkey_privileged_browsers.json` ages — browsers released or
         re-signed after the snapshot are refused passkeys until it is
