@@ -85,6 +85,12 @@ offline "cd '$ROOT/rust' && cargo test --release --offline --lib sync_never_writ
 offline "cd '$ROOT/rust' && cargo test --release --offline --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored"; report $? "rust fast-merge walk"
 
 echo ">>> ===== ANDROID (OFFLINE: no-network namespace) ====="
+# Android-target Rust compile: the unit-test leg reuses cached cargokit output,
+# so a Linux-only leak into the bridge (cfg-gated module referenced by
+# frb_generated) stays invisible until a real APK build (bit 2026-08-23).
+# One target is enough to catch cfg leaks; needs the NDK clang for build scripts.
+NDK_BIN=$(ls -d "$HOME"/Android/Sdk/ndk/*/toolchains/llvm/prebuilt/linux-x86_64/bin 2>/dev/null | sort -V | tail -1)
+offline "cd '$ROOT/rust' && CC_aarch64_linux_android='$NDK_BIN/aarch64-linux-android21-clang' AR_aarch64_linux_android='$NDK_BIN/llvm-ar' CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER='$NDK_BIN/aarch64-linux-android21-clang' cargo check --release --offline --target aarch64-linux-android -p rust_lib_gabbro"; report $? "rust android-target check (cfg leaks)"
 offline "cd '$ROOT/android' && JAVA_TOOL_OPTIONS=-Duser.home=$HOME ./gradlew :app:testDebugUnitTest --offline"; report $? "android unit tests"
 
 echo "End test time: $(date +%T)"

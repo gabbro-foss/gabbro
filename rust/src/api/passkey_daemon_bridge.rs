@@ -5,11 +5,20 @@
 //! whether to ask the user or reply immediately; `passkey_perform` runs the
 //! approved request; `passkey_denied` is the cancel response. The private key
 //! never crosses the bridge — only these opaque CTAP2 response bytes do.
+//!
+//! The module itself compiles on EVERY platform: FRB's generated code
+//! references these fns unconditionally, so gating the module broke the
+//! Android target build (found 2026-08-23, first real Android compile since
+//! the daemon landed). Only the bodies are Linux; elsewhere each fn is an
+//! inert stub Dart never calls (the daemon starts behind Platform.isLinux).
 
 #[cfg(target_os = "linux")]
 use crate::ctap2::{self, RequestPlan};
-#[cfg(target_os = "linux")]
 use crate::frb_generated::StreamSink;
+
+/// CTAP2_ERR_OPERATION_DENIED — the safe answer a stub can always give.
+#[cfg(not(target_os = "linux"))]
+const DENIED: u8 = 0x27;
 
 /// What the daemon should do with one CTAP2 request. When `immediate_response`
 /// is set the daemon frames those bytes straight back (getInfo, locked vault,
@@ -24,68 +33,113 @@ pub struct PasskeyPlan {
 
 /// Describe one reassembled CTAP2 request (command byte + CBOR): no crypto,
 /// no signing.
-#[cfg(target_os = "linux")]
 pub fn passkey_plan(payload: Vec<u8>) -> PasskeyPlan {
-    match ctap2::describe_request(&payload) {
-        RequestPlan::Respond(bytes) => PasskeyPlan {
-            immediate_response: Some(bytes),
+    #[cfg(target_os = "linux")]
+    {
+        match ctap2::describe_request(&payload) {
+            RequestPlan::Respond(bytes) => PasskeyPlan {
+                immediate_response: Some(bytes),
+                is_create: false,
+                rp_id: String::new(),
+                accounts: Vec::new(),
+            },
+            RequestPlan::Ask {
+                is_create,
+                rp_id,
+                accounts,
+            } => PasskeyPlan {
+                immediate_response: None,
+                is_create,
+                rp_id,
+                accounts,
+            },
+        }
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = payload;
+        PasskeyPlan {
+            immediate_response: Some(vec![DENIED]),
             is_create: false,
             rp_id: String::new(),
             accounts: Vec::new(),
-        },
-        RequestPlan::Ask {
-            is_create,
-            rp_id,
-            accounts,
-        } => PasskeyPlan {
-            immediate_response: None,
-            is_create,
-            rp_id,
-            accounts,
-        },
+        }
     }
 }
 
 /// Perform a user-approved request; `account_index` selects among the accounts
 /// `passkey_plan` listed (ignored for a create).
-#[cfg(target_os = "linux")]
 pub fn passkey_perform(payload: Vec<u8>, account_index: usize) -> Vec<u8> {
-    ctap2::perform_approved(&payload, account_index)
+    #[cfg(target_os = "linux")]
+    {
+        ctap2::perform_approved(&payload, account_index)
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = (payload, account_index);
+        vec![DENIED]
+    }
 }
 
 /// The response to frame back when the user cancels at the consent dialog.
-#[cfg(target_os = "linux")]
 pub fn passkey_denied() -> Vec<u8> {
-    ctap2::denied_response()
+    #[cfg(target_os = "linux")]
+    {
+        ctap2::denied_response()
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        vec![DENIED]
+    }
 }
 
 /// The fallible half of daemon startup: instance lock + `/dev/uhid` + device
 /// create. Awaitable so Dart catches the Err and can say why the provider is
 /// inactive (F2) — a stream fn's Err is lost on an unawaited FRB future.
-#[cfg(target_os = "linux")]
 pub fn passkey_daemon_open() -> Result<(), String> {
-    crate::passkey_daemon::open()
+    #[cfg(target_os = "linux")]
+    {
+        crate::passkey_daemon::open()
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        Err("the passkey daemon is Linux-only".into())
+    }
 }
 
 /// Attach the pump to the device `passkey_daemon_open` created and stream
 /// each complete CTAP2 request (command byte + CBOR) to Dart. Rust keeps the
 /// request alive with KEEPALIVE until `passkey_daemon_respond`.
-#[cfg(target_os = "linux")]
 pub fn passkey_daemon_start(sink: StreamSink<Vec<u8>>) -> Result<(), String> {
-    crate::passkey_daemon::start(move |payload| {
-        let _ = sink.add(payload);
-    })
+    #[cfg(target_os = "linux")]
+    {
+        crate::passkey_daemon::start(move |payload| {
+            let _ = sink.add(payload);
+        })
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = sink;
+        Err("the passkey daemon is Linux-only".into())
+    }
 }
 
 /// Hand a finished CTAP2 response (or the denied bytes) back to the daemon.
-#[cfg(target_os = "linux")]
 pub fn passkey_daemon_respond(response: Vec<u8>) -> Result<(), String> {
-    crate::passkey_daemon::respond(response)
+    #[cfg(target_os = "linux")]
+    {
+        crate::passkey_daemon::respond(response)
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = response;
+        Err("the passkey daemon is Linux-only".into())
+    }
 }
 
-/// Stop the daemon and unplug the virtual device.
-#[cfg(target_os = "linux")]
+/// Stop the daemon and unplug the virtual device. No-op off Linux.
 pub fn passkey_daemon_stop() {
+    #[cfg(target_os = "linux")]
     crate::passkey_daemon::stop()
 }
 

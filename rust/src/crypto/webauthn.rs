@@ -71,6 +71,8 @@ pub fn assertion_authenticator_data(rp_id: &str) -> Vec<u8> {
 /// BE|BS only (0x18) — no user presence or verification was performed, and
 /// claiming either on a browser pre-flight would be lying to the relying
 /// party.
+// Only the Linux daemon's silent pre-flight calls this; dead on Android.
+#[cfg_attr(not(target_os = "linux"), allow(dead_code))]
 pub fn silent_assertion_authenticator_data(rp_id: &str) -> Vec<u8> {
     assertion_auth_data_with_flags(rp_id, 0x18)
 }
