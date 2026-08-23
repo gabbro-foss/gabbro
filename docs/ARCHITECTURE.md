@@ -146,25 +146,35 @@ resolved but never applied — inert, emits no warning.
 - **Passkey provider — ship it.** Code, hardware (Linux + Android) and the
   full gate ALL GREEN 2026-08-22. Feature documented under General
   Information; plan archive: `docs/PASSKEY_INVESTIGATION.md`. Remaining:
-  - [ ] app passkeys need network (F1): without it every native-app passkey
-        request is refused (browsers unaffected — they validate against the
-        vendored signature list, offline). Locked decisions:
-        - network permission in the Android manifest only (no Linux change)
-        - `app_passkeys` toggle, OFF by default (informed opt-in)
-        - settings message: what the toggle does, why it needs network,
-          link to a future No-telemetry verification guide section in README
-        - About screen: sharper descriptor — no network unless app passkeys
-          are on, then only the login's own assetlinks fetch, no Gabbro
-          server exists
-        - network permission absent/revoked (e.g. GrapheneOS): everything
-          else works, only app passkeys refuse
-  - [ ] No-telemetry verification guide (promoted from Bikeshed; live
-        BEFORE this release — the `app_passkeys` settings message links to
-        it): README section proving the sharper claim — toggle off: zero
-        packets ever; toggle on, idle: zero; toggle on, app-passkey login:
-        exactly one assetlinks fetch to the login's own site; single network
-        call site in source (`fetchAssetLinks`), grep-able. Methods: ripgrep
-        scan, Wireshark/PCAPdroid, NetGuard.
+  - [ ] app passkeys need network (F1, IN PROGRESS 2026-08-23): without
+        it every native-app passkey request is refused (browsers
+        unaffected — offline allowlist). `decideCaller`
+        (`PasskeyProvider.kt`) already fails closed; the toggle reaches
+        the Flutter-less provider via SharedPreferences (BiometricStore
+        pattern), written over a MethodChannel. INTERNET is an
+        install-time permission — Android never prompts, so the in-app
+        toggle (OFF default) IS the informed opt-in; GrapheneOS
+        network-revoked = only app passkeys refuse. Existing nets green
+        (allowlist, fail-closed, assetlinks parse, settings round-trip).
+        Canon-TDD list, in order:
+        - [ ] (1) README no-telemetry guide FIRST (settings message
+              links to it): toggle off zero packets; on+idle zero;
+              on+login exactly one assetlinks fetch to the login's own
+              site; `fetchAssetLinks` single call site, grep-able;
+              methods: ripgrep, Wireshark/PCAPdroid, NetGuard
+        - [ ] (2) Dart: `app_passkeys` setting, default false,
+              round-trips settings.jsonc
+        - [ ] (3) Dart: settings-screen toggle (Android-only), message =
+              what/why-network/points at the guide; l10n all 37
+        - [ ] (4) Dart: toggle change writes the flag through the new
+              channel (channel-mock seam)
+        - [ ] (5) Kotlin: toggle OFF or flag absent -> app refused
+              BEFORE any fetch (injected fetch must not be called);
+              browser path toggle-independent
+        - [ ] (6) Kotlin: toggle ON -> VerifiedApp path fetches
+        - [ ] (7) About screen: sharper descriptor; l10n all 37
+        - [ ] (8) manifest INTERNET permission + build-config net
+        - [ ] (9) S23 hardware pass: real native-app passkey login
   - [ ] browser-list refresh at release (F5, Android only): the vendored
         `passkey_privileged_browsers.json` ages — browsers released or
         re-signed after the snapshot are refused passkeys until it is
