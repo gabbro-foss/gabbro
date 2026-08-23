@@ -162,9 +162,8 @@ resolved but never applied — inert, emits no warning.
     - [ ] wait for pid.codes review (external; F5 proceeds meanwhile)
     - [ ] PID granted: TDD the constants in `rust/src/uhid.rs`, hardware-verify
           on Linux, drop this whole item
-  - [ ] merge `passkey_investigation_and_implementation` to master
-  - [ ] challenge vault: reissue at v12 — LAST, on master after the merge
-        (old crack-me vaults stay — red herrings are deliberate)
+  - [ ] challenge vault: reissue at v12 (old crack-me vaults stay — red
+        herrings are deliberate)
 
 ---
 
