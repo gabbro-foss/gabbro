@@ -1561,7 +1561,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro n\'effectue aucune connexion réseau sortante. Pas de télémétrie, pas d\'analyses, pas de comptes.';
+      'Pas de télémétrie, pas d\'analyses, pas de comptes, pas de serveur Gabbro. Gabbro n\'effectue aucune connexion réseau — sauf si vous activez les passkeys d\'applications : la seule connexion est alors une récupération par connexion d\'application, le fichier de vérification d\'applications du site lui-même.';
 
   @override
   String get strengthTierTerrible => 'Terrible';

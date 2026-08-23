@@ -650,7 +650,7 @@
   "aboutLicenceBody": "Gabbro je prosta programska oprema z odprtokodno kodo, licencirana pod GNU General Public License v3.0 only (GPL-3.0-only).\n\nImate svobodo to aplikacijo uporabljati, proučevati in distribuirati v skladu s pogoji licence.",
   "aboutOwnerRole": "Lastnik projekta, arhitekt in glavni razvijalec:",
   "aboutAiPartner": "AI razvojni partner:",
-  "aboutNoTelemetry": "Gabbro ne vzpostavlja nobenih odhodnih omrežnih povezav. Brez telemetrije, analitike ali računov.",
+  "aboutNoTelemetry": "Brez telemetrije, analitike, računov ali strežnika Gabbro. Gabbro sploh ne vzpostavlja omrežnih povezav — razen če vklopite passkey za aplikacije: takrat je edina povezava en prenos na prijavo, datoteka za preverjanje aplikacij samega spletnega mesta.",
 
   "strengthTierTerrible": "Grozno",
   "strengthTierWeak": "Šibko",

@@ -1553,7 +1553,7 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro nevytvára žiadne odchádzajúce sieťové spojenia. Žiadna telemetria, analytiky ani účty.';
+      'Žiadna telemetria, analytiky, účty ani server Gabbro. Gabbro nevytvára vôbec žiadne sieťové spojenia — pokiaľ nezapnete passkey pre aplikácie: vtedy je jediným spojením jedno stiahnutie na prihlásenie, overovací súbor aplikácií daného webu.';
 
   @override
   String get strengthTierTerrible => 'Hrozné';

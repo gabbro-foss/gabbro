@@ -650,7 +650,7 @@
   "aboutLicenceBody": "Gabbro ir bezmaksas atvērtā pirmkoda programmatūra, licencēta ar GNU General Public License v3.0 only (GPL-3.0-only).\n\nJūs varat brīvi izmantot, pētīt un izplatīt šo programmatūru saskaņā ar šīs licences nosacījumiem.",
   "aboutOwnerRole": "Projekta īpašnieks, arhitekts un galvenais izstrādātājs:",
   "aboutAiPartner": "MI izstrādes partneris:",
-  "aboutNoTelemetry": "Gabbro neveic nekādus izejošos tīkla savienojumus. Bez telemetrijas, bez analītikas, bez kontiem.",
+  "aboutNoTelemetry": "Bez telemetrijas, bez analītikas, bez kontiem, bez Gabbro servera. Gabbro vispār neveido tīkla savienojumus — ja vien neieslēdzat lietotņu passkey: tad vienīgais savienojums ir viena lejupielāde uz pierakstīšanos, pašas vietnes lietotņu pārbaudes fails.",
 
   "strengthTierTerrible": "Briesmīga",
   "strengthTierWeak": "Vāja",

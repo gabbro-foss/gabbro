@@ -1552,7 +1552,7 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro ei tee ühtegi väljuvat võrguühendust. Telemetria puudub, analüütika puudub, kontod puuduvad.';
+      'Telemetria, analüütika, kontod ja Gabbro server puuduvad. Gabbro ei loo üldse võrguühendusi — välja arvatud siis, kui lülitad sisse rakenduste passkey-d: siis on ainus ühendus üks allalaadimine sisselogimise kohta, saidi enda rakenduste kontrollifail.';
 
   @override
   String get strengthTierTerrible => 'Kohutav';

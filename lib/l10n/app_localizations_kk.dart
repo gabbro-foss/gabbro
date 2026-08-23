@@ -1550,7 +1550,7 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro ешқандай сыртқы желі қосылымын орнатпайды. Телеметрия, аналитика немесе аккаунттар жоқ.';
+      'Телеметрия, аналитика, аккаунттар және Gabbro сервері жоқ. Gabbro желіге мүлдем қосылмайды — тек қолданба passkey-лерін қоссаңыз: онда жалғыз қосылым — әр кіру сайын бір жүктеу, сайттың өз қолданба тексеру файлы.';
 
   @override
   String get strengthTierTerrible => 'Өте нашар';

@@ -1553,7 +1553,7 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro не успоставља никакве одлазне мрежне везе. Нема телеметрије, аналитике ни налога.';
+      'Нема телеметрије, аналитике, налога ни Gabbro сервера. Gabbro уопште не успоставља мрежне везе — осим ако укључите passkey за апликације: тада је једина веза једно преузимање по пријави, датотека за проверу апликација самог сајта.';
 
   @override
   String get strengthTierTerrible => 'Ужасно';
@@ -3811,7 +3811,7 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro ne uspostavlja nikakve odlazne mrežne veze. Nema telemetrije, analitike ni naloga.';
+      'Nema telemetrije, analitike, naloga ni Gabbro servera. Gabbro uopšte ne uspostavlja mrežne veze — osim ako uključite passkey za aplikacije: tada je jedina veza jedno preuzimanje po prijavi, datoteka za proveru aplikacija samog sajta.';
 
   @override
   String get strengthTierTerrible => 'Užasno';

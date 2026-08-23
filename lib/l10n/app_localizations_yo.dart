@@ -1546,7 +1546,7 @@ class AppLocalizationsYo extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro ko ṣe eyikeyi asopọ nẹtiwọki ita. Ko si telemetry, itupalẹ, tabi akanti.';
+      'Ko si telemetry, itupalẹ, akanti, tabi sáfà Gabbro. Gabbro ko ṣe asopọ nẹtiwọki rara — àyàfi tí o bá tan passkey àwọn àppù: nígbà náà asopọ kan ṣoṣo ni gbígba fáìlì ìfẹ̀rí àppù ti sáìtì fúnra rẹ̀, lẹ́ẹ̀kan fún ìwọlé kọ̀ọ̀kan.';
 
   @override
   String get strengthTierTerrible => 'Buru pupọ';

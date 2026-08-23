@@ -1556,7 +1556,7 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro не встановлює вихідних мережевих з\'єднань. Жодної телеметрії, аналітики та облікових записів.';
+      'Жодної телеметрії, аналітики, облікових записів і сервера Gabbro. Gabbro взагалі не встановлює мережевих з\'єднань — хіба що ви ввімкнете passkey застосунків: тоді єдине з\'єднання — одне завантаження на вхід, файл перевірки застосунків самого сайту.';
 
   @override
   String get strengthTierTerrible => 'Жахливий';

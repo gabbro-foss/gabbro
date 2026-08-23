@@ -10,6 +10,19 @@ void main() {
     expect(find.byType(AboutScreen), findsOneWidget);
   });
 
+  testWidgets('the network claim covers the app-passkeys exception (F1)',
+      (tester) async {
+    await tester.pumpWidget(testApp(const AboutScreen()));
+    await tester.pumpAndSettle();
+    // The blanket "no outbound connections" claim died with the app-passkeys
+    // toggle; the sharper claim must name the one exception.
+    await tester.scrollUntilVisible(
+      find.textContaining('app passkeys'),
+      200,
+    );
+    expect(find.textContaining('app passkeys'), findsOneWidget);
+  });
+
   testWidgets('AboutScreen shows app version string', (tester) async {
     await tester.pumpWidget(testApp(const AboutScreen()));
     await tester.pumpAndSettle();

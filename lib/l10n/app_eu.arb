@@ -650,7 +650,7 @@
   "aboutLicenceBody": "Gabbro kode irekiko software librea da, GNU General Public License v3.0 only (GPL-3.0-only) lizentziapean.\n\nLizentziaren baldintzen arabera aplikazio hau erabiltzeko, ikasteko eta banatzeko askatasuna duzu.",
   "aboutOwnerRole": "Proiektu-jabea, arkitektoa eta garatzaile nagusia:",
   "aboutAiPartner": "AI garapen-partnerra:",
-  "aboutNoTelemetry": "Gabbro-k ez du kanpoko sare-konexiorik ezartzen. Telemetriarik, analisiarik edo konturik ez.",
+  "aboutNoTelemetry": "Telemetriarik, analisirik, konturik eta Gabbro zerbitzaririk ez. Gabbrok ez du inolako sare-konexiorik egiten — aplikazioen passkeyak aktibatzen badituzu izan ezik: orduan konexio bakarra saio-hasiera bakoitzeko deskarga bat da, gunearen beraren aplikazioak egiaztatzeko fitxategia.",
 
   "strengthTierTerrible": "Oso ahula",
   "strengthTierWeak": "Ahula",

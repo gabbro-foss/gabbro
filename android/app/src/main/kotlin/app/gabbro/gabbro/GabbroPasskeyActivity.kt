@@ -172,7 +172,8 @@ class GabbroPasskeyCreateActivity : GabbroPasskeyActivity() {
         } else {
             val keyHash = callerApkKeyHashB64(info) ?: return refuse("caller certificate unreadable")
             when (val decision = decideCaller(
-                rpId, info.packageName, cert, allowlist, keyHash, ::fetchAssetLinks
+                rpId, info.packageName, cert, allowlist, keyHash,
+                AppPasskeysStore.enabled(this), ::fetchAssetLinks
             )) {
                 is CallerDecision.Refused -> return refuse(decision.reason)
                 is CallerDecision.PrivilegedBrowser -> return refuse(
@@ -308,7 +309,8 @@ class GabbroPasskeyGetActivity : GabbroPasskeyActivity() {
         } else {
             val keyHash = callerApkKeyHashB64(info) ?: return refuse("caller certificate unreadable")
             when (val decision = decideCaller(
-                rpId, info.packageName, cert, allowlist, keyHash, ::fetchAssetLinks
+                rpId, info.packageName, cert, allowlist, keyHash,
+                AppPasskeysStore.enabled(this), ::fetchAssetLinks
             )) {
                 is CallerDecision.Refused -> return refuse(decision.reason)
                 is CallerDecision.PrivilegedBrowser -> return refuse(

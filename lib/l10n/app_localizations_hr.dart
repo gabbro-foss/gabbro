@@ -1550,7 +1550,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro ne uspostavlja nikakve odlazne mrežne veze. Nema telemetrije, analitike ni računa.';
+      'Nema telemetrije, analitike, računa ni Gabbro poslužitelja. Gabbro uopće ne uspostavlja mrežne veze — osim ako uključite passkey za aplikacije: tada je jedina veza jedno preuzimanje po prijavi, datoteka za provjeru aplikacija samog web-mjesta.';
 
   @override
   String get strengthTierTerrible => 'Užasno';

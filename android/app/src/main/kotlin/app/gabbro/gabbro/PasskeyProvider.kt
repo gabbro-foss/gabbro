@@ -151,10 +151,17 @@ internal fun decideCaller(
     certSha256: String,
     allowlist: PrivilegedBrowserAllowlist,
     apkKeyHashB64: String,
+    appPasskeysEnabled: Boolean,
     fetchAssetLinks: (String) -> String?,
 ): CallerDecision {
     if (allowlist.isPrivileged(packageName, certSha256)) {
         return CallerDecision.PrivilegedBrowser
+    }
+    // F1: the toggle is the user's informed opt-in to the one network fetch —
+    // off means refuse BEFORE touching the network, so zero packets without
+    // consent. Browsers never reach here (offline allowlist above).
+    if (!appPasskeysEnabled) {
+        return CallerDecision.Refused("app passkeys are disabled in settings")
     }
     val body = fetchAssetLinks("https://$rpId/.well-known/assetlinks.json")
         ?: return CallerDecision.Refused("could not fetch asset links for $rpId")

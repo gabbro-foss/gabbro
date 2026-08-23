@@ -650,7 +650,7 @@
   "aboutLicenceBody": "A Gabbro szabad és nyílt forráskódú szoftver, a GNU General Public License v3.0 only (GPL-3.0-only) licence alatt.\n\nSzabadon felhasználhatod, tanulmányozhatod és terjesztheted ezt a szoftvert az adott licenc feltételei szerint.",
   "aboutOwnerRole": "Projekttulajdonos, tervező és vezető fejlesztő:",
   "aboutAiPartner": "MI fejlesztési partner:",
-  "aboutNoTelemetry": "A Gabbro nem hoz létre kimenő hálózati kapcsolatokat. Nincs telemetria, nincs analitika, nincs fiók.",
+  "aboutNoTelemetry": "Nincs telemetria, analitika, fiók, sem Gabbro-szerver. A Gabbro egyáltalán nem létesít hálózati kapcsolatot — hacsak be nem kapcsolja az alkalmazás-passkey-ket: ekkor az egyetlen kapcsolat bejelentkezésenként egy letöltés, az adott webhely saját alkalmazás-ellenőrző fájlja.",
 
   "strengthTierTerrible": "Borzalmas",
   "strengthTierWeak": "Gyenge",

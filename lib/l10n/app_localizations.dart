@@ -2944,7 +2944,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutNoTelemetry.
   ///
   /// In en, this message translates to:
-  /// **'Gabbro makes no outbound network connections. No telemetry, no analytics, no accounts.'**
+  /// **'No telemetry, no analytics, no accounts, no Gabbro server. Gabbro makes no network connection at all, unless you turn on app passkeys — then the only connection ever made is one fetch per app login: that site\'s own app-verification file.'**
   String get aboutNoTelemetry;
 
   /// No description provided for @strengthTierTerrible.

@@ -1554,7 +1554,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro не осъществява изходящи мрежови връзки. Без телеметрия, без аналитика, без акаунти.';
+      'Без телеметрия, без аналитика, без акаунти, без сървър на Gabbro. Gabbro изобщо не осъществява мрежови връзки — освен ако включите passkey за приложения: тогава единствената връзка е едно изтегляне на вход, файлът за проверка на приложения на самия сайт.';
 
   @override
   String get strengthTierTerrible => 'Ужасна';

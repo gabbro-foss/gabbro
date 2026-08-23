@@ -1552,7 +1552,7 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro ei tee lähtevisiä verkkoyhteyksiä. Ei telemetriaa, ei analytiikkaa, ei tilejä.';
+      'Ei telemetriaa, ei analytiikkaa, ei tilejä, ei Gabbro-palvelinta. Gabbro ei muodosta lainkaan verkkoyhteyksiä — paitsi jos otat sovellusten passkeyt käyttöön: silloin ainoa yhteys on yksi haku kirjautumista kohden, sivuston oma sovellusvarmennustiedosto.';
 
   @override
   String get strengthTierTerrible => 'Surkea';

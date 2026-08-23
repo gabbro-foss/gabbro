@@ -1525,7 +1525,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro는 외부 네트워크 연결을 하지 않습니다. 원격 측정, 분석 또는 계정이 없습니다.';
+      '원격 측정, 분석, 계정, Gabbro 서버가 없습니다. Gabbro는 네트워크 연결을 전혀 하지 않습니다. 단, 앱 패스키를 켜면 로그인마다 한 번, 해당 사이트 자체의 앱 확인 파일만 가져옵니다.';
 
   @override
   String get strengthTierTerrible => '매우 약함';

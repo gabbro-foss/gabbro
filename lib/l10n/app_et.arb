@@ -650,7 +650,7 @@
   "aboutLicenceBody": "Gabbro on vaba ja avatud lähtekoodiga tarkvara, litsentseeritud GNU General Public License v3.0 only (GPL-3.0-only) alusel.\n\nSa võid seda tarkvara vabalt kasutada, uurida ja levitada selle litsentsi tingimuste kohaselt.",
   "aboutOwnerRole": "Projekti omanik, arhitekt ja peaaren daja:",
   "aboutAiPartner": "Tehisintellekti arenduspartner:",
-  "aboutNoTelemetry": "Gabbro ei tee ühtegi väljuvat võrguühendust. Telemetria puudub, analüütika puudub, kontod puuduvad.",
+  "aboutNoTelemetry": "Telemetria, analüütika, kontod ja Gabbro server puuduvad. Gabbro ei loo üldse võrguühendusi — välja arvatud siis, kui lülitad sisse rakenduste passkey-d: siis on ainus ühendus üks allalaadimine sisselogimise kohta, saidi enda rakenduste kontrollifail.",
 
   "strengthTierTerrible": "Kohutav",
   "strengthTierWeak": "Nõrk",

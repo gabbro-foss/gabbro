@@ -1554,7 +1554,7 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro neatlieka jokių išeinančių tinklo jungčių. Jokios telemetrijos, jokios analitikos, jokių paskyrų.';
+      'Jokios telemetrijos, analitikos, paskyrų ar Gabbro serverio. Gabbro apskritai neužmezga tinklo ryšių — nebent įjungsite programėlių passkey: tada vienintelis ryšys yra vienas atsisiuntimas per prisijungimą, pačios svetainės programėlių patikros failas.';
 
   @override
   String get strengthTierTerrible => 'Siaubingas';

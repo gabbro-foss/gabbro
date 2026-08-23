@@ -650,7 +650,7 @@
   "aboutLicenceBody": "Gabbro는 GNU General Public License v3.0 only (GPL-3.0-only) 하에 라이선스된 무료 오픈소스 소프트웨어입니다.\n\n라이선스 조건에 따라 이 애플리케이션을 사용, 연구, 배포할 자유가 있습니다.",
   "aboutOwnerRole": "프로젝트 소유자, 아키텍트 및 주요 개발자:",
   "aboutAiPartner": "AI 개발 파트너:",
-  "aboutNoTelemetry": "Gabbro는 외부 네트워크 연결을 하지 않습니다. 원격 측정, 분석 또는 계정이 없습니다.",
+  "aboutNoTelemetry": "원격 측정, 분석, 계정, Gabbro 서버가 없습니다. Gabbro는 네트워크 연결을 전혀 하지 않습니다. 단, 앱 패스키를 켜면 로그인마다 한 번, 해당 사이트 자체의 앱 확인 파일만 가져옵니다.",
 
   "strengthTierTerrible": "매우 약함",
   "strengthTierWeak": "약함",

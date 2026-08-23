@@ -650,7 +650,7 @@
   "aboutLicenceBody": "Gabbro to wolne oprogramowanie z otwartym kodem źródłowym, licencjonowane na zasadach GNU General Public License v3.0 only (GPL-3.0-only).\n\nMasz swobodę używania, studiowania i rozpowszechniania tego oprogramowania na warunkach tej licencji.",
   "aboutOwnerRole": "Właściciel projektu, architekt i główny deweloper:",
   "aboutAiPartner": "Partner AI ds. rozwoju:",
-  "aboutNoTelemetry": "Gabbro nie nawiązuje żadnych wychodzących połączeń sieciowych. Brak telemetrii, analityki i kont.",
+  "aboutNoTelemetry": "Brak telemetrii, analityki, kont i serwera Gabbro. Gabbro w ogóle nie nawiązuje połączeń sieciowych — chyba że włączysz passkey aplikacji: wtedy jedynym połączeniem jest jedno pobranie na logowanie, plik weryfikacji aplikacji samej witryny.",
 
   "strengthTierTerrible": "Tragiczne",
   "strengthTierWeak": "Słabe",

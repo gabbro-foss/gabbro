@@ -1553,7 +1553,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'O Gabbro não faz conexões de rede de saída. Sem telemetria, sem análises, sem contas.';
+      'Sem telemetria, sem análises, sem contas, sem servidor Gabbro. O Gabbro não faz nenhuma conexão de rede — a menos que ative as passkeys de aplicações: então a única conexão é uma transferência por início de sessão, o ficheiro de verificação de aplicações do próprio site.';
 
   @override
   String get strengthTierTerrible => 'Terrível';
@@ -3817,7 +3817,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get aboutNoTelemetry =>
-      'O Gabbro não faz conexões de rede de saída. Sem telemetria, sem análises, sem contas.';
+      'Sem telemetria, sem análises, sem contas, sem servidor Gabbro. O Gabbro não faz nenhuma conexão de rede — a menos que ative as passkeys de aplicações: então a única conexão é uma transferência por início de sessão, o ficheiro de verificação de aplicações do próprio site.';
 
   @override
   String get strengthTierTerrible => 'Terrível';
@@ -6079,7 +6079,7 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get aboutNoTelemetry =>
-      'O Gabbro não estabelece ligações de rede de saída. Sem telemetria, sem análises, sem contas.';
+      'Sem telemetria, sem análises, sem contas, sem servidor Gabbro. O Gabbro não estabelece nenhuma ligação de rede — a menos que ative as passkeys de aplicações: então a única ligação é uma transferência por início de sessão, o ficheiro de verificação de aplicações do próprio site.';
 
   @override
   String get strengthTierTerrible => 'Terrível';

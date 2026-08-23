@@ -1,5 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.NFC" />
+    <!-- F1: app passkeys only — one assetlinks fetch per native-app login,
+         gated by the in-app opt-in toggle (README "Verify no telemetry").
+         Android grants this silently; the toggle is the user's consent. -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-feature android:name="android.hardware.nfc" android:required="false" />
     <!-- R-02 (AI_SECURITY_AUDIT_REVIEW.md): the vault and settings live in
          app-private storage and must never leave the device via the Android

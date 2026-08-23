@@ -1550,7 +1550,7 @@ class AppLocalizationsNn extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro gjer ingen utgåande nettverkstilkoplingar. Ingen telemetri, ingen analysar, ingen kontoar.';
+      'Ingen telemetri, ingen analysar, ingen kontoar, ingen Gabbro-tenar. Gabbro gjer ingen nettverkstilkoplingar i det heile — med mindre du slår på app-passkeys: då er den einaste tilkoplinga éi henting per app-innlogging, nettstaden si eiga app-verifiseringsfil.';
 
   @override
   String get strengthTierTerrible => 'Forferdeleg';

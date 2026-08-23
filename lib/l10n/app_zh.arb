@@ -650,7 +650,7 @@
   "aboutLicenceBody": "Gabbro 是在 GNU General Public License v3.0 only (GPL-3.0-only) 下授权的自由开源软件。\n\n您有权在许可证条款下使用、研究和分发此应用程序。",
   "aboutOwnerRole": "项目所有者、架构师和主要开发者：",
   "aboutAiPartner": "AI 开发合作伙伴：",
-  "aboutNoTelemetry": "Gabbro 不建立任何外部网络连接。无遥测、分析或账户。",
+  "aboutNoTelemetry": "无遥测、分析、账户，也没有 Gabbro 服务器。Gabbro 完全不建立网络连接——除非你开启应用通行密钥：那时唯一的连接是每次应用登录获取一次该网站本身的应用验证文件。",
 
   "strengthTierTerrible": "非常弱",
   "strengthTierWeak": "弱",

@@ -1557,7 +1557,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro stellt keine ausgehenden Netzwerkverbindungen her. Keine Telemetrie, keine Analysen, keine Konten.';
+      'Keine Telemetrie, keine Analysen, keine Konten, kein Gabbro-Server. Gabbro stellt überhaupt keine Netzwerkverbindung her — außer Sie schalten App-Passkeys ein: dann ist die einzige Verbindung je ein Abruf pro App-Anmeldung, die App-Verifizierungsdatei der jeweiligen Website.';
 
   @override
   String get strengthTierTerrible => 'Schrecklich';

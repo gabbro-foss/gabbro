@@ -650,7 +650,7 @@
   "aboutLicenceBody": "GabbroはGNU General Public License v3.0 only (GPL-3.0-only)の下でライセンスされたフリーのオープンソースソフトウェアです。\n\nライセンスの条件の下で、このアプリケーションを使用、研究、配布する自由があります。",
   "aboutOwnerRole": "プロジェクトオーナー、アーキテクト、主要開発者:",
   "aboutAiPartner": "AI開発パートナー:",
-  "aboutNoTelemetry": "Gabbroは外部ネットワーク接続を行いません。テレメトリー、分析、アカウントなし。",
+  "aboutNoTelemetry": "テレメトリー、分析、アカウント、Gabbro サーバーなし。Gabbro はネットワーク接続を一切行いません。ただしアプリのパスキーをオンにした場合のみ、ログインごとに 1 回、サイト自身のアプリ検証ファイルを取得します。",
 
   "strengthTierTerrible": "非常に弱い",
   "strengthTierWeak": "弱い",

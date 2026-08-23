@@ -1553,7 +1553,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro-k ez du kanpoko sare-konexiorik ezartzen. Telemetriarik, analisiarik edo konturik ez.';
+      'Telemetriarik, analisirik, konturik eta Gabbro zerbitzaririk ez. Gabbrok ez du inolako sare-konexiorik egiten — aplikazioen passkeyak aktibatzen badituzu izan ezik: orduan konexio bakarra saio-hasiera bakoitzeko deskarga bat da, gunearen beraren aplikazioak egiaztatzeko fitxategia.';
 
   @override
   String get strengthTierTerrible => 'Oso ahula';

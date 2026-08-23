@@ -1555,7 +1555,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro не устанавливает исходящих сетевых соединений. Никакой телеметрии, аналитики и аккаунтов.';
+      'Никакой телеметрии, аналитики, аккаунтов и сервера Gabbro. Gabbro вообще не устанавливает сетевых соединений — если только вы не включите passkey приложений: тогда единственное соединение — одна загрузка на вход, файл проверки приложений самого сайта.';
 
   @override
   String get strengthTierTerrible => 'Ужасный';

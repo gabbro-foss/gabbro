@@ -650,7 +650,7 @@
   "aboutLicenceBody": "Gabbro on vapaa ja avoimen lähdekoodin ohjelmisto, lisensoitu GNU General Public License v3.0 only (GPL-3.0-only) -lisenssillä.\n\nVoit vapaasti käyttää, tutkia ja jakaa tätä ohjelmistoa kyseisen lisenssin ehtojen mukaisesti.",
   "aboutOwnerRole": "Projektin omistaja, arkkitehti ja pääkehittäjä:",
   "aboutAiPartner": "Tekoälykehityskumppani:",
-  "aboutNoTelemetry": "Gabbro ei tee lähtevisiä verkkoyhteyksiä. Ei telemetriaa, ei analytiikkaa, ei tilejä.",
+  "aboutNoTelemetry": "Ei telemetriaa, ei analytiikkaa, ei tilejä, ei Gabbro-palvelinta. Gabbro ei muodosta lainkaan verkkoyhteyksiä — paitsi jos otat sovellusten passkeyt käyttöön: silloin ainoa yhteys on yksi haku kirjautumista kohden, sivuston oma sovellusvarmennustiedosto.",
 
   "strengthTierTerrible": "Surkea",
   "strengthTierWeak": "Heikko",

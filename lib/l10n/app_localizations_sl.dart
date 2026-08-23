@@ -1556,7 +1556,7 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro ne vzpostavlja nobenih odhodnih omrežnih povezav. Brez telemetrije, analitike ali računov.';
+      'Brez telemetrije, analitike, računov ali strežnika Gabbro. Gabbro sploh ne vzpostavlja omrežnih povezav — razen če vklopite passkey za aplikacije: takrat je edina povezava en prenos na prijavo, datoteka za preverjanje aplikacij samega spletnega mesta.';
 
   @override
   String get strengthTierTerrible => 'Grozno';

@@ -1523,7 +1523,8 @@ class AppLocalizationsJa extends AppLocalizations {
   String get aboutAiPartner => 'AI開発パートナー:';
 
   @override
-  String get aboutNoTelemetry => 'Gabbroは外部ネットワーク接続を行いません。テレメトリー、分析、アカウントなし。';
+  String get aboutNoTelemetry =>
+      'テレメトリー、分析、アカウント、Gabbro サーバーなし。Gabbro はネットワーク接続を一切行いません。ただしアプリのパスキーをオンにした場合のみ、ログインごとに 1 回、サイト自身のアプリ検証ファイルを取得します。';
 
   @override
   String get strengthTierTerrible => '非常に弱い';

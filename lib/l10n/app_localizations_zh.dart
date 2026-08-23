@@ -1509,7 +1509,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aboutAiPartner => 'AI 开发合作伙伴：';
 
   @override
-  String get aboutNoTelemetry => 'Gabbro 不建立任何外部网络连接。无遥测、分析或账户。';
+  String get aboutNoTelemetry =>
+      '无遥测、分析、账户，也没有 Gabbro 服务器。Gabbro 完全不建立网络连接——除非你开启应用通行密钥：那时唯一的连接是每次应用登录获取一次该网站本身的应用验证文件。';
 
   @override
   String get strengthTierTerrible => '非常弱';
@@ -3667,7 +3668,8 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get aboutAiPartner => 'AI 开发合作伙伴：';
 
   @override
-  String get aboutNoTelemetry => 'Gabbro 不建立任何外部网络连接。无遥测、分析或账户。';
+  String get aboutNoTelemetry =>
+      '无遥测、分析、账户，也没有 Gabbro 服务器。Gabbro 完全不建立网络连接——除非你开启应用通行密钥：那时唯一的连接是每次应用登录获取一次该网站本身的应用验证文件。';
 
   @override
   String get strengthTierTerrible => '非常弱';
@@ -5825,7 +5827,8 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get aboutAiPartner => 'AI 開發合作夥伴：';
 
   @override
-  String get aboutNoTelemetry => 'Gabbro 不建立任何外部網路連線。無遙測、分析或帳戶。';
+  String get aboutNoTelemetry =>
+      '無遙測、分析、帳戶，也沒有 Gabbro 伺服器。Gabbro 完全不建立網路連線——除非你開啟應用程式通行密鑰：屆時唯一的連線是每次應用程式登入取得一次該網站本身的應用程式驗證檔案。';
 
   @override
   String get strengthTierTerrible => '非常弱';

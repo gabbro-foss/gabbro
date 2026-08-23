@@ -856,7 +856,7 @@
   "aboutLicenceBody": "Gabbro is free and open source software, licensed under the GNU General Public License v3.0 only (GPL-3.0-only).\n\nYou are free to use, study, and redistribute this software under the terms of that licence.",
   "aboutOwnerRole": "Project owner, architect, and lead developer:",
   "aboutAiPartner": "AI development partner:",
-  "aboutNoTelemetry": "Gabbro makes no outbound network connections. No telemetry, no analytics, no accounts.",
+  "aboutNoTelemetry": "No telemetry, no analytics, no accounts, no Gabbro server. Gabbro makes no network connection at all, unless you turn on app passkeys — then the only connection ever made is one fetch per app login: that site's own app-verification file.",
 
   "strengthTierTerrible": "Terrible",
   "strengthTierWeak": "Weak",

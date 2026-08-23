@@ -1551,7 +1551,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'A Gabbro nem hoz létre kimenő hálózati kapcsolatokat. Nincs telemetria, nincs analitika, nincs fiók.';
+      'Nincs telemetria, analitika, fiók, sem Gabbro-szerver. A Gabbro egyáltalán nem létesít hálózati kapcsolatot — hacsak be nem kapcsolja az alkalmazás-passkey-ket: ekkor az egyetlen kapcsolat bejelentkezésenként egy letöltés, az adott webhely saját alkalmazás-ellenőrző fájlja.';
 
   @override
   String get strengthTierTerrible => 'Borzalmas';

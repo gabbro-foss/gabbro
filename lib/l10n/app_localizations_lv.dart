@@ -1552,7 +1552,7 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro neveic nekādus izejošos tīkla savienojumus. Bez telemetrijas, bez analītikas, bez kontiem.';
+      'Bez telemetrijas, bez analītikas, bez kontiem, bez Gabbro servera. Gabbro vispār neveido tīkla savienojumus — ja vien neieslēdzat lietotņu passkey: tad vienīgais savienojums ir viena lejupielāde uz pierakstīšanos, pašas vietnes lietotņu pārbaudes fails.';
 
   @override
   String get strengthTierTerrible => 'Briesmīga';

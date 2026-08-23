@@ -650,7 +650,7 @@
   "aboutLicenceBody": "Gabbro er fri og open kjeldekode-programvare, lisensiert under GNU General Public License v3.0 only (GPL-3.0-only).\n\nDu kan fritt bruke, studere og redistribuere denne programvara under vilkåra i den lisensen.",
   "aboutOwnerRole": "Prosjekteigar, arkitekt og hovudutviklar:",
   "aboutAiPartner": "KI-utviklingspartnar:",
-  "aboutNoTelemetry": "Gabbro gjer ingen utgåande nettverkstilkoplingar. Ingen telemetri, ingen analysar, ingen kontoar.",
+  "aboutNoTelemetry": "Ingen telemetri, ingen analysar, ingen kontoar, ingen Gabbro-tenar. Gabbro gjer ingen nettverkstilkoplingar i det heile — med mindre du slår på app-passkeys: då er den einaste tilkoplinga éi henting per app-innlogging, nettstaden si eiga app-verifiseringsfil.",
 
   "strengthTierTerrible": "Forferdeleg",
   "strengthTierWeak": "Svak",

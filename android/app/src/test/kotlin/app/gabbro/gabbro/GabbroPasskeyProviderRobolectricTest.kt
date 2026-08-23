@@ -159,6 +159,7 @@ class GabbroPasskeyProviderRobolectricTest {
     fun `caller decision refuses when the site cannot be reached`() {
         val decision = decideCaller(
             "example.com", "com.company.app", appCert, vendoredAllowlist(), "hash",
+            appPasskeysEnabled = true,
         ) { null }
         assertTrue(decision is CallerDecision.Refused)
     }
@@ -168,6 +169,7 @@ class GabbroPasskeyProviderRobolectricTest {
         var fetched: String? = null
         val decision = decideCaller(
             "example.com", "com.company.app", appCert, vendoredAllowlist(), "keyhash",
+            appPasskeysEnabled = true,
         ) { url ->
             fetched = url
             assetLinks("com.company.app", appCert)
@@ -178,6 +180,33 @@ class GabbroPasskeyProviderRobolectricTest {
             "android:apk-key-hash:keyhash",
             (decision as CallerDecision.VerifiedApp).origin,
         )
+    }
+
+    // ── App-passkeys toggle (F1): the informed opt-in. Android grants the
+    // INTERNET permission silently, so with the toggle off a native app must
+    // be refused BEFORE any fetch — zero packets without consent. ────────────
+
+    @Test
+    fun `toggle off refuses an app before any fetch`() {
+        var fetchCalled = false
+        val decision = decideCaller(
+            "example.com", "com.company.app", appCert, vendoredAllowlist(), "hash",
+            appPasskeysEnabled = false,
+        ) {
+            fetchCalled = true
+            assetLinks("com.company.app", appCert)
+        }
+        assertTrue(decision is CallerDecision.Refused)
+        assertFalse("no network before the opt-in", fetchCalled)
+    }
+
+    @Test
+    fun `toggle off leaves privileged browsers untouched`() {
+        val decision = decideCaller(
+            "example.com", "com.brave.browser", braveRelease, vendoredAllowlist(), "hash",
+            appPasskeysEnabled = false,
+        ) { null }
+        assertTrue(decision is CallerDecision.PrivilegedBrowser)
     }
 
     // ── Off-main fetch: a network call on the caller's thread would throw
