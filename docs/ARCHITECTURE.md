@@ -149,21 +149,12 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-- **Passkey provider — ship it.** Code, hardware (Linux + Android) and the
-  full gate ALL GREEN 2026-08-23 (incl. the android-target cfg-leak leg). Feature documented under General
-  Information; plan archive: `docs/PASSKEY_INVESTIGATION.md`. Remaining:
-  - [ ] permanent USB product id (F3, Linux only, FIRST — external review
-        wait overlaps F5): 0x1209:0x0001 is pid.codes' shared TEST id,
-        forbidden for released products; another dev gadget with it could
-        confuse the YubiKey filter. Source-code-only projects qualify; may
-        need a why-a-fixed-PID justification.
-    - [x] PR opened 2026-08-23 requesting 0x1209:0x6ABB:
-          https://github.com/pidcodes/pidcodes.github.com/pull/1265
-    - [ ] wait for pid.codes review (external; F5 proceeds meanwhile)
-    - [ ] PID granted: TDD the constants in `rust/src/uhid.rs`, hardware-verify
-          on Linux, drop this whole item
-  - [ ] challenge vault: reissue at v12 (old crack-me vaults stay — red
-        herrings are deliberate)
+- **Permanent USB product id (F3, Linux only).** 0x1209:0x0001 is pid.codes'
+  shared TEST id; another dev gadget with it could confuse the YubiKey filter.
+  PR opened 2026-08-23 requesting 0x1209:0x6ABB:
+  https://github.com/pidcodes/pidcodes.github.com/pull/1265 — awaiting external
+  review (volunteer-run, can take months; not release-blocking). On grant: TDD
+  the constants in `rust/src/uhid.rs`, hardware-verify on Linux.
 
 ---
 
