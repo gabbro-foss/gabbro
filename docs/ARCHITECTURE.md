@@ -150,18 +150,23 @@ resolved but never applied — inert, emits no warning.
 ### Next task
 
 - **Passkey provider — ship it.** Code, hardware (Linux + Android) and the
-  full gate ALL GREEN 2026-08-22. Feature documented under General
+  full gate ALL GREEN 2026-08-23 (incl. the android-target cfg-leak leg). Feature documented under General
   Information; plan archive: `docs/PASSKEY_INVESTIGATION.md`. Remaining:
+  - [ ] permanent USB product id (F3, Linux only, FIRST — external review
+        wait overlaps F5): 0x1209:0x0001 is pid.codes' shared TEST id,
+        forbidden for released products; another dev gadget with it could
+        confuse the YubiKey filter. Source-code-only projects qualify; may
+        need a why-a-fixed-PID justification.
+    - [x] PR opened 2026-08-23 requesting 0x1209:0x6ABB:
+          https://github.com/pidcodes/pidcodes.github.com/pull/1265
+    - [ ] wait for pid.codes review (external; F5 proceeds meanwhile)
+    - [ ] PID granted: TDD the constants in `rust/src/uhid.rs`, hardware-verify
+          on Linux, drop this whole item
   - [ ] browser-list refresh at release (F5, Android only): the vendored
         `passkey_privileged_browsers.json` ages — browsers released or
         re-signed after the snapshot are refused passkeys until it is
         re-vendored. Add a pre-flight step to BUILD_AND_RELEASE.md:
         re-fetch Google's reference list, diff, commit.
-  - [ ] permanent USB product id (F3, Linux only): 0x1209:0x0001 is
-        pid.codes' shared TEST id, forbidden for released products; another
-        dev gadget with it could confuse the YubiKey filter. Register a
-        Gabbro PID via a pid.codes pull request (free for FOSS), then update
-        the constants in `rust/src/uhid.rs`.
   - [ ] merge `passkey_investigation_and_implementation` to master
   - [ ] challenge vault: reissue at v12 — LAST, on master after the merge
         (old crack-me vaults stay — red herrings are deliberate)
