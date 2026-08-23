@@ -1,9 +1,9 @@
 # Gabbro crack-me challenge
 
-**Published:** 2026-07-11  
+**Published:** 2026-08-23  
 **Status:** Not cracked
 
-`decryptMe_2026-07-11.gabbro` is a real Gabbro vault, sealed with a 
+`decryptMe_2026-08-23.gabbro` is a real Gabbro vault, sealed with a 
 randomly-generated passphrase and two registered YubiKeys.
 
 ---
@@ -11,7 +11,7 @@ randomly-generated passphrase and two registered YubiKeys.
 ## The challenge
 
 Decrypt the vault body and read the note inside. 
-The note contains a field labelled as `decryptionProof_*` which is a random string.
+The note contains a field labelled as `decryptionProof` which is a random string.
 
 ## The reward
 
