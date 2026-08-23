@@ -355,6 +355,30 @@ abstract class AppLocalizations {
   /// **'Sign in to {site} with your passkey?'**
   String passkeySignInPrompt(String site);
 
+  /// Vault-list banner (Linux) when /dev/uhid does not exist because the uhid kernel module is not loaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Passkeys are inactive: the uhid kernel module is not loaded. See the passkey setup steps in the README.'**
+  String get passkeyHintModuleMissing;
+
+  /// Vault-list banner (Linux) when /dev/uhid exists but the udev rule granting user access is missing.
+  ///
+  /// In en, this message translates to:
+  /// **'Passkeys are inactive: Gabbro cannot access /dev/uhid (udev rule missing). See the passkey setup steps in the README.'**
+  String get passkeyHintNoAccess;
+
+  /// Vault-list banner (Linux) when the passkey provider failed to start for an unrecognised reason.
+  ///
+  /// In en, this message translates to:
+  /// **'Passkeys are inactive: the virtual security key could not start. See the passkey setup steps in the README.'**
+  String get passkeyHintOther;
+
+  /// Banner action that permanently hides the passkey hint (persisted in settings).
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t show again'**
+  String get passkeyHintDontShowAgain;
+
   /// No description provided for @add.
   ///
   /// In en, this message translates to:

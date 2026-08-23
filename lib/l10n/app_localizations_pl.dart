@@ -114,6 +114,21 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
+  String get passkeyHintModuleMissing =>
+      'Passkey są nieaktywne: moduł jądra uhid nie jest załadowany. Zobacz kroki konfiguracji passkey w README.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkey są nieaktywne: Gabbro nie ma dostępu do /dev/uhid (brak reguły udev). Zobacz kroki konfiguracji passkey w README.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkey są nieaktywne: nie udało się uruchomić wirtualnego klucza bezpieczeństwa. Zobacz kroki konfiguracji passkey w README.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Nie pokazuj ponownie';
+
+  @override
   String get add => 'Dodaj';
 
   @override

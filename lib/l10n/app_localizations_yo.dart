@@ -114,6 +114,21 @@ class AppLocalizationsYo extends AppLocalizations {
   }
 
   @override
+  String get passkeyHintModuleMissing =>
+      'Passkey kò ṣiṣẹ́: mọ́júùlù kernel uhid kò tíì gbéwọlé. Wo àwọn ìgbésẹ̀ ìṣètò passkey nínú README.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkey kò ṣiṣẹ́: Gabbro kò lè wọlé sí /dev/uhid (òfin udev kò sí). Wo àwọn ìgbésẹ̀ ìṣètò passkey nínú README.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkey kò ṣiṣẹ́: kọ́kọ́rọ́ ààbò àfojúinú kò lè bẹ̀rẹ̀. Wo àwọn ìgbésẹ̀ ìṣètò passkey nínú README.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Má fi hàn mọ́';
+
+  @override
   String get add => 'Fi kun';
 
   @override

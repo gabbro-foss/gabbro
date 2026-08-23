@@ -114,6 +114,21 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
+  String get passkeyHintModuleMissing =>
+      'Passkeys är inaktiva: kärnmodulen uhid är inte laddad. Se stegen för passkey-konfiguration i README.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkeys är inaktiva: Gabbro har inte åtkomst till /dev/uhid (udev-regel saknas). Se stegen för passkey-konfiguration i README.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkeys är inaktiva: den virtuella säkerhetsnyckeln kunde inte starta. Se stegen för passkey-konfiguration i README.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Visa inte igen';
+
+  @override
   String get add => 'Lägg till';
 
   @override

@@ -111,6 +111,21 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get passkeyHintModuleMissing =>
+      '패스키가 비활성 상태입니다. 커널 모듈 uhid가 로드되지 않았습니다. README의 패스키 설정 단계를 참조하세요.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      '패스키가 비활성 상태입니다. Gabbro가 /dev/uhid에 접근할 수 없습니다(udev 규칙 없음). README의 패스키 설정 단계를 참조하세요.';
+
+  @override
+  String get passkeyHintOther =>
+      '패스키가 비활성 상태입니다. 가상 보안 키를 시작할 수 없습니다. README의 패스키 설정 단계를 참조하세요.';
+
+  @override
+  String get passkeyHintDontShowAgain => '다시 표시하지 않음';
+
+  @override
   String get add => '추가';
 
   @override

@@ -114,6 +114,21 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get passkeyHintModuleMissing =>
+      'As passkeys estão inativas: o módulo do kernel uhid não está carregado. Veja os passos de configuração de passkeys no README.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'As passkeys estão inativas: o Gabbro não consegue aceder a /dev/uhid (falta a regra udev). Veja os passos de configuração de passkeys no README.';
+
+  @override
+  String get passkeyHintOther =>
+      'As passkeys estão inativas: a chave de segurança virtual não pôde iniciar. Veja os passos de configuração de passkeys no README.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Não mostrar novamente';
+
+  @override
   String get add => 'Adicionar';
 
   @override
@@ -2349,6 +2364,21 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   }
 
   @override
+  String get passkeyHintModuleMissing =>
+      'As passkeys estão inativas: o módulo do kernel uhid não está carregado. Veja os passos de configuração de passkeys no README.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'As passkeys estão inativas: o Gabbro não consegue acessar /dev/uhid (falta a regra udev). Veja os passos de configuração de passkeys no README.';
+
+  @override
+  String get passkeyHintOther =>
+      'As passkeys estão inativas: a chave de segurança virtual não pôde iniciar. Veja os passos de configuração de passkeys no README.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Não mostrar novamente';
+
+  @override
   String get add => 'Adicionar';
 
   @override
@@ -4579,6 +4609,21 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   String passkeySignInPrompt(String site) {
     return 'Iniciar sessão em $site com a sua passkey?';
   }
+
+  @override
+  String get passkeyHintModuleMissing =>
+      'As passkeys estão inativas: o módulo do kernel uhid não está carregado. Veja os passos de configuração de passkeys no README.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'As passkeys estão inativas: o Gabbro não consegue aceder a /dev/uhid (falta a regra udev). Veja os passos de configuração de passkeys no README.';
+
+  @override
+  String get passkeyHintOther =>
+      'As passkeys estão inativas: a chave de segurança virtual não pôde iniciar. Veja os passos de configuração de passkeys no README.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Não mostrar novamente';
 
   @override
   String get add => 'Adicionar';

@@ -114,6 +114,21 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
+  String get passkeyHintModuleMissing =>
+      'Влизането с passkey е неактивно: модулът на ядрото uhid не е зареден. Вижте стъпките за настройка на passkey в README.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Влизането с passkey е неактивно: Gabbro няма достъп до /dev/uhid (липсва правило на udev). Вижте стъпките за настройка на passkey в README.';
+
+  @override
+  String get passkeyHintOther =>
+      'Влизането с passkey е неактивно: виртуалният ключ за сигурност не можа да стартира. Вижте стъпките за настройка на passkey в README.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Не показвай отново';
+
+  @override
   String get add => 'Добави';
 
   @override

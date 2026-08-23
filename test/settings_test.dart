@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/text_scale.dart';
@@ -278,6 +280,44 @@ void main() {
       expect(updated.blockPassphraseCopyPaste, isFalse);
       expect(updated.theme, original.theme);
       expect(updated.foregroundLockTimeout, original.foregroundLockTimeout);
+    });
+  });
+
+  // ── passkeyHintDismissed ──────────────────────────────────────────────────
+
+  group('passkeyHintDismissed', () {
+    // "Don't show again" on the passkey banner; without persistence a
+    // tarball user who skipped the uhid setup is nagged on every launch.
+    test('defaults to false', () {
+      final s = AppSettings.fromJson({});
+      expect(s.passkeyHintDismissed, isFalse);
+    });
+
+    test('round-trips true through fromJson', () {
+      final s = AppSettings.fromJson({'passkey_hint_dismissed': true});
+      expect(s.passkeyHintDismissed, isTrue);
+    });
+
+    test('serialises to toJson', () {
+      const s = AppSettings(passkeyHintDismissed: true);
+      expect(s.toJson()['passkey_hint_dismissed'], isTrue);
+    });
+
+    test('survives the generated jsonc', () {
+      const s = AppSettings(passkeyHintDismissed: true);
+      final stripped = AppSettings.stripCommentsForTest(s.toJsoncForTest());
+      final reloaded = AppSettings.fromJson(
+        jsonDecode(stripped) as Map<String, dynamic>,
+      );
+      expect(reloaded.passkeyHintDismissed, isTrue);
+    });
+
+    test('copyWith overrides passkeyHintDismissed only', () {
+      const original = AppSettings();
+      final updated = original.copyWith(passkeyHintDismissed: true);
+      expect(updated.passkeyHintDismissed, isTrue);
+      expect(updated.theme, original.theme);
+      expect(updated.blockPassphraseCopyPaste, original.blockPassphraseCopyPaste);
     });
   });
 

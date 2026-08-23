@@ -114,6 +114,21 @@ class AppLocalizationsSl extends AppLocalizations {
   }
 
   @override
+  String get passkeyHintModuleMissing =>
+      'Passkey niso aktivni: modul jedra uhid ni naložen. Glejte korake nastavitve passkey v README.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkey niso aktivni: Gabbro nima dostopa do /dev/uhid (manjka pravilo udev). Glejte korake nastavitve passkey v README.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkey niso aktivni: navideznega varnostnega ključa ni bilo mogoče zagnati. Glejte korake nastavitve passkey v README.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Ne prikaži več';
+
+  @override
   String get add => 'Dodaj';
 
   @override

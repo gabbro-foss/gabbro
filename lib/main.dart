@@ -33,6 +33,8 @@ import 'package:gabbro/screens/vault_list_screen.dart'
         openVaultMenu,
         quitVault;
 import 'package:gabbro/src/rust/api/autotype_bridge.dart';
+import 'package:gabbro/src/rust/api/passkey_daemon_bridge.dart'
+    show passkeyDaemonOpen;
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/frb_generated.dart';
@@ -671,7 +673,8 @@ Future<void> main() async {
   final settings = await AppSettings.load();
   if (Platform.isLinux) {
     await _startAutotypeListener();
-    _startPasskeyDaemon();
+    // Fire-and-forget: failures land in the status notifier, never block launch.
+    unawaited(_startPasskeyDaemon());
   }
   runApp(
     GabbroApp(
@@ -727,22 +730,31 @@ GlobalKey<NavigatorState>? rootNavigatorKey;
 /// Start the Linux passkey provider (ADR-009). Rust owns the uhid device and
 /// streams each request; consent shows as an in-app dialog when the user is
 /// focused on Gabbro (no forced window raise — see docs). Best-effort: a
-/// failure (missing udev rule, no device) just leaves the provider inactive,
-/// it never blocks launch. The process owns the device for its whole life;
-/// quitting closes the fd and the kernel unplugs it.
-void _startPasskeyDaemon() {
+/// failure (missing uhid module / udev rule, second instance) never blocks
+/// launch — it lands in [reportPasskeyFailure], which the vault-list banner
+/// reads to tell the user why passkeys are inactive (F2). The process owns
+/// the device for its whole life; quitting closes the fd and the kernel
+/// unplugs it.
+Future<void> _startPasskeyDaemon() async {
   try {
+    // The fallible half (flock, /dev/uhid, device create) is awaited here so
+    // its error is catchable; the stream fn below only attaches the pump —
+    // its Err would be lost on an unawaited FRB future.
+    await passkeyDaemonOpen();
     final device = UhidPasskeyDevice();
-    PasskeyDaemon(
-      device: device,
-      onConsent: (request) async {
-        final context = rootNavigatorKey?.currentContext;
-        if (context == null) return null; // no UI yet -> treat as cancel
-        return showPasskeyConsent(context, request);
-      },
-    ).run();
+    unawaited(
+      PasskeyDaemon(
+        device: device,
+        onFailure: reportPasskeyFailure,
+        onConsent: (request) async {
+          final context = rootNavigatorKey?.currentContext;
+          if (context == null) return null; // no UI yet -> treat as cancel
+          return showPasskeyConsent(context, request);
+        },
+      ).run(),
+    );
   } catch (e) {
-    debugPrint('passkey: daemon failed to start: $e');
+    reportPasskeyFailure(e);
   }
 }
 

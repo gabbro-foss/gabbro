@@ -115,6 +115,21 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
+  String get passkeyHintModuleMissing =>
+      'Τα passkey είναι ανενεργά: το άρθρωμα πυρήνα uhid δεν είναι φορτωμένο. Δείτε τα βήματα ρύθμισης passkey στο README.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Τα passkey είναι ανενεργά: το Gabbro δεν έχει πρόσβαση στο /dev/uhid (λείπει ο κανόνας udev). Δείτε τα βήματα ρύθμισης passkey στο README.';
+
+  @override
+  String get passkeyHintOther =>
+      'Τα passkey είναι ανενεργά: το εικονικό κλειδί ασφαλείας δεν μπόρεσε να ξεκινήσει. Δείτε τα βήματα ρύθμισης passkey στο README.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Να μην εμφανιστεί ξανά';
+
+  @override
   String get add => 'Προσθήκη';
 
   @override

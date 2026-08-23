@@ -109,6 +109,20 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get passkeyHintModuleMissing =>
+      '通行密钥未启用：内核模块 uhid 未加载。请参阅 README 中的通行密钥设置步骤。';
+
+  @override
+  String get passkeyHintNoAccess =>
+      '通行密钥未启用：Gabbro 无法访问 /dev/uhid（缺少 udev 规则）。请参阅 README 中的通行密钥设置步骤。';
+
+  @override
+  String get passkeyHintOther => '通行密钥未启用：虚拟安全密钥无法启动。请参阅 README 中的通行密钥设置步骤。';
+
+  @override
+  String get passkeyHintDontShowAgain => '不再显示';
+
+  @override
   String get add => '添加';
 
   @override
@@ -2240,6 +2254,20 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   }
 
   @override
+  String get passkeyHintModuleMissing =>
+      '通行密钥未启用：内核模块 uhid 未加载。请参阅 README 中的通行密钥设置步骤。';
+
+  @override
+  String get passkeyHintNoAccess =>
+      '通行密钥未启用：Gabbro 无法访问 /dev/uhid（缺少 udev 规则）。请参阅 README 中的通行密钥设置步骤。';
+
+  @override
+  String get passkeyHintOther => '通行密钥未启用：虚拟安全密钥无法启动。请参阅 README 中的通行密钥设置步骤。';
+
+  @override
+  String get passkeyHintDontShowAgain => '不再显示';
+
+  @override
   String get add => '添加';
 
   @override
@@ -4369,6 +4397,20 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String passkeySignInPrompt(String site) {
     return '要使用通行密鑰登入 $site 嗎？';
   }
+
+  @override
+  String get passkeyHintModuleMissing =>
+      '通行密鑰未啟用：核心模組 uhid 未載入。請參閱 README 中的通行密鑰設定步驟。';
+
+  @override
+  String get passkeyHintNoAccess =>
+      '通行密鑰未啟用：Gabbro 無法存取 /dev/uhid（缺少 udev 規則）。請參閱 README 中的通行密鑰設定步驟。';
+
+  @override
+  String get passkeyHintOther => '通行密鑰未啟用：虛擬安全金鑰無法啟動。請參閱 README 中的通行密鑰設定步驟。';
+
+  @override
+  String get passkeyHintDontShowAgain => '不要再顯示';
 
   @override
   String get add => '新增';

@@ -37,6 +37,8 @@ import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/fido_bridge.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
+import 'package:gabbro/passkey_daemon.dart';
+import 'package:gabbro/widgets/passkey_hint_banner.dart';
 import 'package:gabbro/widgets/yubikey_tap.dart';
 import 'package:gabbro/widgets/sync_review.dart';
 import 'package:gabbro/widgets/sync_method_dialog.dart';
@@ -370,6 +372,14 @@ class VaultListScreen extends StatefulWidget {
   /// user backed out). Seam for tests; defaults to pushing [ImportScreen].
   final Future<int?> Function(BuildContext context) openImport;
 
+  /// Whether the passkey-failure hint was permanently dismissed. `null` reads
+  /// the app settings; tests inject a value.
+  final bool? passkeyHintDismissed;
+
+  /// Persists "Don't show again" for the passkey hint. `null` writes the app
+  /// settings; tests inject a recorder.
+  final VoidCallback? onPasskeyHintDismissForever;
+
   VaultListScreen({
     super.key,
     required this.vaultPath,
@@ -398,6 +408,8 @@ class VaultListScreen extends StatefulWidget {
     this.onQuit,
     this.onLock = lockVault,
     this.openImport = _defaultOpenImport,
+    this.passkeyHintDismissed,
+    this.onPasskeyHintDismissForever,
     bool? isAndroid,
   }) : isAndroid = isAndroid ?? Platform.isAndroid;
 
@@ -724,6 +736,49 @@ class _VaultListScreenState extends State<VaultListScreen>
     _loadEntries();
     _chipScrollController.addListener(_updateChevrons);
     WidgetsBinding.instance.addPostFrameCallback((_) => _updateChevrons());
+    // The daemon usually fails before this screen mounts (app launch), so
+    // announce an already-recorded failure too, not just later changes.
+    passkeyProviderFailure.addListener(_announcePasskeyFailure);
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _announcePasskeyFailure(),
+    );
+  }
+
+  /// Session-only dismissal of the passkey-failure banner (the X).
+  bool _passkeyHintSessionDismissed = false;
+
+  /// Permanent dismissal, from the seam or the app settings.
+  bool _passkeyHintDismissedForever() =>
+      widget.passkeyHintDismissed ??
+      GabbroApp.maybeOf(context)?.settings.passkeyHintDismissed ??
+      false;
+
+  bool _passkeyHintVisible() =>
+      passkeyProviderFailure.value != null &&
+      !_passkeyHintSessionDismissed &&
+      !_passkeyHintDismissedForever();
+
+  /// Speak the banner message: the Linux reader never visits an unfocused
+  /// banner on its own (it reads only names), so its appearance is an event
+  /// that must go through [_announce].
+  void _announcePasskeyFailure() {
+    final reason = passkeyProviderFailure.value;
+    if (reason == null || !mounted || !_passkeyHintVisible()) return;
+    _announce(PasskeyHintBanner.message(AppLocalizations.of(context), reason));
+  }
+
+  void _dismissPasskeyHintForever() {
+    final custom = widget.onPasskeyHintDismissForever;
+    if (custom != null) {
+      custom();
+      return;
+    }
+    final appState = GabbroApp.maybeOf(context);
+    if (appState != null) {
+      appState.updateSettings(
+        appState.settings.copyWith(passkeyHintDismissed: true),
+      );
+    }
   }
 
   @override
@@ -745,6 +800,7 @@ class _VaultListScreenState extends State<VaultListScreen>
 
   @override
   void dispose() {
+    passkeyProviderFailure.removeListener(_announcePasskeyFailure);
     // Clear any sync snackbar so it can't linger on the next screen (e.g. the
     // unlock screen after lock) and crash when its Details action is tapped.
     _messenger?.clearSnackBars();
@@ -1906,6 +1962,23 @@ class _VaultListScreenState extends State<VaultListScreen>
       // list rather than shrink the body (which overflowed the header). The
       // search field stays visible above the keyboard.
       resizeToAvoidBottomInset: false,
+      bottomNavigationBar: ValueListenableBuilder<PasskeyFailureReason?>(
+        valueListenable: passkeyProviderFailure,
+        builder: (context, reason, _) {
+          if (reason == null || !_passkeyHintVisible()) {
+            return const SizedBox.shrink();
+          }
+          return PasskeyHintBanner(
+            reason: reason,
+            onDismiss: () =>
+                setState(() => _passkeyHintSessionDismissed = true),
+            onDismissForever: () {
+              setState(() => _passkeyHintSessionDismissed = true);
+              _dismissPasskeyHintForever();
+            },
+          );
+        },
+      ),
       appBar: AppBar(
         title: Text(
           _isSelecting

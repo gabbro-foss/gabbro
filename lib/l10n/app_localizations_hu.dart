@@ -114,6 +114,21 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get passkeyHintModuleMissing =>
+      'A passkey-k inaktívak: az uhid kernelmodul nincs betöltve. Lásd a passkey beállítási lépéseit a README-ben.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'A passkey-k inaktívak: a Gabbro nem fér hozzá a /dev/uhid eszközhöz (hiányzik az udev szabály). Lásd a passkey beállítási lépéseit a README-ben.';
+
+  @override
+  String get passkeyHintOther =>
+      'A passkey-k inaktívak: a virtuális biztonsági kulcs nem tudott elindulni. Lásd a passkey beállítási lépéseit a README-ben.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Ne jelenjen meg többé';
+
+  @override
   String get add => 'Hozzáadás';
 
   @override

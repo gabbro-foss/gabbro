@@ -38,7 +38,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1820626220;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 441199714;
 
 // Section: executor
 
@@ -2392,6 +2392,38 @@ fn wire__crate__api__passkey_bridge__parse_creation_request_impl(
             move |context| {
                 transform_result_sse::<_, String>((move || {
                     let output_ok = crate::api::passkey_bridge::parse_creation_request(&api_json)?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__passkey_daemon_bridge__passkey_daemon_open_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "passkey_daemon_open",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::api::passkey_daemon_bridge::passkey_daemon_open()?;
                     Ok(output_ok)
                 })())
             }
@@ -5081,136 +5113,142 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        64 => wire__crate__api__passkey_daemon_bridge__passkey_daemon_respond_impl(
+        64 => wire__crate__api__passkey_daemon_bridge__passkey_daemon_open_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        65 => wire__crate__api__passkey_daemon_bridge__passkey_daemon_start_impl(
+        65 => wire__crate__api__passkey_daemon_bridge__passkey_daemon_respond_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        66 => wire__crate__api__passkey_daemon_bridge__passkey_daemon_stop_impl(
+        66 => wire__crate__api__passkey_daemon_bridge__passkey_daemon_start_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        67 => wire__crate__api__passkey_daemon_bridge__passkey_denied_impl(
+        67 => wire__crate__api__passkey_daemon_bridge__passkey_daemon_stop_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        68 => wire__crate__api__passkey_daemon_bridge__passkey_perform_impl(
+        68 => wire__crate__api__passkey_daemon_bridge__passkey_denied_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        69 => wire__crate__api__passkey_daemon_bridge__passkey_plan_impl(
+        69 => wire__crate__api__passkey_daemon_bridge__passkey_perform_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        70 => wire__crate__api__passkey_bridge__passkeys_for_request_impl(
+        70 => wire__crate__api__passkey_daemon_bridge__passkey_plan_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        71 => wire__crate__api__passphrase_generator__passphrase_entropy_bits_impl(
+        71 => wire__crate__api__passkey_bridge__passkeys_for_request_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        73 => wire__crate__api__passkey_bridge__register_passkey_impl(
+        72 => wire__crate__api__passphrase_generator__passphrase_entropy_bits_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        74 => wire__crate__api__passkey_bridge__register_passkey_parts_impl(
+        74 => wire__crate__api__passkey_bridge__register_passkey_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        75 => wire__crate__api__passkey_bridge__registration_response_json_impl(
+        75 => wire__crate__api__passkey_bridge__register_passkey_parts_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        76 => wire__crate__api__vault_bridge__remove_attachment_impl(
+        76 => wire__crate__api__passkey_bridge__registration_response_json_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        77 => {
+        77 => wire__crate__api__vault_bridge__remove_attachment_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        78 => {
             wire__crate__api__vault_bridge__remove_yubikey_impl(port, ptr, rust_vec_len, data_len)
         }
-        78 => wire__crate__api__vault_bridge__rename_folder_impl(port, ptr, rust_vec_len, data_len),
-        79 => {
+        79 => wire__crate__api__vault_bridge__rename_folder_impl(port, ptr, rust_vec_len, data_len),
+        80 => {
             wire__crate__api__vault_bridge__restore_history_impl(port, ptr, rust_vec_len, data_len)
         }
-        80 => wire__crate__api__vault_bridge__restore_vault_backup_impl(
+        81 => wire__crate__api__vault_bridge__restore_vault_backup_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        81 => wire__crate__api__vault_bridge__restore_vault_from_file_impl(
+        82 => wire__crate__api__vault_bridge__restore_vault_from_file_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        82 => {
+        83 => {
             wire__crate__api__simple__set_process_dumpable_impl(port, ptr, rust_vec_len, data_len)
         }
-        83 => {
+        84 => {
             wire__crate__api__vault_bridge__set_vault_alias_impl(port, ptr, rust_vec_len, data_len)
         }
-        84 => wire__crate__api__vault_bridge__set_yubikey_alias_impl(
+        85 => wire__crate__api__vault_bridge__set_yubikey_alias_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        85 => wire__crate__api__passkey_bridge__sign_passkey_assertion_impl(
+        86 => wire__crate__api__passkey_bridge__sign_passkey_assertion_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        87 => wire__crate__api__vault_bridge__unlock_vault_impl(port, ptr, rust_vec_len, data_len),
-        88 => wire__crate__api__vault_bridge__unlock_vault_with_yubikey_impl(
+        88 => wire__crate__api__vault_bridge__unlock_vault_impl(port, ptr, rust_vec_len, data_len),
+        89 => wire__crate__api__vault_bridge__unlock_vault_with_yubikey_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        89 => wire__crate__api__vault_bridge__update_entry_impl(port, ptr, rust_vec_len, data_len),
-        90 => wire__crate__api__vault_bridge__vault_backup_usable_impl(
+        90 => wire__crate__api__vault_bridge__update_entry_impl(port, ptr, rust_vec_len, data_len),
+        91 => wire__crate__api__vault_bridge__vault_backup_usable_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        91 => wire__crate__api__vault_bridge__vault_format_too_new_impl(
+        92 => wire__crate__api__vault_bridge__vault_format_too_new_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        92 => wire__crate__api__vault_bridge__vault_format_too_old_impl(
+        93 => wire__crate__api__vault_bridge__vault_format_too_old_impl(
             port,
             ptr,
             rust_vec_len,
@@ -5250,8 +5288,8 @@ fn pde_ffi_dispatcher_sync_impl(
             wire__crate__api__vault_bridge__list_yubikey_aliases_impl(ptr, rust_vec_len, data_len)
         }
         56 => wire__crate__api__vault_bridge__lock_vault_impl(ptr, rust_vec_len, data_len),
-        72 => wire__crate__api__vault_bridge__read_vault_header_impl(ptr, rust_vec_len, data_len),
-        86 => wire__crate__api__import__sniff_csv_file_impl(ptr, rust_vec_len, data_len),
+        73 => wire__crate__api__vault_bridge__read_vault_header_impl(ptr, rust_vec_len, data_len),
+        87 => wire__crate__api__import__sniff_csv_file_impl(ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }

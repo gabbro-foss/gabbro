@@ -114,6 +114,21 @@ class AppLocalizationsEt extends AppLocalizations {
   }
 
   @override
+  String get passkeyHintModuleMissing =>
+      'Passkey-d ei ole aktiivsed: kerneli moodul uhid on laadimata. Vaata passkey seadistussamme README failis.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkey-d ei ole aktiivsed: Gabbrol puudub ligipääs seadmele /dev/uhid (udev reegel puudub). Vaata passkey seadistussamme README failis.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkey-d ei ole aktiivsed: virtuaalset turvavõtit ei õnnestunud käivitada. Vaata passkey seadistussamme README failis.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Ära enam näita';
+
+  @override
   String get add => 'Lisa';
 
   @override

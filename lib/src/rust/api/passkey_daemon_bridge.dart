@@ -27,8 +27,14 @@ Future<Uint8List> passkeyPerform({
 Future<Uint8List> passkeyDenied() =>
     RustLib.instance.api.crateApiPasskeyDaemonBridgePasskeyDenied();
 
-/// Start the Linux passkey daemon: create the uhid device and stream each
-/// complete CTAP2 request (command byte + CBOR) to Dart. Rust keeps the
+/// The fallible half of daemon startup: instance lock + `/dev/uhid` + device
+/// create. Awaitable so Dart catches the Err and can say why the provider is
+/// inactive (F2) — a stream fn's Err is lost on an unawaited FRB future.
+Future<void> passkeyDaemonOpen() =>
+    RustLib.instance.api.crateApiPasskeyDaemonBridgePasskeyDaemonOpen();
+
+/// Attach the pump to the device `passkey_daemon_open` created and stream
+/// each complete CTAP2 request (command byte + CBOR) to Dart. Rust keeps the
 /// request alive with KEEPALIVE until `passkey_daemon_respond`.
 Stream<Uint8List> passkeyDaemonStart() =>
     RustLib.instance.api.crateApiPasskeyDaemonBridgePasskeyDaemonStart();

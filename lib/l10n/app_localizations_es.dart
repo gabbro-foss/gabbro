@@ -114,6 +114,21 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get passkeyHintModuleMissing =>
+      'Las passkeys están inactivas: el módulo del núcleo uhid no está cargado. Consulta los pasos de configuración de passkeys en el README.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Las passkeys están inactivas: Gabbro no puede acceder a /dev/uhid (falta la regla udev). Consulta los pasos de configuración de passkeys en el README.';
+
+  @override
+  String get passkeyHintOther =>
+      'Las passkeys están inactivas: la llave de seguridad virtual no pudo iniciarse. Consulta los pasos de configuración de passkeys en el README.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'No mostrar de nuevo';
+
+  @override
   String get add => 'Añadir';
 
   @override

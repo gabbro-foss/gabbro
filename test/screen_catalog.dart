@@ -39,6 +39,7 @@ import 'package:gabbro/widgets/password_breakdown_sheet.dart';
 import 'package:gabbro/widgets/sync_review.dart';
 import 'package:gabbro/widgets/gabbro_dialog.dart';
 import 'package:gabbro/widgets/passkey_consent_dialog.dart';
+import 'package:gabbro/widgets/passkey_hint_banner.dart';
 import 'package:gabbro/passkey_daemon.dart';
 import 'package:gabbro/widgets/sync_method_dialog.dart';
 import 'package:gabbro/widgets/url_link.dart';
@@ -286,6 +287,14 @@ final Map<String, Widget Function()> screens = {
       onChanged: (_) {},
       previewText: 'A preview line long enough to stress the row at max text',
       semanticLabel: 'Text size',
+    ),
+  ),
+  // moduleMissing carries the longest reason text the banner ever shows.
+  'passkey_hint_banner': () => Scaffold(
+    body: PasskeyHintBanner(
+      reason: PasskeyFailureReason.moduleMissing,
+      onDismiss: () {},
+      onDismissForever: () {},
     ),
   ),
   'path_field': () => Scaffold(
@@ -586,6 +595,7 @@ const Map<String, String> covers = {
   'import_skipped_dialog': 'import_skipped_dialog',
   'import_failures_dialog': 'import_failures_dialog',
   'passkey_consent_dialog': 'passkey_consent_dialog',
+  'passkey_hint_banner': 'passkey_hint_banner',
   'alphabet_index_bar': 'alphabet_index_bar',
   'save_confirm': 'save_confirm_screen',
   'review_changes': 'review_changes_screen',
@@ -632,4 +642,4 @@ List<String> uiSources() =>
 // nothing. Adding a screen or widget fails here first: the new file must be
 // swept or waived deliberately.
 const screenFileCount = 29;
-const widgetFileCount = 13;
+const widgetFileCount = 14;

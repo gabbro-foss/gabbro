@@ -39,28 +39,57 @@ struct Daemon {
     shared: Arc<Mutex<Shared>>,
     running: Arc<AtomicBool>,
     thread: Option<std::thread::JoinHandle<()>>,
+    /// Held for the daemon's life (F4); dropping it releases the flock.
+    _lock: std::fs::File,
+}
+
+/// Between `open()` and `start()`: the device exists but nothing pumps it
+/// yet. Dropping it (via `stop()` or a re-open) closes the fd and the kernel
+/// unplugs the virtual key.
+struct Opened {
+    dev: std::fs::File,
+    /// Held from `open()` on (F4); dropping it releases the flock.
+    lock: std::fs::File,
 }
 
 static DAEMON: Mutex<Option<Daemon>> = Mutex::new(None);
+static OPENED: Mutex<Option<Opened>> = Mutex::new(None);
 
-/// Open `/dev/uhid`, create the virtual device, and spawn the pump thread.
-/// Each complete CTAP2 request is streamed to `on_request`. Idempotent-safe:
-/// an already-running daemon is stopped first.
-pub fn start(on_request: impl Fn(Vec<u8>) + Send + 'static) -> Result<(), String> {
+/// The fallible half of startup (F2): take the instance lock, open
+/// `/dev/uhid`, create the virtual device. Split from `start()` so the Err
+/// reaches Dart through an awaitable bridge fn — a stream fn's Err lands on
+/// an unawaited FRB future and is lost, leaving the provider silently dead.
+/// Idempotent-safe: an already-running daemon is stopped first.
+pub fn open() -> Result<(), String> {
     stop();
 
-    let dev = std::fs::OpenOptions::new()
+    let lock = take_instance_lock()?;
+
+    let mut dev = std::fs::OpenOptions::new()
         .read(true)
         .write(true)
         .custom_flags(libc::O_NONBLOCK)
         .open("/dev/uhid")
         .map_err(|e| format!("open /dev/uhid: {e} (is the udev rule installed?)"))?;
-    let mut dev = dev;
     dev.write_all(&uhid::create2_event())
         .map_err(|e| format!("create uhid device: {e}"))?;
 
+    *OPENED.lock().map_err(|e| e.to_string())? = Some(Opened { dev, lock });
+    Ok(())
+}
+
+/// Attach the pump thread to the device `open()` created. Each complete
+/// CTAP2 request is streamed to `on_request`. Err only when `open()` did not
+/// run first (a wiring bug, not a runtime condition).
+pub fn start(on_request: impl Fn(Vec<u8>) + Send + 'static) -> Result<(), String> {
+    let opened = OPENED
+        .lock()
+        .map_err(|e| e.to_string())?
+        .take()
+        .ok_or("passkey daemon: open() must succeed before start()")?;
+
     let shared = Arc::new(Mutex::new(Shared {
-        dev,
+        dev: opened.dev,
         hid: Ctaphid::new(),
         inflight_cid: None,
         pending_response: None,
@@ -77,8 +106,33 @@ pub fn start(on_request: impl Fn(Vec<u8>) + Send + 'static) -> Result<(), String
         shared,
         running,
         thread: Some(thread),
+        _lock: opened.lock,
     });
     Ok(())
+}
+
+/// Exclusive single-instance lock (F4), taken BEFORE `/dev/uhid` is opened:
+/// a second Gabbro instance gets a clean Err instead of creating a duplicate
+/// virtual key (the browser would see two identical authenticators).
+fn take_instance_lock() -> Result<std::fs::File, String> {
+    use std::os::fd::AsRawFd;
+
+    let dir = std::env::var("XDG_RUNTIME_DIR")
+        .map(std::path::PathBuf::from)
+        .unwrap_or_else(|_| std::env::temp_dir());
+    let path = dir.join("gabbro-passkey.lock");
+    let file = std::fs::OpenOptions::new()
+        .create(true)
+        .write(true)
+        .truncate(false)
+        .open(&path)
+        .map_err(|e| format!("open {}: {e}", path.display()))?;
+    if unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) } != 0 {
+        return Err(
+            "another Gabbro instance already owns the passkey device (instance lock held)".into(),
+        );
+    }
+    Ok(file)
 }
 
 /// Hand a finished CTAP2 response back to the daemon; the pump thread frames
@@ -92,7 +146,11 @@ pub fn respond(response: Vec<u8>) -> Result<(), String> {
 }
 
 /// Stop the pump thread and drop the uhid device (the kernel unplugs it).
+/// Also drops an opened-but-never-pumped device from a lone `open()`.
 pub fn stop() {
+    if let Ok(mut g) = OPENED.lock() {
+        *g = None;
+    }
     let taken = DAEMON.lock().ok().and_then(|mut g| g.take());
     if let Some(mut daemon) = taken {
         daemon.running.store(false, Ordering::SeqCst);
@@ -200,6 +258,44 @@ fn read_event(dev: &mut std::fs::File, buf: &mut [u8]) -> Result<Option<[u8; 64]
 mod tests {
     use super::*;
     use crate::uhid::{test_find_our_hidraw as find_our_hidraw, test_wait_for as wait_for};
+    use serial_test::serial;
+
+    // F4: two Gabbro instances must not both create the virtual key -- the
+    // browser would see two identical authenticators and consent could race.
+    // The flock is taken BEFORE /dev/uhid is opened, so this needs no uhid
+    // access and runs everywhere (the env override keeps it off the real
+    // runtime dir).
+    #[test]
+    #[serial]
+    fn a_second_instance_gets_a_clean_err_from_the_held_lock() {
+        use std::os::fd::AsRawFd;
+
+        let dir = std::env::temp_dir().join(format!("gabbro_flock_{}", std::process::id()));
+        std::fs::create_dir_all(&dir).expect("temp runtime dir");
+        std::env::set_var("XDG_RUNTIME_DIR", &dir);
+
+        // First instance: hold the exclusive lock.
+        let first = std::fs::OpenOptions::new()
+            .create(true)
+            .write(true)
+            .truncate(false)
+            .open(dir.join("gabbro-passkey.lock"))
+            .expect("lock file");
+        assert_eq!(
+            unsafe { libc::flock(first.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) },
+            0,
+            "test setup: taking the lock"
+        );
+
+        // Second instance: must fail cleanly, before touching /dev/uhid.
+        let result = open();
+        stop(); // cleans up if open unexpectedly succeeded (red run)
+        std::env::remove_var("XDG_RUNTIME_DIR");
+        let _ = std::fs::remove_dir_all(&dir);
+
+        let err = result.expect_err("a second instance must get Err, not a duplicate key");
+        assert!(err.contains("instance"), "names the cause, got: {err}");
+    }
 
     // The whole pump over the real kernel pipe, host side only: start() owns
     // /dev/uhid, we speak through hidraw exactly as a browser would. Pins that
@@ -212,7 +308,8 @@ mod tests {
         use std::io::{Read, Write};
         use std::os::unix::fs::OpenOptionsExt;
 
-        start(|_| {}).expect("daemon starts");
+        open().expect("device opens");
+        start(|_| {}).expect("pump attaches");
 
         let hidraw = wait_for("our hidraw node to appear", find_our_hidraw);
         let mut host = wait_for("hidraw node to become accessible", || {

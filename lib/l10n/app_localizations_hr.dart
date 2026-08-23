@@ -114,6 +114,21 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
+  String get passkeyHintModuleMissing =>
+      'Passkey prijava nije aktivna: modul jezgre uhid nije učitan. Pogledajte korake za postavljanje passkeya u README-u.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkey prijava nije aktivna: Gabbro nema pristup /dev/uhid (nedostaje udev pravilo). Pogledajte korake za postavljanje passkeya u README-u.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkey prijava nije aktivna: virtualni sigurnosni ključ nije se mogao pokrenuti. Pogledajte korake za postavljanje passkeya u README-u.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Ne prikazuj ponovno';
+
+  @override
   String get add => 'Dodaj';
 
   @override

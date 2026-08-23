@@ -114,6 +114,21 @@ class AppLocalizationsLt extends AppLocalizations {
   }
 
   @override
+  String get passkeyHintModuleMissing =>
+      'Passkey neaktyvūs: branduolio modulis uhid neįkeltas. Žr. passkey sąrankos žingsnius README faile.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkey neaktyvūs: Gabbro negali pasiekti /dev/uhid (trūksta udev taisyklės). Žr. passkey sąrankos žingsnius README faile.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkey neaktyvūs: virtualaus saugos rakto nepavyko paleisti. Žr. passkey sąrankos žingsnius README faile.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Daugiau nerodyti';
+
+  @override
   String get add => 'Pridėti';
 
   @override

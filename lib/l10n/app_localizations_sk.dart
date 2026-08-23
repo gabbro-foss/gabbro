@@ -114,6 +114,21 @@ class AppLocalizationsSk extends AppLocalizations {
   }
 
   @override
+  String get passkeyHintModuleMissing =>
+      'Passkey nie sú aktívne: modul jadra uhid nie je načítaný. Pozrite kroky nastavenia passkey v README.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkey nie sú aktívne: Gabbro nemá prístup k /dev/uhid (chýba pravidlo udev). Pozrite kroky nastavenia passkey v README.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkey nie sú aktívne: virtuálny bezpečnostný kľúč sa nepodarilo spustiť. Pozrite kroky nastavenia passkey v README.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Znova nezobrazovať';
+
+  @override
   String get add => 'Pridať';
 
   @override

@@ -114,6 +114,21 @@ class AppLocalizationsSr extends AppLocalizations {
   }
 
   @override
+  String get passkeyHintModuleMissing =>
+      'Passkey нису активни: модул језгра uhid није учитан. Погледајте кораке за подешавање passkey у README.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkey нису активни: Gabbro нема приступ /dev/uhid (недостаје udev правило). Погледајте кораке за подешавање passkey у README.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkey нису активни: виртуелни сигурносни кључ није могао да се покрене. Погледајте кораке за подешавање passkey у README.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Не приказуј поново';
+
+  @override
   String get add => 'Додај';
 
   @override
@@ -2340,6 +2355,21 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   String passkeySignInPrompt(String site) {
     return 'Prijaviti se na $site pomoću passkeya?';
   }
+
+  @override
+  String get passkeyHintModuleMissing =>
+      'Passkey nisu aktivni: modul jezgra uhid nije učitan. Pogledajte korake za podešavanje passkey u README.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkey nisu aktivni: Gabbro nema pristup /dev/uhid (nedostaje udev pravilo). Pogledajte korake za podešavanje passkey u README.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkey nisu aktivni: virtuelni sigurnosni ključ nije mogao da se pokrene. Pogledajte korake za podešavanje passkey u README.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Ne prikazuj ponovo';
 
   @override
   String get add => 'Dodaj';

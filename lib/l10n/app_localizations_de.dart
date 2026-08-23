@@ -115,6 +115,21 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get passkeyHintModuleMissing =>
+      'Passkeys sind inaktiv: das Kernelmodul uhid ist nicht geladen. Siehe die Passkey-Einrichtungsschritte im README.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkeys sind inaktiv: Gabbro hat keinen Zugriff auf /dev/uhid (udev-Regel fehlt). Siehe die Passkey-Einrichtungsschritte im README.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkeys sind inaktiv: der virtuelle Sicherheitsschlüssel konnte nicht starten. Siehe die Passkey-Einrichtungsschritte im README.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Nicht mehr anzeigen';
+
+  @override
   String get add => 'Hinzufügen';
 
   @override

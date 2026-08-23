@@ -114,6 +114,21 @@ class AppLocalizationsFi extends AppLocalizations {
   }
 
   @override
+  String get passkeyHintModuleMissing =>
+      'Passkeyt eivät ole käytössä: ytimen uhid-moduulia ei ole ladattu. Katso passkey-asennusohjeet README-tiedostosta.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkeyt eivät ole käytössä: Gabbro ei pääse laitteeseen /dev/uhid (udev-sääntö puuttuu). Katso passkey-asennusohjeet README-tiedostosta.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkeyt eivät ole käytössä: virtuaalista turva-avainta ei voitu käynnistää. Katso passkey-asennusohjeet README-tiedostosta.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Älä näytä uudelleen';
+
+  @override
   String get add => 'Lisää';
 
   @override

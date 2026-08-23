@@ -114,6 +114,21 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get passkeyHintModuleMissing =>
+      'Passkey неактивны: модуль ядра uhid не загружен. См. шаги настройки passkey в README.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkey неактивны: Gabbro не имеет доступа к /dev/uhid (отсутствует правило udev). См. шаги настройки passkey в README.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkey неактивны: не удалось запустить виртуальный ключ безопасности. См. шаги настройки passkey в README.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Больше не показывать';
+
+  @override
   String get add => 'Добавить';
 
   @override

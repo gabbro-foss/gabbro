@@ -59,8 +59,16 @@ pub fn passkey_denied() -> Vec<u8> {
     ctap2::denied_response()
 }
 
-/// Start the Linux passkey daemon: create the uhid device and stream each
-/// complete CTAP2 request (command byte + CBOR) to Dart. Rust keeps the
+/// The fallible half of daemon startup: instance lock + `/dev/uhid` + device
+/// create. Awaitable so Dart catches the Err and can say why the provider is
+/// inactive (F2) — a stream fn's Err is lost on an unawaited FRB future.
+#[cfg(target_os = "linux")]
+pub fn passkey_daemon_open() -> Result<(), String> {
+    crate::passkey_daemon::open()
+}
+
+/// Attach the pump to the device `passkey_daemon_open` created and stream
+/// each complete CTAP2 request (command byte + CBOR) to Dart. Rust keeps the
 /// request alive with KEEPALIVE until `passkey_daemon_respond`.
 #[cfg(target_os = "linux")]
 pub fn passkey_daemon_start(sink: StreamSink<Vec<u8>>) -> Result<(), String> {

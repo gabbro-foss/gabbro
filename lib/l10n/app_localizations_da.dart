@@ -114,6 +114,21 @@ class AppLocalizationsDa extends AppLocalizations {
   }
 
   @override
+  String get passkeyHintModuleMissing =>
+      'Passkeys er inaktive: kernemodulet uhid er ikke indlæst. Se trinnene til opsætning af passkeys i README.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkeys er inaktive: Gabbro har ikke adgang til /dev/uhid (udev-regel mangler). Se trinnene til opsætning af passkeys i README.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkeys er inaktive: den virtuelle sikkerhedsnøgle kunne ikke starte. Se trinnene til opsætning af passkeys i README.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Vis ikke igen';
+
+  @override
   String get add => 'Tilføj';
 
   @override

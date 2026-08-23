@@ -80,6 +80,22 @@
       "site": {"type": "String"}
     }
   },
+  "passkeyHintModuleMissing": "Passkeys are inactive: the uhid kernel module is not loaded. See the passkey setup steps in the README.",
+  "@passkeyHintModuleMissing": {
+    "description": "Vault-list banner (Linux) when /dev/uhid does not exist because the uhid kernel module is not loaded."
+  },
+  "passkeyHintNoAccess": "Passkeys are inactive: Gabbro cannot access /dev/uhid (udev rule missing). See the passkey setup steps in the README.",
+  "@passkeyHintNoAccess": {
+    "description": "Vault-list banner (Linux) when /dev/uhid exists but the udev rule granting user access is missing."
+  },
+  "passkeyHintOther": "Passkeys are inactive: the virtual security key could not start. See the passkey setup steps in the README.",
+  "@passkeyHintOther": {
+    "description": "Vault-list banner (Linux) when the passkey provider failed to start for an unrecognised reason."
+  },
+  "passkeyHintDontShowAgain": "Don't show again",
+  "@passkeyHintDontShowAgain": {
+    "description": "Banner action that permanently hides the passkey hint (persisted in settings)."
+  },
   "add": "Add",
   "remove": "Remove",
   "rename": "Rename",

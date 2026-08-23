@@ -111,6 +111,21 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get passkeyHintModuleMissing =>
+      'パスキーは無効です。カーネルモジュール uhid が読み込まれていません。README のパスキー設定手順をご覧ください。';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'パスキーは無効です。Gabbro が /dev/uhid にアクセスできません（udev ルールがありません）。README のパスキー設定手順をご覧ください。';
+
+  @override
+  String get passkeyHintOther =>
+      'パスキーは無効です。仮想セキュリティキーを起動できませんでした。README のパスキー設定手順をご覧ください。';
+
+  @override
+  String get passkeyHintDontShowAgain => '今後表示しない';
+
+  @override
   String get add => '追加';
 
   @override

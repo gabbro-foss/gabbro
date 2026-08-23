@@ -114,6 +114,21 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
+  String get passkeyHintModuleMissing =>
+      'Passkeyak ez daude aktibo: uhid kernel modulua ez dago kargatuta. Ikusi passkeyak konfiguratzeko urratsak README fitxategian.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkeyak ez daude aktibo: Gabbrok ezin du /dev/uhid atzitu (udev araua falta da). Ikusi passkeyak konfiguratzeko urratsak README fitxategian.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkeyak ez daude aktibo: segurtasun-gako birtuala ezin izan da abiarazi. Ikusi passkeyak konfiguratzeko urratsak README fitxategian.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Ez erakutsi berriro';
+
+  @override
   String get add => 'Gehitu';
 
   @override

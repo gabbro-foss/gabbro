@@ -114,6 +114,21 @@ class AppLocalizationsKk extends AppLocalizations {
   }
 
   @override
+  String get passkeyHintModuleMissing =>
+      'Passkey белсенді емес: uhid ядро модулі жүктелмеген. README ішіндегі passkey орнату қадамдарын қараңыз.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkey белсенді емес: Gabbro /dev/uhid құрылғысына қатынаса алмайды (udev ережесі жоқ). README ішіндегі passkey орнату қадамдарын қараңыз.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkey белсенді емес: виртуалды қауіпсіздік кілті іске қосылмады. README ішіндегі passkey орнату қадамдарын қараңыз.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Қайта көрсетпеу';
+
+  @override
   String get add => 'Қосу';
 
   @override

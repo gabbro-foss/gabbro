@@ -25,6 +25,18 @@ class _FakeDevice implements PasskeyDevice {
   Future<void> sendResponse(Uint8List response) async => sent.add(response);
 }
 
+/// A device that fails on first read, like the uhid stream erroring when
+/// /dev/uhid cannot be opened.
+class _ThrowingDevice implements PasskeyDevice {
+  @override
+  Future<Uint8List?> nextRequest() async =>
+      throw StateError('open /dev/uhid: EACCES');
+
+  @override
+  Future<void> sendResponse(Uint8List response) async =>
+      fail('nothing to respond to on a dead device');
+}
+
 PasskeyPlan _ask({
   bool isCreate = true,
   String rpId = 'example.com',
@@ -109,6 +121,59 @@ void main() {
     expect(device.sent, [
       [0x27],
     ]);
+  });
+
+  test('a device error completes run() cleanly and reports the failure',
+      () async {
+    // The real trigger: missing uhid module or udev rule surfaces as a
+    // stream error on first read. run() must not leak it as an unhandled
+    // async error -- it reports and returns, leaving the provider inactive.
+    Object? reported;
+    final daemon = PasskeyDaemon(
+      device: _ThrowingDevice(),
+      onConsent: (_) async => fail('no consent on a dead device'),
+      plan: (_) async => fail('no plan on a dead device'),
+      perform: (_, _) async => fail('no perform on a dead device'),
+      denied: () async => fail('no denied on a dead device'),
+      onFailure: (e) => reported = e,
+    );
+
+    await daemon.run(); // must complete, not throw
+
+    expect(reported, isA<StateError>());
+    expect('$reported', contains('/dev/uhid'));
+  });
+
+  group('failure status', () {
+    setUp(() => passkeyProviderFailure.value = null);
+
+    test('a reported failure lands in the provider-status notifier', () {
+      reportPasskeyFailure(StateError('open /dev/uhid: boom'));
+      expect(passkeyProviderFailure.value, isNotNull);
+    });
+
+    test('missing module (ENOENT) is told apart from a missing udev rule '
+        '(EACCES)', () {
+      // The banner's fix instructions differ: ENOENT means the uhid module
+      // is not loaded, EACCES means the module is there but the udev rule
+      // is not -- the wrong hint sends the user to the wrong command.
+      expect(
+        classifyPasskeyFailure(
+          StateError('open /dev/uhid: No such file or directory (os error 2)'),
+        ),
+        PasskeyFailureReason.moduleMissing,
+      );
+      expect(
+        classifyPasskeyFailure(
+          StateError('open /dev/uhid: Permission denied (os error 13)'),
+        ),
+        PasskeyFailureReason.noAccess,
+      );
+      expect(
+        classifyPasskeyFailure(StateError('anything else')),
+        PasskeyFailureReason.other,
+      );
+    });
   });
 
   test('the chooser index for several accounts reaches perform', () async {

@@ -114,6 +114,21 @@ class AppLocalizationsLv extends AppLocalizations {
   }
 
   @override
+  String get passkeyHintModuleMissing =>
+      'Passkey nav aktīvas: kodola modulis uhid nav ielādēts. Skatiet passkey iestatīšanas soļus README failā.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkey nav aktīvas: Gabbro nevar piekļūt /dev/uhid (trūkst udev noteikuma). Skatiet passkey iestatīšanas soļus README failā.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkey nav aktīvas: virtuālo drošības atslēgu neizdevās palaist. Skatiet passkey iestatīšanas soļus README failā.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Vairs nerādīt';
+
+  @override
   String get add => 'Pievienot';
 
   @override

@@ -113,6 +113,21 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get passkeyHintModuleMissing =>
+      'Passkeys are inactive: the uhid kernel module is not loaded. See the passkey setup steps in the README.';
+
+  @override
+  String get passkeyHintNoAccess =>
+      'Passkeys are inactive: Gabbro cannot access /dev/uhid (udev rule missing). See the passkey setup steps in the README.';
+
+  @override
+  String get passkeyHintOther =>
+      'Passkeys are inactive: the virtual security key could not start. See the passkey setup steps in the README.';
+
+  @override
+  String get passkeyHintDontShowAgain => 'Don\'t show again';
+
+  @override
   String get add => 'Add';
 
   @override

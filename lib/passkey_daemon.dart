@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:flutter/foundation.dart' show debugPrint;
+import 'package:flutter/foundation.dart' show ValueNotifier, debugPrint;
 
 import 'screens/vault_list_screen.dart' show reloadVaultList;
 import 'src/rust/api/passkey_daemon_bridge.dart';
@@ -33,6 +33,39 @@ class PasskeyRequest {
 /// Shows consent and returns the chosen account index, or null to cancel.
 typedef ConsentFn = Future<int?> Function(PasskeyRequest request);
 
+/// Reports the error that stopped the daemon (F2): the provider is inactive
+/// from here on, and the UI may tell the user why.
+typedef FailureFn = void Function(Object error);
+
+/// Why the provider is inactive; each reason gets its own fix hint. ENOENT
+/// means the uhid module is not loaded, EACCES means the module is there but
+/// no udev rule grants access -- the wrong hint sends the user to the wrong
+/// command.
+enum PasskeyFailureReason { moduleMissing, noAccess, other }
+
+/// The daemon failure the UI shows a hint for; null while the provider runs
+/// (or before it ever failed). Written by [reportPasskeyFailure].
+final passkeyProviderFailure = ValueNotifier<PasskeyFailureReason?>(null);
+
+/// Map the stopping error onto the reason the banner explains. Rust's io
+/// error strings are always English, so the matches are stable.
+PasskeyFailureReason classifyPasskeyFailure(Object error) {
+  final text = '$error';
+  if (text.contains('No such file or directory')) {
+    return PasskeyFailureReason.moduleMissing;
+  }
+  if (text.contains('Permission denied')) {
+    return PasskeyFailureReason.noAccess;
+  }
+  return PasskeyFailureReason.other;
+}
+
+/// Record why the daemon stopped so the vault-list banner can say it.
+void reportPasskeyFailure(Object error) {
+  debugPrint('passkey: daemon stopped: $error');
+  passkeyProviderFailure.value = classifyPasskeyFailure(error);
+}
+
 typedef PlanFn = Future<PasskeyPlan> Function(List<int> payload);
 typedef PerformFn = Future<Uint8List> Function(List<int> payload, int accountIndex);
 typedef DeniedFn = Future<Uint8List> Function();
@@ -45,6 +78,7 @@ class PasskeyDaemon {
   PasskeyDaemon({
     required this.device,
     required this.onConsent,
+    this.onFailure = _defaultOnFailure,
     PlanFn? plan,
     PerformFn? perform,
     DeniedFn? denied,
@@ -54,14 +88,26 @@ class PasskeyDaemon {
 
   final PasskeyDevice device;
   final ConsentFn onConsent;
+  final FailureFn onFailure;
   final PlanFn _plan;
   final PerformFn _perform;
   final DeniedFn _denied;
 
   /// Serve requests until the device closes. One response per request: an
   /// immediate plan (getInfo, locked, no match, malformed) is written straight
-  /// back; anything else shows consent, then performs or denies.
+  /// back; anything else shows consent, then performs or denies. A device
+  /// error (missing uhid module / udev rule, F2) never escapes as an
+  /// unhandled async error: it is passed to [onFailure] and run() returns,
+  /// leaving the provider inactive.
   Future<void> run() async {
+    try {
+      await _serve();
+    } catch (e) {
+      onFailure(e);
+    }
+  }
+
+  Future<void> _serve() async {
     while (true) {
       final payload = await device.nextRequest();
       if (payload == null) return;
@@ -97,6 +143,9 @@ class PasskeyDaemon {
     }
   }
 }
+
+void _defaultOnFailure(Object error) =>
+    debugPrint('passkey: daemon stopped: $error');
 
 Future<PasskeyPlan> _defaultPlan(List<int> payload) =>
     passkeyPlan(payload: payload);
