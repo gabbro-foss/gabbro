@@ -54,7 +54,7 @@ allowList pre-flights (`options.up=false`) are answered without consent.
 gabbro/
 ├── lib/                  # Flutter app
 │   ├── screens/          # unlock, vault list, adopt vault, export, import, generator, keyboard shortcuts, settings, manage vaults/folders, …
-│   ├── widgets/          # path_field, generator_widget, yubikey_tap, password_breakdown_sheet, sync_review, sync_method_dialog, gabbro_dialog (every dialog goes through it), passkey_consent_dialog, text_size_slider, url_link, …
+│   ├── widgets/          # path_field, generator_widget, yubikey_tap, password_breakdown_sheet, sync_review, sync_method_dialog, gabbro_dialog (every dialog goes through it), passkey_consent_dialog, passkey_hint_banner, text_size_slider, url_link, …
 │   ├── src/rust/         # Auto-generated bridge (do not edit)
 │   └── *.dart            # main, app_paths (GabbroPaths), settings, text_scale, control_scale, gabbro_contrast (high-contrast theme flag), vault_registry, safe_file_picker, gabbro_file_picker (dialog facade), linux_file_picker (XDG portal client), android_file_picker (picker channel client), autotype_listener, autotype_target, passkey_daemon (Linux daemon orchestrator), clipboard_clear
 ├── rust/src/
@@ -86,7 +86,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 835 | 20 |
+| Rust (`cargo test -q`) | 836 | 20 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 13 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -94,8 +94,8 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2420 | 10 |
-| Real-FFI suites (`dart test integration_test/ -j 1`) | 16 | 0 |
+| Flutter (`flutter test`) | 2448 | 10 |
+| Real-FFI suites (`dart test integration_test/ -j 1`) | 17 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 173 | 15 |
 
 **Real-FFI suites run under plain `dart test`, never `flutter drive` (non-negotiable):** they test
@@ -146,9 +146,6 @@ resolved but never applied — inert, emits no warning.
 - **Passkey provider — ship it.** Code, hardware (Linux + Android) and the
   full gate ALL GREEN 2026-08-22. Feature documented under General
   Information; plan archive: `docs/PASSKEY_INVESTIGATION.md`. Remaining:
-  - [ ] in-app hint when the passkey daemon cannot start (missing uhid
-        module / udev rule): today it fails silently and passkeys just
-        don't appear in the browser — say why and point at the fix.
   - [ ] app passkeys need network (F1): without it every native-app passkey
         request is refused (browsers unaffected — they validate against the
         vendored signature list, offline). Locked decisions:
@@ -168,15 +165,6 @@ resolved but never applied — inert, emits no warning.
         exactly one assetlinks fetch to the login's own site; single network
         call site in source (`fetchAssetLinks`), grep-able. Methods: ripgrep
         scan, Wireshark/PCAPdroid, NetGuard.
-  - [ ] daemon-start failure is an unhandled async error (F2): the
-        `main.dart` catch only guards the synchronous start; the real
-        `/dev/uhid` failure arrives on the first async read and escapes it.
-        Red test first; must land as a clean "provider inactive". The
-        in-app hint item above hangs off this handler. Same work item (F4):
-        single-instance guard — exclusive flock on
-        `$XDG_RUNTIME_DIR/gabbro-passkey.lock` in daemon `start()` before
-        opening `/dev/uhid`, so a second instance gets a clean Err instead
-        of creating a duplicate virtual key.
   - [ ] browser-list refresh at release (F5, Android only): the vendored
         `passkey_privileged_browsers.json` ages — browsers released or
         re-signed after the snapshot are refused passkeys until it is
