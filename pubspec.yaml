@@ -32,7 +32,7 @@ dependencies:
   intl: any
   rust_lib_gabbro:
     path: rust_builder
-  flutter_rust_bridge: 2.12.0
+  flutter_rust_bridge: 2.13.0
   freezed_annotation: ^3.1.0
   scrollable_positioned_list: ^0.3.8
   dbus: ^0.7.11
