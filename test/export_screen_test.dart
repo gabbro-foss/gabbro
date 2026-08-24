@@ -149,10 +149,9 @@ void main() {
       await tester.pumpWidget(_androidGabbroScreen(cap, vaultAlias: 'My Work'));
       await tester.tap(find.text('Export'));
       await tester.pumpAndSettle();
-      // Date toggle is ON by default, so a dated filename is expected here.
+      // Date toggle is OFF by default, so a static filename is expected here.
       expect(cap.treeUri, 'content://docs/tree/primary%3ADownload%2FGabbroSync');
-      expect(cap.filename, startsWith('My_Work_'));
-      expect(cap.filename, endsWith('.gabbro'));
+      expect(cap.filename, 'My_Work.gabbro');
       expect(cap.sha256Filename, '${cap.filename}.sha256');
       expect(cap.data, equals(Uint8List.fromList([1, 2, 3])));
       expect(cap.sha256Content, 'AA  x\n');
@@ -163,8 +162,7 @@ void main() {
       await tester.pumpWidget(_androidGabbroScreen(cap, vaultAlias: "Alex's Vault!"));
       await tester.tap(find.text('Export'));
       await tester.pumpAndSettle();
-      expect(cap.filename, startsWith('Alexs_Vault_'));
-      expect(cap.filename, endsWith('.gabbro'));
+      expect(cap.filename, 'Alexs_Vault.gabbro');
     });
 
     testWidgets('android .gabbro: no remembered folder -> Export disabled, no write',
@@ -186,7 +184,7 @@ void main() {
 
     // ── Include date toggle ──────────────────────────────────────────────────
 
-    testWidgets('include date toggle is ON by default', (tester) async {
+    testWidgets('include date toggle is OFF by default', (tester) async {
       await tester.pumpWidget(
         testApp(ExportScreen(
             isAndroid: true,
@@ -195,17 +193,13 @@ void main() {
         )),
       );
       final toggle = tester.widget<SwitchListTile>(find.byType(SwitchListTile));
-      expect(toggle.value, isTrue);
+      expect(toggle.value, isFalse);
     });
 
-    testWidgets('android .gabbro: date toggle off -> static filename (rsync target)',
+    testWidgets('android .gabbro: default -> static filename (rsync target)',
         (tester) async {
       final cap = _SafCapture();
       await tester.pumpWidget(_androidGabbroScreen(cap, vaultAlias: 'My Work'));
-      // Turn the include-date toggle off — there is exactly one SwitchListTile
-      // for a passphrase-only vault (no downgrade toggle).
-      await tester.tap(find.byType(SwitchListTile));
-      await tester.pump();
       await tester.tap(find.text('Export'));
       await tester.pumpAndSettle();
       expect(cap.filename, 'My_Work.gabbro');
@@ -216,6 +210,10 @@ void main() {
         (tester) async {
       final cap = _SafCapture();
       await tester.pumpWidget(_androidGabbroScreen(cap, vaultAlias: 'My Work'));
+      // Turn the include-date toggle on — there is exactly one SwitchListTile
+      // for a passphrase-only vault (no downgrade toggle).
+      await tester.tap(find.byType(SwitchListTile));
+      await tester.pump();
       await tester.tap(find.text('Export'));
       await tester.pumpAndSettle();
       expect(cap.filename, startsWith('My_Work_'));
@@ -296,8 +294,7 @@ void main() {
       await tester.pump();
       await tester.tap(find.text('Export'));
       await tester.pump();
-      expect(jsonExportedPath, startsWith('/storage/emulated/0/Documents/vault_'));
-      expect(jsonExportedPath, endsWith('.json'));
+      expect(jsonExportedPath, '/storage/emulated/0/Documents/vault.json');
     });
 
     // Android JSON folder picker reaches FilePicker.getDirectoryPath, which
@@ -428,7 +425,7 @@ void main() {
   group('PathField wiring (net)', () {
     testWidgets(
         'linux .gabbro export asks for a save dialog filtered to .gabbro '
-        'with a dated filename from the alias', (tester) async {
+        'with a static filename from the alias', (tester) async {
       await tester.pumpWidget(testApp(ExportScreen(
         isAndroid: false,
         vaultAlias: 'My Work',
@@ -440,8 +437,7 @@ void main() {
       final pf = tester.widget<PathField>(find.byType(PathField));
       expect(pf.mode, PathFieldMode.save);
       expect(pf.allowedExtensions, ['gabbro']);
-      expect(pf.saveFileName, startsWith('My_Work_'));
-      expect(pf.saveFileName, endsWith('.gabbro'));
+      expect(pf.saveFileName, 'My_Work.gabbro');
     });
 
     testWidgets('switching to JSON switches the filter and suffix',
@@ -458,6 +454,43 @@ void main() {
 
       final pf = tester.widget<PathField>(find.byType(PathField));
       expect(pf.allowedExtensions, ['json']);
+      expect(pf.saveFileName, 'My_Work.json');
+    });
+
+    // Net: the toggle must re-seed the save dialog, not just the SAF filename.
+    // A stale seed here hands the user a dated name they just turned off.
+    testWidgets('linux .gabbro: date toggle re-seeds the save filename',
+        (tester) async {
+      await tester.pumpWidget(testApp(ExportScreen(
+        isAndroid: false,
+        vaultAlias: 'My Work',
+        onExport: (path) async {},
+        onExportJson: (path) async {},
+      )));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(SwitchListTile));
+      await tester.pumpAndSettle();
+
+      final pf = tester.widget<PathField>(find.byType(PathField));
+      expect(pf.saveFileName, startsWith('My_Work_'));
+      expect(pf.saveFileName, endsWith('.gabbro'));
+    });
+
+    testWidgets('linux JSON: date toggle re-seeds the save filename',
+        (tester) async {
+      await tester.pumpWidget(testApp(ExportScreen(
+        isAndroid: false,
+        vaultAlias: 'My Work',
+        onExport: (path) async {},
+        onExportJson: (path) async {},
+      )));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('JSON'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(SwitchListTile));
+      await tester.pumpAndSettle();
+
+      final pf = tester.widget<PathField>(find.byType(PathField));
       expect(pf.saveFileName, startsWith('My_Work_'));
       expect(pf.saveFileName, endsWith('.json'));
     });
@@ -501,9 +534,7 @@ void main() {
       await tester.tap(find.text('Export'));
       await tester.pumpAndSettle();
 
-      expect(exportedPath,
-          startsWith('/storage/emulated/0/Download/Gabbro/My_Work_'));
-      expect(exportedPath, endsWith('.json'));
+      expect(exportedPath, '/storage/emulated/0/Download/Gabbro/My_Work.json');
     });
   });
 }

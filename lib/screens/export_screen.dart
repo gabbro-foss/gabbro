@@ -22,7 +22,7 @@ String sanitiseAlias(String? alias) {
   return sanitised.isEmpty ? 'vault' : sanitised;
 }
 
-String _defaultFilename(String? alias, bool isJson, {bool includeDate = true}) {
+String _defaultFilename(String? alias, bool isJson, {bool includeDate = false}) {
   final base = sanitiseAlias(alias);
   if (includeDate) {
     final date = DateTime.now().toIso8601String().substring(0, 10);
@@ -164,7 +164,9 @@ class _ExportScreenState extends State<ExportScreen> {
   // On Linux:   stores the full file path including filename.
   String? _path;
   _ExportFormat _format = _ExportFormat.gabbroVault;
-  bool _includeDate = true;
+  // Default OFF: a repeat export overwrites the previous file (sync target).
+  // On, each export lands under its own dated name.
+  bool _includeDate = false;
   // ADR-013: opt-in downgrade — export a key-protected vault as passphrase-only.
   // Default OFF (the protection-preserving default); only shown for key-protected
   // vaults exporting to .gabbro.
