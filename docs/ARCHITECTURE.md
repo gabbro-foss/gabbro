@@ -149,6 +149,8 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
+**flutter_rust_bridge 2.12.0 -> 2.13.0.** When taken: re-check the vendored
+cargokit patch (Gradle 9 `ExecOperations`), then a `--warm` gate.
 
 ---
 
@@ -169,9 +171,9 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
 
 ### Housekeeping
-- **Fail fast when a Gabbro instance holds the daemon lock during tests.**
-  `passkey_daemon_open_test` times out mute (its flock helper waits on the
-  running app's lock, 2026-08-23) — pre-check the lock and name the cause.
+- **Confirm passkeys work on a real Debian/Mint install with no manual setup**
+  (alpha.22 post-release check; the container can't prove the udev rule
+  activates).
 - **Permanent USB product id (Linux passkeys).** 0x1209:0x0001 is pid.codes'
   shared TEST id; another dev gadget with it could confuse the YubiKey filter.
   PR requesting 0x1209:0x6ABB awaits external review (volunteer-run, can take
