@@ -19,7 +19,8 @@ and serving WebAuthn credential creation/assertion from the vault.
 Gabbro will implement software passkey storage: a `Passkey` vault entry type
 served by an Android Credential Manager provider and a Linux virtual FIDO2
 authenticator (uhid). No browser extension on any platform (ADR-008 stands).
-Plan and sources: [PASSKEY_INVESTIGATION.md](../PASSKEY_INVESTIGATION.md).
+Plan and sources: PASSKEY_INVESTIGATION.md (deleted after implementation
+shipped, 2026-08-24; full text in git history).
 
 ## Rationale
 

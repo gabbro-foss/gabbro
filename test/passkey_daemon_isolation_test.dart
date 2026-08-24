@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
-// Net for the Linux passkey daemon (docs/PASSKEY_INVESTIGATION.md): auto-type
+// Net for the Linux passkey daemon (ADR-009): auto-type
 // and the daemon stay strangers, and daemon code never reaches an Android
 // build. If either breaks, a Linux passkey change ships inside auto-type or
 // inside the Android .so.

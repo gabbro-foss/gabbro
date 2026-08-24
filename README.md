@@ -275,8 +275,10 @@ reboot):
 
 ```bash
 sudo rm /etc/udev/rules.d/70-gabbro-uhid.rules /etc/modules-load.d/gabbro-uhid.conf && sudo udevadm control --reload
-``` If you bound a custom shortcut for auto-type,
-remove it too — it would now point at a deleted binary and silently do nothing.
+```
+
+If you bound a custom shortcut for auto-type, unbind it — it would now point at
+a deleted binary and silently do nothing.
 
 **Your vaults and settings are not removed** — they live in
 `~/.local/share/app.gabbro.gabbro/` (vaults) and `~/.config/gabbro/` (settings),
@@ -443,6 +445,28 @@ app.gabbro.gabbro
   `SHA-256` certificate digest (`<abi>` is whichever file you downloaded — `arm64-v8a`, `armeabi-v7a` or `x86_64`). All three per-ABI APKs are signed by the same key and share this fingerprint.
 
 A mismatch means the file is **not** an official Gabbro build — do not install it.
+
+---
+
+## Passkeys
+
+Website passkeys live in your vault as ordinary entries, so they sync and back
+up with it. Hardware-bound passkeys on a YubiKey remain the stronger option —
+the trade-off is documented in
+[ADR-009](docs/decisions/ADR-009-software-passkey-storage.md).
+
+- **Linux:** nothing to enable. While Gabbro runs, browsers see it as a
+  security key: in the browser's passkey prompt pick the security-key option,
+  then approve in the dialog Gabbro shows. The vault must be unlocked. Tarball
+  installs need the one-time `/dev/uhid` setup under **Installation** (the AUR
+  and APT packages do it for you).
+- **Android:** Settings → **Passwords, passkeys & accounts** → add **Gabbro**
+  as a passkey service (wording varies by Android version; search Settings for
+  "passkeys"). Passkey prompts then offer Gabbro.
+
+Passkeys for **native Android apps** are off by default: turn on **App
+passkeys** in Gabbro's settings. Each app login then makes one network fetch —
+see **Verify no telemetry** above.
 
 ---
 
