@@ -164,11 +164,26 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Features and UI/UX
+- **Sync settings (near one-click sync).** Three settings, defaults keep current
+  behaviour: (a) always-auto-merge toggle (off by default), (b) default export
+  path, (c) default import path. Together: one-click sync in vault_B receiving
+  an export from vault_A.
+- **Export filename date opt-in.** Reverse the default: no date in the exported
+  filename; with-date becomes the opt-in.
+- **Emergency sheet.** Printable one-pager in `docs/` (vault location, YubiKey
+  serials, hand-written passphrase blank, storage advice), linked from README.
+  Paper only — no code.
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
 
 ### Housekeeping
+- **Reproducible builds.** Third parties rebuild from source and get
+  bit-identical artifacts, proving the binaries match the code (stronger than
+  the current sign-what-I-built). Hard with Flutter/Rust toolchains; scope
+  first.
+- **Shorten comments and user-facing messages.** Sweep the whole stack: code
+  comments trimmed to what the code can't say; UI strings terse.
 - **Permanent USB product id (Linux passkeys).** 0x1209:0x0001 is pid.codes'
   shared TEST id; another dev gadget with it could confuse the YubiKey filter.
   PR requesting 0x1209:0x6ABB awaits external review (volunteer-run, can take
@@ -180,6 +195,9 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - **Human expert cryptography review** of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
 
 ### V2+ / Defer
+- **Wayland auto-type** — blocked: Wayland breaks global input injection
+  (https://gist.github.com/probonopd/9feb7c20257af5dd915e3a9f2d1f2277).
+  Revisit only if Mint defaults to Wayland.
 - **Linux biometric unlock** (laptop fingerprint readers, e.g. libfido2/PAM or `fprintd`). Fits the current per-device model unchanged: Linux would just get its own local per-vault secret store; the vault file carries no biometric state, so nothing else changes.
 - **Windows support.**
 - **Yubico partnership.**
