@@ -100,7 +100,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2464 | 10 |
+| Flutter (`flutter test`) | 2466 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 17 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 178 | 15 |
 
@@ -149,6 +149,19 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
+**Auto-merge setting** (sync family, step 1 of 3 — see Bikeshed > **Sync family**
+for the standing constraints and the remaining two steps).
+
+A standing policy, not a per-action choice, so it lives in Settings, off by
+default. On, a sync applies without the review screens. Independent of the two
+picker tasks: it touches neither export nor import.
+
+- [ ] Net: pin the current sync review flow, both platforms
+- [ ] Settings model + persistence
+- [ ] Wire into the sync flow
+- [ ] l10n: all ARBs; a11y: semantics + screen-reader tests
+- [ ] Docs
+- [ ] Hardware: one pass per platform
 
 ---
 
@@ -164,12 +177,46 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Features and UI/UX
-- **Sync settings (near one-click sync).** Three settings, defaults keep current
-  behaviour: (a) always-auto-merge toggle (off by default), (b) default export
-  path, (c) default import path. Together: one-click sync in vault_B receiving
-  an export from vault_A.
-- **Export filename date opt-in.** Reverse the default: no date in the exported
-  filename; with-date becomes the opt-in.
+#### Sync family — do in this order
+
+Goal: one-click sync in vault_B receiving an export from vault_A.
+
+**Standing constraints, all three steps.** Every setting works on Linux and
+Android (SAF paths differ, behaviour must not). New strings ship in all locales;
+new controls ship with semantics labels — neither is a follow-up.
+
+**Step 1 — auto-merge setting.** In Current Focus.
+
+**Step 2 — import screen: one picker, not six.** Today six stacked sections each
+carry their own path field; the user needs one. Replace with a single path
+selector + **Remember** checkbox (one folder for all types) and a type dropdown —
+Gabbro (default), Generic CSV, Google Password Manager, Dashlane, Enpass,
+Bitwarden. Per-type explanation text stays; so do the top warning banner and the
+size-limit note. Changing the type clears the path: extensions differ
+(`.gabbro`/`.csv`/`.json`), so a stale path would arm the button on a file that
+cannot parse. Gabbro selected also reveals the passphrase field and, for a
+key-protected source, the PIN + Android transport sub-form. Action button label
+follows the type: *Sync from vault* / *Next: map columns* / *Import*.
+A rewrite of a 1000-line screen with six independent error/loading/format-check
+flows.
+
+**Step 3 — remember folders.** Four remembered folders: export and import, on
+Linux and on Android. Every one is user-selected; none ships with a built-in
+value. Export and import may point at the same folder — that is the sync case,
+where the file one device writes is the file the other reads.
+
+The folder lives on the export and import screens, not in Settings, behind a
+**Remember** checkbox (not "Lock" — the app already uses *lock* for the vault).
+Android export already remembers silently, so its box arrives ticked; reuse that
+mechanism rather than adding a second one. "Sync from file" on the vault list is
+unchanged: it is a menu action with no screen to host a checkbox, and the import
+screen's Gabbro route already covers the receiving side of a sync.
+
+**Why step 2 before step 3:** the import screen has 3 PathField code sites
+(`_gabbroSection`, `_csvSection`, the shared `_importSection`) rendered six
+times. Wiring Remember first would build and test 3 sites, then delete 2 in the
+remold and re-pin the tests.
+
 - **Emergency sheet.** Printable one-pager in `docs/` (vault location, YubiKey
   serials, hand-written passphrase blank, storage advice), linked from README.
   Paper only — no code.

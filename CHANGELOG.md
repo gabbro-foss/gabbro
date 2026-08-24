@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- Export: "Include date in filename" now defaults to off, so a repeat export overwrites the previous file instead of adding a dated copy. Turn it on for dated exports.
 - flutter_rust_bridge 2.12.0 -> 2.13.0 (bridge regenerated; no behaviour change).
 
 ## [0.1.0-alpha.22] – 2026-08-23
