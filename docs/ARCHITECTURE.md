@@ -131,7 +131,7 @@ warnings are not noise.**
 | Kotlin plugin version (2.0.21 vs 2.2.20) | Flutter SDK's own `:gradle` build | Upstream. Debug and release alike. |
 | "Kotlin does not yet support 25 JDK target, falling back to JVM_24" | Flutter SDK's own unpinned Gradle modules | Upstream; appeared with the Java-25 JBR (2026-08-11). Our `:app` is pinned to JVM 21 (netted). Clears when Kotlin adds the 25 target. |
 | JVM restricted-method (`System::load`) | Gradle `native-platform` jar | Gradle's own jar. Did NOT clear at 9.3.1 (still ships `0.22-milestone-29`); Java 25 warns on it every run. Blocks at a future Java. No action. |
-| `cargo deny` no-license-field: `allo-isolate` | `flutter_rust_bridge` dep | Fixed on their master; await release. `[[licenses.clarify]]` is inert — don't retry. |
+| `cargo deny` no-license-field: `allo-isolate` | `flutter_rust_bridge` dep | Fixed on their master; still present at FRB 2.13.0 (pins 0.1.27). `[[licenses.clarify]]` is inert — don't retry. |
 | `cargo deny` duplicates x8 | `argon2`->`digest`, `jni`->`libloading`, `bindgen`->`shlex`, `p256`->`rand_core`+`getrandom` | Upstream pins. Was x6; `p256` (passkeys) added the `rand_core 0.10`/`getrandom 0.4` pair beside `rand 0.8`'s. |
 | KGP via `buildscript` classpath | `url_launcher_android` | Did not reproduce 2026-08-06; re-check before acting. |
 | Flutter: AGP 8.11.1 support "will soon be dropped" (wants >= 9.0.1) | Flutter tooling, new 2026-08-21 | A future Flutter upgrade refuses to build Android until AGP is bumped. No action yet: 8.11.1 still builds; bump AGP + Kotlin together when forced. |
@@ -149,8 +149,6 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**flutter_rust_bridge 2.12.0 -> 2.13.0.** When taken: re-check the vendored
-cargokit patch (Gradle 9 `ExecOperations`), then a `--warm` gate.
 
 ---
 
