@@ -1,4 +1,4 @@
-# Maintainer: Gabbro <gabbro@tuta.com>
+# Maintainer: Gabbro <gabbro at tuta dot com>
 #
 # gabbro-bin: repackages the prebuilt Gabbro Linux release tarball. Building the
 # full Flutter + Rust stack from source in the AUR is heavy and needless when the
