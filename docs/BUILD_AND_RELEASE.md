@@ -10,7 +10,7 @@ under **Installation**.
 
 **Critical notes: read before Android or Kotlin sessions.**
 
-- System Java is 26.0.1, incompatible with the Kotlin compiler. Fix: `org.gradle.java.home=/opt/android-studio/jbr` in `android/gradle.properties` (Java 25.0.2 since the 2026-08 android-studio update). Gradle wrapper is 9.3.1: 9.1.0 is the floor for running on Java 25, 9.3.1 is the Flutter SDK's max validated (still 9.3.1 at Flutter 3.47.0; check `maxKnownAndSupportedGradleVersion` in the SDK's `gradle_utils.dart` after an SDK bump).
+- System Java is 26.0.1, incompatible with the Kotlin compiler. Fix: `org.gradle.java.home=/opt/android-studio/jbr` in `android/gradle.properties` (Java 25.0.2 since the 2026-08 android-studio update). Gradle wrapper is 9.3.1: 9.1.0 is the floor for running on Java 25, 9.3.1 is the Flutter SDK's max validated (still 9.3.1 at Flutter 3.47.1; check `maxKnownAndSupportedGradleVersion` in the SDK's `gradle_utils.dart` after an SDK bump).
 - Gradle 9 accommodations (nets: `test/android_build_config_test.dart`): cargokit's vendored `plugin.gradle` uses injected `ExecOperations` (`Project.exec` was removed, so re-patch after any flutter_rust_bridge template refresh), and `app/build.gradle.kts` pins Kotlin to JVM 21 to match `compileOptions` (unpinned, Kotlin follows the running JDK and the mismatch is a hard error).
 - AGP 8.11.1 in `android/settings.gradle.kts`. Java and Kotlin JVM target both set to 21 in `app/build.gradle.kts`.
 - `libfido2-sys` and `pub mod fido` are gated behind `cfg(not(target_os = "android"))`: libfido2 is Linux-only; Android uses yubikit-android via Kotlin.
