@@ -100,7 +100,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2503 | 10 |
+| Flutter (`flutter test`) | 2867 | 171 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 17 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 180 | 15 |
 
@@ -259,8 +259,10 @@ is keyboard-only. Offenders, verified in code:
   when hidden, always on Android) -> body, snackbar, FAB lose the inset.
 - Vault list, tablet: `TabletVaultLayout` is returned outside the `SafeArea`,
   pads with fixed `EdgeInsets`.
-- Adopt vault, keyboard shortcuts, change passphrase, manage YubiKeys: no
-  `SafeArea`, explicit `padding:` on the scroll view (disables auto-inset).
+- Keyboard shortcuts, adopt vault, change passphrase, manage folders,
+  csv mapping: no `SafeArea`, or none on the side that matters (net: adopt
+  vault + manage folders fail only on a landscape side bar; manage YubiKeys
+  passes); explicit `padding:` on the scroll view disables auto-inset.
 - Fine as is: sheets read `padding.bottom` themselves; dialogs carry Flutter's
   own `SafeArea`; unlock/save/consent/all other screens have `SafeArea`;
   manage folders and recovery history use un-padded lists (auto-inset).
@@ -270,11 +272,15 @@ Cases: 3-button nav (~48dp bottom), gesture nav (~20dp bottom), landscape
 to the last entry, FAB tap, snackbar readable, Linux passkey banner visible and
 announced, alphabet bar full height, search with keyboard, tablet divider drag.
 
-- [ ] Net: generic inset probe over the screen catalog at inset 0, phone +
-      tablet, portrait + landscape (green on today's code)
-- [ ] Red: same probe at 20/48 bottom and 48 side; vault-list snackbar, FAB,
+- [x] Net: `test/inset_net_test.dart`, every catalogued screen x {phone,
+      tablet} x {portrait, landscape} x {none, gesture 20, buttons 48, side 48
+      (landscape only)}; scrolls each list to its end, then no text, icon,
+      FAB or snackbar in the band. Green at inset 0 on today's code;
+- [x] Red (same file, 25 cases): vault list phone + tablet + wide, tablet layout,
+      keyboard shortcuts, change passphrase (3-button, landscape), adopt vault,
+      manage folders, csv mapping (side bar). Vault-list snackbar, FAB,
       banner rows
-- [ ] Fix: slot null when the banner is hidden; tablet branch inside the
+- [x] Fix: slot null when the banner is hidden; tablet branch inside the
       SafeArea; SafeArea on the four screens
 - [ ] Hardware: S23 3-button, S23 gesture, Lenovo tablet portrait + landscape
 

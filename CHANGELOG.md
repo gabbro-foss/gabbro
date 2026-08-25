@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - One-click sync. Sync settings (vault menu): an auto-merge switch (off by default) and a remembered sync folder with a Remember box. With both set, Sync from vault opens the file named as this vault exports (`<alias>.gabbro`) in that folder and merges it with no picker, no chooser and no review; a YubiKey-protected file still asks for its tap, and a file your passphrase does not open still asks for one. Linux gains a native folder picker (XDG portal); Android reads the folder through its persisted storage grant.
 
+### Fixed
+- Android edge-to-edge (targetSdk 36): the vault list, its sync snackbar and four other screens no longer run under the navigation bar or a landscape side bar. A new inset net renders every screen with faked system bars on phone and tablet, portrait and landscape.
+
 ### Changed
 - The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
 - Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
@@ -47,6 +50,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.0-alpha.20] – 2026-08-11
 
+### Fixed
+- Android edge-to-edge (targetSdk 36): the vault list, its sync snackbar and four other screens no longer run under the navigation bar or a landscape side bar. A new inset net renders every screen with faked system bars on phone and tablet, portrait and landscape.
+
 ### Changed
 - The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
 - Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
@@ -63,6 +69,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - **A link that would not open said nothing, or said the wrong thing.** Opening a URL from an entry gave no message at all when it failed, and at the largest text sizes the message shown elsewhere ran off the bottom of the screen. Both now appear in a dialog that scrolls, and a link that is not a web page says so instead of reporting a failure.
 - **An entry in the vault list at the autofill prompt did nothing (Android).** When Gabbro asked for your passphrase to fill or save a login, the list of vaults also offered "Open a vault file…" — tapping it opened nothing and said nothing. It is no longer offered there, and where you have a single vault the list itself is gone, since it could only reselect the vault you were already unlocking. The app's own unlock screen is unchanged.
+
+### Fixed
+- Android edge-to-edge (targetSdk 36): the vault list, its sync snackbar and four other screens no longer run under the navigation bar or a landscape side bar. A new inset net renders every screen with faked system bars on phone and tablet, portrait and landscape.
 
 ### Changed
 - The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
@@ -89,6 +98,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **The vault list showed no entries at all at the largest text sizes.** On a narrow phone the search box grew with its placeholder until it had taken the whole screen, and the A-Z bar drew itself into a space too small to hold it. The placeholder now stays on one line and the A-Z bar steps aside when it cannot fit, so the entries keep their room.
 - **Three messages appeared in English whatever your language.** The two file-dialog warnings and the notice that changing your passphrase turned biometric unlock off were never translated, so they arrived in English — at the moment something had just failed or a security setting had changed under you. All three are now translated into every language, and a test refuses any string that ships as English everywhere.
 - **Serbian (Cyrillic) was almost entirely written in Latin script.** Choosing Српски gave you the same Latin text as Српски (latinica) — only 85 of 645 strings were actually Cyrillic. All of them are now, so the two Serbian options finally differ. A test refuses any Cyrillic locale that ships Latin-script prose, so this cannot come back.
+
+### Fixed
+- Android edge-to-edge (targetSdk 36): the vault list, its sync snackbar and four other screens no longer run under the navigation bar or a landscape side bar. A new inset net renders every screen with faked system bars on phone and tablet, portrait and landscape.
 
 ### Changed
 - The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
@@ -140,6 +152,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Native Linux packages.** Arch via the AUR (`yay -S gabbro-bin`) and Debian/Mint via a signed `.deb` (`sudo apt install ./gabbro_<version>_amd64.deb`) — both install system-wide with a menu entry and a `gabbro` command, resolve their dependencies, and uninstall cleanly. The `.deb` carries a detached GPG signature like the tarball.
 
+### Fixed
+- Android edge-to-edge (targetSdk 36): the vault list, its sync snackbar and four other screens no longer run under the navigation bar or a landscape side bar. A new inset net renders every screen with faked system bars on phone and tablet, portrait and landscape.
+
 ### Changed
 - The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
 - Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
@@ -166,6 +181,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Sync review: a long password, URL or folder name was cut off in the choice buttons, so you picked between two values you could not read. Value choices are now full-width rows that wrap onto as many lines as needed, at every text size.
 - Tablet, largest text: the "select an entry" placeholder in the detail pane ran off the bottom of the pane. It now scrolls.
 
+### Fixed
+- Android edge-to-edge (targetSdk 36): the vault list, its sync snackbar and four other screens no longer run under the navigation bar or a landscape side bar. A new inset net renders every screen with faked system bars on phone and tablet, portrait and landscape.
+
 ### Changed
 - The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
 - Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
@@ -181,6 +199,9 @@ _Built with Flutter 3.44.6, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21._
 
 ### Security
 - **Vault format VERSION 11.** New vaults derive the encryption key straight from Argon2id (via HKDF); existing vaults auto-upgrade the first time you unlock them (entries unchanged). Removes the non-load-bearing X25519 + ML-KEM hybrid layer (ADR-018); quantum resistance is unchanged (Argon2id + AES-256-GCM).
+
+### Fixed
+- Android edge-to-edge (targetSdk 36): the vault list, its sync snackbar and four other screens no longer run under the navigation bar or a landscape side bar. A new inset net renders every screen with faked system bars on phone and tablet, portrait and landscape.
 
 ### Changed
 - The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
@@ -200,6 +221,9 @@ _Built with Flutter 3.44.6, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21._
 ### Added
 - **Linux desktop auto-type (X11).** With a login open in Gabbro, a global hotkey types `username⇥password↵` into the focused window; uses the login's email when it has no username.
 
+### Fixed
+- Android edge-to-edge (targetSdk 36): the vault list, its sync snackbar and four other screens no longer run under the navigation bar or a landscape side bar. A new inset net renders every screen with faked system bars on phone and tablet, portrait and landscape.
+
 ### Changed
 - The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
 - Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
@@ -218,6 +242,9 @@ _Built with Flutter 3.44.6, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21._
 - **Large-text accessibility — continuous text-size slider (phase 1).** An absolute text scale capped to your screen (up to 2x on phones, 3x on tablets) set by a zoom-glyph-bracketed slider with live preview, replacing the five fixed sizes. Onboarding's accessibility button reveals the slider inline (hiding the logo for room) and jumps to a strong scale. Old saved text sizes migrate automatically.
 - **Help screens can be pinch-zoomed.** Tap any help screenshot to open it full-screen and pinch to zoom / drag to pan — the images are pictures that the text-size setting can't enlarge, and screenshots are blocked in-app, so this is the way to read small detail.
 - **Buttons and controls grow with the text size too.** At large text, the menu, entry-row, type-picker and navigation-rail icons, the add button, page arrows, app-bar buttons, selection checkboxes and the password show/hide (eye) toggles scale up (so they stay easy to see and tap), touch targets are a full size, and the A–Z index bar's letters enlarge without spilling off their strip. Eye toggles that sit inside a text field grow a little more gently so they stay within the field.
+
+### Fixed
+- Android edge-to-edge (targetSdk 36): the vault list, its sync snackbar and four other screens no longer run under the navigation bar or a landscape side bar. A new inset net renders every screen with faked system bars on phone and tablet, portrait and landscape.
 
 ### Changed
 - The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
@@ -257,6 +284,9 @@ _Built with Flutter 3.44.6, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21._
 - Biometric unlock no longer silently fails after a passphrase change: changing the passphrase now turns biometric off (its stored secret was tied to the old passphrase) and tells you to re-enable it in Settings.
 - Changing the passphrase now accepts a "Fair" passphrase, matching onboarding (it previously required a stronger one); weaker passphrases show an explicit "too weak" line.
 
+### Fixed
+- Android edge-to-edge (targetSdk 36): the vault list, its sync snackbar and four other screens no longer run under the navigation bar or a landscape side bar. A new inset net renders every screen with faked system bars on phone and tablet, portrait and landscape.
+
 ### Changed
 - The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
 - Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
@@ -286,6 +316,9 @@ _Built with Flutter 3.44.6, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21._
 - **Login entries gain an optional email field, and username is now optional.** A Login now holds both `username` and `email` (only title + password are required). Autofill routes the email to email-typed fields and the username to username-typed fields, each falling back to the other when only one is set — so a form that asks for an email gets the email, not the username. Old vaults load unchanged (no format bump); shown in the editor (reusing "Email (optional)", username relabelled "Username (optional)" across 37 locales), detail, and review-diff. Device-verified on Android.
 - **Autofill: match a vault login to an installed Android app by its package id.** Login entries gain an optional "Android app ID" field; a native app autofills only on an **exact** package match (no loose substring matching — an unset id matches nothing, so no false positives). Apps that request autofill but match no entry are recorded (app-private, capped) and offered as tap-to-fill suggestion chips in the editor, so you needn't hunt for the package name. Field, note, and chips localised across 37 locales. Device-verified on Android (match, no-false-positive, capture); replaces the old loose `extractAppToken` matcher.
 
+### Fixed
+- Android edge-to-edge (targetSdk 36): the vault list, its sync snackbar and four other screens no longer run under the navigation bar or a landscape side bar. A new inset net renders every screen with faked system bars on phone and tablet, portrait and landscape.
+
 ### Changed
 - The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
 - Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
@@ -310,6 +343,9 @@ _Built with Flutter 3.44.6, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21._
 - **Crash-on-open hardening: malformed `.gabbro` no longer panics the parser.** `SealedVault::from_bytes` reads an 8-byte body-length field straight off disk and then checked `data.len() < pos + body_len`. Because `body_len` is attacker-controlled and cast to `usize`, a crafted header with a near-`u64::MAX` body length overflowed the `pos + body_len` add — panicking on the add in debug, and in release wrapping to a small value so the guard passed and `data[pos..pos + body_len]` became a reversed range, panicking on the slice. Either way a hand-crafted or corrupt vault file crashed the app on open. Fixed with a `checked_add`: an overflowing body length now returns a clean `Err` like any other truncation. No change for valid vaults (backward-compat gate green). Found by a new negative/fuzz test, not in the wild. The parser was otherwise already well-defended (every slice length-guarded); this closes the one integer-overflow gap.
 - Vault parser fuzz harness (`rust/tests/vault_parse_fuzz.rs`): the negative-input safety net for `SealedVault::from_bytes`, complementing the valid-only `vault_backward_compat` gate. Feeds the parser (1) every truncation of a real golden vault, (2) seeded-random garbage, and (3) structurally valid headers with oversized/overflowing body-length fields, asserting it always returns `Err`, never panics. Not `#[ignore]`'d — parsing does no Argon2id work, so it runs in the routine `cargo test` as a permanent guard. Caught the body-length overflow above.
 - **Lock / vault-switch now clear the navigation back stack (locked-vault re-exposure hardening).** Auto-lock already wiped the back stack (`pushAndRemoveUntil`), but the manual lock button and the vault-switch dropdown used `pushReplacement`, which only swaps the top route. A hardware-found edge case (back-press during a stalled YubiKey tap after switching vaults) could leave a previously-unlocked vault's screen reachable underneath. Manual lock (`_lockAndExit`) and `switchToVault` now both `pushAndRemoveUntil((_) => false)` like auto-lock, so no prior route — and no previously-unlocked vault's screen — can survive a lock or a switch, regardless of stack depth or in-flight async state. Defence-in-depth: a failed/locked entry-list load now also clears any retained decrypted summaries from memory (the existing error gate already hid them from the UI). The originally-observed symptom was no longer reproducible after the stalled-tap fix; this closes the class by construction. Widget tests pin "lock/switch leaves nothing to pop back to" and "a locked load renders no entry-list chrome." Hardware-verified on Android.
+
+### Fixed
+- Android edge-to-edge (targetSdk 36): the vault list, its sync snackbar and four other screens no longer run under the navigation bar or a landscape side bar. A new inset net renders every screen with faked system bars on phone and tablet, portrait and landscape.
 
 ### Changed
 - The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
@@ -368,6 +404,9 @@ _Built with Flutter 3.44.6, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21._
 - `_FallbackMaterialLocalizationsDelegate` in `main.dart`: `GlobalMaterialLocalizations` does not cover all BCP-47 tags (e.g. `yo` Yoruba, `nn` Norwegian Nynorsk). Selecting an unsupported locale caused a null-crash in `MaterialLocalizations.of()` — `BackButton` tooltip and any other Material widget that uses the `!` accessor. Fix: a custom `LocalizationsDelegate<MaterialLocalizations>` that returns `true` from `isSupported()` for every locale and loads English Material strings as a fallback for unsupported ones; ARB translations still load in the correct language.
 - `docs/AI_SECURITY_AUDIT.md`: F-01 status corrected from "Reclassified" to "Fixed (VERSION 7)". The architectural incompatibilities cited in the reclassification (alias rename without unlock, key management without reseal) were resolved as part of the VERSION 7 work; the finding is fully addressed. Updated remediation table, "Still open" summary line, and the finding section text.
 - `docs/SECURITY.md`: F-01 "Known limitations" section updated to reflect VERSION 7 header-integrity guarantee; stale "planned for a future version" text removed.
+
+### Fixed
+- Android edge-to-edge (targetSdk 36): the vault list, its sync snackbar and four other screens no longer run under the navigation bar or a landscape side bar. A new inset net renders every screen with faked system bars on phone and tablet, portrait and landscape.
 
 ### Changed
 - The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
