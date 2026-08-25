@@ -242,6 +242,37 @@ class AppLocalizationsYo extends AppLocalizations {
   String get securityTitle => 'Aabo';
 
   @override
+  String get syncSettingsTitle => 'Ètò ìmúṣọ̀kan';
+
+  @override
+  String get sectionAutoMerge => 'Ìdàpọ̀ aládàáṣe';
+
+  @override
+  String get autoMergeTitle => 'Dàpọ̀ ní aládàáṣe';
+
+  @override
+  String get autoMergeDescription =>
+      'Ṣọkan láti àpótí á fi àwọn àyípadà ẹ̀rọ kejì sílò lẹ́sẹ̀kẹsẹ̀, láìsí yíyàn tàbí àyẹ̀wò. Níbi tí wọ́n bá yàtọ̀, iye ẹ̀rọ kejì ni ó gba.';
+
+  @override
+  String get autoMergeNote =>
+      'A ó ṣì béèrè fún fáìlì náà tí kò bá ṣí pẹ̀lú gbólóhùn àṣínà rẹ.';
+
+  @override
+  String get sectionSyncFolder => 'Fódà ìmúṣọ̀kan';
+
+  @override
+  String get syncFolderDescription =>
+      'Níbi tí ìgbéjáde ẹ̀rọ kejì ń dé. Ṣọkan láti àpótí á ṣí fáìlì tí ó ní orúkọ àpótí yìí níbẹ̀ láì béèrè.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Kò tíì ṣètò: Ṣọkan láti àpótí á máa béèrè fún fáìlì ní gbogbo ìgbà.';
+
+  @override
+  String get rememberFolder => 'Rántí';
+
+  @override
   String get aboutTitle => 'Nipa Gabbro';
 
   @override
@@ -524,6 +555,9 @@ class AppLocalizationsYo extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Aabo';
+
+  @override
+  String get menuSyncSettings => 'Ètò ìmúṣọ̀kan';
 
   @override
   String get menuManageFolders => 'Ṣakoso awọn folda';

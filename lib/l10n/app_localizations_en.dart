@@ -241,6 +241,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get securityTitle => 'Security';
 
   @override
+  String get syncSettingsTitle => 'Sync settings';
+
+  @override
+  String get sectionAutoMerge => 'Automatic merge';
+
+  @override
+  String get autoMergeTitle => 'Merge automatically';
+
+  @override
+  String get autoMergeDescription =>
+      'Sync from vault applies the other device\'s changes straight away, with no chooser and no review. Where the two differ, the other device\'s value wins.';
+
+  @override
+  String get autoMergeNote =>
+      'The file is still asked for if it does not open with your passphrase.';
+
+  @override
+  String get sectionSyncFolder => 'Sync folder';
+
+  @override
+  String get syncFolderDescription =>
+      'Where the other device\'s export lands. Sync from vault opens the file there that carries this vault\'s name, without asking for it.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Not set: Sync from vault asks for the file each time.';
+
+  @override
+  String get rememberFolder => 'Remember';
+
+  @override
   String get aboutTitle => 'About Gabbro';
 
   @override
@@ -523,6 +554,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Security';
+
+  @override
+  String get menuSyncSettings => 'Sync settings';
 
   @override
   String get menuManageFolders => 'Manage folders';

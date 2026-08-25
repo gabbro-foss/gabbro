@@ -206,4 +206,33 @@ void main() {
 
     expect(path, '/tmp/My Vault/café.gabbro');
   });
+
+  // ── S5: folder picker (sync folder; later export/import folders) ──────────
+
+  test('T7: pickDirectory sends OpenFile with directory=true, returns the path',
+      () async {
+    final fake = await _startFakePortal(
+      response: 0,
+      uris: ['file:///home/user/GabbroSync'],
+    );
+    addTearDown(fake.close);
+
+    final picker = LinuxFilePicker(clientFactory: fake.clientFactory);
+    final path = await picker.pickDirectory();
+
+    expect(path, '/home/user/GabbroSync');
+    expect(fake.portal.lastMethod, 'OpenFile');
+    expect(fake.portal.lastOptions!['directory'], const DBusBoolean(true));
+    expect(fake.portal.lastOptions!['multiple'], const DBusBoolean(false));
+    expect(fake.portal.lastOptions!.containsKey('filters'), isFalse,
+        reason: 'a folder dialog has no file filter');
+  });
+
+  test('T8: pickDirectory returns null when the user cancels', () async {
+    final fake = await _startFakePortal(response: 1);
+    addTearDown(fake.close);
+
+    final picker = LinuxFilePicker(clientFactory: fake.clientFactory);
+    expect(await picker.pickDirectory(), isNull);
+  });
 }

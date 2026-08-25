@@ -242,6 +242,37 @@ class AppLocalizationsPt extends AppLocalizations {
   String get securityTitle => 'Segurança';
 
   @override
+  String get syncSettingsTitle => 'Configurações de sincronização';
+
+  @override
+  String get sectionAutoMerge => 'Mesclagem automática';
+
+  @override
+  String get autoMergeTitle => 'Mesclar automaticamente';
+
+  @override
+  String get autoMergeDescription =>
+      'Sincronizar do cofre aplica as alterações do outro dispositivo na hora, sem escolha nem revisão. Onde diferem, vale o valor do outro dispositivo.';
+
+  @override
+  String get autoMergeNote =>
+      'O arquivo ainda será pedido se não abrir com a sua frase-senha.';
+
+  @override
+  String get sectionSyncFolder => 'Pasta de sincronização';
+
+  @override
+  String get syncFolderDescription =>
+      'Onde chega a exportação do outro dispositivo. Sincronizar do cofre abre ali o arquivo com o nome deste cofre, sem perguntar.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Não definida: Sincronizar do cofre pede o arquivo toda vez.';
+
+  @override
+  String get rememberFolder => 'Lembrar';
+
+  @override
   String get aboutTitle => 'Sobre o Gabbro';
 
   @override
@@ -525,6 +556,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Segurança';
+
+  @override
+  String get menuSyncSettings => 'Configurações de sincronização';
 
   @override
   String get menuManageFolders => 'Gerenciar pastas';
@@ -2485,6 +2519,37 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get securityTitle => 'Segurança';
 
   @override
+  String get syncSettingsTitle => 'Configurações de sincronização';
+
+  @override
+  String get sectionAutoMerge => 'Mesclagem automática';
+
+  @override
+  String get autoMergeTitle => 'Mesclar automaticamente';
+
+  @override
+  String get autoMergeDescription =>
+      'Sincronizar do cofre aplica as alterações do outro dispositivo na hora, sem escolha nem revisão. Onde diferem, vale o valor do outro dispositivo.';
+
+  @override
+  String get autoMergeNote =>
+      'O arquivo ainda será pedido se não abrir com a sua frase-senha.';
+
+  @override
+  String get sectionSyncFolder => 'Pasta de sincronização';
+
+  @override
+  String get syncFolderDescription =>
+      'Onde chega a exportação do outro dispositivo. Sincronizar do cofre abre ali o arquivo com o nome deste cofre, sem perguntar.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Não definida: Sincronizar do cofre pede o arquivo toda vez.';
+
+  @override
+  String get rememberFolder => 'Lembrar';
+
+  @override
   String get aboutTitle => 'Sobre o Gabbro';
 
   @override
@@ -2768,6 +2833,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get menuSecurity => 'Segurança';
+
+  @override
+  String get menuSyncSettings => 'Configurações de sincronização';
 
   @override
   String get menuManageFolders => 'Gerenciar pastas';
@@ -4725,6 +4793,37 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   String get securityTitle => 'Segurança';
 
   @override
+  String get syncSettingsTitle => 'Definições de sincronização';
+
+  @override
+  String get sectionAutoMerge => 'Fusão automática';
+
+  @override
+  String get autoMergeTitle => 'Fundir automaticamente';
+
+  @override
+  String get autoMergeDescription =>
+      'Sincronizar do cofre aplica de imediato as alterações do outro dispositivo, sem escolha nem revisão. Onde diferem, vale o valor do outro dispositivo.';
+
+  @override
+  String get autoMergeNote =>
+      'O ficheiro é pedido na mesma se não abrir com a sua frase-passe.';
+
+  @override
+  String get sectionSyncFolder => 'Pasta de sincronização';
+
+  @override
+  String get syncFolderDescription =>
+      'Onde chega a exportação do outro dispositivo. Sincronizar do cofre abre aí o ficheiro com o nome deste cofre, sem perguntar.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Não definida: Sincronizar do cofre pede o ficheiro de cada vez.';
+
+  @override
+  String get rememberFolder => 'Lembrar';
+
+  @override
   String get aboutTitle => 'Sobre o Gabbro';
 
   @override
@@ -5008,6 +5107,9 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get menuSecurity => 'Segurança';
+
+  @override
+  String get menuSyncSettings => 'Definições de sincronização';
 
   @override
   String get menuManageFolders => 'Gerir pastas';

@@ -43,6 +43,15 @@ class AppSettings {
   /// Android-only; ignored on Linux.
   final String androidExportFolderUri;
 
+  /// Apply an incoming sync without the chooser or the review (incoming wins).
+  /// Off by default: a review is the safer first experience.
+  final bool autoMergeSync;
+
+  /// Folder the other device's export lands in. Sync from vault opens the
+  /// file there with this vault's own name and skips the picker. Linux path
+  /// or Android SAF tree URI; empty = not remembered, picker as before.
+  final String syncFolder;
+
   const AppSettings({
     this.theme = ThemeChoice.system,
     this.textScale = 1.0,
@@ -58,6 +67,8 @@ class AppSettings {
     this.passkeyHintDismissed = false,
     this.appPasskeys = false,
     this.androidExportFolderUri = '',
+    this.autoMergeSync = false,
+    this.syncFolder = '',
   });
 
   static AppSettings get defaults => const AppSettings();
@@ -79,6 +90,8 @@ class AppSettings {
     'passkey_hint_dismissed': passkeyHintDismissed,
     'app_passkeys': appPasskeys,
     'android_export_folder_uri': androidExportFolderUri,
+    'auto_merge_sync': autoMergeSync,
+    'sync_folder': syncFolder,
   };
 
   factory AppSettings.fromJson(Map<String, dynamic> json) {
@@ -112,6 +125,8 @@ class AppSettings {
       passkeyHintDismissed: json['passkey_hint_dismissed'] as bool? ?? false,
       appPasskeys: json['app_passkeys'] as bool? ?? false,
       androidExportFolderUri: json['android_export_folder_uri'] as String? ?? '',
+      autoMergeSync: json['auto_merge_sync'] as bool? ?? false,
+      syncFolder: json['sync_folder'] as String? ?? '',
     );
   }
 
@@ -167,6 +182,8 @@ class AppSettings {
     bool? passkeyHintDismissed,
     bool? appPasskeys,
     String? androidExportFolderUri,
+    bool? autoMergeSync,
+    String? syncFolder,
   }) => AppSettings(
     theme: theme ?? this.theme,
     textScale: textScale ?? this.textScale,
@@ -183,6 +200,8 @@ class AppSettings {
     appPasskeys: appPasskeys ?? this.appPasskeys,
     androidExportFolderUri:
         androidExportFolderUri ?? this.androidExportFolderUri,
+    autoMergeSync: autoMergeSync ?? this.autoMergeSync,
+    syncFolder: syncFolder ?? this.syncFolder,
   );
 
   // ── File I/O ───────────────────────────────────────────────────────────
@@ -280,7 +299,19 @@ class AppSettings {
 
   // Android export destination folder (SAF tree URI). Set automatically when you
   // pick an export folder; remembered so exports go straight there. Android only.
-  "android_export_folder_uri": ${jsonEncode(androidExportFolderUri)}
+  "android_export_folder_uri": ${jsonEncode(androidExportFolderUri)},
+
+  // Apply an incoming sync automatically (the other device's value wins where
+  // the two differ), without the chooser or the one-by-one review. Same
+  // passphrase does not prove same vault: the file is still asked for if it
+  // does not open.
+  // Options: true | false
+  "auto_merge_sync": $autoMergeSync,
+
+  // Folder the other device's export lands in. "Sync from vault" opens the
+  // file there that carries this vault's own name and skips the picker.
+  // Linux path or Android folder URI; empty = ask each time.
+  "sync_folder": ${jsonEncode(syncFolder)}
 }
 ''';
 

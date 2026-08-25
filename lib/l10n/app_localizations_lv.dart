@@ -242,6 +242,37 @@ class AppLocalizationsLv extends AppLocalizations {
   String get securityTitle => 'Drošība';
 
   @override
+  String get syncSettingsTitle => 'Sinhronizācijas iestatījumi';
+
+  @override
+  String get sectionAutoMerge => 'Automātiska apvienošana';
+
+  @override
+  String get autoMergeTitle => 'Apvienot automātiski';
+
+  @override
+  String get autoMergeDescription =>
+      'Sinhronizēt no glabātavas uzreiz piemēro otras ierīces izmaiņas bez izvēles un bez pārskatīšanas. Kur tās atšķiras, uzvar otras ierīces vērtība.';
+
+  @override
+  String get autoMergeNote =>
+      'Fails tik un tā tiks prasīts, ja tas neatveras ar jūsu paroles frāzi.';
+
+  @override
+  String get sectionSyncFolder => 'Sinhronizācijas mape';
+
+  @override
+  String get syncFolderDescription =>
+      'Kur nonāk otras ierīces eksports. Sinhronizēt no glabātavas tur atver failu ar šīs glabātavas nosaukumu, neprasot.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Nav iestatīts: Sinhronizēt no glabātavas katru reizi prasa failu.';
+
+  @override
+  String get rememberFolder => 'Atcerēties';
+
+  @override
   String get aboutTitle => 'Par Gabbro';
 
   @override
@@ -524,6 +555,9 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Drošība';
+
+  @override
+  String get menuSyncSettings => 'Sinhronizācijas iestatījumi';
 
   @override
   String get menuManageFolders => 'Pārvaldīt mapes';

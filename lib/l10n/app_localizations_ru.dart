@@ -242,6 +242,37 @@ class AppLocalizationsRu extends AppLocalizations {
   String get securityTitle => 'Безопасность';
 
   @override
+  String get syncSettingsTitle => 'Настройки синхронизации';
+
+  @override
+  String get sectionAutoMerge => 'Автоматическое слияние';
+
+  @override
+  String get autoMergeTitle => 'Объединять автоматически';
+
+  @override
+  String get autoMergeDescription =>
+      'Синхронизировать из хранилища сразу применяет изменения другого устройства, без выбора и без проверки. Где они различаются, побеждает значение другого устройства.';
+
+  @override
+  String get autoMergeNote =>
+      'Файл всё равно будет запрошен, если он не открывается вашей парольной фразой.';
+
+  @override
+  String get sectionSyncFolder => 'Папка синхронизации';
+
+  @override
+  String get syncFolderDescription =>
+      'Куда попадает экспорт другого устройства. Синхронизировать из хранилища открывает там файл с именем этого хранилища, не спрашивая.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Не задана: Синхронизировать из хранилища каждый раз запрашивает файл.';
+
+  @override
+  String get rememberFolder => 'Запомнить';
+
+  @override
   String get aboutTitle => 'О Gabbro';
 
   @override
@@ -525,6 +556,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Безопасность';
+
+  @override
+  String get menuSyncSettings => 'Настройки синхронизации';
 
   @override
   String get menuManageFolders => 'Управление папками';

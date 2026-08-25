@@ -242,6 +242,37 @@ class AppLocalizationsFr extends AppLocalizations {
   String get securityTitle => 'Sécurité';
 
   @override
+  String get syncSettingsTitle => 'Paramètres de synchronisation';
+
+  @override
+  String get sectionAutoMerge => 'Fusion automatique';
+
+  @override
+  String get autoMergeTitle => 'Fusionner automatiquement';
+
+  @override
+  String get autoMergeDescription =>
+      'Synchroniser depuis le coffre applique aussitôt les changements de l\'autre appareil, sans choix ni relecture. En cas de différence, la valeur de l\'autre appareil l\'emporte.';
+
+  @override
+  String get autoMergeNote =>
+      'Le fichier sera tout de même demandé s\'il ne s\'ouvre pas avec votre phrase secrète.';
+
+  @override
+  String get sectionSyncFolder => 'Dossier de synchronisation';
+
+  @override
+  String get syncFolderDescription =>
+      'Là où arrive l\'export de l\'autre appareil. Synchroniser depuis le coffre y ouvre le fichier portant le nom de ce coffre, sans rien demander.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Non défini : Synchroniser depuis le coffre demande le fichier à chaque fois.';
+
+  @override
+  String get rememberFolder => 'Mémoriser';
+
+  @override
   String get aboutTitle => 'À propos de Gabbro';
 
   @override
@@ -526,6 +557,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Sécurité';
+
+  @override
+  String get menuSyncSettings => 'Paramètres de synchronisation';
 
   @override
   String get menuManageFolders => 'Gérer les dossiers';

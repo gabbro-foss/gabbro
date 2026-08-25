@@ -242,6 +242,37 @@ class AppLocalizationsUk extends AppLocalizations {
   String get securityTitle => 'Безпека';
 
   @override
+  String get syncSettingsTitle => 'Налаштування синхронізації';
+
+  @override
+  String get sectionAutoMerge => 'Автоматичне злиття';
+
+  @override
+  String get autoMergeTitle => 'Об\'єднувати автоматично';
+
+  @override
+  String get autoMergeDescription =>
+      'Синхронізувати зі сховища одразу застосовує зміни іншого пристрою, без вибору і без перегляду. Де вони різняться, перемагає значення іншого пристрою.';
+
+  @override
+  String get autoMergeNote =>
+      'Файл усе одно буде запитано, якщо він не відкривається вашою парольною фразою.';
+
+  @override
+  String get sectionSyncFolder => 'Тека синхронізації';
+
+  @override
+  String get syncFolderDescription =>
+      'Куди потрапляє експорт іншого пристрою. Синхронізувати зі сховища відкриває там файл з іменем цього сховища, не питаючи.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Не задано: Синхронізувати зі сховища щоразу запитує файл.';
+
+  @override
+  String get rememberFolder => 'Запам\'ятати';
+
+  @override
   String get aboutTitle => 'Про Gabbro';
 
   @override
@@ -526,6 +557,9 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Безпека';
+
+  @override
+  String get menuSyncSettings => 'Налаштування синхронізації';
 
   @override
   String get menuManageFolders => 'Керування папками';

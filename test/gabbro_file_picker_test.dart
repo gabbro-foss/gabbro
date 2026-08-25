@@ -22,6 +22,12 @@ class _RecordingLinuxPicker extends LinuxFilePicker {
     calls.add(('saveFile', fileName));
     return '/tmp/saved-linux.gabbro';
   }
+
+  @override
+  Future<String?> pickDirectory() async {
+    calls.add(('pickDirectory', null));
+    return '/tmp/from-linux-folder';
+  }
 }
 
 /// Cancels every dialog, so no path is ever read from disk.
@@ -33,6 +39,9 @@ class _CancellingLinuxPicker extends LinuxFilePicker {
   Future<String?> saveFile(
           {String? fileName, List<String>? allowedExtensions}) async =>
       null;
+
+  @override
+  Future<String?> pickDirectory() async => null;
 }
 
 /// Returns a fixed path (or null) from openFile.
@@ -203,8 +212,30 @@ void main() {
     await GabbroFilePicker.pickPath(allowedExtensions: ['gabbro']);
     await GabbroFilePicker.savePath(fileName: 'vault.gabbro');
     await GabbroFilePicker.pickFileWithData();
+    await GabbroFilePicker.pickDirectory();
 
     expect(androidCalls, isEmpty);
+  });
+
+  test('S5: on Linux pickDirectory routes to the portal client', () async {
+    final linux = _RecordingLinuxPicker();
+    GabbroFilePicker.isLinux = () => true;
+    GabbroFilePicker.linuxPicker = linux;
+
+    expect(await GabbroFilePicker.pickDirectory(), '/tmp/from-linux-folder');
+    expect(linux.calls.single.$1, 'pickDirectory');
+  });
+
+  testWidgets('S5: off Linux pickDirectory asks our picker channel',
+      (tester) async {
+    final channel = _RecordingChannel()
+      ..install(tester)
+      ..reply = 'content://tree/primary%3ADownload%2FGabbroSync';
+    GabbroFilePicker.isLinux = () => false;
+
+    expect(await GabbroFilePicker.pickDirectory(),
+        'content://tree/primary%3ADownload%2FGabbroSync');
+    expect(channel.calls.single.method, 'pick_dir');
   });
 
   test('14: off Linux savePath is refused - no save dialog is reachable there',

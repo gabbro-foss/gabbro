@@ -242,6 +242,37 @@ class AppLocalizationsPl extends AppLocalizations {
   String get securityTitle => 'Bezpieczeństwo';
 
   @override
+  String get syncSettingsTitle => 'Ustawienia synchronizacji';
+
+  @override
+  String get sectionAutoMerge => 'Automatyczne scalanie';
+
+  @override
+  String get autoMergeTitle => 'Scal automatycznie';
+
+  @override
+  String get autoMergeDescription =>
+      'Synchronizuj z sejfu od razu stosuje zmiany z drugiego urządzenia, bez wyboru i bez przeglądu. Tam, gdzie się różnią, wygrywa wartość z drugiego urządzenia.';
+
+  @override
+  String get autoMergeNote =>
+      'O plik i tak zostaniesz zapytany, jeśli nie otworzy się twoim hasłem.';
+
+  @override
+  String get sectionSyncFolder => 'Folder synchronizacji';
+
+  @override
+  String get syncFolderDescription =>
+      'Gdzie trafia eksport z drugiego urządzenia. Synchronizuj z sejfu otwiera tam plik o nazwie tego sejfu bez pytania.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Nie ustawiono: Synchronizuj z sejfu pyta o plik za każdym razem.';
+
+  @override
+  String get rememberFolder => 'Zapamiętaj';
+
+  @override
   String get aboutTitle => 'O Gabbro';
 
   @override
@@ -526,6 +557,9 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Bezpieczeństwo';
+
+  @override
+  String get menuSyncSettings => 'Ustawienia synchronizacji';
 
   @override
   String get menuManageFolders => 'Zarządzaj folderami';

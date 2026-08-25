@@ -235,6 +235,35 @@ class AppLocalizationsZh extends AppLocalizations {
   String get securityTitle => '安全';
 
   @override
+  String get syncSettingsTitle => '同步设置';
+
+  @override
+  String get sectionAutoMerge => '自动合并';
+
+  @override
+  String get autoMergeTitle => '自动合并';
+
+  @override
+  String get autoMergeDescription =>
+      '“从保险库同步”会立即应用另一台设备的更改，不再选择，也不再审核。两者不同之处以另一台设备的值为准。';
+
+  @override
+  String get autoMergeNote => '若文件无法用你的口令短语打开，仍会要求你选择文件。';
+
+  @override
+  String get sectionSyncFolder => '同步文件夹';
+
+  @override
+  String get syncFolderDescription =>
+      '另一台设备导出文件所在的位置。“从保险库同步”会直接在那里打开与本保险库同名的文件，不再询问。';
+
+  @override
+  String get syncFolderNotSet => '未设置：“从保险库同步”每次都会询问文件。';
+
+  @override
+  String get rememberFolder => '记住';
+
+  @override
   String get aboutTitle => '关于 Gabbro';
 
   @override
@@ -511,6 +540,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get menuSecurity => '安全';
+
+  @override
+  String get menuSyncSettings => '同步设置';
 
   @override
   String get menuManageFolders => '管理文件夹';
@@ -2375,6 +2407,35 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get securityTitle => '安全';
 
   @override
+  String get syncSettingsTitle => '同步设置';
+
+  @override
+  String get sectionAutoMerge => '自动合并';
+
+  @override
+  String get autoMergeTitle => '自动合并';
+
+  @override
+  String get autoMergeDescription =>
+      '“从保险库同步”会立即应用另一台设备的更改，不再选择，也不再审核。两者不同之处以另一台设备的值为准。';
+
+  @override
+  String get autoMergeNote => '若文件无法用你的口令短语打开，仍会要求你选择文件。';
+
+  @override
+  String get sectionSyncFolder => '同步文件夹';
+
+  @override
+  String get syncFolderDescription =>
+      '另一台设备导出文件所在的位置。“从保险库同步”会直接在那里打开与本保险库同名的文件，不再询问。';
+
+  @override
+  String get syncFolderNotSet => '未设置：“从保险库同步”每次都会询问文件。';
+
+  @override
+  String get rememberFolder => '记住';
+
+  @override
   String get aboutTitle => '关于 Gabbro';
 
   @override
@@ -2651,6 +2712,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get menuSecurity => '安全';
+
+  @override
+  String get menuSyncSettings => '同步设置';
 
   @override
   String get menuManageFolders => '管理文件夹';
@@ -4515,6 +4579,35 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get securityTitle => '安全性';
 
   @override
+  String get syncSettingsTitle => '同步設定';
+
+  @override
+  String get sectionAutoMerge => '自動合併';
+
+  @override
+  String get autoMergeTitle => '自動合併';
+
+  @override
+  String get autoMergeDescription =>
+      '「從保險庫同步」會立即套用另一部裝置的變更，不再選擇，也不再檢視。兩者不同之處以另一部裝置的值為準。';
+
+  @override
+  String get autoMergeNote => '若檔案無法以您的密碼片語開啟，仍會要求您選擇檔案。';
+
+  @override
+  String get sectionSyncFolder => '同步資料夾';
+
+  @override
+  String get syncFolderDescription =>
+      '另一部裝置匯出檔案所在的位置。「從保險庫同步」會直接在那裡開啟與本保險庫同名的檔案，不再詢問。';
+
+  @override
+  String get syncFolderNotSet => '未設定：「從保險庫同步」每次都會詢問檔案。';
+
+  @override
+  String get rememberFolder => '記住';
+
+  @override
   String get aboutTitle => '關於 Gabbro';
 
   @override
@@ -4791,6 +4884,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get menuSecurity => '安全性';
+
+  @override
+  String get menuSyncSettings => '同步設定';
 
   @override
   String get menuManageFolders => '管理資料夾';

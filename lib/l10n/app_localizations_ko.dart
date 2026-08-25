@@ -239,6 +239,35 @@ class AppLocalizationsKo extends AppLocalizations {
   String get securityTitle => '보안';
 
   @override
+  String get syncSettingsTitle => '동기화 설정';
+
+  @override
+  String get sectionAutoMerge => '자동 병합';
+
+  @override
+  String get autoMergeTitle => '자동으로 병합';
+
+  @override
+  String get autoMergeDescription =>
+      '금고에서 동기화는 선택이나 검토 없이 다른 기기의 변경 사항을 바로 적용합니다. 서로 다른 곳에서는 다른 기기의 값이 우선합니다.';
+
+  @override
+  String get autoMergeNote => '파일이 내 암호 문구로 열리지 않으면 파일을 다시 묻습니다.';
+
+  @override
+  String get sectionSyncFolder => '동기화 폴더';
+
+  @override
+  String get syncFolderDescription =>
+      '다른 기기의 내보내기가 저장되는 곳입니다. 금고에서 동기화는 그곳에서 이 금고의 이름을 가진 파일을 묻지 않고 엽니다.';
+
+  @override
+  String get syncFolderNotSet => '설정 안 됨: 금고에서 동기화가 매번 파일을 묻습니다.';
+
+  @override
+  String get rememberFolder => '기억하기';
+
+  @override
   String get aboutTitle => 'Gabbro 정보';
 
   @override
@@ -517,6 +546,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get menuSecurity => '보안';
+
+  @override
+  String get menuSyncSettings => '동기화 설정';
 
   @override
   String get menuManageFolders => '폴더 관리';

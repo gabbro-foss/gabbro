@@ -239,6 +239,35 @@ class AppLocalizationsJa extends AppLocalizations {
   String get securityTitle => 'セキュリティ';
 
   @override
+  String get syncSettingsTitle => '同期設定';
+
+  @override
+  String get sectionAutoMerge => '自動マージ';
+
+  @override
+  String get autoMergeTitle => '自動でマージ';
+
+  @override
+  String get autoMergeDescription =>
+      '「保管庫から同期」は、選択も確認もなしに他のデバイスの変更をすぐ適用します。異なる箇所では他のデバイスの値が優先されます。';
+
+  @override
+  String get autoMergeNote => 'ファイルがあなたのパスフレーズで開けない場合は、引き続きファイルの指定を求められます。';
+
+  @override
+  String get sectionSyncFolder => '同期フォルダー';
+
+  @override
+  String get syncFolderDescription =>
+      '他のデバイスのエクスポート先です。「保管庫から同期」は、この保管庫の名前を持つファイルをそこから確認なしに開きます。';
+
+  @override
+  String get syncFolderNotSet => '未設定：「保管庫から同期」は毎回ファイルを尋ねます。';
+
+  @override
+  String get rememberFolder => '記憶する';
+
+  @override
   String get aboutTitle => 'Gabbroについて';
 
   @override
@@ -517,6 +546,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get menuSecurity => 'セキュリティ';
+
+  @override
+  String get menuSyncSettings => '同期設定';
 
   @override
   String get menuManageFolders => 'フォルダの管理';

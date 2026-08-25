@@ -242,6 +242,37 @@ class AppLocalizationsEu extends AppLocalizations {
   String get securityTitle => 'Segurtasuna';
 
   @override
+  String get syncSettingsTitle => 'Sinkronizazio-ezarpenak';
+
+  @override
+  String get sectionAutoMerge => 'Bateratze automatikoa';
+
+  @override
+  String get autoMergeTitle => 'Bateratu automatikoki';
+
+  @override
+  String get autoMergeDescription =>
+      'Kutxatik sinkronizatzeak beste gailuaren aldaketak berehala aplikatzen ditu, aukerarik eta berrikuspenik gabe. Desberdinak direnean, beste gailuaren balioak irabazten du.';
+
+  @override
+  String get autoMergeNote =>
+      'Fitxategia eskatuko da hala ere zure pasaesaldiarekin irekitzen ez bada.';
+
+  @override
+  String get sectionSyncFolder => 'Sinkronizazio-karpeta';
+
+  @override
+  String get syncFolderDescription =>
+      'Beste gailuaren esportazioa non iristen den. Kutxatik sinkronizatzeak hor irekitzen du kutxa honen izena duen fitxategia, galdetu gabe.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Ezarri gabe: kutxatik sinkronizatzeak fitxategia eskatzen du aldiro.';
+
+  @override
+  String get rememberFolder => 'Gogoratu';
+
+  @override
   String get aboutTitle => 'Gabbro-ri buruz';
 
   @override
@@ -525,6 +556,9 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Segurtasuna';
+
+  @override
+  String get menuSyncSettings => 'Sinkronizazio-ezarpenak';
 
   @override
   String get menuManageFolders => 'Karpetak kudeatu';

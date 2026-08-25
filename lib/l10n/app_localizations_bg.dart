@@ -242,6 +242,37 @@ class AppLocalizationsBg extends AppLocalizations {
   String get securityTitle => 'Сигурност';
 
   @override
+  String get syncSettingsTitle => 'Настройки за синхронизация';
+
+  @override
+  String get sectionAutoMerge => 'Автоматично сливане';
+
+  @override
+  String get autoMergeTitle => 'Сливане автоматично';
+
+  @override
+  String get autoMergeDescription =>
+      'Синхронизиране от трезор прилага промените от другото устройство веднага, без избор и без преглед. При разлика печели стойността от другото устройство.';
+
+  @override
+  String get autoMergeNote =>
+      'Файлът пак ще бъде поискан, ако не се отвори с вашата парола.';
+
+  @override
+  String get sectionSyncFolder => 'Папка за синхронизация';
+
+  @override
+  String get syncFolderDescription =>
+      'Където попада експортът от другото устройство. Синхронизиране от трезор отваря там файла с името на този трезор, без да пита.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Не е зададена: Синхронизиране от трезор пита за файла всеки път.';
+
+  @override
+  String get rememberFolder => 'Запомни';
+
+  @override
   String get aboutTitle => 'За Gabbro';
 
   @override
@@ -526,6 +557,9 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Сигурност';
+
+  @override
+  String get menuSyncSettings => 'Настройки за синхронизация';
 
   @override
   String get menuManageFolders => 'Управление на папки';

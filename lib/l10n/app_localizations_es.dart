@@ -242,6 +242,37 @@ class AppLocalizationsEs extends AppLocalizations {
   String get securityTitle => 'Seguridad';
 
   @override
+  String get syncSettingsTitle => 'Ajustes de sincronización';
+
+  @override
+  String get sectionAutoMerge => 'Fusión automática';
+
+  @override
+  String get autoMergeTitle => 'Fusionar automáticamente';
+
+  @override
+  String get autoMergeDescription =>
+      'Sincronizar desde bóveda aplica los cambios del otro dispositivo de inmediato, sin elección ni revisión. Donde difieren, gana el valor del otro dispositivo.';
+
+  @override
+  String get autoMergeNote =>
+      'Aun así se pedirá el archivo si no se abre con tu frase de contraseña.';
+
+  @override
+  String get sectionSyncFolder => 'Carpeta de sincronización';
+
+  @override
+  String get syncFolderDescription =>
+      'Donde llega la exportación del otro dispositivo. Sincronizar desde bóveda abre allí el archivo con el nombre de esta bóveda sin preguntar.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Sin definir: Sincronizar desde bóveda pide el archivo cada vez.';
+
+  @override
+  String get rememberFolder => 'Recordar';
+
+  @override
   String get aboutTitle => 'Acerca de Gabbro';
 
   @override
@@ -525,6 +556,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Seguridad';
+
+  @override
+  String get menuSyncSettings => 'Ajustes de sincronización';
 
   @override
   String get menuManageFolders => 'Gestionar carpetas';

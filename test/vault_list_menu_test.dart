@@ -269,6 +269,7 @@ void main() {
       expect(find.text('Export vault'), findsOneWidget);
       expect(find.text('Import entries'), findsOneWidget);
       expect(find.text('Sync from vault'), findsOneWidget);
+      expect(find.text('Sync settings'), findsOneWidget);
       expect(find.text('Manage vaults'), findsOneWidget);
       expect(find.text('Change passphrase'), findsOneWidget);
       expect(find.text('Manage YubiKeys'), findsOneWidget);
@@ -283,7 +284,7 @@ void main() {
       expect(find.text('Quit'), findsOneWidget);
       // Net (2026-07-21): pin the exact count so a silently added or removed item
       // is caught. Bump this when the menu gains an item.
-      expect(find.byType(PopupMenuItem<String>), findsNWidgets(15));
+      expect(find.byType(PopupMenuItem<String>), findsNWidgets(16));
     });
 
     // Linux-only: off-Linux onQuit is null, so the menu has no Quit item.
@@ -295,7 +296,7 @@ void main() {
       await tester.tap(find.byIcon(Icons.menu));
       await tester.pumpAndSettle();
       expect(find.text('Quit'), findsNothing);
-      expect(find.byType(PopupMenuItem<String>), findsNWidgets(14));
+      expect(find.byType(PopupMenuItem<String>), findsNWidgets(15));
     });
 
     // Quit from an unlocked vault confirms first (an accidental menu tap must

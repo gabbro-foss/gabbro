@@ -242,6 +242,37 @@ class AppLocalizationsNn extends AppLocalizations {
   String get securityTitle => 'Tryggleik';
 
   @override
+  String get syncSettingsTitle => 'Synkroniseringsinnstillingar';
+
+  @override
+  String get sectionAutoMerge => 'Automatisk fletting';
+
+  @override
+  String get autoMergeTitle => 'Flett automatisk';
+
+  @override
+  String get autoMergeDescription =>
+      'Synkroniser frå kvelv tek i bruk endringane frå den andre eininga med ein gong, utan val og utan gjennomgang. Der dei skil seg, vinn verdien frå den andre eininga.';
+
+  @override
+  String get autoMergeNote =>
+      'Du vert likevel spurd om fila om ho ikkje opnar med passfrasen din.';
+
+  @override
+  String get sectionSyncFolder => 'Synkroniseringsmappe';
+
+  @override
+  String get syncFolderDescription =>
+      'Der eksporten frå den andre eininga hamnar. Synkroniser frå kvelv opnar fila der med namnet på dette kvelvet utan å spørje.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Ikkje sett: Synkroniser frå kvelv spør om fila kvar gong.';
+
+  @override
+  String get rememberFolder => 'Hugs';
+
+  @override
   String get aboutTitle => 'Om Gabbro';
 
   @override
@@ -524,6 +555,9 @@ class AppLocalizationsNn extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Tryggleik';
+
+  @override
+  String get menuSyncSettings => 'Synkroniseringsinnstillingar';
 
   @override
   String get menuManageFolders => 'Administrer mapper';

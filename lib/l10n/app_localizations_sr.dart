@@ -242,6 +242,37 @@ class AppLocalizationsSr extends AppLocalizations {
   String get securityTitle => 'Безбедност';
 
   @override
+  String get syncSettingsTitle => 'Подешавања синхронизације';
+
+  @override
+  String get sectionAutoMerge => 'Аутоматско спајање';
+
+  @override
+  String get autoMergeTitle => 'Споји аутоматски';
+
+  @override
+  String get autoMergeDescription =>
+      'Синхронизуј из трезора одмах примењује измене другог уређаја, без избора и без прегледа. Где се разликују, важи вредност другог уређаја.';
+
+  @override
+  String get autoMergeNote =>
+      'Датотека ће ипак бити затражена ако се не отвори вашом лозинком.';
+
+  @override
+  String get sectionSyncFolder => 'Фасцикла за синхронизацију';
+
+  @override
+  String get syncFolderDescription =>
+      'Где стиже извоз другог уређаја. Синхронизуј из трезора тамо отвара датотеку са именом овог трезора без питања.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Није подешено: Синхронизуј из трезора сваки пут тражи датотеку.';
+
+  @override
+  String get rememberFolder => 'Запамти';
+
+  @override
   String get aboutTitle => 'О апликацији Gabbro';
 
   @override
@@ -524,6 +555,9 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Безбедност';
+
+  @override
+  String get menuSyncSettings => 'Подешавања синхронизације';
 
   @override
   String get menuManageFolders => 'Управљање мапама';
@@ -2477,6 +2511,37 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   String get securityTitle => 'Bezbednost';
 
   @override
+  String get syncSettingsTitle => 'Podešavanja sinhronizacije';
+
+  @override
+  String get sectionAutoMerge => 'Automatsko spajanje';
+
+  @override
+  String get autoMergeTitle => 'Spoji automatski';
+
+  @override
+  String get autoMergeDescription =>
+      'Sinhronizuj iz trezora odmah primenjuje izmene drugog uređaja, bez izbora i bez pregleda. Gde se razlikuju, važi vrednost drugog uređaja.';
+
+  @override
+  String get autoMergeNote =>
+      'Datoteka će ipak biti zatražena ako se ne otvori vašom lozinkom.';
+
+  @override
+  String get sectionSyncFolder => 'Fascikla za sinhronizaciju';
+
+  @override
+  String get syncFolderDescription =>
+      'Gde stiže izvoz drugog uređaja. Sinhronizuj iz trezora tamo otvara datoteku sa imenom ovog trezora bez pitanja.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Nije podešeno: Sinhronizuj iz trezora svaki put traži datoteku.';
+
+  @override
+  String get rememberFolder => 'Zapamti';
+
+  @override
   String get aboutTitle => 'O aplikaciji Gabbro';
 
   @override
@@ -2760,6 +2825,9 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get menuSecurity => 'Bezbednost';
+
+  @override
+  String get menuSyncSettings => 'Podešavanja sinhronizacije';
 
   @override
   String get menuManageFolders => 'Upravljanje mapama';

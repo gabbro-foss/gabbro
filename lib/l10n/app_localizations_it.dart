@@ -242,6 +242,37 @@ class AppLocalizationsIt extends AppLocalizations {
   String get securityTitle => 'Sicurezza';
 
   @override
+  String get syncSettingsTitle => 'Impostazioni di sincronizzazione';
+
+  @override
+  String get sectionAutoMerge => 'Unione automatica';
+
+  @override
+  String get autoMergeTitle => 'Unisci automaticamente';
+
+  @override
+  String get autoMergeDescription =>
+      'Sincronizza da cassaforte applica subito le modifiche dell\'altro dispositivo, senza scelta né revisione. Dove differiscono, vince il valore dell\'altro dispositivo.';
+
+  @override
+  String get autoMergeNote =>
+      'Il file viene comunque richiesto se non si apre con la tua passphrase.';
+
+  @override
+  String get sectionSyncFolder => 'Cartella di sincronizzazione';
+
+  @override
+  String get syncFolderDescription =>
+      'Dove arriva l\'esportazione dell\'altro dispositivo. Sincronizza da cassaforte apre lì il file con il nome di questa cassaforte, senza chiedere.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Non impostata: Sincronizza da cassaforte chiede il file ogni volta.';
+
+  @override
+  String get rememberFolder => 'Ricorda';
+
+  @override
   String get aboutTitle => 'Informazioni su Gabbro';
 
   @override
@@ -525,6 +556,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Sicurezza';
+
+  @override
+  String get menuSyncSettings => 'Impostazioni di sincronizzazione';
 
   @override
   String get menuManageFolders => 'Gestisci cartelle';

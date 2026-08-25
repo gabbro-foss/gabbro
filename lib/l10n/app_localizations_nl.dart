@@ -242,6 +242,37 @@ class AppLocalizationsNl extends AppLocalizations {
   String get securityTitle => 'Beveiliging';
 
   @override
+  String get syncSettingsTitle => 'Synchronisatie-instellingen';
+
+  @override
+  String get sectionAutoMerge => 'Automatisch samenvoegen';
+
+  @override
+  String get autoMergeTitle => 'Automatisch samenvoegen';
+
+  @override
+  String get autoMergeDescription =>
+      'Synchroniseren vanuit kluis past de wijzigingen van het andere apparaat meteen toe, zonder keuze en zonder controle. Waar ze verschillen, wint de waarde van het andere apparaat.';
+
+  @override
+  String get autoMergeNote =>
+      'Er wordt alsnog om het bestand gevraagd als het niet opent met uw wachtwoordzin.';
+
+  @override
+  String get sectionSyncFolder => 'Synchronisatiemap';
+
+  @override
+  String get syncFolderDescription =>
+      'Waar de export van het andere apparaat terechtkomt. Synchroniseren vanuit kluis opent daar het bestand met de naam van deze kluis, zonder te vragen.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Niet ingesteld: Synchroniseren vanuit kluis vraagt elke keer om het bestand.';
+
+  @override
+  String get rememberFolder => 'Onthouden';
+
+  @override
   String get aboutTitle => 'Over Gabbro';
 
   @override
@@ -525,6 +556,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Beveiliging';
+
+  @override
+  String get menuSyncSettings => 'Synchronisatie-instellingen';
 
   @override
   String get menuManageFolders => 'Mappen beheren';

@@ -601,6 +601,60 @@ abstract class AppLocalizations {
   /// **'Security'**
   String get securityTitle;
 
+  /// No description provided for @syncSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync settings'**
+  String get syncSettingsTitle;
+
+  /// No description provided for @sectionAutoMerge.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic merge'**
+  String get sectionAutoMerge;
+
+  /// Label of the auto-merge switch on the Sync settings screen. Same wording as the chooser button it replaces.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge automatically'**
+  String get autoMergeTitle;
+
+  /// No description provided for @autoMergeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync from vault applies the other device\'s changes straight away, with no chooser and no review. Where the two differ, the other device\'s value wins.'**
+  String get autoMergeDescription;
+
+  /// No description provided for @autoMergeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The file is still asked for if it does not open with your passphrase.'**
+  String get autoMergeNote;
+
+  /// No description provided for @sectionSyncFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync folder'**
+  String get sectionSyncFolder;
+
+  /// No description provided for @syncFolderDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Where the other device\'s export lands. Sync from vault opens the file there that carries this vault\'s name, without asking for it.'**
+  String get syncFolderDescription;
+
+  /// No description provided for @syncFolderNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set: Sync from vault asks for the file each time.'**
+  String get syncFolderNotSet;
+
+  /// Checkbox next to a chosen folder: keep it for next time.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember'**
+  String get rememberFolder;
+
   /// No description provided for @aboutTitle.
   ///
   /// In en, this message translates to:
@@ -1152,6 +1206,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Security'**
   String get menuSecurity;
+
+  /// No description provided for @menuSyncSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync settings'**
+  String get menuSyncSettings;
 
   /// No description provided for @menuManageFolders.
   ///

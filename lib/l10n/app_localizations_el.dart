@@ -243,6 +243,37 @@ class AppLocalizationsEl extends AppLocalizations {
   String get securityTitle => 'Ασφάλεια';
 
   @override
+  String get syncSettingsTitle => 'Ρυθμίσεις συγχρονισμού';
+
+  @override
+  String get sectionAutoMerge => 'Αυτόματη συγχώνευση';
+
+  @override
+  String get autoMergeTitle => 'Αυτόματη συγχώνευση';
+
+  @override
+  String get autoMergeDescription =>
+      'Ο συγχρονισμός από θησαυροφυλάκιο εφαρμόζει αμέσως τις αλλαγές της άλλης συσκευής, χωρίς επιλογή και χωρίς έλεγχο. Όπου διαφέρουν, επικρατεί η τιμή της άλλης συσκευής.';
+
+  @override
+  String get autoMergeNote =>
+      'Το αρχείο θα ζητηθεί ούτως ή άλλως αν δεν ανοίγει με τη φράση πρόσβασής σας.';
+
+  @override
+  String get sectionSyncFolder => 'Φάκελος συγχρονισμού';
+
+  @override
+  String get syncFolderDescription =>
+      'Όπου καταλήγει η εξαγωγή της άλλης συσκευής. Ο συγχρονισμός από θησαυροφυλάκιο ανοίγει εκεί το αρχείο με το όνομα αυτού του θησαυροφυλακίου, χωρίς να ρωτά.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Δεν ορίστηκε: ο συγχρονισμός από θησαυροφυλάκιο ζητά το αρχείο κάθε φορά.';
+
+  @override
+  String get rememberFolder => 'Απομνημόνευση';
+
+  @override
   String get aboutTitle => 'Σχετικά με το Gabbro';
 
   @override
@@ -527,6 +558,9 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Ασφάλεια';
+
+  @override
+  String get menuSyncSettings => 'Ρυθμίσεις συγχρονισμού';
 
   @override
   String get menuManageFolders => 'Διαχείριση φακέλων';

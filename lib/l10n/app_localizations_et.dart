@@ -242,6 +242,37 @@ class AppLocalizationsEt extends AppLocalizations {
   String get securityTitle => 'Turvalisus';
 
   @override
+  String get syncSettingsTitle => 'Sünkroonimise seaded';
+
+  @override
+  String get sectionAutoMerge => 'Automaatne ühendamine';
+
+  @override
+  String get autoMergeTitle => 'Ühenda automaatselt';
+
+  @override
+  String get autoMergeDescription =>
+      'Hoidlast sünkroonimine rakendab teise seadme muudatused kohe, ilma valiku ja ülevaatuseta. Erinevuse korral võidab teise seadme väärtus.';
+
+  @override
+  String get autoMergeNote =>
+      'Faili küsitakse siiski, kui see sinu paroolifraasiga ei avane.';
+
+  @override
+  String get sectionSyncFolder => 'Sünkroonimiskaust';
+
+  @override
+  String get syncFolderDescription =>
+      'Kuhu teise seadme eksport jõuab. Hoidlast sünkroonimine avab sealt selle hoidla nimega faili küsimata.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Määramata: hoidlast sünkroonimine küsib faili iga kord.';
+
+  @override
+  String get rememberFolder => 'Jäta meelde';
+
+  @override
   String get aboutTitle => 'Teave Gabbro kohta';
 
   @override
@@ -525,6 +556,9 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Turvalisus';
+
+  @override
+  String get menuSyncSettings => 'Sünkroonimise seaded';
 
   @override
   String get menuManageFolders => 'Halda kaustu';

@@ -146,6 +146,21 @@
 
   "appearanceTitle": "Appearance",
   "securityTitle": "Security",
+  "syncSettingsTitle": "Sync settings",
+  "sectionAutoMerge": "Automatic merge",
+  "autoMergeTitle": "Merge automatically",
+  "@autoMergeTitle": {
+    "description": "Label of the auto-merge switch on the Sync settings screen. Same wording as the chooser button it replaces."
+  },
+  "autoMergeDescription": "Sync from vault applies the other device's changes straight away, with no chooser and no review. Where the two differ, the other device's value wins.",
+  "autoMergeNote": "The file is still asked for if it does not open with your passphrase.",
+  "sectionSyncFolder": "Sync folder",
+  "syncFolderDescription": "Where the other device's export lands. Sync from vault opens the file there that carries this vault's name, without asking for it.",
+  "syncFolderNotSet": "Not set: Sync from vault asks for the file each time.",
+  "rememberFolder": "Remember",
+  "@rememberFolder": {
+    "description": "Checkbox next to a chosen folder: keep it for next time."
+  },
   "aboutTitle": "About Gabbro",
   "generatorTitle": "Password generator",
   "importTitle": "Import entries",
@@ -247,6 +262,7 @@
   "menuManageYubiKeys": "Manage YubiKeys",
   "menuAppearance": "Appearance",
   "menuSecurity": "Security",
+  "menuSyncSettings": "Sync settings",
   "menuManageFolders": "Manage folders",
   "menuPasswordGenerator": "Password generator",
   "menuAbout": "About",

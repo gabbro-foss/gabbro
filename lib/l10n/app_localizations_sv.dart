@@ -242,6 +242,37 @@ class AppLocalizationsSv extends AppLocalizations {
   String get securityTitle => 'Säkerhet';
 
   @override
+  String get syncSettingsTitle => 'Synkroniseringsinställningar';
+
+  @override
+  String get sectionAutoMerge => 'Automatisk sammanslagning';
+
+  @override
+  String get autoMergeTitle => 'Slå ihop automatiskt';
+
+  @override
+  String get autoMergeDescription =>
+      'Synkronisera från valv tillämpar den andra enhetens ändringar direkt, utan val och utan granskning. Där de skiljer sig vinner den andra enhetens värde.';
+
+  @override
+  String get autoMergeNote =>
+      'Du får ändå frågan om filen om den inte öppnas med din lösenfras.';
+
+  @override
+  String get sectionSyncFolder => 'Synkroniseringsmapp';
+
+  @override
+  String get syncFolderDescription =>
+      'Dit den andra enhetens export hamnar. Synkronisera från valv öppnar filen där med det här valvets namn utan att fråga.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Inte angiven: Synkronisera från valv frågar efter filen varje gång.';
+
+  @override
+  String get rememberFolder => 'Kom ihåg';
+
+  @override
   String get aboutTitle => 'Om Gabbro';
 
   @override
@@ -524,6 +555,9 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Säkerhet';
+
+  @override
+  String get menuSyncSettings => 'Synkroniseringsinställningar';
 
   @override
   String get menuManageFolders => 'Hantera mappar';

@@ -242,6 +242,37 @@ class AppLocalizationsSk extends AppLocalizations {
   String get securityTitle => 'Zabezpečenie';
 
   @override
+  String get syncSettingsTitle => 'Nastavenia synchronizácie';
+
+  @override
+  String get sectionAutoMerge => 'Automatické zlúčenie';
+
+  @override
+  String get autoMergeTitle => 'Zlúčiť automaticky';
+
+  @override
+  String get autoMergeDescription =>
+      'Synchronizovať z trezoru použije zmeny z druhého zariadenia hneď, bez voľby a bez kontroly. Kde sa líšia, vyhráva hodnota z druhého zariadenia.';
+
+  @override
+  String get autoMergeNote =>
+      'Súbor bude aj tak vyžiadaný, ak sa neotvorí vaším heslom.';
+
+  @override
+  String get sectionSyncFolder => 'Priečinok synchronizácie';
+
+  @override
+  String get syncFolderDescription =>
+      'Kam prichádza export z druhého zariadenia. Synchronizovať z trezoru tam otvorí súbor s názvom tohto trezoru bez pýtania.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Nenastavené: Synchronizovať z trezoru sa na súbor pýta zakaždým.';
+
+  @override
+  String get rememberFolder => 'Zapamätať';
+
+  @override
   String get aboutTitle => 'O aplikácii Gabbro';
 
   @override
@@ -525,6 +556,9 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Zabezpečenie';
+
+  @override
+  String get menuSyncSettings => 'Nastavenia synchronizácie';
 
   @override
   String get menuManageFolders => 'Správa priečinkov';

@@ -242,6 +242,37 @@ class AppLocalizationsHu extends AppLocalizations {
   String get securityTitle => 'Biztonság';
 
   @override
+  String get syncSettingsTitle => 'Szinkronizálási beállítások';
+
+  @override
+  String get sectionAutoMerge => 'Automatikus egyesítés';
+
+  @override
+  String get autoMergeTitle => 'Egyesítés automatikusan';
+
+  @override
+  String get autoMergeDescription =>
+      'A Szinkronizálás széfből azonnal alkalmazza a másik eszköz változásait, választás és átnézés nélkül. Eltérésnél a másik eszköz értéke nyer.';
+
+  @override
+  String get autoMergeNote =>
+      'A fájlt akkor is kéri, ha nem nyílik meg a jelmondatával.';
+
+  @override
+  String get sectionSyncFolder => 'Szinkronizálási mappa';
+
+  @override
+  String get syncFolderDescription =>
+      'Ahová a másik eszköz exportja érkezik. A Szinkronizálás széfből ott nyitja meg az e széf nevét viselő fájlt, kérdés nélkül.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Nincs beállítva: a Szinkronizálás széfből minden alkalommal kéri a fájlt.';
+
+  @override
+  String get rememberFolder => 'Megjegyzés';
+
+  @override
   String get aboutTitle => 'A Gabbróról';
 
   @override
@@ -524,6 +555,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Biztonság';
+
+  @override
+  String get menuSyncSettings => 'Szinkronizálási beállítások';
 
   @override
   String get menuManageFolders => 'Mappák kezelése';

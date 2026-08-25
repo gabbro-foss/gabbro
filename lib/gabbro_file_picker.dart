@@ -56,8 +56,12 @@ class GabbroFilePicker {
   static Future<PickedFile?> Function() androidPickFileWithData =
       _androidPickFileWithData;
 
-  /// Folder picker — reached only by Android flows (SAF trees); Linux flows
-  /// use save dialogs instead.
+  /// Folder picker: a portal folder dialog on Linux (returns a path), the
+  /// SAF tree picker on Android (returns a tree URI). Null on cancel.
+  static Future<String?> pickDirectory() =>
+      isLinux() ? linuxPicker.pickDirectory() : androidPickDirectory();
+
+  /// Android folder leg (SAF trees); export reaches it directly.
   static Future<String?> Function() androidPickDirectory = _androidPickDirectory;
 
   // ── Android legs: our own picker channel ──────────────────────────────────

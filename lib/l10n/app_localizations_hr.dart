@@ -242,6 +242,37 @@ class AppLocalizationsHr extends AppLocalizations {
   String get securityTitle => 'Sigurnost';
 
   @override
+  String get syncSettingsTitle => 'Postavke sinkronizacije';
+
+  @override
+  String get sectionAutoMerge => 'Automatsko spajanje';
+
+  @override
+  String get autoMergeTitle => 'Spoji automatski';
+
+  @override
+  String get autoMergeDescription =>
+      'Sinkroniziraj iz trezora odmah primjenjuje promjene drugog uređaja, bez odabira i bez pregleda. Gdje se razlikuju, vrijedi vrijednost drugog uređaja.';
+
+  @override
+  String get autoMergeNote =>
+      'Datoteka će se ipak zatražiti ako se ne otvori vašom lozinkom.';
+
+  @override
+  String get sectionSyncFolder => 'Mapa za sinkronizaciju';
+
+  @override
+  String get syncFolderDescription =>
+      'Gdje stiže izvoz drugog uređaja. Sinkroniziraj iz trezora ondje otvara datoteku s imenom ovog trezora bez pitanja.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Nije postavljeno: Sinkroniziraj iz trezora svaki put traži datoteku.';
+
+  @override
+  String get rememberFolder => 'Zapamti';
+
+  @override
   String get aboutTitle => 'O aplikaciji Gabbro';
 
   @override
@@ -525,6 +556,9 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Sigurnost';
+
+  @override
+  String get menuSyncSettings => 'Postavke sinkronizacije';
 
   @override
   String get menuManageFolders => 'Upravljanje mapama';

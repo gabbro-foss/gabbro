@@ -243,6 +243,37 @@ class AppLocalizationsDe extends AppLocalizations {
   String get securityTitle => 'Sicherheit';
 
   @override
+  String get syncSettingsTitle => 'Sync-Einstellungen';
+
+  @override
+  String get sectionAutoMerge => 'Automatisches Zusammenführen';
+
+  @override
+  String get autoMergeTitle => 'Automatisch zusammenführen';
+
+  @override
+  String get autoMergeDescription =>
+      'Aus Tresor synchronisieren übernimmt die Änderungen des anderen Geräts sofort, ohne Auswahl und ohne Prüfung. Bei Unterschieden gewinnt der Wert des anderen Geräts.';
+
+  @override
+  String get autoMergeNote =>
+      'Öffnet sich die Datei nicht mit Ihrer Passphrase, wird trotzdem danach gefragt.';
+
+  @override
+  String get sectionSyncFolder => 'Sync-Ordner';
+
+  @override
+  String get syncFolderDescription =>
+      'Wohin der Export des anderen Geräts gelangt. Aus Tresor synchronisieren öffnet dort die Datei mit dem Namen dieses Tresors, ohne nachzufragen.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Nicht gesetzt: Aus Tresor synchronisieren fragt jedes Mal nach der Datei.';
+
+  @override
+  String get rememberFolder => 'Merken';
+
+  @override
   String get aboutTitle => 'Über Gabbro';
 
   @override
@@ -526,6 +557,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Sicherheit';
+
+  @override
+  String get menuSyncSettings => 'Sync-Einstellungen';
 
   @override
   String get menuManageFolders => 'Ordner verwalten';

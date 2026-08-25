@@ -242,6 +242,37 @@ class AppLocalizationsKk extends AppLocalizations {
   String get securityTitle => 'Қауіпсіздік';
 
   @override
+  String get syncSettingsTitle => 'Синхрондау баптаулары';
+
+  @override
+  String get sectionAutoMerge => 'Автоматты біріктіру';
+
+  @override
+  String get autoMergeTitle => 'Автоматты біріктіру';
+
+  @override
+  String get autoMergeDescription =>
+      'Қоймадан синхрондау басқа құрылғының өзгерістерін таңдаусыз және тексерусіз бірден қолданады. Айырмашылық болса, басқа құрылғының мәні басым.';
+
+  @override
+  String get autoMergeNote =>
+      'Файл құпия сөз тіркесіңізбен ашылмаса, ол бәрібір сұралады.';
+
+  @override
+  String get sectionSyncFolder => 'Синхрондау қалтасы';
+
+  @override
+  String get syncFolderDescription =>
+      'Басқа құрылғының экспорты түсетін орын. Қоймадан синхрондау сол жерден осы қойманың атындағы файлды сұрамай ашады.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Орнатылмаған: Қоймадан синхрондау файлды әр жолы сұрайды.';
+
+  @override
+  String get rememberFolder => 'Есте сақтау';
+
+  @override
   String get aboutTitle => 'Gabbro туралы';
 
   @override
@@ -524,6 +555,9 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Қауіпсіздік';
+
+  @override
+  String get menuSyncSettings => 'Синхрондау баптаулары';
 
   @override
   String get menuManageFolders => 'Қалталарды басқару';

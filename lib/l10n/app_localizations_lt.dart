@@ -242,6 +242,37 @@ class AppLocalizationsLt extends AppLocalizations {
   String get securityTitle => 'Saugumas';
 
   @override
+  String get syncSettingsTitle => 'Sinchronizavimo nustatymai';
+
+  @override
+  String get sectionAutoMerge => 'Automatinis sujungimas';
+
+  @override
+  String get autoMergeTitle => 'Sujungti automatiškai';
+
+  @override
+  String get autoMergeDescription =>
+      'Sinchronizuoti iš saugyklos iš karto pritaiko kito įrenginio pakeitimus, be pasirinkimo ir be peržiūros. Kur skiriasi, laimi kito įrenginio reikšmė.';
+
+  @override
+  String get autoMergeNote =>
+      'Failo vis tiek bus paprašyta, jei jis neatsidaro su jūsų slaptafraze.';
+
+  @override
+  String get sectionSyncFolder => 'Sinchronizavimo aplankas';
+
+  @override
+  String get syncFolderDescription =>
+      'Kur patenka kito įrenginio eksportas. Sinchronizuoti iš saugyklos ten atveria šios saugyklos vardu pavadintą failą neklausdamas.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Nenustatyta: Sinchronizuoti iš saugyklos kaskart klausia failo.';
+
+  @override
+  String get rememberFolder => 'Įsiminti';
+
+  @override
   String get aboutTitle => 'Apie Gabbro';
 
   @override
@@ -526,6 +557,9 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Saugumas';
+
+  @override
+  String get menuSyncSettings => 'Sinchronizavimo nustatymai';
 
   @override
   String get menuManageFolders => 'Tvarkyti aplankus';

@@ -25,6 +25,7 @@ import 'package:gabbro/screens/export_screen.dart';
 import 'package:gabbro/screens/appearance_screen.dart';
 import 'package:gabbro/screens/language_screen.dart';
 import 'package:gabbro/screens/security_screen.dart';
+import 'package:gabbro/screens/sync_settings_screen.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/screens/change_passphrase_screen.dart';
 import 'package:gabbro/screens/generator_screen.dart';
@@ -1625,6 +1626,16 @@ class _VaultListScreenState extends State<VaultListScreen>
         Navigator.of(
           context,
         ).push(MaterialPageRoute(builder: (context) => const LanguageScreen()));
+      case 'sync_settings':
+        final syncAppState = GabbroApp.of(context);
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => SyncSettingsScreen(
+              settings: syncAppState.settings,
+              onUpdate: (updated) => syncAppState.updateSettings(updated),
+            ),
+          ),
+        );
       case 'security':
         final appState = GabbroApp.of(context);
         Navigator.of(context).push(
@@ -2049,6 +2060,16 @@ class _VaultListScreenState extends State<VaultListScreen>
                         Icon(Icons.sync, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
                         Expanded(child: Text(ml.syncFromVault)),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'sync_settings',
+                    child: Row(
+                      children: [
+                        Icon(Icons.sync_alt, size: scaledIconSize(context, 20)),
+                        const SizedBox(width: 12),
+                        Expanded(child: Text(ml.menuSyncSettings)),
                       ],
                     ),
                   ),

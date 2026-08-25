@@ -242,6 +242,37 @@ class AppLocalizationsFi extends AppLocalizations {
   String get securityTitle => 'Tietoturva';
 
   @override
+  String get syncSettingsTitle => 'Synkronointiasetukset';
+
+  @override
+  String get sectionAutoMerge => 'Automaattinen yhdistäminen';
+
+  @override
+  String get autoMergeTitle => 'Yhdistä automaattisesti';
+
+  @override
+  String get autoMergeDescription =>
+      'Synkronoi holvista ottaa toisen laitteen muutokset käyttöön heti, ilman valintaa ja tarkistusta. Eroavissa kohdissa toisen laitteen arvo voittaa.';
+
+  @override
+  String get autoMergeNote =>
+      'Tiedostoa kysytään silti, jos se ei avaudu salalauseellasi.';
+
+  @override
+  String get sectionSyncFolder => 'Synkronointikansio';
+
+  @override
+  String get syncFolderDescription =>
+      'Minne toisen laitteen vienti päätyy. Synkronoi holvista avaa sieltä tämän holvin nimisen tiedoston kysymättä.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Ei asetettu: Synkronoi holvista kysyy tiedostoa joka kerta.';
+
+  @override
+  String get rememberFolder => 'Muista';
+
+  @override
   String get aboutTitle => 'Tietoja Gabbrosta';
 
   @override
@@ -526,6 +557,9 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Tietoturva';
+
+  @override
+  String get menuSyncSettings => 'Synkronointiasetukset';
 
   @override
   String get menuManageFolders => 'Hallinnoi kansioita';

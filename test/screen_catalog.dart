@@ -29,6 +29,7 @@ import 'package:gabbro/screens/manage_vaults_screen.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/screens/recovery_history_screen.dart';
 import 'package:gabbro/screens/security_screen.dart';
+import 'package:gabbro/screens/sync_settings_screen.dart';
 import 'package:gabbro/screens/tablet_vault_layout.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
@@ -167,6 +168,14 @@ final Map<String, Widget Function()> screens = {
   'security': () => SecurityScreen(
     settings: const AppSettings(),
     onUpdate: (_) {},
+    isAndroid: false,
+  ),
+  'sync_settings': () => SyncSettingsScreen(
+    settings: const AppSettings(
+      syncFolder: '/home/user/a/rather/long/folder/path/that/wraps/GabbroSync',
+    ),
+    onUpdate: (_) {},
+    onPickFolder: () async => null,
     isAndroid: false,
   ),
   'manage_folders': () => ManageFoldersScreen(
@@ -568,6 +577,7 @@ const Map<String, String> covers = {
   'export': 'export_screen',
   'change_passphrase': 'change_passphrase_screen',
   'security': 'security_screen',
+  'sync_settings': 'sync_settings_screen',
   'manage_folders': 'manage_folders_screen',
   'manage_vaults': 'manage_vaults_screen',
   'entry_detail': 'entry_detail_screen',
@@ -634,5 +644,5 @@ List<String> uiSources() =>
 // renamed folder) would otherwise leave `missing` empty and pass while checking
 // nothing. Adding a screen or widget fails here first: the new file must be
 // swept or waived deliberately.
-const screenFileCount = 28;
+const screenFileCount = 29;
 const widgetFileCount = 14;

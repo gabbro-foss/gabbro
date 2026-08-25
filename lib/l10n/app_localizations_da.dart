@@ -242,6 +242,37 @@ class AppLocalizationsDa extends AppLocalizations {
   String get securityTitle => 'Sikkerhed';
 
   @override
+  String get syncSettingsTitle => 'Synkroniseringsindstillinger';
+
+  @override
+  String get sectionAutoMerge => 'Automatisk fletning';
+
+  @override
+  String get autoMergeTitle => 'Flet automatisk';
+
+  @override
+  String get autoMergeDescription =>
+      'Synkronisér fra boks anvender den anden enheds ændringer med det samme, uden valg og uden gennemsyn. Hvor de afviger, vinder den anden enheds værdi.';
+
+  @override
+  String get autoMergeNote =>
+      'Der bliver stadig spurgt om filen, hvis den ikke åbner med din adgangssætning.';
+
+  @override
+  String get sectionSyncFolder => 'Synkroniseringsmappe';
+
+  @override
+  String get syncFolderDescription =>
+      'Hvor den anden enheds eksport lander. Synkronisér fra boks åbner filen dér med denne boks\' navn uden at spørge.';
+
+  @override
+  String get syncFolderNotSet =>
+      'Ikke angivet: Synkronisér fra boks spørger om filen hver gang.';
+
+  @override
+  String get rememberFolder => 'Husk';
+
+  @override
   String get aboutTitle => 'Om Gabbro';
 
   @override
@@ -523,6 +554,9 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Sikkerhed';
+
+  @override
+  String get menuSyncSettings => 'Synkroniseringsindstillinger';
 
   @override
   String get menuManageFolders => 'Administrér mapper';

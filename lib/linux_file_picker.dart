@@ -30,6 +30,13 @@ class LinuxFilePicker {
     return _request('SaveFile', options);
   }
 
+  /// Shows the folder dialog (`OpenFile` with `directory`). Returns the
+  /// picked folder path, or null if the user cancelled.
+  Future<String?> pickDirectory() => _request('OpenFile', {
+        'multiple': const DBusBoolean(false),
+        'directory': const DBusBoolean(true),
+      });
+
   Map<String, DBusValue> _options(List<String>? allowedExtensions) {
     final options = <String, DBusValue>{
       'multiple': const DBusBoolean(false),

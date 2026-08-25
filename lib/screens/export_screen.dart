@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:gabbro/folder_label.dart';
 import 'package:gabbro/gabbro_file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -230,16 +231,12 @@ class _ExportScreenState extends State<ExportScreen> {
     await widget.onSaveExportFolderUri(picked.treeUri);
   }
 
-  /// Human-readable label for a SAF tree URI, e.g.
-  /// `content://…/tree/primary%3ADownload%2FGabbroSync` -> `primary:Download/GabbroSync`.
+  /// The picker's display name when it gave one, else the decoded tree URI.
   String _folderLabel() {
     if (_folderDisplayName != null && _folderDisplayName!.isNotEmpty) {
       return _folderDisplayName!;
     }
-    final marker = '/tree/';
-    final i = _exportFolderUri.indexOf(marker);
-    if (i < 0) return _exportFolderUri;
-    return Uri.decodeComponent(_exportFolderUri.substring(i + marker.length));
+    return folderDisplayLabel(_exportFolderUri);
   }
 
   String get _exportPath {
