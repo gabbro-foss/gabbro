@@ -246,6 +246,38 @@ whatever is missing or wrong is fixed in the same section that changes it.
   -> error, no picker; setting on -> `fast = true`, skip `SyncMethodDialog`.
 - Hardware: one pass Linux, one pass Android.
 
+**In progress: edge-to-edge insets** (found by the Android pass 2a, 2026-08-25;
+latent on master, exposed by targetSdk 36 = Flutter 3.47.x default, enforced on
+Android 15+). Consequence: on the S23 the bottom of the vault list and the
+sync snackbar sit under the navigation buttons.
+
+Wiring (Flutter `scaffold.dart:3032`, `:3104`, `:3220`): the nav-bar inset
+reaches a Scaffold's body and snackbar only as `MediaQuery.padding.bottom`,
+and a Scaffold strips it whenever `bottomNavigationBar != null`; `minInsets`
+is keyboard-only. Offenders, verified in code:
+- Vault list, phone: the passkey-banner slot always holds a widget (zero-size
+  when hidden, always on Android) -> body, snackbar, FAB lose the inset.
+- Vault list, tablet: `TabletVaultLayout` is returned outside the `SafeArea`,
+  pads with fixed `EdgeInsets`.
+- Adopt vault, keyboard shortcuts, change passphrase, manage YubiKeys: no
+  `SafeArea`, explicit `padding:` on the scroll view (disables auto-inset).
+- Fine as is: sheets read `padding.bottom` themselves; dialogs carry Flutter's
+  own `SafeArea`; unlock/save/consent/all other screens have `SafeArea`;
+  manage folders and recovery history use un-padded lists (auto-inset).
+
+Cases: 3-button nav (~48dp bottom), gesture nav (~20dp bottom), landscape
+(inset on a side), tablet two-pane, no inset (Linux). Must not regress: scroll
+to the last entry, FAB tap, snackbar readable, Linux passkey banner visible and
+announced, alphabet bar full height, search with keyboard, tablet divider drag.
+
+- [ ] Net: generic inset probe over the screen catalog at inset 0, phone +
+      tablet, portrait + landscape (green on today's code)
+- [ ] Red: same probe at 20/48 bottom and 48 side; vault-list snackbar, FAB,
+      banner rows
+- [ ] Fix: slot null when the banner is hidden; tablet branch inside the
+      SafeArea; SafeArea on the four screens
+- [ ] Hardware: S23 3-button, S23 gesture, Lenovo tablet portrait + landscape
+
 Progress (tick as each Bikeshed section lands):
 - [x] Net (S8), both platforms
 - [x] Labels (S2)
@@ -256,7 +288,7 @@ Progress (tick as each Bikeshed section lands):
 - [ ] Remember folders on export/import + read-only view in Sync settings (S9, S5)
 - [x] On-screen explanations checked against S1-S9 (S10)
 - [ ] Docs: README, VAULT_SYNC.md, CHANGELOG
-- [ ] Hardware: one pass per platform per section
+- [ ] Hardware: one pass per platform per section (step 1: Linux green 2026-08-25; Android 2a green except the inset regression above; 2b missing-file, 2c keyed NFC pending)
 
 ---
 
