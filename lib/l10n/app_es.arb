@@ -699,7 +699,7 @@
   "importEnterPassphrase": "Introduce la contraseña maestra de este almacén.",
   "importSourceKeyProtected": "Esta bóveda está protegida por una YubiKey. Deberás tocar una llave registrada para sincronizar.",
   "importDuplicateWarning": "Se añade cada entrada del archivo, incluso las que la bóveda ya contiene. Mejor una sola vez, en una bóveda vacía.",
-  "importGabbroSubtitle": "Importar entradas desde otro almacén Gabbro (archivo .gabbro)",
+  "importGabbroSubtitle": "Importar entradas de otra bóveda de Gabbro (archivo .gabbro). Para esta misma bóveda desde otro dispositivo, usa Sincronizar desde bóveda.",
   "importEnpassSubtitle": "Exportación JSON desde Enpass (Herramientas → Exportar)",
   "importBitwardenSubtitle": "Exportación JSON sin cifrar desde Bitwarden (Herramientas → Exportar almacén)",
   "importCsvSubtitle": "Exportación CSV desde cualquier gestor de contraseñas",

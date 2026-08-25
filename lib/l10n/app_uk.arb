@@ -699,7 +699,7 @@
   "importEnterPassphrase": "Введіть кодову фразу для цього сховища.",
   "importSourceKeyProtected": "Це сховище захищено YubiKey. Для синхронізації потрібно торкнутися зареєстрованого ключа.",
   "importDuplicateWarning": "Додається кожен запис із файлу, навіть уже наявні у сховищі. Найкраще один раз, у порожнє сховище.",
-  "importGabbroSubtitle": "Імпортувати записи з іншого сховища Gabbro (файл .gabbro)",
+  "importGabbroSubtitle": "Імпорт записів з іншого сховища Gabbro (файл .gabbro). Для цього ж сховища з іншого пристрою використовуйте «Синхронізувати зі сховища».",
   "importEnpassSubtitle": "JSON-експорт з Enpass (Інструменти → Експорт)",
   "importBitwardenSubtitle": "Незашифрований JSON-експорт з Bitwarden (Інструменти → Експорт сховища)",
   "importCsvSubtitle": "CSV-експорт з будь-якого менеджера паролів",

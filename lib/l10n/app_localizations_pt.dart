@@ -1681,7 +1681,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get importGabbroSubtitle =>
-      'Importar entradas de outro cofre Gabbro (arquivo .gabbro)';
+      'Importar entradas de outro cofre Gabbro (arquivo .gabbro). Para este mesmo cofre de outro dispositivo, use Sincronizar do cofre.';
 
   @override
   String get importEnpassSubtitle =>
@@ -3963,7 +3963,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get importGabbroSubtitle =>
-      'Importar entradas de outro cofre Gabbro (arquivo .gabbro)';
+      'Importar entradas de outro cofre Gabbro (arquivo .gabbro). Para este mesmo cofre de outro dispositivo, use Sincronizar do cofre.';
 
   @override
   String get importEnpassSubtitle =>
@@ -6244,7 +6244,7 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get importGabbroSubtitle =>
-      'Importar entradas de outro cofre Gabbro (ficheiro .gabbro)';
+      'Importar entradas de outro cofre Gabbro (ficheiro .gabbro). Para este mesmo cofre de outro dispositivo, use Sincronizar do cofre.';
 
   @override
   String get importEnpassSubtitle =>

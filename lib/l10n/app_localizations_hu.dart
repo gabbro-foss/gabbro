@@ -1679,7 +1679,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get importGabbroSubtitle =>
-      'Bejegyzések importálása másik Gabbro széfből (.gabbro fájl)';
+      'Bejegyzések importálása egy másik Gabbro-széfből (.gabbro fájl). Ugyanehhez a széfhez egy másik eszközről a Szinkronizálás széfből való.';
 
   @override
   String get importEnpassSubtitle =>

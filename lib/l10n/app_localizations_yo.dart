@@ -1677,7 +1677,7 @@ class AppLocalizationsYo extends AppLocalizations {
 
   @override
   String get importGabbroSubtitle =>
-      'Mu awọn titẹ sii wọle lati vọọliti Gabbro miiran (faili .gabbro)';
+      'Gbé àwọn ohun wọlé láti àpótí Gabbro mìíràn (fáìlì .gabbro). Fún àpótí yìí kan náà láti ẹ̀rọ mìíràn, lo Ṣọkan láti àpótí dípò.';
 
   @override
   String get importEnpassSubtitle =>

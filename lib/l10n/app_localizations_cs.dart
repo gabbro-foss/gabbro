@@ -1681,7 +1681,7 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get importGabbroSubtitle =>
-      'Importovat záznamy z jiného trezoru Gabbro (soubor .gabbro)';
+      'Import položek z jiného trezoru Gabbro (soubor .gabbro). Pro tento trezor z jiného zařízení použijte Synchronizovat z trezoru.';
 
   @override
   String get importEnpassSubtitle =>

@@ -699,7 +699,7 @@
   "importEnterPassphrase": "Inserisci la passphrase per questo archivio.",
   "importSourceKeyProtected": "Questa cassaforte è protetta da una YubiKey. Dovrai toccare una chiave registrata per sincronizzare.",
   "importDuplicateWarning": "Ogni voce del file viene aggiunta, anche quelle già presenti nella cassaforte. Meglio una sola volta, in una cassaforte vuota.",
-  "importGabbroSubtitle": "Importa voci da un altro archivio Gabbro (file .gabbro)",
+  "importGabbroSubtitle": "Importa voci da un'altra cassaforte Gabbro (file .gabbro). Per questa stessa cassaforte da un altro dispositivo usa Sincronizza da cassaforte.",
   "importEnpassSubtitle": "Esportazione JSON da Enpass (Strumenti → Esporta)",
   "importBitwardenSubtitle": "Esportazione JSON non cifrata da Bitwarden (Strumenti → Esporta archivio)",
   "importCsvSubtitle": "Esportazione CSV da qualsiasi gestore di password",

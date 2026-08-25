@@ -1685,7 +1685,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get importGabbroSubtitle =>
-      'Items importeren vanuit een andere Gabbro-kluis (.gabbro-bestand)';
+      'Items importeren uit een andere Gabbro-kluis (.gabbro-bestand). Voor deze kluis vanaf een ander apparaat: gebruik Synchroniseren vanuit kluis.';
 
   @override
   String get importEnpassSubtitle =>

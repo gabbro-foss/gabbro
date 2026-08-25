@@ -699,7 +699,7 @@
   "importEnterPassphrase": "このボルトのパスフレーズを入力してください。",
   "importSourceKeyProtected": "この保管庫は YubiKey で保護されています。同期するには、登録済みのキーをタップする必要があります。",
   "importDuplicateWarning": "ファイル内のすべての項目が追加されます。保管庫に既にあるものも含みます。空の保管庫に一度だけ行うのが最適です。",
-  "importGabbroSubtitle": "別のGabbroボルト (.gabbro) からエントリをインポート",
+  "importGabbroSubtitle": "別の Gabbro 保管庫（.gabbro ファイル）から項目を読み込みます。この同じ保管庫を別のデバイスから取り込む場合は「保管庫から同期」を使ってください。",
   "importEnpassSubtitle": "EnpassからのJSONエクスポート (ツール → エクスポート)",
   "importBitwardenSubtitle": "BitwardenからのJSONエクスポート (ツール → ボルトをエクスポート)",
   "importCsvSubtitle": "パスワードマネージャーからのCSVエクスポート",

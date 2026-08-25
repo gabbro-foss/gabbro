@@ -3178,7 +3178,7 @@ abstract class AppLocalizations {
   /// No description provided for @importGabbroSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Import entries from another Gabbro vault (.gabbro file)'**
+  /// **'Import entries from a different Gabbro vault (.gabbro file). For this same vault from another device, use Sync from vault instead.'**
   String get importGabbroSubtitle;
 
   /// No description provided for @importEnpassSubtitle.

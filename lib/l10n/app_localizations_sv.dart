@@ -1676,7 +1676,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get importGabbroSubtitle =>
-      'Importera poster från ett annat Gabbro-valv (.gabbro-fil)';
+      'Importera poster från ett annat Gabbro-valv (.gabbro-fil). För det här valvet från en annan enhet: använd Synkronisera från valv.';
 
   @override
   String get importEnpassSubtitle =>

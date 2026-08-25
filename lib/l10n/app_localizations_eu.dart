@@ -1679,7 +1679,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get importGabbroSubtitle =>
-      'Beste Gabbro gandegi batetik sarrerak inportatu (.gabbro fitxategia)';
+      'Inportatu sarrerak beste Gabbro kutxa batetik (.gabbro fitxategia). Kutxa hau beste gailu batetik bada, erabili Kutxatik sinkronizatu.';
 
   @override
   String get importEnpassSubtitle =>

@@ -1628,7 +1628,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get importDuplicateWarning => '文件中的每个条目都会添加，包括保险库中已有的。最好只做一次，导入空保险库。';
 
   @override
-  String get importGabbroSubtitle => '从另一个 Gabbro 保险库（.gabbro 文件）导入条目';
+  String get importGabbroSubtitle =>
+      '从另一个 Gabbro 保险库（.gabbro 文件）导入条目。若是来自其他设备的同一个保险库，请改用“从保险库同步”。';
 
   @override
   String get importEnpassSubtitle => '来自 Enpass 的 JSON 导出（工具 → 导出）';
@@ -3805,7 +3806,8 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get importDuplicateWarning => '文件中的每个条目都会添加，包括保险库中已有的。最好只做一次，导入空保险库。';
 
   @override
-  String get importGabbroSubtitle => '从另一个 Gabbro 保险库（.gabbro 文件）导入条目';
+  String get importGabbroSubtitle =>
+      '从另一个 Gabbro 保险库（.gabbro 文件）导入条目。若是来自其他设备的同一个保险库，请改用“从保险库同步”。';
 
   @override
   String get importEnpassSubtitle => '来自 Enpass 的 JSON 导出（工具 → 导出）';
@@ -5982,7 +5984,8 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get importDuplicateWarning => '檔案中的每個項目都會新增，包括保險庫中已有的。最好只做一次，匯入空的保險庫。';
 
   @override
-  String get importGabbroSubtitle => '從另一個 Gabbro 保險庫（.gabbro 檔案）匯入項目';
+  String get importGabbroSubtitle =>
+      '從另一個 Gabbro 保險庫（.gabbro 檔案）匯入項目。若是來自其他裝置的同一個保險庫，請改用「從保險庫同步」。';
 
   @override
   String get importEnpassSubtitle => '來自 Enpass 的 JSON 匯出（工具 → 匯出）';

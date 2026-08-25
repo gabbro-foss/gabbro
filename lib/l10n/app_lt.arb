@@ -699,7 +699,7 @@
   "importEnterPassphrase": "Įveskite šios saugyklos slaptafrazę.",
   "importSourceKeyProtected": "Šis seifas apsaugotas YubiKey. Norėdami sinchronizuoti, turėsite paliesti registruotą raktą.",
   "importDuplicateWarning": "Pridedamas kiekvienas failo įrašas, net jau esantys saugykloje. Geriausia vieną kartą, į tuščią saugyklą.",
-  "importGabbroSubtitle": "Importuoti įrašus iš kitos Gabbro saugyklos (.gabbro failas)",
+  "importGabbroSubtitle": "Importuoti įrašus iš kitos Gabbro saugyklos (.gabbro failas). Šiai pačiai saugyklai iš kito įrenginio naudokite Sinchronizuoti iš saugyklos.",
   "importEnpassSubtitle": "JSON eksportas iš Enpass (Įrankiai → Eksportuoti)",
   "importBitwardenSubtitle": "Nešifruotas JSON eksportas iš Bitwarden (Įrankiai → Eksportuoti saugyklą)",
   "importCsvSubtitle": "CSV eksportas iš bet kurios slaptažodžių tvarkyklės",

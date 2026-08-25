@@ -1684,7 +1684,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get importGabbroSubtitle =>
-      'Importa voci da un altro archivio Gabbro (file .gabbro)';
+      'Importa voci da un\'altra cassaforte Gabbro (file .gabbro). Per questa stessa cassaforte da un altro dispositivo usa Sincronizza da cassaforte.';
 
   @override
   String get importEnpassSubtitle =>

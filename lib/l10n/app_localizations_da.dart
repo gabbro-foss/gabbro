@@ -1681,7 +1681,7 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get importGabbroSubtitle =>
-      'Importér poster fra en anden Gabbro-hvælving (.gabbro-fil)';
+      'Importér poster fra en anden Gabbro-boks (.gabbro-fil). For denne boks fra en anden enhed: brug Synkronisér fra boks.';
 
   @override
   String get importEnpassSubtitle =>

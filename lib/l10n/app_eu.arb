@@ -699,7 +699,7 @@
   "importEnterPassphrase": "Sartu gandegi honetako pasaesaldia.",
   "importSourceKeyProtected": "Kutxa gotor hau YubiKey batek babesten du. Sinkronizatzeko, erregistratutako gako bat ukitu beharko duzu.",
   "importDuplicateWarning": "Fitxategiko sarrera guztiak gehitzen dira, kutxak dagoeneko dituenak barne. Hobe behin, kutxa huts batean.",
-  "importGabbroSubtitle": "Beste Gabbro gandegi batetik sarrerak inportatu (.gabbro fitxategia)",
+  "importGabbroSubtitle": "Inportatu sarrerak beste Gabbro kutxa batetik (.gabbro fitxategia). Kutxa hau beste gailu batetik bada, erabili Kutxatik sinkronizatu.",
   "importEnpassSubtitle": "Enpass-etiko JSON esportazioa (Tresnak → Esportatu)",
   "importBitwardenSubtitle": "Bitwarden-etiko JSON enkriptatu gabeko esportazioa (Tresnak → Gandegi esportatu)",
   "importCsvSubtitle": "Edozein pasahitz-kudeatzailetik CSV esportazioa",

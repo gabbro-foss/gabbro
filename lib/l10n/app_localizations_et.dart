@@ -1680,7 +1680,7 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get importGabbroSubtitle =>
-      'Impordi kirjeid teisest Gabbro seifist (.gabbro fail)';
+      'Impordi kirjed teisest Gabbro hoidlast (.gabbro-fail). Sama hoidla jaoks teisest seadmest kasuta hoidlast sünkroonimist.';
 
   @override
   String get importEnpassSubtitle =>

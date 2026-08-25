@@ -699,7 +699,7 @@
   "importEnterPassphrase": "Zadajte prístupovú frázu pre tento trezor.",
   "importSourceKeyProtected": "Tento trezor je chránený kľúčom YubiKey. Na synchronizáciu sa musíte dotknúť zaregistrovaného kľúča.",
   "importDuplicateWarning": "Každá položka zo súboru sa pridá, aj tie, ktoré trezor už obsahuje. Najlepšie raz, do prázdneho trezoru.",
-  "importGabbroSubtitle": "Importovať záznamy z iného trezora Gabbro (súbor .gabbro)",
+  "importGabbroSubtitle": "Import položiek z iného trezoru Gabbro (súbor .gabbro). Pre tento trezor z iného zariadenia použite Synchronizovať z trezoru.",
   "importEnpassSubtitle": "JSON export z Enpass (Nástroje → Exportovať)",
   "importBitwardenSubtitle": "Nešifrovaný JSON export z Bitwarden (Nástroje → Exportovať trezor)",
   "importCsvSubtitle": "CSV export z ľubovoľného správcu hesiel",

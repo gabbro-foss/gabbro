@@ -1684,7 +1684,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get importGabbroSubtitle =>
-      'Импортировать записи из другого хранилища Gabbro (файл .gabbro)';
+      'Импорт записей из другого хранилища Gabbro (файл .gabbro). Для этого же хранилища с другого устройства используйте «Синхронизировать из хранилища».';
 
   @override
   String get importEnpassSubtitle =>

@@ -699,7 +699,7 @@
   "importEnterPassphrase": "Ievadiet šī seifa ieejas frāzi.",
   "importSourceKeyProtected": "Šī glabātava ir aizsargāta ar YubiKey. Lai sinhronizētu, jums būs jāpieskaras reģistrētai atslēgai.",
   "importDuplicateWarning": "Tiek pievienots katrs faila ieraksts, arī tie, kas glabātavā jau ir. Vislabāk vienreiz, tukšā glabātavā.",
-  "importGabbroSubtitle": "Importēt ierakstus no cita Gabbro seifa (.gabbro fails)",
+  "importGabbroSubtitle": "Importēt ierakstus no citas Gabbro glabātavas (.gabbro fails). Šai pašai glabātavai no citas ierīces izmantojiet Sinhronizēt no glabātavas.",
   "importEnpassSubtitle": "JSON eksports no Enpass (Rīki → Eksportēt)",
   "importBitwardenSubtitle": "Nešifrēts JSON eksports no Bitwarden (Rīki → Eksportēt seifa datus)",
   "importCsvSubtitle": "CSV eksports no jebkura paroļu pārvaldnieka",

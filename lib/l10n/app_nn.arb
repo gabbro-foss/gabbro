@@ -699,7 +699,7 @@
   "importEnterPassphrase": "Angi passfrasen for dette kvelvet.",
   "importSourceKeyProtected": "Dette hvelvet er verna av ein YubiKey. Du må trykkje på ein registrert nøkkel for å synkronisere.",
   "importDuplicateWarning": "Kvar oppføring i fila vert lagd til, òg dei kvelvet alt har. Best gjort éin gong, i eit tomt kvelv.",
-  "importGabbroSubtitle": "Importer oppføringer frå eit anna Gabbro-kvelv (.gabbro-fil)",
+  "importGabbroSubtitle": "Importer oppføringar frå eit anna Gabbro-kvelv (.gabbro-fil). For dette kvelvet frå ei anna eining: bruk Synkroniser frå kvelv.",
   "importEnpassSubtitle": "JSON-eksport frå Enpass (Verktøy → Eksporter)",
   "importBitwardenSubtitle": "Ukryptert JSON-eksport frå Bitwarden (Verktøy → Eksporter kvelv)",
   "importCsvSubtitle": "CSV-eksport frå kva som helst passordhandsamar",

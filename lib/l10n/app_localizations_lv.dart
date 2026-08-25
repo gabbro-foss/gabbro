@@ -1681,7 +1681,7 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get importGabbroSubtitle =>
-      'Importēt ierakstus no cita Gabbro seifa (.gabbro fails)';
+      'Importēt ierakstus no citas Gabbro glabātavas (.gabbro fails). Šai pašai glabātavai no citas ierīces izmantojiet Sinhronizēt no glabātavas.';
 
   @override
   String get importEnpassSubtitle =>

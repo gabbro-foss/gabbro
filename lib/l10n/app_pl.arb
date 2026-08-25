@@ -699,7 +699,7 @@
   "importEnterPassphrase": "Wprowadź hasło główne dla tego skarbca.",
   "importSourceKeyProtected": "Ten sejf jest chroniony kluczem YubiKey. Aby zsynchronizować, musisz dotknąć zarejestrowanego klucza.",
   "importDuplicateWarning": "Każdy wpis z pliku zostanie dodany, także te już obecne w sejfie. Najlepiej raz, do pustego sejfu.",
-  "importGabbroSubtitle": "Importuj wpisy z innego skarbca Gabbro (plik .gabbro)",
+  "importGabbroSubtitle": "Importuj wpisy z innego sejfu Gabbro (plik .gabbro). Dla tego samego sejfu z innego urządzenia użyj Synchronizuj z sejfu.",
   "importEnpassSubtitle": "Eksport JSON z Enpass (Narzędzia → Eksportuj)",
   "importBitwardenSubtitle": "Niezaszyfrowany eksport JSON z Bitwarden (Narzędzia → Eksportuj skarbiec)",
   "importCsvSubtitle": "Eksport CSV z dowolnego menedżera haseł",

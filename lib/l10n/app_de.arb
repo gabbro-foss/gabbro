@@ -699,7 +699,7 @@
   "importEnterPassphrase": "Passphrase für diesen Tresor eingeben.",
   "importSourceKeyProtected": "Dieser Tresor ist durch einen YubiKey geschützt. Zum Synchronisieren müssen Sie einen registrierten Schlüssel antippen.",
   "importDuplicateWarning": "Jeder Eintrag der Datei wird hinzugefügt, auch bereits vorhandene. Am besten einmalig in einen leeren Tresor.",
-  "importGabbroSubtitle": "Einträge aus einem anderen Gabbro-Tresor importieren (.gabbro-Datei)",
+  "importGabbroSubtitle": "Einträge aus einem anderen Gabbro-Tresor importieren (.gabbro-Datei). Für diesen Tresor von einem anderen Gerät stattdessen „Aus Tresor synchronisieren“ verwenden.",
   "importEnpassSubtitle": "JSON-Export aus Enpass (Werkzeuge → Exportieren)",
   "importBitwardenSubtitle": "Unverschlüsselter JSON-Export aus Bitwarden (Werkzeuge → Tresor exportieren)",
   "importCsvSubtitle": "CSV-Export aus einem beliebigen Passwortmanager",

@@ -699,7 +699,7 @@
   "importEnterPassphrase": "Ange lösenfransen för det här valvet.",
   "importSourceKeyProtected": "Detta valv skyddas av en YubiKey. Du måste trycka på en registrerad nyckel för att synkronisera.",
   "importDuplicateWarning": "Varje post i filen läggs till, även de valvet redan har. Bäst att göra en gång, i ett tomt valv.",
-  "importGabbroSubtitle": "Importera poster från ett annat Gabbro-valv (.gabbro-fil)",
+  "importGabbroSubtitle": "Importera poster från ett annat Gabbro-valv (.gabbro-fil). För det här valvet från en annan enhet: använd Synkronisera från valv.",
   "importEnpassSubtitle": "JSON-export från Enpass (Verktyg → Exportera)",
   "importBitwardenSubtitle": "Okrypterad JSON-export från Bitwarden (Verktyg → Exportera valv)",
   "importCsvSubtitle": "CSV-export från valfri lösenordshanterare",

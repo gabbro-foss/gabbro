@@ -1683,7 +1683,7 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get importGabbroSubtitle =>
-      'Uvozi vnose iz drugega trezorja Gabbro (datoteka .gabbro)';
+      'Uvoz vnosov iz drugega trezorja Gabbro (datoteka .gabbro). Za ta isti trezor z druge naprave uporabite Sinhroniziraj iz trezorja.';
 
   @override
   String get importEnpassSubtitle => 'JSON izvoz iz Enpass (Orodja → Izvozi)';

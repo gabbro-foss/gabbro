@@ -1686,7 +1686,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get importGabbroSubtitle =>
-      'Importuj wpisy z innego skarbca Gabbro (plik .gabbro)';
+      'Importuj wpisy z innego sejfu Gabbro (plik .gabbro). Dla tego samego sejfu z innego urządzenia użyj Synchronizuj z sejfu.';
 
   @override
   String get importEnpassSubtitle =>

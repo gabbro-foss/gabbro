@@ -1686,7 +1686,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get importGabbroSubtitle =>
-      'Importar entradas desde otro almacén Gabbro (archivo .gabbro)';
+      'Importar entradas de otra bóveda de Gabbro (archivo .gabbro). Para esta misma bóveda desde otro dispositivo, usa Sincronizar desde bóveda.';
 
   @override
   String get importEnpassSubtitle =>

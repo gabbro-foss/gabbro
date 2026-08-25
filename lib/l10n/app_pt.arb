@@ -699,7 +699,7 @@
   "importEnterPassphrase": "Insira a frase secreta deste cofre.",
   "importSourceKeyProtected": "Este cofre está protegido por uma YubiKey. Terá de tocar numa chave registada para sincronizar.",
   "importDuplicateWarning": "Cada entrada do arquivo é adicionada, mesmo as que o cofre já tem. Melhor uma única vez, em um cofre vazio.",
-  "importGabbroSubtitle": "Importar entradas de outro cofre Gabbro (arquivo .gabbro)",
+  "importGabbroSubtitle": "Importar entradas de outro cofre Gabbro (arquivo .gabbro). Para este mesmo cofre de outro dispositivo, use Sincronizar do cofre.",
   "importEnpassSubtitle": "Exportação JSON do Enpass (Ferramentas → Exportar)",
   "importBitwardenSubtitle": "Exportação JSON não criptografada do Bitwarden (Ferramentas → Exportar Cofre)",
   "importCsvSubtitle": "Exportação CSV de qualquer gerenciador de senhas",

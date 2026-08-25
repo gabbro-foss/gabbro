@@ -1645,7 +1645,8 @@ class AppLocalizationsJa extends AppLocalizations {
       'ファイル内のすべての項目が追加されます。保管庫に既にあるものも含みます。空の保管庫に一度だけ行うのが最適です。';
 
   @override
-  String get importGabbroSubtitle => '別のGabbroボルト (.gabbro) からエントリをインポート';
+  String get importGabbroSubtitle =>
+      '別の Gabbro 保管庫（.gabbro ファイル）から項目を読み込みます。この同じ保管庫を別のデバイスから取り込む場合は「保管庫から同期」を使ってください。';
 
   @override
   String get importEnpassSubtitle => 'EnpassからのJSONエクスポート (ツール → エクスポート)';

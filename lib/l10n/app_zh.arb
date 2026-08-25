@@ -699,7 +699,7 @@
   "importEnterPassphrase": "请输入此保险库的密码短语。",
   "importSourceKeyProtected": "此保险库受 YubiKey 保护。同步时需要轻触已注册的密钥。",
   "importDuplicateWarning": "文件中的每个条目都会添加，包括保险库中已有的。最好只做一次，导入空保险库。",
-  "importGabbroSubtitle": "从另一个 Gabbro 保险库（.gabbro 文件）导入条目",
+  "importGabbroSubtitle": "从另一个 Gabbro 保险库（.gabbro 文件）导入条目。若是来自其他设备的同一个保险库，请改用“从保险库同步”。",
   "importEnpassSubtitle": "来自 Enpass 的 JSON 导出（工具 → 导出）",
   "importBitwardenSubtitle": "来自 Bitwarden 的未加密 JSON 导出（工具 → 导出保险库）",
   "importCsvSubtitle": "来自任何密码管理器的 CSV 导出",

@@ -699,7 +699,7 @@
   "importEnterPassphrase": "Entrez le mot de passe principal de ce coffre.",
   "importSourceKeyProtected": "Ce coffre est protégé par une YubiKey. Vous devrez toucher une clé enregistrée pour effectuer la synchronisation.",
   "importDuplicateWarning": "Chaque entrée du fichier est ajoutée, même celles déjà dans le coffre. À faire une seule fois, dans un coffre vide.",
-  "importGabbroSubtitle": "Importer les entrées depuis un autre coffre Gabbro (fichier .gabbro)",
+  "importGabbroSubtitle": "Importer les entrées d'un autre coffre Gabbro (fichier .gabbro). Pour ce même coffre depuis un autre appareil, utilisez plutôt Synchroniser depuis le coffre.",
   "importEnpassSubtitle": "Export JSON depuis Enpass (Outils → Exporter)",
   "importBitwardenSubtitle": "Export JSON non chiffré depuis Bitwarden (Outils → Exporter le coffre)",
   "importCsvSubtitle": "Export CSV depuis n'importe quel gestionnaire de mots de passe",

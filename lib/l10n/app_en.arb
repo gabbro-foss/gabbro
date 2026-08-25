@@ -917,7 +917,7 @@
   "importEnterPassphrase": "Enter the passphrase for this vault.",
   "importSourceKeyProtected": "This vault is protected by a YubiKey. You will need to tap a registered key to sync from it.",
   "importDuplicateWarning": "Every entry in the file is added, even ones your vault already holds. Best done once, into an empty vault.",
-  "importGabbroSubtitle": "Import entries from another Gabbro vault (.gabbro file)",
+  "importGabbroSubtitle": "Import entries from a different Gabbro vault (.gabbro file). For this same vault from another device, use Sync from vault instead.",
   "importEnpassSubtitle": "JSON export from Enpass (Tools → Export)",
   "importBitwardenSubtitle": "Unencrypted JSON export from Bitwarden (Tools → Export Vault)",
   "importCsvSubtitle": "CSV export from any password manager",

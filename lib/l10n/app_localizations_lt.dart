@@ -1682,7 +1682,7 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get importGabbroSubtitle =>
-      'Importuoti įrašus iš kitos Gabbro saugyklos (.gabbro failas)';
+      'Importuoti įrašus iš kitos Gabbro saugyklos (.gabbro failas). Šiai pačiai saugyklai iš kito įrenginio naudokite Sinchronizuoti iš saugyklos.';
 
   @override
   String get importEnpassSubtitle =>

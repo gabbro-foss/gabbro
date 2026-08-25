@@ -699,7 +699,7 @@
   "importEnterPassphrase": "Indtast adgangssætningen til denne hvælving.",
   "importSourceKeyProtected": "Denne boks er beskyttet af en YubiKey. Du skal trykke på en registreret nøgle for at synkronisere.",
   "importDuplicateWarning": "Hver post i filen tilføjes, også dem din boks allerede har. Gør det helst én gang, i en tom boks.",
-  "importGabbroSubtitle": "Importér poster fra en anden Gabbro-hvælving (.gabbro-fil)",
+  "importGabbroSubtitle": "Importér poster fra en anden Gabbro-boks (.gabbro-fil). For denne boks fra en anden enhed: brug Synkronisér fra boks.",
   "importEnpassSubtitle": "JSON-eksport fra Enpass (Funktioner → Eksportér)",
   "importBitwardenSubtitle": "Ukrypteret JSON-eksport fra Bitwarden (Funktioner → Eksportér boks)",
   "importCsvSubtitle": "CSV-eksport fra enhver adgangskodeadministrator",

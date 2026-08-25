@@ -1677,7 +1677,7 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get importGabbroSubtitle =>
-      'Importer oppføringer fra et annet Gabbro-hvelv (.gabbro-fil)';
+      'Importer oppføringer fra et annet Gabbro-hvelv (.gabbro-fil). For dette hvelvet fra en annen enhet: bruk Synkroniser fra hvelv.';
 
   @override
   String get importEnpassSubtitle =>

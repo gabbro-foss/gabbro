@@ -1646,7 +1646,8 @@ class AppLocalizationsKo extends AppLocalizations {
       '파일의 모든 항목이 추가됩니다. 이미 금고에 있는 항목도 포함됩니다. 빈 금고에 한 번만 하는 것이 좋습니다.';
 
   @override
-  String get importGabbroSubtitle => '다른 Gabbro 볼트 (.gabbro)에서 항목 가져오기';
+  String get importGabbroSubtitle =>
+      '다른 Gabbro 금고(.gabbro 파일)에서 항목을 가져옵니다. 다른 기기의 이 금고라면 대신 금고에서 동기화를 사용하세요.';
 
   @override
   String get importEnpassSubtitle => 'Enpass에서 JSON 내보내기 (도구 → 내보내기)';

@@ -1680,7 +1680,7 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get importGabbroSubtitle =>
-      'Басқа Gabbro сейфінен жазбаларды импорттау (.gabbro файлы)';
+      'Басқа Gabbro қоймасынан жазбаларды импорттау (.gabbro файлы). Осы қойманы басқа құрылғыдан алу үшін Қоймадан синхрондауды қолданыңыз.';
 
   @override
   String get importEnpassSubtitle =>

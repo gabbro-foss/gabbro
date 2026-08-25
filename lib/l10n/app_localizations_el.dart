@@ -1691,7 +1691,7 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get importGabbroSubtitle =>
-      'Εισαγωγή καταχωρίσεων από άλλο θησαυροφυλάκιο Gabbro (αρχείο .gabbro)';
+      'Εισαγωγή καταχωρίσεων από άλλο θησαυροφυλάκιο Gabbro (αρχείο .gabbro). Για το ίδιο θησαυροφυλάκιο από άλλη συσκευή χρησιμοποιήστε τον συγχρονισμό από θησαυροφυλάκιο.';
 
   @override
   String get importEnpassSubtitle =>

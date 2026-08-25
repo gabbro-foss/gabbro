@@ -1686,7 +1686,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get importGabbroSubtitle =>
-      'Einträge aus einem anderen Gabbro-Tresor importieren (.gabbro-Datei)';
+      'Einträge aus einem anderen Gabbro-Tresor importieren (.gabbro-Datei). Für diesen Tresor von einem anderen Gerät stattdessen „Aus Tresor synchronisieren“ verwenden.';
 
   @override
   String get importEnpassSubtitle =>

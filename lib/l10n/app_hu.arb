@@ -699,7 +699,7 @@
   "importEnterPassphrase": "Add meg ennek a széfnek a jelmondatát.",
   "importSourceKeyProtected": "Ezt a széfet egy YubiKey védi. A szinkronizáláshoz meg kell érintened egy regisztrált kulcsot.",
   "importDuplicateWarning": "A fájl minden bejegyzése hozzáadódik, a széfben már meglévők is. Legjobb egyszer, üres széfbe.",
-  "importGabbroSubtitle": "Bejegyzések importálása másik Gabbro széfből (.gabbro fájl)",
+  "importGabbroSubtitle": "Bejegyzések importálása egy másik Gabbro-széfből (.gabbro fájl). Ugyanehhez a széfhez egy másik eszközről a Szinkronizálás széfből való.",
   "importEnpassSubtitle": "JSON-exportálás az Enpassból (Eszközök → Exportálás)",
   "importBitwardenSubtitle": "Titkosítatlan JSON-exportálás a Bitwardenből (Eszközök → Széf exportálása)",
   "importCsvSubtitle": "CSV-exportálás bármely jelszókezelőből",

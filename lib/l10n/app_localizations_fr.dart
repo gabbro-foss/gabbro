@@ -1696,7 +1696,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get importGabbroSubtitle =>
-      'Importer les entrées depuis un autre coffre Gabbro (fichier .gabbro)';
+      'Importer les entrées d\'un autre coffre Gabbro (fichier .gabbro). Pour ce même coffre depuis un autre appareil, utilisez plutôt Synchroniser depuis le coffre.';
 
   @override
   String get importEnpassSubtitle =>

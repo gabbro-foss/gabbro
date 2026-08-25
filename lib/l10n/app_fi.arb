@@ -699,7 +699,7 @@
   "importEnterPassphrase": "Syötä tämän holvin salauslause.",
   "importSourceKeyProtected": "Tämä holvi on suojattu YubiKey-avaimella. Sinun on napautettava rekisteröityä avainta synkronoidaksesi.",
   "importDuplicateWarning": "Tiedoston jokainen kohde lisätään, myös holvissa jo olevat. Parasta tehdä kerran, tyhjään holviin.",
-  "importGabbroSubtitle": "Tuo merkintöjä toisesta Gabbro-holvista (.gabbro-tiedosto)",
+  "importGabbroSubtitle": "Tuo kohteet toisesta Gabbro-holvista (.gabbro-tiedosto). Tälle samalle holville toiselta laitteelta käytä Synkronoi holvista.",
   "importEnpassSubtitle": "JSON-vienti Enpassista (Työkalut → Vie)",
   "importBitwardenSubtitle": "Salaamaton JSON-vienti Bitwardenista (Työkalut → Vie holvi)",
   "importCsvSubtitle": "CSV-vienti mistä tahansa salasanahallinnasta",

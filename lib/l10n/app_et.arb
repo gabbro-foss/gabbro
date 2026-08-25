@@ -699,7 +699,7 @@
   "importEnterPassphrase": "Sisesta selle seifi pääslause.",
   "importSourceKeyProtected": "See hoidla on kaitstud YubiKey-ga. Sünkroonimiseks peate puudutama registreeritud võtit.",
   "importDuplicateWarning": "Iga faili kirje lisatakse, ka need, mis hoidlas juba on. Parim teha üks kord, tühja hoidlasse.",
-  "importGabbroSubtitle": "Impordi kirjeid teisest Gabbro seifist (.gabbro fail)",
+  "importGabbroSubtitle": "Impordi kirjed teisest Gabbro hoidlast (.gabbro-fail). Sama hoidla jaoks teisest seadmest kasuta hoidlast sünkroonimist.",
   "importEnpassSubtitle": "JSON-eksport Enpassist (Tööriistad → Ekspordi)",
   "importBitwardenSubtitle": "Krüpteerimata JSON-eksport Bitwardenist (Tööriistad → Ekspordi seif)",
   "importCsvSubtitle": "CSV-eksport mis tahes paroolihaldurilt",

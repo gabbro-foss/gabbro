@@ -1673,7 +1673,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get importGabbroSubtitle =>
-      'Import entries from another Gabbro vault (.gabbro file)';
+      'Import entries from a different Gabbro vault (.gabbro file). For this same vault from another device, use Sync from vault instead.';
 
   @override
   String get importEnpassSubtitle => 'JSON export from Enpass (Tools → Export)';

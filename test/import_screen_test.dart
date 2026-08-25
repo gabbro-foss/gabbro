@@ -91,6 +91,18 @@ void main() {
       expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
     });
 
+    testWidgets('the Gabbro section sends the same vault to Sync from vault', (
+      tester,
+    ) async {
+      // S10: import is additive, so importing this vault's own synced file
+      // would duplicate every entry. The section says where that file goes.
+      await tester.pumpWidget(buildScreen());
+      expect(
+        find.textContaining('use Sync from vault instead'),
+        findsOneWidget,
+      );
+    });
+
     testWidgets('shows Gabbro vault section', (tester) async {
       await tester.pumpWidget(buildScreen());
       await tester.ensureVisible(find.text('Gabbro vault'));

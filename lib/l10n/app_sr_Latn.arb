@@ -699,7 +699,7 @@
   "importEnterPassphrase": "Unesite pristupnu frazu za ovaj trezor.",
   "importSourceKeyProtected": "Ovaj trezor je zaštićen YubiKey-jem. Za sinhronizaciju ćete morati da dodirnete registrovani ključ.",
   "importDuplicateWarning": "Svaki unos iz datoteke se dodaje, i oni koje trezor već ima. Najbolje jednom, u prazan trezor.",
-  "importGabbroSubtitle": "Uvezi unose iz drugog Gabbro trezora (datoteka .gabbro)",
+  "importGabbroSubtitle": "Uvoz unosa iz drugog Gabbro trezora (.gabbro datoteka). Za ovaj isti trezor sa drugog uređaja koristite Sinhronizuj iz trezora.",
   "importEnpassSubtitle": "JSON izvoz iz Enpass (Alati → Izvezi)",
   "importBitwardenSubtitle": "Nešifrovani JSON izvoz iz Bitwarden (Alati → Izvezi trezor)",
   "importCsvSubtitle": "CSV izvoz iz bilo kog menadžera lozinki",

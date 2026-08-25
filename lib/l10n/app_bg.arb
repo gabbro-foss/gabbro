@@ -699,7 +699,7 @@
   "importEnterPassphrase": "Въведи паролната фраза за този трезор.",
   "importSourceKeyProtected": "Този сейф е защитен с YubiKey. За да синхронизирате, ще трябва да докоснете регистриран ключ.",
   "importDuplicateWarning": "Всеки запис от файла се добавя, дори вече наличните в трезора. Най-добре веднъж, в празен трезор.",
-  "importGabbroSubtitle": "Импортирай записи от друг трезор Gabbro (.gabbro файл)",
+  "importGabbroSubtitle": "Импортиране на записи от друг трезор на Gabbro (.gabbro файл). За същия трезор от друго устройство използвайте Синхронизиране от трезор.",
   "importEnpassSubtitle": "JSON експорт от Enpass (Инструменти → Експортирай)",
   "importBitwardenSubtitle": "Нешифрован JSON експорт от Bitwarden (Инструменти → Експортирай хранилище)",
   "importCsvSubtitle": "CSV експорт от всеки мениджър на пароли",

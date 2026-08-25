@@ -1680,7 +1680,7 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get importGabbroSubtitle =>
-      'Tuo merkintöjä toisesta Gabbro-holvista (.gabbro-tiedosto)';
+      'Tuo kohteet toisesta Gabbro-holvista (.gabbro-tiedosto). Tälle samalle holville toiselta laitteelta käytä Synkronoi holvista.';
 
   @override
   String get importEnpassSubtitle => 'JSON-vienti Enpassista (Työkalut → Vie)';
