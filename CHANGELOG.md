@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Sync settings (vault menu): an auto-merge switch (off by default) and a remembered sync folder with a Remember box. Linux gains a native folder picker (XDG portal). The folder is wired into Sync from vault in the next step.
+
 ### Changed
 - Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
 - Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).

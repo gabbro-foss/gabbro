@@ -42,7 +42,7 @@ allowList pre-flights (`options.up=false`) are answered without consent.
 
 **Password generator:** classic (32–256 chars) and passphrase (4–20 words, many languages, EFF-style wordlists embedded at compile time). Classic mode is script-aware (Latin/Greek/Cyrillic pools). All generation in Rust.
 
-**Settings:** `~/.config/gabbro/settings.jsonc` (Linux). JSONC format — human-editable. Theme, text scale (`text_scale`, 0.8-3.0; renders clamp to the device max — 2x under 600dp shortest side, 3x above, `lib/text_scale.dart`), high-contrast, alphabet bar position.
+**Settings:** `~/.config/gabbro/settings.jsonc` (Linux). JSONC format — human-editable. Theme, text scale (`text_scale`, 0.8-3.0; renders clamp to the device max — 2x under 600dp shortest side, 3x above, `lib/text_scale.dart`), high-contrast, alphabet bar position, auto-merge sync + sync folder (`auto_merge_sync`, `sync_folder`).
 
 **Keyboard shortcuts (Linux desktop):** Ctrl+L lock, Ctrl+F / Ctrl+Shift+F search, Ctrl+N new entry, Ctrl+M menu, Ctrl+Q lock and quit (confirms first), Esc dismiss/cancel. No Ctrl+C (copying a secret stays a deliberate, auto-clearing action); no Super key. Listed in-app on the desktop-only Keyboard shortcuts screen.
 
@@ -59,10 +59,10 @@ allowList pre-flights (`options.up=false`) are answered without consent.
 ```
 gabbro/
 ├── lib/                  # Flutter app
-│   ├── screens/          # unlock, vault list, adopt vault, export, import, generator, keyboard shortcuts, settings, manage vaults/folders, …
+│   ├── screens/          # unlock, vault list, adopt vault, export, import, sync settings, generator, keyboard shortcuts, appearance, security, manage vaults/folders, …
 │   ├── widgets/          # path_field, generator_widget, yubikey_tap, password_breakdown_sheet, sync_review, sync_method_dialog, gabbro_dialog (every dialog goes through it), passkey_consent_dialog, passkey_hint_banner, text_size_slider, url_link, …
 │   ├── src/rust/         # Auto-generated bridge (do not edit)
-│   └── *.dart            # main, app_paths (GabbroPaths), settings, text_scale, control_scale, gabbro_contrast (high-contrast theme flag), vault_registry, safe_file_picker, gabbro_file_picker (dialog facade), linux_file_picker (XDG portal client), android_file_picker (picker channel client), autotype_listener, autotype_target, passkey_daemon (Linux daemon orchestrator), app_passkeys_flag (F1 toggle mirror channel), clipboard_clear
+│   └── *.dart            # main, app_paths (GabbroPaths), settings, text_scale, control_scale, gabbro_contrast (high-contrast theme flag), folder_label, vault_registry, safe_file_picker, gabbro_file_picker (dialog facade), linux_file_picker (XDG portal client), android_file_picker (picker channel client), autotype_listener, autotype_target, passkey_daemon (Linux daemon orchestrator), app_passkeys_flag (F1 toggle mirror channel), clipboard_clear
 ├── rust/src/
 │   ├── api/              # Bridge surface: vault, vault_bridge, import, *_generator, fido_bridge, passkey_bridge, passkey_daemon_bridge, autofill_bridge, autotype_bridge, entropy, types
 │   ├── crypto/           # Internal (not bridge-exposed): kdf, hkdf, aes_gcm, vault_crypto, webauthn
@@ -100,7 +100,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2455 | 10 |
+| Flutter (`flutter test`) | 2489 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 17 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 178 | 15 |
 
@@ -249,7 +249,7 @@ Progress (tick as each Bikeshed section lands):
 - [x] Net (S8), both platforms
 - [x] Labels (S2)
 - [x] Import additive, no dedupe (S3)
-- [ ] Sync settings screen: auto-merge + sync folder + Remember (S5, S6.1)
+- [x] Sync settings screen: auto-merge + sync folder + Remember (S5, S6.1)
 - [ ] Sync from vault by name match, picker fallback, auto-merge wiring (S6, S7)
 - [ ] Import screen: one picker (Bikeshed step 2)
 - [ ] Remember folders on export/import + read-only view in Sync settings (S9, S5)
