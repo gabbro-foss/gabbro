@@ -100,7 +100,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2466 | 10 |
+| Flutter (`flutter test`) | 2471 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 17 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 178 | 15 |
 
@@ -220,9 +220,29 @@ Android export already remembers silently; that mechanism is reused, its box
 arrives ticked. Export and import may point at the same folder: that is the
 sync case, where the file one device writes is the file the other reads.
 
+**In progress: Step 1** (promoted from Bikeshed 2026-08-25).
+
+- Net first (S8): `test/vault_list_sync_test.dart`, `test/import_screen_test.dart`,
+  Rust import tests. Pin the chooser, both paths, fallback, keyed flow; pin
+  import parsing/counts for all 6 types.
+- Labels: rename `syncFromFileTitle` -> Sync from vault, `syncFromVault` ->
+  Import, all 37 ARBs.
+- Import additive: red-first in `rust/src/api/import.rs` (drop the content-hash
+  skip in `merge_source_into_session` and the 5 other importers); delete
+  `SkippedEntryData`, `import_skipped_dialog.dart`, their tests.
+- Settings: `auto_merge_sync` (bool, false), `sync_folder` (string, empty),
+  `#[serde(default)]`-equivalent: absent key = default. Linux path; Android
+  SAF tree URI, same mechanism as `android_export_folder_uri`.
+- Sync settings screen: `SwitchListTile` + folder field + Remember; semantics
+  labels; screen-reader + large-text tests; all ARBs.
+- `_syncFromFile` in `vault_list_screen.dart` (one code path, both layouts):
+  folder set -> resolve `<sync folder>/<this vault's file name>`, missing file
+  -> error, no picker; setting on -> `fast = true`, skip `SyncMethodDialog`.
+- Hardware: one pass Linux, one pass Android.
+
 Progress (tick as each Bikeshed section lands):
-- [ ] Net (S8), both platforms
-- [ ] Labels (S2)
+- [x] Net (S8), both platforms
+- [x] Labels (S2)
 - [ ] Import additive, no dedupe (S3)
 - [ ] Sync settings screen: auto-merge + sync folder + Remember (S5, S6.1)
 - [ ] Sync from vault by name match, picker fallback, auto-merge wiring (S6, S7)
@@ -249,25 +269,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 
 Spec: Current Focus > **One-click sync** (S1–S9). Promote one section at a
 time; each ends with a hardware pass per platform and its ticks in the spec.
-
-**Step 1 — one-click sync (S2, S3, S5, S6, S7).**
-- Net first (S8): `test/vault_list_sync_test.dart`, `test/import_screen_test.dart`,
-  Rust import tests. Pin the chooser, both paths, fallback, keyed flow; pin
-  import parsing/counts for all 6 types.
-- Labels: rename `syncFromFileTitle` -> Sync from vault, `syncFromVault` ->
-  Import, all 37 ARBs.
-- Import additive: red-first in `rust/src/api/import.rs` (drop the content-hash
-  skip in `merge_source_into_session` and the 5 other importers); delete
-  `SkippedEntryData`, `import_skipped_dialog.dart`, their tests.
-- Settings: `auto_merge_sync` (bool, false), `sync_folder` (string, empty),
-  `#[serde(default)]`-equivalent: absent key = default. Linux path; Android
-  SAF tree URI, same mechanism as `android_export_folder_uri`.
-- Sync settings screen: `SwitchListTile` + folder field + Remember; semantics
-  labels; screen-reader + large-text tests; all ARBs.
-- `_syncFromFile` in `vault_list_screen.dart` (one code path, both layouts):
-  folder set -> resolve `<sync folder>/<this vault's file name>`, missing file
-  -> error, no picker; setting on -> `fast = true`, skip `SyncMethodDialog`.
-- Hardware: one pass Linux, one pass Android.
 
 **Step 2 — import screen: one picker, not six.** Today six stacked sections each
 carry their own path field; the user needs one. Replace with a single path

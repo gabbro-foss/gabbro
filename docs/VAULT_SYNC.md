@@ -10,7 +10,7 @@ The vault is encrypted at rest, so a sync tool only ever moves an opaque blob.
 **On Linux, no export step is needed:** every save writes the vault file in place, so
 you can point Syncthing (or any sync tool) straight at the vault's own folder — the
 default is `~/.local/share/app.gabbro.gabbro/`. Each save then propagates on its own;
-on the receiving device, **Sync from file** (passphrase, plus YubiKey tap if the vault
+on the receiving device, **Sync from vault** (passphrase, plus YubiKey tap if the vault
 uses one) merges the incoming copy in a couple of clicks.
 
 **On Android this shortcut does not work:** the vault lives in the app's private
