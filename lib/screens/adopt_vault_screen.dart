@@ -264,7 +264,10 @@ class _AdoptVaultScreenState extends State<AdoptVaultScreen> {
     final l = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(l.adoptTitle)),
-      body: ListView(
+      // SafeArea: an explicit ListView padding disables Flutter's automatic
+      // system-bar inset (edge-to-edge Android, 2026-08-25).
+      body: SafeArea(
+        child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           // Editable + browse: a typed or pasted path keeps working where the
@@ -308,6 +311,7 @@ class _AdoptVaultScreenState extends State<AdoptVaultScreen> {
             ),
           ],
         ],
+      ),
       ),
     );
   }

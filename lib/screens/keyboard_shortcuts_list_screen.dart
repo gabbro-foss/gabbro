@@ -16,7 +16,11 @@ class KeyboardShortcutsListScreen extends StatelessWidget {
     final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(l.keyboardShortcutsTitle)),
-      body: ListView(
+      // SafeArea: an explicit ListView padding disables Flutter's automatic
+      // system-bar inset, so edge-to-edge Android put the last rows under
+      // the nav bar (2026-08-25).
+      body: SafeArea(
+        child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           _Section(l.kbSectionGeneral, const [
@@ -51,6 +55,7 @@ class KeyboardShortcutsListScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
       ),
     );
   }

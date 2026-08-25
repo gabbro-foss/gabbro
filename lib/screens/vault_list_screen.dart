@@ -785,9 +785,26 @@ class _VaultListScreenState extends State<VaultListScreen>
   /// banner on its own (it reads only names), so its appearance is an event
   /// that must go through [_announce].
   void _announcePasskeyFailure() {
+    if (!mounted) return;
+    // The banner slot is derived from the notifier at build time.
+    setState(() {});
     final reason = passkeyProviderFailure.value;
-    if (reason == null || !mounted || !_passkeyHintVisible()) return;
+    if (reason == null || !_passkeyHintVisible()) return;
     _announce(PasskeyHintBanner.message(AppLocalizations.of(context), reason));
+  }
+
+  /// The passkey-failure banner for the Scaffold's bottom slot, or null.
+  Widget? _passkeyBanner() {
+    final reason = passkeyProviderFailure.value;
+    if (reason == null || !_passkeyHintVisible()) return null;
+    return PasskeyHintBanner(
+      reason: reason,
+      onDismiss: () => setState(() => _passkeyHintSessionDismissed = true),
+      onDismissForever: () {
+        setState(() => _passkeyHintSessionDismissed = true);
+        _dismissPasskeyHintForever();
+      },
+    );
   }
 
   void _dismissPasskeyHintForever() {
@@ -2024,23 +2041,11 @@ class _VaultListScreenState extends State<VaultListScreen>
       // list rather than shrink the body (which overflowed the header). The
       // search field stays visible above the keyboard.
       resizeToAvoidBottomInset: false,
-      bottomNavigationBar: ValueListenableBuilder<PasskeyFailureReason?>(
-        valueListenable: passkeyProviderFailure,
-        builder: (context, reason, _) {
-          if (reason == null || !_passkeyHintVisible()) {
-            return const SizedBox.shrink();
-          }
-          return PasskeyHintBanner(
-            reason: reason,
-            onDismiss: () =>
-                setState(() => _passkeyHintSessionDismissed = true),
-            onDismissForever: () {
-              setState(() => _passkeyHintSessionDismissed = true);
-              _dismissPasskeyHintForever();
-            },
-          );
-        },
-      ),
+      // Null when hidden, never an empty box: a Scaffold strips the system
+      // bar inset from its body and snackbar whenever this slot is filled, so
+      // an empty box here put the list and the sync snackbar under Android's
+      // nav bar (edge-to-edge, 2026-08-25). The notifier listener rebuilds.
+      bottomNavigationBar: _passkeyBanner(),
       appBar: AppBar(
         title: Text(
           _isSelecting
@@ -2326,7 +2331,10 @@ class _VaultListScreenState extends State<VaultListScreen>
                 semanticLabel: l.newEntryTitle,
               ),
             ),
-      body: LayoutBuilder(
+      // SafeArea outside the LayoutBuilder so the tablet two-pane branch gets
+      // the system-bar insets too (it pads with fixed EdgeInsets itself).
+      body: SafeArea(
+        child: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth >= 600) {
             return TabletVaultLayout(
@@ -2693,6 +2701,7 @@ class _VaultListScreenState extends State<VaultListScreen>
           // no body-scoped Actions override (it failed on hardware, round 10).
           return body;
         },
+        ),
       ),
     );
   }

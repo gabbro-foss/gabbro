@@ -308,7 +308,10 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
     final l = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(l.changePassphraseTitle)),
-      body: Center(
+      // SafeArea: keeps the form out of the system bars (edge-to-edge
+      // Android, 2026-08-25).
+      body: SafeArea(
+        child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 480),
           child: SingleChildScrollView(
@@ -571,6 +574,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
             ),
           ),
         ),
+      ),
       ),
     );
   }
