@@ -227,8 +227,8 @@ and the chooser what a merge does. Existing text is checked against S1-S9;
 whatever is missing or wrong is fixed in the same section that changes it.
 
 **Handover 2026-08-25 (session stopped here; read before anything).**
-Branch `streamline_sync_process` off master `263252fd`, 19 commits, NOT pushed,
-tree clean. `.scratchpad` holds the finished pass 2a; replace it. The full gate
+Branch `streamline_sync_process` off master `263252fd`, 20 commits, NOT pushed,
+tree clean. `.scratchpad` holds the unrun Lenovo tablet pass 3. The full gate
 has not run on the branch (Rust subset
 `api::import vault::entry vault::session::tests` 91 green; `flutter test` 2867
 green; Android unit 180 green). No dependency changed: no `--warm` needed.
@@ -244,20 +244,13 @@ the edge-to-edge insets below.
 
 Hardware so far: Linux passes 1a-1e all green (passphrase one-click, keyed
 source made with two USB keys swapped on one port, keyed one-click with PIN +
-tap). Android S23 pass 2a green (SAF folder, `read_tree_file`, 13 added) but
-found the inset regression; the fix is NOT yet device-verified.
+tap; 1c re-run to make `keyed.gabbro`). Android S23 green: 2a (3-button + gesture,
+insets fixed), 2b (missing file, Remember unticked), 2c (keyed vault, NFC, 1 added).
 
 Next, in order (write ONE pass at a time into `.scratchpad`, one action per
-row, rebuild first: `(cd android && ./gradlew --stop) && flutter build apk
---split-per-abi --release`):
-1. S23, 3-button nav: fresh install, pass 2a again; row 10 must show the
-   snackbar and the last entry above the buttons.
-2. S23, gesture nav (Settings > Display > Navigation bar): same pass.
-3. S23 pass 2b: missing file (`adb shell mv`), untick Remember -> picker.
-4. Linux pass 1c again to re-make `keyed.gabbro` (do NOT clean up), `adb push`
-   it, S23 pass 2c: receiving vault `keyed`, NFC only, both keys.
-5. Lenovo tablet (TB373FU): inset pass, portrait then landscape.
-6. Full gate `./gabbro_test`; then docs (README check, VAULT_SYNC done), merge.
+row; the current `build/app/outputs/flutter-apk` APK already carries the inset fix):
+1. Lenovo tablet (TB373FU): inset pass, portrait then landscape (`.scratchpad`).
+2. Full gate `./gabbro_test`; then docs (README check, VAULT_SYNC done), merge.
 Then Bikeshed steps 2 and 3.
 
 **In progress: edge-to-edge insets** (found by the Android pass 2a, 2026-08-25;
@@ -296,7 +289,7 @@ announced, alphabet bar full height, search with keyboard, tablet divider drag.
       banner rows
 - [x] Fix: slot null when the banner is hidden; tablet branch inside the
       SafeArea; SafeArea on the four screens
-- [ ] Hardware: S23 3-button, S23 gesture, Lenovo tablet portrait + landscape
+- [ ] Hardware: S23 3-button + gesture green; Lenovo tablet pending
 
 Progress (tick as each Bikeshed section lands):
 - [x] Net (S8), both platforms
@@ -308,7 +301,7 @@ Progress (tick as each Bikeshed section lands):
 - [ ] Remember folders on export/import + read-only view in Sync settings (S9, S5)
 - [x] On-screen explanations checked against S1-S9 (S10)
 - [ ] Docs: README, VAULT_SYNC.md, CHANGELOG
-- [ ] Hardware: Linux green (1a-1e); Android 2a green, inset fix unverified; 2b, 2c, tablet pending (see Handover)
+- [ ] Hardware: Linux 1a-1e green; S23 2a-2c green; tablet pending (see Handover)
 
 ---
 
