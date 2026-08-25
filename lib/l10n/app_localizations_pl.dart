@@ -252,7 +252,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get autoMergeDescription =>
-      'Synchronizuj z sejfu od razu stosuje zmiany z drugiego urządzenia, bez wyboru i bez przeglądu. Tam, gdzie się różnią, wygrywa wartość z drugiego urządzenia.';
+      'Synchronizuj z sejfu stosuje przychodzące zmiany automatycznie. Tam, gdzie wartości w obu sejfach się różnią, wygrywają zmiany przychodzące.';
 
   @override
   String get autoMergeNote =>

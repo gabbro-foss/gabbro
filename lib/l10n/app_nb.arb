@@ -72,7 +72,7 @@
   "syncSettingsTitle": "Synkroniseringsinnstillinger",
   "sectionAutoMerge": "Automatisk fletting",
   "autoMergeTitle": "Flett automatisk",
-  "autoMergeDescription": "Synkroniser fra hvelv tar i bruk den andre enhetens endringer med en gang, uten valg og uten gjennomgang. Der de avviker, vinner den andre enhetens verdi.",
+  "autoMergeDescription": "Synkroniser fra hvelv tar i bruk innkommende endringer automatisk. Der verdiene i de to hvelvene avviker, vinner de innkommende endringene.",
   "autoMergeNote": "Du blir likevel spurt om filen hvis den ikke åpner med passfrasen din.",
   "sectionSyncFolder": "Synkroniseringsmappe",
   "syncFolderDescription": "Der den andre enhetens eksport havner. Synkroniser fra hvelv åpner filen {name} der, navnet dette hvelvet eksporteres som, uten å spørre.",

@@ -622,7 +622,7 @@ abstract class AppLocalizations {
   /// No description provided for @autoMergeDescription.
   ///
   /// In en, this message translates to:
-  /// **'Sync from vault applies the other device\'s changes straight away, with no chooser and no review. Where the two differ, the other device\'s value wins.'**
+  /// **'Sync from vault applies incoming changes automatically. Where values in both vaults differ, incoming changes win.'**
   String get autoMergeDescription;
 
   /// No description provided for @autoMergeNote.

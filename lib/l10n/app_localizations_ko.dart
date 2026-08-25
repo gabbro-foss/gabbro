@@ -249,7 +249,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get autoMergeDescription =>
-      '금고에서 동기화는 선택이나 검토 없이 다른 기기의 변경 사항을 바로 적용합니다. 서로 다른 곳에서는 다른 기기의 값이 우선합니다.';
+      '금고에서 동기화는 수신된 변경 사항을 자동으로 적용합니다. 두 금고의 값이 다르면 수신된 변경 사항이 우선합니다.';
 
   @override
   String get autoMergeNote => '파일이 내 암호 문구로 열리지 않으면 파일을 다시 묻습니다.';

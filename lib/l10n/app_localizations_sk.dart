@@ -252,7 +252,7 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get autoMergeDescription =>
-      'Synchronizovať z trezoru použije zmeny z druhého zariadenia hneď, bez voľby a bez kontroly. Kde sa líšia, vyhráva hodnota z druhého zariadenia.';
+      'Synchronizovať z trezoru použije prichádzajúce zmeny automaticky. Kde sa hodnoty v oboch trezoroch líšia, vyhrávajú prichádzajúce zmeny.';
 
   @override
   String get autoMergeNote =>

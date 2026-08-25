@@ -252,7 +252,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get autoMergeDescription =>
-      'Kutxatik sinkronizatzeak beste gailuaren aldaketak berehala aplikatzen ditu, aukerarik eta berrikuspenik gabe. Desberdinak direnean, beste gailuaren balioak irabazten du.';
+      'Kutxatik sinkronizatzeak sarrerako aldaketak automatikoki aplikatzen ditu. Bi kutxetako balioak desberdinak direnean, sarrerako aldaketek irabazten dute.';
 
   @override
   String get autoMergeNote =>

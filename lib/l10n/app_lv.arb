@@ -72,7 +72,7 @@
   "syncSettingsTitle": "Sinhronizācijas iestatījumi",
   "sectionAutoMerge": "Automātiska apvienošana",
   "autoMergeTitle": "Apvienot automātiski",
-  "autoMergeDescription": "Sinhronizēt no glabātavas uzreiz piemēro otras ierīces izmaiņas bez izvēles un bez pārskatīšanas. Kur tās atšķiras, uzvar otras ierīces vērtība.",
+  "autoMergeDescription": "Sinhronizēt no glabātavas automātiski piemēro ienākošās izmaiņas. Kur abu glabātavu vērtības atšķiras, uzvar ienākošās izmaiņas.",
   "autoMergeNote": "Fails tik un tā tiks prasīts, ja tas neatveras ar jūsu paroles frāzi.",
   "sectionSyncFolder": "Sinhronizācijas mape",
   "syncFolderDescription": "Kur nonāk otras ierīces eksports. Sinhronizēt no glabātavas tur atver failu {name}, nosaukumu, ar kādu šī glabātava tiek eksportēta, neprasot.",

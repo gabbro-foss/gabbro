@@ -72,7 +72,7 @@
   "syncSettingsTitle": "Sync-Einstellungen",
   "sectionAutoMerge": "Automatisches Zusammenführen",
   "autoMergeTitle": "Automatisch zusammenführen",
-  "autoMergeDescription": "Aus Tresor synchronisieren übernimmt die Änderungen des anderen Geräts sofort, ohne Auswahl und ohne Prüfung. Bei Unterschieden gewinnt der Wert des anderen Geräts.",
+  "autoMergeDescription": "Aus Tresor synchronisieren übernimmt eingehende Änderungen automatisch. Wo sich Werte in beiden Tresoren unterscheiden, gewinnen die eingehenden Änderungen.",
   "autoMergeNote": "Öffnet sich die Datei nicht mit Ihrer Passphrase, wird trotzdem danach gefragt.",
   "sectionSyncFolder": "Sync-Ordner",
   "syncFolderDescription": "Wohin der Export des anderen Geräts gelangt. Aus Tresor synchronisieren öffnet dort die Datei {name}, den Namen, unter dem dieser Tresor exportiert wird, ohne nachzufragen.",

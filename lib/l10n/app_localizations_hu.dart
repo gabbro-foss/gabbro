@@ -252,7 +252,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get autoMergeDescription =>
-      'A Szinkronizálás széfből azonnal alkalmazza a másik eszköz változásait, választás és átnézés nélkül. Eltérésnél a másik eszköz értéke nyer.';
+      'A Szinkronizálás széfből automatikusan alkalmazza a bejövő változásokat. Ahol a két széf értékei eltérnek, a bejövő változások nyernek.';
 
   @override
   String get autoMergeNote =>

@@ -152,7 +152,7 @@
   "@autoMergeTitle": {
     "description": "Label of the auto-merge switch on the Sync settings screen. Same wording as the chooser button it replaces."
   },
-  "autoMergeDescription": "Sync from vault applies the other device's changes straight away, with no chooser and no review. Where the two differ, the other device's value wins.",
+  "autoMergeDescription": "Sync from vault applies incoming changes automatically. Where values in both vaults differ, incoming changes win.",
   "autoMergeNote": "The file is still asked for if it does not open with your passphrase.",
   "sectionSyncFolder": "Sync folder",
   "syncFolderDescription": "Where the other device's export lands. Sync from vault opens the file there called {name}, the name this vault exports as, without asking for it.",

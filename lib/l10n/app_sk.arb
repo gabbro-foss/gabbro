@@ -72,7 +72,7 @@
   "syncSettingsTitle": "Nastavenia synchronizácie",
   "sectionAutoMerge": "Automatické zlúčenie",
   "autoMergeTitle": "Zlúčiť automaticky",
-  "autoMergeDescription": "Synchronizovať z trezoru použije zmeny z druhého zariadenia hneď, bez voľby a bez kontroly. Kde sa líšia, vyhráva hodnota z druhého zariadenia.",
+  "autoMergeDescription": "Synchronizovať z trezoru použije prichádzajúce zmeny automaticky. Kde sa hodnoty v oboch trezoroch líšia, vyhrávajú prichádzajúce zmeny.",
   "autoMergeNote": "Súbor bude aj tak vyžiadaný, ak sa neotvorí vaším heslom.",
   "sectionSyncFolder": "Priečinok synchronizácie",
   "syncFolderDescription": "Kam prichádza export z druhého zariadenia. Synchronizovať z trezoru tam otvorí súbor {name}, názov, pod ktorým sa tento trezor exportuje, bez pýtania.",

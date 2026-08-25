@@ -252,7 +252,7 @@ class AppLocalizationsYo extends AppLocalizations {
 
   @override
   String get autoMergeDescription =>
-      'Ṣọkan láti àpótí á fi àwọn àyípadà ẹ̀rọ kejì sílò lẹ́sẹ̀kẹsẹ̀, láìsí yíyàn tàbí àyẹ̀wò. Níbi tí wọ́n bá yàtọ̀, iye ẹ̀rọ kejì ni ó gba.';
+      'Ṣọkan láti àpótí á fi àwọn àyípadà tí ń wọlé sílò ní aládàáṣe. Níbi tí àwọn iye nínú àpótí méjèèjì bá yàtọ̀, àwọn àyípadà tí ń wọlé ni ó gba.';
 
   @override
   String get autoMergeNote =>

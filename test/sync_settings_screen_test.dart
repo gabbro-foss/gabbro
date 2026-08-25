@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
+import 'package:gabbro/safe_file_picker.dart';
 import 'package:gabbro/screens/sync_settings_screen.dart';
 import 'package:gabbro/settings.dart';
 import 'test_helpers.dart';
@@ -90,6 +91,23 @@ void main() {
       // the other device is then visible here.
       await tester.pumpWidget(_buildScreen());
       expect(find.textContaining('example.gabbro'), findsOneWidget);
+      // The name is the one thing the user must match on the other device:
+      // it is bold inside the sentence.
+      final rich = tester.widget<RichText>(
+        find.byWidgetPredicate(
+          (w) => w is RichText && w.text.toPlainText().contains('example.gabbro'),
+        ),
+      );
+      TextSpan? bold;
+      rich.text.visitChildren((span) {
+        if (span is TextSpan &&
+            span.text == 'example.gabbro' &&
+            span.style?.fontWeight == FontWeight.bold) {
+          bold = span;
+        }
+        return true;
+      });
+      expect(bold, isNotNull, reason: 'the file name is a bold span');
     });
 
     testWidgets('shows "not set" and Remember unticked when empty', (
@@ -192,6 +210,73 @@ void main() {
       await tester.pumpAndSettle();
       expect(picks, 1);
       expect(tester.widget<CheckboxListTile>(_rememberTile()).value, isFalse);
+    });
+  });
+
+  // The XDG portal refuses a request from a process it cannot inspect, and
+  // Gabbro lowers its dumpable flag (hardening). Every native dialog therefore
+  // goes through runPicker, which raises the flag around the call; a bare call
+  // fails on hardware with "Unable to open /proc/<pid>/root" (2026-08-25).
+  group('folder picker goes through runPicker', () {
+    tearDown(resetDumpableToggle);
+
+    testWidgets('Choose folder raises dumpable before the picker, lowers after', (
+      tester,
+    ) async {
+      final events = <String>[];
+      dumpableToggle = (raise) async => events.add(raise ? 'raise' : 'lower');
+      await tester.pumpWidget(
+        _buildScreen(
+          onPickFolder: () async {
+            events.add('pick');
+            return '/tmp/GabbroSync';
+          },
+        ),
+      );
+      await tester.tap(find.text('Choose folder'));
+      await tester.pumpAndSettle();
+      expect(events, ['raise', 'pick', 'lower']);
+    });
+
+    testWidgets('ticking Remember with no folder uses the same guard', (
+      tester,
+    ) async {
+      final events = <String>[];
+      dumpableToggle = (raise) async => events.add(raise ? 'raise' : 'lower');
+      await tester.pumpWidget(
+        _buildScreen(
+          onPickFolder: () async {
+            events.add('pick');
+            return null;
+          },
+        ),
+      );
+      await tester.tap(_rememberTile());
+      await tester.pumpAndSettle();
+      expect(events, ['raise', 'pick', 'lower']);
+    });
+
+    testWidgets('a picker that throws shows the portal message, changes nothing', (
+      tester,
+    ) async {
+      final events = <String>[];
+      dumpableToggle = (raise) async => events.add(raise ? 'raise' : 'lower');
+      var calls = 0;
+      await tester.pumpWidget(
+        _buildScreen(
+          settings: const AppSettings(syncFolder: '/tmp/GabbroSync'),
+          onUpdate: (_) => calls++,
+          onPickFolder: () async => throw Exception('portal refused'),
+        ),
+      );
+      await tester.tap(find.text('Choose folder'));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull, reason: 'nothing escapes');
+      expect(find.byType(SnackBar), findsOneWidget);
+      expect(calls, 0);
+      expect(find.text('/tmp/GabbroSync'), findsOneWidget);
+      expect(events.last, 'lower');
     });
   });
 

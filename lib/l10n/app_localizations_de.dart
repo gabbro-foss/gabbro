@@ -253,7 +253,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get autoMergeDescription =>
-      'Aus Tresor synchronisieren übernimmt die Änderungen des anderen Geräts sofort, ohne Auswahl und ohne Prüfung. Bei Unterschieden gewinnt der Wert des anderen Geräts.';
+      'Aus Tresor synchronisieren übernimmt eingehende Änderungen automatisch. Wo sich Werte in beiden Tresoren unterscheiden, gewinnen die eingehenden Änderungen.';
 
   @override
   String get autoMergeNote =>

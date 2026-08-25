@@ -72,7 +72,7 @@
   "syncSettingsTitle": "Paramètres de synchronisation",
   "sectionAutoMerge": "Fusion automatique",
   "autoMergeTitle": "Fusionner automatiquement",
-  "autoMergeDescription": "Synchroniser depuis le coffre applique aussitôt les changements de l'autre appareil, sans choix ni relecture. En cas de différence, la valeur de l'autre appareil l'emporte.",
+  "autoMergeDescription": "Synchroniser depuis le coffre applique les changements entrants automatiquement. Là où les valeurs des deux coffres diffèrent, les changements entrants l'emportent.",
   "autoMergeNote": "Le fichier sera tout de même demandé s'il ne s'ouvre pas avec votre phrase secrète.",
   "sectionSyncFolder": "Dossier de synchronisation",
   "syncFolderDescription": "Là où arrive l'export de l'autre appareil. Synchroniser depuis le coffre y ouvre le fichier {name}, le nom sous lequel ce coffre s'exporte, sans rien demander.",

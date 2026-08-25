@@ -252,7 +252,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get autoMergeDescription =>
-      'Synchroniser depuis le coffre applique aussitôt les changements de l\'autre appareil, sans choix ni relecture. En cas de différence, la valeur de l\'autre appareil l\'emporte.';
+      'Synchroniser depuis le coffre applique les changements entrants automatiquement. Là où les valeurs des deux coffres diffèrent, les changements entrants l\'emportent.';
 
   @override
   String get autoMergeNote =>

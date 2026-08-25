@@ -252,7 +252,7 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get autoMergeDescription =>
-      'Sinchronizuoti iš saugyklos iš karto pritaiko kito įrenginio pakeitimus, be pasirinkimo ir be peržiūros. Kur skiriasi, laimi kito įrenginio reikšmė.';
+      'Sinchronizuoti iš saugyklos automatiškai pritaiko gaunamus pakeitimus. Kur abiejų saugyklų reikšmės skiriasi, laimi gaunami pakeitimai.';
 
   @override
   String get autoMergeNote =>

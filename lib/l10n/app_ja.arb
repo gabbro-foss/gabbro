@@ -72,7 +72,7 @@
   "syncSettingsTitle": "同期設定",
   "sectionAutoMerge": "自動マージ",
   "autoMergeTitle": "自動でマージ",
-  "autoMergeDescription": "「保管庫から同期」は、選択も確認もなしに他のデバイスの変更をすぐ適用します。異なる箇所では他のデバイスの値が優先されます。",
+  "autoMergeDescription": "「保管庫から同期」は受信した変更を自動的に適用します。両方の保管庫で値が異なる場合は、受信した変更が優先されます。",
   "autoMergeNote": "ファイルがあなたのパスフレーズで開けない場合は、引き続きファイルの指定を求められます。",
   "sectionSyncFolder": "同期フォルダー",
   "syncFolderDescription": "他のデバイスのエクスポート先です。「保管庫から同期」は、この保管庫のエクスポート名である {name} をそこから確認なしに開きます。",

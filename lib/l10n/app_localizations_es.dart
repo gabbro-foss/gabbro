@@ -252,7 +252,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get autoMergeDescription =>
-      'Sincronizar desde bóveda aplica los cambios del otro dispositivo de inmediato, sin elección ni revisión. Donde difieren, gana el valor del otro dispositivo.';
+      'Sincronizar desde bóveda aplica los cambios entrantes automáticamente. Donde los valores de ambas bóvedas difieren, ganan los cambios entrantes.';
 
   @override
   String get autoMergeNote =>

@@ -72,7 +72,7 @@
   "syncSettingsTitle": "Synkronointiasetukset",
   "sectionAutoMerge": "Automaattinen yhdistäminen",
   "autoMergeTitle": "Yhdistä automaattisesti",
-  "autoMergeDescription": "Synkronoi holvista ottaa toisen laitteen muutokset käyttöön heti, ilman valintaa ja tarkistusta. Eroavissa kohdissa toisen laitteen arvo voittaa.",
+  "autoMergeDescription": "Synkronoi holvista ottaa saapuvat muutokset käyttöön automaattisesti. Missä arvot holveissa eroavat, saapuvat muutokset voittavat.",
   "autoMergeNote": "Tiedostoa kysytään silti, jos se ei avaudu salalauseellasi.",
   "sectionSyncFolder": "Synkronointikansio",
   "syncFolderDescription": "Minne toisen laitteen vienti päätyy. Synkronoi holvista avaa sieltä tiedoston {name}, nimen jolla tämä holvi viedään, kysymättä.",

@@ -252,7 +252,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get autoMergeDescription =>
-      'Sincronizar do cofre aplica as alterações do outro dispositivo na hora, sem escolha nem revisão. Onde diferem, vale o valor do outro dispositivo.';
+      'Sincronizar do cofre aplica as alterações recebidas automaticamente. Onde os valores dos dois cofres diferem, as alterações recebidas vencem.';
 
   @override
   String get autoMergeNote =>
@@ -2535,7 +2535,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get autoMergeDescription =>
-      'Sincronizar do cofre aplica as alterações do outro dispositivo na hora, sem escolha nem revisão. Onde diferem, vale o valor do outro dispositivo.';
+      'Sincronizar do cofre aplica as alterações recebidas automaticamente. Onde os valores dos dois cofres diferem, as alterações recebidas vencem.';
 
   @override
   String get autoMergeNote =>
@@ -4815,7 +4815,7 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get autoMergeDescription =>
-      'Sincronizar do cofre aplica de imediato as alterações do outro dispositivo, sem escolha nem revisão. Onde diferem, vale o valor do outro dispositivo.';
+      'Sincronizar do cofre aplica as alterações recebidas automaticamente. Onde os valores dos dois cofres diferem, as alterações recebidas vencem.';
 
   @override
   String get autoMergeNote =>

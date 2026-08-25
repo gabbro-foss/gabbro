@@ -252,7 +252,7 @@ class AppLocalizationsNn extends AppLocalizations {
 
   @override
   String get autoMergeDescription =>
-      'Synkroniser frå kvelv tek i bruk endringane frå den andre eininga med ein gong, utan val og utan gjennomgang. Der dei skil seg, vinn verdien frå den andre eininga.';
+      'Synkroniser frå kvelv tek i bruk innkomande endringar automatisk. Der verdiane i dei to kvelva skil seg, vinn dei innkomande endringane.';
 
   @override
   String get autoMergeNote =>

@@ -252,7 +252,7 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get autoMergeDescription =>
-      'Sinhronizēt no glabātavas uzreiz piemēro otras ierīces izmaiņas bez izvēles un bez pārskatīšanas. Kur tās atšķiras, uzvar otras ierīces vērtība.';
+      'Sinhronizēt no glabātavas automātiski piemēro ienākošās izmaiņas. Kur abu glabātavu vērtības atšķiras, uzvar ienākošās izmaiņas.';
 
   @override
   String get autoMergeNote =>

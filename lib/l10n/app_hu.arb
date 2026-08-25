@@ -72,7 +72,7 @@
   "syncSettingsTitle": "Szinkronizálási beállítások",
   "sectionAutoMerge": "Automatikus egyesítés",
   "autoMergeTitle": "Egyesítés automatikusan",
-  "autoMergeDescription": "A Szinkronizálás széfből azonnal alkalmazza a másik eszköz változásait, választás és átnézés nélkül. Eltérésnél a másik eszköz értéke nyer.",
+  "autoMergeDescription": "A Szinkronizálás széfből automatikusan alkalmazza a bejövő változásokat. Ahol a két széf értékei eltérnek, a bejövő változások nyernek.",
   "autoMergeNote": "A fájlt akkor is kéri, ha nem nyílik meg a jelmondatával.",
   "sectionSyncFolder": "Szinkronizálási mappa",
   "syncFolderDescription": "Ahová a másik eszköz exportja érkezik. A Szinkronizálás széfből ott nyitja meg a {name} fájlt, az e széf exportálásakor használt nevet, kérdés nélkül.",

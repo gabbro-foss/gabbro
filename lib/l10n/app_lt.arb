@@ -72,7 +72,7 @@
   "syncSettingsTitle": "Sinchronizavimo nustatymai",
   "sectionAutoMerge": "Automatinis sujungimas",
   "autoMergeTitle": "Sujungti automatiškai",
-  "autoMergeDescription": "Sinchronizuoti iš saugyklos iš karto pritaiko kito įrenginio pakeitimus, be pasirinkimo ir be peržiūros. Kur skiriasi, laimi kito įrenginio reikšmė.",
+  "autoMergeDescription": "Sinchronizuoti iš saugyklos automatiškai pritaiko gaunamus pakeitimus. Kur abiejų saugyklų reikšmės skiriasi, laimi gaunami pakeitimai.",
   "autoMergeNote": "Failo vis tiek bus paprašyta, jei jis neatsidaro su jūsų slaptafraze.",
   "sectionSyncFolder": "Sinchronizavimo aplankas",
   "syncFolderDescription": "Kur patenka kito įrenginio eksportas. Sinchronizuoti iš saugyklos ten atveria failą {name}, pavadinimą, kuriuo ši saugykla eksportuojama, neklausdamas.",

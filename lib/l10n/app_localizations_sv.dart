@@ -252,7 +252,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get autoMergeDescription =>
-      'Synkronisera från valv tillämpar den andra enhetens ändringar direkt, utan val och utan granskning. Där de skiljer sig vinner den andra enhetens värde.';
+      'Synkronisera från valv tillämpar inkommande ändringar automatiskt. Där värdena i de två valven skiljer sig vinner de inkommande ändringarna.';
 
   @override
   String get autoMergeNote =>

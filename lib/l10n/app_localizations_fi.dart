@@ -252,7 +252,7 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get autoMergeDescription =>
-      'Synkronoi holvista ottaa toisen laitteen muutokset käyttöön heti, ilman valintaa ja tarkistusta. Eroavissa kohdissa toisen laitteen arvo voittaa.';
+      'Synkronoi holvista ottaa saapuvat muutokset käyttöön automaattisesti. Missä arvot holveissa eroavat, saapuvat muutokset voittavat.';
 
   @override
   String get autoMergeNote =>

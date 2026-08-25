@@ -72,7 +72,7 @@
   "syncSettingsTitle": "Nastavitve sinhronizacije",
   "sectionAutoMerge": "Samodejno združevanje",
   "autoMergeTitle": "Združi samodejno",
-  "autoMergeDescription": "Sinhroniziraj iz trezorja takoj uveljavi spremembe druge naprave, brez izbire in brez pregleda. Kjer se razlikujeta, obvelja vrednost druge naprave.",
+  "autoMergeDescription": "Sinhroniziraj iz trezorja samodejno uveljavi dohodne spremembe. Kjer se vrednosti v obeh trezorjih razlikujejo, obveljajo dohodne spremembe.",
   "autoMergeNote": "Datoteka bo vseeno zahtevana, če se ne odpre z vašim geslom.",
   "sectionSyncFolder": "Mapa za sinhronizacijo",
   "syncFolderDescription": "Kamor prispe izvoz druge naprave. Sinhroniziraj iz trezorja tam odpre datoteko {name}, ime, pod katerim se ta trezor izvaža, brez vprašanja.",

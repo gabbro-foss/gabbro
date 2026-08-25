@@ -72,7 +72,7 @@
   "syncSettingsTitle": "Ustawienia synchronizacji",
   "sectionAutoMerge": "Automatyczne scalanie",
   "autoMergeTitle": "Scal automatycznie",
-  "autoMergeDescription": "Synchronizuj z sejfu od razu stosuje zmiany z drugiego urządzenia, bez wyboru i bez przeglądu. Tam, gdzie się różnią, wygrywa wartość z drugiego urządzenia.",
+  "autoMergeDescription": "Synchronizuj z sejfu stosuje przychodzące zmiany automatycznie. Tam, gdzie wartości w obu sejfach się różnią, wygrywają zmiany przychodzące.",
   "autoMergeNote": "O plik i tak zostaniesz zapytany, jeśli nie otworzy się twoim hasłem.",
   "sectionSyncFolder": "Folder synchronizacji",
   "syncFolderDescription": "Gdzie trafia eksport z drugiego urządzenia. Synchronizuj z sejfu otwiera tam plik {name}, nazwę, pod jaką ten sejf jest eksportowany, bez pytania.",

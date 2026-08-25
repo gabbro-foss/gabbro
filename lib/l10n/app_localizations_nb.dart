@@ -252,7 +252,7 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get autoMergeDescription =>
-      'Synkroniser fra hvelv tar i bruk den andre enhetens endringer med en gang, uten valg og uten gjennomgang. Der de avviker, vinner den andre enhetens verdi.';
+      'Synkroniser fra hvelv tar i bruk innkommende endringer automatisk. Der verdiene i de to hvelvene avviker, vinner de innkommende endringene.';
 
   @override
   String get autoMergeNote =>

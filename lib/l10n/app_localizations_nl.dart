@@ -252,7 +252,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get autoMergeDescription =>
-      'Synchroniseren vanuit kluis past de wijzigingen van het andere apparaat meteen toe, zonder keuze en zonder controle. Waar ze verschillen, wint de waarde van het andere apparaat.';
+      'Synchroniseren vanuit kluis past inkomende wijzigingen automatisch toe. Waar waarden in beide kluizen verschillen, winnen de inkomende wijzigingen.';
 
   @override
   String get autoMergeNote =>

@@ -72,7 +72,7 @@
   "syncSettingsTitle": "Ajustes de sincronización",
   "sectionAutoMerge": "Fusión automática",
   "autoMergeTitle": "Fusionar automáticamente",
-  "autoMergeDescription": "Sincronizar desde bóveda aplica los cambios del otro dispositivo de inmediato, sin elección ni revisión. Donde difieren, gana el valor del otro dispositivo.",
+  "autoMergeDescription": "Sincronizar desde bóveda aplica los cambios entrantes automáticamente. Donde los valores de ambas bóvedas difieren, ganan los cambios entrantes.",
   "autoMergeNote": "Aun así se pedirá el archivo si no se abre con tu frase de contraseña.",
   "sectionSyncFolder": "Carpeta de sincronización",
   "syncFolderDescription": "Donde llega la exportación del otro dispositivo. Sincronizar desde bóveda abre allí el archivo {name}, el nombre con el que se exporta esta bóveda, sin preguntar.",

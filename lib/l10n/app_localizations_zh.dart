@@ -244,8 +244,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get autoMergeTitle => '自动合并';
 
   @override
-  String get autoMergeDescription =>
-      '“从保险库同步”会立即应用另一台设备的更改，不再选择，也不再审核。两者不同之处以另一台设备的值为准。';
+  String get autoMergeDescription => '“从保险库同步”会自动应用传入的更改。两个保险库中的值不同时，以传入的更改为准。';
 
   @override
   String get autoMergeNote => '若文件无法用你的口令短语打开，仍会要求你选择文件。';
@@ -2423,8 +2422,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get autoMergeTitle => '自动合并';
 
   @override
-  String get autoMergeDescription =>
-      '“从保险库同步”会立即应用另一台设备的更改，不再选择，也不再审核。两者不同之处以另一台设备的值为准。';
+  String get autoMergeDescription => '“从保险库同步”会自动应用传入的更改。两个保险库中的值不同时，以传入的更改为准。';
 
   @override
   String get autoMergeNote => '若文件无法用你的口令短语打开，仍会要求你选择文件。';
@@ -4602,8 +4600,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get autoMergeTitle => '自動合併';
 
   @override
-  String get autoMergeDescription =>
-      '「從保險庫同步」會立即套用另一部裝置的變更，不再選擇，也不再檢視。兩者不同之處以另一部裝置的值為準。';
+  String get autoMergeDescription => '「從保險庫同步」會自動套用傳入的變更。兩個保險庫中的值不同時，以傳入的變更為準。';
 
   @override
   String get autoMergeNote => '若檔案無法以您的密碼片語開啟，仍會要求您選擇檔案。';

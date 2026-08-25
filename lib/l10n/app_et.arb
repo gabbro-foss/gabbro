@@ -72,7 +72,7 @@
   "syncSettingsTitle": "Sünkroonimise seaded",
   "sectionAutoMerge": "Automaatne ühendamine",
   "autoMergeTitle": "Ühenda automaatselt",
-  "autoMergeDescription": "Hoidlast sünkroonimine rakendab teise seadme muudatused kohe, ilma valiku ja ülevaatuseta. Erinevuse korral võidab teise seadme väärtus.",
+  "autoMergeDescription": "Hoidlast sünkroonimine rakendab sissetulevad muudatused automaatselt. Kus väärtused kahes hoidlas erinevad, võidavad sissetulevad muudatused.",
   "autoMergeNote": "Faili küsitakse siiski, kui see sinu paroolifraasiga ei avane.",
   "sectionSyncFolder": "Sünkroonimiskaust",
   "syncFolderDescription": "Kuhu teise seadme eksport jõuab. Hoidlast sünkroonimine avab sealt faili {name}, nime, millega see hoidla eksporditakse, küsimata.",

@@ -249,7 +249,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get autoMergeDescription =>
-      '「保管庫から同期」は、選択も確認もなしに他のデバイスの変更をすぐ適用します。異なる箇所では他のデバイスの値が優先されます。';
+      '「保管庫から同期」は受信した変更を自動的に適用します。両方の保管庫で値が異なる場合は、受信した変更が優先されます。';
 
   @override
   String get autoMergeNote => 'ファイルがあなたのパスフレーズで開けない場合は、引き続きファイルの指定を求められます。';

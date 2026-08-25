@@ -5,6 +5,7 @@ import 'package:gabbro/folder_label.dart';
 import 'package:gabbro/gabbro_file_picker.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/saf_tree.dart';
+import 'package:gabbro/safe_file_picker.dart';
 import 'package:gabbro/screens/export_screen.dart' show exportVaultFileName;
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
@@ -19,8 +20,8 @@ Future<String?> _defaultPickFolder() async {
 /// Sync settings (S5): the auto-merge policy and the remembered sync folder.
 ///
 /// With a folder remembered and auto-merge on, `menu > Sync from vault` is one
-/// click: the file in that folder carrying this vault's name is merged with
-/// no picker, no chooser and no review.
+/// click: the file in that folder carrying this vault's export name is merged
+/// with no file picker, no how-to-apply question and no review.
 class SyncSettingsScreen extends StatefulWidget {
   final AppSettings settings;
   final void Function(AppSettings) onUpdate;
@@ -65,8 +66,17 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
 
   bool get _remembered => _settings.syncFolder.isNotEmpty;
 
+  // runPicker raises the dumpable flag for the dialog's duration: the XDG
+  // portal refuses a request from a process it cannot inspect (hardening
+  // lowers the flag), and any failure becomes the one "unavailable" message.
   Future<void> _pickFolder() async {
-    final picked = await widget.onPickFolder();
+    final String? picked;
+    try {
+      picked = await runPicker(widget.onPickFolder);
+    } on FilePickerUnavailable {
+      if (mounted) showPickerUnavailable(context, hasManualEntry: false);
+      return;
+    }
     if (picked == null || !mounted) return;
     _update(_settings.copyWith(syncFolder: picked));
   }
@@ -79,6 +89,28 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
     } else {
       _update(_settings.copyWith(syncFolder: ''));
     }
+  }
+
+  /// The folder sentence with the expected file name in bold: that name is
+  /// the one thing the user must match on the other device.
+  Widget _folderDescription(AppLocalizations l, TextStyle style) {
+    final name = exportVaultFileName(widget.vaultAlias);
+    final text = l.syncFolderDescription(name);
+    final i = text.indexOf(name);
+    if (i < 0) return Text(text, style: style);
+    return Text.rich(
+      TextSpan(
+        style: style,
+        children: [
+          TextSpan(text: text.substring(0, i)),
+          TextSpan(
+            text: name,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          TextSpan(text: text.substring(i + name.length)),
+        ],
+      ),
+    );
   }
 
   @override
@@ -117,10 +149,7 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
               // ── Sync folder ───────────────────────────────────────────
               SectionHeader(label: l.sectionSyncFolder),
               const SizedBox(height: 4),
-              Text(
-                l.syncFolderDescription(exportVaultFileName(widget.vaultAlias)),
-                style: small,
-              ),
+              _folderDescription(l, small),
               const SizedBox(height: 8),
               Text(
                 _remembered

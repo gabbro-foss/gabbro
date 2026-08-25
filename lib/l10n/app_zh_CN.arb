@@ -72,7 +72,7 @@
   "syncSettingsTitle": "同步设置",
   "sectionAutoMerge": "自动合并",
   "autoMergeTitle": "自动合并",
-  "autoMergeDescription": "“从保险库同步”会立即应用另一台设备的更改，不再选择，也不再审核。两者不同之处以另一台设备的值为准。",
+  "autoMergeDescription": "“从保险库同步”会自动应用传入的更改。两个保险库中的值不同时，以传入的更改为准。",
   "autoMergeNote": "若文件无法用你的口令短语打开，仍会要求你选择文件。",
   "sectionSyncFolder": "同步文件夹",
   "syncFolderDescription": "另一台设备导出文件所在的位置。“从保险库同步”会直接在那里打开名为 {name} 的文件（本保险库的导出名），不再询问。",

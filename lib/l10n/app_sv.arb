@@ -72,7 +72,7 @@
   "syncSettingsTitle": "Synkroniseringsinställningar",
   "sectionAutoMerge": "Automatisk sammanslagning",
   "autoMergeTitle": "Slå ihop automatiskt",
-  "autoMergeDescription": "Synkronisera från valv tillämpar den andra enhetens ändringar direkt, utan val och utan granskning. Där de skiljer sig vinner den andra enhetens värde.",
+  "autoMergeDescription": "Synkronisera från valv tillämpar inkommande ändringar automatiskt. Där värdena i de två valven skiljer sig vinner de inkommande ändringarna.",
   "autoMergeNote": "Du får ändå frågan om filen om den inte öppnas med din lösenfras.",
   "sectionSyncFolder": "Synkroniseringsmapp",
   "syncFolderDescription": "Dit den andra enhetens export hamnar. Synkronisera från valv öppnar filen {name} där, namnet det här valvet exporteras som, utan att fråga.",

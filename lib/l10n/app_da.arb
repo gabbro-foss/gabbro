@@ -72,7 +72,7 @@
   "syncSettingsTitle": "Synkroniseringsindstillinger",
   "sectionAutoMerge": "Automatisk fletning",
   "autoMergeTitle": "Flet automatisk",
-  "autoMergeDescription": "Synkronisér fra boks anvender den anden enheds ændringer med det samme, uden valg og uden gennemsyn. Hvor de afviger, vinder den anden enheds værdi.",
+  "autoMergeDescription": "Synkronisér fra boks anvender indkommende ændringer automatisk. Hvor værdier i de to bokse afviger, vinder de indkommende ændringer.",
   "autoMergeNote": "Der bliver stadig spurgt om filen, hvis den ikke åbner med din adgangssætning.",
   "sectionSyncFolder": "Synkroniseringsmappe",
   "syncFolderDescription": "Hvor den anden enheds eksport lander. Synkronisér fra boks åbner filen {name} dér, navnet denne boks eksporteres under, uden at spørge.",

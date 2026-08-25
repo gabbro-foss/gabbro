@@ -252,7 +252,7 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get autoMergeDescription =>
-      'Synkronisér fra boks anvender den anden enheds ændringer med det samme, uden valg og uden gennemsyn. Hvor de afviger, vinder den anden enheds værdi.';
+      'Synkronisér fra boks anvender indkommende ændringer automatisk. Hvor værdier i de to bokse afviger, vinder de indkommende ændringer.';
 
   @override
   String get autoMergeNote =>

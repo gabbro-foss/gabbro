@@ -72,7 +72,7 @@
   "syncSettingsTitle": "Postavke sinkronizacije",
   "sectionAutoMerge": "Automatsko spajanje",
   "autoMergeTitle": "Spoji automatski",
-  "autoMergeDescription": "Sinkroniziraj iz trezora odmah primjenjuje promjene drugog uređaja, bez odabira i bez pregleda. Gdje se razlikuju, vrijedi vrijednost drugog uređaja.",
+  "autoMergeDescription": "Sinkroniziraj iz trezora automatski primjenjuje dolazne promjene. Gdje se vrijednosti u oba trezora razlikuju, dolazne promjene vrijede.",
   "autoMergeNote": "Datoteka će se ipak zatražiti ako se ne otvori vašom lozinkom.",
   "sectionSyncFolder": "Mapa za sinkronizaciju",
   "syncFolderDescription": "Gdje stiže izvoz drugog uređaja. Sinkroniziraj iz trezora ondje otvara datoteku {name}, naziv pod kojim se ovaj trezor izvozi, bez pitanja.",

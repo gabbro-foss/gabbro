@@ -72,7 +72,7 @@
   "syncSettingsTitle": "Configurações de sincronização",
   "sectionAutoMerge": "Mesclagem automática",
   "autoMergeTitle": "Mesclar automaticamente",
-  "autoMergeDescription": "Sincronizar do cofre aplica as alterações do outro dispositivo na hora, sem escolha nem revisão. Onde diferem, vale o valor do outro dispositivo.",
+  "autoMergeDescription": "Sincronizar do cofre aplica as alterações recebidas automaticamente. Onde os valores dos dois cofres diferem, as alterações recebidas vencem.",
   "autoMergeNote": "O arquivo ainda será pedido se não abrir com a sua frase-senha.",
   "sectionSyncFolder": "Pasta de sincronização",
   "syncFolderDescription": "Onde chega a exportação do outro dispositivo. Sincronizar do cofre abre ali o arquivo {name}, o nome com que este cofre é exportado, sem perguntar.",

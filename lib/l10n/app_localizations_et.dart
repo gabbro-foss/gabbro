@@ -252,7 +252,7 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get autoMergeDescription =>
-      'Hoidlast sünkroonimine rakendab teise seadme muudatused kohe, ilma valiku ja ülevaatuseta. Erinevuse korral võidab teise seadme väärtus.';
+      'Hoidlast sünkroonimine rakendab sissetulevad muudatused automaatselt. Kus väärtused kahes hoidlas erinevad, võidavad sissetulevad muudatused.';
 
   @override
   String get autoMergeNote =>

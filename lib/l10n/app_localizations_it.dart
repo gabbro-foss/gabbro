@@ -252,7 +252,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get autoMergeDescription =>
-      'Sincronizza da cassaforte applica subito le modifiche dell\'altro dispositivo, senza scelta né revisione. Dove differiscono, vince il valore dell\'altro dispositivo.';
+      'Sincronizza da cassaforte applica automaticamente le modifiche in arrivo. Dove i valori delle due casseforti differiscono, vincono le modifiche in arrivo.';
 
   @override
   String get autoMergeNote =>

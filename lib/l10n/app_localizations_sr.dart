@@ -252,7 +252,7 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get autoMergeDescription =>
-      'Синхронизуј из трезора одмах примењује измене другог уређаја, без избора и без прегледа. Где се разликују, важи вредност другог уређаја.';
+      'Синхронизуј из трезора аутоматски примењује долазне измене. Где се вредности у оба трезора разликују, важе долазне измене.';
 
   @override
   String get autoMergeNote =>
@@ -2527,7 +2527,7 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get autoMergeDescription =>
-      'Sinhronizuj iz trezora odmah primenjuje izmene drugog uređaja, bez izbora i bez pregleda. Gde se razlikuju, važi vrednost drugog uređaja.';
+      'Sinhronizuj iz trezora automatski primenjuje dolazne izmene. Gde se vrednosti u oba trezora razlikuju, važe dolazne izmene.';
 
   @override
   String get autoMergeNote =>

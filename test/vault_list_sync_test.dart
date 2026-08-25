@@ -1988,4 +1988,109 @@ void main() {
       expect(find.text('How should this sync apply?'), findsOneWidget);
     });
   });
+
+  // ── S6/S7 with a key-protected source ──────────────────────────────────────
+  // Auto-merge removes the how-to-apply question, never the tap: the source's
+  // YubiKey is still asked for, and a rotated passphrase still falls back.
+  group('VaultListScreen one-click sync, key-protected source', () {
+    final sourceRecords = <YubikeyRecordData>[
+      YubikeyRecordData(
+        credentialId: Uint8List.fromList([0xA1]),
+        salt: Uint8List.fromList([0x01]),
+      ),
+    ];
+
+    Widget keyedAutoMergeScreen({
+      Future<MergeSummary?> Function(String, List<int>, List<int>)?
+      fastMergeVaultWithKeyHeld,
+      Future<MergeSummary> Function(String, List<int>, List<int>, List<int>)?
+      fastMergeVaultWithKey,
+    }) => testApp(
+      VaultListScreen(
+        vaultPath: '/tmp/example_gabbro.gabbro',
+        vaultAlias: 'example',
+        listEntries: () => [],
+        yubikeyRecords: [],
+        autoMergeSync: true,
+        syncFolder: '/tmp/GabbroSync',
+        onResolveSyncSource: (_, _) async => '/tmp/GabbroSync/example.gabbro',
+        onPickSyncFile: () async => throw StateError('no picker with a folder'),
+        onDetectSyncSourceRecords: (_) => sourceRecords,
+        onGetSyncYubikeyHmac: (records, pin, transport) async =>
+            (hmac: const [0x11], credentialId: const [0xA1]),
+        mergeVault: (_, _) async => throw StateError('no passphrase-only merge'),
+        fastMergeVault: (_, _) async => throw StateError('no passphrase-only merge'),
+        mergeVaultWithKey: (_, _, _, _) async =>
+            throw StateError('review merge must not run under auto-merge'),
+        mergeVaultWithKeyHeld: (_, _, _) async =>
+            throw StateError('review merge must not run under auto-merge'),
+        fastMergeVaultWithKeyHeld:
+            fastMergeVaultWithKeyHeld ?? (_, _, _) async => null,
+        fastMergeVaultWithKey:
+            fastMergeVaultWithKey ??
+            (_, _, _, _) async => throw StateError('not expected'),
+      ),
+    );
+
+    Future<void> enterPin(WidgetTester tester) async {
+      final fields = find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.byType(TextField),
+      );
+      await tester.enterText(fields.last, '123456');
+      await tester.tap(find.text('Sync'));
+      await _settle(tester);
+    }
+
+    testWidgets('PIN and tap are still asked; then the fast keyed merge, no chooser', (
+      tester,
+    ) async {
+      List<int>? heldHmac;
+      await tester.pumpWidget(
+        keyedAutoMergeScreen(
+          fastMergeVaultWithKeyHeld: (_, hmac, _) async {
+            heldHmac = hmac;
+            return _summary(added: 3);
+          },
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from vault'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(AlertDialog), findsOneWidget, reason: 'PIN dialog');
+      await enterPin(tester);
+
+      expect(find.text('How should this sync apply?'), findsNothing);
+      expect(heldHmac, equals(const [0x11]));
+      expect(find.textContaining('synced'), findsOneWidget);
+    });
+
+    testWidgets('held passphrase fails: typed fallback, then the fast keyed merge', (
+      tester,
+    ) async {
+      List<int>? typed;
+      await tester.pumpWidget(
+        keyedAutoMergeScreen(
+          fastMergeVaultWithKeyHeld: (_, _, _) async => null,
+          fastMergeVaultWithKey: (_, passphrase, hmac, _) async {
+            typed = passphrase;
+            expect(hmac, equals(const [0x11]), reason: 'the one tap is reused');
+            return _summary(added: 1);
+          },
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from vault'));
+      await tester.pumpAndSettle();
+      await enterPin(tester);
+
+      expect(find.text('How should this sync apply?'), findsNothing);
+      expect(find.byType(AlertDialog), findsOneWidget, reason: 'passphrase box');
+      await _enterSyncPassphrase(tester);
+
+      expect(typed, equals(utf8.encode('passphrase')));
+      expect(find.textContaining('synced'), findsOneWidget);
+    });
+  });
 }

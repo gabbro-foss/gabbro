@@ -252,7 +252,7 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get autoMergeDescription =>
-      'Sinhroniziraj iz trezorja takoj uveljavi spremembe druge naprave, brez izbire in brez pregleda. Kjer se razlikujeta, obvelja vrednost druge naprave.';
+      'Sinhroniziraj iz trezorja samodejno uveljavi dohodne spremembe. Kjer se vrednosti v obeh trezorjih razlikujejo, obveljajo dohodne spremembe.';
 
   @override
   String get autoMergeNote =>

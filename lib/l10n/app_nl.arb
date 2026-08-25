@@ -72,7 +72,7 @@
   "syncSettingsTitle": "Synchronisatie-instellingen",
   "sectionAutoMerge": "Automatisch samenvoegen",
   "autoMergeTitle": "Automatisch samenvoegen",
-  "autoMergeDescription": "Synchroniseren vanuit kluis past de wijzigingen van het andere apparaat meteen toe, zonder keuze en zonder controle. Waar ze verschillen, wint de waarde van het andere apparaat.",
+  "autoMergeDescription": "Synchroniseren vanuit kluis past inkomende wijzigingen automatisch toe. Waar waarden in beide kluizen verschillen, winnen de inkomende wijzigingen.",
   "autoMergeNote": "Er wordt alsnog om het bestand gevraagd als het niet opent met uw wachtwoordzin.",
   "sectionSyncFolder": "Synchronisatiemap",
   "syncFolderDescription": "Waar de export van het andere apparaat terechtkomt. Synchroniseren vanuit kluis opent daar het bestand {name}, de naam waaronder deze kluis exporteert, zonder te vragen.",

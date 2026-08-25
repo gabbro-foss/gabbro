@@ -72,7 +72,7 @@
   "syncSettingsTitle": "Impostazioni di sincronizzazione",
   "sectionAutoMerge": "Unione automatica",
   "autoMergeTitle": "Unisci automaticamente",
-  "autoMergeDescription": "Sincronizza da cassaforte applica subito le modifiche dell'altro dispositivo, senza scelta né revisione. Dove differiscono, vince il valore dell'altro dispositivo.",
+  "autoMergeDescription": "Sincronizza da cassaforte applica automaticamente le modifiche in arrivo. Dove i valori delle due casseforti differiscono, vincono le modifiche in arrivo.",
   "autoMergeNote": "Il file viene comunque richiesto se non si apre con la tua passphrase.",
   "sectionSyncFolder": "Cartella di sincronizzazione",
   "syncFolderDescription": "Dove arriva l'esportazione dell'altro dispositivo. Sincronizza da cassaforte apre lì il file {name}, il nome con cui questa cassaforte viene esportata, senza chiedere.",

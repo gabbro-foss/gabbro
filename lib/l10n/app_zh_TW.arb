@@ -72,7 +72,7 @@
   "syncSettingsTitle": "同步設定",
   "sectionAutoMerge": "自動合併",
   "autoMergeTitle": "自動合併",
-  "autoMergeDescription": "「從保險庫同步」會立即套用另一部裝置的變更，不再選擇，也不再檢視。兩者不同之處以另一部裝置的值為準。",
+  "autoMergeDescription": "「從保險庫同步」會自動套用傳入的變更。兩個保險庫中的值不同時，以傳入的變更為準。",
   "autoMergeNote": "若檔案無法以您的密碼片語開啟，仍會要求您選擇檔案。",
   "sectionSyncFolder": "同步資料夾",
   "syncFolderDescription": "另一部裝置匯出檔案所在的位置。「從保險庫同步」會直接在那裡開啟名為 {name} 的檔案（本保險庫的匯出名稱），不再詢問。",

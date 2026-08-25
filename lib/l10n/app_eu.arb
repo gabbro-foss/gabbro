@@ -72,7 +72,7 @@
   "syncSettingsTitle": "Sinkronizazio-ezarpenak",
   "sectionAutoMerge": "Bateratze automatikoa",
   "autoMergeTitle": "Bateratu automatikoki",
-  "autoMergeDescription": "Kutxatik sinkronizatzeak beste gailuaren aldaketak berehala aplikatzen ditu, aukerarik eta berrikuspenik gabe. Desberdinak direnean, beste gailuaren balioak irabazten du.",
+  "autoMergeDescription": "Kutxatik sinkronizatzeak sarrerako aldaketak automatikoki aplikatzen ditu. Bi kutxetako balioak desberdinak direnean, sarrerako aldaketek irabazten dute.",
   "autoMergeNote": "Fitxategia eskatuko da hala ere zure pasaesaldiarekin irekitzen ez bada.",
   "sectionSyncFolder": "Sinkronizazio-karpeta",
   "syncFolderDescription": "Beste gailuaren esportazioa non iristen den. Kutxatik sinkronizatzeak hor irekitzen du {name} fitxategia, kutxa hau esportatzean duen izena, galdetu gabe.",
