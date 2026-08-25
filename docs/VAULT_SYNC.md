@@ -15,8 +15,8 @@ uses one) merges the incoming copy in a couple of clicks.
 
 **One click:** on the receiving device, **Sync settings** (vault menu) takes the
 folder the export lands in and an **auto-merge** switch. With both set, **Sync from
-vault** opens the file of this vault's name in that folder and applies it, no
-questions asked; a YubiKey-protected file still asks for its tap.
+vault** opens the file called `<alias>.gabbro` (this vault's export name) in that
+folder and applies it, no questions asked; a YubiKey-protected file still asks for its tap.
 
 **On Android this shortcut does not work:** the vault lives in the app's private
 storage, which no sync app can read. Export the vault to a shared folder (e.g.
@@ -188,9 +188,9 @@ Save. Both sides should reach **Up to Date**.
 throwaway file - never the vault:
 
 ```bash
-echo test > ~/GabbroSync/synctest.txt     # 1. create on Linux
-# -> confirm synctest.txt appears in Download/GabbroSync on the phone
-rm ~/GabbroSync/synctest.txt              # 2. delete on Linux
+echo test > ~/GabbroSync/probe.txt     # 1. create on Linux
+# -> confirm probe.txt appears in Download/GabbroSync on the phone
+rm ~/GabbroSync/probe.txt              # 2. delete on Linux
 # -> confirm it disappears on the phone
 ```
 

@@ -100,7 +100,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2496 | 10 |
+| Flutter (`flutter test`) | 2498 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 17 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 180 | 15 |
 
@@ -193,9 +193,10 @@ Different Gabbro vault: `menu > Import entries > Gabbro vault > Import`
   one place each to change it.
 
 **S6. Sync from vault, the flow.**
-1. Sync folder set: no picker. The source is the file in that folder with
-   this vault's own file name (same vault = same name, same passphrase, a
-   different hash). No folder set, or Remember unticked: picker, as today.
+1. Sync folder set: no picker. The source is the file in that folder called
+   `<alias>.gabbro`, this vault's own export name, so both devices agree by
+   construction; it never collides with the on-disk `<alias>_gabbro.gabbro`.
+   No folder set, or Remember unticked: picker, as today.
 2. Source keyed: PIN + tap of the *source's* YubiKey, which may differ from
    the receiving vault's, if it has one. Passphrase-only source: no prompt.
 3. Auto-merge off: the chooser as today (*Merge automatically* / *Review all
@@ -241,7 +242,7 @@ whatever is missing or wrong is fixed in the same section that changes it.
 - Sync settings screen: `SwitchListTile` + folder field + Remember; semantics
   labels; screen-reader + large-text tests; all ARBs.
 - `_syncFromFile` in `vault_list_screen.dart` (one code path, both layouts):
-  folder set -> resolve `<sync folder>/<this vault's file name>`, missing file
+  folder set -> resolve `<sync folder>/<alias>.gabbro` (export name), missing file
   -> error, no picker; setting on -> `fast = true`, skip `SyncMethodDialog`.
 - Hardware: one pass Linux, one pass Android.
 
