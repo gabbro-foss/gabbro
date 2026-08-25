@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - One-click sync. Sync settings (vault menu): an auto-merge switch (off by default) and a remembered sync folder with a Remember box. With both set, Sync from vault opens the file of this vault's name in that folder and merges it with no picker, no chooser and no review; a YubiKey-protected file still asks for its tap, and a file your passphrase does not open still asks for one. Linux gains a native folder picker (XDG portal); Android reads the folder through its persisted storage grant.
 
 ### Changed
+- The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
 - Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
 - Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).
 - Export: "Include date in filename" now defaults to off, so a repeat export overwrites the previous file instead of adding a dated copy. Turn it on for dated exports.
@@ -47,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0-alpha.20] – 2026-08-11
 
 ### Changed
+- The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
 - Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
 - Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).
 - **The stored text-scale ceiling now matches what the app can show.** Renders always capped at 2x (phone) / 3x (tablet); the settings file could still hold up to 8.0 from an older design. A hand-edited value above 3.0 now loads as 3.0.
@@ -63,6 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **An entry in the vault list at the autofill prompt did nothing (Android).** When Gabbro asked for your passphrase to fill or save a login, the list of vaults also offered "Open a vault file…" — tapping it opened nothing and said nothing. It is no longer offered there, and where you have a single vault the list itself is gone, since it could only reselect the vault you were already unlocking. The app's own unlock screen is unchanged.
 
 ### Changed
+- The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
 - Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
 - Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).
 - **Links open through Gabbro's own code**, not the `url_launcher` plugin: the desktop's handler on Linux, Android's own on Android. Same system browser as before, never an in-app view, one less third-party dependency. Only `http` and `https` links are opened now — a stored `file://`, `ftp://` or `ssh://` address is refused, since this button means "open a web page".
@@ -88,6 +91,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Serbian (Cyrillic) was almost entirely written in Latin script.** Choosing Српски gave you the same Latin text as Српски (latinica) — only 85 of 645 strings were actually Cyrillic. All of them are now, so the two Serbian options finally differ. A test refuses any Cyrillic locale that ships Latin-script prose, so this cannot come back.
 
 ### Changed
+- The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
 - Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
 - Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).
 - **Starting a vault switch and changing your mind is now one tap.** Picking another vault in Manage vaults opens its unlock screen over the vault you already had open; a Cancel button in the top-left goes back to it. That corner offered Quit before, which was never the action you wanted there — Quit stays in the vault menu, on `Ctrl+Q`, and on the first-run and locked screens.
@@ -137,6 +141,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Native Linux packages.** Arch via the AUR (`yay -S gabbro-bin`) and Debian/Mint via a signed `.deb` (`sudo apt install ./gabbro_<version>_amd64.deb`) — both install system-wide with a menu entry and a `gabbro` command, resolve their dependencies, and uninstall cleanly. The `.deb` carries a detached GPG signature like the tarball.
 
 ### Changed
+- The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
 - Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
 - Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).
 - **The Linux tarball no longer bundles `install.sh`.** The native packages replace it; the tarball is now extract-and-run (use the AUR or `.deb` for app-menu / PATH integration).
@@ -162,6 +167,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Tablet, largest text: the "select an entry" placeholder in the detail pane ran off the bottom of the pane. It now scrolls.
 
 ### Changed
+- The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
 - Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
 - Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).
 - **A vault older than VERSION 11 is refused, not damaged.** The file is left untouched and the app explains it needs upgrading rather than reporting corruption. To upgrade: install alpha.14, open each vault once, then return. See [docs/VAULT_UPGRADE_PATH.md](docs/VAULT_UPGRADE_PATH.md).
@@ -177,6 +183,7 @@ _Built with Flutter 3.44.6, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21._
 - **Vault format VERSION 11.** New vaults derive the encryption key straight from Argon2id (via HKDF); existing vaults auto-upgrade the first time you unlock them (entries unchanged). Removes the non-load-bearing X25519 + ML-KEM hybrid layer (ADR-018); quantum resistance is unchanged (Argon2id + AES-256-GCM).
 
 ### Changed
+- The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
 - Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
 - Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).
 - Project repository moved to the `gabbro-foss` GitHub organisation; in-app GitHub/Issues links updated (old links redirect).
@@ -194,6 +201,7 @@ _Built with Flutter 3.44.6, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21._
 - **Linux desktop auto-type (X11).** With a login open in Gabbro, a global hotkey types `username⇥password↵` into the focused window; uses the login's email when it has no username.
 
 ### Changed
+- The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
 - Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
 - Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).
 - **Smaller, per-device Android downloads.** Releases now ship a separate APK per phone type (modern `arm64-v8a` ~29 MB, old 32-bit `armeabi-v7a`, emulator/Chromebook `x86_64`) instead of one ~76 MB file bundling all three. Download the one for your device — use `arm64-v8a` if unsure. All are signed by the same key (same fingerprint).
@@ -212,6 +220,7 @@ _Built with Flutter 3.44.6, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21._
 - **Buttons and controls grow with the text size too.** At large text, the menu, entry-row, type-picker and navigation-rail icons, the add button, page arrows, app-bar buttons, selection checkboxes and the password show/hide (eye) toggles scale up (so they stay easy to see and tap), touch targets are a full size, and the A–Z index bar's letters enlarge without spilling off their strip. Eye toggles that sit inside a text field grow a little more gently so they stay within the field.
 
 ### Changed
+- The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
 - Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
 - Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).
 - **Sync now offers "Merge automatically" or "Review all changes".** When syncing from a file you pick how to apply it: *Merge automatically* takes all incoming changes with no prompts (the incoming vault wins any clash; the replaced value is kept in history), or *Review all changes* steps through them one by one as before. Nothing is lost either way.
@@ -249,6 +258,7 @@ _Built with Flutter 3.44.6, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21._
 - Changing the passphrase now accepts a "Fair" passphrase, matching onboarding (it previously required a stronger one); weaker passphrases show an explicit "too weak" line.
 
 ### Changed
+- The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
 - Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
 - Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).
 - Android autofill now fills fields through the current `setField` API on Android 14+, keeping the deprecated `setValue` path for Android 8–13 — so Gabbro keeps building cleanly against newer Android SDKs with no change to how autofill behaves. Hardware-verified on Android 16 (web + native app, locked + unlocked vault).
@@ -277,6 +287,7 @@ _Built with Flutter 3.44.6, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21._
 - **Autofill: match a vault login to an installed Android app by its package id.** Login entries gain an optional "Android app ID" field; a native app autofills only on an **exact** package match (no loose substring matching — an unset id matches nothing, so no false positives). Apps that request autofill but match no entry are recorded (app-private, capped) and offered as tap-to-fill suggestion chips in the editor, so you needn't hunt for the package name. Field, note, and chips localised across 37 locales. Device-verified on Android (match, no-false-positive, capture); replaces the old loose `extractAppToken` matcher.
 
 ### Changed
+- The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
 - Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
 - Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).
 - **Autofill: web login fields detected from HTML attributes.** `classifyField` now reads the html `id` (catching short field names) and trusts html `name`/`id` only on real form controls, so `<form name="login">` containers are no longer mis-detected. Hardware-verified on Android across six sites; OTP/reCAPTCHA correctly skipped.
@@ -301,6 +312,7 @@ _Built with Flutter 3.44.6, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21._
 - **Lock / vault-switch now clear the navigation back stack (locked-vault re-exposure hardening).** Auto-lock already wiped the back stack (`pushAndRemoveUntil`), but the manual lock button and the vault-switch dropdown used `pushReplacement`, which only swaps the top route. A hardware-found edge case (back-press during a stalled YubiKey tap after switching vaults) could leave a previously-unlocked vault's screen reachable underneath. Manual lock (`_lockAndExit`) and `switchToVault` now both `pushAndRemoveUntil((_) => false)` like auto-lock, so no prior route — and no previously-unlocked vault's screen — can survive a lock or a switch, regardless of stack depth or in-flight async state. Defence-in-depth: a failed/locked entry-list load now also clears any retained decrypted summaries from memory (the existing error gate already hid them from the UI). The originally-observed symptom was no longer reproducible after the stalled-tap fix; this closes the class by construction. Widget tests pin "lock/switch leaves nothing to pop back to" and "a locked load renders no entry-list chrome." Hardware-verified on Android.
 
 ### Changed
+- The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
 - Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
 - Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).
 - **Path fields are now editable — type or paste, not pick-only.** The vault-path field in onboarding (and the file-path fields in export/import) previously accepted only a value chosen through the native file dialog. They are now directly editable while still offering the picker — important when the native dialog is unavailable (e.g. under a Wayland bubblewrap sandbox), where typing/pasting a path is the only way in. A caller-requested read-only display mode is preserved, and an external path update (the onboarding alias-driven preview) still flows into the field. Widget tests cover typing, picking, external-update sync, and read-only mode.
@@ -358,6 +370,7 @@ _Built with Flutter 3.44.6, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21._
 - `docs/SECURITY.md`: F-01 "Known limitations" section updated to reflect VERSION 7 header-integrity guarantee; stale "planned for a future version" text removed.
 
 ### Changed
+- The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
 - Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
 - Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).
 - Dependency surface audit (Phase 1): replaced `once_cell::sync::Lazy` with `std::sync::LazyLock` (stabilised in Rust 1.80) in `vault/session.rs`; removed `once_cell` as a direct dependency.

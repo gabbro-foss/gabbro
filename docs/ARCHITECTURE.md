@@ -100,7 +100,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2495 | 10 |
+| Flutter (`flutter test`) | 2496 | 10 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 17 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 180 | 15 |
 
@@ -253,7 +253,7 @@ Progress (tick as each Bikeshed section lands):
 - [x] Sync from vault by name match, picker fallback, auto-merge wiring (S6, S7)
 - [ ] Import screen: one picker (Bikeshed step 2)
 - [ ] Remember folders on export/import + read-only view in Sync settings (S9, S5)
-- [ ] On-screen explanations checked against S1-S9 (S10)
+- [x] On-screen explanations checked against S1-S9 (S10)
 - [ ] Docs: README, VAULT_SYNC.md, CHANGELOG
 - [ ] Hardware: one pass per platform per section
 
