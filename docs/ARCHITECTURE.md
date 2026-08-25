@@ -149,19 +149,87 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**Auto-merge setting** (sync family, step 1 of 3 — see Bikeshed > **Sync family**
-for the standing constraints and the remaining two steps).
+**One-click sync** — full spec. Implementation lives in Bikeshed > **Sync family**
+as three sections, promoted here one at a time; tick the list below as each lands.
 
-A standing policy, not a per-action choice, so it lives in Settings, off by
-default. On, a sync applies without the review screens. Independent of the two
-picker tasks: it touches neither export nor import.
+Goal: feature parity with other password managers' one-click sync. On the
+receiving device, `menu > Sync from vault`, and done.
 
-- [ ] Net: pin the current sync review flow, both platforms
-- [ ] Settings model + persistence
-- [ ] Wire into the sync flow
-- [ ] l10n: all ARBs; a11y: semantics + screen-reader tests
-- [ ] Docs
-- [ ] Hardware: one pass per platform
+**Requirements, every item, from the first test on.** Works on Linux and
+Android (SAF paths differ, behaviour must not). Every new string ships in all
+37 locales; every new control ships with a semantics label and a
+screen-reader test (ADR-015) and holds up at the large-text ceilings (ADR-016).
+None of this is a follow-up.
+
+**S1. Sync and import are distinct operations and stay so.**
+Sync = UUID merge of the *same* vault from another device: same format, same
+entry types, entries carry identity. Import = additive load of foreign data
+(other password managers, or a *different* Gabbro vault): radically different,
+unpredictable, nothing to match on.
+
+**S2. Labels.** `menu > Sync from file` becomes **Sync from vault** (two
+`.gabbro` files are synced). The import screen's Gabbro button becomes
+**Import** (says where the user is, and that it is a different operation).
+
+**S3. Import, all 6 types, Gabbro included: additive, no dedupe.** Every source
+entry is added, duplicates included. A change from today's content-hash skip:
+the skipped-entries dialog and the `skipped` result go. Import is a
+once-at-onboarding act into an empty vault; beyond that it is the user's
+responsibility. Dedupe, if ever, is a separate task.
+
+**S4. Routes for a `.gabbro` file.** Same vault: `menu > Sync from vault`.
+Different Gabbro vault: `menu > Import entries > Gabbro vault > Import`
+(passphrase, plus PIN + tap if the source is keyed).
+
+**S5. Sync settings, a new menu entry**, holding:
+- **Auto-merge** toggle, off by default. On: the sync applies as *Merge
+  automatically* does today, without the chooser or the review. The toggle's
+  description carries the same-passphrase warning (S7), since the chooser
+  that shows it is skipped.
+- **Sync folder** (where the other device's export lands) + **Remember**
+  checkbox.
+- The export and import folders, read-only, with a note that they are changed
+  on `menu > Export` / `menu > Import entries`. One place to see every folder;
+  one place each to change it.
+
+**S6. Sync from vault, the flow.**
+1. Sync folder set: no picker. The source is the file in that folder with
+   this vault's own file name (same vault = same name, same passphrase, a
+   different hash). No folder set, or Remember unticked: picker, as today.
+2. Source keyed: PIN + tap of the *source's* YubiKey, which may differ from
+   the receiving vault's, if it has one. Passphrase-only source: no prompt.
+3. Auto-merge off: the chooser as today (*Merge automatically* / *Review all
+   changes* / Cancel). Auto-merge on: straight to the automatic merge.
+4. The held passphrase is tried first, silently, either way.
+
+**S7. Passphrase fallback stays, auto-merge on or off.** If the held passphrase
+does not open the source, ask for one and continue with the choice already
+made. Same passphrase does not prove same vault; a same vault may carry a
+rotated passphrase. Import is not a substitute (S3 would duplicate every
+entry). A passphrase-only source keeps today's chooser warning: *Same
+passphrase does not prove same vault.*
+
+**S8. Unchanged, pinned by the net before any change:** the chooser, both its
+paths (automatic; one-by-one review with keep/pick/drop, Merge the rest,
+Cancel-rolls-back), the merge engine, the keyed-source flow, the fallback,
+and import parsing/counts/keyed source for all 6 types.
+
+**S9. Export and import folders** live on their own screens behind a
+**Remember** checkbox (not "Lock": the app already uses *lock* for the vault).
+Android export already remembers silently; that mechanism is reused, its box
+arrives ticked. Export and import may point at the same folder: that is the
+sync case, where the file one device writes is the file the other reads.
+
+Progress (tick as each Bikeshed section lands):
+- [ ] Net (S8), both platforms
+- [ ] Labels (S2)
+- [ ] Import additive, no dedupe (S3)
+- [ ] Sync settings screen: auto-merge + sync folder + Remember (S5, S6.1)
+- [ ] Sync from vault by name match, picker fallback, auto-merge wiring (S6, S7)
+- [ ] Import screen: one picker (Bikeshed step 2)
+- [ ] Remember folders on export/import + read-only view in Sync settings (S9, S5)
+- [ ] Docs: README, VAULT_SYNC.md, CHANGELOG
+- [ ] Hardware: one pass per platform per section
 
 ---
 
@@ -179,13 +247,27 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 ### Features and UI/UX
 #### Sync family — do in this order
 
-Goal: one-click sync in vault_B receiving an export from vault_A.
+Spec: Current Focus > **One-click sync** (S1–S9). Promote one section at a
+time; each ends with a hardware pass per platform and its ticks in the spec.
 
-**Standing constraints, all three steps.** Every setting works on Linux and
-Android (SAF paths differ, behaviour must not). New strings ship in all locales;
-new controls ship with semantics labels — neither is a follow-up.
-
-**Step 1 — auto-merge setting.** In Current Focus.
+**Step 1 — one-click sync (S2, S3, S5, S6, S7).**
+- Net first (S8): `test/vault_list_sync_test.dart`, `test/import_screen_test.dart`,
+  Rust import tests. Pin the chooser, both paths, fallback, keyed flow; pin
+  import parsing/counts for all 6 types.
+- Labels: rename `syncFromFileTitle` -> Sync from vault, `syncFromVault` ->
+  Import, all 37 ARBs.
+- Import additive: red-first in `rust/src/api/import.rs` (drop the content-hash
+  skip in `merge_source_into_session` and the 5 other importers); delete
+  `SkippedEntryData`, `import_skipped_dialog.dart`, their tests.
+- Settings: `auto_merge_sync` (bool, false), `sync_folder` (string, empty),
+  `#[serde(default)]`-equivalent: absent key = default. Linux path; Android
+  SAF tree URI, same mechanism as `android_export_folder_uri`.
+- Sync settings screen: `SwitchListTile` + folder field + Remember; semantics
+  labels; screen-reader + large-text tests; all ARBs.
+- `_syncFromFile` in `vault_list_screen.dart` (one code path, both layouts):
+  folder set -> resolve `<sync folder>/<this vault's file name>`, missing file
+  -> error, no picker; setting on -> `fast = true`, skip `SyncMethodDialog`.
+- Hardware: one pass Linux, one pass Android.
 
 **Step 2 — import screen: one picker, not six.** Today six stacked sections each
 carry their own path field; the user needs one. Replace with a single path
@@ -196,21 +278,13 @@ size-limit note. Changing the type clears the path: extensions differ
 (`.gabbro`/`.csv`/`.json`), so a stale path would arm the button on a file that
 cannot parse. Gabbro selected also reveals the passphrase field and, for a
 key-protected source, the PIN + Android transport sub-form. Action button label
-follows the type: *Sync from vault* / *Next: map columns* / *Import*.
+follows the type: *Import* / *Next: map columns* / *Import*.
 A rewrite of a 1000-line screen with six independent error/loading/format-check
 flows.
 
-**Step 3 — remember folders.** Four remembered folders: export and import, on
-Linux and on Android. Every one is user-selected; none ships with a built-in
-value. Export and import may point at the same folder — that is the sync case,
-where the file one device writes is the file the other reads.
-
-The folder lives on the export and import screens, not in Settings, behind a
-**Remember** checkbox (not "Lock" — the app already uses *lock* for the vault).
-Android export already remembers silently, so its box arrives ticked; reuse that
-mechanism rather than adding a second one. "Sync from file" on the vault list is
-unchanged: it is a menu action with no screen to host a checkbox, and the import
-screen's Gabbro route already covers the receiving side of a sync.
+**Step 3 — remember folders (S9) + read-only view (S5).** Export and import
+folders, Linux and Android, user-selected, no built-in value. Reuse the Android
+export mechanism. Then add both to Sync settings read-only with the note.
 
 **Why step 2 before step 3:** the import screen has 3 PathField code sites
 (`_gabbroSection`, `_csvSection`, the shared `_importSection`) rendered six
