@@ -226,25 +226,39 @@ sync case, where the file one device writes is the file the other reads.
 and the chooser what a merge does. Existing text is checked against S1-S9;
 whatever is missing or wrong is fixed in the same section that changes it.
 
-**In progress: Step 1** (promoted from Bikeshed 2026-08-25).
+**Handover 2026-08-25 (session stopped here; read before anything).**
+Branch `streamline_sync_process` off master `263252fd`, 19 commits, NOT pushed,
+tree clean. `.scratchpad` holds the finished pass 2a; replace it. The full gate
+has not run on the branch (Rust subset
+`api::import vault::entry vault::session::tests` 91 green; `flutter test` 2867
+green; Android unit 180 green). No dependency changed: no `--warm` needed.
 
-- Net first (S8): `test/vault_list_sync_test.dart`, `test/import_screen_test.dart`,
-  Rust import tests. Pin the chooser, both paths, fallback, keyed flow; pin
-  import parsing/counts for all 6 types.
-- Labels: rename `syncFromFileTitle` -> Sync from vault, `syncFromVault` ->
-  Import, all 37 ARBs.
-- Import additive: red-first in `rust/src/api/import.rs` (drop the content-hash
-  skip in `merge_source_into_session` and the 5 other importers); delete
-  `SkippedEntryData`, `import_skipped_dialog.dart`, their tests.
-- Settings: `auto_merge_sync` (bool, false), `sync_folder` (string, empty),
-  `#[serde(default)]`-equivalent: absent key = default. Linux path; Android
-  SAF tree URI, same mechanism as `android_export_folder_uri`.
-- Sync settings screen: `SwitchListTile` + folder field + Remember; semantics
-  labels; screen-reader + large-text tests; all ARBs.
-- `_syncFromFile` in `vault_list_screen.dart` (one code path, both layouts):
-  folder set -> resolve `<sync folder>/<alias>.gabbro` (export name), missing file
-  -> error, no picker; setting on -> `fast = true`, skip `SyncMethodDialog`.
-- Hardware: one pass Linux, one pass Android.
+Step 1 code is complete: net (S8), labels (S2), import additive (S3, Rust
+`import.rs` + Dart, skipped dialog gone, `content_hash` gone), Sync settings
+screen + `auto_merge_sync`/`sync_folder` (S5), Linux portal folder picker,
+Android SAF tree read (`read_tree_file`, `saf_tree.dart`), Sync from vault by
+export name `<alias>.gabbro` with auto-merge skipping the chooser (S6, S7),
+on-screen texts (S10), plus two finds fixed on hardware: the folder picker
+must go through `runPicker` (portal refuses a non-dumpable process), and
+the edge-to-edge insets below.
+
+Hardware so far: Linux passes 1a-1e all green (passphrase one-click, keyed
+source made with two USB keys swapped on one port, keyed one-click with PIN +
+tap). Android S23 pass 2a green (SAF folder, `read_tree_file`, 13 added) but
+found the inset regression; the fix is NOT yet device-verified.
+
+Next, in order (write ONE pass at a time into `.scratchpad`, one action per
+row, rebuild first: `(cd android && ./gradlew --stop) && flutter build apk
+--split-per-abi --release`):
+1. S23, 3-button nav: fresh install, pass 2a again; row 10 must show the
+   snackbar and the last entry above the buttons.
+2. S23, gesture nav (Settings > Display > Navigation bar): same pass.
+3. S23 pass 2b: missing file (`adb shell mv`), untick Remember -> picker.
+4. Linux pass 1c again to re-make `keyed.gabbro` (do NOT clean up), `adb push`
+   it, S23 pass 2c: receiving vault `keyed`, NFC only, both keys.
+5. Lenovo tablet (TB373FU): inset pass, portrait then landscape.
+6. Full gate `./gabbro_test`; then docs (README check, VAULT_SYNC done), merge.
+Then Bikeshed steps 2 and 3.
 
 **In progress: edge-to-edge insets** (found by the Android pass 2a, 2026-08-25;
 latent on master, exposed by targetSdk 36 = Flutter 3.47.x default, enforced on
@@ -294,7 +308,7 @@ Progress (tick as each Bikeshed section lands):
 - [ ] Remember folders on export/import + read-only view in Sync settings (S9, S5)
 - [x] On-screen explanations checked against S1-S9 (S10)
 - [ ] Docs: README, VAULT_SYNC.md, CHANGELOG
-- [ ] Hardware: one pass per platform per section (step 1: Linux green 2026-08-25; Android 2a green except the inset regression above; 2b missing-file, 2c keyed NFC pending)
+- [ ] Hardware: Linux green (1a-1e); Android 2a green, inset fix unverified; 2b, 2c, tablet pending (see Handover)
 
 ---
 
