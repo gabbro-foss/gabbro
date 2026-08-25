@@ -5,6 +5,7 @@ import 'package:gabbro/folder_label.dart';
 import 'package:gabbro/gabbro_file_picker.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/saf_tree.dart';
+import 'package:gabbro/screens/export_screen.dart' show exportVaultFileName;
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
 
@@ -28,6 +29,10 @@ class SyncSettingsScreen extends StatefulWidget {
   /// cancel. Seam for tests.
   final Future<String?> Function() onPickFolder;
 
+  /// This vault's alias: the sync folder text names the file it expects,
+  /// `<alias>.gabbro`, the name the other device's export carries.
+  final String? vaultAlias;
+
   /// Injected for testing; production code uses [Platform.isAndroid].
   final bool isAndroid;
 
@@ -36,6 +41,7 @@ class SyncSettingsScreen extends StatefulWidget {
     required this.settings,
     required this.onUpdate,
     this.onPickFolder = _defaultPickFolder,
+    this.vaultAlias,
     bool? isAndroid,
   }) : isAndroid = isAndroid ?? Platform.isAndroid;
 
@@ -111,7 +117,10 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
               // ── Sync folder ───────────────────────────────────────────
               SectionHeader(label: l.sectionSyncFolder),
               const SizedBox(height: 4),
-              Text(l.syncFolderDescription, style: small),
+              Text(
+                l.syncFolderDescription(exportVaultFileName(widget.vaultAlias)),
+                style: small,
+              ),
               const SizedBox(height: 8),
               Text(
                 _remembered

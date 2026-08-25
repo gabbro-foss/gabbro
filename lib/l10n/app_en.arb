@@ -155,7 +155,12 @@
   "autoMergeDescription": "Sync from vault applies the other device's changes straight away, with no chooser and no review. Where the two differ, the other device's value wins.",
   "autoMergeNote": "The file is still asked for if it does not open with your passphrase.",
   "sectionSyncFolder": "Sync folder",
-  "syncFolderDescription": "Where the other device's export lands. Sync from vault opens the file there that carries this vault's name, without asking for it.",
+  "syncFolderDescription": "Where the other device's export lands. Sync from vault opens the file there called {name}, the name this vault exports as, without asking for it.",
+  "@syncFolderDescription": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "syncFolderNotSet": "Not set: Sync from vault asks for the file each time.",
   "syncFolderFileMissing": "No file named {name} in the sync folder.",
   "@syncFolderFileMissing": {

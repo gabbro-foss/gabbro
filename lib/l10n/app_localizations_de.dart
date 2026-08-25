@@ -263,8 +263,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get sectionSyncFolder => 'Sync-Ordner';
 
   @override
-  String get syncFolderDescription =>
-      'Wohin der Export des anderen Geräts gelangt. Aus Tresor synchronisieren öffnet dort die Datei mit dem Namen dieses Tresors, ohne nachzufragen.';
+  String syncFolderDescription(String name) {
+    return 'Wohin der Export des anderen Geräts gelangt. Aus Tresor synchronisieren öffnet dort die Datei $name, den Namen, unter dem dieser Tresor exportiert wird, ohne nachzufragen.';
+  }
 
   @override
   String get syncFolderNotSet =>

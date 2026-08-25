@@ -262,8 +262,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get sectionSyncFolder => 'Sinhronizācijas mape';
 
   @override
-  String get syncFolderDescription =>
-      'Kur nonāk otras ierīces eksports. Sinhronizēt no glabātavas tur atver failu ar šīs glabātavas nosaukumu, neprasot.';
+  String syncFolderDescription(String name) {
+    return 'Kur nonāk otras ierīces eksports. Sinhronizēt no glabātavas tur atver failu $name, nosaukumu, ar kādu šī glabātava tiek eksportēta, neprasot.';
+  }
 
   @override
   String get syncFolderNotSet =>

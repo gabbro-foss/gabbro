@@ -59,7 +59,8 @@ Widget _buildScreen({
   Future<String?> Function(String folder, String name)? onResolveSyncSource,
 }) => testApp(
   VaultListScreen(
-    vaultPath: '/tmp/test.gabbro',
+    vaultPath: '/tmp/example_gabbro.gabbro',
+    vaultAlias: 'example',
     listEntries: () => [],
     yubikeyRecords: [],
     onPickSyncFile: onPickSyncFile ?? () async => pickedPath,
@@ -1840,7 +1841,7 @@ void main() {
           onResolveSyncSource: (folder, name) async {
             resolvedFolder = folder;
             resolvedName = name;
-            return '/tmp/GabbroSync/test.gabbro';
+            return '/tmp/GabbroSync/example.gabbro';
           },
           mergeVault: (path, _) async {
             merged = path;
@@ -1857,8 +1858,8 @@ void main() {
 
       expect(pickerCalls, 0, reason: 'the folder replaces the picker');
       expect(resolvedFolder, '/tmp/GabbroSync');
-      expect(resolvedName, 'test.gabbro', reason: 'this vault\'s own file name');
-      expect(merged, '/tmp/GabbroSync/test.gabbro');
+      expect(resolvedName, 'example.gabbro', reason: 'the name this vault exports as');
+      expect(merged, '/tmp/GabbroSync/example.gabbro');
     });
 
     testWidgets('no file of this vault\'s name in the folder: error, no merge', (
@@ -1884,7 +1885,7 @@ void main() {
       await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
-      expect(find.text('No file named test.gabbro in the sync folder.'), findsOneWidget);
+      expect(find.text('No file named example.gabbro in the sync folder.'), findsOneWidget);
       expect(find.text('How should this sync apply?'), findsNothing);
       expect(mergeCalls, 0);
       expect(pickerCalls, 0, reason: 'a missing file is not a reason to pick');
@@ -1952,7 +1953,7 @@ void main() {
         _buildScreen(
           syncFolder: '/tmp/GabbroSync',
           autoMergeSync: true,
-          onResolveSyncSource: (_, _) async => '/tmp/GabbroSync/test.gabbro',
+          onResolveSyncSource: (_, _) async => '/tmp/GabbroSync/example.gabbro',
           mergeVault: (_, _) async => throw StateError('no review merge'),
           fastMergeVaultHeld: (_) async {
             heldCalled = true;
@@ -1976,7 +1977,7 @@ void main() {
         _buildScreen(
           syncFolder: '/tmp/GabbroSync',
           autoMergeSync: false,
-          onResolveSyncSource: (_, _) async => '/tmp/GabbroSync/test.gabbro',
+          onResolveSyncSource: (_, _) async => '/tmp/GabbroSync/example.gabbro',
           mergeVault: (_, _) async => _summary(),
         ),
       );

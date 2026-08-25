@@ -262,8 +262,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get sectionSyncFolder => 'Carpeta de sincronización';
 
   @override
-  String get syncFolderDescription =>
-      'Donde llega la exportación del otro dispositivo. Sincronizar desde bóveda abre allí el archivo con el nombre de esta bóveda sin preguntar.';
+  String syncFolderDescription(String name) {
+    return 'Donde llega la exportación del otro dispositivo. Sincronizar desde bóveda abre allí el archivo $name, el nombre con el que se exporta esta bóveda, sin preguntar.';
+  }
 
   @override
   String get syncFolderNotSet =>

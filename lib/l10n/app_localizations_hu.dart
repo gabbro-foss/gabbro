@@ -262,8 +262,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get sectionSyncFolder => 'Szinkronizálási mappa';
 
   @override
-  String get syncFolderDescription =>
-      'Ahová a másik eszköz exportja érkezik. A Szinkronizálás széfből ott nyitja meg az e széf nevét viselő fájlt, kérdés nélkül.';
+  String syncFolderDescription(String name) {
+    return 'Ahová a másik eszköz exportja érkezik. A Szinkronizálás széfből ott nyitja meg a $name fájlt, az e széf exportálásakor használt nevet, kérdés nélkül.';
+  }
 
   @override
   String get syncFolderNotSet =>

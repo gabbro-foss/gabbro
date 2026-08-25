@@ -24,6 +24,12 @@ String sanitiseAlias(String? alias) {
   return sanitised.isEmpty ? 'vault' : sanitised;
 }
 
+/// The name a `.gabbro` export of the vault called [alias] gets (no date):
+/// `<sanitised alias>.gabbro`. Sync from vault looks for exactly this name in
+/// the sync folder, so the two devices agree by construction. It never
+/// collides with the vault on disk, which is `<alias>_gabbro.gabbro`.
+String exportVaultFileName(String? alias) => '${sanitiseAlias(alias)}.gabbro';
+
 String _defaultFilename(String? alias, bool isJson, {bool includeDate = false}) {
   final base = sanitiseAlias(alias);
   if (includeDate) {

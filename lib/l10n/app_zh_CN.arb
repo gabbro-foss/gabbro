@@ -75,7 +75,7 @@
   "autoMergeDescription": "“从保险库同步”会立即应用另一台设备的更改，不再选择，也不再审核。两者不同之处以另一台设备的值为准。",
   "autoMergeNote": "若文件无法用你的口令短语打开，仍会要求你选择文件。",
   "sectionSyncFolder": "同步文件夹",
-  "syncFolderDescription": "另一台设备导出文件所在的位置。“从保险库同步”会直接在那里打开与本保险库同名的文件，不再询问。",
+  "syncFolderDescription": "另一台设备导出文件所在的位置。“从保险库同步”会直接在那里打开名为 {name} 的文件（本保险库的导出名），不再询问。",
   "syncFolderNotSet": "未设置：“从保险库同步”每次都会询问文件。",
   "syncFolderFileMissing": "同步文件夹中没有名为 {name} 的文件。",
   "rememberFolder": "记住",

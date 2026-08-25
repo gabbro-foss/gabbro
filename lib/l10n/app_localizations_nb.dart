@@ -262,8 +262,9 @@ class AppLocalizationsNb extends AppLocalizations {
   String get sectionSyncFolder => 'Synkroniseringsmappe';
 
   @override
-  String get syncFolderDescription =>
-      'Der den andre enhetens eksport havner. Synkroniser fra hvelv åpner filen der med dette hvelvets navn uten å spørre.';
+  String syncFolderDescription(String name) {
+    return 'Der den andre enhetens eksport havner. Synkroniser fra hvelv åpner filen $name der, navnet dette hvelvet eksporteres som, uten å spørre.';
+  }
 
   @override
   String get syncFolderNotSet =>

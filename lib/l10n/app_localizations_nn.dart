@@ -262,8 +262,9 @@ class AppLocalizationsNn extends AppLocalizations {
   String get sectionSyncFolder => 'Synkroniseringsmappe';
 
   @override
-  String get syncFolderDescription =>
-      'Der eksporten frå den andre eininga hamnar. Synkroniser frå kvelv opnar fila der med namnet på dette kvelvet utan å spørje.';
+  String syncFolderDescription(String name) {
+    return 'Der eksporten frå den andre eininga hamnar. Synkroniser frå kvelv opnar fila $name der, namnet dette kvelvet vert eksportert som, utan å spørje.';
+  }
 
   @override
   String get syncFolderNotSet =>

@@ -75,7 +75,7 @@
   "autoMergeDescription": "Sincronizar do cofre aplica de imediato as alterações do outro dispositivo, sem escolha nem revisão. Onde diferem, vale o valor do outro dispositivo.",
   "autoMergeNote": "O ficheiro é pedido na mesma se não abrir com a sua frase-passe.",
   "sectionSyncFolder": "Pasta de sincronização",
-  "syncFolderDescription": "Onde chega a exportação do outro dispositivo. Sincronizar do cofre abre aí o ficheiro com o nome deste cofre, sem perguntar.",
+  "syncFolderDescription": "Onde chega a exportação do outro dispositivo. Sincronizar do cofre abre aí o ficheiro {name}, o nome com que este cofre é exportado, sem perguntar.",
   "syncFolderNotSet": "Não definida: Sincronizar do cofre pede o ficheiro de cada vez.",
   "syncFolderFileMissing": "Nenhum ficheiro chamado {name} na pasta de sincronização.",
   "rememberFolder": "Lembrar",

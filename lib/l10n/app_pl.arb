@@ -75,7 +75,7 @@
   "autoMergeDescription": "Synchronizuj z sejfu od razu stosuje zmiany z drugiego urządzenia, bez wyboru i bez przeglądu. Tam, gdzie się różnią, wygrywa wartość z drugiego urządzenia.",
   "autoMergeNote": "O plik i tak zostaniesz zapytany, jeśli nie otworzy się twoim hasłem.",
   "sectionSyncFolder": "Folder synchronizacji",
-  "syncFolderDescription": "Gdzie trafia eksport z drugiego urządzenia. Synchronizuj z sejfu otwiera tam plik o nazwie tego sejfu bez pytania.",
+  "syncFolderDescription": "Gdzie trafia eksport z drugiego urządzenia. Synchronizuj z sejfu otwiera tam plik {name}, nazwę, pod jaką ten sejf jest eksportowany, bez pytania.",
   "syncFolderNotSet": "Nie ustawiono: Synchronizuj z sejfu pyta o plik za każdym razem.",
   "syncFolderFileMissing": "Brak pliku o nazwie {name} w folderze synchronizacji.",
   "rememberFolder": "Zapamiętaj",

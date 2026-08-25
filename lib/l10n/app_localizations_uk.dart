@@ -262,8 +262,9 @@ class AppLocalizationsUk extends AppLocalizations {
   String get sectionSyncFolder => 'Тека синхронізації';
 
   @override
-  String get syncFolderDescription =>
-      'Куди потрапляє експорт іншого пристрою. Синхронізувати зі сховища відкриває там файл з іменем цього сховища, не питаючи.';
+  String syncFolderDescription(String name) {
+    return 'Куди потрапляє експорт іншого пристрою. Синхронізувати зі сховища відкриває там файл $name, ім\'я, під яким експортується це сховище, не питаючи.';
+  }
 
   @override
   String get syncFolderNotSet =>

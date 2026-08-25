@@ -75,7 +75,7 @@
   "autoMergeDescription": "Sincronizar desde bóveda aplica los cambios del otro dispositivo de inmediato, sin elección ni revisión. Donde difieren, gana el valor del otro dispositivo.",
   "autoMergeNote": "Aun así se pedirá el archivo si no se abre con tu frase de contraseña.",
   "sectionSyncFolder": "Carpeta de sincronización",
-  "syncFolderDescription": "Donde llega la exportación del otro dispositivo. Sincronizar desde bóveda abre allí el archivo con el nombre de esta bóveda sin preguntar.",
+  "syncFolderDescription": "Donde llega la exportación del otro dispositivo. Sincronizar desde bóveda abre allí el archivo {name}, el nombre con el que se exporta esta bóveda, sin preguntar.",
   "syncFolderNotSet": "Sin definir: Sincronizar desde bóveda pide el archivo cada vez.",
   "syncFolderFileMissing": "No hay ningún archivo llamado {name} en la carpeta de sincronización.",
   "rememberFolder": "Recordar",

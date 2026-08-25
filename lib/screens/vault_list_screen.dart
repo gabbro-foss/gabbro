@@ -1249,7 +1249,9 @@ class _VaultListScreenState extends State<VaultListScreen>
     final autoMerge = widget.autoMergeSync ?? settings?.autoMergeSync ?? false;
     final String? picked;
     if (syncFolder.isNotEmpty) {
-      final name = File(widget.vaultPath).uri.pathSegments.last;
+      // The other device's export name, never the on-disk name
+      // (`<alias>_gabbro.gabbro`), which sync must never collide with.
+      final name = exportVaultFileName(_currentAlias(context));
       picked = await widget.onResolveSyncSource(syncFolder, name);
       if (!mounted) return;
       if (picked == null) {
@@ -1681,6 +1683,7 @@ class _VaultListScreenState extends State<VaultListScreen>
             builder: (context) => SyncSettingsScreen(
               settings: syncAppState.settings,
               onUpdate: (updated) => syncAppState.updateSettings(updated),
+              vaultAlias: _currentAlias(context),
             ),
           ),
         );

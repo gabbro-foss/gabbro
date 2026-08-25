@@ -262,8 +262,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get sectionSyncFolder => 'Dossier de synchronisation';
 
   @override
-  String get syncFolderDescription =>
-      'Là où arrive l\'export de l\'autre appareil. Synchroniser depuis le coffre y ouvre le fichier portant le nom de ce coffre, sans rien demander.';
+  String syncFolderDescription(String name) {
+    return 'Là où arrive l\'export de l\'autre appareil. Synchroniser depuis le coffre y ouvre le fichier $name, le nom sous lequel ce coffre s\'exporte, sans rien demander.';
+  }
 
   @override
   String get syncFolderNotSet =>

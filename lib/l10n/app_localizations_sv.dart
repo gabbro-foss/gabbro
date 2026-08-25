@@ -262,8 +262,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get sectionSyncFolder => 'Synkroniseringsmapp';
 
   @override
-  String get syncFolderDescription =>
-      'Dit den andra enhetens export hamnar. Synkronisera från valv öppnar filen där med det här valvets namn utan att fråga.';
+  String syncFolderDescription(String name) {
+    return 'Dit den andra enhetens export hamnar. Synkronisera från valv öppnar filen $name där, namnet det här valvet exporteras som, utan att fråga.';
+  }
 
   @override
   String get syncFolderNotSet =>

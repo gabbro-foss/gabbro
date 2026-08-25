@@ -262,8 +262,9 @@ class AppLocalizationsLt extends AppLocalizations {
   String get sectionSyncFolder => 'Sinchronizavimo aplankas';
 
   @override
-  String get syncFolderDescription =>
-      'Kur patenka kito įrenginio eksportas. Sinchronizuoti iš saugyklos ten atveria šios saugyklos vardu pavadintą failą neklausdamas.';
+  String syncFolderDescription(String name) {
+    return 'Kur patenka kito įrenginio eksportas. Sinchronizuoti iš saugyklos ten atveria failą $name, pavadinimą, kuriuo ši saugykla eksportuojama, neklausdamas.';
+  }
 
   @override
   String get syncFolderNotSet =>

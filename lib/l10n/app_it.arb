@@ -75,7 +75,7 @@
   "autoMergeDescription": "Sincronizza da cassaforte applica subito le modifiche dell'altro dispositivo, senza scelta né revisione. Dove differiscono, vince il valore dell'altro dispositivo.",
   "autoMergeNote": "Il file viene comunque richiesto se non si apre con la tua passphrase.",
   "sectionSyncFolder": "Cartella di sincronizzazione",
-  "syncFolderDescription": "Dove arriva l'esportazione dell'altro dispositivo. Sincronizza da cassaforte apre lì il file con il nome di questa cassaforte, senza chiedere.",
+  "syncFolderDescription": "Dove arriva l'esportazione dell'altro dispositivo. Sincronizza da cassaforte apre lì il file {name}, il nome con cui questa cassaforte viene esportata, senza chiedere.",
   "syncFolderNotSet": "Non impostata: Sincronizza da cassaforte chiede il file ogni volta.",
   "syncFolderFileMissing": "Nessun file di nome {name} nella cartella di sincronizzazione.",
   "rememberFolder": "Ricorda",

@@ -75,7 +75,7 @@
   "autoMergeDescription": "Synchroniseren vanuit kluis past de wijzigingen van het andere apparaat meteen toe, zonder keuze en zonder controle. Waar ze verschillen, wint de waarde van het andere apparaat.",
   "autoMergeNote": "Er wordt alsnog om het bestand gevraagd als het niet opent met uw wachtwoordzin.",
   "sectionSyncFolder": "Synchronisatiemap",
-  "syncFolderDescription": "Waar de export van het andere apparaat terechtkomt. Synchroniseren vanuit kluis opent daar het bestand met de naam van deze kluis, zonder te vragen.",
+  "syncFolderDescription": "Waar de export van het andere apparaat terechtkomt. Synchroniseren vanuit kluis opent daar het bestand {name}, de naam waaronder deze kluis exporteert, zonder te vragen.",
   "syncFolderNotSet": "Niet ingesteld: Synchroniseren vanuit kluis vraagt elke keer om het bestand.",
   "syncFolderFileMissing": "Geen bestand met de naam {name} in de synchronisatiemap.",
   "rememberFolder": "Onthouden",

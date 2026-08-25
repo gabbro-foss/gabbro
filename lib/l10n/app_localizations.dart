@@ -640,8 +640,8 @@ abstract class AppLocalizations {
   /// No description provided for @syncFolderDescription.
   ///
   /// In en, this message translates to:
-  /// **'Where the other device\'s export lands. Sync from vault opens the file there that carries this vault\'s name, without asking for it.'**
-  String get syncFolderDescription;
+  /// **'Where the other device\'s export lands. Sync from vault opens the file there called {name}, the name this vault exports as, without asking for it.'**
+  String syncFolderDescription(String name);
 
   /// No description provided for @syncFolderNotSet.
   ///

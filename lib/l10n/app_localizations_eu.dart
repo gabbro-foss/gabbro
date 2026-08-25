@@ -262,8 +262,9 @@ class AppLocalizationsEu extends AppLocalizations {
   String get sectionSyncFolder => 'Sinkronizazio-karpeta';
 
   @override
-  String get syncFolderDescription =>
-      'Beste gailuaren esportazioa non iristen den. Kutxatik sinkronizatzeak hor irekitzen du kutxa honen izena duen fitxategia, galdetu gabe.';
+  String syncFolderDescription(String name) {
+    return 'Beste gailuaren esportazioa non iristen den. Kutxatik sinkronizatzeak hor irekitzen du $name fitxategia, kutxa hau esportatzean duen izena, galdetu gabe.';
+  }
 
   @override
   String get syncFolderNotSet =>

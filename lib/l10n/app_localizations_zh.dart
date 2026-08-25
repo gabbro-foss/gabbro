@@ -254,8 +254,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sectionSyncFolder => '同步文件夹';
 
   @override
-  String get syncFolderDescription =>
-      '另一台设备导出文件所在的位置。“从保险库同步”会直接在那里打开与本保险库同名的文件，不再询问。';
+  String syncFolderDescription(String name) {
+    return '另一台设备导出文件所在的位置。“从保险库同步”会直接在那里打开名为 $name 的文件（本保险库的导出名），不再询问。';
+  }
 
   @override
   String get syncFolderNotSet => '未设置：“从保险库同步”每次都会询问文件。';
@@ -2432,8 +2433,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sectionSyncFolder => '同步文件夹';
 
   @override
-  String get syncFolderDescription =>
-      '另一台设备导出文件所在的位置。“从保险库同步”会直接在那里打开与本保险库同名的文件，不再询问。';
+  String syncFolderDescription(String name) {
+    return '另一台设备导出文件所在的位置。“从保险库同步”会直接在那里打开名为 $name 的文件（本保险库的导出名），不再询问。';
+  }
 
   @override
   String get syncFolderNotSet => '未设置：“从保险库同步”每次都会询问文件。';
@@ -4610,8 +4612,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get sectionSyncFolder => '同步資料夾';
 
   @override
-  String get syncFolderDescription =>
-      '另一部裝置匯出檔案所在的位置。「從保險庫同步」會直接在那裡開啟與本保險庫同名的檔案，不再詢問。';
+  String syncFolderDescription(String name) {
+    return '另一部裝置匯出檔案所在的位置。「從保險庫同步」會直接在那裡開啟名為 $name 的檔案（本保險庫的匯出名稱），不再詢問。';
+  }
 
   @override
   String get syncFolderNotSet => '未設定：「從保險庫同步」每次都會詢問檔案。';

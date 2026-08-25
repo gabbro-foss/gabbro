@@ -262,8 +262,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get sectionSyncFolder => 'Папка синхронизации';
 
   @override
-  String get syncFolderDescription =>
-      'Куда попадает экспорт другого устройства. Синхронизировать из хранилища открывает там файл с именем этого хранилища, не спрашивая.';
+  String syncFolderDescription(String name) {
+    return 'Куда попадает экспорт другого устройства. Синхронизировать из хранилища открывает там файл $name, имя, под которым экспортируется это хранилище, не спрашивая.';
+  }
 
   @override
   String get syncFolderNotSet =>

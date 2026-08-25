@@ -262,8 +262,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get sectionSyncFolder => 'Sünkroonimiskaust';
 
   @override
-  String get syncFolderDescription =>
-      'Kuhu teise seadme eksport jõuab. Hoidlast sünkroonimine avab sealt selle hoidla nimega faili küsimata.';
+  String syncFolderDescription(String name) {
+    return 'Kuhu teise seadme eksport jõuab. Hoidlast sünkroonimine avab sealt faili $name, nime, millega see hoidla eksporditakse, küsimata.';
+  }
 
   @override
   String get syncFolderNotSet =>

@@ -75,7 +75,7 @@
   "autoMergeDescription": "Synkroniser frå kvelv tek i bruk endringane frå den andre eininga med ein gong, utan val og utan gjennomgang. Der dei skil seg, vinn verdien frå den andre eininga.",
   "autoMergeNote": "Du vert likevel spurd om fila om ho ikkje opnar med passfrasen din.",
   "sectionSyncFolder": "Synkroniseringsmappe",
-  "syncFolderDescription": "Der eksporten frå den andre eininga hamnar. Synkroniser frå kvelv opnar fila der med namnet på dette kvelvet utan å spørje.",
+  "syncFolderDescription": "Der eksporten frå den andre eininga hamnar. Synkroniser frå kvelv opnar fila {name} der, namnet dette kvelvet vert eksportert som, utan å spørje.",
   "syncFolderNotSet": "Ikkje sett: Synkroniser frå kvelv spør om fila kvar gong.",
   "syncFolderFileMissing": "Inga fil med namnet {name} i synkroniseringsmappa.",
   "rememberFolder": "Hugs",

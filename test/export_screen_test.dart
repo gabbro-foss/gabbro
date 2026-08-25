@@ -53,6 +53,14 @@ Widget _androidGabbroScreen(
 void main() {
   // ── sanitiseAlias unit tests ──────────────────────────────────────────────
 
+  group('exportVaultFileName', () {
+    test('is the sanitised alias plus .gabbro, never the on-disk name', () {
+      expect(exportVaultFileName('example'), 'example.gabbro');
+      expect(exportVaultFileName('My Vault!'), 'My_Vault.gabbro');
+      expect(exportVaultFileName(null), 'vault.gabbro');
+    });
+  });
+
   group('sanitiseAlias', () {
     test('replaces spaces with underscores', () {
       expect(sanitiseAlias('My Work'), 'My_Work');

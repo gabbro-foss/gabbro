@@ -262,8 +262,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get sectionSyncFolder => 'Synchronisatiemap';
 
   @override
-  String get syncFolderDescription =>
-      'Waar de export van het andere apparaat terechtkomt. Synchroniseren vanuit kluis opent daar het bestand met de naam van deze kluis, zonder te vragen.';
+  String syncFolderDescription(String name) {
+    return 'Waar de export van het andere apparaat terechtkomt. Synchroniseren vanuit kluis opent daar het bestand $name, de naam waaronder deze kluis exporteert, zonder te vragen.';
+  }
 
   @override
   String get syncFolderNotSet =>

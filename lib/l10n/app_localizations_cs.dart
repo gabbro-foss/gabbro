@@ -262,8 +262,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get sectionSyncFolder => 'Složka synchronizace';
 
   @override
-  String get syncFolderDescription =>
-      'Kam přichází export z druhého zařízení. Synchronizace z trezoru tam otevře soubor se jménem tohoto trezoru, aniž by se ptala.';
+  String syncFolderDescription(String name) {
+    return 'Kam přichází export z druhého zařízení. Synchronizace z trezoru tam otevře soubor $name, název, pod kterým se tento trezor exportuje, aniž by se ptala.';
+  }
 
   @override
   String get syncFolderNotSet =>

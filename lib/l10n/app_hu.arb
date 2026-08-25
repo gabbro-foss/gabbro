@@ -75,7 +75,7 @@
   "autoMergeDescription": "A Szinkronizálás széfből azonnal alkalmazza a másik eszköz változásait, választás és átnézés nélkül. Eltérésnél a másik eszköz értéke nyer.",
   "autoMergeNote": "A fájlt akkor is kéri, ha nem nyílik meg a jelmondatával.",
   "sectionSyncFolder": "Szinkronizálási mappa",
-  "syncFolderDescription": "Ahová a másik eszköz exportja érkezik. A Szinkronizálás széfből ott nyitja meg az e széf nevét viselő fájlt, kérdés nélkül.",
+  "syncFolderDescription": "Ahová a másik eszköz exportja érkezik. A Szinkronizálás széfből ott nyitja meg a {name} fájlt, az e széf exportálásakor használt nevet, kérdés nélkül.",
   "syncFolderNotSet": "Nincs beállítva: a Szinkronizálás széfből minden alkalommal kéri a fájlt.",
   "syncFolderFileMissing": "Nincs {name} nevű fájl a szinkronizálási mappában.",
   "rememberFolder": "Megjegyzés",

@@ -262,8 +262,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get sectionSyncFolder => 'Folder synchronizacji';
 
   @override
-  String get syncFolderDescription =>
-      'Gdzie trafia eksport z drugiego urządzenia. Synchronizuj z sejfu otwiera tam plik o nazwie tego sejfu bez pytania.';
+  String syncFolderDescription(String name) {
+    return 'Gdzie trafia eksport z drugiego urządzenia. Synchronizuj z sejfu otwiera tam plik $name, nazwę, pod jaką ten sejf jest eksportowany, bez pytania.';
+  }
 
   @override
   String get syncFolderNotSet =>

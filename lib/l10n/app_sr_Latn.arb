@@ -75,7 +75,7 @@
   "autoMergeDescription": "Sinhronizuj iz trezora odmah primenjuje izmene drugog uređaja, bez izbora i bez pregleda. Gde se razlikuju, važi vrednost drugog uređaja.",
   "autoMergeNote": "Datoteka će ipak biti zatražena ako se ne otvori vašom lozinkom.",
   "sectionSyncFolder": "Fascikla za sinhronizaciju",
-  "syncFolderDescription": "Gde stiže izvoz drugog uređaja. Sinhronizuj iz trezora tamo otvara datoteku sa imenom ovog trezora bez pitanja.",
+  "syncFolderDescription": "Gde stiže izvoz drugog uređaja. Sinhronizuj iz trezora tamo otvara datoteku {name}, ime pod kojim se ovaj trezor izvozi, bez pitanja.",
   "syncFolderNotSet": "Nije podešeno: Sinhronizuj iz trezora svaki put traži datoteku.",
   "syncFolderFileMissing": "U fascikli za sinhronizaciju nema datoteke sa imenom {name}.",
   "rememberFolder": "Zapamti",

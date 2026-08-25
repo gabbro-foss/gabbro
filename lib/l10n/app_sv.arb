@@ -75,7 +75,7 @@
   "autoMergeDescription": "Synkronisera från valv tillämpar den andra enhetens ändringar direkt, utan val och utan granskning. Där de skiljer sig vinner den andra enhetens värde.",
   "autoMergeNote": "Du får ändå frågan om filen om den inte öppnas med din lösenfras.",
   "sectionSyncFolder": "Synkroniseringsmapp",
-  "syncFolderDescription": "Dit den andra enhetens export hamnar. Synkronisera från valv öppnar filen där med det här valvets namn utan att fråga.",
+  "syncFolderDescription": "Dit den andra enhetens export hamnar. Synkronisera från valv öppnar filen {name} där, namnet det här valvet exporteras som, utan att fråga.",
   "syncFolderNotSet": "Inte angiven: Synkronisera från valv frågar efter filen varje gång.",
   "syncFolderFileMissing": "Ingen fil med namnet {name} i synkroniseringsmappen.",
   "rememberFolder": "Kom ihåg",

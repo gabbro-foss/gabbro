@@ -262,8 +262,9 @@ class AppLocalizationsYo extends AppLocalizations {
   String get sectionSyncFolder => 'Fódà ìmúṣọ̀kan';
 
   @override
-  String get syncFolderDescription =>
-      'Níbi tí ìgbéjáde ẹ̀rọ kejì ń dé. Ṣọkan láti àpótí á ṣí fáìlì tí ó ní orúkọ àpótí yìí níbẹ̀ láì béèrè.';
+  String syncFolderDescription(String name) {
+    return 'Níbi tí ìgbéjáde ẹ̀rọ kejì ń dé. Ṣọkan láti àpótí á ṣí fáìlì $name níbẹ̀, orúkọ tí a fi ń gbé àpótí yìí jáde, láì béèrè.';
+  }
 
   @override
   String get syncFolderNotSet =>

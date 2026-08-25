@@ -19,6 +19,7 @@ Widget _buildScreen({
     onUpdate: onUpdate ?? (_) {},
     onPickFolder: onPickFolder ?? () async => null,
     isAndroid: isAndroid,
+    vaultAlias: 'example',
   ),
 );
 
@@ -37,6 +38,7 @@ Widget _buildScaled(double scale, {AppSettings settings = const AppSettings()}) 
         onUpdate: (_) {},
         onPickFolder: () async => null,
         isAndroid: false,
+        vaultAlias: 'example',
       ),
     );
 
@@ -80,6 +82,16 @@ void main() {
   });
 
   group('sync folder', () {
+    testWidgets('names the file it expects: the alias as exported', (
+      tester,
+    ) async {
+      // The vault on disk is example_gabbro.gabbro; the export, and so the
+      // file the other device syncs, is example.gabbro. A mismatched alias on
+      // the other device is then visible here.
+      await tester.pumpWidget(_buildScreen());
+      expect(find.textContaining('example.gabbro'), findsOneWidget);
+    });
+
     testWidgets('shows "not set" and Remember unticked when empty', (
       tester,
     ) async {

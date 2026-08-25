@@ -75,7 +75,7 @@
   "autoMergeDescription": "Synkronisér fra boks anvender den anden enheds ændringer med det samme, uden valg og uden gennemsyn. Hvor de afviger, vinder den anden enheds værdi.",
   "autoMergeNote": "Der bliver stadig spurgt om filen, hvis den ikke åbner med din adgangssætning.",
   "sectionSyncFolder": "Synkroniseringsmappe",
-  "syncFolderDescription": "Hvor den anden enheds eksport lander. Synkronisér fra boks åbner filen dér med denne boks' navn uden at spørge.",
+  "syncFolderDescription": "Hvor den anden enheds eksport lander. Synkronisér fra boks åbner filen {name} dér, navnet denne boks eksporteres under, uden at spørge.",
   "syncFolderNotSet": "Ikke angivet: Synkronisér fra boks spørger om filen hver gang.",
   "syncFolderFileMissing": "Ingen fil ved navn {name} i synkroniseringsmappen.",
   "rememberFolder": "Husk",

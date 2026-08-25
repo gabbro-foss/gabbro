@@ -262,8 +262,9 @@ class AppLocalizationsSr extends AppLocalizations {
   String get sectionSyncFolder => 'Фасцикла за синхронизацију';
 
   @override
-  String get syncFolderDescription =>
-      'Где стиже извоз другог уређаја. Синхронизуј из трезора тамо отвара датотеку са именом овог трезора без питања.';
+  String syncFolderDescription(String name) {
+    return 'Где стиже извоз другог уређаја. Синхронизуј из трезора тамо отвара датотеку $name, име под којим се овај трезор извози, без питања.';
+  }
 
   @override
   String get syncFolderNotSet =>
@@ -2536,8 +2537,9 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   String get sectionSyncFolder => 'Fascikla za sinhronizaciju';
 
   @override
-  String get syncFolderDescription =>
-      'Gde stiže izvoz drugog uređaja. Sinhronizuj iz trezora tamo otvara datoteku sa imenom ovog trezora bez pitanja.';
+  String syncFolderDescription(String name) {
+    return 'Gde stiže izvoz drugog uređaja. Sinhronizuj iz trezora tamo otvara datoteku $name, ime pod kojim se ovaj trezor izvozi, bez pitanja.';
+  }
 
   @override
   String get syncFolderNotSet =>

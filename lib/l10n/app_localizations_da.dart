@@ -262,8 +262,9 @@ class AppLocalizationsDa extends AppLocalizations {
   String get sectionSyncFolder => 'Synkroniseringsmappe';
 
   @override
-  String get syncFolderDescription =>
-      'Hvor den anden enheds eksport lander. Synkronisér fra boks åbner filen dér med denne boks\' navn uden at spørge.';
+  String syncFolderDescription(String name) {
+    return 'Hvor den anden enheds eksport lander. Synkronisér fra boks åbner filen $name dér, navnet denne boks eksporteres under, uden at spørge.';
+  }
 
   @override
   String get syncFolderNotSet =>

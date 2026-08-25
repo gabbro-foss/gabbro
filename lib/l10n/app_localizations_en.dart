@@ -261,8 +261,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sectionSyncFolder => 'Sync folder';
 
   @override
-  String get syncFolderDescription =>
-      'Where the other device\'s export lands. Sync from vault opens the file there that carries this vault\'s name, without asking for it.';
+  String syncFolderDescription(String name) {
+    return 'Where the other device\'s export lands. Sync from vault opens the file there called $name, the name this vault exports as, without asking for it.';
+  }
 
   @override
   String get syncFolderNotSet =>

@@ -262,8 +262,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get sectionSyncFolder => 'Pasta de sincronização';
 
   @override
-  String get syncFolderDescription =>
-      'Onde chega a exportação do outro dispositivo. Sincronizar do cofre abre ali o arquivo com o nome deste cofre, sem perguntar.';
+  String syncFolderDescription(String name) {
+    return 'Onde chega a exportação do outro dispositivo. Sincronizar do cofre abre ali o arquivo $name, o nome com que este cofre é exportado, sem perguntar.';
+  }
 
   @override
   String get syncFolderNotSet =>
@@ -2544,8 +2545,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get sectionSyncFolder => 'Pasta de sincronização';
 
   @override
-  String get syncFolderDescription =>
-      'Onde chega a exportação do outro dispositivo. Sincronizar do cofre abre ali o arquivo com o nome deste cofre, sem perguntar.';
+  String syncFolderDescription(String name) {
+    return 'Onde chega a exportação do outro dispositivo. Sincronizar do cofre abre ali o arquivo $name, o nome com que este cofre é exportado, sem perguntar.';
+  }
 
   @override
   String get syncFolderNotSet =>
@@ -4823,8 +4825,9 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   String get sectionSyncFolder => 'Pasta de sincronização';
 
   @override
-  String get syncFolderDescription =>
-      'Onde chega a exportação do outro dispositivo. Sincronizar do cofre abre aí o ficheiro com o nome deste cofre, sem perguntar.';
+  String syncFolderDescription(String name) {
+    return 'Onde chega a exportação do outro dispositivo. Sincronizar do cofre abre aí o ficheiro $name, o nome com que este cofre é exportado, sem perguntar.';
+  }
 
   @override
   String get syncFolderNotSet =>

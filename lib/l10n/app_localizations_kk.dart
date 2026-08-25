@@ -262,8 +262,9 @@ class AppLocalizationsKk extends AppLocalizations {
   String get sectionSyncFolder => 'Синхрондау қалтасы';
 
   @override
-  String get syncFolderDescription =>
-      'Басқа құрылғының экспорты түсетін орын. Қоймадан синхрондау сол жерден осы қойманың атындағы файлды сұрамай ашады.';
+  String syncFolderDescription(String name) {
+    return 'Басқа құрылғының экспорты түсетін орын. Қоймадан синхрондау сол жерден осы қойма экспортталатын $name файлын сұрамай ашады.';
+  }
 
   @override
   String get syncFolderNotSet =>

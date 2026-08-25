@@ -75,7 +75,7 @@
   "autoMergeDescription": "Synkroniser fra hvelv tar i bruk den andre enhetens endringer med en gang, uten valg og uten gjennomgang. Der de avviker, vinner den andre enhetens verdi.",
   "autoMergeNote": "Du blir likevel spurt om filen hvis den ikke åpner med passfrasen din.",
   "sectionSyncFolder": "Synkroniseringsmappe",
-  "syncFolderDescription": "Der den andre enhetens eksport havner. Synkroniser fra hvelv åpner filen der med dette hvelvets navn uten å spørre.",
+  "syncFolderDescription": "Der den andre enhetens eksport havner. Synkroniser fra hvelv åpner filen {name} der, navnet dette hvelvet eksporteres som, uten å spørre.",
   "syncFolderNotSet": "Ikke angitt: Synkroniser fra hvelv spør om filen hver gang.",
   "syncFolderFileMissing": "Ingen fil med navnet {name} i synkroniseringsmappen.",
   "rememberFolder": "Husk",

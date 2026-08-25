@@ -262,8 +262,9 @@ class AppLocalizationsSl extends AppLocalizations {
   String get sectionSyncFolder => 'Mapa za sinhronizacijo';
 
   @override
-  String get syncFolderDescription =>
-      'Kamor prispe izvoz druge naprave. Sinhroniziraj iz trezorja tam odpre datoteko z imenom tega trezorja, brez vprašanja.';
+  String syncFolderDescription(String name) {
+    return 'Kamor prispe izvoz druge naprave. Sinhroniziraj iz trezorja tam odpre datoteko $name, ime, pod katerim se ta trezor izvaža, brez vprašanja.';
+  }
 
   @override
   String get syncFolderNotSet =>

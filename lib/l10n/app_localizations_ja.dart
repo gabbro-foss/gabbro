@@ -258,8 +258,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get sectionSyncFolder => '同期フォルダー';
 
   @override
-  String get syncFolderDescription =>
-      '他のデバイスのエクスポート先です。「保管庫から同期」は、この保管庫の名前を持つファイルをそこから確認なしに開きます。';
+  String syncFolderDescription(String name) {
+    return '他のデバイスのエクスポート先です。「保管庫から同期」は、この保管庫のエクスポート名である $name をそこから確認なしに開きます。';
+  }
 
   @override
   String get syncFolderNotSet => '未設定：「保管庫から同期」は毎回ファイルを尋ねます。';

@@ -262,8 +262,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get sectionSyncFolder => 'Cartella di sincronizzazione';
 
   @override
-  String get syncFolderDescription =>
-      'Dove arriva l\'esportazione dell\'altro dispositivo. Sincronizza da cassaforte apre lì il file con il nome di questa cassaforte, senza chiedere.';
+  String syncFolderDescription(String name) {
+    return 'Dove arriva l\'esportazione dell\'altro dispositivo. Sincronizza da cassaforte apre lì il file $name, il nome con cui questa cassaforte viene esportata, senza chiedere.';
+  }
 
   @override
   String get syncFolderNotSet =>

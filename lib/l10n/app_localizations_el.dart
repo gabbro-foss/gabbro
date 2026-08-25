@@ -263,8 +263,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get sectionSyncFolder => 'Φάκελος συγχρονισμού';
 
   @override
-  String get syncFolderDescription =>
-      'Όπου καταλήγει η εξαγωγή της άλλης συσκευής. Ο συγχρονισμός από θησαυροφυλάκιο ανοίγει εκεί το αρχείο με το όνομα αυτού του θησαυροφυλακίου, χωρίς να ρωτά.';
+  String syncFolderDescription(String name) {
+    return 'Όπου καταλήγει η εξαγωγή της άλλης συσκευής. Ο συγχρονισμός από θησαυροφυλάκιο ανοίγει εκεί το αρχείο $name, το όνομα με το οποίο εξάγεται αυτό το θησαυροφυλάκιο, χωρίς να ρωτά.';
+  }
 
   @override
   String get syncFolderNotSet =>

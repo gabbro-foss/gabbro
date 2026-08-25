@@ -75,7 +75,7 @@
   "autoMergeDescription": "Synkronoi holvista ottaa toisen laitteen muutokset käyttöön heti, ilman valintaa ja tarkistusta. Eroavissa kohdissa toisen laitteen arvo voittaa.",
   "autoMergeNote": "Tiedostoa kysytään silti, jos se ei avaudu salalauseellasi.",
   "sectionSyncFolder": "Synkronointikansio",
-  "syncFolderDescription": "Minne toisen laitteen vienti päätyy. Synkronoi holvista avaa sieltä tämän holvin nimisen tiedoston kysymättä.",
+  "syncFolderDescription": "Minne toisen laitteen vienti päätyy. Synkronoi holvista avaa sieltä tiedoston {name}, nimen jolla tämä holvi viedään, kysymättä.",
   "syncFolderNotSet": "Ei asetettu: Synkronoi holvista kysyy tiedostoa joka kerta.",
   "syncFolderFileMissing": "Synkronointikansiossa ei ole tiedostoa nimeltä {name}.",
   "rememberFolder": "Muista",

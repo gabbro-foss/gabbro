@@ -75,7 +75,7 @@
   "autoMergeDescription": "Synchroniser depuis le coffre applique aussitôt les changements de l'autre appareil, sans choix ni relecture. En cas de différence, la valeur de l'autre appareil l'emporte.",
   "autoMergeNote": "Le fichier sera tout de même demandé s'il ne s'ouvre pas avec votre phrase secrète.",
   "sectionSyncFolder": "Dossier de synchronisation",
-  "syncFolderDescription": "Là où arrive l'export de l'autre appareil. Synchroniser depuis le coffre y ouvre le fichier portant le nom de ce coffre, sans rien demander.",
+  "syncFolderDescription": "Là où arrive l'export de l'autre appareil. Synchroniser depuis le coffre y ouvre le fichier {name}, le nom sous lequel ce coffre s'exporte, sans rien demander.",
   "syncFolderNotSet": "Non défini : Synchroniser depuis le coffre demande le fichier à chaque fois.",
   "syncFolderFileMissing": "Aucun fichier nommé {name} dans le dossier de synchronisation.",
   "rememberFolder": "Mémoriser",

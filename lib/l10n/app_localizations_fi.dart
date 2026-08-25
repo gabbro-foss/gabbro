@@ -262,8 +262,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get sectionSyncFolder => 'Synkronointikansio';
 
   @override
-  String get syncFolderDescription =>
-      'Minne toisen laitteen vienti päätyy. Synkronoi holvista avaa sieltä tämän holvin nimisen tiedoston kysymättä.';
+  String syncFolderDescription(String name) {
+    return 'Minne toisen laitteen vienti päätyy. Synkronoi holvista avaa sieltä tiedoston $name, nimen jolla tämä holvi viedään, kysymättä.';
+  }
 
   @override
   String get syncFolderNotSet =>

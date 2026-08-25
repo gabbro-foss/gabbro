@@ -75,7 +75,7 @@
   "autoMergeDescription": "Hoidlast sünkroonimine rakendab teise seadme muudatused kohe, ilma valiku ja ülevaatuseta. Erinevuse korral võidab teise seadme väärtus.",
   "autoMergeNote": "Faili küsitakse siiski, kui see sinu paroolifraasiga ei avane.",
   "sectionSyncFolder": "Sünkroonimiskaust",
-  "syncFolderDescription": "Kuhu teise seadme eksport jõuab. Hoidlast sünkroonimine avab sealt selle hoidla nimega faili küsimata.",
+  "syncFolderDescription": "Kuhu teise seadme eksport jõuab. Hoidlast sünkroonimine avab sealt faili {name}, nime, millega see hoidla eksporditakse, küsimata.",
   "syncFolderNotSet": "Määramata: hoidlast sünkroonimine küsib faili iga kord.",
   "syncFolderFileMissing": "Sünkroonimiskaustas pole faili nimega {name}.",
   "rememberFolder": "Jäta meelde",

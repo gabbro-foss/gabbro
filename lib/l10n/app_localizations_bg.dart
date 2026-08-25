@@ -262,8 +262,9 @@ class AppLocalizationsBg extends AppLocalizations {
   String get sectionSyncFolder => 'Папка за синхронизация';
 
   @override
-  String get syncFolderDescription =>
-      'Където попада експортът от другото устройство. Синхронизиране от трезор отваря там файла с името на този трезор, без да пита.';
+  String syncFolderDescription(String name) {
+    return 'Където попада експортът от другото устройство. Синхронизиране от трезор отваря там файла $name, името, с което този трезор се експортира, без да пита.';
+  }
 
   @override
   String get syncFolderNotSet =>

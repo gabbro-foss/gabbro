@@ -258,8 +258,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get sectionSyncFolder => '동기화 폴더';
 
   @override
-  String get syncFolderDescription =>
-      '다른 기기의 내보내기가 저장되는 곳입니다. 금고에서 동기화는 그곳에서 이 금고의 이름을 가진 파일을 묻지 않고 엽니다.';
+  String syncFolderDescription(String name) {
+    return '다른 기기의 내보내기가 저장되는 곳입니다. 금고에서 동기화는 그곳에서 이 금고의 내보내기 이름인 $name 파일을 묻지 않고 엽니다.';
+  }
 
   @override
   String get syncFolderNotSet => '설정 안 됨: 금고에서 동기화가 매번 파일을 묻습니다.';
