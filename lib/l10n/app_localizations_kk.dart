@@ -1269,20 +1269,6 @@ class AppLocalizationsKk extends AppLocalizations {
       'Бұл жазбаны өңдеп, түзетіп сақтаңыз немесе бас тарту үшін өткізіп жіберіңіз.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count жазба өткізіп жіберілді',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Бұл жазбалар сейфте бар болғандықтан қайта жазылмады:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Басқа құрылғы «$title» жойды.\n\nМұнда да жою керек пе, әлде сақтап қалу керек пе?';
   }
@@ -1651,7 +1637,7 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Сейфте бұрыннан бар жазбалар автоматты өткізіп жіберіледі. Қорытынды көрсетіледі.';
+      'Файлдағы әрбір жазба қосылады, қоймада бар болса да. Бос қоймаға бір рет жасаған дұрыс.';
 
   @override
   String get importGabbroSubtitle =>

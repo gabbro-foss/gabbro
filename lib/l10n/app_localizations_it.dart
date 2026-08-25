@@ -1271,21 +1271,6 @@ class AppLocalizationsIt extends AppLocalizations {
       'Modifica per correggere e salvare questa voce, o salta per scartarla.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count voci saltate',
-      one: '1 voce saltata',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Queste voci esistono già nel tuo archivio e non sono state sovrascritte:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'L\'altro dispositivo ha eliminato «$title».\n\nEliminarlo anche qui, o mantenerlo?';
   }
@@ -1656,7 +1641,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Le voci già presenti nel tuo archivio verranno saltate automaticamente. Ti verrà mostrato un riepilogo.';
+      'Ogni voce del file viene aggiunta, anche quelle già presenti nella cassaforte. Meglio una sola volta, in una cassaforte vuota.';
 
   @override
   String get importGabbroSubtitle =>

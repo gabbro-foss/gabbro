@@ -526,13 +526,6 @@
   },
   "importIssueHelp": "Ṣatunkọ, ṣe atunṣe ki o pamọ titẹ sii yii, tabi fo lati kọ.",
 
-  "entriesSkipped": "{count, plural, other{A fo awọn titẹ sii {count}}}",
-  "@entriesSkipped": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "skippedEntriesNote": "Awọn titẹ sii wọnyi ti wa ninu vọọliti rẹ tẹlẹ ati pe a ko rọpo wọn:",
 
   "syncDeleteEntryContent": "Ẹrọ miiran pa «{title}».\n\nPa nibi pẹlu, tabi tọju?",
   "@syncDeleteEntryContent": {
@@ -694,7 +687,7 @@
   "importFileNotFound": "A ko ri faili.",
   "importEnterPassphrase": "Tẹ gbolohun ọrọ igbaniwọle fun vọọliti yii.",
   "importSourceKeyProtected": "YubiKey ni ó ń dáàbò bo àpótí ìpamọ́ yìí. Wàá nílò láti tẹ bọtìnì tí a forúkọsílẹ̀ láti fi muṣiṣẹ́pọ̀.",
-  "importDuplicateWarning": "A yoo fo awọn titẹ sii ti o ti wa ninu vọọliti rẹ tẹlẹ laifọwọyi. A yoo ṣe afihan akopọ.",
+  "importDuplicateWarning": "A ń fi gbogbo ohun inú fáìlì kún un, àní àwọn tí àpótí ti ní. Ó dára jù láti ṣe é lẹ́ẹ̀kan, sínú àpótí òfo.",
   "importGabbroSubtitle": "Mu awọn titẹ sii wọle lati vọọliti Gabbro miiran (faili .gabbro)",
   "importEnpassSubtitle": "Gbigba jade JSON lati Enpass (Awọn irinṣẹ → Gba jade)",
   "importBitwardenSubtitle": "Gbigba jade JSON ti ko ni fipamọ lati Bitwarden (Awọn irinṣẹ → Gba vọọliti jade)",

@@ -526,13 +526,6 @@
   },
   "importIssueHelp": "Edita para corregir y guardar esta entrada, u omítela para descartarla.",
 
-  "entriesSkipped": "{count, plural, one{1 entrada omitida} other{{count} entradas omitidas}}",
-  "@entriesSkipped": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "skippedEntriesNote": "Estas entradas ya existen en tu almacén y no fueron sobreescritas:",
 
   "syncDeleteEntryContent": "El otro dispositivo eliminó «{title}».\n\n¿Eliminarlo aquí también o conservarlo?",
   "@syncDeleteEntryContent": {
@@ -694,7 +687,7 @@
   "importFileNotFound": "Archivo no encontrado.",
   "importEnterPassphrase": "Introduce la contraseña maestra de este almacén.",
   "importSourceKeyProtected": "Esta bóveda está protegida por una YubiKey. Deberás tocar una llave registrada para sincronizar.",
-  "importDuplicateWarning": "Las entradas que ya están en tu almacén se omitirán automáticamente. Se te mostrará un resumen.",
+  "importDuplicateWarning": "Se añade cada entrada del archivo, incluso las que la bóveda ya contiene. Mejor una sola vez, en una bóveda vacía.",
   "importGabbroSubtitle": "Importar entradas desde otro almacén Gabbro (archivo .gabbro)",
   "importEnpassSubtitle": "Exportación JSON desde Enpass (Herramientas → Exportar)",
   "importBitwardenSubtitle": "Exportación JSON sin cifrar desde Bitwarden (Herramientas → Exportar almacén)",

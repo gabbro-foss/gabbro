@@ -1271,21 +1271,6 @@ class AppLocalizationsHu extends AppLocalizations {
       'Szerkeszd, javítsd és mentsd el ezt a bejegyzést, vagy hagyd ki az elvetéséhez.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count bejegyzés kihagyva',
-      one: '1 bejegyzés kihagyva',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Ezek a bejegyzések már léteznek a széfedben, és nem lettek felülírva:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'A másik eszköz törölte a(z) \'$title\' bejegyzést.\n\nTöröld itt is, vagy tartsd meg?';
   }
@@ -1651,7 +1636,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Az olyan bejegyzések, amelyek már megvannak a széfedben, automatikusan kimaradnak. Látni fogsz egy összefoglalót.';
+      'A fájl minden bejegyzése hozzáadódik, a széfben már meglévők is. Legjobb egyszer, üres széfbe.';
 
   @override
   String get importGabbroSubtitle =>

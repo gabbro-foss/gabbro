@@ -44,7 +44,6 @@ import 'package:gabbro/passkey_daemon.dart';
 import 'package:gabbro/widgets/sync_method_dialog.dart';
 import 'package:gabbro/widgets/url_link.dart';
 import 'package:gabbro/screens/import_failures_dialog.dart';
-import 'package:gabbro/screens/import_skipped_dialog.dart';
 import 'package:gabbro/widgets/path_field.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
 import 'package:gabbro/widgets/text_size_slider.dart';
@@ -528,11 +527,6 @@ final Map<String, Future<void> Function(BuildContext)> dialogs = {
     context: ctx,
     builder: (_) => const SyncMethodDialog(),
   ),
-  'import_skipped_dialog': (ctx) => showSkippedEntriesDialog(ctx, const [
-    SkippedEntryData(
-      title: 'An entry title long enough to stress the row at max text',
-    ),
-  ]),
   'import_failures_dialog': (ctx) => showImportFailuresDialog(ctx, const [
     ImportFailureData(
       title: 'An entry title long enough to stress the row at max text',
@@ -592,7 +586,6 @@ const Map<String, String> covers = {
   'sync_review': 'sync_review',
   'gabbro_dialog': 'gabbro_dialog',
   'sync_method_dialog': 'sync_method_dialog',
-  'import_skipped_dialog': 'import_skipped_dialog',
   'import_failures_dialog': 'import_failures_dialog',
   'passkey_consent_dialog': 'passkey_consent_dialog',
   'passkey_hint_banner': 'passkey_hint_banner',
@@ -641,5 +634,5 @@ List<String> uiSources() =>
 // renamed folder) would otherwise leave `missing` empty and pass while checking
 // nothing. Adding a screen or widget fails here first: the new file must be
 // swept or waived deliberately.
-const screenFileCount = 29;
+const screenFileCount = 28;
 const widgetFileCount = 14;

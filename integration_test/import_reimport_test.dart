@@ -1,6 +1,6 @@
-// Real-FFI reproduction of the S15 hardware failure: re-importing the same
-// CSV must import nothing, including after the vault has been locked and
-// re-unlocked (the auto-lock round trip the app hits between two imports).
+// Real-FFI pin of S3: import is additive. Re-importing the same CSV adds every
+// row again, including after the vault has been locked and re-unlocked (the
+// auto-lock round trip the app hits between two imports).
 //
 // Run: dart test integration_test/import_reimport_test.dart -j 1
 // Needs the release cdylib (see rust_lib_setup.dart).
@@ -46,23 +46,21 @@ void main() {
     tempDir.deleteSync(recursive: true);
   });
 
-  test('re-import in the same session imports nothing', () async {
+  test('re-import in the same session adds every row again', () async {
     await unlockVault(passphrase: _passphrase.codeUnits, path: vaultPath);
     final first = await importFromCsv(input: csv, config: _config);
     expect(first.imported.toInt(), 3);
     final second = await importFromCsv(input: csv, config: _config);
-    expect(second.skipped.length, 3);
-    expect(second.imported.toInt(), 0);
+    expect(second.imported.toInt(), 3);
   });
 
-  test('re-import after lock -> unlock imports nothing', () async {
+  test('re-import after lock -> unlock adds every row again', () async {
     await unlockVault(passphrase: _passphrase.codeUnits, path: vaultPath);
     final first = await importFromCsv(input: csv, config: _config);
     expect(first.imported.toInt(), 3);
     lockVault();
     await unlockVault(passphrase: _passphrase.codeUnits, path: vaultPath);
     final second = await importFromCsv(input: csv, config: _config);
-    expect(second.skipped.length, 3);
-    expect(second.imported.toInt(), 0);
+    expect(second.imported.toInt(), 3);
   });
 }

@@ -526,13 +526,6 @@
   },
   "importIssueHelp": "Modifica per correggere e salvare questa voce, o salta per scartarla.",
 
-  "entriesSkipped": "{count, plural, one{1 voce saltata} other{{count} voci saltate}}",
-  "@entriesSkipped": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "skippedEntriesNote": "Queste voci esistono già nel tuo archivio e non sono state sovrascritte:",
 
   "syncDeleteEntryContent": "L'altro dispositivo ha eliminato «{title}».\n\nEliminarlo anche qui, o mantenerlo?",
   "@syncDeleteEntryContent": {
@@ -694,7 +687,7 @@
   "importFileNotFound": "File non trovato.",
   "importEnterPassphrase": "Inserisci la passphrase per questo archivio.",
   "importSourceKeyProtected": "Questa cassaforte è protetta da una YubiKey. Dovrai toccare una chiave registrata per sincronizzare.",
-  "importDuplicateWarning": "Le voci già presenti nel tuo archivio verranno saltate automaticamente. Ti verrà mostrato un riepilogo.",
+  "importDuplicateWarning": "Ogni voce del file viene aggiunta, anche quelle già presenti nella cassaforte. Meglio una sola volta, in una cassaforte vuota.",
   "importGabbroSubtitle": "Importa voci da un altro archivio Gabbro (file .gabbro)",
   "importEnpassSubtitle": "Esportazione JSON da Enpass (Strumenti → Esporta)",
   "importBitwardenSubtitle": "Esportazione JSON non cifrata da Bitwarden (Strumenti → Esporta archivio)",

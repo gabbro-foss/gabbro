@@ -526,13 +526,6 @@
   },
   "importIssueHelp": "Rediger for å rette og lagre denne oppføringa, eller hopp over for å forkaste ho.",
 
-  "entriesSkipped": "{count, plural, one{1 oppføring hoppa over} other{{count} oppføringer hoppa over}}",
-  "@entriesSkipped": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "skippedEntriesNote": "Desse oppføringane finst allereie i kvelvet ditt og vart ikkje overskrivne:",
 
   "syncDeleteEntryContent": "Den andre eininga sletta '{title}'.\n\nSlett ho her òg, eller behald ho?",
   "@syncDeleteEntryContent": {
@@ -694,7 +687,7 @@
   "importFileNotFound": "Fil ikkje funnen.",
   "importEnterPassphrase": "Angi passfrasen for dette kvelvet.",
   "importSourceKeyProtected": "Dette hvelvet er verna av ein YubiKey. Du må trykkje på ein registrert nøkkel for å synkronisere.",
-  "importDuplicateWarning": "Oppføringer som allereie finst i kvelvet vert automatisk hoppa over. Du vil sjå eit samandrag.",
+  "importDuplicateWarning": "Kvar oppføring i fila vert lagd til, òg dei kvelvet alt har. Best gjort éin gong, i eit tomt kvelv.",
   "importGabbroSubtitle": "Importer oppføringer frå eit anna Gabbro-kvelv (.gabbro-fil)",
   "importEnpassSubtitle": "JSON-eksport frå Enpass (Verktøy → Eksporter)",
   "importBitwardenSubtitle": "Ukryptert JSON-eksport frå Bitwarden (Verktøy → Eksporter kvelv)",

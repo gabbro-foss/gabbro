@@ -526,13 +526,6 @@
   },
   "importIssueHelp": "Редактирай, поправи и запази този запис или го пропусни, за да го отхвърлиш.",
 
-  "entriesSkipped": "{count, plural, one{1 запис е пропуснат} other{{count} записа са пропуснати}}",
-  "@entriesSkipped": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "skippedEntriesNote": "Тези записи вече съществуват в твоя трезор и не са бивали презаписани:",
 
   "syncDeleteEntryContent": "Другото устройство изтри «{title}».\n\nДа се изтрие ли и тук, или да се запази?",
   "@syncDeleteEntryContent": {
@@ -694,7 +687,7 @@
   "importFileNotFound": "Файлът не е намерен.",
   "importEnterPassphrase": "Въведи паролната фраза за този трезор.",
   "importSourceKeyProtected": "Този сейф е защитен с YubiKey. За да синхронизирате, ще трябва да докоснете регистриран ключ.",
-  "importDuplicateWarning": "Записи, които вече са в твоя трезор, ще бъдат автоматично пропуснати. Ще видиш обобщение.",
+  "importDuplicateWarning": "Всеки запис от файла се добавя, дори вече наличните в трезора. Най-добре веднъж, в празен трезор.",
   "importGabbroSubtitle": "Импортирай записи от друг трезор Gabbro (.gabbro файл)",
   "importEnpassSubtitle": "JSON експорт от Enpass (Инструменти → Експортирай)",
   "importBitwardenSubtitle": "Нешифрован JSON експорт от Bitwarden (Инструменти → Експортирай хранилище)",

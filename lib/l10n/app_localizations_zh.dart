@@ -1242,19 +1242,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get importIssueHelp => '编辑、修正并保存此条目，或跳过以拒绝。';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '已跳过 $count 个条目',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote => '以下条目已存在于您的保险库中，未被覆盖：';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return '另一台设备已删除«$title»。\n\n在此处也删除，还是保留？';
   }
@@ -1601,7 +1588,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get importSourceKeyProtected => '此保险库受 YubiKey 保护。同步时需要轻触已注册的密钥。';
 
   @override
-  String get importDuplicateWarning => '您保险库中已有的条目将自动跳过。将显示摘要。';
+  String get importDuplicateWarning => '文件中的每个条目都会添加，包括保险库中已有的。最好只做一次，导入空保险库。';
 
   @override
   String get importGabbroSubtitle => '从另一个 Gabbro 保险库（.gabbro 文件）导入条目';
@@ -3395,19 +3382,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get importIssueHelp => '编辑、修正并保存此条目，或跳过以拒绝。';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '已跳过 $count 个条目',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote => '以下条目已存在于您的保险库中，未被覆盖：';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return '另一台设备已删除«$title»。\n\n在此处也删除，还是保留？';
   }
@@ -3754,7 +3728,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get importSourceKeyProtected => '此保险库受 YubiKey 保护。同步时需要轻触已注册的密钥。';
 
   @override
-  String get importDuplicateWarning => '您保险库中已有的条目将自动跳过。将显示摘要。';
+  String get importDuplicateWarning => '文件中的每个条目都会添加，包括保险库中已有的。最好只做一次，导入空保险库。';
 
   @override
   String get importGabbroSubtitle => '从另一个 Gabbro 保险库（.gabbro 文件）导入条目';
@@ -5548,19 +5522,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get importIssueHelp => '編輯、修正並儲存此項目，或跳過以拒絕。';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '已跳過 $count 個項目',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote => '以下項目已存在於您的保險庫中，未被覆寫：';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return '另一台裝置已刪除«$title»。\n\n在此處也刪除，還是保留？';
   }
@@ -5907,7 +5868,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get importSourceKeyProtected => '此保險庫受 YubiKey 保護。同步時需要輕觸已註冊的金鑰。';
 
   @override
-  String get importDuplicateWarning => '您保險庫中已有的項目將自動跳過。將顯示摘要。';
+  String get importDuplicateWarning => '檔案中的每個項目都會新增，包括保險庫中已有的。最好只做一次，匯入空的保險庫。';
 
   @override
   String get importGabbroSubtitle => '從另一個 Gabbro 保險庫（.gabbro 檔案）匯入項目';

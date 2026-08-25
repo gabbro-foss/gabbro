@@ -1273,21 +1273,6 @@ class AppLocalizationsLt extends AppLocalizations {
       'Redaguokite, ištaisykite ir išsaugokite šį įrašą arba praleiskite, kad jį atmestumėte.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count įrašai praleisti',
-      one: '1 įrašas praleistas',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Šie įrašai jau yra jūsų saugykloje ir nebuvo perrašyti:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Kitas įrenginys ištrynė «$title».\n\nIštrinti čia taip pat, ar palikti?';
   }
@@ -1654,7 +1639,7 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Įrašai, kurie jau yra jūsų saugykloje, bus automatiškai praleisti. Bus parodyta suvestinė.';
+      'Pridedamas kiekvienas failo įrašas, net jau esantys saugykloje. Geriausia vieną kartą, į tuščią saugyklą.';
 
   @override
   String get importGabbroSubtitle =>

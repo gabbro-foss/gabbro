@@ -12,14 +12,8 @@ CsvPreviewData _preview(List<String> headers) =>
     CsvPreviewData(headers: headers, rows: const []);
 
 ImportResult _ok(int count) =>
-    ImportResult(imported: BigInt.from(count), failures: [], skipped: []);
+    ImportResult(imported: BigInt.from(count), failures: []);
 
-ImportResult _okSkipping(int count, List<String> skippedTitles) => ImportResult(
-      imported: BigInt.from(count),
-      failures: [],
-      skipped:
-          skippedTitles.map((t) => SkippedEntryData(title: t)).toList(),
-    );
 
 // ── Screen builder ────────────────────────────────────────────────────────────
 
@@ -278,46 +272,8 @@ void main() {
     expect(poppedWith, 0);
   });
 
-  // ── Skipped entries (D1) ──────────────────────────────────────────────────
-  // CSV imports through this screen, not through ImportScreen, so the skipped
-  // dialog the other five sources show has to be raised here or the user is
-  // never told a row was recognised and left out.
-
-  testWidgets('a skipped row is named to the user before the screen closes',
-      (tester) async {
-    await tester.pumpWidget(_buildScreen(
-      preview: _preview(['Title', 'URL']),
-      onImport: (_, _) async => _okSkipping(1, ['Already in the vault']),
-    ));
-
-    await _tapImport(tester);
-    await tester.pumpAndSettle();
-
-    expect(find.text('Already in the vault'), findsOneWidget);
-  });
-
-  testWidgets('the imported count still pops once the skipped dialog is closed',
-      (tester) async {
-    Object? poppedWith = 'not popped';
-    await tester.pumpWidget(_buildViaRoute(
-      preview: _preview(['Title', 'URL']),
-      onImport: (_, _) async => _okSkipping(3, ['One', 'Two']),
-      onPopped: (v) => poppedWith = v,
-    ));
-
-    await tester.tap(find.text('Open'));
-    await tester.pumpAndSettle();
-    await _tapImport(tester);
-    await tester.pumpAndSettle();
-
-    expect(poppedWith, 'not popped', reason: 'dialog must be read first');
-    await tester.tap(find.byType(FilledButton).last); // the dialog's OK
-    await tester.pumpAndSettle();
-
-    expect(poppedWith, 3);
-  });
-
-  testWidgets('no dialog is raised when nothing was skipped', (tester) async {
+  // S3: import is additive; nothing is skipped, so no dialog interrupts the pop.
+  testWidgets('a clean import raises no dialog', (tester) async {
     await tester.pumpWidget(_buildScreen(
       preview: _preview(['Title', 'URL']),
       onImport: (_, _) async => _ok(2),

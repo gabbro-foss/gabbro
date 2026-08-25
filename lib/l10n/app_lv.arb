@@ -526,13 +526,6 @@
   },
   "importIssueHelp": "Rediģējiet, labojiet un saglabājiet šo ierakstu vai izlaidiet, lai to atmestų.",
 
-  "entriesSkipped": "{count, plural, one{1 ieraksts izlaists} other{{count} ieraksti izlaisti}}",
-  "@entriesSkipped": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "skippedEntriesNote": "Šie ieraksti jau pastāv jūsu seifā un netika pārrakstīti:",
 
   "syncDeleteEntryContent": "Otra ierīce izdzēsa '{title}'.\n\nDzēst arī šeit, vai paturēt?",
   "@syncDeleteEntryContent": {
@@ -694,7 +687,7 @@
   "importFileNotFound": "Fails nav atrasts.",
   "importEnterPassphrase": "Ievadiet šī seifa ieejas frāzi.",
   "importSourceKeyProtected": "Šī glabātava ir aizsargāta ar YubiKey. Lai sinhronizētu, jums būs jāpieskaras reģistrētai atslēgai.",
-  "importDuplicateWarning": "Ieraksti, kas jau ir jūsu seifā, tiks automātiski izlaisti. Tiks parādīts kopsavilkums.",
+  "importDuplicateWarning": "Tiek pievienots katrs faila ieraksts, arī tie, kas glabātavā jau ir. Vislabāk vienreiz, tukšā glabātavā.",
   "importGabbroSubtitle": "Importēt ierakstus no cita Gabbro seifa (.gabbro fails)",
   "importEnpassSubtitle": "JSON eksports no Enpass (Rīki → Eksportēt)",
   "importBitwardenSubtitle": "Nešifrēts JSON eksports no Bitwarden (Rīki → Eksportēt seifa datus)",

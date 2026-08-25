@@ -526,13 +526,6 @@
   },
   "importIssueHelp": "Відредагуйте, виправте та збережіть цей запис або пропустіть, щоб відхилити його.",
 
-  "entriesSkipped": "{count, plural, one{1 запис пропущено} few{{count} записи пропущено} other{{count} записів пропущено}}",
-  "@entriesSkipped": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "skippedEntriesNote": "Ці записи вже існують у вашому сховищі та не були перезаписані:",
 
   "syncDeleteEntryContent": "Інший пристрій видалив «{title}».\n\nВидалити тут теж або залишити?",
   "@syncDeleteEntryContent": {
@@ -694,7 +687,7 @@
   "importFileNotFound": "Файл не знайдено.",
   "importEnterPassphrase": "Введіть кодову фразу для цього сховища.",
   "importSourceKeyProtected": "Це сховище захищено YubiKey. Для синхронізації потрібно торкнутися зареєстрованого ключа.",
-  "importDuplicateWarning": "Записи, які вже є у вашому сховищі, будуть автоматично пропущені. Ви побачите зведення.",
+  "importDuplicateWarning": "Додається кожен запис із файлу, навіть уже наявні у сховищі. Найкраще один раз, у порожнє сховище.",
   "importGabbroSubtitle": "Імпортувати записи з іншого сховища Gabbro (файл .gabbro)",
   "importEnpassSubtitle": "JSON-експорт з Enpass (Інструменти → Експорт)",
   "importBitwardenSubtitle": "Незашифрований JSON-експорт з Bitwarden (Інструменти → Експорт сховища)",

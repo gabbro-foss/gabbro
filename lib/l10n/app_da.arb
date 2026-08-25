@@ -526,13 +526,6 @@
   },
   "importIssueHelp": "Rediger for at rette og gem denne post, eller spring over for at kassere den.",
 
-  "entriesSkipped": "{count, plural, one{1 post sprunget over} other{{count} poster sprunget over}}",
-  "@entriesSkipped": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "skippedEntriesNote": "Disse poster findes allerede i din hvælving og blev ikke overskrevet:",
 
   "syncDeleteEntryContent": "Den anden enhed slettede '{title}'.\n\nSlet den her også, eller behold den?",
   "@syncDeleteEntryContent": {
@@ -694,7 +687,7 @@
   "importFileNotFound": "Fil ikke fundet.",
   "importEnterPassphrase": "Indtast adgangssætningen til denne hvælving.",
   "importSourceKeyProtected": "Denne boks er beskyttet af en YubiKey. Du skal trykke på en registreret nøgle for at synkronisere.",
-  "importDuplicateWarning": "Poster, der allerede findes i din hvælving, springes automatisk over. Du vil se et resumé.",
+  "importDuplicateWarning": "Hver post i filen tilføjes, også dem din boks allerede har. Gør det helst én gang, i en tom boks.",
   "importGabbroSubtitle": "Importér poster fra en anden Gabbro-hvælving (.gabbro-fil)",
   "importEnpassSubtitle": "JSON-eksport fra Enpass (Funktioner → Eksportér)",
   "importBitwardenSubtitle": "Ukrypteret JSON-eksport fra Bitwarden (Funktioner → Eksportér boks)",

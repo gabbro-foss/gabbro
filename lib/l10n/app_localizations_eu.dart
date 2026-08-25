@@ -1272,21 +1272,6 @@ class AppLocalizationsEu extends AppLocalizations {
       'Editatu, zuzendu eta gorde sarrera hau, edo saltatu ukatzeko.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count sarrerak saltatu dira',
-      one: '1 sarrera saltatu da',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Sarrera hauek dagoeneko daude zure gandegian eta ez dira gainidatzi:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Beste gailu batek «$title» ezabatu du.\n\nHemen ere ezabatu, ala gorde?';
   }
@@ -1651,7 +1636,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Zure gandegian dagoeneko dauden sarrerak automatikoki saltatuko dira. Laburpena erakutsiko da.';
+      'Fitxategiko sarrera guztiak gehitzen dira, kutxak dagoeneko dituenak barne. Hobe behin, kutxa huts batean.';
 
   @override
   String get importGabbroSubtitle =>

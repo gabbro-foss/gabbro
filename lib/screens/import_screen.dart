@@ -7,7 +7,6 @@ import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/screens/csv_mapping_screen.dart';
 import 'package:gabbro/screens/import_failures_dialog.dart';
-import 'package:gabbro/screens/import_skipped_dialog.dart';
 import 'package:gabbro/screens/unlock_screen.dart' show vaultUpgradePathUrl;
 import 'package:gabbro/src/rust/api/import.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -256,9 +255,6 @@ class _ImportScreenState extends State<ImportScreen> {
       if (result.failures.isNotEmpty && mounted) {
         editedCount = await showImportFailuresDialog(context, result.failures);
       }
-      if (result.skipped.isNotEmpty && mounted) {
-        await showSkippedEntriesDialog(context, result.skipped);
-      }
       if (mounted) {
         Navigator.of(context).pop(result.imported.toInt() + editedCount);
       }
@@ -310,9 +306,6 @@ class _ImportScreenState extends State<ImportScreen> {
       var editedCount = 0;
       if (result.failures.isNotEmpty && mounted) {
         editedCount = await showImportFailuresDialog(context, result.failures);
-      }
-      if (result.skipped.isNotEmpty && mounted) {
-        await showSkippedEntriesDialog(context, result.skipped);
       }
       if (mounted) {
         Navigator.of(context).pop(result.imported.toInt() + editedCount);
@@ -366,9 +359,6 @@ class _ImportScreenState extends State<ImportScreen> {
       if (result.failures.isNotEmpty && mounted) {
         editedCount = await showImportFailuresDialog(context, result.failures);
       }
-      if (result.skipped.isNotEmpty && mounted) {
-        await showSkippedEntriesDialog(context, result.skipped);
-      }
       if (mounted) {
         Navigator.of(context).pop(result.imported.toInt() + editedCount);
       }
@@ -420,9 +410,6 @@ class _ImportScreenState extends State<ImportScreen> {
       var editedCount = 0;
       if (result.failures.isNotEmpty && mounted) {
         editedCount = await showImportFailuresDialog(context, result.failures);
-      }
-      if (result.skipped.isNotEmpty && mounted) {
-        await showSkippedEntriesDialog(context, result.skipped);
       }
       if (mounted) {
         Navigator.of(context).pop(result.imported.toInt() + editedCount);
@@ -488,9 +475,6 @@ class _ImportScreenState extends State<ImportScreen> {
         );
       } else {
         result = await widget.onImportGabbro(path, passphraseBytes);
-      }
-      if (result.skipped.isNotEmpty && mounted) {
-        await showSkippedEntriesDialog(context, result.skipped);
       }
       if (mounted) Navigator.of(context).pop(result.imported.toInt());
     } catch (e) {

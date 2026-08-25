@@ -526,13 +526,6 @@
   },
   "importIssueHelp": "Bewerk om te corrigeren en sla dit item op, of sla het over om het te verwijderen.",
 
-  "entriesSkipped": "{count, plural, one{1 item overgeslagen} other{{count} items overgeslagen}}",
-  "@entriesSkipped": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "skippedEntriesNote": "Deze items bestaan al in uw kluis en zijn niet overschreven:",
 
   "syncDeleteEntryContent": "Het andere apparaat heeft '{title}' verwijderd.\n\nHier ook verwijderen, of behouden?",
   "@syncDeleteEntryContent": {
@@ -694,7 +687,7 @@
   "importFileNotFound": "Bestand niet gevonden.",
   "importEnterPassphrase": "Voer de wachtwoordzin voor deze kluis in.",
   "importSourceKeyProtected": "Deze kluis is beveiligd met een YubiKey. Je moet een geregistreerde sleutel aanraken om te synchroniseren.",
-  "importDuplicateWarning": "Items die al in uw kluis staan, worden automatisch overgeslagen. Er wordt een samenvatting getoond.",
+  "importDuplicateWarning": "Elk item uit het bestand wordt toegevoegd, ook wat de kluis al bevat. Doe dit bij voorkeur eenmalig, in een lege kluis.",
   "importGabbroSubtitle": "Items importeren vanuit een andere Gabbro-kluis (.gabbro-bestand)",
   "importEnpassSubtitle": "JSON-export vanuit Enpass (Hulpmiddelen → Exporteren)",
   "importBitwardenSubtitle": "Niet-versleutelde JSON-export vanuit Bitwarden (Hulpmiddelen → Kluis exporteren)",

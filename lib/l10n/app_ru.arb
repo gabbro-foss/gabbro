@@ -526,13 +526,6 @@
   },
   "importIssueHelp": "Отредактируйте, исправьте и сохраните эту запись или пропустите, чтобы отклонить её.",
 
-  "entriesSkipped": "{count, plural, one{1 запись пропущена} few{{count} записи пропущены} other{{count} записей пропущено}}",
-  "@entriesSkipped": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "skippedEntriesNote": "Эти записи уже существуют в вашем хранилище и не были перезаписаны:",
 
   "syncDeleteEntryContent": "Другое устройство удалило «{title}».\n\nУдалить здесь тоже или оставить?",
   "@syncDeleteEntryContent": {
@@ -694,7 +687,7 @@
   "importFileNotFound": "Файл не найден.",
   "importEnterPassphrase": "Введите кодовую фразу для этого хранилища.",
   "importSourceKeyProtected": "Это хранилище защищено YubiKey. Для синхронизации нужно коснуться зарегистрированного ключа.",
-  "importDuplicateWarning": "Записи, которые уже есть в вашем хранилище, будут автоматически пропущены. Вы увидите сводку.",
+  "importDuplicateWarning": "Добавляется каждая запись из файла, даже уже имеющиеся в хранилище. Лучше один раз, в пустое хранилище.",
   "importGabbroSubtitle": "Импортировать записи из другого хранилища Gabbro (файл .gabbro)",
   "importEnpassSubtitle": "JSON-экспорт из Enpass (Инструменты → Экспорт)",
   "importBitwardenSubtitle": "Незашифрованный JSON-экспорт из Bitwarden (Инструменты → Экспорт хранилища)",

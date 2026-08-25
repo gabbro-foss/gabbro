@@ -1271,21 +1271,6 @@ class AppLocalizationsEt extends AppLocalizations {
       'Muuda, paranda ja salvesta see kirje või jäta see vahele, et see hüljata.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count kirjet vahele jäetud',
-      one: '1 kirje vahele jäetud',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Need kirjed on juba sinu seifis ja neid ei kirjutatud üle:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Teine seade kustutas kirje \'$title\'.\n\nKustuta ka siit, või hoia alles?';
   }
@@ -1652,7 +1637,7 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Kirjed, mis on juba seifis olemas, jäetakse automaatselt vahele. Kuvatakse kokkuvõte.';
+      'Iga faili kirje lisatakse, ka need, mis hoidlas juba on. Parim teha üks kord, tühja hoidlasse.';
 
   @override
   String get importGabbroSubtitle =>

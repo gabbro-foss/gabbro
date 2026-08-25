@@ -526,13 +526,6 @@
   },
   "importIssueHelp": "Muuda, paranda ja salvesta see kirje või jäta see vahele, et see hüljata.",
 
-  "entriesSkipped": "{count, plural, one{1 kirje vahele jäetud} other{{count} kirjet vahele jäetud}}",
-  "@entriesSkipped": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "skippedEntriesNote": "Need kirjed on juba sinu seifis ja neid ei kirjutatud üle:",
 
   "syncDeleteEntryContent": "Teine seade kustutas kirje '{title}'.\n\nKustuta ka siit, või hoia alles?",
   "@syncDeleteEntryContent": {
@@ -694,7 +687,7 @@
   "importFileNotFound": "Faili ei leitud.",
   "importEnterPassphrase": "Sisesta selle seifi pääslause.",
   "importSourceKeyProtected": "See hoidla on kaitstud YubiKey-ga. Sünkroonimiseks peate puudutama registreeritud võtit.",
-  "importDuplicateWarning": "Kirjed, mis on juba seifis olemas, jäetakse automaatselt vahele. Kuvatakse kokkuvõte.",
+  "importDuplicateWarning": "Iga faili kirje lisatakse, ka need, mis hoidlas juba on. Parim teha üks kord, tühja hoidlasse.",
   "importGabbroSubtitle": "Impordi kirjeid teisest Gabbro seifist (.gabbro fail)",
   "importEnpassSubtitle": "JSON-eksport Enpassist (Tööriistad → Ekspordi)",
   "importBitwardenSubtitle": "Krüpteerimata JSON-eksport Bitwardenist (Tööriistad → Ekspordi seif)",

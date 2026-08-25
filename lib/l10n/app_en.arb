@@ -724,13 +724,6 @@
   },
   "importIssueHelp": "Edit to correct and save this entry, or skip to discard it.",
 
-  "entriesSkipped": "{count, plural, one{1 entry skipped} other{{count} entries skipped}}",
-  "@entriesSkipped": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "skippedEntriesNote": "These entries already exist in your vault and were not overwritten:",
 
   "syncDeleteEntryContent": "The other device deleted '{title}'.\n\nDelete it here too, or keep it?",
   "@syncDeleteEntryContent": {
@@ -900,7 +893,7 @@
   "importFileNotFound": "File not found.",
   "importEnterPassphrase": "Enter the passphrase for this vault.",
   "importSourceKeyProtected": "This vault is protected by a YubiKey. You will need to tap a registered key to sync from it.",
-  "importDuplicateWarning": "Entries your vault already holds will be skipped automatically. You will be shown a summary.",
+  "importDuplicateWarning": "Every entry in the file is added, even ones your vault already holds. Best done once, into an empty vault.",
   "importGabbroSubtitle": "Import entries from another Gabbro vault (.gabbro file)",
   "importEnpassSubtitle": "JSON export from Enpass (Tools → Export)",
   "importBitwardenSubtitle": "Unencrypted JSON export from Bitwarden (Tools → Export Vault)",

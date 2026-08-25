@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
-import 'package:gabbro/screens/import_skipped_dialog.dart';
 import 'package:gabbro/src/rust/api/import.dart';
 
 Future<ImportResult> _defaultImportCsv(
@@ -75,15 +74,8 @@ class _CsvMappingScreenState extends State<CsvMappingScreen> {
       );
       final result = await widget.onImport(widget.csvContent, config);
       if (!mounted) return;
-      // The import is over: stop the progress spinner before anything blocks on
-      // the user, or it keeps animating under the dialog below.
+      // The import is over: stop the progress spinner before leaving.
       setState(() => _isImporting = false);
-      // CSV is the one source that imports from its own screen, so the skipped
-      // dialog ImportScreen raises for the other five has to be raised here.
-      // `importFromCsv` never reports failures, so there is no failures dialog.
-      if (result.skipped.isNotEmpty) {
-        await showSkippedEntriesDialog(context, result.skipped);
-      }
       if (mounted) Navigator.of(context).pop(result.imported.toInt());
     } catch (e) {
       if (mounted) {

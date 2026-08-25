@@ -526,13 +526,6 @@
   },
   "importIssueHelp": "Redaguokite, ištaisykite ir išsaugokite šį įrašą arba praleiskite, kad jį atmestumėte.",
 
-  "entriesSkipped": "{count, plural, one{1 įrašas praleistas} other{{count} įrašai praleisti}}",
-  "@entriesSkipped": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "skippedEntriesNote": "Šie įrašai jau yra jūsų saugykloje ir nebuvo perrašyti:",
 
   "syncDeleteEntryContent": "Kitas įrenginys ištrynė «{title}».\n\nIštrinti čia taip pat, ar palikti?",
   "@syncDeleteEntryContent": {
@@ -694,7 +687,7 @@
   "importFileNotFound": "Failas nerastas.",
   "importEnterPassphrase": "Įveskite šios saugyklos slaptafrazę.",
   "importSourceKeyProtected": "Šis seifas apsaugotas YubiKey. Norėdami sinchronizuoti, turėsite paliesti registruotą raktą.",
-  "importDuplicateWarning": "Įrašai, kurie jau yra jūsų saugykloje, bus automatiškai praleisti. Bus parodyta suvestinė.",
+  "importDuplicateWarning": "Pridedamas kiekvienas failo įrašas, net jau esantys saugykloje. Geriausia vieną kartą, į tuščią saugyklą.",
   "importGabbroSubtitle": "Importuoti įrašus iš kitos Gabbro saugyklos (.gabbro failas)",
   "importEnpassSubtitle": "JSON eksportas iš Enpass (Įrankiai → Eksportuoti)",
   "importBitwardenSubtitle": "Nešifruotas JSON eksportas iš Bitwarden (Įrankiai → Eksportuoti saugyklą)",

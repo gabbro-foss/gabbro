@@ -526,13 +526,6 @@
   },
   "importIssueHelp": "Уредите, исправите и сачувајте овај унос, или прескочите како бисте га одбили.",
 
-  "entriesSkipped": "{count, plural, one{1 унос прескочен} few{{count} уноса прескочена} other{{count} уноса прескочено}}",
-  "@entriesSkipped": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "skippedEntriesNote": "Ови уноси већ постоје у вашем трезору и нису преписани:",
 
   "syncDeleteEntryContent": "Други уређај је обрисао «{title}».\n\nОбрисати и овде, или задржати?",
   "@syncDeleteEntryContent": {
@@ -694,7 +687,7 @@
   "importFileNotFound": "Датотека није пронађена.",
   "importEnterPassphrase": "Унесите приступну фразу за овај трезор.",
   "importSourceKeyProtected": "Овај трезор је заштићен YubiKey-јем. За синхронизацију ћете морати да додирнете регистровани кључ.",
-  "importDuplicateWarning": "Уноси који већ постоје у вашем трезору биће аутоматски прескочени. Приказаће се преглед.",
+  "importDuplicateWarning": "Сваки унос из датотеке се додаје, и они које трезор већ има. Најбоље једном, у празан трезор.",
   "importGabbroSubtitle": "Увези уносе из другог Gabbro трезора (датотека .gabbro)",
   "importEnpassSubtitle": "JSON извоз из Enpass (Алати → Извези)",
   "importBitwardenSubtitle": "Нешифровани JSON извоз из Bitwarden (Алати → Извези трезор)",

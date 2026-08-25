@@ -234,9 +234,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<(String, String)> dco_decode_list_record_string_string(dynamic raw);
 
   @protected
-  List<SkippedEntryData> dco_decode_list_skipped_entry_data(dynamic raw);
-
-  @protected
   List<SyncFieldResolutionInput> dco_decode_list_sync_field_resolution_input(
     dynamic raw,
   );
@@ -312,9 +309,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   RegistrationParts dco_decode_registration_parts(dynamic raw);
-
-  @protected
-  SkippedEntryData dco_decode_skipped_entry_data(dynamic raw);
 
   @protected
   StrengthTier dco_decode_strength_tier(dynamic raw);
@@ -640,11 +634,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  List<SkippedEntryData> sse_decode_list_skipped_entry_data(
-    SseDeserializer deserializer,
-  );
-
-  @protected
   List<SyncFieldResolutionInput> sse_decode_list_sync_field_resolution_input(
     SseDeserializer deserializer,
   );
@@ -738,9 +727,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   RegistrationParts sse_decode_registration_parts(SseDeserializer deserializer);
-
-  @protected
-  SkippedEntryData sse_decode_skipped_entry_data(SseDeserializer deserializer);
 
   @protected
   StrengthTier sse_decode_strength_tier(SseDeserializer deserializer);
@@ -1153,12 +1139,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  void sse_encode_list_skipped_entry_data(
-    List<SkippedEntryData> self,
-    SseSerializer serializer,
-  );
-
-  @protected
   void sse_encode_list_sync_field_resolution_input(
     List<SyncFieldResolutionInput> self,
     SseSerializer serializer,
@@ -1284,12 +1264,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_registration_parts(
     RegistrationParts self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_skipped_entry_data(
-    SkippedEntryData self,
     SseSerializer serializer,
   );
 

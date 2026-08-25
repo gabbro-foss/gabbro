@@ -526,13 +526,6 @@
   },
   "importIssueHelp": "Rediger for å rette og lagre denne oppføringen, eller hopp over for å forkaste den.",
 
-  "entriesSkipped": "{count, plural, one{1 oppføring hoppet over} other{{count} oppføringer hoppet over}}",
-  "@entriesSkipped": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "skippedEntriesNote": "Disse oppføringene finnes allerede i hvelvet ditt og ble ikke overskrevet:",
 
   "syncDeleteEntryContent": "Den andre enheten slettet '{title}'.\n\nSlett den her også, eller behold den?",
   "@syncDeleteEntryContent": {
@@ -694,7 +687,7 @@
   "importFileNotFound": "Fil ikke funnet.",
   "importEnterPassphrase": "Angi passfrasen for dette hvelvet.",
   "importSourceKeyProtected": "Dette hvelvet er beskyttet av en YubiKey. Du må trykke på en registrert nøkkel for å synkronisere.",
-  "importDuplicateWarning": "Oppføringer som allerede finnes i hvelvet hoppes over automatisk. Du vil se et sammendrag.",
+  "importDuplicateWarning": "Hver oppføring i filen legges til, også de hvelvet allerede har. Best gjort én gang, i et tomt hvelv.",
   "importGabbroSubtitle": "Importer oppføringer fra et annet Gabbro-hvelv (.gabbro-fil)",
   "importEnpassSubtitle": "JSON-eksport fra Enpass (Verktøy → Eksporter)",
   "importBitwardenSubtitle": "Ukryptert JSON-eksport fra Bitwarden (Verktøy → Eksporter hvelv)",

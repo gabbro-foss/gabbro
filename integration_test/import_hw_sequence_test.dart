@@ -1,7 +1,7 @@
-// Real-FFI replay of the whole S15 hardware sequence (matrix rows 4-8):
+// Real-FFI replay of the import hardware sequence (matrix rows 4-8), under S3:
 // generic CSV, same CSV again, mixed CSV, Google PM, same Google PM again,
 // with a lock -> unlock round trip before every import (the auto-lock the
-// app hits between steps). Counts must match the matrix expectations.
+// app hits between steps). Import is additive: every row lands every time.
 //
 // Run: dart test integration_test/import_hw_sequence_test.dart -j 1
 
@@ -54,13 +54,11 @@ void main() {
 
     await relock();
     final r5 = await importFromCsv(input: generic, config: _config);
-    expect(r5.imported.toInt(), 0, reason: 'row 5');
-    expect(r5.skipped.length, 3, reason: 'row 5 skipped');
+    expect(r5.imported.toInt(), 3, reason: 'row 5: same CSV again, all 3 added');
 
     await relock();
     final r6 = await importFromCsv(input: mixed, config: _config);
-    expect(r6.imported.toInt(), 1, reason: 'row 6');
-    expect(r6.skipped.length, 3, reason: 'row 6 skipped');
+    expect(r6.imported.toInt(), 4, reason: 'row 6: mixed CSV, all 4 added');
 
     await relock();
     final r7 = await importFromGooglePm(data: google);
@@ -68,7 +66,6 @@ void main() {
 
     await relock();
     final r8 = await importFromGooglePm(data: google);
-    expect(r8.imported.toInt(), 0, reason: 'row 8');
-    expect(r8.skipped.length, 8, reason: 'row 8 skipped');
+    expect(r8.imported.toInt(), 8, reason: 'row 8: same Google PM again, all 8 added');
   });
 }

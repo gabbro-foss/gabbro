@@ -1275,22 +1275,6 @@ class AppLocalizationsPl extends AppLocalizations {
       'Edytuj, popraw i zapisz ten wpis, lub pomiń, aby go odrzucić.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count wpisów pominiętych',
-      few: '$count wpisy pominięte',
-      one: '1 wpis pominięty',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Te wpisy już istnieją w Twoim skarbcu i nie zostały nadpisane:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Inne urządzenie usunęło «$title».\n\nUsunąć tutaj też, czy zachować?';
   }
@@ -1659,7 +1643,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Wpisy, które już są w Twoim skarbcu, zostaną automatycznie pominięte. Zobaczysz podsumowanie.';
+      'Każdy wpis z pliku zostanie dodany, także te już obecne w sejfie. Najlepiej raz, do pustego sejfu.';
 
   @override
   String get importGabbroSubtitle =>

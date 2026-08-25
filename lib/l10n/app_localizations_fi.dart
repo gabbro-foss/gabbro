@@ -1270,21 +1270,6 @@ class AppLocalizationsFi extends AppLocalizations {
       'Muokkaa, korjaa ja tallenna tämä merkintä tai ohita se hylätäksesi sen.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count merkintää ohitettu',
-      one: '1 merkintä ohitettu',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Nämä merkinnät ovat jo holvissasi eikä niitä korvattu:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Toinen laite poisti \'$title\'.\n\nPoistetaanko se myös täältä vai säilytetäänkö?';
   }
@@ -1652,7 +1637,7 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Merkinnät, jotka ovat jo holvissa, ohitetaan automaattisesti. Näet yhteenvedon.';
+      'Tiedoston jokainen kohde lisätään, myös holvissa jo olevat. Parasta tehdä kerran, tyhjään holviin.';
 
   @override
   String get importGabbroSubtitle =>

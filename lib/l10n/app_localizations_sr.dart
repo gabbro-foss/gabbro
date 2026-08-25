@@ -1270,22 +1270,6 @@ class AppLocalizationsSr extends AppLocalizations {
       'Уредите, исправите и сачувајте овај унос, или прескочите како бисте га одбили.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count уноса прескочено',
-      few: '$count уноса прескочена',
-      one: '1 унос прескочен',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Ови уноси већ постоје у вашем трезору и нису преписани:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Други уређај је обрисао «$title».\n\nОбрисати и овде, или задржати?';
   }
@@ -1654,7 +1638,7 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Уноси који већ постоје у вашем трезору биће аутоматски прескочени. Приказаће се преглед.';
+      'Сваки унос из датотеке се додаје, и они које трезор већ има. Најбоље једном, у празан трезор.';
 
   @override
   String get importGabbroSubtitle =>
@@ -3522,22 +3506,6 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
       'Uredite, ispravite i sačuvajte ovaj unos, ili preskočite kako biste ga odbili.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count unosa preskočeno',
-      few: '$count unosa preskočena',
-      one: '1 unos preskočen',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Ovi unosi već postoje u vašem trezoru i nisu prepisani:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Drugi uređaj je obrisao «$title».\n\nObrisati i ovde, ili zadržati?';
   }
@@ -3907,7 +3875,7 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get importDuplicateWarning =>
-      'Unosi koji već postoje u vašem trezoru biće automatski preskočeni. Prikazaće se pregled.';
+      'Svaki unos iz datoteke se dodaje, i oni koje trezor već ima. Najbolje jednom, u prazan trezor.';
 
   @override
   String get importGabbroSubtitle =>

@@ -1269,21 +1269,6 @@ class AppLocalizationsPt extends AppLocalizations {
       'Edite para corrigir e salvar esta entrada, ou pule para descartá-la.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count entradas puladas',
-      one: '1 entrada pulada',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Estas entradas já existem no cofre e não foram substituídas:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'O outro dispositivo excluiu \'$title\'.\n\nExcluir aqui também, ou manter?';
   }
@@ -1653,7 +1638,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Entradas que já estão no cofre serão puladas automaticamente. Será exibido um resumo.';
+      'Cada entrada do arquivo é adicionada, mesmo as que o cofre já tem. Melhor uma única vez, em um cofre vazio.';
 
   @override
   String get importGabbroSubtitle =>
@@ -3527,21 +3512,6 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
       'Edite para corrigir e salvar esta entrada, ou pule para descartá-la.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count entradas puladas',
-      one: '1 entrada pulada',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Estas entradas já existem no cofre e não foram substituídas:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'O outro dispositivo excluiu \'$title\'.\n\nExcluir aqui também, ou manter?';
   }
@@ -3911,7 +3881,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get importDuplicateWarning =>
-      'Entradas que já estão no cofre serão puladas automaticamente. Será exibido um resumo.';
+      'Cada entrada do arquivo é adicionada, mesmo as que o cofre já tem. Melhor uma única vez, em um cofre vazio.';
 
   @override
   String get importGabbroSubtitle =>
@@ -5782,21 +5752,6 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
       'Edite para corrigir e guardar esta entrada, ou ignore para a descartar.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count entradas ignoradas',
-      one: '1 entrada ignorada',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Estas entradas já existem no cofre e não foram substituídas:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'O outro dispositivo eliminou \'$title\'.\n\nEliminar aqui também, ou manter?';
   }
@@ -6168,7 +6123,7 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get importDuplicateWarning =>
-      'As entradas que já estão no cofre serão ignoradas automaticamente. Será apresentado um resumo.';
+      'Cada entrada do ficheiro é adicionada, mesmo as que o cofre já tem. Melhor uma única vez, num cofre vazio.';
 
   @override
   String get importGabbroSubtitle =>

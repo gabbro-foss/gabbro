@@ -1270,21 +1270,6 @@ class AppLocalizationsLv extends AppLocalizations {
       'Rediģējiet, labojiet un saglabājiet šo ierakstu vai izlaidiet, lai to atmestų.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count ieraksti izlaisti',
-      one: '1 ieraksts izlaists',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Šie ieraksti jau pastāv jūsu seifā un netika pārrakstīti:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Otra ierīce izdzēsa \'$title\'.\n\nDzēst arī šeit, vai paturēt?';
   }
@@ -1653,7 +1638,7 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Ieraksti, kas jau ir jūsu seifā, tiks automātiski izlaisti. Tiks parādīts kopsavilkums.';
+      'Tiek pievienots katrs faila ieraksts, arī tie, kas glabātavā jau ir. Vislabāk vienreiz, tukšā glabātavā.';
 
   @override
   String get importGabbroSubtitle =>

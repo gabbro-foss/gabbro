@@ -1273,21 +1273,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Bewerk om te corrigeren en sla dit item op, of sla het over om het te verwijderen.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count items overgeslagen',
-      one: '1 item overgeslagen',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Deze items bestaan al in uw kluis en zijn niet overschreven:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Het andere apparaat heeft \'$title\' verwijderd.\n\nHier ook verwijderen, of behouden?';
   }
@@ -1657,7 +1642,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Items die al in uw kluis staan, worden automatisch overgeslagen. Er wordt een samenvatting getoond.';
+      'Elk item uit het bestand wordt toegevoegd, ook wat de kluis al bevat. Doe dit bij voorkeur eenmalig, in een lege kluis.';
 
   @override
   String get importGabbroSubtitle =>

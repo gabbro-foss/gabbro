@@ -1270,21 +1270,6 @@ class AppLocalizationsDa extends AppLocalizations {
       'Rediger for at rette og gem denne post, eller spring over for at kassere den.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count poster sprunget over',
-      one: '1 post sprunget over',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Disse poster findes allerede i din hvælving og blev ikke overskrevet:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Den anden enhed slettede \'$title\'.\n\nSlet den her også, eller behold den?';
   }
@@ -1653,7 +1638,7 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Poster, der allerede findes i din hvælving, springes automatisk over. Du vil se et resumé.';
+      'Hver post i filen tilføjes, også dem din boks allerede har. Gør det helst én gang, i en tom boks.';
 
   @override
   String get importGabbroSubtitle =>

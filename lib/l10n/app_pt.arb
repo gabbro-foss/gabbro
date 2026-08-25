@@ -526,13 +526,6 @@
   },
   "importIssueHelp": "Edite para corrigir e salvar esta entrada, ou pule para descartá-la.",
 
-  "entriesSkipped": "{count, plural, one{1 entrada pulada} other{{count} entradas puladas}}",
-  "@entriesSkipped": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "skippedEntriesNote": "Estas entradas já existem no cofre e não foram substituídas:",
 
   "syncDeleteEntryContent": "O outro dispositivo excluiu '{title}'.\n\nExcluir aqui também, ou manter?",
   "@syncDeleteEntryContent": {
@@ -694,7 +687,7 @@
   "importFileNotFound": "Arquivo não encontrado.",
   "importEnterPassphrase": "Insira a frase secreta deste cofre.",
   "importSourceKeyProtected": "Este cofre está protegido por uma YubiKey. Terá de tocar numa chave registada para sincronizar.",
-  "importDuplicateWarning": "Entradas que já estão no cofre serão puladas automaticamente. Será exibido um resumo.",
+  "importDuplicateWarning": "Cada entrada do arquivo é adicionada, mesmo as que o cofre já tem. Melhor uma única vez, em um cofre vazio.",
   "importGabbroSubtitle": "Importar entradas de outro cofre Gabbro (arquivo .gabbro)",
   "importEnpassSubtitle": "Exportação JSON do Enpass (Ferramentas → Exportar)",
   "importBitwardenSubtitle": "Exportação JSON não criptografada do Bitwarden (Ferramentas → Exportar Cofre)",

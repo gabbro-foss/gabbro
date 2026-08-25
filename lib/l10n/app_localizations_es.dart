@@ -1270,21 +1270,6 @@ class AppLocalizationsEs extends AppLocalizations {
       'Edita para corregir y guardar esta entrada, u omítela para descartarla.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count entradas omitidas',
-      one: '1 entrada omitida',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Estas entradas ya existen en tu almacén y no fueron sobreescritas:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'El otro dispositivo eliminó «$title».\n\n¿Eliminarlo aquí también o conservarlo?';
   }
@@ -1658,7 +1643,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Las entradas que ya están en tu almacén se omitirán automáticamente. Se te mostrará un resumen.';
+      'Se añade cada entrada del archivo, incluso las que la bóveda ya contiene. Mejor una sola vez, en una bóveda vacía.';
 
   @override
   String get importGabbroSubtitle =>

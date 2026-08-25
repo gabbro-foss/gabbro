@@ -1279,21 +1279,6 @@ class AppLocalizationsEl extends AppLocalizations {
       'Επεξεργαστείτε, διορθώστε και αποθηκεύστε αυτή την καταχώριση, ή παραλείψτε για να την απορρίψετε.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count καταχωρίσεις παραλείφθηκαν',
-      one: '1 καταχώριση παραλείφθηκε',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Αυτές οι καταχωρίσεις υπάρχουν ήδη στο θησαυροφυλάκιό σας και δεν αντικαταστάθηκαν:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Η άλλη συσκευή διέγραψε «$title».\n\nΔιαγραφή και εδώ, ή διατήρηση;';
   }
@@ -1663,7 +1648,7 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Οι καταχωρίσεις που υπάρχουν ήδη στο θησαυροφυλάκιό σας θα παραλειφθούν αυτόματα. Θα εμφανιστεί περίληψη.';
+      'Κάθε καταχώριση του αρχείου προστίθεται, ακόμη κι όσες υπάρχουν ήδη. Κατά προτίμηση μία φορά, σε κενό θησαυροφυλάκιο.';
 
   @override
   String get importGabbroSubtitle =>

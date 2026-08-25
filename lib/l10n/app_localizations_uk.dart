@@ -1275,22 +1275,6 @@ class AppLocalizationsUk extends AppLocalizations {
       'Відредагуйте, виправте та збережіть цей запис або пропустіть, щоб відхилити його.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count записів пропущено',
-      few: '$count записи пропущено',
-      one: '1 запис пропущено',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Ці записи вже існують у вашому сховищі та не були перезаписані:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Інший пристрій видалив «$title».\n\nВидалити тут теж або залишити?';
   }
@@ -1657,7 +1641,7 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Записи, які вже є у вашому сховищі, будуть автоматично пропущені. Ви побачите зведення.';
+      'Додається кожен запис із файлу, навіть уже наявні у сховищі. Найкраще один раз, у порожнє сховище.';
 
   @override
   String get importGabbroSubtitle =>

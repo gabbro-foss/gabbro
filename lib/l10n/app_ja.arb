@@ -526,13 +526,6 @@
   },
   "importIssueHelp": "このエントリを編集、修正して保存するか、スキップして拒否してください。",
 
-  "entriesSkipped": "{count, plural, other{{count}件のエントリをスキップしました}}",
-  "@entriesSkipped": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "skippedEntriesNote": "以下のエントリはすでにボルトに存在し、上書きされませんでした:",
 
   "syncDeleteEntryContent": "別のデバイスが「{title}」を削除しました。\n\nここでも削除しますか、それとも保持しますか?",
   "@syncDeleteEntryContent": {
@@ -694,7 +687,7 @@
   "importFileNotFound": "ファイルが見つかりません。",
   "importEnterPassphrase": "このボルトのパスフレーズを入力してください。",
   "importSourceKeyProtected": "この保管庫は YubiKey で保護されています。同期するには、登録済みのキーをタップする必要があります。",
-  "importDuplicateWarning": "すでにボルトにあるエントリは自動的にスキップされます。概要が表示されます。",
+  "importDuplicateWarning": "ファイル内のすべての項目が追加されます。保管庫に既にあるものも含みます。空の保管庫に一度だけ行うのが最適です。",
   "importGabbroSubtitle": "別のGabbroボルト (.gabbro) からエントリをインポート",
   "importEnpassSubtitle": "EnpassからのJSONエクスポート (ツール → エクスポート)",
   "importBitwardenSubtitle": "BitwardenからのJSONエクスポート (ツール → ボルトをエクスポート)",

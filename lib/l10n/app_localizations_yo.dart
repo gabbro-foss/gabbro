@@ -1269,20 +1269,6 @@ class AppLocalizationsYo extends AppLocalizations {
       'Ṣatunkọ, ṣe atunṣe ki o pamọ titẹ sii yii, tabi fo lati kọ.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'A fo awọn titẹ sii $count',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Awọn titẹ sii wọnyi ti wa ninu vọọliti rẹ tẹlẹ ati pe a ko rọpo wọn:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Ẹrọ miiran pa «$title».\n\nPa nibi pẹlu, tabi tọju?';
   }
@@ -1648,7 +1634,7 @@ class AppLocalizationsYo extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'A yoo fo awọn titẹ sii ti o ti wa ninu vọọliti rẹ tẹlẹ laifọwọyi. A yoo ṣe afihan akopọ.';
+      'A ń fi gbogbo ohun inú fáìlì kún un, àní àwọn tí àpótí ti ní. Ó dára jù láti ṣe é lẹ́ẹ̀kan, sínú àpótí òfo.';
 
   @override
   String get importGabbroSubtitle =>

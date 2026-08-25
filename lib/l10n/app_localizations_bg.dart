@@ -1272,21 +1272,6 @@ class AppLocalizationsBg extends AppLocalizations {
       'Редактирай, поправи и запази този запис или го пропусни, за да го отхвърлиш.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count записа са пропуснати',
-      one: '1 запис е пропуснат',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Тези записи вече съществуват в твоя трезор и не са бивали презаписани:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Другото устройство изтри «$title».\n\nДа се изтрие ли и тук, или да се запази?';
   }
@@ -1653,7 +1638,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Записи, които вече са в твоя трезор, ще бъдат автоматично пропуснати. Ще видиш обобщение.';
+      'Всеки запис от файла се добавя, дори вече наличните в трезора. Най-добре веднъж, в празен трезор.';
 
   @override
   String get importGabbroSubtitle =>

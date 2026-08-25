@@ -1253,19 +1253,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get importIssueHelp => '이 항목을 편집, 수정하고 저장하거나 건너뛰어 거부하세요.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count개의 항목을 건너뛰었습니다',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote => '다음 항목은 이미 볼트에 존재하며 덮어쓰지 않았습니다:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return '다른 기기에서 «$title»을(를) 삭제했습니다.\n\n여기서도 삭제하시겠습니까, 아니면 유지하시겠습니까?';
   }
@@ -1618,7 +1605,8 @@ class AppLocalizationsKo extends AppLocalizations {
       '이 보관함은 YubiKey로 보호됩니다. 동기화하려면 등록된 키를 탭해야 합니다.';
 
   @override
-  String get importDuplicateWarning => '이미 볼트에 있는 항목은 자동으로 건너뜁니다. 요약이 표시됩니다.';
+  String get importDuplicateWarning =>
+      '파일의 모든 항목이 추가됩니다. 이미 금고에 있는 항목도 포함됩니다. 빈 금고에 한 번만 하는 것이 좋습니다.';
 
   @override
   String get importGabbroSubtitle => '다른 Gabbro 볼트 (.gabbro)에서 항목 가져오기';

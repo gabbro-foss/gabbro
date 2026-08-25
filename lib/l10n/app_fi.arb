@@ -526,13 +526,6 @@
   },
   "importIssueHelp": "Muokkaa, korjaa ja tallenna tämä merkintä tai ohita se hylätäksesi sen.",
 
-  "entriesSkipped": "{count, plural, one{1 merkintä ohitettu} other{{count} merkintää ohitettu}}",
-  "@entriesSkipped": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "skippedEntriesNote": "Nämä merkinnät ovat jo holvissasi eikä niitä korvattu:",
 
   "syncDeleteEntryContent": "Toinen laite poisti '{title}'.\n\nPoistetaanko se myös täältä vai säilytetäänkö?",
   "@syncDeleteEntryContent": {
@@ -694,7 +687,7 @@
   "importFileNotFound": "Tiedostoa ei löydy.",
   "importEnterPassphrase": "Syötä tämän holvin salauslause.",
   "importSourceKeyProtected": "Tämä holvi on suojattu YubiKey-avaimella. Sinun on napautettava rekisteröityä avainta synkronoidaksesi.",
-  "importDuplicateWarning": "Merkinnät, jotka ovat jo holvissa, ohitetaan automaattisesti. Näet yhteenvedon.",
+  "importDuplicateWarning": "Tiedoston jokainen kohde lisätään, myös holvissa jo olevat. Parasta tehdä kerran, tyhjään holviin.",
   "importGabbroSubtitle": "Tuo merkintöjä toisesta Gabbro-holvista (.gabbro-tiedosto)",
   "importEnpassSubtitle": "JSON-vienti Enpassista (Työkalut → Vie)",
   "importBitwardenSubtitle": "Salaamaton JSON-vienti Bitwardenista (Työkalut → Vie holvi)",

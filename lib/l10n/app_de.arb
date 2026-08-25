@@ -526,13 +526,6 @@
   },
   "importIssueHelp": "Bearbeiten, um diesen Eintrag zu korrigieren und zu speichern, oder überspringen, um ihn zu verwerfen.",
 
-  "entriesSkipped": "{count, plural, one{1 Eintrag übersprungen} other{{count} Einträge übersprungen}}",
-  "@entriesSkipped": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "skippedEntriesNote": "Diese Einträge existieren bereits im Tresor und wurden nicht überschrieben:",
 
   "syncDeleteEntryContent": "Das andere Gerät hat «{title}» gelöscht.\n\nHier auch löschen oder behalten?",
   "@syncDeleteEntryContent": {
@@ -694,7 +687,7 @@
   "importFileNotFound": "Datei nicht gefunden.",
   "importEnterPassphrase": "Passphrase für diesen Tresor eingeben.",
   "importSourceKeyProtected": "Dieser Tresor ist durch einen YubiKey geschützt. Zum Synchronisieren müssen Sie einen registrierten Schlüssel antippen.",
-  "importDuplicateWarning": "Einträge, die bereits im Tresor vorhanden sind, werden automatisch übersprungen. Eine Zusammenfassung wird angezeigt.",
+  "importDuplicateWarning": "Jeder Eintrag der Datei wird hinzugefügt, auch bereits vorhandene. Am besten einmalig in einen leeren Tresor.",
   "importGabbroSubtitle": "Einträge aus einem anderen Gabbro-Tresor importieren (.gabbro-Datei)",
   "importEnpassSubtitle": "JSON-Export aus Enpass (Werkzeuge → Exportieren)",
   "importBitwardenSubtitle": "Unverschlüsselter JSON-Export aus Bitwarden (Werkzeuge → Tresor exportieren)",

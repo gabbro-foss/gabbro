@@ -526,13 +526,6 @@
   },
   "importIssueHelp": "Upravte, opravte a uložte tento záznam, nebo přeskočte, abyste ho odmítli.",
 
-  "entriesSkipped": "{count, plural, one{1 záznam přeskočen} few{{count} záznamy přeskočeny} other{{count} záznamů přeskočeno}}",
-  "@entriesSkipped": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "skippedEntriesNote": "Tyto záznamy již existují ve vašem trezoru a nebyly přepsány:",
 
   "syncDeleteEntryContent": "Druhé zařízení smazalo «{title}».\n\nSmazat i zde, nebo ponechat?",
   "@syncDeleteEntryContent": {
@@ -694,7 +687,7 @@
   "importFileNotFound": "Soubor nenalezen.",
   "importEnterPassphrase": "Zadejte přístupovou frázi pro tento trezor.",
   "importSourceKeyProtected": "Tento trezor je chráněn klíčem YubiKey. K synchronizaci se musíte dotknout zaregistrovaného klíče.",
-  "importDuplicateWarning": "Záznamy, které již ve svém trezoru máte, budou automaticky přeskočeny. Zobrazí se přehled.",
+  "importDuplicateWarning": "Každá položka ze souboru se přidá, i ty, které trezor už obsahuje. Nejlépe jednou, do prázdného trezoru.",
   "importGabbroSubtitle": "Importovat záznamy z jiného trezoru Gabbro (soubor .gabbro)",
   "importEnpassSubtitle": "JSON export z Enpass (Nástroje → Exportovat)",
   "importBitwardenSubtitle": "Nešifrovaný JSON export z Bitwarden (Nástroje → Exportovat trezor)",

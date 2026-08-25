@@ -1270,21 +1270,6 @@ class AppLocalizationsSv extends AppLocalizations {
       'Redigera för att rätta och spara den här posten, eller hoppa över för att kassera den.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count poster överhoppade',
-      one: '1 post överhoppad',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Dessa poster finns redan i ditt valv och skrevs inte över:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Den andra enheten raderade \'$title\'.\n\nRadera den här också, eller behåll den?';
   }
@@ -1648,7 +1633,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Poster som redan finns i ditt valv hoppas över automatiskt. Du kommer se en sammanfattning.';
+      'Varje post i filen läggs till, även de valvet redan har. Bäst att göra en gång, i ett tomt valv.';
 
   @override
   String get importGabbroSubtitle =>

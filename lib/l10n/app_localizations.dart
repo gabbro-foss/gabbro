@@ -2455,18 +2455,6 @@ abstract class AppLocalizations {
   /// **'Edit to correct and save this entry, or skip to discard it.'**
   String get importIssueHelp;
 
-  /// No description provided for @entriesSkipped.
-  ///
-  /// In en, this message translates to:
-  /// **'{count, plural, one{1 entry skipped} other{{count} entries skipped}}'**
-  String entriesSkipped(int count);
-
-  /// No description provided for @skippedEntriesNote.
-  ///
-  /// In en, this message translates to:
-  /// **'These entries already exist in your vault and were not overwritten:'**
-  String get skippedEntriesNote;
-
   /// No description provided for @syncDeleteEntryContent.
   ///
   /// In en, this message translates to:
@@ -3118,7 +3106,7 @@ abstract class AppLocalizations {
   /// No description provided for @importDuplicateWarning.
   ///
   /// In en, this message translates to:
-  /// **'Entries your vault already holds will be skipped automatically. You will be shown a summary.'**
+  /// **'Every entry in the file is added, even ones your vault already holds. Best done once, into an empty vault.'**
   String get importDuplicateWarning;
 
   /// No description provided for @importGabbroSubtitle.

@@ -526,13 +526,6 @@
   },
   "importIssueHelp": "Бұл жазбаны өңдеп, түзетіп сақтаңыз немесе бас тарту үшін өткізіп жіберіңіз.",
 
-  "entriesSkipped": "{count, plural, other{{count} жазба өткізіп жіберілді}}",
-  "@entriesSkipped": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "skippedEntriesNote": "Бұл жазбалар сейфте бар болғандықтан қайта жазылмады:",
 
   "syncDeleteEntryContent": "Басқа құрылғы «{title}» жойды.\n\nМұнда да жою керек пе, әлде сақтап қалу керек пе?",
   "@syncDeleteEntryContent": {
@@ -694,7 +687,7 @@
   "importFileNotFound": "Файл табылмады.",
   "importEnterPassphrase": "Осы сейфтің кілт фразасын енгізіңіз.",
   "importSourceKeyProtected": "Бұл қойма YubiKey арқылы қорғалған. Синхрондау үшін тіркелген кілтті түрту қажет.",
-  "importDuplicateWarning": "Сейфте бұрыннан бар жазбалар автоматты өткізіп жіберіледі. Қорытынды көрсетіледі.",
+  "importDuplicateWarning": "Файлдағы әрбір жазба қосылады, қоймада бар болса да. Бос қоймаға бір рет жасаған дұрыс.",
   "importGabbroSubtitle": "Басқа Gabbro сейфінен жазбаларды импорттау (.gabbro файлы)",
   "importEnpassSubtitle": "Enpass бағдарламасынан JSON экспорты (Құралдар → Экспорттау)",
   "importBitwardenSubtitle": "Bitwarden бағдарламасынан шифрланбаған JSON экспорты (Құралдар → Сейфті экспорттау)",

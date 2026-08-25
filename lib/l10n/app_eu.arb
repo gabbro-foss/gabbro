@@ -526,13 +526,6 @@
   },
   "importIssueHelp": "Editatu, zuzendu eta gorde sarrera hau, edo saltatu ukatzeko.",
 
-  "entriesSkipped": "{count, plural, one{1 sarrera saltatu da} other{{count} sarrerak saltatu dira}}",
-  "@entriesSkipped": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "skippedEntriesNote": "Sarrera hauek dagoeneko daude zure gandegian eta ez dira gainidatzi:",
 
   "syncDeleteEntryContent": "Beste gailu batek «{title}» ezabatu du.\n\nHemen ere ezabatu, ala gorde?",
   "@syncDeleteEntryContent": {
@@ -694,7 +687,7 @@
   "importFileNotFound": "Fitxategia ez da aurkitu.",
   "importEnterPassphrase": "Sartu gandegi honetako pasaesaldia.",
   "importSourceKeyProtected": "Kutxa gotor hau YubiKey batek babesten du. Sinkronizatzeko, erregistratutako gako bat ukitu beharko duzu.",
-  "importDuplicateWarning": "Zure gandegian dagoeneko dauden sarrerak automatikoki saltatuko dira. Laburpena erakutsiko da.",
+  "importDuplicateWarning": "Fitxategiko sarrera guztiak gehitzen dira, kutxak dagoeneko dituenak barne. Hobe behin, kutxa huts batean.",
   "importGabbroSubtitle": "Beste Gabbro gandegi batetik sarrerak inportatu (.gabbro fitxategia)",
   "importEnpassSubtitle": "Enpass-etiko JSON esportazioa (Tresnak → Esportatu)",
   "importBitwardenSubtitle": "Bitwarden-etiko JSON enkriptatu gabeko esportazioa (Tresnak → Gandegi esportatu)",

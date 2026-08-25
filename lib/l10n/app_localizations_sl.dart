@@ -1275,23 +1275,6 @@ class AppLocalizationsSl extends AppLocalizations {
       'Uredite, popravite in shranite ta vnos ali preskočite, da ga zavrnete.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count vnosov preskočenih',
-      few: '$count vnosi preskočeni',
-      two: '$count vnosa preskočena',
-      one: '1 vnos preskočen',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Ti vnosi že obstajajo v vašem trezorju in niso bili prepisani:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Druga naprava je izbrisala «$title».\n\nIzbrisati tudi tukaj ali obdržati?';
   }
@@ -1657,7 +1640,7 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Vnosi, ki so že v vašem trezorju, bodo samodejno preskočeni. Prikazan bo pregled.';
+      'Doda se vsak vnos iz datoteke, tudi tisti, ki jih trezor že ima. Najbolje enkrat, v prazen trezor.';
 
   @override
   String get importGabbroSubtitle =>

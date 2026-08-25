@@ -526,13 +526,6 @@
   },
   "importIssueHelp": "Redigera för att rätta och spara den här posten, eller hoppa över för att kassera den.",
 
-  "entriesSkipped": "{count, plural, one{1 post överhoppad} other{{count} poster överhoppade}}",
-  "@entriesSkipped": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "skippedEntriesNote": "Dessa poster finns redan i ditt valv och skrevs inte över:",
 
   "syncDeleteEntryContent": "Den andra enheten raderade '{title}'.\n\nRadera den här också, eller behåll den?",
   "@syncDeleteEntryContent": {
@@ -694,7 +687,7 @@
   "importFileNotFound": "Fil hittades inte.",
   "importEnterPassphrase": "Ange lösenfransen för det här valvet.",
   "importSourceKeyProtected": "Detta valv skyddas av en YubiKey. Du måste trycka på en registrerad nyckel för att synkronisera.",
-  "importDuplicateWarning": "Poster som redan finns i ditt valv hoppas över automatiskt. Du kommer se en sammanfattning.",
+  "importDuplicateWarning": "Varje post i filen läggs till, även de valvet redan har. Bäst att göra en gång, i ett tomt valv.",
   "importGabbroSubtitle": "Importera poster från ett annat Gabbro-valv (.gabbro-fil)",
   "importEnpassSubtitle": "JSON-export från Enpass (Verktyg → Exportera)",
   "importBitwardenSubtitle": "Okrypterad JSON-export från Bitwarden (Verktyg → Exportera valv)",

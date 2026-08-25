@@ -1267,21 +1267,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Edit to correct and save this entry, or skip to discard it.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count entries skipped',
-      one: '1 entry skipped',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'These entries already exist in your vault and were not overwritten:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'The other device deleted \'$title\'.\n\nDelete it here too, or keep it?';
   }
@@ -1645,7 +1630,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Entries your vault already holds will be skipped automatically. You will be shown a summary.';
+      'Every entry in the file is added, even ones your vault already holds. Best done once, into an empty vault.';
 
   @override
   String get importGabbroSubtitle =>

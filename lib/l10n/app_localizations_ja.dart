@@ -1252,19 +1252,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get importIssueHelp => 'このエントリを編集、修正して保存するか、スキップして拒否してください。';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count件のエントリをスキップしました',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote => '以下のエントリはすでにボルトに存在し、上書きされませんでした:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return '別のデバイスが「$title」を削除しました。\n\nここでも削除しますか、それとも保持しますか?';
   }
@@ -1617,7 +1604,8 @@ class AppLocalizationsJa extends AppLocalizations {
       'この保管庫は YubiKey で保護されています。同期するには、登録済みのキーをタップする必要があります。';
 
   @override
-  String get importDuplicateWarning => 'すでにボルトにあるエントリは自動的にスキップされます。概要が表示されます。';
+  String get importDuplicateWarning =>
+      'ファイル内のすべての項目が追加されます。保管庫に既にあるものも含みます。空の保管庫に一度だけ行うのが最適です。';
 
   @override
   String get importGabbroSubtitle => '別のGabbroボルト (.gabbro) からエントリをインポート';

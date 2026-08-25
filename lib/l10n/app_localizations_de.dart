@@ -1275,21 +1275,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Bearbeiten, um diesen Eintrag zu korrigieren und zu speichern, oder überspringen, um ihn zu verwerfen.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count Einträge übersprungen',
-      one: '1 Eintrag übersprungen',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Diese Einträge existieren bereits im Tresor und wurden nicht überschrieben:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Das andere Gerät hat «$title» gelöscht.\n\nHier auch löschen oder behalten?';
   }
@@ -1658,7 +1643,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Einträge, die bereits im Tresor vorhanden sind, werden automatisch übersprungen. Eine Zusammenfassung wird angezeigt.';
+      'Jeder Eintrag der Datei wird hinzugefügt, auch bereits vorhandene. Am besten einmalig in einen leeren Tresor.';
 
   @override
   String get importGabbroSubtitle =>

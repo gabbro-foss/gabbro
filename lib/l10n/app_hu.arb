@@ -526,13 +526,6 @@
   },
   "importIssueHelp": "Szerkeszd, javítsd és mentsd el ezt a bejegyzést, vagy hagyd ki az elvetéséhez.",
 
-  "entriesSkipped": "{count, plural, one{1 bejegyzés kihagyva} other{{count} bejegyzés kihagyva}}",
-  "@entriesSkipped": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "skippedEntriesNote": "Ezek a bejegyzések már léteznek a széfedben, és nem lettek felülírva:",
 
   "syncDeleteEntryContent": "A másik eszköz törölte a(z) '{title}' bejegyzést.\n\nTöröld itt is, vagy tartsd meg?",
   "@syncDeleteEntryContent": {
@@ -694,7 +687,7 @@
   "importFileNotFound": "A fájl nem található.",
   "importEnterPassphrase": "Add meg ennek a széfnek a jelmondatát.",
   "importSourceKeyProtected": "Ezt a széfet egy YubiKey védi. A szinkronizáláshoz meg kell érintened egy regisztrált kulcsot.",
-  "importDuplicateWarning": "Az olyan bejegyzések, amelyek már megvannak a széfedben, automatikusan kimaradnak. Látni fogsz egy összefoglalót.",
+  "importDuplicateWarning": "A fájl minden bejegyzése hozzáadódik, a széfben már meglévők is. Legjobb egyszer, üres széfbe.",
   "importGabbroSubtitle": "Bejegyzések importálása másik Gabbro széfből (.gabbro fájl)",
   "importEnpassSubtitle": "JSON-exportálás az Enpassból (Eszközök → Exportálás)",
   "importBitwardenSubtitle": "Titkosítatlan JSON-exportálás a Bitwardenből (Eszközök → Széf exportálása)",

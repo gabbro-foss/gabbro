@@ -1271,21 +1271,6 @@ class AppLocalizationsNn extends AppLocalizations {
       'Rediger for å rette og lagre denne oppføringa, eller hopp over for å forkaste ho.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count oppføringer hoppa over',
-      one: '1 oppføring hoppa over',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Desse oppføringane finst allereie i kvelvet ditt og vart ikkje overskrivne:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Den andre eininga sletta \'$title\'.\n\nSlett ho her òg, eller behald ho?';
   }
@@ -1650,7 +1635,7 @@ class AppLocalizationsNn extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Oppføringer som allereie finst i kvelvet vert automatisk hoppa over. Du vil sjå eit samandrag.';
+      'Kvar oppføring i fila vert lagd til, òg dei kvelvet alt har. Best gjort éin gong, i eit tomt kvelv.';
 
   @override
   String get importGabbroSubtitle =>
