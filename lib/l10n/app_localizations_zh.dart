@@ -498,9 +498,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get menuImportEntries => '导入条目';
 
   @override
-  String get menuSyncFromFile => '从文件同步';
-
-  @override
   String get menuManageVaults => '管理保险库';
 
   @override
@@ -738,9 +735,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get syncFailedTitle => '同步失败';
-
-  @override
-  String get syncFromFileTitle => '从文件同步';
 
   @override
   String get nothingToSync => '没有需要同步的内容 — 两个保险库均已是最新状态。';
@@ -2657,9 +2651,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get menuImportEntries => '导入条目';
 
   @override
-  String get menuSyncFromFile => '从文件同步';
-
-  @override
   String get menuManageVaults => '管理保险库';
 
   @override
@@ -2897,9 +2888,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get syncFailedTitle => '同步失败';
-
-  @override
-  String get syncFromFileTitle => '从文件同步';
 
   @override
   String get nothingToSync => '没有需要同步的内容 — 两个保险库均已是最新状态。';
@@ -4816,9 +4804,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get menuImportEntries => '匯入項目';
 
   @override
-  String get menuSyncFromFile => '從檔案同步';
-
-  @override
   String get menuManageVaults => '管理保險庫';
 
   @override
@@ -5056,9 +5041,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get syncFailedTitle => '同步失敗';
-
-  @override
-  String get syncFromFileTitle => '從檔案同步';
 
   @override
   String get nothingToSync => '沒有需要同步的內容 — 兩個保險庫均已是最新狀態。';

@@ -165,7 +165,6 @@
 
   "menuExportVault": "Експортувати сховище",
   "menuImportEntries": "Імпортувати записи",
-  "menuSyncFromFile": "Синхронізувати з файлу",
   "menuManageVaults": "Керування сховищами",
   "menuChangePassphrase": "Змінити кодову фразу",
   "menuManageYubiKeys": "Керування ключами YubiKey",
@@ -277,7 +276,6 @@
   "syncFieldConflictContent": "«{title}» має різне значення поля {field} на пристроях. Залишити ваше значення чи використати значення іншого пристрою?",
   "syncFieldConflictUseIncoming": "Використати значення іншого пристрою",
   "syncFailedTitle": "Синхронізація не вдалася",
-  "syncFromFileTitle": "Синхронізувати з файлу",
   "nothingToSync": "Нічого синхронізувати — обидва сховища вже актуальні.",
   "syncMethodTitle": "Як застосувати цю синхронізацію?",
   "syncSamePassphraseWarning": "Однакова кодова фраза не доводить, що це те саме сховище.",

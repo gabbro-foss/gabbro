@@ -165,7 +165,6 @@
 
   "menuExportVault": "볼트 내보내기",
   "menuImportEntries": "항목 가져오기",
-  "menuSyncFromFile": "파일에서 동기화",
   "menuManageVaults": "볼트 관리",
   "menuChangePassphrase": "암호 문구 변경",
   "menuManageYubiKeys": "YubiKey 관리",
@@ -277,7 +276,6 @@
   "syncFieldConflictContent": "'{title}'의 {field} 값이 기기마다 다릅니다. 내 값을 유지할까요, 아니면 다른 기기의 값을 사용할까요?",
   "syncFieldConflictUseIncoming": "다른 기기의 값 사용",
   "syncFailedTitle": "동기화에 실패했습니다",
-  "syncFromFileTitle": "파일에서 동기화",
   "nothingToSync": "동기화할 것이 없습니다 — 두 볼트 모두 이미 최신 상태입니다.",
   "syncMethodTitle": "이 동기화를 어떻게 적용하시겠습니까?",
   "syncSamePassphraseWarning": "같은 암호 문구가 같은 볼트임을 증명하지 않습니다.",

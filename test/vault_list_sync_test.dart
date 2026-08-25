@@ -109,7 +109,7 @@ Future<void> _openMenu(WidgetTester tester) async {
 // because `_buildScreen` defaults the held merge to "does not open it".
 Future<void> _startSync(WidgetTester tester) async {
   await _openMenu(tester);
-  await tester.tap(find.text('Sync from file'));
+  await tester.tap(find.text('Sync from vault'));
   await tester.pumpAndSettle();
   // Take the granular review path so the existing assertions (review dialog +
   // per-decision apply) still hold.
@@ -150,10 +150,10 @@ void main() {
         _buildScreen(pickedPath: null, mergeVault: (_, _) async => _summary()),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Sync from file'), findsNothing);
+      expect(find.text('Sync from vault'), findsNothing);
     });
 
     // Sync-from-file has no manual path fallback, so an unavailable picker
@@ -169,7 +169,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       expect(
@@ -197,12 +197,12 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Review all changes'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Sync from file'), findsOneWidget);
+      expect(find.text('Sync from vault'), findsOneWidget);
       expect(find.text('Cancel'), findsOneWidget);
       expect(find.widgetWithText(TextButton, 'Sync'), findsOneWidget);
       expect(find.text('/tmp/other.gabbro'), findsOneWidget);
@@ -221,7 +221,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       expect(
@@ -248,7 +248,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       expect(find.text('How should this sync apply?'), findsOneWidget);
@@ -275,7 +275,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       // The Quick-vs-Review chooser appears.
@@ -308,7 +308,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       expect(find.text('How should this sync apply?'), findsOneWidget);
@@ -332,7 +332,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Review all changes'));
@@ -357,7 +357,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Review all changes'));
@@ -387,7 +387,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Review all changes'));
       await tester.pumpAndSettle();
@@ -428,7 +428,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       expect(find.text('How should this sync apply?'), findsOneWidget);
@@ -449,7 +449,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Review all changes'));
@@ -467,7 +467,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Review all changes'));
@@ -637,7 +637,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Review all changes'));
       await tester.pumpAndSettle();
@@ -665,7 +665,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Review all changes'));
       await tester.pumpAndSettle();
@@ -1212,7 +1212,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Review all changes'));
       await tester.pumpAndSettle();
@@ -1304,7 +1304,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
       expect(find.text('NFC'), findsNothing);
 
@@ -1319,7 +1319,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
       expect(find.text('NFC'), findsOneWidget);
     });
@@ -1331,7 +1331,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       // PIN only: the held passphrase is tried first, so no passphrase field.
@@ -1356,7 +1356,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       expect(find.text("Use incoming vault's YubiKey"), findsOneWidget);
@@ -1379,7 +1379,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       final fields = find.descendant(
@@ -1419,7 +1419,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       expect(revealEyeButtons(), findsOneWidget);
@@ -1438,7 +1438,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.visibility), findsOneWidget);
@@ -1462,7 +1462,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
       await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
       handle.dispose();
@@ -1493,7 +1493,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       final fields = find.descendant(
@@ -1535,7 +1535,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       final fields = find.descendant(
@@ -1564,7 +1564,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       // Leave the PIN empty, then try to sync.
@@ -1591,7 +1591,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       final fields = find.descendant(
@@ -1633,7 +1633,7 @@ void main() {
           ),
         );
         await _openMenu(tester);
-        await tester.tap(find.text('Sync from file'));
+        await tester.tap(find.text('Sync from vault'));
         await tester.pumpAndSettle();
 
         final fields = find.descendant(
@@ -1702,7 +1702,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       expect(find.text('How should this sync apply?'), findsOneWidget);
@@ -1726,7 +1726,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Merge automatically'));
       await tester.pumpAndSettle();
@@ -1773,7 +1773,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Review all changes'));
       await tester.pumpAndSettle();
@@ -1788,7 +1788,7 @@ void main() {
 
   // ── Net (S2): today's labels, re-pinned when they change ──────────────────
   group('sync labels', () {
-    testWidgets('the menu item and the passphrase dialog both say Sync from file', (
+    testWidgets('the menu item and the passphrase dialog both say Sync from vault', (
       tester,
     ) async {
       await tester.pumpWidget(
@@ -1798,8 +1798,8 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      expect(find.text('Sync from file'), findsOneWidget);
-      await tester.tap(find.text('Sync from file'));
+      expect(find.text('Sync from vault'), findsOneWidget);
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Review all changes'));
       await tester.pumpAndSettle();
@@ -1807,7 +1807,7 @@ void main() {
       expect(
         find.descendant(
           of: find.byType(AlertDialog),
-          matching: find.text('Sync from file'),
+          matching: find.text('Sync from vault'),
         ),
         findsOneWidget,
       );

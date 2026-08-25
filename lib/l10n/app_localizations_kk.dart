@@ -511,9 +511,6 @@ class AppLocalizationsKk extends AppLocalizations {
   String get menuImportEntries => 'Жазбаларды импорттау';
 
   @override
-  String get menuSyncFromFile => 'Файлдан синхрондау';
-
-  @override
   String get menuManageVaults => 'Сейфтерді басқару';
 
   @override
@@ -751,9 +748,6 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Синхрондау сәтсіз болды';
-
-  @override
-  String get syncFromFileTitle => 'Файлдан синхрондау';
 
   @override
   String get nothingToSync =>

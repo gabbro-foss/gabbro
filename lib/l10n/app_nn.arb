@@ -165,7 +165,6 @@
 
   "menuExportVault": "Eksporter kvelv",
   "menuImportEntries": "Importer oppføringer",
-  "menuSyncFromFile": "Synkroniser frå fil",
   "menuManageVaults": "Administrer kvelv",
   "menuChangePassphrase": "Byt passfrase",
   "menuManageYubiKeys": "Administrer YubiKeys",
@@ -277,7 +276,6 @@
   "syncFieldConflictContent": "'{title}' har ulik verdi for {field} på kvar eining. Behald din verdi, eller bruk den andre eininga sin?",
   "syncFieldConflictUseIncoming": "Bruk verdien frå den andre eininga",
   "syncFailedTitle": "Synkronisering mislukkast",
-  "syncFromFileTitle": "Synkroniser frå fil",
   "nothingToSync": "Inkje å synkronisere — begge kvelva er allereie oppdaterte.",
   "syncMethodTitle": "Korleis skal denne synkroniseringa brukast?",
   "syncSamePassphraseWarning": "Same passfrase provar ikkje same kvelv.",

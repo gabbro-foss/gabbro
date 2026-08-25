@@ -511,9 +511,6 @@ class AppLocalizationsNb extends AppLocalizations {
   String get menuImportEntries => 'Importer oppføringer';
 
   @override
-  String get menuSyncFromFile => 'Synkroniser fra fil';
-
-  @override
   String get menuManageVaults => 'Administrer hvelvinger';
 
   @override
@@ -752,9 +749,6 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Synkronisering mislyktes';
-
-  @override
-  String get syncFromFileTitle => 'Synkroniser fra fil';
 
   @override
   String get nothingToSync =>

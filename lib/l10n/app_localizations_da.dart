@@ -510,9 +510,6 @@ class AppLocalizationsDa extends AppLocalizations {
   String get menuImportEntries => 'Importér poster';
 
   @override
-  String get menuSyncFromFile => 'Synkronisér fra fil';
-
-  @override
   String get menuManageVaults => 'Administrér hvælvinger';
 
   @override
@@ -751,9 +748,6 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Synkronisering mislykkedes';
-
-  @override
-  String get syncFromFileTitle => 'Synkronisér fra fil';
 
   @override
   String get nothingToSync =>

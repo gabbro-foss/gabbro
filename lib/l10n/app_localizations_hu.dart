@@ -511,9 +511,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get menuImportEntries => 'Bejegyzések importálása';
 
   @override
-  String get menuSyncFromFile => 'Szinkronizálás fájlból';
-
-  @override
   String get menuManageVaults => 'Széfek kezelése';
 
   @override
@@ -752,9 +749,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Szinkronizálás sikertelen';
-
-  @override
-  String get syncFromFileTitle => 'Szinkronizálás fájlból';
 
   @override
   String get nothingToSync =>

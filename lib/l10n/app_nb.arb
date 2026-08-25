@@ -165,7 +165,6 @@
 
   "menuExportVault": "Eksporter hvelv",
   "menuImportEntries": "Importer oppføringer",
-  "menuSyncFromFile": "Synkroniser fra fil",
   "menuManageVaults": "Administrer hvelvinger",
   "menuChangePassphrase": "Bytt passfrase",
   "menuManageYubiKeys": "Administrer YubiKeys",
@@ -277,7 +276,6 @@
   "syncFieldConflictContent": "'{title}' har en annen verdi for {field} på hver enhet. Behold din verdi, eller bruk den andre enhetens?",
   "syncFieldConflictUseIncoming": "Bruk den andre enhetens verdi",
   "syncFailedTitle": "Synkronisering mislyktes",
-  "syncFromFileTitle": "Synkroniser fra fil",
   "nothingToSync": "Ingenting å synkronisere — begge hvelvingene er allerede oppdatert.",
   "syncMethodTitle": "Hvordan skal denne synkroniseringen brukes?",
   "syncSamePassphraseWarning": "Samme passfrase beviser ikke samme hvelving.",

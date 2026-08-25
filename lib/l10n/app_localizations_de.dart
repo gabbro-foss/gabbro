@@ -513,9 +513,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get menuImportEntries => 'Einträge importieren';
 
   @override
-  String get menuSyncFromFile => 'Aus Datei synchronisieren';
-
-  @override
   String get menuManageVaults => 'Tresore verwalten';
 
   @override
@@ -754,9 +751,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Synchronisierung fehlgeschlagen';
-
-  @override
-  String get syncFromFileTitle => 'Aus Datei synchronisieren';
 
   @override
   String get nothingToSync =>

@@ -511,9 +511,6 @@ class AppLocalizationsSr extends AppLocalizations {
   String get menuImportEntries => 'Увези уносе';
 
   @override
-  String get menuSyncFromFile => 'Синхронизуј из датотеке';
-
-  @override
   String get menuManageVaults => 'Управљање трезорима';
 
   @override
@@ -753,9 +750,6 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Синхронизација није успела';
-
-  @override
-  String get syncFromFileTitle => 'Синхронизуј из датотеке';
 
   @override
   String get nothingToSync =>
@@ -2769,9 +2763,6 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   String get menuImportEntries => 'Uvezi unose';
 
   @override
-  String get menuSyncFromFile => 'Sinhronizuj iz datoteke';
-
-  @override
   String get menuManageVaults => 'Upravljanje trezorima';
 
   @override
@@ -3011,9 +3002,6 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get syncFailedTitle => 'Sinhronizacija nije uspela';
-
-  @override
-  String get syncFromFileTitle => 'Sinhronizuj iz datoteke';
 
   @override
   String get nothingToSync =>

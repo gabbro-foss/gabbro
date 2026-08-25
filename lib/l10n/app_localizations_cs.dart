@@ -512,9 +512,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get menuImportEntries => 'Importovat záznamy';
 
   @override
-  String get menuSyncFromFile => 'Synchronizovat ze souboru';
-
-  @override
   String get menuManageVaults => 'Správa trezorů';
 
   @override
@@ -754,9 +751,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Synchronizace selhala';
-
-  @override
-  String get syncFromFileTitle => 'Synchronizovat ze souboru';
 
   @override
   String get nothingToSync =>

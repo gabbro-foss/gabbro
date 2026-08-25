@@ -165,7 +165,6 @@
 
   "menuExportVault": "Vie holvi",
   "menuImportEntries": "Tuo merkintöjä",
-  "menuSyncFromFile": "Synkronoi tiedostosta",
   "menuManageVaults": "Hallinnoi holveja",
   "menuChangePassphrase": "Vaihda salauslause",
   "menuManageYubiKeys": "Hallinnoi YubiKey-avaimia",
@@ -277,7 +276,6 @@
   "syncFieldConflictContent": "Kohteella '{title}' on eri arvo kentälle {field} kullakin laitteella. Säilytetäänkö oma arvo vai käytetäänkö toisen laitteen arvoa?",
   "syncFieldConflictUseIncoming": "Käytä toisen laitteen arvoa",
   "syncFailedTitle": "Synkronointi epäonnistui",
-  "syncFromFileTitle": "Synkronoi tiedostosta",
   "nothingToSync": "Ei synkronoitavaa — molemmat holvit ovat jo ajan tasalla.",
   "syncMethodTitle": "Miten tämä synkronointi otetaan käyttöön?",
   "syncSamePassphraseWarning": "Sama salauslause ei todista samaa holvia.",

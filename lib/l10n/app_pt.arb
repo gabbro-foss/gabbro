@@ -165,7 +165,6 @@
 
   "menuExportVault": "Exportar cofre",
   "menuImportEntries": "Importar entradas",
-  "menuSyncFromFile": "Sincronizar de arquivo",
   "menuManageVaults": "Gerenciar cofres",
   "menuChangePassphrase": "Alterar frase secreta",
   "menuManageYubiKeys": "Gerenciar YubiKeys",
@@ -277,7 +276,6 @@
   "syncFieldConflictContent": "«{title}» tem um valor diferente para {field} em cada dispositivo. Manter o seu valor ou usar o do outro dispositivo?",
   "syncFieldConflictUseIncoming": "Usar o valor do outro dispositivo",
   "syncFailedTitle": "Sincronização falhou",
-  "syncFromFileTitle": "Sincronizar de arquivo",
   "nothingToSync": "Nada a sincronizar — ambos os cofres já estão atualizados.",
   "syncMethodTitle": "Como aplicar esta sincronização?",
   "syncSamePassphraseWarning": "A mesma frase secreta não prova que seja o mesmo cofre.",

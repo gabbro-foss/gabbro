@@ -165,7 +165,6 @@
 
   "menuExportVault": "Eksportuj skarbiec",
   "menuImportEntries": "Importuj wpisy",
-  "menuSyncFromFile": "Synchronizuj z pliku",
   "menuManageVaults": "Zarządzaj skarbcami",
   "menuChangePassphrase": "Zmień hasło główne",
   "menuManageYubiKeys": "Zarządzaj kluczami YubiKey",
@@ -277,7 +276,6 @@
   "syncFieldConflictContent": "„{title}” ma inną wartość pola {field} na każdym urządzeniu. Zachować własną wartość czy użyć z drugiego urządzenia?",
   "syncFieldConflictUseIncoming": "Użyj wartości z drugiego urządzenia",
   "syncFailedTitle": "Synchronizacja nie powiodła się",
-  "syncFromFileTitle": "Synchronizuj z pliku",
   "nothingToSync": "Nie ma nic do synchronizowania — oba skarbce są już aktualne.",
   "syncMethodTitle": "Jak zastosować tę synchronizację?",
   "syncSamePassphraseWarning": "To samo hasło główne nie dowodzi tego samego skarbca.",

@@ -513,9 +513,6 @@ class AppLocalizationsLt extends AppLocalizations {
   String get menuImportEntries => 'Importuoti įrašus';
 
   @override
-  String get menuSyncFromFile => 'Sinchronizuoti iš failo';
-
-  @override
   String get menuManageVaults => 'Tvarkyti saugyklas';
 
   @override
@@ -754,9 +751,6 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Sinchronizavimas nepavyko';
-
-  @override
-  String get syncFromFileTitle => 'Sinchronizuoti iš failo';
 
   @override
   String get nothingToSync =>

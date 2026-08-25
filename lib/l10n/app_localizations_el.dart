@@ -514,9 +514,6 @@ class AppLocalizationsEl extends AppLocalizations {
   String get menuImportEntries => 'Εισαγωγή καταχωρίσεων';
 
   @override
-  String get menuSyncFromFile => 'Συγχρονισμός από αρχείο';
-
-  @override
   String get menuManageVaults => 'Διαχείριση θησαυροφυλακίων';
 
   @override
@@ -756,9 +753,6 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Αποτυχία συγχρονισμού';
-
-  @override
-  String get syncFromFileTitle => 'Συγχρονισμός από αρχείο';
 
   @override
   String get nothingToSync =>

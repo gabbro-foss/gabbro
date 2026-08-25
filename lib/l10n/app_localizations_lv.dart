@@ -511,9 +511,6 @@ class AppLocalizationsLv extends AppLocalizations {
   String get menuImportEntries => 'Importēt ierakstus';
 
   @override
-  String get menuSyncFromFile => 'Sinhronizēt no faila';
-
-  @override
   String get menuManageVaults => 'Pārvaldīt seifus';
 
   @override
@@ -752,9 +749,6 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Sinhronizācija neizdevās';
-
-  @override
-  String get syncFromFileTitle => 'Sinhronizēt no faila';
 
   @override
   String get nothingToSync =>

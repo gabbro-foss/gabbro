@@ -165,7 +165,6 @@
 
   "menuExportVault": "Izvozi trezor",
   "menuImportEntries": "Uvozi vnose",
-  "menuSyncFromFile": "Sinhroniziraj iz datoteke",
   "menuManageVaults": "Upravljanje trezorjev",
   "menuChangePassphrase": "Spremeni geslo za dostop",
   "menuManageYubiKeys": "Upravljanje ključev YubiKey",
@@ -277,7 +276,6 @@
   "syncFieldConflictContent": "'{title}' ima na vsaki napravi drugačno vrednost za {field}. Ohraniti svojo vrednost ali uporabiti vrednost druge naprave?",
   "syncFieldConflictUseIncoming": "Uporabi vrednost druge naprave",
   "syncFailedTitle": "Sinhronizacija ni uspela",
-  "syncFromFileTitle": "Sinhroniziraj iz datoteke",
   "nothingToSync": "Ni ničesar za sinhronizacijo — oba trezorja sta že posodobljena.",
   "syncMethodTitle": "Kako naj se uporabi ta sinhronizacija?",
   "syncSamePassphraseWarning": "Enako geslo za dostop ne dokazuje enakega trezorja.",

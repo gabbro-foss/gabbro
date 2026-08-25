@@ -165,7 +165,6 @@
 
   "menuExportVault": "导出保险库",
   "menuImportEntries": "导入条目",
-  "menuSyncFromFile": "从文件同步",
   "menuManageVaults": "管理保险库",
   "menuChangePassphrase": "更改密码短语",
   "menuManageYubiKeys": "管理 YubiKey",
@@ -277,7 +276,6 @@
   "syncFieldConflictContent": "'{title}' 在每台设备上的 {field} 值不同。保留你的值，还是使用另一台设备的值？",
   "syncFieldConflictUseIncoming": "使用另一台设备的值",
   "syncFailedTitle": "同步失败",
-  "syncFromFileTitle": "从文件同步",
   "nothingToSync": "没有需要同步的内容 — 两个保险库均已是最新状态。",
   "syncMethodTitle": "此次同步应如何应用？",
   "syncSamePassphraseWarning": "相同的密码短语不能证明是同一个保险库。",

@@ -165,7 +165,6 @@
 
   "menuExportVault": "Сейфті экспорттау",
   "menuImportEntries": "Жазбаларды импорттау",
-  "menuSyncFromFile": "Файлдан синхрондау",
   "menuManageVaults": "Сейфтерді басқару",
   "menuChangePassphrase": "Кілт фразасын өзгерту",
   "menuManageYubiKeys": "YubiKey кілттерін басқару",
@@ -277,7 +276,6 @@
   "syncFieldConflictContent": "«{title}» әр құрылғыда {field} үшін әртүрлі мәнге ие. Өз мәніңізді сақтайсыз ба, әлде басқа құрылғының мәнін қолданасыз ба?",
   "syncFieldConflictUseIncoming": "Басқа құрылғының мәнін қолдану",
   "syncFailedTitle": "Синхрондау сәтсіз болды",
-  "syncFromFileTitle": "Файлдан синхрондау",
   "nothingToSync": "Синхрондайтын ештеңе жоқ — екі сейф те жаңартылған.",
   "syncMethodTitle": "Бұл синхрондау қалай қолданылсын?",
   "syncSamePassphraseWarning": "Бірдей кілт фразасы бірдей сейфті дәлелдемейді.",

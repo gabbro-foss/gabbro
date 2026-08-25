@@ -165,7 +165,6 @@
 
   "menuExportVault": "Esporta archivio",
   "menuImportEntries": "Importa voci",
-  "menuSyncFromFile": "Sincronizza da file",
   "menuManageVaults": "Gestisci archivi",
   "menuChangePassphrase": "Cambia passphrase",
   "menuManageYubiKeys": "Gestisci YubiKey",
@@ -277,7 +276,6 @@
   "syncFieldConflictContent": "«{title}» ha un valore diverso per {field} su ciascun dispositivo. Mantenere il proprio valore o usare quello dell'altro dispositivo?",
   "syncFieldConflictUseIncoming": "Usa il valore dell'altro dispositivo",
   "syncFailedTitle": "Sincronizzazione fallita",
-  "syncFromFileTitle": "Sincronizza da file",
   "nothingToSync": "Niente da sincronizzare — entrambi gli archivi sono già aggiornati.",
   "syncMethodTitle": "Come applicare questa sincronizzazione?",
   "syncSamePassphraseWarning": "La stessa passphrase non prova che sia lo stesso archivio.",

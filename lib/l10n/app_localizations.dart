@@ -1123,12 +1123,6 @@ abstract class AppLocalizations {
   /// **'Import entries'**
   String get menuImportEntries;
 
-  /// No description provided for @menuSyncFromFile.
-  ///
-  /// In en, this message translates to:
-  /// **'Sync from file'**
-  String get menuSyncFromFile;
-
   /// No description provided for @menuManageVaults.
   ///
   /// In en, this message translates to:
@@ -1572,12 +1566,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sync failed'**
   String get syncFailedTitle;
-
-  /// No description provided for @syncFromFileTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Sync from file'**
-  String get syncFromFileTitle;
 
   /// No description provided for @nothingToSync.
   ///

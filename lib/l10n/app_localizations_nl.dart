@@ -512,9 +512,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get menuImportEntries => 'Items importeren';
 
   @override
-  String get menuSyncFromFile => 'Synchroniseren vanuit bestand';
-
-  @override
   String get menuManageVaults => 'Kluizen beheren';
 
   @override
@@ -753,9 +750,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Synchronisatie mislukt';
-
-  @override
-  String get syncFromFileTitle => 'Synchroniseren vanuit bestand';
 
   @override
   String get nothingToSync =>

@@ -512,9 +512,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get menuImportEntries => 'Importa voci';
 
   @override
-  String get menuSyncFromFile => 'Sincronizza da file';
-
-  @override
   String get menuManageVaults => 'Gestisci archivi';
 
   @override
@@ -753,9 +750,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Sincronizzazione fallita';
-
-  @override
-  String get syncFromFileTitle => 'Sincronizza da file';
 
   @override
   String get nothingToSync =>

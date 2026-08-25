@@ -165,7 +165,6 @@
 
   "menuExportVault": "ボルトをエクスポート",
   "menuImportEntries": "エントリをインポート",
-  "menuSyncFromFile": "ファイルから同期",
   "menuManageVaults": "ボルトの管理",
   "menuChangePassphrase": "パスフレーズを変更",
   "menuManageYubiKeys": "YubiKeyの管理",
@@ -277,7 +276,6 @@
   "syncFieldConflictContent": "「{title}」は {field} の値がデバイスごとに異なります。自分の値を保持しますか、それとも他のデバイスの値を使用しますか？",
   "syncFieldConflictUseIncoming": "他のデバイスの値を使用",
   "syncFailedTitle": "同期に失敗しました",
-  "syncFromFileTitle": "ファイルから同期",
   "nothingToSync": "同期するものはありません — 両方のボルトはすでに最新です。",
   "syncMethodTitle": "この同期をどのように適用しますか？",
   "syncSamePassphraseWarning": "同じパスフレーズでも同じボルトとは限りません。",

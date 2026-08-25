@@ -504,9 +504,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get menuImportEntries => 'エントリをインポート';
 
   @override
-  String get menuSyncFromFile => 'ファイルから同期';
-
-  @override
   String get menuManageVaults => 'ボルトの管理';
 
   @override
@@ -744,9 +741,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get syncFailedTitle => '同期に失敗しました';
-
-  @override
-  String get syncFromFileTitle => 'ファイルから同期';
 
   @override
   String get nothingToSync => '同期するものはありません — 両方のボルトはすでに最新です。';

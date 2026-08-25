@@ -165,7 +165,6 @@
 
   "menuExportVault": "Gandegi esportatu",
   "menuImportEntries": "Sarrerak inportatu",
-  "menuSyncFromFile": "Fitxategitik sinkronizatu",
   "menuManageVaults": "Gandegiak kudeatu",
   "menuChangePassphrase": "Pasaesaldia aldatu",
   "menuManageYubiKeys": "YubiKey gakoak kudeatu",
@@ -277,7 +276,6 @@
   "syncFieldConflictContent": "'{title}' elementuak {field} eremurako balio desberdina du gailu bakoitzean. Zure balioa mantendu edo beste gailuarena erabili?",
   "syncFieldConflictUseIncoming": "Erabili beste gailuaren balioa",
   "syncFailedTitle": "Sinkronizazioa huts egin du",
-  "syncFromFileTitle": "Fitxategitik sinkronizatu",
   "nothingToSync": "Ez dago sinkronizatzeko ezer — bi gandegiak eguneratuta daude dagoeneko.",
   "syncMethodTitle": "Nola aplikatu behar da sinkronizazio hau?",
   "syncSamePassphraseWarning": "Pasaesaldi bera izateak ez du gandegi bera frogatzen.",

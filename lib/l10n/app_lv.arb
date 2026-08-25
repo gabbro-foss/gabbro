@@ -165,7 +165,6 @@
 
   "menuExportVault": "Eksportēt seifu",
   "menuImportEntries": "Importēt ierakstus",
-  "menuSyncFromFile": "Sinhronizēt no faila",
   "menuManageVaults": "Pārvaldīt seifus",
   "menuChangePassphrase": "Mainīt ieejas frāzi",
   "menuManageYubiKeys": "Pārvaldīt YubiKey atslēgas",
@@ -277,7 +276,6 @@
   "syncFieldConflictContent": "Laukam {field} ierakstā “{title}” katrā ierīcē ir atšķirīga vērtība. Paturēt savu vērtību vai izmantot otras ierīces vērtību?",
   "syncFieldConflictUseIncoming": "Izmantot otras ierīces vērtību",
   "syncFailedTitle": "Sinhronizācija neizdevās",
-  "syncFromFileTitle": "Sinhronizēt no faila",
   "nothingToSync": "Nav ko sinhronizēt — abi seifi jau ir atjaunināti.",
   "syncMethodTitle": "Kā piemērot šo sinhronizāciju?",
   "syncSamePassphraseWarning": "Tāda pati ieejas frāze nepierāda to pašu seifu.",

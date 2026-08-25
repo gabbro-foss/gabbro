@@ -513,9 +513,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get menuImportEntries => 'Импортирай записи';
 
   @override
-  String get menuSyncFromFile => 'Синхронизирай от файл';
-
-  @override
   String get menuManageVaults => 'Управление на трезори';
 
   @override
@@ -754,9 +751,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Синхронизацията не успя';
-
-  @override
-  String get syncFromFileTitle => 'Синхронизирай от файл';
 
   @override
   String get nothingToSync =>

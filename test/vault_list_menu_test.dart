@@ -268,7 +268,7 @@ void main() {
 
       expect(find.text('Export vault'), findsOneWidget);
       expect(find.text('Import entries'), findsOneWidget);
-      expect(find.text('Sync from file'), findsOneWidget);
+      expect(find.text('Sync from vault'), findsOneWidget);
       expect(find.text('Manage vaults'), findsOneWidget);
       expect(find.text('Change passphrase'), findsOneWidget);
       expect(find.text('Manage YubiKeys'), findsOneWidget);

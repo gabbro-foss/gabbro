@@ -512,9 +512,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get menuImportEntries => 'Importar entradas';
 
   @override
-  String get menuSyncFromFile => 'Sincronizar de arquivo';
-
-  @override
   String get menuManageVaults => 'Gerenciar cofres';
 
   @override
@@ -753,9 +750,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Sincronização falhou';
-
-  @override
-  String get syncFromFileTitle => 'Sincronizar de arquivo';
 
   @override
   String get nothingToSync =>
@@ -2776,9 +2770,6 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get menuImportEntries => 'Importar entradas';
 
   @override
-  String get menuSyncFromFile => 'Sincronizar de arquivo';
-
-  @override
   String get menuManageVaults => 'Gerenciar cofres';
 
   @override
@@ -3017,9 +3008,6 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get syncFailedTitle => 'Sincronização falhou';
-
-  @override
-  String get syncFromFileTitle => 'Sincronizar de arquivo';
 
   @override
   String get nothingToSync =>
@@ -5037,9 +5025,6 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   String get menuImportEntries => 'Importar entradas';
 
   @override
-  String get menuSyncFromFile => 'Sincronizar de ficheiro';
-
-  @override
   String get menuManageVaults => 'Gerir cofres';
 
   @override
@@ -5278,9 +5263,6 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get syncFailedTitle => 'Sincronização falhou';
-
-  @override
-  String get syncFromFileTitle => 'Sincronizar de ficheiro';
 
   @override
   String get nothingToSync =>

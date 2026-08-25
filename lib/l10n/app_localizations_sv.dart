@@ -511,9 +511,6 @@ class AppLocalizationsSv extends AppLocalizations {
   String get menuImportEntries => 'Importera poster';
 
   @override
-  String get menuSyncFromFile => 'Synkronisera från fil';
-
-  @override
   String get menuManageVaults => 'Hantera valv';
 
   @override
@@ -752,9 +749,6 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Synkronisering misslyckades';
-
-  @override
-  String get syncFromFileTitle => 'Synkronisera från fil';
 
   @override
   String get nothingToSync =>

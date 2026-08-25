@@ -165,7 +165,6 @@
 
   "menuExportVault": "Széf exportálása",
   "menuImportEntries": "Bejegyzések importálása",
-  "menuSyncFromFile": "Szinkronizálás fájlból",
   "menuManageVaults": "Széfek kezelése",
   "menuChangePassphrase": "Jelmondat módosítása",
   "menuManageYubiKeys": "YubiKey-ek kezelése",
@@ -277,7 +276,6 @@
   "syncFieldConflictContent": "A(z) „{title}” eltérő értékkel rendelkezik a(z) {field} mezőhöz minden eszközön. Megtartja a saját értékét, vagy a másik eszközét használja?",
   "syncFieldConflictUseIncoming": "A másik eszköz értékének használata",
   "syncFailedTitle": "Szinkronizálás sikertelen",
-  "syncFromFileTitle": "Szinkronizálás fájlból",
   "nothingToSync": "Nincs szinkronizálnivaló — mindkét széf már naprakész.",
   "syncMethodTitle": "Hogyan legyen alkalmazva ez a szinkronizálás?",
   "syncSamePassphraseWarning": "Azonos jelmondat nem bizonyít azonos széfet.",

@@ -512,9 +512,6 @@ class AppLocalizationsSl extends AppLocalizations {
   String get menuImportEntries => 'Uvozi vnose';
 
   @override
-  String get menuSyncFromFile => 'Sinhroniziraj iz datoteke';
-
-  @override
   String get menuManageVaults => 'Upravljanje trezorjev';
 
   @override
@@ -755,9 +752,6 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Sinhronizacija ni uspela';
-
-  @override
-  String get syncFromFileTitle => 'Sinhroniziraj iz datoteke';
 
   @override
   String get nothingToSync =>

@@ -504,9 +504,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get menuImportEntries => '항목 가져오기';
 
   @override
-  String get menuSyncFromFile => '파일에서 동기화';
-
-  @override
   String get menuManageVaults => '볼트 관리';
 
   @override
@@ -744,9 +741,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get syncFailedTitle => '동기화에 실패했습니다';
-
-  @override
-  String get syncFromFileTitle => '파일에서 동기화';
 
   @override
   String get nothingToSync => '동기화할 것이 없습니다 — 두 볼트 모두 이미 최신 상태입니다.';

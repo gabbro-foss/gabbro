@@ -165,7 +165,6 @@
 
   "menuExportVault": "Exportar almacén",
   "menuImportEntries": "Importar entradas",
-  "menuSyncFromFile": "Sincronizar desde archivo",
   "menuManageVaults": "Gestionar almacenes",
   "menuChangePassphrase": "Cambiar contraseña maestra",
   "menuManageYubiKeys": "Gestionar YubiKeys",
@@ -277,7 +276,6 @@
   "syncFieldConflictContent": "«{title}» tiene un valor distinto para {field} en cada dispositivo. ¿Mantener tu valor o usar el del otro dispositivo?",
   "syncFieldConflictUseIncoming": "Usar el valor del otro dispositivo",
   "syncFailedTitle": "Error de sincronización",
-  "syncFromFileTitle": "Sincronizar desde archivo",
   "nothingToSync": "Nada que sincronizar — ambos almacenes ya están actualizados.",
   "syncMethodTitle": "¿Cómo debe aplicarse esta sincronización?",
   "syncSamePassphraseWarning": "La misma contraseña maestra no prueba que sea el mismo almacén.",

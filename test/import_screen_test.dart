@@ -17,6 +17,17 @@ import 'package:gabbro/widgets/path_field.dart';
 import 'package:gabbro/widgets/yubikey_tap.dart';
 
 /// Scrolls to [sectionTitle], then taps the FilledButton in that section.
+// The Gabbro section's action button. Four other sections also say "Import",
+// so the finder is scoped to the section rather than to the text.
+Finder _gabbroImportButton() => find
+    .descendant(
+      of: find
+          .ancestor(of: find.text('Gabbro vault'), matching: find.byType(Column))
+          .first,
+      matching: find.widgetWithText(FilledButton, 'Import'),
+    )
+    .first;
+
 Future<void> _tapImportForSection(
     WidgetTester tester, String sectionTitle) async {
   await tester.scrollUntilVisible(
@@ -144,8 +155,8 @@ void main() {
     testWidgets('shows error when Gabbro import attempted with no file',
         (tester) async {
       await tester.pumpWidget(buildScreen());
-      await tester.ensureVisible(find.text('Sync from vault'));
-      await tester.tap(find.text('Sync from vault'));
+      await tester.ensureVisible(_gabbroImportButton());
+      await tester.tap(_gabbroImportButton());
       await tester.pump();
       expect(find.text('Select a file.'), findsOneWidget);
     });
@@ -182,8 +193,8 @@ void main() {
 
       await tester.enterText(
           find.widgetWithText(TextField, 'Vault passphrase'), 'pw');
-      await tester.ensureVisible(find.text('Sync from vault'));
-      await tester.tap(find.text('Sync from vault'));
+      await tester.ensureVisible(_gabbroImportButton());
+      await tester.tap(_gabbroImportButton());
       await tester.pump();
       await tester.pump(const Duration(seconds: 1));
 
@@ -265,7 +276,7 @@ void main() {
         initialGabbroPath: tmp.path,
         onDetectSourceRecords: (_) => [],
       )));
-      await tester.ensureVisible(find.text('Sync from vault'));
+      await tester.ensureVisible(_gabbroImportButton());
       expect(find.text('YubiKey PIN'), findsNothing);
       expect(find.textContaining('protected by a YubiKey'), findsNothing);
     });
@@ -303,8 +314,8 @@ void main() {
           find.widgetWithText(TextField, 'Vault passphrase'), 'pw');
       await tester.enterText(
           find.widgetWithText(TextField, 'YubiKey PIN'), '1234');
-      await tester.ensureVisible(find.text('Sync from vault'));
-      await tester.tap(find.text('Sync from vault'));
+      await tester.ensureVisible(_gabbroImportButton());
+      await tester.tap(_gabbroImportButton());
       await tester.pump();
       await tester.pump();
 
@@ -332,8 +343,8 @@ void main() {
           find.widgetWithText(TextField, 'Vault passphrase'), 'pw');
       await tester.enterText(
           find.widgetWithText(TextField, 'YubiKey PIN'), '1234');
-      await tester.ensureVisible(find.text('Sync from vault'));
-      await tester.tap(find.text('Sync from vault'));
+      await tester.ensureVisible(_gabbroImportButton());
+      await tester.tap(_gabbroImportButton());
       await tester.pump(); // kick off the async; tap is now pending
 
       expect(find.text('Tap your YubiKey now…'), findsOneWidget);
@@ -344,7 +355,7 @@ void main() {
       await tester.pump();
     });
 
-    // ── R7: Sync from vault demands full credentials ─────────────────────────
+    // ── R7: the Gabbro Import demands full credentials ─────────────────────────
     //
     // Four guards on one button, none of them previously tested. The last one
     // matters most: without it, pressing Sync with an empty PIN box sends that
@@ -361,8 +372,8 @@ void main() {
         },
       )));
 
-      await tester.ensureVisible(find.text('Sync from vault'));
-      await tester.tap(find.text('Sync from vault'));
+      await tester.ensureVisible(_gabbroImportButton());
+      await tester.tap(_gabbroImportButton());
       await tester.pump();
 
       expect(find.text('Select a file.'), findsOneWidget);
@@ -385,8 +396,8 @@ void main() {
 
       await tester.enterText(
           find.widgetWithText(TextField, 'Vault passphrase'), 'pw');
-      await tester.ensureVisible(find.text('Sync from vault'));
-      await tester.tap(find.text('Sync from vault'));
+      await tester.ensureVisible(_gabbroImportButton());
+      await tester.tap(_gabbroImportButton());
       await tester.pump();
 
       expect(find.text('File not found.'), findsOneWidget);
@@ -407,8 +418,8 @@ void main() {
         },
       )));
 
-      await tester.ensureVisible(find.text('Sync from vault'));
-      await tester.tap(find.text('Sync from vault'));
+      await tester.ensureVisible(_gabbroImportButton());
+      await tester.tap(_gabbroImportButton());
       await tester.pump();
 
       expect(find.text('Enter the passphrase for this vault.'), findsOneWidget);
@@ -436,8 +447,8 @@ void main() {
 
       await tester.enterText(
           find.widgetWithText(TextField, 'Vault passphrase'), 'pw');
-      await tester.ensureVisible(find.text('Sync from vault'));
-      await tester.tap(find.text('Sync from vault'));
+      await tester.ensureVisible(_gabbroImportButton());
+      await tester.tap(_gabbroImportButton());
       await tester.pump();
 
       expect(find.text('YubiKey PIN is required'), findsOneWidget);
@@ -546,7 +557,7 @@ void main() {
 
       expect(find.textContaining('file version not supported'), findsOneWidget);
       // Still on the import screen: a failure must not pop as a success does.
-      expect(find.text('Sync from vault'), findsOneWidget);
+      expect(_gabbroImportButton(), findsOneWidget);
     });
 
     testWidgets('N2 the spinner clears after a failed Gabbro import',
@@ -557,7 +568,7 @@ void main() {
       // with a dead screen after one bad file.
       expect(find.byType(CircularProgressIndicator), findsNothing);
       final btn = tester.widget<FilledButton>(
-          find.widgetWithText(FilledButton, 'Sync from vault'));
+          _gabbroImportButton());
       expect(btn.onPressed, isNotNull);
     });
 

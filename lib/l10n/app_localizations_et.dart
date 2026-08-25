@@ -512,9 +512,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get menuImportEntries => 'Impordi kirjeid';
 
   @override
-  String get menuSyncFromFile => 'Sünkrooni failist';
-
-  @override
   String get menuManageVaults => 'Halda seife';
 
   @override
@@ -753,9 +750,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Sünkroonimine ebaõnnestus';
-
-  @override
-  String get syncFromFileTitle => 'Sünkrooni failist';
 
   @override
   String get nothingToSync =>

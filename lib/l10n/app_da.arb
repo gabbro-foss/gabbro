@@ -165,7 +165,6 @@
 
   "menuExportVault": "Eksportér hvælving",
   "menuImportEntries": "Importér poster",
-  "menuSyncFromFile": "Synkronisér fra fil",
   "menuManageVaults": "Administrér hvælvinger",
   "menuChangePassphrase": "Skift adgangssætning",
   "menuManageYubiKeys": "Administrér YubiKeys",
@@ -277,7 +276,6 @@
   "syncFieldConflictContent": "'{title}' har en anden værdi for {field} på hver enhed. Behold din værdi, eller brug den anden enheds?",
   "syncFieldConflictUseIncoming": "Brug den anden enheds værdi",
   "syncFailedTitle": "Synkronisering mislykkedes",
-  "syncFromFileTitle": "Synkronisér fra fil",
   "nothingToSync": "Intet at synkronisere — begge hvælvinger er allerede opdaterede.",
   "syncMethodTitle": "Hvordan skal denne synkronisering anvendes?",
   "syncSamePassphraseWarning": "Samme adgangssætning beviser ikke samme hvælving.",

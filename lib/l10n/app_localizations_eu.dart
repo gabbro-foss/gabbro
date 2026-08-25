@@ -512,9 +512,6 @@ class AppLocalizationsEu extends AppLocalizations {
   String get menuImportEntries => 'Sarrerak inportatu';
 
   @override
-  String get menuSyncFromFile => 'Fitxategitik sinkronizatu';
-
-  @override
   String get menuManageVaults => 'Gandegiak kudeatu';
 
   @override
@@ -753,9 +750,6 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Sinkronizazioa huts egin du';
-
-  @override
-  String get syncFromFileTitle => 'Fitxategitik sinkronizatu';
 
   @override
   String get nothingToSync =>

@@ -165,7 +165,6 @@
 
   "menuExportVault": "Экспортировать хранилище",
   "menuImportEntries": "Импортировать записи",
-  "menuSyncFromFile": "Синхронизировать из файла",
   "menuManageVaults": "Управление хранилищами",
   "menuChangePassphrase": "Изменить кодовую фразу",
   "menuManageYubiKeys": "Управление ключами YubiKey",
@@ -277,7 +276,6 @@
   "syncFieldConflictContent": "«{title}» имеет разное значение поля {field} на устройствах. Оставить ваше значение или использовать значение другого устройства?",
   "syncFieldConflictUseIncoming": "Использовать значение другого устройства",
   "syncFailedTitle": "Синхронизация не удалась",
-  "syncFromFileTitle": "Синхронизировать из файла",
   "nothingToSync": "Нечего синхронизировать — оба хранилища уже актуальны.",
   "syncMethodTitle": "Как применить эту синхронизацию?",
   "syncSamePassphraseWarning": "Одна и та же кодовая фраза не доказывает, что это то же хранилище.",

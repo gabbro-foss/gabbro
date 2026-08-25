@@ -242,7 +242,6 @@
 
   "menuExportVault": "Export vault",
   "menuImportEntries": "Import entries",
-  "menuSyncFromFile": "Sync from file",
   "menuManageVaults": "Manage vaults",
   "menuChangePassphrase": "Change passphrase",
   "menuManageYubiKeys": "Manage YubiKeys",
@@ -353,7 +352,6 @@
   "assignToFolderTitle": "Assign to folder",
   "folderConflictTitle": "Folder conflict",
   "syncFailedTitle": "Sync failed",
-  "syncFromFileTitle": "Sync from file",
   "nothingToSync": "Nothing to sync — both vaults are already up to date.",
   "syncMethodTitle": "How should this sync apply?",
   "@syncMethodTitle": {

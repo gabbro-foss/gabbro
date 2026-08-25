@@ -165,7 +165,6 @@
 
   "menuExportVault": "Tresor exportieren",
   "menuImportEntries": "Einträge importieren",
-  "menuSyncFromFile": "Aus Datei synchronisieren",
   "menuManageVaults": "Tresore verwalten",
   "menuChangePassphrase": "Passphrase ändern",
   "menuManageYubiKeys": "YubiKeys verwalten",
@@ -277,7 +276,6 @@
   "syncFieldConflictContent": "„{title}“ hat auf jedem Gerät einen anderen Wert für {field}. Eigenen Wert behalten oder den des anderen Geräts verwenden?",
   "syncFieldConflictUseIncoming": "Wert des anderen Geräts verwenden",
   "syncFailedTitle": "Synchronisierung fehlgeschlagen",
-  "syncFromFileTitle": "Aus Datei synchronisieren",
   "nothingToSync": "Nichts zu synchronisieren — beide Tresore sind bereits aktuell.",
   "syncMethodTitle": "Wie soll diese Synchronisierung angewendet werden?",
   "syncSamePassphraseWarning": "Dieselbe Passphrase beweist nicht denselben Tresor.",

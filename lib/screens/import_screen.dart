@@ -901,7 +901,7 @@ class _ImportScreenState extends State<ImportScreen> {
                   width: 20,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : Text(l.syncFromVault),
+              : Text(l.import),
         ),
       ],
     );

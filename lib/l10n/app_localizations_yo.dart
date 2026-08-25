@@ -511,9 +511,6 @@ class AppLocalizationsYo extends AppLocalizations {
   String get menuImportEntries => 'Mu awọn titẹ sii wọle';
 
   @override
-  String get menuSyncFromFile => 'Ṣọkan lati faili';
-
-  @override
   String get menuManageVaults => 'Ṣakoso awọn vọọliti';
 
   @override
@@ -752,9 +749,6 @@ class AppLocalizationsYo extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Iṣọkan kuna';
-
-  @override
-  String get syncFromFileTitle => 'Ṣọkan lati faili';
 
   @override
   String get nothingToSync =>

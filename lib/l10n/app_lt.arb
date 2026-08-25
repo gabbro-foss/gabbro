@@ -165,7 +165,6 @@
 
   "menuExportVault": "Eksportuoti saugyklą",
   "menuImportEntries": "Importuoti įrašus",
-  "menuSyncFromFile": "Sinchronizuoti iš failo",
   "menuManageVaults": "Tvarkyti saugyklas",
   "menuChangePassphrase": "Keisti slaptafrazę",
   "menuManageYubiKeys": "Tvarkyti YubiKey raktus",
@@ -277,7 +276,6 @@
   "syncFieldConflictContent": "Lauko {field} reikšmė įraše „{title}“ kiekviename įrenginyje skiriasi. Palikti savo reikšmę ar naudoti kito įrenginio?",
   "syncFieldConflictUseIncoming": "Naudoti kito įrenginio reikšmę",
   "syncFailedTitle": "Sinchronizavimas nepavyko",
-  "syncFromFileTitle": "Sinchronizuoti iš failo",
   "nothingToSync": "Nėra ko sinchronizuoti — abi saugyklos jau atnaujintos.",
   "syncMethodTitle": "Kaip taikyti šią sinchronizaciją?",
   "syncSamePassphraseWarning": "Ta pati slaptafrazė neįrodo, kad tai ta pati saugykla.",

@@ -513,9 +513,6 @@ class AppLocalizationsUk extends AppLocalizations {
   String get menuImportEntries => 'Імпортувати записи';
 
   @override
-  String get menuSyncFromFile => 'Синхронізувати з файлу';
-
-  @override
   String get menuManageVaults => 'Керування сховищами';
 
   @override
@@ -755,9 +752,6 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Синхронізація не вдалася';
-
-  @override
-  String get syncFromFileTitle => 'Синхронізувати з файлу';
 
   @override
   String get nothingToSync =>

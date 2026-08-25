@@ -2048,7 +2048,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                       children: [
                         Icon(Icons.sync, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
-                        Expanded(child: Text(ml.menuSyncFromFile)),
+                        Expanded(child: Text(ml.syncFromVault)),
                       ],
                     ),
                   ),
@@ -2626,7 +2626,7 @@ class _VaultListScreenState extends State<VaultListScreen>
   }
 }
 
-/// Passphrase dialog for "Sync from file".
+/// Passphrase dialog for "Sync from vault".
 ///
 /// Owns its TextEditingController so Flutter can dispose it safely during the
 /// dialog exit animation via State.dispose(), avoiding use-after-dispose errors.
@@ -2755,7 +2755,7 @@ class SyncPassphraseDialogState extends State<SyncPassphraseDialog> {
       // scrollable scrolls title + content + actions together so neither the
       // soft keyboard nor large text strands the action buttons (ADR-016).
       scrollable: true,
-      title: Text(l.syncFromFileTitle),
+      title: Text(l.syncFromVault),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,

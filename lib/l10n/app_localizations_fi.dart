@@ -513,9 +513,6 @@ class AppLocalizationsFi extends AppLocalizations {
   String get menuImportEntries => 'Tuo merkintöjä';
 
   @override
-  String get menuSyncFromFile => 'Synkronoi tiedostosta';
-
-  @override
   String get menuManageVaults => 'Hallinnoi holveja';
 
   @override
@@ -754,9 +751,6 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Synkronointi epäonnistui';
-
-  @override
-  String get syncFromFileTitle => 'Synkronoi tiedostosta';
 
   @override
   String get nothingToSync =>
