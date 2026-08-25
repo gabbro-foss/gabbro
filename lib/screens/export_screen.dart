@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:gabbro/folder_label.dart';
 import 'package:gabbro/gabbro_file_picker.dart';
+import 'package:gabbro/saf_tree.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
@@ -43,21 +44,11 @@ Future<void> _defaultExportPassphraseOnly(String path) =>
 // Raw POSIX paths can't overwrite a file another app created under scoped storage,
 // so Android `.gabbro` export writes via the Storage Access Framework: Rust builds
 // the ciphertext bytes, Kotlin writes them into the user-granted directory tree.
-const _exportChannel = MethodChannel('app.gabbro.gabbro/export');
 
-Future<ExportFolder?> _defaultPickExportDir() async {
-  final r = await _exportChannel.invokeMethod<Map<Object?, Object?>>(
-    'pick_export_dir',
-  );
-  if (r == null) return null; // user cancelled
-  return (
-    treeUri: r['treeUri'] as String,
-    displayName: r['displayName'] as String,
-  );
-}
+Future<ExportFolder?> _defaultPickExportDir() => pickSafTree();
 
 Future<bool> _defaultHasGrant(String treeUri) async =>
-    await _exportChannel.invokeMethod<bool>('has_grant', {
+    await safTreeChannel.invokeMethod<bool>('has_grant', {
       'treeUri': treeUri,
     }) ??
     false;
@@ -68,7 +59,7 @@ Future<void> _defaultWriteExport(
   Uint8List data,
   String sha256Filename,
   String sha256Content,
-) => _exportChannel.invokeMethod<void>('write_export_file', {
+) => safTreeChannel.invokeMethod<void>('write_export_file', {
   'treeUri': treeUri,
   'filename': filename,
   'data': data,

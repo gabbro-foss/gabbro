@@ -270,6 +270,11 @@ class AppLocalizationsIt extends AppLocalizations {
       'Non impostata: Sincronizza da cassaforte chiede il file ogni volta.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'Nessun file di nome $name nella cartella di sincronizzazione.';
+  }
+
+  @override
   String get rememberFolder => 'Ricorda';
 
   @override

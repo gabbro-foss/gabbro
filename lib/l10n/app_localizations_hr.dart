@@ -270,6 +270,11 @@ class AppLocalizationsHr extends AppLocalizations {
       'Nije postavljeno: Sinkroniziraj iz trezora svaki put traži datoteku.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'U mapi za sinkronizaciju nema datoteke naziva $name.';
+  }
+
+  @override
   String get rememberFolder => 'Zapamti';
 
   @override

@@ -270,6 +270,11 @@ class AppLocalizationsYo extends AppLocalizations {
       'Kò tíì ṣètò: Ṣọkan láti àpótí á máa béèrè fún fáìlì ní gbogbo ìgbà.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'Kò sí fáìlì tí a pè ní $name nínú fódà ìmúṣọ̀kan.';
+  }
+
+  @override
   String get rememberFolder => 'Rántí';
 
   @override

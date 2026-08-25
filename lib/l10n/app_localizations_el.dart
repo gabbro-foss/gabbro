@@ -271,6 +271,11 @@ class AppLocalizationsEl extends AppLocalizations {
       'Δεν ορίστηκε: ο συγχρονισμός από θησαυροφυλάκιο ζητά το αρχείο κάθε φορά.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'Δεν υπάρχει αρχείο με όνομα $name στον φάκελο συγχρονισμού.';
+  }
+
+  @override
   String get rememberFolder => 'Απομνημόνευση';
 
   @override

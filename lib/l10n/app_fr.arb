@@ -77,6 +77,7 @@
   "sectionSyncFolder": "Dossier de synchronisation",
   "syncFolderDescription": "Là où arrive l'export de l'autre appareil. Synchroniser depuis le coffre y ouvre le fichier portant le nom de ce coffre, sans rien demander.",
   "syncFolderNotSet": "Non défini : Synchroniser depuis le coffre demande le fichier à chaque fois.",
+  "syncFolderFileMissing": "Aucun fichier nommé {name} dans le dossier de synchronisation.",
   "rememberFolder": "Mémoriser",
   "aboutTitle": "À propos de Gabbro",
   "generatorTitle": "Générateur de mots de passe",

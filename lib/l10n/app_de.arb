@@ -77,6 +77,7 @@
   "sectionSyncFolder": "Sync-Ordner",
   "syncFolderDescription": "Wohin der Export des anderen Geräts gelangt. Aus Tresor synchronisieren öffnet dort die Datei mit dem Namen dieses Tresors, ohne nachzufragen.",
   "syncFolderNotSet": "Nicht gesetzt: Aus Tresor synchronisieren fragt jedes Mal nach der Datei.",
+  "syncFolderFileMissing": "Keine Datei namens {name} im Sync-Ordner.",
   "rememberFolder": "Merken",
   "aboutTitle": "Über Gabbro",
   "generatorTitle": "Passwortgenerator",

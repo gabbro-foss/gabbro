@@ -270,6 +270,11 @@ class AppLocalizationsPl extends AppLocalizations {
       'Nie ustawiono: Synchronizuj z sejfu pyta o plik za każdym razem.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'Brak pliku o nazwie $name w folderze synchronizacji.';
+  }
+
+  @override
   String get rememberFolder => 'Zapamiętaj';
 
   @override

@@ -270,6 +270,11 @@ class AppLocalizationsBg extends AppLocalizations {
       'Не е зададена: Синхронизиране от трезор пита за файла всеки път.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'Няма файл с име $name в папката за синхронизация.';
+  }
+
+  @override
   String get rememberFolder => 'Запомни';
 
   @override

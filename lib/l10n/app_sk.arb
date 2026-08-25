@@ -77,6 +77,7 @@
   "sectionSyncFolder": "Priečinok synchronizácie",
   "syncFolderDescription": "Kam prichádza export z druhého zariadenia. Synchronizovať z trezoru tam otvorí súbor s názvom tohto trezoru bez pýtania.",
   "syncFolderNotSet": "Nenastavené: Synchronizovať z trezoru sa na súbor pýta zakaždým.",
+  "syncFolderFileMissing": "V priečinku synchronizácie nie je žiadny súbor s názvom {name}.",
   "rememberFolder": "Zapamätať",
   "aboutTitle": "O aplikácii Gabbro",
   "generatorTitle": "Generátor hesiel",

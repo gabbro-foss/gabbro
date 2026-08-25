@@ -4,10 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:gabbro/folder_label.dart';
 import 'package:gabbro/gabbro_file_picker.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
+import 'package:gabbro/saf_tree.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
 
-Future<String?> _defaultPickFolder() => GabbroFilePicker.pickDirectory();
+// Android: the SAF tree picker, whose grant Kotlin persists, so the file can
+// be read later without asking again. Linux: the portal folder dialog.
+Future<String?> _defaultPickFolder() async {
+  if (!Platform.isAndroid) return GabbroFilePicker.pickDirectory();
+  return (await pickSafTree())?.treeUri;
+}
 
 /// Sync settings (S5): the auto-merge policy and the remembered sync folder.
 ///

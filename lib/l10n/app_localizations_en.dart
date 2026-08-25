@@ -269,6 +269,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'Not set: Sync from vault asks for the file each time.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'No file named $name in the sync folder.';
+  }
+
+  @override
   String get rememberFolder => 'Remember';
 
   @override

@@ -77,6 +77,7 @@
   "sectionSyncFolder": "Cartella di sincronizzazione",
   "syncFolderDescription": "Dove arriva l'esportazione dell'altro dispositivo. Sincronizza da cassaforte apre lì il file con il nome di questa cassaforte, senza chiedere.",
   "syncFolderNotSet": "Non impostata: Sincronizza da cassaforte chiede il file ogni volta.",
+  "syncFolderFileMissing": "Nessun file di nome {name} nella cartella di sincronizzazione.",
   "rememberFolder": "Ricorda",
   "aboutTitle": "Informazioni su Gabbro",
   "generatorTitle": "Generatore di password",

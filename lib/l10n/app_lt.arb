@@ -77,6 +77,7 @@
   "sectionSyncFolder": "Sinchronizavimo aplankas",
   "syncFolderDescription": "Kur patenka kito įrenginio eksportas. Sinchronizuoti iš saugyklos ten atveria šios saugyklos vardu pavadintą failą neklausdamas.",
   "syncFolderNotSet": "Nenustatyta: Sinchronizuoti iš saugyklos kaskart klausia failo.",
+  "syncFolderFileMissing": "Sinchronizavimo aplanke nėra failo pavadinimu {name}.",
   "rememberFolder": "Įsiminti",
   "aboutTitle": "Apie Gabbro",
   "generatorTitle": "Slaptažodžių generatorius",

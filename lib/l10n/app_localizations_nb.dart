@@ -270,6 +270,11 @@ class AppLocalizationsNb extends AppLocalizations {
       'Ikke angitt: Synkroniser fra hvelv spør om filen hver gang.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'Ingen fil med navnet $name i synkroniseringsmappen.';
+  }
+
+  @override
   String get rememberFolder => 'Husk';
 
   @override

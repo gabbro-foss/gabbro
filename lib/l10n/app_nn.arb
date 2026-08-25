@@ -77,6 +77,7 @@
   "sectionSyncFolder": "Synkroniseringsmappe",
   "syncFolderDescription": "Der eksporten frå den andre eininga hamnar. Synkroniser frå kvelv opnar fila der med namnet på dette kvelvet utan å spørje.",
   "syncFolderNotSet": "Ikkje sett: Synkroniser frå kvelv spør om fila kvar gong.",
+  "syncFolderFileMissing": "Inga fil med namnet {name} i synkroniseringsmappa.",
   "rememberFolder": "Hugs",
   "aboutTitle": "Om Gabbro",
   "generatorTitle": "Passordgenerator",

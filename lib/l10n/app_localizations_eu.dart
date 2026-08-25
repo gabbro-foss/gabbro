@@ -270,6 +270,11 @@ class AppLocalizationsEu extends AppLocalizations {
       'Ezarri gabe: kutxatik sinkronizatzeak fitxategia eskatzen du aldiro.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'Ez dago $name izeneko fitxategirik sinkronizazio-karpetan.';
+  }
+
+  @override
   String get rememberFolder => 'Gogoratu';
 
   @override

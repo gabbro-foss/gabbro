@@ -77,6 +77,7 @@
   "sectionSyncFolder": "Pasta de sincronização",
   "syncFolderDescription": "Onde chega a exportação do outro dispositivo. Sincronizar do cofre abre ali o arquivo com o nome deste cofre, sem perguntar.",
   "syncFolderNotSet": "Não definida: Sincronizar do cofre pede o arquivo toda vez.",
+  "syncFolderFileMissing": "Nenhum arquivo chamado {name} na pasta de sincronização.",
   "rememberFolder": "Lembrar",
   "aboutTitle": "Sobre o Gabbro",
   "generatorTitle": "Gerador de senhas",

@@ -77,6 +77,7 @@
   "sectionSyncFolder": "同期フォルダー",
   "syncFolderDescription": "他のデバイスのエクスポート先です。「保管庫から同期」は、この保管庫の名前を持つファイルをそこから確認なしに開きます。",
   "syncFolderNotSet": "未設定：「保管庫から同期」は毎回ファイルを尋ねます。",
+  "syncFolderFileMissing": "同期フォルダーに {name} という名前のファイルがありません。",
   "rememberFolder": "記憶する",
   "aboutTitle": "Gabbroについて",
   "generatorTitle": "パスワードジェネレーター",

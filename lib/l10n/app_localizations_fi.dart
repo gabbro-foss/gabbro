@@ -270,6 +270,11 @@ class AppLocalizationsFi extends AppLocalizations {
       'Ei asetettu: Synkronoi holvista kysyy tiedostoa joka kerta.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'Synkronointikansiossa ei ole tiedostoa nimeltä $name.';
+  }
+
+  @override
   String get rememberFolder => 'Muista';
 
   @override

@@ -77,6 +77,7 @@
   "sectionSyncFolder": "Synkroniseringsmapp",
   "syncFolderDescription": "Dit den andra enhetens export hamnar. Synkronisera från valv öppnar filen där med det här valvets namn utan att fråga.",
   "syncFolderNotSet": "Inte angiven: Synkronisera från valv frågar efter filen varje gång.",
+  "syncFolderFileMissing": "Ingen fil med namnet {name} i synkroniseringsmappen.",
   "rememberFolder": "Kom ihåg",
   "aboutTitle": "Om Gabbro",
   "generatorTitle": "Lösenordsgenerator",

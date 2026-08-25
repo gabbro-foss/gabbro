@@ -270,6 +270,11 @@ class AppLocalizationsRu extends AppLocalizations {
       'Не задана: Синхронизировать из хранилища каждый раз запрашивает файл.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'В папке синхронизации нет файла с именем $name.';
+  }
+
+  @override
   String get rememberFolder => 'Запомнить';
 
   @override

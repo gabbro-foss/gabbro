@@ -270,6 +270,11 @@ class AppLocalizationsCs extends AppLocalizations {
       'Nenastaveno: Synchronizace z trezoru se na soubor ptá pokaždé.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'Ve složce synchronizace není žádný soubor s názvem $name.';
+  }
+
+  @override
   String get rememberFolder => 'Zapamatovat';
 
   @override

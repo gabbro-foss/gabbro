@@ -77,6 +77,7 @@
   "sectionSyncFolder": "Synchronisatiemap",
   "syncFolderDescription": "Waar de export van het andere apparaat terechtkomt. Synchroniseren vanuit kluis opent daar het bestand met de naam van deze kluis, zonder te vragen.",
   "syncFolderNotSet": "Niet ingesteld: Synchroniseren vanuit kluis vraagt elke keer om het bestand.",
+  "syncFolderFileMissing": "Geen bestand met de naam {name} in de synchronisatiemap.",
   "rememberFolder": "Onthouden",
   "aboutTitle": "Over Gabbro",
   "generatorTitle": "Wachtwoordgenerator",

@@ -270,6 +270,11 @@ class AppLocalizationsKk extends AppLocalizations {
       'Орнатылмаған: Қоймадан синхрондау файлды әр жолы сұрайды.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'Синхрондау қалтасында $name атты файл жоқ.';
+  }
+
+  @override
   String get rememberFolder => 'Есте сақтау';
 
   @override

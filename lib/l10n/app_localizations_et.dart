@@ -270,6 +270,11 @@ class AppLocalizationsEt extends AppLocalizations {
       'Määramata: hoidlast sünkroonimine küsib faili iga kord.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'Sünkroonimiskaustas pole faili nimega $name.';
+  }
+
+  @override
   String get rememberFolder => 'Jäta meelde';
 
   @override

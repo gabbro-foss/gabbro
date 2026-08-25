@@ -270,6 +270,11 @@ class AppLocalizationsNl extends AppLocalizations {
       'Niet ingesteld: Synchroniseren vanuit kluis vraagt elke keer om het bestand.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'Geen bestand met de naam $name in de synchronisatiemap.';
+  }
+
+  @override
   String get rememberFolder => 'Onthouden';
 
   @override

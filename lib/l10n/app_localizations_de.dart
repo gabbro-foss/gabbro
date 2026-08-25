@@ -271,6 +271,11 @@ class AppLocalizationsDe extends AppLocalizations {
       'Nicht gesetzt: Aus Tresor synchronisieren fragt jedes Mal nach der Datei.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'Keine Datei namens $name im Sync-Ordner.';
+  }
+
+  @override
   String get rememberFolder => 'Merken';
 
   @override

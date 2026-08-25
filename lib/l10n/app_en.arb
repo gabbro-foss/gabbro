@@ -157,6 +157,13 @@
   "sectionSyncFolder": "Sync folder",
   "syncFolderDescription": "Where the other device's export lands. Sync from vault opens the file there that carries this vault's name, without asking for it.",
   "syncFolderNotSet": "Not set: Sync from vault asks for the file each time.",
+  "syncFolderFileMissing": "No file named {name} in the sync folder.",
+  "@syncFolderFileMissing": {
+    "description": "Sync from vault with a remembered folder: the folder holds no file of this vault's name. The user exports from the other device first, or checks the folder.",
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "rememberFolder": "Remember",
   "@rememberFolder": {
     "description": "Checkbox next to a chosen folder: keep it for next time."

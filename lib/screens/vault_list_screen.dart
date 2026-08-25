@@ -25,6 +25,7 @@ import 'package:gabbro/screens/export_screen.dart';
 import 'package:gabbro/screens/appearance_screen.dart';
 import 'package:gabbro/screens/language_screen.dart';
 import 'package:gabbro/screens/security_screen.dart';
+import 'package:gabbro/saf_tree.dart';
 import 'package:gabbro/screens/sync_settings_screen.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/screens/change_passphrase_screen.dart';
@@ -147,6 +148,14 @@ Future<YubikeyHmacMatch> _defaultGetSyncYubikeyHmac(
 ) => getAnyYubikeyHmacSecret(records: records, pin: pin, transport: transport);
 Future<String?> _defaultPickSyncFile() =>
     GabbroFilePicker.pickPath(allowedExtensions: ['gabbro']);
+
+/// `<folder>/<name>` as a readable path, or null when absent. On Android the
+/// folder is a granted SAF tree, read through Kotlin into the cache.
+Future<String?> _defaultResolveSyncSource(String folder, String name) async {
+  if (Platform.isAndroid) return readSafTreeFile(folder, name);
+  final path = '$folder${Platform.pathSeparator}$name';
+  return File(path).existsSync() ? path : null;
+}
 
 const _yubikeyChannel = MethodChannel('app.gabbro.gabbro/yubikey');
 const _biometricChannel = MethodChannel('app.gabbro.gabbro/biometric');
@@ -331,6 +340,16 @@ class VaultListScreen extends StatefulWidget {
   onGetSyncYubikeyHmac;
 
   final Future<String?> Function() onPickSyncFile;
+
+  /// S6: the remembered sync folder and the auto-merge policy. `null` reads
+  /// the app settings; tests inject values.
+  final String? syncFolder;
+  final bool? autoMergeSync;
+
+  /// Resolves `<folder>/<name>` to a readable path, or null when the folder
+  /// holds no such file. Linux checks the path; Android copies the file out
+  /// of the granted tree. Seam for tests.
+  final Future<String?> Function(String folder, String name) onResolveSyncSource;
   final bool isAndroid;
 
   final VaultEntryData Function(String id)? getEntryFn;
@@ -398,6 +417,9 @@ class VaultListScreen extends StatefulWidget {
     this.onDetectSyncSourceRecords = _defaultDetectSyncSourceRecords,
     this.onGetSyncYubikeyHmac = _defaultGetSyncYubikeyHmac,
     this.onPickSyncFile = _defaultPickSyncFile,
+    this.syncFolder,
+    this.autoMergeSync,
+    this.onResolveSyncSource = _defaultResolveSyncSource,
     this.getEntryFn,
     this.onDeleteEntryFn,
     this.onRefreshFn,
@@ -1219,12 +1241,34 @@ class _VaultListScreenState extends State<VaultListScreen>
   );
 
   Future<void> _syncFromFile() async {
+    // S6: a remembered folder replaces the picker. The source is the file in
+    // that folder carrying this vault's own name; a missing one is an error,
+    // never a fall-through to the picker (same vault = same name).
+    final settings = GabbroApp.maybeOf(context)?.settings;
+    final syncFolder = widget.syncFolder ?? settings?.syncFolder ?? '';
+    final autoMerge = widget.autoMergeSync ?? settings?.autoMergeSync ?? false;
     final String? picked;
-    try {
-      picked = await runPicker(widget.onPickSyncFile);
-    } on FilePickerUnavailable {
-      if (mounted) showPickerUnavailable(context, hasManualEntry: false);
-      return;
+    if (syncFolder.isNotEmpty) {
+      final name = File(widget.vaultPath).uri.pathSegments.last;
+      picked = await widget.onResolveSyncSource(syncFolder, name);
+      if (!mounted) return;
+      if (picked == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context).syncFolderFileMissing(name),
+            ),
+          ),
+        );
+        return;
+      }
+    } else {
+      try {
+        picked = await runPicker(widget.onPickSyncFile);
+      } on FilePickerUnavailable {
+        if (mounted) showPickerUnavailable(context, hasManualEntry: false);
+        return;
+      }
     }
     if (picked == null || !mounted) return;
     // Bound here (not the try-assigned local) so it promotes to non-null inside
@@ -1256,12 +1300,16 @@ class _VaultListScreenState extends State<VaultListScreen>
     }
 
     // Choose how to apply: automatically (incoming wins, no prompts) or a
-    // granular one-by-one review.
-    final fast = await showGabbroDialog<bool>(
-      context: context,
-      builder: (_) =>
-          SyncMethodDialog(showsPassphraseWarning: !isKeyProtected),
-    );
+    // granular one-by-one review. The auto-merge setting (S7) makes that
+    // choice standing, so the chooser is skipped; its same-passphrase warning
+    // then lives on the Sync settings screen.
+    final bool? fast = autoMerge
+        ? true
+        : await showGabbroDialog<bool>(
+            context: context,
+            builder: (_) =>
+                SyncMethodDialog(showsPassphraseWarning: !isKeyProtected),
+          );
     if (fast == null || !mounted) return;
 
     setState(() => _isSyncing = true);

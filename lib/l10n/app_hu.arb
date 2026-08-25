@@ -77,6 +77,7 @@
   "sectionSyncFolder": "Szinkronizálási mappa",
   "syncFolderDescription": "Ahová a másik eszköz exportja érkezik. A Szinkronizálás széfből ott nyitja meg az e széf nevét viselő fájlt, kérdés nélkül.",
   "syncFolderNotSet": "Nincs beállítva: a Szinkronizálás széfből minden alkalommal kéri a fájlt.",
+  "syncFolderFileMissing": "Nincs {name} nevű fájl a szinkronizálási mappában.",
   "rememberFolder": "Megjegyzés",
   "aboutTitle": "A Gabbróról",
   "generatorTitle": "Jelszógenerátor",

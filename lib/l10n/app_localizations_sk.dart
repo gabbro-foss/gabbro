@@ -270,6 +270,11 @@ class AppLocalizationsSk extends AppLocalizations {
       'Nenastavené: Synchronizovať z trezoru sa na súbor pýta zakaždým.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'V priečinku synchronizácie nie je žiadny súbor s názvom $name.';
+  }
+
+  @override
   String get rememberFolder => 'Zapamätať';
 
   @override

@@ -77,6 +77,7 @@
   "sectionSyncFolder": "Folder synchronizacji",
   "syncFolderDescription": "Gdzie trafia eksport z drugiego urządzenia. Synchronizuj z sejfu otwiera tam plik o nazwie tego sejfu bez pytania.",
   "syncFolderNotSet": "Nie ustawiono: Synchronizuj z sejfu pyta o plik za każdym razem.",
+  "syncFolderFileMissing": "Brak pliku o nazwie {name} w folderze synchronizacji.",
   "rememberFolder": "Zapamiętaj",
   "aboutTitle": "O Gabbro",
   "generatorTitle": "Generator haseł",

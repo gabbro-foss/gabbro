@@ -69,6 +69,19 @@ object GabbroPicker {
         return File(dir, safeName)
     }
 
+    /**
+     * Sync from vault with a remembered folder: the file called [name] in the
+     * granted tree, copied into the cache so Rust can read it by path. Null
+     * when the tree holds no such file, and nothing is written then.
+     * [openChild] resolves a name inside the tree to its contents.
+     */
+    fun cacheTreeChild(cacheDir: File, name: String, openChild: (String) -> InputStream?): String? {
+        val input = openChild(name) ?: return null
+        val target = cacheTarget(cacheDir, name)
+        copyTo(input, target)
+        return target.absolutePath
+    }
+
     /** Copies the picked file's contents to [target]. */
     fun copyTo(input: InputStream, target: File) {
         input.use { source ->

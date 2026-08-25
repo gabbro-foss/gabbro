@@ -270,6 +270,11 @@ class AppLocalizationsFr extends AppLocalizations {
       'Non défini : Synchroniser depuis le coffre demande le fichier à chaque fois.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'Aucun fichier nommé $name dans le dossier de synchronisation.';
+  }
+
+  @override
   String get rememberFolder => 'Mémoriser';
 
   @override

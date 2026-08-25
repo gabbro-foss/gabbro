@@ -77,6 +77,7 @@
   "sectionSyncFolder": "Mapa za sinkronizaciju",
   "syncFolderDescription": "Gdje stiže izvoz drugog uređaja. Sinkroniziraj iz trezora ondje otvara datoteku s imenom ovog trezora bez pitanja.",
   "syncFolderNotSet": "Nije postavljeno: Sinkroniziraj iz trezora svaki put traži datoteku.",
+  "syncFolderFileMissing": "U mapi za sinkronizaciju nema datoteke naziva {name}.",
   "rememberFolder": "Zapamti",
   "aboutTitle": "O aplikaciji Gabbro",
   "generatorTitle": "Generator lozinki",

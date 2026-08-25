@@ -261,6 +261,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get syncFolderNotSet => '未设置：“从保险库同步”每次都会询问文件。';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return '同步文件夹中没有名为 $name 的文件。';
+  }
+
+  @override
   String get rememberFolder => '记住';
 
   @override
@@ -2433,6 +2438,11 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get syncFolderNotSet => '未设置：“从保险库同步”每次都会询问文件。';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return '同步文件夹中没有名为 $name 的文件。';
+  }
+
+  @override
   String get rememberFolder => '记住';
 
   @override
@@ -4603,6 +4613,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get syncFolderNotSet => '未設定：「從保險庫同步」每次都會詢問檔案。';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return '同步資料夾中沒有名為 $name 的檔案。';
+  }
 
   @override
   String get rememberFolder => '記住';

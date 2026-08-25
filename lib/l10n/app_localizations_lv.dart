@@ -270,6 +270,11 @@ class AppLocalizationsLv extends AppLocalizations {
       'Nav iestatīts: Sinhronizēt no glabātavas katru reizi prasa failu.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'Sinhronizācijas mapē nav faila ar nosaukumu $name.';
+  }
+
+  @override
   String get rememberFolder => 'Atcerēties';
 
   @override

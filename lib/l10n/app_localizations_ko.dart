@@ -265,6 +265,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String get syncFolderNotSet => '설정 안 됨: 금고에서 동기화가 매번 파일을 묻습니다.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return '동기화 폴더에 $name(이)라는 파일이 없습니다.';
+  }
+
+  @override
   String get rememberFolder => '기억하기';
 
   @override

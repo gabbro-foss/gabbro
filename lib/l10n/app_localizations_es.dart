@@ -270,6 +270,11 @@ class AppLocalizationsEs extends AppLocalizations {
       'Sin definir: Sincronizar desde bóveda pide el archivo cada vez.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'No hay ningún archivo llamado $name en la carpeta de sincronización.';
+  }
+
+  @override
   String get rememberFolder => 'Recordar';
 
   @override

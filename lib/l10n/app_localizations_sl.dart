@@ -270,6 +270,11 @@ class AppLocalizationsSl extends AppLocalizations {
       'Ni nastavljeno: Sinhroniziraj iz trezorja vsakič vpraša za datoteko.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'V mapi za sinhronizacijo ni datoteke z imenom $name.';
+  }
+
+  @override
   String get rememberFolder => 'Zapomni si';
 
   @override

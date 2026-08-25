@@ -54,12 +54,18 @@ Widget _buildScreen({
   String? pickedPath,
   Future<String?> Function()? onPickSyncFile,
   _Applied? applied,
+  String? syncFolder,
+  bool? autoMergeSync,
+  Future<String?> Function(String folder, String name)? onResolveSyncSource,
 }) => testApp(
   VaultListScreen(
     vaultPath: '/tmp/test.gabbro',
     listEntries: () => [],
     yubikeyRecords: [],
     onPickSyncFile: onPickSyncFile ?? () async => pickedPath,
+    syncFolder: syncFolder,
+    autoMergeSync: autoMergeSync,
+    onResolveSyncSource: onResolveSyncSource ?? (_, _) async => null,
     mergeVault: mergeVault,
     fastMergeVault: fastMergeVault ?? (_, _) async => _summary(),
     // Default to "the held passphrase does not open it", so every pre-existing
@@ -1811,6 +1817,174 @@ void main() {
         ),
         findsOneWidget,
       );
+    });
+  });
+
+  // ── S6/S7: one-click sync ─────────────────────────────────────────────────
+  // A remembered folder replaces the picker; auto-merge replaces the chooser.
+  group('VaultListScreen one-click sync', () {
+    testWidgets('a remembered folder resolves this vault\'s file, no picker', (
+      tester,
+    ) async {
+      var pickerCalls = 0;
+      String? resolvedFolder;
+      String? resolvedName;
+      String? merged;
+      await tester.pumpWidget(
+        _buildScreen(
+          syncFolder: '/tmp/GabbroSync',
+          onPickSyncFile: () async {
+            pickerCalls++;
+            return '/tmp/wrong.gabbro';
+          },
+          onResolveSyncSource: (folder, name) async {
+            resolvedFolder = folder;
+            resolvedName = name;
+            return '/tmp/GabbroSync/test.gabbro';
+          },
+          mergeVault: (path, _) async {
+            merged = path;
+            return _summary();
+          },
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from vault'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Review all changes'));
+      await tester.pumpAndSettle();
+      await _enterSyncPassphrase(tester);
+
+      expect(pickerCalls, 0, reason: 'the folder replaces the picker');
+      expect(resolvedFolder, '/tmp/GabbroSync');
+      expect(resolvedName, 'test.gabbro', reason: 'this vault\'s own file name');
+      expect(merged, '/tmp/GabbroSync/test.gabbro');
+    });
+
+    testWidgets('no file of this vault\'s name in the folder: error, no merge', (
+      tester,
+    ) async {
+      var mergeCalls = 0;
+      var pickerCalls = 0;
+      await tester.pumpWidget(
+        _buildScreen(
+          syncFolder: '/tmp/GabbroSync',
+          onPickSyncFile: () async {
+            pickerCalls++;
+            return null;
+          },
+          onResolveSyncSource: (_, _) async => null,
+          mergeVault: (_, _) async {
+            mergeCalls++;
+            return _summary();
+          },
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from vault'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('No file named test.gabbro in the sync folder.'), findsOneWidget);
+      expect(find.text('How should this sync apply?'), findsNothing);
+      expect(mergeCalls, 0);
+      expect(pickerCalls, 0, reason: 'a missing file is not a reason to pick');
+    });
+
+    testWidgets('no folder remembered: the picker, as before', (tester) async {
+      var pickerCalls = 0;
+      var resolveCalls = 0;
+      await tester.pumpWidget(
+        _buildScreen(
+          syncFolder: '',
+          onPickSyncFile: () async {
+            pickerCalls++;
+            return null;
+          },
+          onResolveSyncSource: (_, _) async {
+            resolveCalls++;
+            return null;
+          },
+          mergeVault: (_, _) async => _summary(),
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from vault'));
+      await tester.pumpAndSettle();
+
+      expect(pickerCalls, 1);
+      expect(resolveCalls, 0);
+    });
+
+    testWidgets('auto-merge on: no chooser, the fast merge runs', (tester) async {
+      var fastCalled = false;
+      await tester.pumpWidget(
+        _buildScreen(
+          pickedPath: '/tmp/other.gabbro',
+          autoMergeSync: true,
+          mergeVault: (_, _) async =>
+              throw StateError('review merge must not run under auto-merge'),
+          fastMergeVault: (_, _) async {
+            fastCalled = true;
+            return _summary(added: 1);
+          },
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from vault'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('How should this sync apply?'), findsNothing);
+      // The held passphrase fails (harness default), so the fallback still asks.
+      expect(find.byType(AlertDialog), findsOneWidget);
+      await _enterSyncPassphrase(tester);
+      await _settle(tester);
+
+      expect(fastCalled, isTrue);
+      expect(find.textContaining('Review changes'), findsNothing);
+      expect(find.textContaining('synced'), findsOneWidget);
+    });
+
+    testWidgets('auto-merge on, held passphrase opens the file: one click', (
+      tester,
+    ) async {
+      var heldCalled = false;
+      await tester.pumpWidget(
+        _buildScreen(
+          syncFolder: '/tmp/GabbroSync',
+          autoMergeSync: true,
+          onResolveSyncSource: (_, _) async => '/tmp/GabbroSync/test.gabbro',
+          mergeVault: (_, _) async => throw StateError('no review merge'),
+          fastMergeVaultHeld: (_) async {
+            heldCalled = true;
+            return _summary(added: 2);
+          },
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from vault'));
+      await _settle(tester);
+
+      expect(heldCalled, isTrue);
+      expect(find.byType(AlertDialog), findsNothing, reason: 'nothing asked');
+      expect(find.textContaining('synced'), findsOneWidget);
+    });
+
+    testWidgets('auto-merge off with a folder: the chooser, as before', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _buildScreen(
+          syncFolder: '/tmp/GabbroSync',
+          autoMergeSync: false,
+          onResolveSyncSource: (_, _) async => '/tmp/GabbroSync/test.gabbro',
+          mergeVault: (_, _) async => _summary(),
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from vault'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('How should this sync apply?'), findsOneWidget);
     });
   });
 }

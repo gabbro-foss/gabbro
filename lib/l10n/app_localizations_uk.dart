@@ -270,6 +270,11 @@ class AppLocalizationsUk extends AppLocalizations {
       'Не задано: Синхронізувати зі сховища щоразу запитує файл.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'У теці синхронізації немає файлу з іменем $name.';
+  }
+
+  @override
   String get rememberFolder => 'Запам\'ятати';
 
   @override

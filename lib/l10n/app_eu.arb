@@ -77,6 +77,7 @@
   "sectionSyncFolder": "Sinkronizazio-karpeta",
   "syncFolderDescription": "Beste gailuaren esportazioa non iristen den. Kutxatik sinkronizatzeak hor irekitzen du kutxa honen izena duen fitxategia, galdetu gabe.",
   "syncFolderNotSet": "Ezarri gabe: kutxatik sinkronizatzeak fitxategia eskatzen du aldiro.",
+  "syncFolderFileMissing": "Ez dago {name} izeneko fitxategirik sinkronizazio-karpetan.",
   "rememberFolder": "Gogoratu",
   "aboutTitle": "Gabbro-ri buruz",
   "generatorTitle": "Pasahitz-sorgailua",

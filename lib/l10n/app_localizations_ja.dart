@@ -265,6 +265,11 @@ class AppLocalizationsJa extends AppLocalizations {
   String get syncFolderNotSet => '未設定：「保管庫から同期」は毎回ファイルを尋ねます。';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return '同期フォルダーに $name という名前のファイルがありません。';
+  }
+
+  @override
   String get rememberFolder => '記憶する';
 
   @override

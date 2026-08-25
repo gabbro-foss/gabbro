@@ -270,6 +270,11 @@ class AppLocalizationsNn extends AppLocalizations {
       'Ikkje sett: Synkroniser frå kvelv spør om fila kvar gong.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'Inga fil med namnet $name i synkroniseringsmappa.';
+  }
+
+  @override
   String get rememberFolder => 'Hugs';
 
   @override

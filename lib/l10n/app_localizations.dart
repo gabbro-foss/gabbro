@@ -649,6 +649,12 @@ abstract class AppLocalizations {
   /// **'Not set: Sync from vault asks for the file each time.'**
   String get syncFolderNotSet;
 
+  /// Sync from vault with a remembered folder: the folder holds no file of this vault's name. The user exports from the other device first, or checks the folder.
+  ///
+  /// In en, this message translates to:
+  /// **'No file named {name} in the sync folder.'**
+  String syncFolderFileMissing(String name);
+
   /// Checkbox next to a chosen folder: keep it for next time.
   ///
   /// In en, this message translates to:

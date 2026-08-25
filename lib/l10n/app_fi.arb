@@ -77,6 +77,7 @@
   "sectionSyncFolder": "Synkronointikansio",
   "syncFolderDescription": "Minne toisen laitteen vienti päätyy. Synkronoi holvista avaa sieltä tämän holvin nimisen tiedoston kysymättä.",
   "syncFolderNotSet": "Ei asetettu: Synkronoi holvista kysyy tiedostoa joka kerta.",
+  "syncFolderFileMissing": "Synkronointikansiossa ei ole tiedostoa nimeltä {name}.",
   "rememberFolder": "Muista",
   "aboutTitle": "Tietoja Gabbrosta",
   "generatorTitle": "Salasanageneraattori",

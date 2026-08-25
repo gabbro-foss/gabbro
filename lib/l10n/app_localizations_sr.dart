@@ -270,6 +270,11 @@ class AppLocalizationsSr extends AppLocalizations {
       'Није подешено: Синхронизуј из трезора сваки пут тражи датотеку.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'У фасцикли за синхронизацију нема датотеке са именом $name.';
+  }
+
+  @override
   String get rememberFolder => 'Запамти';
 
   @override
@@ -2537,6 +2542,11 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   @override
   String get syncFolderNotSet =>
       'Nije podešeno: Sinhronizuj iz trezora svaki put traži datoteku.';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return 'U fascikli za sinhronizaciju nema datoteke sa imenom $name.';
+  }
 
   @override
   String get rememberFolder => 'Zapamti';

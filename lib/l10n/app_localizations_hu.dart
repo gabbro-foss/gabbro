@@ -270,6 +270,11 @@ class AppLocalizationsHu extends AppLocalizations {
       'Nincs beállítva: a Szinkronizálás széfből minden alkalommal kéri a fájlt.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'Nincs $name nevű fájl a szinkronizálási mappában.';
+  }
+
+  @override
   String get rememberFolder => 'Megjegyzés';
 
   @override

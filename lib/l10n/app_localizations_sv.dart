@@ -270,6 +270,11 @@ class AppLocalizationsSv extends AppLocalizations {
       'Inte angiven: Synkronisera från valv frågar efter filen varje gång.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'Ingen fil med namnet $name i synkroniseringsmappen.';
+  }
+
+  @override
   String get rememberFolder => 'Kom ihåg';
 
   @override

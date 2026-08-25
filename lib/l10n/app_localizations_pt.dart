@@ -270,6 +270,11 @@ class AppLocalizationsPt extends AppLocalizations {
       'Não definida: Sincronizar do cofre pede o arquivo toda vez.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'Nenhum arquivo chamado $name na pasta de sincronização.';
+  }
+
+  @override
   String get rememberFolder => 'Lembrar';
 
   @override
@@ -2547,6 +2552,11 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
       'Não definida: Sincronizar do cofre pede o arquivo toda vez.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'Nenhum arquivo chamado $name na pasta de sincronização.';
+  }
+
+  @override
   String get rememberFolder => 'Lembrar';
 
   @override
@@ -4819,6 +4829,11 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   @override
   String get syncFolderNotSet =>
       'Não definida: Sincronizar do cofre pede o ficheiro de cada vez.';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return 'Nenhum ficheiro chamado $name na pasta de sincronização.';
+  }
 
   @override
   String get rememberFolder => 'Lembrar';

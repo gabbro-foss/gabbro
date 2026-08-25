@@ -270,6 +270,11 @@ class AppLocalizationsLt extends AppLocalizations {
       'Nenustatyta: Sinchronizuoti iš saugyklos kaskart klausia failo.';
 
   @override
+  String syncFolderFileMissing(String name) {
+    return 'Sinchronizavimo aplanke nėra failo pavadinimu $name.';
+  }
+
+  @override
   String get rememberFolder => 'Įsiminti';
 
   @override

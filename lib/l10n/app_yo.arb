@@ -77,6 +77,7 @@
   "sectionSyncFolder": "Fódà ìmúṣọ̀kan",
   "syncFolderDescription": "Níbi tí ìgbéjáde ẹ̀rọ kejì ń dé. Ṣọkan láti àpótí á ṣí fáìlì tí ó ní orúkọ àpótí yìí níbẹ̀ láì béèrè.",
   "syncFolderNotSet": "Kò tíì ṣètò: Ṣọkan láti àpótí á máa béèrè fún fáìlì ní gbogbo ìgbà.",
+  "syncFolderFileMissing": "Kò sí fáìlì tí a pè ní {name} nínú fódà ìmúṣọ̀kan.",
   "rememberFolder": "Rántí",
   "aboutTitle": "Nipa Gabbro",
   "generatorTitle": "Ẹrọ ṣiṣẹda ọrọ igbaniwọle",

@@ -77,6 +77,7 @@
   "sectionSyncFolder": "Mapa za sinhronizacijo",
   "syncFolderDescription": "Kamor prispe izvoz druge naprave. Sinhroniziraj iz trezorja tam odpre datoteko z imenom tega trezorja, brez vprašanja.",
   "syncFolderNotSet": "Ni nastavljeno: Sinhroniziraj iz trezorja vsakič vpraša za datoteko.",
+  "syncFolderFileMissing": "V mapi za sinhronizacijo ni datoteke z imenom {name}.",
   "rememberFolder": "Zapomni si",
   "aboutTitle": "O aplikaciji Gabbro",
   "generatorTitle": "Generator gesel",
