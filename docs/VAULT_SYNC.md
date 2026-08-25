@@ -13,6 +13,11 @@ default is `~/.local/share/app.gabbro.gabbro/`. Each save then propagates on its
 on the receiving device, **Sync from vault** (passphrase, plus YubiKey tap if the vault
 uses one) merges the incoming copy in a couple of clicks.
 
+**One click:** on the receiving device, **Sync settings** (vault menu) takes the
+folder the export lands in and an **auto-merge** switch. With both set, **Sync from
+vault** opens the file of this vault's name in that folder and applies it, no
+questions asked; a YubiKey-protected file still asks for its tap.
+
 **On Android this shortcut does not work:** the vault lives in the app's private
 storage, which no sync app can read. Export the vault to a shared folder (e.g.
 `Download/GabbroSync`) and point the sync app there, as in the walkthrough below.
