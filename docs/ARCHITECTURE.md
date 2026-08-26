@@ -299,8 +299,19 @@ Progress (tick as each Bikeshed section lands):
 - [ ] Import screen: one picker (step 2, IN PROGRESS; Remember box is step 3)
   - [x] Net: `test/import_screen_net_test.dart`, the five non-Gabbro flows (gone file,
         size cap, success pops count, failures dialog, error re-arms; CSV sniff -> mapping)
-  - [ ] Red: type dropdown, one path field, per-type text, type change clears the path,
-        action label per type, keyed Gabbro sub-form, 37 locales, semantics, large text
+  - Red list (approved 2026-08-26), each ticked when red then green:
+    - [ ] R1 one PathField, never six
+    - [ ] R2 type dropdown, six entries, Gabbro default, semantics label
+    - [ ] R3 banner + size note stay for every type
+    - [ ] R4 per-type explanation text
+    - [ ] R5 action label: Import, or Next: map columns for CSV
+    - [ ] R6 file filter follows the type
+    - [ ] R7 type change clears path and error
+    - [ ] R8 passphrase field only for Gabbro; keyed sub-form unchanged
+    - [ ] R9 all existing + net tests re-targeted via the helpers
+    - [ ] R10 dropdown label in all 37 locales
+    - [ ] R11 labelled-tap-target green; dropdown announces its value
+    - [ ] R12 no overflow at 2x phone / 3x tablet
   - [ ] Green: remold `import_screen.dart`, one state triple, delete the six sections
   - [ ] Hardware: Linux, S23, tablet
 - [ ] Remember folders on export/import + read-only view in Sync settings (S9, S5)
