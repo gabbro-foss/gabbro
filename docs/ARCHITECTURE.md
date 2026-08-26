@@ -227,11 +227,8 @@ and the chooser what a merge does. Existing text is checked against S1-S9;
 whatever is missing or wrong is fixed in the same section that changes it.
 
 **Handover 2026-08-25 (session stopped here; read before anything).**
-Branch `streamline_sync_process` off master `263252fd`, 20 commits, NOT pushed,
-tree clean. `.scratchpad` holds the unrun Lenovo tablet pass 3. The full gate
-has not run on the branch (Rust subset
-`api::import vault::entry vault::session::tests` 91 green; `flutter test` 2867
-green; Android unit 180 green). No dependency changed: no `--warm` needed.
+Branch `streamline_sync_process` off master `263252fd`. Full gate ALL GREEN
+2026-08-26 (12m29s). No dependency changed: no `--warm` needed.
 
 Step 1 code is complete: net (S8), labels (S2), import additive (S3, Rust
 `import.rs` + Dart, skipped dialog gone, `content_hash` gone), Sync settings
@@ -249,9 +246,11 @@ insets fixed), 2b (missing file, Remember unticked), 2c (keyed vault, NFC, 1 add
 
 Next, in order (write ONE pass at a time into `.scratchpad`, one action per
 row; the current `build/app/outputs/flutter-apk` APK already carries the inset fix):
-1. Lenovo tablet (TB373FU): inset pass, portrait then landscape (`.scratchpad`).
-2. Full gate `./gabbro_test`; then docs (README check, VAULT_SYNC done), merge.
-Then Bikeshed steps 2 and 3.
+1. ~~Lenovo tablet~~ done 2026-08-26, pass 3 all green (also covered the S7 passphrase fallback).
+2. Full gate `./gabbro_test`; then docs (README check, VAULT_SYNC done); push the branch.
+Branch stays open through Bikeshed steps 2 and 3 and the help-carousel review
+(the rework changes screens the carousel describes); merge to master only after all four.
+
 
 **In progress: edge-to-edge insets** (found by the Android pass 2a, 2026-08-25;
 latent on master, exposed by targetSdk 36 = Flutter 3.47.x default, enforced on
@@ -289,7 +288,7 @@ announced, alphabet bar full height, search with keyboard, tablet divider drag.
       banner rows
 - [x] Fix: slot null when the banner is hidden; tablet branch inside the
       SafeArea; SafeArea on the four screens
-- [ ] Hardware: S23 3-button + gesture green; Lenovo tablet pending
+- [x] Hardware: S23 3-button + gesture green; Lenovo tablet (gesture, portrait + landscape, two-pane) green
 
 Progress (tick as each Bikeshed section lands):
 - [x] Net (S8), both platforms
@@ -300,8 +299,8 @@ Progress (tick as each Bikeshed section lands):
 - [ ] Import screen: one picker (Bikeshed step 2)
 - [ ] Remember folders on export/import + read-only view in Sync settings (S9, S5)
 - [x] On-screen explanations checked against S1-S9 (S10)
-- [ ] Docs: README, VAULT_SYNC.md, CHANGELOG
-- [ ] Hardware: Linux 1a-1e green; S23 2a-2c green; tablet pending (see Handover)
+- [x] Docs: README, VAULT_SYNC.md, CHANGELOG (step 1)
+- [x] Hardware: Linux 1a-1e green; S23 2a-2c green; tablet pass 3 green
 
 ---
 

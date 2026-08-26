@@ -16,7 +16,7 @@ uses one) merges the incoming copy in a couple of clicks.
 **One click:** on the receiving device, **Sync settings** (vault menu) takes the
 folder the export lands in and an **auto-merge** switch. With both set, **Sync from
 vault** opens the file called `<alias>.gabbro` (this vault's export name) in that
-folder and applies it, no questions asked; a YubiKey-protected file still asks for its tap.
+folder and applies it with no picker, chooser or review; a YubiKey-protected file still asks for its tap, and a file your passphrase does not open still asks for one.
 
 **On Android this shortcut does not work:** the vault lives in the app's private
 storage, which no sync app can read. Export the vault to a shared folder (e.g.
