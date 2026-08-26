@@ -296,7 +296,13 @@ Progress (tick as each Bikeshed section lands):
 - [x] Import additive, no dedupe (S3)
 - [x] Sync settings screen: auto-merge + sync folder + Remember (S5, S6.1)
 - [x] Sync from vault by name match, picker fallback, auto-merge wiring (S6, S7)
-- [ ] Import screen: one picker (Bikeshed step 2)
+- [ ] Import screen: one picker (step 2, IN PROGRESS; Remember box is step 3)
+  - [x] Net: `test/import_screen_net_test.dart`, the five non-Gabbro flows (gone file,
+        size cap, success pops count, failures dialog, error re-arms; CSV sniff -> mapping)
+  - [ ] Red: type dropdown, one path field, per-type text, type change clears the path,
+        action label per type, keyed Gabbro sub-form, 37 locales, semantics, large text
+  - [ ] Green: remold `import_screen.dart`, one state triple, delete the six sections
+  - [ ] Hardware: Linux, S23, tablet
 - [ ] Remember folders on export/import + read-only view in Sync settings (S9, S5)
 - [x] On-screen explanations checked against S1-S9 (S10)
 - [x] Docs: README, VAULT_SYNC.md, CHANGELOG (step 1)
