@@ -82,6 +82,7 @@
   "aboutTitle": "Sobre o Gabbro",
   "generatorTitle": "Gerador de palavras-passe",
   "importTitle": "Importar entradas",
+  "importSourceLabel": "Origem",
   "exportTitle": "Exportar cofre",
   "changePassphraseTitle": "Alterar frase-passe",
   "csvMappingTitle": "Mapear colunas CSV",

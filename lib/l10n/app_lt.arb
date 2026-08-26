@@ -82,6 +82,7 @@
   "aboutTitle": "Apie Gabbro",
   "generatorTitle": "Slaptažodžių generatorius",
   "importTitle": "Importuoti įrašus",
+  "importSourceLabel": "Šaltinis",
   "exportTitle": "Eksportuoti saugyklą",
   "changePassphraseTitle": "Keisti slaptafrazę",
   "csvMappingTitle": "Susieti CSV stulpelius",

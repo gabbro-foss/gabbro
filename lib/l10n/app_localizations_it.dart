@@ -288,6 +288,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get importTitle => 'Importa voci';
 
   @override
+  String get importSourceLabel => 'Origine';
+
+  @override
   String get exportTitle => 'Esporta archivio';
 
   @override

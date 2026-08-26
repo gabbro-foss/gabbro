@@ -11,33 +11,28 @@ import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/screens/import_screen.dart';
 import 'package:gabbro/src/rust/api/import.dart';
 import 'package:gabbro/text_scale.dart';
-import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/widgets/path_field.dart';
+import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/widgets/yubikey_tap.dart';
 
-/// Scrolls to [sectionTitle], then taps the FilledButton in that section.
-// The Gabbro section's action button. Four other sections also say "Import",
-// so the finder is scoped to the section rather than to the text.
-Finder _gabbroImportButton() => find
-    .descendant(
-      of: find
-          .ancestor(of: find.text('Gabbro vault'), matching: find.byType(Column))
-          .first,
-      matching: find.widgetWithText(FilledButton, 'Import'),
-    )
-    .first;
+// The one action button; Gabbro vault is the default type.
+Finder _gabbroImportButton() => find.widgetWithText(FilledButton, 'Import');
 
+/// Picks [title] in the type dropdown.
+Future<void> _selectType(WidgetTester tester, String title) async {
+  final dd = find.byType(DropdownButton<ImportType>);
+  await tester.ensureVisible(dd);
+  await tester.tap(dd);
+  await tester.pumpAndSettle();
+  await tester.tap(find.text(title).last);
+  await tester.pumpAndSettle();
+}
+
+/// Selects the type [title], then taps the action button.
 Future<void> _tapImportForSection(
-    WidgetTester tester, String sectionTitle) async {
-  await tester.scrollUntilVisible(
-    find.text(sectionTitle),
-    300,
-    scrollable: find.byType(Scrollable).first,
-  );
-  final col = find
-      .ancestor(of: find.text(sectionTitle), matching: find.byType(Column))
-      .first;
-  final btn = find.descendant(of: col, matching: find.byType(FilledButton));
+    WidgetTester tester, String title) async {
+  await _selectType(tester, title);
+  final btn = find.byType(FilledButton);
   await tester.ensureVisible(btn);
   await tester.tap(btn);
   await tester.pump();
@@ -831,65 +826,26 @@ void main() {
     testWidgets('shows error when CSV continue attempted with no file',
         (tester) async {
       await tester.pumpWidget(buildScreen());
-      await tester.scrollUntilVisible(
-        find.text('Generic CSV'),
-        300,
-        scrollable: find.byType(Scrollable).first,
-      );
-      final col = find
-          .ancestor(
-              of: find.text('Generic CSV'), matching: find.byType(Column))
-          .first;
-      final btn = find.descendant(of: col, matching: find.byType(FilledButton));
-      await tester.ensureVisible(btn);
-      await tester.tap(btn);
-      await tester.pump();
+      await _tapImportForSection(tester, 'Generic CSV');
       expect(find.text('Select a file.'), findsWidgets);
     });
 
-    // ── Section visibility ────────────────────────────────────────────────────
+    // ── Type selection ───────────────────────────────────────────────────────
 
-    testWidgets('Enpass section is visible when scrolled to', (tester) async {
-      await tester.pumpWidget(buildScreen());
-      await tester.scrollUntilVisible(
-        find.text('Enpass'),
-        300,
-        scrollable: find.byType(Scrollable).first,
-      );
-      expect(find.text('Enpass'), findsOneWidget);
-    });
-
-    testWidgets('Bitwarden section is visible when scrolled to',
-        (tester) async {
-      await tester.pumpWidget(buildScreen());
-      await tester.scrollUntilVisible(
-        find.text('Bitwarden'),
-        300,
-        scrollable: find.byType(Scrollable).first,
-      );
-      expect(find.text('Bitwarden'), findsOneWidget);
-    });
-
-    testWidgets('Google PM section is visible when scrolled to',
-        (tester) async {
-      await tester.pumpWidget(buildScreen());
-      await tester.scrollUntilVisible(
-        find.text('Google Password Manager'),
-        300,
-        scrollable: find.byType(Scrollable).first,
-      );
-      expect(find.text('Google Password Manager'), findsOneWidget);
-    });
-
-    testWidgets('Dashlane section is visible when scrolled to', (tester) async {
-      await tester.pumpWidget(buildScreen());
-      await tester.scrollUntilVisible(
-        find.text('Dashlane'),
-        300,
-        scrollable: find.byType(Scrollable).first,
-      );
-      expect(find.text('Dashlane'), findsOneWidget);
-    });
+    for (final type in [
+      'Enpass',
+      'Bitwarden',
+      'Google Password Manager',
+      'Dashlane',
+    ]) {
+      testWidgets('$type is selectable from the type dropdown',
+          (tester) async {
+        await tester.pumpWidget(buildScreen());
+        await _selectType(tester, type);
+        // Shown once: the collapsed dropdown; the menu is closed again.
+        expect(find.text(type), findsOneWidget);
+      });
+    }
 
     // ── Passphrase field ─────────────────────────────────────────────────────
 
@@ -939,34 +895,5 @@ void main() {
       expect(importLimitLabel(kEnpassImportMaxBytes), '128 MB');
     });
   });
-
-  // Net for the file_picker replacement: pins what this screen asks the
-  // picker for. The replacement must honour the same requests.
-  group('PathField wiring (net)', () {
-    testWidgets(
-        'import sections ask for open dialogs with the right filters: '
-        'one .gabbro, three .csv, two .json', (tester) async {
-      final noResult = ImportResult(
-        imported: BigInt.zero,
-        failures: [],
-      );
-      await tester.pumpWidget(testApp(ImportScreen(
-        onImportEnpass: (_) async => noResult,
-        onImportBitwarden: (_) async => noResult,
-        onImportGooglePm: (_) async => noResult,
-        onImportDashlane: (_) async => noResult,
-        onSniffCsv: (_) => CsvPreviewData(headers: [], rows: []),
-      )));
-      await tester.pumpAndSettle();
-
-      final fields =
-          tester.widgetList<PathField>(find.byType(PathField)).toList();
-      for (final pf in fields) {
-        expect(pf.mode, PathFieldMode.open);
-      }
-      final filters = fields.map((pf) => pf.allowedExtensions?.single).toList()
-        ..sort((a, b) => a!.compareTo(b!));
-      expect(filters, ['csv', 'csv', 'csv', 'gabbro', 'json', 'json']);
-    });
-  });
+  // The picker filters per type are pinned by R6 in import_screen_remold_test.
 }

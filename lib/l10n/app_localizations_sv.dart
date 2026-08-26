@@ -288,6 +288,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get importTitle => 'Importera poster';
 
   @override
+  String get importSourceLabel => 'Källa';
+
+  @override
   String get exportTitle => 'Exportera valv';
 
   @override

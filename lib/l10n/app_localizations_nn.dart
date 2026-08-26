@@ -288,6 +288,9 @@ class AppLocalizationsNn extends AppLocalizations {
   String get importTitle => 'Importer oppføringer';
 
   @override
+  String get importSourceLabel => 'Kjelde';
+
+  @override
   String get exportTitle => 'Eksporter kvelv';
 
   @override

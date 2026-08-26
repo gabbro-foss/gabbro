@@ -288,6 +288,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get importTitle => 'Uvezi unose';
 
   @override
+  String get importSourceLabel => 'Izvor';
+
+  @override
   String get exportTitle => 'Izvezi trezor';
 
   @override

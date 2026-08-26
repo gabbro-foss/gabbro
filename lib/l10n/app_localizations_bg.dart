@@ -288,6 +288,9 @@ class AppLocalizationsBg extends AppLocalizations {
   String get importTitle => 'Импортиране на записи';
 
   @override
+  String get importSourceLabel => 'Източник';
+
+  @override
   String get exportTitle => 'Експортиране на трезор';
 
   @override

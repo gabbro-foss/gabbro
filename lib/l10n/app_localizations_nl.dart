@@ -288,6 +288,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get importTitle => 'Items importeren';
 
   @override
+  String get importSourceLabel => 'Bron';
+
+  @override
   String get exportTitle => 'Kluis exporteren';
 
   @override

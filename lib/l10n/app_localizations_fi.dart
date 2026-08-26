@@ -288,6 +288,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get importTitle => 'Tuo merkintöjä';
 
   @override
+  String get importSourceLabel => 'Lähde';
+
+  @override
   String get exportTitle => 'Vie holvi';
 
   @override

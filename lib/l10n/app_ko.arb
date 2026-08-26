@@ -82,6 +82,7 @@
   "aboutTitle": "Gabbro 정보",
   "generatorTitle": "비밀번호 생성기",
   "importTitle": "항목 가져오기",
+  "importSourceLabel": "출처",
   "exportTitle": "볼트 내보내기",
   "changePassphraseTitle": "암호 문구 변경",
   "csvMappingTitle": "CSV 열 매핑",

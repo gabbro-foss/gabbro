@@ -288,6 +288,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get importTitle => 'Bejegyzések importálása';
 
   @override
+  String get importSourceLabel => 'Forrás';
+
+  @override
   String get exportTitle => 'Széf exportálása';
 
   @override

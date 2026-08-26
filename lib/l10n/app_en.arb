@@ -176,6 +176,7 @@
   "aboutTitle": "About Gabbro",
   "generatorTitle": "Password generator",
   "importTitle": "Import entries",
+  "importSourceLabel": "Source",
   "exportTitle": "Export vault",
   "changePassphraseTitle": "Change passphrase",
   "csvMappingTitle": "Map CSV columns",

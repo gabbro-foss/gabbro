@@ -82,6 +82,7 @@
   "aboutTitle": "Σχετικά με το Gabbro",
   "generatorTitle": "Γεννήτρια κωδικών",
   "importTitle": "Εισαγωγή καταχωρίσεων",
+  "importSourceLabel": "Πηγή",
   "exportTitle": "Εξαγωγή θησαυροφυλακίου",
   "changePassphraseTitle": "Αλλαγή φράσης πρόσβασης",
   "csvMappingTitle": "Αντιστοίχιση στηλών CSV",

@@ -288,6 +288,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get importTitle => 'Importēt ierakstus';
 
   @override
+  String get importSourceLabel => 'Avots';
+
+  @override
   String get exportTitle => 'Eksportēt seifu';
 
   @override

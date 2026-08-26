@@ -283,6 +283,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get importTitle => 'エントリをインポート';
 
   @override
+  String get importSourceLabel => 'ソース';
+
+  @override
   String get exportTitle => 'ボルトをエクスポート';
 
   @override

@@ -288,6 +288,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get importTitle => 'Импорт записей';
 
   @override
+  String get importSourceLabel => 'Источник';
+
+  @override
   String get exportTitle => 'Экспорт хранилища';
 
   @override

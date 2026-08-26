@@ -283,6 +283,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get importTitle => '항목 가져오기';
 
   @override
+  String get importSourceLabel => '출처';
+
+  @override
   String get exportTitle => '볼트 내보내기';
 
   @override

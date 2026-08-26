@@ -82,6 +82,7 @@
   "aboutTitle": "Gabbroについて",
   "generatorTitle": "パスワードジェネレーター",
   "importTitle": "エントリをインポート",
+  "importSourceLabel": "ソース",
   "exportTitle": "ボルトをエクスポート",
   "changePassphraseTitle": "パスフレーズを変更",
   "csvMappingTitle": "CSV列のマッピング",

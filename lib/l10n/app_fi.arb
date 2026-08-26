@@ -82,6 +82,7 @@
   "aboutTitle": "Tietoja Gabbrosta",
   "generatorTitle": "Salasanageneraattori",
   "importTitle": "Tuo merkintöjä",
+  "importSourceLabel": "Lähde",
   "exportTitle": "Vie holvi",
   "changePassphraseTitle": "Vaihda salauslause",
   "csvMappingTitle": "Kartoita CSV-sarakkeet",

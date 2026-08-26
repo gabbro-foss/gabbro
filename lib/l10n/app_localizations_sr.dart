@@ -288,6 +288,9 @@ class AppLocalizationsSr extends AppLocalizations {
   String get importTitle => 'Увези уносе';
 
   @override
+  String get importSourceLabel => 'Извор';
+
+  @override
   String get exportTitle => 'Извези трезор';
 
   @override
@@ -2561,6 +2564,9 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get importTitle => 'Uvezi unose';
+
+  @override
+  String get importSourceLabel => 'Izvor';
 
   @override
   String get exportTitle => 'Izvezi trezor';

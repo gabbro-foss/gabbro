@@ -82,6 +82,7 @@
   "aboutTitle": "O aplikaci Gabbro",
   "generatorTitle": "Generátor hesel",
   "importTitle": "Importovat záznamy",
+  "importSourceLabel": "Zdroj",
   "exportTitle": "Exportovat trezor",
   "changePassphraseTitle": "Změnit přístupovou frázi",
   "csvMappingTitle": "Mapování sloupců CSV",

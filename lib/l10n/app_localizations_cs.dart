@@ -288,6 +288,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get importTitle => 'Importovat záznamy';
 
   @override
+  String get importSourceLabel => 'Zdroj';
+
+  @override
   String get exportTitle => 'Exportovat trezor';
 
   @override

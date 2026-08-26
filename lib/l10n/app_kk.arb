@@ -82,6 +82,7 @@
   "aboutTitle": "Gabbro туралы",
   "generatorTitle": "Құпия сөз генераторы",
   "importTitle": "Жазбаларды импорттау",
+  "importSourceLabel": "Дереккөз",
   "exportTitle": "Сейфті экспорттау",
   "changePassphraseTitle": "Кілт фразасын өзгерту",
   "csvMappingTitle": "CSV бағандарын бейнелеу",

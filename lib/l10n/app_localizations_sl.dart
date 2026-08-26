@@ -288,6 +288,9 @@ class AppLocalizationsSl extends AppLocalizations {
   String get importTitle => 'Uvozi vnose';
 
   @override
+  String get importSourceLabel => 'Vir';
+
+  @override
   String get exportTitle => 'Izvozi trezor';
 
   @override

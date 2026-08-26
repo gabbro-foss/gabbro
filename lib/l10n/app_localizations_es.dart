@@ -288,6 +288,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get importTitle => 'Importar entradas';
 
   @override
+  String get importSourceLabel => 'Origen';
+
+  @override
   String get exportTitle => 'Exportar almacén';
 
   @override

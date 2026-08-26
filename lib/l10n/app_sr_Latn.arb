@@ -82,6 +82,7 @@
   "aboutTitle": "O aplikaciji Gabbro",
   "generatorTitle": "Generator lozinki",
   "importTitle": "Uvezi unose",
+  "importSourceLabel": "Izvor",
   "exportTitle": "Izvezi trezor",
   "changePassphraseTitle": "Promeni pristupnu frazu",
   "csvMappingTitle": "Mapiranje CSV kolona",

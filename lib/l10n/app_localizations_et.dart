@@ -288,6 +288,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get importTitle => 'Impordi kirjeid';
 
   @override
+  String get importSourceLabel => 'Allikas';
+
+  @override
   String get exportTitle => 'Ekspordi seif';
 
   @override

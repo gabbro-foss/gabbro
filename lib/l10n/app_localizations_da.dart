@@ -288,6 +288,9 @@ class AppLocalizationsDa extends AppLocalizations {
   String get importTitle => 'Importér poster';
 
   @override
+  String get importSourceLabel => 'Kilde';
+
+  @override
   String get exportTitle => 'Eksportér hvælving';
 
   @override

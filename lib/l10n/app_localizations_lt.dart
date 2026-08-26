@@ -288,6 +288,9 @@ class AppLocalizationsLt extends AppLocalizations {
   String get importTitle => 'Importuoti įrašus';
 
   @override
+  String get importSourceLabel => 'Šaltinis';
+
+  @override
   String get exportTitle => 'Eksportuoti saugyklą';
 
   @override

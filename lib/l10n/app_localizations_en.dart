@@ -287,6 +287,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get importTitle => 'Import entries';
 
   @override
+  String get importSourceLabel => 'Source';
+
+  @override
   String get exportTitle => 'Export vault';
 
   @override

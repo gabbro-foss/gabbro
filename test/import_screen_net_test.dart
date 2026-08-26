@@ -13,32 +13,32 @@ import 'package:gabbro/src/rust/api/import.dart';
 
 import 'test_helpers.dart';
 
-/// The section's Column: nearest Column above its title text.
-Finder _section(String title) =>
-    find.ancestor(of: find.text(title), matching: find.byType(Column)).first;
+/// Picks [title] in the type dropdown.
+Future<void> _selectType(WidgetTester tester, String title) async {
+  final dd = find.byType(DropdownButton<ImportType>);
+  await tester.ensureVisible(dd);
+  await tester.tap(dd);
+  await tester.pumpAndSettle();
+  await tester.tap(find.text(title).last);
+  await tester.pumpAndSettle();
+}
 
-/// Types [path] into the section's path field (the PathField's onChanged is
-/// the same callback the native picker feeds).
+/// Selects the type, then types [path] into the one path field (the
+/// PathField's onChanged is the same callback the native picker feeds).
 Future<void> _setPath(WidgetTester tester, String title, String path) async {
-  await tester.scrollUntilVisible(
-    find.text(title),
-    300,
-    scrollable: find.byType(Scrollable).first,
-  );
-  final field =
-      find.descendant(of: _section(title), matching: find.byType(TextFormField));
+  await _selectType(tester, title);
+  final field = find.byType(TextFormField);
   await tester.ensureVisible(field);
   await tester.enterText(field, path);
   await tester.pump();
 }
 
-/// Taps the section's action button and lets the flow run. The importers read
+/// Taps the action button and lets the flow run. The importers read
 /// the file with real I/O, which the test's fake clock never completes, so
 /// real time runs briefly before settling.
 Future<void> _tapAction(WidgetTester tester, String title,
     {bool settle = true}) async {
-  final btn =
-      find.descendant(of: _section(title), matching: find.byType(FilledButton));
+  final btn = find.byType(FilledButton);
   await tester.ensureVisible(btn);
   final onPressed = tester.widget<FilledButton>(btn).onPressed;
   expect(onPressed, isNotNull, reason: 'action button disabled');
@@ -217,8 +217,7 @@ void main() {
         expect(find.textContaining('Import failed:'), findsOneWidget);
         expect(find.textContaining('boom'), findsOneWidget);
         expect(find.byType(CircularProgressIndicator), findsNothing);
-        final btn = tester.widget<FilledButton>(find
-            .descendant(of: _section(t.title), matching: find.byType(FilledButton)));
+        final btn = tester.widget<FilledButton>(find.byType(FilledButton));
         expect(btn.onPressed, isNotNull);
       });
     });
@@ -289,8 +288,7 @@ void main() {
       await _tapAction(tester, title);
       expect(find.textContaining('Import failed:'), findsOneWidget);
       expect(find.byType(CsvMappingScreen), findsNothing);
-      final btn = tester.widget<FilledButton>(find
-          .descendant(of: _section(title), matching: find.byType(FilledButton)));
+      final btn = tester.widget<FilledButton>(find.byType(FilledButton));
       expect(btn.onPressed, isNotNull);
     });
   });

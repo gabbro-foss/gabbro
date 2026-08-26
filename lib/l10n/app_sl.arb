@@ -82,6 +82,7 @@
   "aboutTitle": "O aplikaciji Gabbro",
   "generatorTitle": "Generator gesel",
   "importTitle": "Uvozi vnose",
+  "importSourceLabel": "Vir",
   "exportTitle": "Izvozi trezor",
   "changePassphraseTitle": "Spremeni geslo za dostop",
   "csvMappingTitle": "Preslikava stolpcev CSV",

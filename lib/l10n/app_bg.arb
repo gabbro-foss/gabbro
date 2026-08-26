@@ -82,6 +82,7 @@
   "aboutTitle": "За Gabbro",
   "generatorTitle": "Генератор на пароли",
   "importTitle": "Импортиране на записи",
+  "importSourceLabel": "Източник",
   "exportTitle": "Експортиране на трезор",
   "changePassphraseTitle": "Промени паролна фраза",
   "csvMappingTitle": "Съпоставяне на CSV колони",

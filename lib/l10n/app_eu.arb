@@ -82,6 +82,7 @@
   "aboutTitle": "Gabbro-ri buruz",
   "generatorTitle": "Pasahitz-sorgailua",
   "importTitle": "Sarrerak inportatu",
+  "importSourceLabel": "Iturria",
   "exportTitle": "Gandegi esportatu",
   "changePassphraseTitle": "Pasaesaldia aldatu",
   "csvMappingTitle": "CSV zutabeen mapaketa",

@@ -288,6 +288,9 @@ class AppLocalizationsKk extends AppLocalizations {
   String get importTitle => 'Жазбаларды импорттау';
 
   @override
+  String get importSourceLabel => 'Дереккөз';
+
+  @override
   String get exportTitle => 'Сейфті экспорттау';
 
   @override

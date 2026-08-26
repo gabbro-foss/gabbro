@@ -679,6 +679,12 @@ abstract class AppLocalizations {
   /// **'Import entries'**
   String get importTitle;
 
+  /// No description provided for @importSourceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Source'**
+  String get importSourceLabel;
+
   /// No description provided for @exportTitle.
   ///
   /// In en, this message translates to:

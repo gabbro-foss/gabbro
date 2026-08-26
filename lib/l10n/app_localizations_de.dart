@@ -289,6 +289,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get importTitle => 'Einträge importieren';
 
   @override
+  String get importSourceLabel => 'Quelle';
+
+  @override
   String get exportTitle => 'Tresor exportieren';
 
   @override

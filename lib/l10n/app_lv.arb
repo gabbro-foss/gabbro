@@ -82,6 +82,7 @@
   "aboutTitle": "Par Gabbro",
   "generatorTitle": "Paroļu ģenerators",
   "importTitle": "Importēt ierakstus",
+  "importSourceLabel": "Avots",
   "exportTitle": "Eksportēt seifu",
   "changePassphraseTitle": "Mainīt ieejas frāzi",
   "csvMappingTitle": "Kartēt CSV kolonnas",

@@ -82,6 +82,7 @@
   "aboutTitle": "Om Gabbro",
   "generatorTitle": "Passordgenerator",
   "importTitle": "Importer oppføringer",
+  "importSourceLabel": "Kjelde",
   "exportTitle": "Eksporter kvelv",
   "changePassphraseTitle": "Byt passfrase",
   "csvMappingTitle": "Kart CSV-kolonnar",

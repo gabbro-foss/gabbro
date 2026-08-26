@@ -288,6 +288,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get importTitle => 'Importer des entrées';
 
   @override
+  String get importSourceLabel => 'Source';
+
+  @override
   String get exportTitle => 'Exporter le coffre';
 
   @override

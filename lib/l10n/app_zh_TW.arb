@@ -82,6 +82,7 @@
   "aboutTitle": "關於 Gabbro",
   "generatorTitle": "密碼產生器",
   "importTitle": "匯入項目",
+  "importSourceLabel": "來源",
   "exportTitle": "匯出保險庫",
   "changePassphraseTitle": "變更密碼片語",
   "csvMappingTitle": "CSV 欄位對應",

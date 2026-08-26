@@ -288,6 +288,9 @@ class AppLocalizationsYo extends AppLocalizations {
   String get importTitle => 'Mu awọn titẹ sii wọle';
 
   @override
+  String get importSourceLabel => 'Orísun';
+
+  @override
   String get exportTitle => 'Mu vọọliti jade';
 
   @override

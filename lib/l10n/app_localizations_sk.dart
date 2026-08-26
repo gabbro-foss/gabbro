@@ -288,6 +288,9 @@ class AppLocalizationsSk extends AppLocalizations {
   String get importTitle => 'Importovať záznamy';
 
   @override
+  String get importSourceLabel => 'Zdroj';
+
+  @override
   String get exportTitle => 'Exportovať trezor';
 
   @override

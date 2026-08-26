@@ -288,6 +288,9 @@ class AppLocalizationsUk extends AppLocalizations {
   String get importTitle => 'Імпорт записів';
 
   @override
+  String get importSourceLabel => 'Джерело';
+
+  @override
   String get exportTitle => 'Експорт сховища';
 
   @override

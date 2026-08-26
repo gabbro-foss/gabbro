@@ -82,6 +82,7 @@
   "aboutTitle": "Teave Gabbro kohta",
   "generatorTitle": "Parooligeneraator",
   "importTitle": "Impordi kirjeid",
+  "importSourceLabel": "Allikas",
   "exportTitle": "Ekspordi seif",
   "changePassphraseTitle": "Muuda pääsulauset",
   "csvMappingTitle": "Kaardista CSV-veerud",

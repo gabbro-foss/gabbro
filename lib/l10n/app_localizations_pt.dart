@@ -288,6 +288,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get importTitle => 'Importar entradas';
 
   @override
+  String get importSourceLabel => 'Origem';
+
+  @override
   String get exportTitle => 'Exportar cofre';
 
   @override
@@ -2571,6 +2574,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get importTitle => 'Importar entradas';
 
   @override
+  String get importSourceLabel => 'Origem';
+
+  @override
   String get exportTitle => 'Exportar cofre';
 
   @override
@@ -4849,6 +4855,9 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get importTitle => 'Importar entradas';
+
+  @override
+  String get importSourceLabel => 'Origem';
 
   @override
   String get exportTitle => 'Exportar cofre';

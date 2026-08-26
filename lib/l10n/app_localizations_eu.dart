@@ -288,6 +288,9 @@ class AppLocalizationsEu extends AppLocalizations {
   String get importTitle => 'Sarrerak inportatu';
 
   @override
+  String get importSourceLabel => 'Iturria';
+
+  @override
   String get exportTitle => 'Gandegi esportatu';
 
   @override

@@ -82,6 +82,7 @@
   "aboutTitle": "Over Gabbro",
   "generatorTitle": "Wachtwoordgenerator",
   "importTitle": "Items importeren",
+  "importSourceLabel": "Bron",
   "exportTitle": "Kluis exporteren",
   "changePassphraseTitle": "Wachtwoordzin wijzigen",
   "csvMappingTitle": "CSV-kolommen koppelen",

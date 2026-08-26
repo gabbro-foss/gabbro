@@ -288,6 +288,9 @@ class AppLocalizationsNb extends AppLocalizations {
   String get importTitle => 'Importer oppføringer';
 
   @override
+  String get importSourceLabel => 'Kilde';
+
+  @override
   String get exportTitle => 'Eksporter hvelv';
 
   @override

@@ -288,6 +288,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get importTitle => 'Importuj wpisy';
 
   @override
+  String get importSourceLabel => 'Źródło';
+
+  @override
   String get exportTitle => 'Eksportuj skarbiec';
 
   @override

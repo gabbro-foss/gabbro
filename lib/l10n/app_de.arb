@@ -82,6 +82,7 @@
   "aboutTitle": "Über Gabbro",
   "generatorTitle": "Passwortgenerator",
   "importTitle": "Einträge importieren",
+  "importSourceLabel": "Quelle",
   "exportTitle": "Tresor exportieren",
   "changePassphraseTitle": "Passphrase ändern",
   "csvMappingTitle": "CSV-Spalten zuordnen",

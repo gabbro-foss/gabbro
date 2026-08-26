@@ -82,6 +82,7 @@
   "aboutTitle": "A Gabbróról",
   "generatorTitle": "Jelszógenerátor",
   "importTitle": "Bejegyzések importálása",
+  "importSourceLabel": "Forrás",
   "exportTitle": "Széf exportálása",
   "changePassphraseTitle": "Jelmondat módosítása",
   "csvMappingTitle": "CSV-oszlopok hozzárendelése",

@@ -278,6 +278,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get importTitle => '导入条目';
 
   @override
+  String get importSourceLabel => '来源';
+
+  @override
   String get exportTitle => '导出保险库';
 
   @override
@@ -2456,6 +2459,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get importTitle => '导入条目';
 
   @override
+  String get importSourceLabel => '来源';
+
+  @override
   String get exportTitle => '导出保险库';
 
   @override
@@ -4632,6 +4638,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get importTitle => '匯入項目';
+
+  @override
+  String get importSourceLabel => '來源';
 
   @override
   String get exportTitle => '匯出保險庫';

@@ -289,6 +289,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get importTitle => 'Εισαγωγή καταχωρίσεων';
 
   @override
+  String get importSourceLabel => 'Πηγή';
+
+  @override
   String get exportTitle => 'Εξαγωγή θησαυροφυλακίου';
 
   @override

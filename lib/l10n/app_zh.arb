@@ -82,6 +82,7 @@
   "aboutTitle": "关于 Gabbro",
   "generatorTitle": "密码生成器",
   "importTitle": "导入条目",
+  "importSourceLabel": "来源",
   "exportTitle": "导出保险库",
   "changePassphraseTitle": "更改密码短语",
   "csvMappingTitle": "CSV 列映射",

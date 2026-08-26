@@ -82,6 +82,7 @@
   "aboutTitle": "Informazioni su Gabbro",
   "generatorTitle": "Generatore di password",
   "importTitle": "Importa voci",
+  "importSourceLabel": "Origine",
   "exportTitle": "Esporta archivio",
   "changePassphraseTitle": "Cambia passphrase",
   "csvMappingTitle": "Mappa colonne CSV",

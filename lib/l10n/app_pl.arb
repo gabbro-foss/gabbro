@@ -82,6 +82,7 @@
   "aboutTitle": "O Gabbro",
   "generatorTitle": "Generator haseł",
   "importTitle": "Importuj wpisy",
+  "importSourceLabel": "Źródło",
   "exportTitle": "Eksportuj skarbiec",
   "changePassphraseTitle": "Zmień hasło główne",
   "csvMappingTitle": "Mapowanie kolumn CSV",
