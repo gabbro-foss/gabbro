@@ -1526,8 +1526,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get exportChooseDestinationVault => 'エクスポートされたボルトファイルの保存先を選択してください。';
 
   @override
-  String get exportTwoFilesNote =>
-      '2つのファイルが作成されます: vault.gabbro と vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return '2つのファイルが書き込まれます: $name と $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => '保存先を選択してください。';
@@ -2049,45 +2050,52 @@ class AppLocalizationsJa extends AppLocalizations {
   String get menuHelp => 'ヘルプ';
 
   @override
-  String get helpCaptionCreate => 'ボルトを作成: 名前、パスフレーズを入力し、オプションでYubiKeyで保護';
+  String get helpCaptionCreate => 'ボールト作成: 名前、パスフレーズ、任意でYubiKey';
 
   @override
-  String get helpCaptionEmpty => '+をクリックして最初のエントリを追加';
+  String get helpCaptionEmpty => '+ をタップして項目を追加';
 
   @override
-  String get helpCaptionDetail => '目のアイコンをクリックしてパスワードを表示し、長押しで詳細な文字分析を表示';
+  String get helpCaptionDetail => '項目をタップで開く、目で表示、長押しで詳細';
 
   @override
-  String get helpCaptionTitleSearch => 'デフォルト: 検索バーはエントリのタイトルのみを検索します';
+  String get helpCaptionTitleSearch => 'タイトルを検索';
 
   @override
-  String get helpCaptionFullSearch =>
-      '虫眼鏡をクリックしてすべてのフィールドの検索に切り替え; もう一度クリックしてタイトル検索に戻る';
+  String get helpCaptionFullSearch => '虫眼鏡をタップして全フィールドを検索';
 
   @override
-  String get helpCaptionFilter => 'フィルターボタンを使用して特定のタイプのエントリのみを表示';
+  String get helpCaptionFilter => '種類で項目を絞り込む';
 
   @override
-  String get helpCaptionFolders => 'フォルダ選択を使用してフォルダごとにエントリをフィルタリング';
+  String get helpCaptionFolders => 'フォルダーで項目を絞り込む';
 
   @override
-  String get helpCaptionSelect =>
-      'エントリを長押しして選択モードに入る; さらに項目を追加し、フォルダに割り当てるか削除。Xをクリックして終了。';
+  String get helpCaptionSelect => '長押しで選択、フォルダーへ移動または削除';
 
   @override
-  String get helpCaptionJumpToLetter => 'インデックスバーの文字をクリックしてそのセクションに移動';
+  String get helpCaptionJumpToLetter => '文字をタップしてジャンプ';
 
   @override
-  String get helpCaptionBreakdown => '目のアイコンをクリックしてパスワードを表示し、長押しで詳細な文字分析を表示';
+  String get helpCaptionBreakdown => 'パスワードまたはパスフレーズを生成';
 
   @override
-  String get helpCaptionManageVaults => '«ボルトの管理»でボルトの名前変更や削除、または新しいボルトを追加できます';
+  String get helpCaptionManageVaults => 'ボールト管理: 追加、名前変更、削除';
 
   @override
-  String get helpCaptionUnlock => 'パスフレーズを入力してボルトのロックを解除';
+  String get helpCaptionUnlock => 'パスフレーズでロック解除';
 
   @override
-  String get helpCaptionVaultSync => '暗号化されたボルトの同期プロセス';
+  String get helpCaptionVaultSync => '同期: こちらでエクスポート、あちらでボールトから同期';
+
+  @override
+  String get helpCaptionSyncSettings => '同期設定: 自動統合と既定フォルダー';
+
+  @override
+  String get helpCaptionExport => 'エクスポートの種類と場所';
+
+  @override
+  String get helpCaptionImport => 'インポートの種類とパス';
 
   @override
   String get passphraseNoWordlist => 'お使いの言語のワードリストはまだありません。英語を使用しています。';

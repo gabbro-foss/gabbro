@@ -27,6 +27,9 @@ class _HelpScreenState extends State<HelpScreen> {
     'assets/help/help_010_manage_vaults_main.png',
     'assets/help/help_011_unlock_screen.png',
     'assets/help/help_012_vault_sync.png',
+    'assets/help/help_013_sync_settings.png',
+    'assets/help/help_014_export.png',
+    'assets/help/help_015_import.png',
   ];
 
   List<String> _captions(AppLocalizations l) => [
@@ -43,6 +46,9 @@ class _HelpScreenState extends State<HelpScreen> {
     l.helpCaptionManageVaults,
     l.helpCaptionUnlock,
     l.helpCaptionVaultSync,
+    l.helpCaptionSyncSettings,
+    l.helpCaptionExport,
+    l.helpCaptionImport,
   ];
 
   @override
@@ -174,7 +180,7 @@ class _HelpScreenState extends State<HelpScreen> {
                             const SizedBox(height: 16),
                             Text(
                               captions[i],
-                              style: textTheme.bodyMedium,
+                              style: textTheme.bodyLarge,
                               textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 16),

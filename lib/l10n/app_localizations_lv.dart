@@ -1554,8 +1554,9 @@ class AppLocalizationsLv extends AppLocalizations {
       'Izvēlieties eksportētā seifa faila galamērķi.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Tiks izveidoti divi faili: vault.gabbro un vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Tiks ierakstīti divi faili: $name un $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Izvēlieties galamērķi.';
@@ -2102,53 +2103,59 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Izveidojiet seifu: ievadiet nosaukumu, ieejas frāzi un pēc izvēles aizsargājiet ar YubiKey';
+      'Izveidot glabātuvi: nosaukums, paroles frāze, pēc izvēles YubiKey';
 
   @override
-  String get helpCaptionEmpty =>
-      'Pieskarieties +, lai pievienotu pirmo ierakstu';
+  String get helpCaptionEmpty => 'Pieskarieties +, lai pievienotu ierakstu';
 
   @override
   String get helpCaptionDetail =>
-      'Pieskarieties acu ikonai, lai atklātu paroli, pēc tam turiet, lai skatītu detalizētu rakstzīmju sadalījumu';
+      'Pieskarieties ierakstam, lai atvērtu, acij, lai parādītu, turiet detaļām';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Pēc noklusējuma meklēšanas josla meklē tikai ierakstu nosaukumos';
+  String get helpCaptionTitleSearch => 'Meklēt nosaukumos';
 
   @override
   String get helpCaptionFullSearch =>
-      'Pieskarieties palielinošajam stiklam, lai pārslēgtos uz visu lauku meklēšanu; pieskarieties vēlreiz, lai atgrieztos pie nosaukumu meklēšanas';
+      'Pieskarieties lupai, lai meklētu visos laukos';
 
   @override
-  String get helpCaptionFilter =>
-      'Izmantojiet filtrēšanas pogas, lai rādītu tikai noteikta veida ierakstus';
+  String get helpCaptionFilter => 'Filtrēt ierakstus pēc veida';
 
   @override
-  String get helpCaptionFolders =>
-      'Izmantojiet mapju atlasītāju, lai filtrētu ierakstus pēc mapes';
+  String get helpCaptionFolders => 'Filtrēt ierakstus pēc mapes';
 
   @override
   String get helpCaptionSelect =>
-      'Turiet ierakstu, lai ievadītu atlases režīmu; pievienojiet vairāk vienumu, pēc tam piešķiriet mapei vai dzēsiet. Pieskarieties X, lai izietu.';
+      'Turiet, lai atlasītu; tad pārvietojiet uz mapi vai dzēsiet';
 
   @override
   String get helpCaptionJumpToLetter =>
-      'Pieskarieties indeksa joslā esošajam burtam, lai pārietu uz šo sadaļu';
+      'Pieskarieties burtam, lai pārietu uz to';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Pieskarieties acu ikonai, lai atklātu paroli, pēc tam turiet, lai skatītu detalizētu rakstzīmju sadalījumu';
+  String get helpCaptionBreakdown => 'Ģenerēt paroli vai paroles frāzi';
 
   @override
   String get helpCaptionManageVaults =>
-      'Seifa pārvaldībā varat pārdēvēt vai dzēst seifus, vai pievienot jaunu';
+      'Pārvaldīt glabātuves: pievienot, pārdēvēt, dzēst';
 
   @override
-  String get helpCaptionUnlock => 'Ievadiet ieejas frāzi, lai atbloķētu seifu';
+  String get helpCaptionUnlock => 'Atbloķēt ar paroles frāzi';
 
   @override
-  String get helpCaptionVaultSync => 'Šifrēta seifa sinhronizācijas process';
+  String get helpCaptionVaultSync =>
+      'Sinhronizācija: šeit Eksportēt, tur Sinhronizēt no glabātuves';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Sinhronizācijas iestatījumi: automātiska apvienošana un noklusējuma mapes';
+
+  @override
+  String get helpCaptionExport => 'Eksporta veids un vieta';
+
+  @override
+  String get helpCaptionImport => 'Importa veids un ceļš';
 
   @override
   String get passphraseNoWordlist =>

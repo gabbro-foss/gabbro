@@ -1556,8 +1556,9 @@ class AppLocalizationsRu extends AppLocalizations {
       'Выберите место назначения для экспортированного файла хранилища.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Будут созданы два файла: vault.gabbro и vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Будут записаны два файла: $name и $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Выберите место назначения.';
@@ -2103,54 +2104,57 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Создайте хранилище: введите название, кодовую фразу и при желании защитите ключом YubiKey';
+      'Создать хранилище: имя, парольная фраза, по желанию YubiKey';
 
   @override
-  String get helpCaptionEmpty => 'Нажмите +, чтобы добавить первую запись';
+  String get helpCaptionEmpty => 'Нажмите +, чтобы добавить запись';
 
   @override
   String get helpCaptionDetail =>
-      'Нажмите на значок глаза, чтобы показать пароль, затем удерживайте для просмотра детального анализа символов';
+      'Нажмите запись, чтобы открыть, глаз, чтобы показать, удерживайте для подробностей';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'По умолчанию строка поиска ищет только по названиям записей';
+  String get helpCaptionTitleSearch => 'Поиск по названиям';
 
   @override
-  String get helpCaptionFullSearch =>
-      'Нажмите на лупу для переключения на поиск по всем полям; нажмите снова для возврата к поиску по названию';
+  String get helpCaptionFullSearch => 'Нажмите лупу для поиска по всем полям';
 
   @override
-  String get helpCaptionFilter =>
-      'Используйте кнопки фильтрации для отображения только записей определённого типа';
+  String get helpCaptionFilter => 'Фильтр записей по типу';
 
   @override
-  String get helpCaptionFolders =>
-      'Используйте выбор папки для фильтрации записей по папке';
+  String get helpCaptionFolders => 'Фильтр записей по папке';
 
   @override
   String get helpCaptionSelect =>
-      'Удерживайте запись для входа в режим выбора; добавляйте элементы, затем назначьте папку или удалите. Нажмите X для выхода.';
+      'Удерживайте для выбора; затем переместите в папку или удалите';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Нажмите на букву в индексной панели для перехода к этому разделу';
+  String get helpCaptionJumpToLetter => 'Нажмите букву, чтобы перейти к ней';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Нажмите на значок глаза, чтобы показать пароль, затем удерживайте для просмотра детального анализа символов';
+  String get helpCaptionBreakdown => 'Создать пароль или парольную фразу';
 
   @override
   String get helpCaptionManageVaults =>
-      'В разделе «Управление хранилищами» можно переименовать или удалить хранилища, а также добавить новое';
+      'Управление хранилищами: добавить, переименовать, удалить';
 
   @override
-  String get helpCaptionUnlock =>
-      'Введите кодовую фразу для разблокировки хранилища';
+  String get helpCaptionUnlock => 'Разблокировать парольной фразой';
 
   @override
   String get helpCaptionVaultSync =>
-      'Процесс синхронизации зашифрованного хранилища';
+      'Синхронизация: здесь Экспорт, там Синхронизировать из хранилища';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Настройки синхронизации: автообъединение и папки по умолчанию';
+
+  @override
+  String get helpCaptionExport => 'Тип и место экспорта';
+
+  @override
+  String get helpCaptionImport => 'Тип и путь импорта';
 
   @override
   String get passphraseNoWordlist =>

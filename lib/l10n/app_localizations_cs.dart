@@ -1553,8 +1553,9 @@ class AppLocalizationsCs extends AppLocalizations {
       'Zvolte cíl pro exportovaný soubor trezoru.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Budou vytvořeny dva soubory: vault.gabbro a vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Budou zapsány dva soubory: $name a $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Zvolte cíl.';
@@ -2096,53 +2097,58 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Vytvořte trezor: zadejte název, přístupovou frázi a volitelně chraňte klíčem YubiKey';
+      'Vytvořit trezor: název, heslo, volitelně YubiKey';
 
   @override
-  String get helpCaptionEmpty => 'Klepnutím na + přidejte první záznam';
+  String get helpCaptionEmpty => 'Klepnutím na + přidáte položku';
 
   @override
   String get helpCaptionDetail =>
-      'Klepnutím na ikonu oka zobrazíte heslo, poté podržte pro zobrazení podrobné analýzy znaků';
+      'Klepnutím položku otevřete, oko odhalí, dlouhý stisk pro detaily';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Výchozí nastavení: panel hledání prohledává pouze názvy záznamů';
+  String get helpCaptionTitleSearch => 'Hledat v názvech';
 
   @override
   String get helpCaptionFullSearch =>
-      'Klepnutím na lupu přepnete na hledání ve všech polích; klepnutím znovu se vrátíte na hledání podle názvu';
+      'Klepnutím na lupu hledáte ve všech polích';
 
   @override
-  String get helpCaptionFilter =>
-      'Použijte tlačítka filtrování pro zobrazení pouze záznamů určitého typu';
+  String get helpCaptionFilter => 'Filtrovat položky podle typu';
 
   @override
-  String get helpCaptionFolders =>
-      'Použijte výběr složky pro filtrování záznamů podle složky';
+  String get helpCaptionFolders => 'Filtrovat položky podle složky';
 
   @override
   String get helpCaptionSelect =>
-      'Podržením záznamu přejdete do režimu výběru; přidejte další položky, poté přiřaďte ke složce nebo smažte. Klepnutím X opustíte.';
+      'Dlouhým stiskem vyberte; pak přesuňte do složky nebo smažte';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Klepnutím na písmeno v indexovém panelu přejdete na danou sekci';
+  String get helpCaptionJumpToLetter => 'Klepnutím na písmeno tam skočíte';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Klepnutím na ikonu oka zobrazíte heslo, poté podržte pro zobrazení podrobné analýzy znaků';
+  String get helpCaptionBreakdown => 'Vygenerovat heslo nebo passphrase';
 
   @override
   String get helpCaptionManageVaults =>
-      'Ve «Správě trezorů» můžete přejmenovat nebo smazat trezory, nebo přidat nový';
+      'Správa trezorů: přidat, přejmenovat, smazat';
 
   @override
-  String get helpCaptionUnlock =>
-      'Zadejte přístupovou frázi pro odemknutí trezoru';
+  String get helpCaptionUnlock => 'Odemknout heslem';
 
   @override
-  String get helpCaptionVaultSync => 'Proces synchronizace šifrovaného trezoru';
+  String get helpCaptionVaultSync =>
+      'Synchronizace: Export tady, Synchronizovat z trezoru tam';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Nastavení synchronizace: automatické sloučení a výchozí složky';
+
+  @override
+  String get helpCaptionExport => 'Typ a umístění exportu';
+
+  @override
+  String get helpCaptionImport => 'Typ a cesta importu';
 
   @override
   String get passphraseNoWordlist =>

@@ -1553,8 +1553,9 @@ class AppLocalizationsEs extends AppLocalizations {
       'Elige un destino para el archivo de almacén exportado.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Se crearán dos archivos: vault.gabbro y vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Se escribirán dos archivos: $name y $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Selecciona un destino.';
@@ -2112,54 +2113,58 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Crea un cofre: introduce un nombre, una frase de contraseña y protégelo opcionalmente con un YubiKey';
+      'Crear bóveda: nombre, frase de acceso, YubiKey opcional';
 
   @override
-  String get helpCaptionEmpty => 'Toca + para añadir tu primera entrada';
+  String get helpCaptionEmpty => 'Toca + para añadir una entrada';
 
   @override
   String get helpCaptionDetail =>
-      'Toca el icono de ojo para revelar una contraseña, luego mantenla pulsada para ver un desglose detallado de caracteres';
+      'Toca la entrada para abrir, el ojo para revelar, mantén pulsado para detalles';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Por defecto, la barra de búsqueda busca solo en los títulos de las entradas';
+  String get helpCaptionTitleSearch => 'Buscar en títulos';
 
   @override
   String get helpCaptionFullSearch =>
-      'Toca la lupa para buscar en todos los campos; tócala de nuevo para volver a la búsqueda por título';
+      'Toca la lupa para buscar en todos los campos';
 
   @override
-  String get helpCaptionFilter =>
-      'Usa los filtros para mostrar solo entradas de un tipo específico';
+  String get helpCaptionFilter => 'Filtrar entradas por tipo';
 
   @override
-  String get helpCaptionFolders =>
-      'Usa el selector de carpetas para filtrar entradas por carpeta';
+  String get helpCaptionFolders => 'Filtrar entradas por carpeta';
 
   @override
   String get helpCaptionSelect =>
-      'Mantén pulsada una entrada para entrar en modo selección; añade más elementos, luego asígnalos a una carpeta o elimínalos. Toca X para salir.';
+      'Mantén pulsado para seleccionar; luego mueve a una carpeta o elimina';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Toca una letra en la barra de índice para saltar a esa sección';
+  String get helpCaptionJumpToLetter => 'Toca una letra para saltar a ella';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Toca el icono de ojo para revelar una contraseña, luego mantenla pulsada para ver un desglose detallado de caracteres';
+  String get helpCaptionBreakdown => 'Generar una contraseña o una frase';
 
   @override
   String get helpCaptionManageVaults =>
-      'En Gestionar cofres, puedes renombrar o eliminar cofres, o añadir uno nuevo';
+      'Gestionar bóvedas: añadir, renombrar, eliminar';
 
   @override
-  String get helpCaptionUnlock =>
-      'Introduce tu frase de contraseña para desbloquear tu cofre';
+  String get helpCaptionUnlock => 'Desbloquear con la frase de acceso';
 
   @override
   String get helpCaptionVaultSync =>
-      'Proceso de sincronización de cofre cifrado';
+      'Sincronización: Exportar aquí, Sincronizar desde bóveda allí';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Ajustes de sincronización: fusión automática y carpetas por defecto';
+
+  @override
+  String get helpCaptionExport => 'Tipo y ubicación de exportación';
+
+  @override
+  String get helpCaptionImport => 'Tipo y ruta de importación';
 
   @override
   String get passphraseNoWordlist =>

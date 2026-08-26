@@ -1551,8 +1551,9 @@ class AppLocalizationsSv extends AppLocalizations {
       'Välj en destination för din exporterade valvfil.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Två filer skapas: vault.gabbro och vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Två filer skrivs: $name och $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Välj en destination.';
@@ -2091,55 +2092,58 @@ class AppLocalizationsSv extends AppLocalizations {
   String get menuHelp => 'Hjälp';
 
   @override
-  String get helpCaptionCreate =>
-      'Skapa ett valv: ange ett namn, lösenfras och skydda eventuellt med en YubiKey';
+  String get helpCaptionCreate => 'Skapa valv: namn, lösenfras, valfri YubiKey';
 
   @override
-  String get helpCaptionEmpty =>
-      'Tryck på + för att lägga till din första post';
+  String get helpCaptionEmpty => 'Tryck + för att lägga till en post';
 
   @override
   String get helpCaptionDetail =>
-      'Tryck på ögon­ikonen för att visa ett lösenord, håll sedan inne för att se en detaljerad teckenanalys';
+      'Tryck på posten för att öppna, ögat för att visa, håll intryckt för detaljer';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Som standard söker sökfältet bara i posttitlar';
+  String get helpCaptionTitleSearch => 'Sök i titlar';
 
   @override
   String get helpCaptionFullSearch =>
-      'Tryck på förstoringsglaset för att växla till sökning i alla fält; tryck igen för att återgå till titelsökning';
+      'Tryck på förstoringsglaset för att söka i alla fält';
 
   @override
-  String get helpCaptionFilter =>
-      'Använd filterknapparna för att bara visa poster av en viss typ';
+  String get helpCaptionFilter => 'Filtrera poster efter typ';
 
   @override
-  String get helpCaptionFolders =>
-      'Använd mappväljaren för att filtrera poster efter mapp';
+  String get helpCaptionFolders => 'Filtrera poster efter mapp';
 
   @override
   String get helpCaptionSelect =>
-      'Håll inne på en post för att aktivera valläge; lägg till fler objekt, tilldela sedan till en mapp eller ta bort. Tryck X för att avsluta.';
+      'Håll intryckt för att markera; flytta sedan till en mapp eller ta bort';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Tryck på en bokstav i indexfältet för att hoppa till det avsnittet';
+  String get helpCaptionJumpToLetter => 'Tryck på en bokstav för att hoppa dit';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Tryck på ögon­ikonen för att visa ett lösenord, håll sedan inne för att se en detaljerad teckenanalys';
+  String get helpCaptionBreakdown => 'Skapa ett lösenord eller en lösenfras';
 
   @override
   String get helpCaptionManageVaults =>
-      'I Hantera valv kan du byta namn på eller ta bort valv, eller lägga till ett nytt';
+      'Hantera valv: lägg till, byt namn, ta bort';
 
   @override
-  String get helpCaptionUnlock => 'Ange din lösenfras för att låsa upp valvet';
+  String get helpCaptionUnlock => 'Lås upp med lösenfras';
 
   @override
   String get helpCaptionVaultSync =>
-      'Krypterad synkroniseringsprocess för valvet';
+      'Synkronisering: Exportera här, Synkronisera från valv där';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Synkroniseringsinställningar: automatisk sammanslagning och standardmappar';
+
+  @override
+  String get helpCaptionExport => 'Exporttyp och plats';
+
+  @override
+  String get helpCaptionImport => 'Importtyp och sökväg';
 
   @override
   String get passphraseNoWordlist =>

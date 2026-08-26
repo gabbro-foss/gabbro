@@ -484,7 +484,11 @@ class _ExportScreenState extends State<ExportScreen> {
                 if (!isJson) ...[
                   const SizedBox(height: 4),
                   Text(
-                    l.exportTwoFilesNote,
+                    l.exportTwoFilesNote(_defaultFilename(
+                      widget.vaultAlias,
+                      false,
+                      includeDate: _includeDate,
+                    )),
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],

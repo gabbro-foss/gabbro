@@ -51,6 +51,7 @@ Widget _androidGabbroScreen(
 }
 
 void main() {
+  twoFilesNoteTests();
   // ── sanitiseAlias unit tests ──────────────────────────────────────────────
 
   group('exportVaultFileName', () {
@@ -546,5 +547,25 @@ void main() {
 
       expect(exportedPath, '/storage/emulated/0/Download/Gabbro/My_Work.json');
     });
+  });
+}
+
+// The two-files note names the file that will actually be written, never a
+// fixed "vault.gabbro": the alias is the name, and the date toggle changes it.
+void twoFilesNoteTests() {
+  testWidgets('the two-files note names the real export file', (tester) async {
+    await tester.pumpWidget(testApp(ExportScreen(
+      isAndroid: false,
+      vaultAlias: 'example',
+      onExport: (_) async {},
+      onExportJson: (_) async {},
+    )));
+    await tester.pumpAndSettle();
+    expect(find.text('Two files will be written: example.gabbro and example.gabbro.sha256'),
+        findsOneWidget);
+    await tester.tap(find.text('Include date in filename'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('example_'), findsOneWidget);
+    expect(find.textContaining('Two files will be written: vault'), findsNothing);
   });
 }

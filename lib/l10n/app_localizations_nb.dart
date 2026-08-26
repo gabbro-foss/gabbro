@@ -1552,8 +1552,9 @@ class AppLocalizationsNb extends AppLocalizations {
       'Velg et mål for den eksporterte hvelvfilen.';
 
   @override
-  String get exportTwoFilesNote =>
-      'To filer opprettes: vault.gabbro og vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'To filer skrives: $name og $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Velg et mål.';
@@ -2094,54 +2095,58 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Opprett et hvelv: angi et navn, passfrase og beskytt eventuelt med en YubiKey';
+      'Opprett hvelv: navn, passfrase, valgfri YubiKey';
 
   @override
-  String get helpCaptionEmpty =>
-      'Trykk på + for å legge til din første oppføring';
+  String get helpCaptionEmpty => 'Trykk + for å legge til en oppføring';
 
   @override
   String get helpCaptionDetail =>
-      'Trykk på øye­ikonet for å avsløre et passord, hold deretter inne for å se en detaljert tegnanalyse';
+      'Trykk på oppføringen for å åpne, øyet for å vise, hold inne for detaljer';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Som standard søker søkefeltet bare i oppførings­titler';
+  String get helpCaptionTitleSearch => 'Søk i titler';
 
   @override
   String get helpCaptionFullSearch =>
-      'Trykk på forstørrelsesglasset for å bytte til søk i alle felt; trykk igjen for å gå tilbake til tittel­søk';
+      'Trykk på forstørrelsesglasset for å søke i alle felt';
 
   @override
-  String get helpCaptionFilter =>
-      'Bruk filter­knappene til bare å vise oppføringer av en bestemt type';
+  String get helpCaptionFilter => 'Filtrer oppføringer etter type';
 
   @override
-  String get helpCaptionFolders =>
-      'Bruk mappevelgeren til å filtrere oppføringer etter mappe';
+  String get helpCaptionFolders => 'Filtrer oppføringer etter mappe';
 
   @override
   String get helpCaptionSelect =>
-      'Hold inne på en oppføring for å gå inn i valg­modus; legg til flere elementer, tilordne deretter til en mappe eller slett. Trykk X for å avslutte.';
+      'Hold inne for å velge; flytt så til en mappe eller slett';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Trykk på en bokstav på indeks­linjen for å hoppe til den delen';
+  String get helpCaptionJumpToLetter => 'Trykk på en bokstav for å hoppe dit';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Trykk på øye­ikonet for å avsløre et passord, hold deretter inne for å se en detaljert tegnanalyse';
+  String get helpCaptionBreakdown => 'Generer et passord eller en passfrase';
 
   @override
   String get helpCaptionManageVaults =>
-      'I Administrer hvelvinger kan du gi nytt navn til eller slette hvelvinger, eller legge til et nytt';
+      'Håndter hvelv: legg til, gi nytt navn, slett';
 
   @override
-  String get helpCaptionUnlock => 'Angi passfrasen din for å låse opp hvelvet';
+  String get helpCaptionUnlock => 'Lås opp med passfrase';
 
   @override
   String get helpCaptionVaultSync =>
-      'Kryptert synkroniseringsprosess for hvelvet';
+      'Synkronisering: Eksporter her, Synkroniser fra hvelv der';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Synkroniseringsinnstillinger: automatisk fletting og standardmapper';
+
+  @override
+  String get helpCaptionExport => 'Eksporttype og plassering';
+
+  @override
+  String get helpCaptionImport => 'Importtype og sti';
 
   @override
   String get passphraseNoWordlist =>

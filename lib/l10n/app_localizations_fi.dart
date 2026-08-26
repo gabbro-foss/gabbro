@@ -1554,8 +1554,9 @@ class AppLocalizationsFi extends AppLocalizations {
       'Valitse kohde viedylle holvitiedostolle.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Luodaan kaksi tiedostoa: vault.gabbro ja vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Kaksi tiedostoa kirjoitetaan: $name ja $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Valitse kohde.';
@@ -2099,52 +2100,58 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Luo holvi: syötä nimi, salauslause ja suojaa tarvittaessa YubiKey-avaimella';
+      'Luo holvi: nimi, salalause, valinnainen YubiKey';
 
   @override
-  String get helpCaptionEmpty => 'Kosketa + lisätäksesi ensimmäisen merkinnän';
+  String get helpCaptionEmpty => 'Lisää kohde napauttamalla +';
 
   @override
   String get helpCaptionDetail =>
-      'Kosketa silmäkuvaketta paljastaaksesi salasanan, paina sitten pitkään nähdäksesi yksityiskohtaisen merkkirakennelman';
+      'Napauta kohdetta avataksesi, silmää näyttääksesi, pidä painettuna tietoja varten';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Oletusarvoisesti hakupalkki hakee vain merkintöjen otsikkoja';
+  String get helpCaptionTitleSearch => 'Hae otsikoista';
 
   @override
   String get helpCaptionFullSearch =>
-      'Kosketa suurennuslasia vaihtaaksesi kaikkien kenttien hakuun; kosketa uudelleen palataksesi otsikkohakuun';
+      'Napauta suurennuslasia hakeaksesi kaikista kentistä';
 
   @override
-  String get helpCaptionFilter =>
-      'Käytä suodatinpainikkeita näyttääksesi vain tietyn tyyppiset merkinnät';
+  String get helpCaptionFilter => 'Suodata kohteet tyypin mukaan';
 
   @override
-  String get helpCaptionFolders =>
-      'Käytä kansionvalitsinta suodattaaksesi merkinnät kansion mukaan';
+  String get helpCaptionFolders => 'Suodata kohteet kansion mukaan';
 
   @override
   String get helpCaptionSelect =>
-      'Paina pitkään merkintää siirtyäksesi valintatilaan; lisää kohteita ja määritä kansioon tai poista. Kosketa X poistuaksesi.';
+      'Valitse pitkällä painalluksella; siirrä sitten kansioon tai poista';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Kosketa hakemistopalkissa olevaa kirjainta hypätäksesi kyseiseen osioon';
+  String get helpCaptionJumpToLetter => 'Napauta kirjainta hypätäksesi siihen';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Kosketa silmäkuvaketta paljastaaksesi salasanan, paina sitten pitkään nähdäksesi yksityiskohtaisen merkkirakennelman';
+  String get helpCaptionBreakdown => 'Luo salasana tai salalause';
 
   @override
   String get helpCaptionManageVaults =>
-      'Hallinnoi holveja -kohdassa voit nimetä tai poistaa holveja tai lisätä uuden';
+      'Hallitse holveja: lisää, nimeä uudelleen, poista';
 
   @override
-  String get helpCaptionUnlock => 'Syötä salauslause avataksesi holvin';
+  String get helpCaptionUnlock => 'Avaa salalauseella';
 
   @override
-  String get helpCaptionVaultSync => 'Salatun holvin synkronointiprosessi';
+  String get helpCaptionVaultSync =>
+      'Synkronointi: Vie täällä, Synkronoi holvista siellä';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Synkronointiasetukset: automaattinen yhdistäminen ja oletuskansiot';
+
+  @override
+  String get helpCaptionExport => 'Viennin tyyppi ja sijainti';
+
+  @override
+  String get helpCaptionImport => 'Tuonnin tyyppi ja polku';
 
   @override
   String get passphraseNoWordlist =>

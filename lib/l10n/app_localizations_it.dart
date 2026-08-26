@@ -1555,8 +1555,9 @@ class AppLocalizationsIt extends AppLocalizations {
       'Scegli una destinazione per il file archivio esportato.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Verranno creati due file: vault.gabbro e vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Verranno scritti due file: $name e $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Seleziona una destinazione.';
@@ -2107,54 +2108,58 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Crea un vault: inserisci un nome, una passphrase e proteggilo facoltativamente con un YubiKey';
+      'Crea caveau: nome, passphrase, YubiKey facoltativa';
 
   @override
-  String get helpCaptionEmpty => 'Tocca + per aggiungere la tua prima voce';
+  String get helpCaptionEmpty => 'Tocca + per aggiungere una voce';
 
   @override
   String get helpCaptionDetail =>
-      'Tocca l\'icona occhio per rivelare una password, poi tieni premuto per vedere una scomposizione dettagliata dei caratteri';
+      'Tocca la voce per aprire, l\'occhio per rivelare, tieni premuto per i dettagli';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Per impostazione predefinita, la barra di ricerca cerca solo nei titoli delle voci';
+  String get helpCaptionTitleSearch => 'Cerca nei titoli';
 
   @override
   String get helpCaptionFullSearch =>
-      'Tocca la lente di ingrandimento per cercare in tutti i campi; tocca di nuovo per tornare alla ricerca per titolo';
+      'Tocca la lente per cercare in tutti i campi';
 
   @override
-  String get helpCaptionFilter =>
-      'Usa i filtri per mostrare solo le voci di un tipo specifico';
+  String get helpCaptionFilter => 'Filtra le voci per tipo';
 
   @override
-  String get helpCaptionFolders =>
-      'Usa il selettore di cartelle per filtrare le voci per cartella';
+  String get helpCaptionFolders => 'Filtra le voci per cartella';
 
   @override
   String get helpCaptionSelect =>
-      'Premi a lungo su una voce per entrare in modalità selezione; aggiungi altri elementi, poi assegnali a una cartella o eliminali. Tocca X per uscire.';
+      'Tieni premuto per selezionare; poi sposta in una cartella o elimina';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Tocca una lettera nella barra dell\'indice per passare a quella sezione';
+  String get helpCaptionJumpToLetter => 'Tocca una lettera per saltare lì';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Tocca l\'icona occhio per rivelare una password, poi tieni premuto per vedere una scomposizione dettagliata dei caratteri';
+  String get helpCaptionBreakdown => 'Genera una password o una passphrase';
 
   @override
   String get helpCaptionManageVaults =>
-      'In Gestisci vault, puoi rinominare o eliminare vault, o aggiungerne uno nuovo';
+      'Gestisci caveau: aggiungi, rinomina, elimina';
 
   @override
-  String get helpCaptionUnlock =>
-      'Inserisci la tua passphrase per sbloccare il vault';
+  String get helpCaptionUnlock => 'Sblocca con la passphrase';
 
   @override
   String get helpCaptionVaultSync =>
-      'Processo di sincronizzazione dell\'archivio cifrato';
+      'Sincronizzazione: Esporta qui, Sincronizza dal caveau là';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Impostazioni di sincronizzazione: unione automatica e cartelle predefinite';
+
+  @override
+  String get helpCaptionExport => 'Tipo e posizione dell\'esportazione';
+
+  @override
+  String get helpCaptionImport => 'Tipo e percorso dell\'importazione';
 
   @override
   String get passphraseNoWordlist =>

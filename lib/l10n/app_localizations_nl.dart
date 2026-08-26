@@ -1557,8 +1557,9 @@ class AppLocalizationsNl extends AppLocalizations {
       'Kies een bestemming voor uw geëxporteerde kluisbestand.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Er worden twee bestanden geschreven: vault.gabbro en vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Er worden twee bestanden geschreven: $name en $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Selecteer een bestemming.';
@@ -2106,53 +2107,59 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Maak een kluis aan: voer een naam en wachtwoordzin in en beveilig deze optioneel met een YubiKey';
+      'Kluis maken: naam, wachtwoordzin, optioneel YubiKey';
 
   @override
-  String get helpCaptionEmpty => 'Tik op + om uw eerste item toe te voegen';
+  String get helpCaptionEmpty => 'Tik op + om een item toe te voegen';
 
   @override
   String get helpCaptionDetail =>
-      'Tik op het oogpictogram om een wachtwoord te onthullen, en houd het lang ingedrukt om een gedetailleerde tekenanalyse te bekijken';
+      'Tik op een item om te openen, het oog om te tonen, houd ingedrukt voor details';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Standaard zoekt de zoekbalk alleen in itemtitels';
+  String get helpCaptionTitleSearch => 'Zoeken in titels';
 
   @override
   String get helpCaptionFullSearch =>
-      'Tik op het vergrootglaspictogram om te wisselen naar zoeken in alle velden; tik opnieuw om terug te keren naar alleen titels';
+      'Tik op het vergrootglas om in alle velden te zoeken';
 
   @override
-  String get helpCaptionFilter =>
-      'Gebruik de filterchips om alleen items van een specifiek type te tonen';
+  String get helpCaptionFilter => 'Items filteren op type';
 
   @override
-  String get helpCaptionFolders =>
-      'Gebruik de mappenkiezer om items op map te filteren';
+  String get helpCaptionFolders => 'Items filteren op map';
 
   @override
   String get helpCaptionSelect =>
-      'Houd een item lang ingedrukt om de selectiemodus te activeren; voeg meer items toe en wijs ze toe aan een map of verwijder ze. Tik op X om af te sluiten.';
+      'Houd ingedrukt om te selecteren; verplaats dan naar een map of verwijder';
 
   @override
   String get helpCaptionJumpToLetter =>
-      'Tik op een letter in de indexbalk om naar dat gedeelte te springen';
+      'Tik op een letter om erheen te springen';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Tik op het oogpictogram om een wachtwoord te onthullen, en houd het lang ingedrukt om een gedetailleerde tekenanalyse te bekijken';
+  String get helpCaptionBreakdown => 'Wachtwoord of wachtwoordzin genereren';
 
   @override
   String get helpCaptionManageVaults =>
-      'Hernoem of verwijder kluizen in Kluizen beheren, of voeg een nieuwe toe';
+      'Kluizen beheren: toevoegen, hernoemen, verwijderen';
 
   @override
-  String get helpCaptionUnlock =>
-      'Voer uw wachtwoordzin in om uw kluis te ontgrendelen';
+  String get helpCaptionUnlock => 'Ontgrendelen met wachtwoordzin';
 
   @override
-  String get helpCaptionVaultSync => 'Versleuteld kluissynchronisatieproces';
+  String get helpCaptionVaultSync =>
+      'Synchronisatie: hier Exporteren, daar Synchroniseren vanuit kluis';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Synchronisatie-instellingen: automatisch samenvoegen en standaardmappen';
+
+  @override
+  String get helpCaptionExport => 'Exporttype en locatie';
+
+  @override
+  String get helpCaptionImport => 'Importtype en pad';
 
   @override
   String get passphraseNoWordlist =>

@@ -1565,8 +1565,9 @@ class AppLocalizationsEl extends AppLocalizations {
       'Επιλέξτε προορισμό για το εξαχθέν αρχείο θησαυροφυλακίου.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Θα δημιουργηθούν δύο αρχεία: vault.gabbro και vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Θα γραφτούν δύο αρχεία: $name και $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Επιλέξτε προορισμό.';
@@ -2117,55 +2118,58 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Δημιουργήστε θησαυροφυλάκιο: εισάγετε όνομα, φράση πρόσβασης και προαιρετικά προστατέψτε με YubiKey';
+      'Δημιουργία θησαυροφυλακίου: όνομα, φράση πρόσβασης, προαιρετικά YubiKey';
 
   @override
-  String get helpCaptionEmpty =>
-      'Κάντε κλικ στο + για προσθήκη πρώτης καταχώρισης';
+  String get helpCaptionEmpty => 'Πατήστε + για νέα καταχώρηση';
 
   @override
   String get helpCaptionDetail =>
-      'Κάντε κλικ στο εικονίδιο ματιού για εμφάνιση κωδικού, μετά κρατήστε πατημένο για λεπτομερή ανάλυση χαρακτήρων';
+      'Πατήστε καταχώρηση για άνοιγμα, μάτι για εμφάνιση, παρατεταμένο πάτημα για λεπτομέρειες';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Προεπιλογή: η γραμμή αναζήτησης ψάχνει μόνο τους τίτλους καταχωρίσεων';
+  String get helpCaptionTitleSearch => 'Αναζήτηση σε τίτλους';
 
   @override
   String get helpCaptionFullSearch =>
-      'Κλικ στον μεγεθυντή για εναλλαγή σε αναζήτηση σε όλα τα πεδία· κλικ ξανά για επιστροφή στην αναζήτηση τίτλου';
+      'Πατήστε τον μεγεθυντή για αναζήτηση σε όλα τα πεδία';
 
   @override
-  String get helpCaptionFilter =>
-      'Χρησιμοποιήστε τα κουμπιά φιλτραρίσματος για εμφάνιση μόνο καταχωρίσεων συγκεκριμένου τύπου';
+  String get helpCaptionFilter => 'Φιλτράρισμα καταχωρήσεων κατά τύπο';
 
   @override
-  String get helpCaptionFolders =>
-      'Χρησιμοποιήστε την επιλογή φακέλου για φιλτράρισμα καταχωρίσεων ανά φάκελο';
+  String get helpCaptionFolders => 'Φιλτράρισμα καταχωρήσεων κατά φάκελο';
 
   @override
   String get helpCaptionSelect =>
-      'Παρατεταμένο πάτημα σε καταχώριση για είσοδο σε λειτουργία επιλογής· προσθέστε περισσότερα στοιχεία, μετά αναθέστε σε φάκελο ή διαγράψτε. Κλικ X για έξοδο.';
+      'Παρατεταμένο πάτημα για επιλογή· μετά μεταφορά σε φάκελο ή διαγραφή';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Κλικ σε γράμμα της αλφαβητικής γραμμής για μετάβαση στην ενότητα';
+  String get helpCaptionJumpToLetter => 'Πατήστε ένα γράμμα για μετάβαση εκεί';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Κάντε κλικ στο εικονίδιο ματιού για εμφάνιση κωδικού, μετά κρατήστε πατημένο για λεπτομερή ανάλυση χαρακτήρων';
+  String get helpCaptionBreakdown => 'Δημιουργία κωδικού ή φράσης πρόσβασης';
 
   @override
   String get helpCaptionManageVaults =>
-      'Στη «Διαχείριση θησαυροφυλακίων» μπορείτε να μετονομάσετε ή διαγράψετε θησαυροφυλάκια ή να προσθέσετε νέο';
+      'Διαχείριση θησαυροφυλακίων: προσθήκη, μετονομασία, διαγραφή';
 
   @override
-  String get helpCaptionUnlock =>
-      'Εισάγετε τη φράση πρόσβασης για ξεκλείδωμα θησαυροφυλακίου';
+  String get helpCaptionUnlock => 'Ξεκλείδωμα με φράση πρόσβασης';
 
   @override
   String get helpCaptionVaultSync =>
-      'Διαδικασία συγχρονισμού κρυπτογραφημένου θησαυροφυλακίου';
+      'Συγχρονισμός: Εξαγωγή εδώ, Συγχρονισμός από θησαυροφυλάκιο εκεί';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Ρυθμίσεις συγχρονισμού: αυτόματη συγχώνευση και προεπιλεγμένοι φάκελοι';
+
+  @override
+  String get helpCaptionExport => 'Τύπος και θέση εξαγωγής';
+
+  @override
+  String get helpCaptionImport => 'Τύπος και διαδρομή εισαγωγής';
 
   @override
   String get passphraseNoWordlist =>

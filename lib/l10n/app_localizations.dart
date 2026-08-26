@@ -2962,8 +2962,8 @@ abstract class AppLocalizations {
   /// No description provided for @exportTwoFilesNote.
   ///
   /// In en, this message translates to:
-  /// **'Two files will be written: vault.gabbro and vault.gabbro.sha256'**
-  String get exportTwoFilesNote;
+  /// **'Two files will be written: {name} and {name}.sha256'**
+  String exportTwoFilesNote(String name);
 
   /// No description provided for @exportSelectDestination.
   ///
@@ -3892,80 +3892,98 @@ abstract class AppLocalizations {
   /// No description provided for @helpCaptionCreate.
   ///
   /// In en, this message translates to:
-  /// **'Create a vault: enter a name, passphrase, and optionally protect it with a YubiKey'**
+  /// **'Create vault, name, passphrase, optional YubiKey'**
   String get helpCaptionCreate;
 
   /// No description provided for @helpCaptionEmpty.
   ///
   /// In en, this message translates to:
-  /// **'Tap + to add your first entry'**
+  /// **'Tap + to add an entry'**
   String get helpCaptionEmpty;
 
   /// No description provided for @helpCaptionDetail.
   ///
   /// In en, this message translates to:
-  /// **'Tap the eye icon to reveal a password, then long-press it to view a detailed character breakdown'**
+  /// **'Tap entry to open, eye to reveal, long-press for details'**
   String get helpCaptionDetail;
 
   /// No description provided for @helpCaptionTitleSearch.
   ///
   /// In en, this message translates to:
-  /// **'By default, the search bar searches entry titles only'**
+  /// **'Search titles'**
   String get helpCaptionTitleSearch;
 
   /// No description provided for @helpCaptionFullSearch.
   ///
   /// In en, this message translates to:
-  /// **'Tap the magnifying glass to switch to full-field search; tap again to return to title-only'**
+  /// **'Tap magnifier to search all fields'**
   String get helpCaptionFullSearch;
 
   /// No description provided for @helpCaptionFilter.
   ///
   /// In en, this message translates to:
-  /// **'Use the filter chips to show only entries of a specific type'**
+  /// **'Filter entries by type'**
   String get helpCaptionFilter;
 
   /// No description provided for @helpCaptionFolders.
   ///
   /// In en, this message translates to:
-  /// **'Use the folder picker to filter entries by folder'**
+  /// **'Filter entries by folder'**
   String get helpCaptionFolders;
 
   /// No description provided for @helpCaptionSelect.
   ///
   /// In en, this message translates to:
-  /// **'Long-tap an entry to enter select mode; add more items, then assign to a folder or delete. Tap X to exit.'**
+  /// **'Long-press to select; then move to a folder or delete'**
   String get helpCaptionSelect;
 
   /// No description provided for @helpCaptionJumpToLetter.
   ///
   /// In en, this message translates to:
-  /// **'Tap a letter on the index bar to jump to that section'**
+  /// **'Tap a letter to jump there'**
   String get helpCaptionJumpToLetter;
 
   /// No description provided for @helpCaptionBreakdown.
   ///
   /// In en, this message translates to:
-  /// **'Tap the eye icon to reveal a password, then long-press it to view a detailed character breakdown'**
+  /// **'Generate a password or a passphrase'**
   String get helpCaptionBreakdown;
 
   /// No description provided for @helpCaptionManageVaults.
   ///
   /// In en, this message translates to:
-  /// **'In Manage vaults, rename or delete vaults, or add a new one'**
+  /// **'Manage vaults: add, rename, delete'**
   String get helpCaptionManageVaults;
 
   /// No description provided for @helpCaptionUnlock.
   ///
   /// In en, this message translates to:
-  /// **'Enter your passphrase to unlock your vault'**
+  /// **'Unlock with passphrase'**
   String get helpCaptionUnlock;
 
   /// No description provided for @helpCaptionVaultSync.
   ///
   /// In en, this message translates to:
-  /// **'Encrypted vault sync process'**
+  /// **'Sync: Export here, Sync from vault there'**
   String get helpCaptionVaultSync;
+
+  /// No description provided for @helpCaptionSyncSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync settings: auto-merge and default folders'**
+  String get helpCaptionSyncSettings;
+
+  /// No description provided for @helpCaptionExport.
+  ///
+  /// In en, this message translates to:
+  /// **'Export type and location'**
+  String get helpCaptionExport;
+
+  /// No description provided for @helpCaptionImport.
+  ///
+  /// In en, this message translates to:
+  /// **'Import type and path'**
+  String get helpCaptionImport;
 
   /// No description provided for @passphraseNoWordlist.
   ///

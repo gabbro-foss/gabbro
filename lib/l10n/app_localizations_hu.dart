@@ -1553,8 +1553,9 @@ class AppLocalizationsHu extends AppLocalizations {
       'Válassz célhelyet az exportált széffájlhoz.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Két fájl jön létre: vault.gabbro és vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Két fájl készül: $name és $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Válassz célhelyet.';
@@ -2101,54 +2102,58 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Széf létrehozása: add meg a nevet, jelmondatot, és opcionálisan védd YubiKey-jel';
+      'Széf létrehozása: név, jelmondat, opcionális YubiKey';
 
   @override
-  String get helpCaptionEmpty =>
-      'Koppints a + gombra az első bejegyzés hozzáadásához';
+  String get helpCaptionEmpty => 'Koppints a + gombra bejegyzés hozzáadásához';
 
   @override
   String get helpCaptionDetail =>
-      'Koppints a szem ikonra a jelszó felfedéséhez, majd nyomj hosszan a részletes karakterelemzés megtekintéséhez';
+      'Koppints a bejegyzésre a megnyitáshoz, a szemre a felfedéshez, tartsd lenyomva a részletekért';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Alapértelmezés szerint a keresősáv csak a bejegyzések címeiben keres';
+  String get helpCaptionTitleSearch => 'Keresés a címekben';
 
   @override
   String get helpCaptionFullSearch =>
-      'Koppints a nagyítóra az összes mezőben való keresésre való váltáshoz; koppints újra a cím szerinti kereséshez való visszatéréshez';
+      'Koppints a nagyítóra az összes mező kereséséhez';
 
   @override
-  String get helpCaptionFilter =>
-      'Használd a szűrőgombokat, hogy csak egy adott típusú bejegyzéseket jelenítsd meg';
+  String get helpCaptionFilter => 'Bejegyzések szűrése típus szerint';
 
   @override
-  String get helpCaptionFolders =>
-      'Használd a mappaválasztót a bejegyzések mappa szerinti szűréséhez';
+  String get helpCaptionFolders => 'Bejegyzések szűrése mappa szerint';
 
   @override
   String get helpCaptionSelect =>
-      'Nyomj hosszan egy bejegyzésre a kijelölési módba való lépéshez; adj hozzá több elemet, majd rendeld hozzá mappához vagy töröld. Koppints X-re a kilépéshez.';
+      'Tartsd lenyomva a kijelöléshez; majd áthelyezés mappába vagy törlés';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Koppints az indexsávon egy betűre az adott szakaszhoz való ugráshoz';
+  String get helpCaptionJumpToLetter => 'Koppints egy betűre az odaugráshoz';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Koppints a szem ikonra a jelszó felfedéséhez, majd nyomj hosszan a részletes karakterelemzés megtekintéséhez';
+  String get helpCaptionBreakdown => 'Jelszó vagy jelmondat generálása';
 
   @override
   String get helpCaptionManageVaults =>
-      'A Széfek kezelése részben átnevezhetsz vagy törölhetsz széfeket, illetve hozzáadhatsz egy újat';
+      'Széfek kezelése: hozzáadás, átnevezés, törlés';
 
   @override
-  String get helpCaptionUnlock => 'Add meg a jelmondatot a széf feloldásához';
+  String get helpCaptionUnlock => 'Feloldás jelmondattal';
 
   @override
   String get helpCaptionVaultSync =>
-      'Titkosított széf szinkronizálási folyamata';
+      'Szinkronizálás: itt Exportálás, ott Szinkronizálás széfből';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Szinkronizálási beállítások: automatikus egyesítés és alapértelmezett mappák';
+
+  @override
+  String get helpCaptionExport => 'Export típusa és helye';
+
+  @override
+  String get helpCaptionImport => 'Import típusa és útvonala';
 
   @override
   String get passphraseNoWordlist =>

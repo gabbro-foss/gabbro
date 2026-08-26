@@ -1556,8 +1556,9 @@ class AppLocalizationsEt extends AppLocalizations {
       'Vali eksporditud seififaili sihtkoht.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Luuakse kaks faili: vault.gabbro ja vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Kirjutatakse kaks faili: $name ja $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Vali sihtkoht.';
@@ -2098,52 +2099,58 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Loo seif: sisesta nimi, pääslause ja kaitse soovi korral YubiKey\'ga';
+      'Loo hoidla: nimi, paroolifraas, valikuline YubiKey';
 
   @override
-  String get helpCaptionEmpty => 'Puuduta +, et lisada oma esimene kirje';
+  String get helpCaptionEmpty => 'Puuduta +, et lisada kirje';
 
   @override
   String get helpCaptionDetail =>
-      'Puuduta silmaikooni parooli nägemiseks, seejärel hoia pikalt, et näha üksikasjalikku tähemärkide jaotust';
+      'Puuduta kirjet avamiseks, silma näitamiseks, hoia all üksikasjade jaoks';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Vaikimisi otsib otsinguriba ainult kirjete pealkirju';
+  String get helpCaptionTitleSearch => 'Otsi pealkirjadest';
 
   @override
   String get helpCaptionFullSearch =>
-      'Puuduta luupi, et lülituda kõigi väljade otsimisele; puuduta uuesti pealkirjaotsimisele naasmiseks';
+      'Puuduta luupi, et otsida kõigist väljadest';
 
   @override
-  String get helpCaptionFilter =>
-      'Kasuta filtreerimisnuppe, et kuvada ainult teatud tüüpi kirjeid';
+  String get helpCaptionFilter => 'Filtreeri kirjeid tüübi järgi';
 
   @override
-  String get helpCaptionFolders =>
-      'Kasuta kaustavaliku, et filtreerida kirjeid kausta järgi';
+  String get helpCaptionFolders => 'Filtreeri kirjeid kausta järgi';
 
   @override
   String get helpCaptionSelect =>
-      'Hoia kirjel pikalt, et siseneda valikurežiimi; lisa rohkem üksusi, seejärel määra kausta või kustuta. Puuduta X väljumiseks.';
+      'Hoia all valimiseks; seejärel teisalda kausta või kustuta';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Puuduta registriribal tähte, et hüpata sellele jaotisele';
+  String get helpCaptionJumpToLetter => 'Puuduta tähte sinna hüppamiseks';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Puuduta silmaikooni parooli nägemiseks, seejärel hoia pikalt, et näha üksikasjalikku tähemärkide jaotust';
+  String get helpCaptionBreakdown => 'Genereeri parool või paroolifraas';
 
   @override
   String get helpCaptionManageVaults =>
-      'Halda seife jaotises saad seife ümber nimetada või kustutada või lisada uue';
+      'Halda hoidlaid: lisa, nimeta ümber, kustuta';
 
   @override
-  String get helpCaptionUnlock => 'Sisesta oma pääslause seifi avamiseks';
+  String get helpCaptionUnlock => 'Ava paroolifraasiga';
 
   @override
-  String get helpCaptionVaultSync => 'Krüpteeritud seifi sünkroonimisprotsess';
+  String get helpCaptionVaultSync =>
+      'Sünkroonimine: siin Ekspordi, seal Sünkrooni hoidlast';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Sünkroonimise seaded: automaatne ühendamine ja vaikekaustad';
+
+  @override
+  String get helpCaptionExport => 'Ekspordi tüüp ja asukoht';
+
+  @override
+  String get helpCaptionImport => 'Impordi tüüp ja tee';
 
   @override
   String get passphraseNoWordlist =>

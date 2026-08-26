@@ -1555,8 +1555,9 @@ class AppLocalizationsSl extends AppLocalizations {
       'Izberite cilj za izvoženo datoteko trezorja.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Ustvarjeni bodo dve datoteki: vault.gabbro in vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Zapisani bosta dve datoteki: $name in $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Izberite cilj.';
@@ -2097,54 +2098,58 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Ustvarite trezor: vnesite ime, geslo za dostop in po želji zaščitite z YubiKey';
+      'Ustvari trezor: ime, geselna fraza, po želji YubiKey';
 
   @override
-  String get helpCaptionEmpty => 'Kliknite + za dodajanje prvega vnosa';
+  String get helpCaptionEmpty => 'Dotaknite se + za nov vnos';
 
   @override
   String get helpCaptionDetail =>
-      'Kliknite ikono očesa za prikaz gesla, nato zadržite za prikaz podrobne analize znakov';
+      'Dotaknite se vnosa za odpiranje, očesa za prikaz, držite za podrobnosti';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Privzeto: iskalna vrstica išče samo naslove vnosov';
+  String get helpCaptionTitleSearch => 'Išči po naslovih';
 
   @override
   String get helpCaptionFullSearch =>
-      'Kliknite povečevalno steklo za preklop na iskanje po vseh poljih; kliknite znova za vrnitev na iskanje po naslovu';
+      'Dotaknite se lupe za iskanje po vseh poljih';
 
   @override
-  String get helpCaptionFilter =>
-      'Uporabite gumbe za filtriranje za prikaz samo vnosov določene vrste';
+  String get helpCaptionFilter => 'Filtriraj vnose po vrsti';
 
   @override
-  String get helpCaptionFolders =>
-      'Uporabite izbiro mape za filtriranje vnosov po mapi';
+  String get helpCaptionFolders => 'Filtriraj vnose po mapi';
 
   @override
   String get helpCaptionSelect =>
-      'Z dolgim pritiskom na vnos vstopite v način izbire; dodajte več elementov, nato dodelite mapi ali izbrišite. Kliknite X za izhod.';
+      'Držite za izbiro; nato premaknite v mapo ali izbrišite';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Kliknite črko v indeksni vrstici za skok na to sekcijo';
+  String get helpCaptionJumpToLetter => 'Dotaknite se črke za skok nanjo';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Kliknite ikono očesa za prikaz gesla, nato zadržite za prikaz podrobne analize znakov';
+  String get helpCaptionBreakdown => 'Ustvari geslo ali geselno frazo';
 
   @override
   String get helpCaptionManageVaults =>
-      'V «Upravljanju trezorjev» lahko preimenujete ali izbrišete trezorje ali dodate novega';
+      'Upravljanje trezorjev: dodaj, preimenuj, izbriši';
 
   @override
-  String get helpCaptionUnlock =>
-      'Vnesite geslo za dostop za odklenitev trezorja';
+  String get helpCaptionUnlock => 'Odkleni z geselno frazo';
 
   @override
   String get helpCaptionVaultSync =>
-      'Postopek sinhronizacije šifriranega trezorja';
+      'Sinhronizacija: tu Izvozi, tam Sinhroniziraj iz trezorja';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Nastavitve sinhronizacije: samodejno združevanje in privzete mape';
+
+  @override
+  String get helpCaptionExport => 'Vrsta in mesto izvoza';
+
+  @override
+  String get helpCaptionImport => 'Vrsta in pot uvoza';
 
   @override
   String get passphraseNoWordlist =>

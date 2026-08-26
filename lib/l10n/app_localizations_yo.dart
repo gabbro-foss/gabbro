@@ -1549,8 +1549,9 @@ class AppLocalizationsYo extends AppLocalizations {
       'Yan ibi ti faili vọọliti okeere yoo wa.';
 
   @override
-  String get exportTwoFilesNote =>
-      'A yoo ṣẹda awọn faili meji: vault.gabbro ati vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'A ó kọ fáìlì méjì: $name àti $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Yan ibi.';
@@ -2096,52 +2097,58 @@ class AppLocalizationsYo extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Ṣẹda vọọliti: tẹ orukọ, gbolohun ọrọ igbaniwọle ki o daabobo pẹlu YubiKey ti o fẹ';
+      'Ṣẹ̀dá àpótí: orúkọ, gbólóhùn àṣírí, YubiKey bí o bá fẹ́';
 
   @override
-  String get helpCaptionEmpty => 'Tẹ + lati fi titẹ sii akọkọ kun';
+  String get helpCaptionEmpty => 'Tẹ + láti fi ohun kún un';
 
   @override
   String get helpCaptionDetail =>
-      'Tẹ aami oju lati ri ọrọ igbaniwọle, lẹhinna tẹ gigun lati ri itupalẹ ohun kikọ alaye';
+      'Tẹ ohun kan láti ṣí, ojú láti fi hàn, tẹ̀ ẹ́ mọ́lẹ̀ pẹ́ fún àlàyé';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Atilẹba: ẹkun wiwa n ṣawari awọn akọle titẹ sii nikan';
+  String get helpCaptionTitleSearch => 'Wá nínú àwọn àkọlé';
 
   @override
   String get helpCaptionFullSearch =>
-      'Tẹ maikirosikopu lati yi pada si wiwa gbogbo awọn aaye; tẹ lẹẹkansi lati pada si wiwa akọle';
+      'Tẹ gíláàsì ìfẹ̀ láti wá nínú gbogbo àwọn àyè';
 
   @override
-  String get helpCaptionFilter =>
-      'Lo awọn bọtini àlẹmọ lati ṣe afihan awọn titẹ sii ti iru kan pato nikan';
+  String get helpCaptionFilter => 'Ṣe àyẹ̀wò àwọn ohun nípa irú';
 
   @override
-  String get helpCaptionFolders =>
-      'Lo yiyan folda lati àlẹmọ awọn titẹ sii nipasẹ folda';
+  String get helpCaptionFolders => 'Ṣe àyẹ̀wò àwọn ohun nípa fóldà';
 
   @override
   String get helpCaptionSelect =>
-      'Tẹ gigun lori titẹ sii lati wọ ipo yiyan; fi awọn nkan diẹ sii kun, lẹhinna yàn si folda tabi pa. Tẹ X lati jade.';
+      'Tẹ̀ mọ́lẹ̀ pẹ́ láti yàn; lẹ́yìn náà gbé lọ sí fóldà tàbí paarẹ́';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Tẹ lẹta ninu ẹgbẹ-atọka lati lọ si apakan yẹn';
+  String get helpCaptionJumpToLetter => 'Tẹ lẹ́tà kan láti fò síbẹ̀';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Tẹ aami oju lati ri ọrọ igbaniwọle, lẹhinna tẹ gigun lati ri itupalẹ ohun kikọ alaye';
+  String get helpCaptionBreakdown => 'Ṣẹ̀dá ọ̀rọ̀ìpamọ́ tàbí gbólóhùn àṣírí';
 
   @override
   String get helpCaptionManageVaults =>
-      'Ninu «Ṣakoso awọn vọọliti» o le tún orukọ ṣe tabi pa awọn vọọliti, tabi fi tuntun kun';
+      'Ṣàkóso àwọn àpótí: fi kún, yí orúkọ padà, paarẹ́';
 
   @override
-  String get helpCaptionUnlock => 'Tẹ gbolohun ọrọ igbaniwọle lati ṣii vọọliti';
+  String get helpCaptionUnlock => 'Ṣí pẹ̀lú gbólóhùn àṣírí';
 
   @override
-  String get helpCaptionVaultSync => 'Ilana isọdọkan vọọliti ti o ni aabo';
+  String get helpCaptionVaultSync =>
+      'Ìmúdọ́gba: Gbé jáde níbí, Mú dọ́gba láti inú àpótí níbẹ̀';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Ètò ìmúdọ́gba: ìdàpọ̀ fúnra rẹ̀ àti àwọn fóldà àkọ́kọ́';
+
+  @override
+  String get helpCaptionExport => 'Irú àti ibi ìgbéjáde';
+
+  @override
+  String get helpCaptionImport => 'Irú àti ọ̀nà ìgbéwọlé';
 
   @override
   String get passphraseNoWordlist =>

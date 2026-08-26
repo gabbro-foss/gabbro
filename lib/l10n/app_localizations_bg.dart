@@ -1555,8 +1555,9 @@ class AppLocalizationsBg extends AppLocalizations {
       'Избери местоназначение за експортирания файл на трезора.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Ще бъдат създадени два файла: vault.gabbro и vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Ще бъдат записани два файла: $name и $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Избери местоназначение.';
@@ -2097,54 +2098,59 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Създай трезор: въведи ime, паролна фраза и по желание защити с YubiKey';
+      'Създаване на трезор: име, парола, по избор YubiKey';
 
   @override
-  String get helpCaptionEmpty => 'Докосни +, за да добавиш първия запис';
+  String get helpCaptionEmpty => 'Докоснете +, за да добавите запис';
 
   @override
   String get helpCaptionDetail =>
-      'Докосни иконата с окото, за да разкриеш парола, след това задръж за подробен анализ на символите';
+      'Докоснете запис за отваряне, окото показва, задръжте за подробности';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'По подразбиране лентата за търсене търси само в заглавията на записите';
+  String get helpCaptionTitleSearch => 'Търсене в заглавията';
 
   @override
   String get helpCaptionFullSearch =>
-      'Докосни лупата, за да превключиш към търсене във всички полета; докосни отново, за да се върнеш към търсене по заглавие';
+      'Докоснете лупата за търсене във всички полета';
 
   @override
-  String get helpCaptionFilter =>
-      'Използвай бутоните за филтриране, за да покажеш само записи от определен тип';
+  String get helpCaptionFilter => 'Филтрирайте записите по тип';
 
   @override
-  String get helpCaptionFolders =>
-      'Използвай избора на папка, за да филтрираш записите по папка';
+  String get helpCaptionFolders => 'Филтрирайте записите по папка';
 
   @override
   String get helpCaptionSelect =>
-      'Задръж запис, за да влезеш в режим на избор; добави още елементи, след това назначи в папка или изтрий. Докосни X за изход.';
+      'Задръжте за избор; после преместете в папка или изтрийте';
 
   @override
   String get helpCaptionJumpToLetter =>
-      'Докосни буква в индексната лента, за да прескочиш към тази секция';
+      'Докоснете буква, за да прескочите до нея';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Докосни иконата с окото, за да разкриеш парола, след това задръж за подробен анализ на символите';
+  String get helpCaptionBreakdown => 'Генерирайте парола или парола-фраза';
 
   @override
   String get helpCaptionManageVaults =>
-      'В «Управление на трезори» можеш да преименуваш или изтриеш трезори, или да добавиш нов';
+      'Управление на трезори: добавяне, преименуване, изтриване';
 
   @override
-  String get helpCaptionUnlock =>
-      'Въведи паролна фраза за отключване на трезора';
+  String get helpCaptionUnlock => 'Отключване с парола';
 
   @override
   String get helpCaptionVaultSync =>
-      'Процес на синхронизиране на шифрован трезор';
+      'Синхронизация: Експорт тук, Синхронизирай от трезор там';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Настройки за синхронизация: автоматично сливане и папки по подразбиране';
+
+  @override
+  String get helpCaptionExport => 'Тип и място на експорта';
+
+  @override
+  String get helpCaptionImport => 'Тип и път на импорта';
 
   @override
   String get passphraseNoWordlist =>

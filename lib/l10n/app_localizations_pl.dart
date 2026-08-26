@@ -1559,8 +1559,9 @@ class AppLocalizationsPl extends AppLocalizations {
       'Wybierz miejsce docelowe dla eksportowanego pliku skarbca.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Zostaną utworzone dwa pliki: vault.gabbro i vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Zostaną zapisane dwa pliki: $name i $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Wybierz miejsce docelowe.';
@@ -2105,54 +2106,59 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Utwórz skarbiec: wprowadź nazwę, hasło główne i opcjonalnie chroń kluczem YubiKey';
+      'Utwórz skarbiec: nazwa, hasło, opcjonalnie YubiKey';
 
   @override
-  String get helpCaptionEmpty => 'Dotknij +, aby dodać pierwszy wpis';
+  String get helpCaptionEmpty => 'Dotknij +, aby dodać wpis';
 
   @override
   String get helpCaptionDetail =>
-      'Dotknij ikony oka, aby wyświetlić hasło, następnie naciśnij i przytrzymaj, aby zobaczyć szczegółową analizę znaków';
+      'Dotknij wpisu, aby otworzyć, oka, aby odsłonić, przytrzymaj, aby zobaczyć szczegóły';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Domyślnie pasek wyszukiwania przeszukuje tylko tytuły wpisów';
+  String get helpCaptionTitleSearch => 'Szukaj w tytułach';
 
   @override
   String get helpCaptionFullSearch =>
-      'Dotknij lupy, aby przełączyć na wyszukiwanie we wszystkich polach; dotknij ponownie, aby wrócić do wyszukiwania po tytule';
+      'Dotknij lupy, aby szukać we wszystkich polach';
 
   @override
-  String get helpCaptionFilter =>
-      'Użyj przycisków filtrowania, aby wyświetlać tylko wpisy określonego typu';
+  String get helpCaptionFilter => 'Filtruj wpisy według typu';
 
   @override
-  String get helpCaptionFolders =>
-      'Użyj selektora folderu, aby filtrować wpisy według folderu';
+  String get helpCaptionFolders => 'Filtruj wpisy według folderu';
 
   @override
   String get helpCaptionSelect =>
-      'Naciśnij i przytrzymaj wpis, aby wejść w tryb zaznaczania; dodaj więcej elementów, następnie przypisz do folderu lub usuń. Dotknij X, aby wyjść.';
+      'Przytrzymaj, aby zaznaczyć; potem przenieś do folderu lub usuń';
 
   @override
   String get helpCaptionJumpToLetter =>
-      'Dotknij litery na pasku indeksu, aby przeskoczyć do tej sekcji';
+      'Dotknij litery, aby do niej przeskoczyć';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Dotknij ikony oka, aby wyświetlić hasło, następnie naciśnij i przytrzymaj, aby zobaczyć szczegółową analizę znaków';
+  String get helpCaptionBreakdown => 'Wygeneruj hasło lub frazę';
 
   @override
   String get helpCaptionManageVaults =>
-      'W «Zarządzaj skarbcami» możesz zmienić nazwę lub usunąć skarbce, a także dodać nowy';
+      'Zarządzaj skarbcami: dodaj, zmień nazwę, usuń';
 
   @override
-  String get helpCaptionUnlock =>
-      'Wprowadź hasło główne, aby odblokować skarbiec';
+  String get helpCaptionUnlock => 'Odblokuj hasłem';
 
   @override
   String get helpCaptionVaultSync =>
-      'Zaszyfrowany proces synchronizacji skarbca';
+      'Synchronizacja: tu Eksportuj, tam Synchronizuj ze skarbca';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Ustawienia synchronizacji: automatyczne scalanie i foldery domyślne';
+
+  @override
+  String get helpCaptionExport => 'Typ i miejsce eksportu';
+
+  @override
+  String get helpCaptionImport => 'Typ i ścieżka importu';
 
   @override
   String get passphraseNoWordlist =>

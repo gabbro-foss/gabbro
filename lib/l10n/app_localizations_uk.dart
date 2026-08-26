@@ -1557,8 +1557,9 @@ class AppLocalizationsUk extends AppLocalizations {
       'Виберіть місце призначення для експортованого файлу сховища.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Буде створено два файли: vault.gabbro та vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Буде записано два файли: $name та $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Виберіть місце призначення.';
@@ -2104,54 +2105,57 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Створіть сховище: введіть назву, кодову фразу та за бажанням захистіть ключем YubiKey';
+      'Створити сховище: назва, парольна фраза, за бажанням YubiKey';
 
   @override
-  String get helpCaptionEmpty => 'Натисніть +, щоб додати перший запис';
+  String get helpCaptionEmpty => 'Торкніться +, щоб додати запис';
 
   @override
   String get helpCaptionDetail =>
-      'Натисніть на значок ока, щоб показати пароль, потім утримуйте для перегляду детального аналізу символів';
+      'Торкніться запису, щоб відкрити, ока, щоб показати, утримуйте для деталей';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'За замовчуванням рядок пошуку шукає лише за назвами записів';
+  String get helpCaptionTitleSearch => 'Пошук у назвах';
 
   @override
-  String get helpCaptionFullSearch =>
-      'Натисніть на лупу для переключення на пошук по всіх полях; натисніть знову для повернення до пошуку за назвою';
+  String get helpCaptionFullSearch => 'Торкніться лупи для пошуку в усіх полях';
 
   @override
-  String get helpCaptionFilter =>
-      'Використовуйте кнопки фільтрації для відображення лише записів певного типу';
+  String get helpCaptionFilter => 'Фільтр записів за типом';
 
   @override
-  String get helpCaptionFolders =>
-      'Використовуйте вибір папки для фільтрації записів за папкою';
+  String get helpCaptionFolders => 'Фільтр записів за текою';
 
   @override
   String get helpCaptionSelect =>
-      'Утримуйте запис для входу в режим вибору; додайте елементи, потім призначте папку або видаліть. Натисніть X для виходу.';
+      'Утримуйте для вибору; потім перемістіть у теку або видаліть';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Натисніть на букву в індексній панелі для переходу до цього розділу';
+  String get helpCaptionJumpToLetter => 'Торкніться літери, щоб перейти до неї';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Натисніть на значок ока, щоб показати пароль, потім утримуйте для перегляду детального аналізу символів';
+  String get helpCaptionBreakdown => 'Створити пароль або парольну фразу';
 
   @override
   String get helpCaptionManageVaults =>
-      'У розділі «Керування сховищами» можна перейменувати або видалити сховища, а також додати нове';
+      'Керування сховищами: додати, перейменувати, видалити';
 
   @override
-  String get helpCaptionUnlock =>
-      'Введіть кодову фразу для розблокування сховища';
+  String get helpCaptionUnlock => 'Розблокувати парольною фразою';
 
   @override
   String get helpCaptionVaultSync =>
-      'Процес синхронізації зашифрованого сховища';
+      'Синхронізація: тут Експорт, там Синхронізувати зі сховища';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Налаштування синхронізації: автооб\'єднання та типові теки';
+
+  @override
+  String get helpCaptionExport => 'Тип і місце експорту';
+
+  @override
+  String get helpCaptionImport => 'Тип і шлях імпорту';
 
   @override
   String get passphraseNoWordlist =>

@@ -1554,8 +1554,9 @@ class AppLocalizationsKk extends AppLocalizations {
       'Экспортталған сейф файлының орнын таңдаңыз.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Екі файл жасалады: vault.gabbro және vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Екі файл жазылады: $name және $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Орнын таңдаңыз.';
@@ -2098,53 +2099,58 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Сейф жасау: атау мен кілт фразасын енгізіп, қалаусаңыз YubiKey арқылы қорғаңыз';
+      'Қойма жасау: атауы, құпия фраза, қалауыңызша YubiKey';
 
   @override
-  String get helpCaptionEmpty => 'Бірінші жазба қосу үшін + басыңыз';
+  String get helpCaptionEmpty => 'Жазба қосу үшін + түртіңіз';
 
   @override
   String get helpCaptionDetail =>
-      'Құпия сөзді көрсету үшін көз белгішесін басыңыз, таңбалардың толық талдауы үшін ұзақ басыңыз';
+      'Ашу үшін жазбаны, көрсету үшін көзді түртіңіз, мәліметтер үшін ұзақ басыңыз';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Әдепкі бойынша: іздеу жолағы тек жазба тақырыптарын іздейді';
+  String get helpCaptionTitleSearch => 'Атаулардан іздеу';
 
   @override
   String get helpCaptionFullSearch =>
-      'Барлық өрістерде іздеуге ауысу үшін үлкейткішті басыңыз; тақырыпты іздеуге оралу үшін қайта басыңыз';
+      'Барлық өрістерден іздеу үшін лупаны түртіңіз';
 
   @override
-  String get helpCaptionFilter =>
-      'Белгілі бір түрдегі жазбаларды ғана көрсету үшін сүзгі түймелерін пайдаланыңыз';
+  String get helpCaptionFilter => 'Жазбаларды түрі бойынша сүзу';
 
   @override
-  String get helpCaptionFolders =>
-      'Жазбаларды қалта бойынша сүзу үшін қалта таңдауды пайдаланыңыз';
+  String get helpCaptionFolders => 'Жазбаларды қалта бойынша сүзу';
 
   @override
   String get helpCaptionSelect =>
-      'Таңдау режиміне өту үшін жазбаны ұзақ басыңыз; қосымша элементтер қосып, қалтаға тағайындаңыз немесе жойыңыз. Шығу үшін X басыңыз.';
+      'Таңдау үшін ұзақ басыңыз; содан кейін қалтаға жылжытыңыз немесе жойыңыз';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Сол бөлімге өту үшін индекс жолағындағы әріпті басыңыз';
+  String get helpCaptionJumpToLetter => 'Әріпке түртіп сонда өтіңіз';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Құпия сөзді көрсету үшін көз белгішесін басыңыз, таңбалардың толық талдауы үшін ұзақ басыңыз';
+  String get helpCaptionBreakdown => 'Құпиясөз немесе құпия фраза жасау';
 
   @override
   String get helpCaptionManageVaults =>
-      '«Сейфтерді басқарuda» сейфтерді қайта атауға, жоюға немесе жаңасын қосуға болады';
+      'Қоймаларды басқару: қосу, атын өзгерту, жою';
 
   @override
-  String get helpCaptionUnlock =>
-      'Сейфтің бекітуін ашу үшін кілт фразасын енгізіңіз';
+  String get helpCaptionUnlock => 'Құпия фразамен ашу';
 
   @override
-  String get helpCaptionVaultSync => 'Шифрланған сейфті синхрондау процесі';
+  String get helpCaptionVaultSync =>
+      'Синхрондау: мұнда Экспорт, онда Қоймадан синхрондау';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Синхрондау параметрлері: автоматты біріктіру және әдепкі қалталар';
+
+  @override
+  String get helpCaptionExport => 'Экспорт түрі мен орны';
+
+  @override
+  String get helpCaptionImport => 'Импорт түрі мен жолы';
 
   @override
   String get passphraseNoWordlist =>

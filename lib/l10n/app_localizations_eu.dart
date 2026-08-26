@@ -1554,8 +1554,9 @@ class AppLocalizationsEu extends AppLocalizations {
       'Aukeratu esportatutako gandegi-fitxategirako helburua.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Bi fitxategi sortuko dira: vault.gabbro eta vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Bi fitxategi idatziko dira: $name eta $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Aukeratu helburua.';
@@ -2097,53 +2098,57 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Sortu gandegiak: sartu izena, pasaesaldia eta aukeran babestu YubiKey-ekin';
+      'Sortu kutxa: izena, pasaesaldia, aukerako YubiKey';
 
   @override
-  String get helpCaptionEmpty => '+ sakatu lehen sarrera gehitzeko';
+  String get helpCaptionEmpty => 'Sakatu + sarrera bat gehitzeko';
 
   @override
   String get helpCaptionDetail =>
-      'Sakatu begi-ikonoa pasahitza ikusteko, gero luze sakatu karaktereen azterketa zehatza ikusteko';
+      'Sakatu sarrera irekitzeko, begia erakusteko, luze sakatu xehetasunetarako';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Lehenespenez: bilaketa-barrak sarrera-izenburuak bakarrik bilatzen ditu';
+  String get helpCaptionTitleSearch => 'Bilatu izenburuetan';
 
   @override
-  String get helpCaptionFullSearch =>
-      'Sakatu lupa eremu guztiak bilatzeko; berriro sakatu izenburuaren araberako bilaketa itzultzeko';
+  String get helpCaptionFullSearch => 'Sakatu lupa eremu guztietan bilatzeko';
 
   @override
-  String get helpCaptionFilter =>
-      'Erabili iragazki-botoiak mota jakineko sarrerak soilik ikusteko';
+  String get helpCaptionFilter => 'Iragazi sarrerak motaren arabera';
 
   @override
-  String get helpCaptionFolders =>
-      'Erabili karpeta hautaketa sarrerak karpetaren arabera iragazteko';
+  String get helpCaptionFolders => 'Iragazi sarrerak karpetaren arabera';
 
   @override
   String get helpCaptionSelect =>
-      'Luze sakatu sarreran hautaketa-modura sartzeko; gehitu elementu gehiago, gero esleitu karpetari edo ezabatu. Sakatu X irteteko.';
+      'Luze sakatu hautatzeko; gero eraman karpeta batera edo ezabatu';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Sakatu indize-barrako letra atal horretara joateko';
+  String get helpCaptionJumpToLetter => 'Sakatu letra bat hara joateko';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Sakatu begi-ikonoa pasahitza ikusteko, gero luze sakatu karaktereen azterketa zehatza ikusteko';
+  String get helpCaptionBreakdown => 'Sortu pasahitz bat edo pasaesaldi bat';
 
   @override
   String get helpCaptionManageVaults =>
-      '«Gandegiak kudeatu»-n gandegiak berrizendatu edo ezabatu ditzakezu, edo berria gehitu';
+      'Kudeatu kutxak: gehitu, izena aldatu, ezabatu';
 
   @override
-  String get helpCaptionUnlock => 'Sartu pasaesaldia gandegiak desblokeatzeko';
+  String get helpCaptionUnlock => 'Desblokeatu pasaesaldiarekin';
 
   @override
   String get helpCaptionVaultSync =>
-      'Enkriptatutako gandegiaren sinkronizazio-prozesua';
+      'Sinkronizazioa: Esportatu hemen, Sinkronizatu kutxatik han';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Sinkronizazio-ezarpenak: bateratze automatikoa eta karpeta lehenetsiak';
+
+  @override
+  String get helpCaptionExport => 'Esportazio mota eta kokapena';
+
+  @override
+  String get helpCaptionImport => 'Inportazio mota eta bidea';
 
   @override
   String get passphraseNoWordlist =>

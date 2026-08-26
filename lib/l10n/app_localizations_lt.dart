@@ -1556,8 +1556,9 @@ class AppLocalizationsLt extends AppLocalizations {
       'Pasirinkite eksportuoto saugyklos failo paskirties vietą.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Bus sukurti du failai: vault.gabbro ir vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Bus įrašyti du failai: $name ir $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Pasirinkite paskirties vietą.';
@@ -2104,54 +2105,58 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Kurkite saugyklą: įveskite pavadinimą, slaptafrazę ir, jei norite, apsaugokite YubiKey';
+      'Sukurti saugyklą: pavadinimas, slaptafrazė, pasirinktinai YubiKey';
 
   @override
-  String get helpCaptionEmpty => 'Bakstelėkite +, kad pridėtumėte pirmą įrašą';
+  String get helpCaptionEmpty => 'Palieskite +, kad pridėtumėte įrašą';
 
   @override
   String get helpCaptionDetail =>
-      'Bakstelėkite akies piktogramą, kad atskleistumėte slaptažodį, tada ilgai paspauskite, kad matytumėte išsamią simbolių struktūrą';
+      'Palieskite įrašą atidaryti, akį parodyti, palaikykite išsamiau';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Pagal numatytuosius nustatymus paieška ieško tik įrašų pavadinimuose';
+  String get helpCaptionTitleSearch => 'Ieškoti pavadinimuose';
 
   @override
   String get helpCaptionFullSearch =>
-      'Bakstelėkite didinamąjį stiklą, kad persijungtumėte į visų laukų paiešką; bakstelėkite vėl, kad grįžtumėte prie pavadinimų paieškos';
+      'Palieskite lupą ieškoti visuose laukuose';
 
   @override
-  String get helpCaptionFilter =>
-      'Naudokite filtravimo mygtukus, kad rodytumėte tik tam tikro tipo įrašus';
+  String get helpCaptionFilter => 'Filtruoti įrašus pagal tipą';
 
   @override
-  String get helpCaptionFolders =>
-      'Naudokite aplanko pasirinkiklį, kad filtruotumėte įrašus pagal aplanką';
+  String get helpCaptionFolders => 'Filtruoti įrašus pagal aplanką';
 
   @override
   String get helpCaptionSelect =>
-      'Ilgai paspauskite įrašą, kad įjungtumėte pasirinkimo režimą; pridėkite daugiau elementų, tada priskirkite aplanką arba ištrinkite. Bakstelėkite X, kad išeitumėte.';
+      'Palaikykite pasirinkti; tada perkelkite į aplanką arba ištrinkite';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Bakstelėkite abėcėlės juostoje esančią raidę, kad peršoktumėte į tą skyrių';
+  String get helpCaptionJumpToLetter => 'Palieskite raidę, kad peršoktumėte';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Bakstelėkite akies piktogramą, kad atskleistumėte slaptažodį, tada ilgai paspauskite, kad matytumėte išsamią simbolių struktūrą';
+  String get helpCaptionBreakdown => 'Generuoti slaptažodį arba slaptafrazę';
 
   @override
   String get helpCaptionManageVaults =>
-      'Saugyklų valdyme galite pervadinti arba ištrinti saugyklas arba pridėti naują';
+      'Tvarkyti saugyklas: pridėti, pervadinti, ištrinti';
 
   @override
-  String get helpCaptionUnlock =>
-      'Įveskite slaptafrazę, kad atrakintumėte saugyklą';
+  String get helpCaptionUnlock => 'Atrakinti slaptafraze';
 
   @override
   String get helpCaptionVaultSync =>
-      'Užšifruotos saugyklos sinchronizavimo procesas';
+      'Sinchronizacija: čia Eksportuoti, ten Sinchronizuoti iš saugyklos';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Sinchronizavimo nustatymai: automatinis sujungimas ir numatytieji aplankai';
+
+  @override
+  String get helpCaptionExport => 'Eksporto tipas ir vieta';
+
+  @override
+  String get helpCaptionImport => 'Importo tipas ir kelias';
 
   @override
   String get passphraseNoWordlist =>

@@ -1512,7 +1512,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get exportChooseDestinationVault => '选择导出保险库文件的目标位置。';
 
   @override
-  String get exportTwoFilesNote => '将创建两个文件：vault.gabbro 和 vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return '将写入两个文件：$name 和 $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => '选择目标位置。';
@@ -2020,43 +2022,52 @@ class AppLocalizationsZh extends AppLocalizations {
   String get menuHelp => '帮助';
 
   @override
-  String get helpCaptionCreate => '创建保险库：输入名称、密码短语，可选择使用 YubiKey 保护';
+  String get helpCaptionCreate => '创建保险库：名称、口令短语，可选 YubiKey';
 
   @override
-  String get helpCaptionEmpty => '点击 + 添加第一个条目';
+  String get helpCaptionEmpty => '点击 + 添加条目';
 
   @override
-  String get helpCaptionDetail => '点击眼睛图标显示密码，然后长按查看详细字符分析';
+  String get helpCaptionDetail => '点击条目打开，眼睛显示，长按查看详情';
 
   @override
-  String get helpCaptionTitleSearch => '默认：搜索栏仅搜索条目标题';
+  String get helpCaptionTitleSearch => '搜索标题';
 
   @override
-  String get helpCaptionFullSearch => '点击放大镜切换到搜索所有字段；再次点击返回标题搜索';
+  String get helpCaptionFullSearch => '点击放大镜搜索所有字段';
 
   @override
-  String get helpCaptionFilter => '使用过滤按钮仅显示特定类型的条目';
+  String get helpCaptionFilter => '按类型筛选条目';
 
   @override
-  String get helpCaptionFolders => '使用文件夹选择按文件夹过滤条目';
+  String get helpCaptionFolders => '按文件夹筛选条目';
 
   @override
-  String get helpCaptionSelect => '长按条目进入选择模式；添加更多项目后，分配到文件夹或删除。点击 X 退出。';
+  String get helpCaptionSelect => '长按选择，然后移到文件夹或删除';
 
   @override
-  String get helpCaptionJumpToLetter => '点击索引栏中的字母跳转到该部分';
+  String get helpCaptionJumpToLetter => '点击字母跳转';
 
   @override
-  String get helpCaptionBreakdown => '点击眼睛图标显示密码，然后长按查看详细字符分析';
+  String get helpCaptionBreakdown => '生成密码或口令短语';
 
   @override
-  String get helpCaptionManageVaults => '在«管理保险库»中，您可以重命名或删除保险库，或添加新的';
+  String get helpCaptionManageVaults => '管理保险库：添加、重命名、删除';
 
   @override
-  String get helpCaptionUnlock => '输入密码短语解锁保险库';
+  String get helpCaptionUnlock => '用口令短语解锁';
 
   @override
-  String get helpCaptionVaultSync => '加密保险库同步流程';
+  String get helpCaptionVaultSync => '同步：此处导出，彼处从保险库同步';
+
+  @override
+  String get helpCaptionSyncSettings => '同步设置：自动合并和默认文件夹';
+
+  @override
+  String get helpCaptionExport => '导出类型和位置';
+
+  @override
+  String get helpCaptionImport => '导入类型和路径';
 
   @override
   String get passphraseNoWordlist => '您的语言暂无词汇列表。使用英语。';
@@ -3708,7 +3719,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get exportChooseDestinationVault => '选择导出保险库文件的目标位置。';
 
   @override
-  String get exportTwoFilesNote => '将创建两个文件：vault.gabbro 和 vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return '将写入两个文件：$name 和 $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => '选择目标位置。';
@@ -4216,43 +4229,52 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get menuHelp => '帮助';
 
   @override
-  String get helpCaptionCreate => '创建保险库：输入名称、密码短语，可选择使用 YubiKey 保护';
+  String get helpCaptionCreate => '创建保险库：名称、口令短语，可选 YubiKey';
 
   @override
-  String get helpCaptionEmpty => '点击 + 添加第一个条目';
+  String get helpCaptionEmpty => '点击 + 添加条目';
 
   @override
-  String get helpCaptionDetail => '点击眼睛图标显示密码，然后长按查看详细字符分析';
+  String get helpCaptionDetail => '点击条目打开，眼睛显示，长按查看详情';
 
   @override
-  String get helpCaptionTitleSearch => '默认：搜索栏仅搜索条目标题';
+  String get helpCaptionTitleSearch => '搜索标题';
 
   @override
-  String get helpCaptionFullSearch => '点击放大镜切换到搜索所有字段；再次点击返回标题搜索';
+  String get helpCaptionFullSearch => '点击放大镜搜索所有字段';
 
   @override
-  String get helpCaptionFilter => '使用过滤按钮仅显示特定类型的条目';
+  String get helpCaptionFilter => '按类型筛选条目';
 
   @override
-  String get helpCaptionFolders => '使用文件夹选择按文件夹过滤条目';
+  String get helpCaptionFolders => '按文件夹筛选条目';
 
   @override
-  String get helpCaptionSelect => '长按条目进入选择模式；添加更多项目后，分配到文件夹或删除。点击 X 退出。';
+  String get helpCaptionSelect => '长按选择，然后移到文件夹或删除';
 
   @override
-  String get helpCaptionJumpToLetter => '点击索引栏中的字母跳转到该部分';
+  String get helpCaptionJumpToLetter => '点击字母跳转';
 
   @override
-  String get helpCaptionBreakdown => '点击眼睛图标显示密码，然后长按查看详细字符分析';
+  String get helpCaptionBreakdown => '生成密码或口令短语';
 
   @override
-  String get helpCaptionManageVaults => '在«管理保险库»中，您可以重命名或删除保险库，或添加新的';
+  String get helpCaptionManageVaults => '管理保险库：添加、重命名、删除';
 
   @override
-  String get helpCaptionUnlock => '输入密码短语解锁保险库';
+  String get helpCaptionUnlock => '用口令短语解锁';
 
   @override
-  String get helpCaptionVaultSync => '加密保险库同步流程';
+  String get helpCaptionVaultSync => '同步：此处导出，彼处从保险库同步';
+
+  @override
+  String get helpCaptionSyncSettings => '同步设置：自动合并和默认文件夹';
+
+  @override
+  String get helpCaptionExport => '导出类型和位置';
+
+  @override
+  String get helpCaptionImport => '导入类型和路径';
 
   @override
   String get passphraseNoWordlist => '您的语言暂无词汇列表。使用英语。';
@@ -5904,7 +5926,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get exportChooseDestinationVault => '選擇匯出保險庫檔案的目標位置。';
 
   @override
-  String get exportTwoFilesNote => '將建立兩個檔案：vault.gabbro 和 vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return '將寫入兩個檔案：$name 和 $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => '選擇目標位置。';
@@ -6412,43 +6436,52 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get menuHelp => '說明';
 
   @override
-  String get helpCaptionCreate => '建立保險庫：輸入名稱、密碼片語，可選擇使用 YubiKey 保護';
+  String get helpCaptionCreate => '建立保險庫：名稱、密語，可選 YubiKey';
 
   @override
-  String get helpCaptionEmpty => '按一下 + 新增第一個項目';
+  String get helpCaptionEmpty => '點選 + 新增項目';
 
   @override
-  String get helpCaptionDetail => '按一下眼睛圖示顯示密碼，然後長按查看詳細字元分析';
+  String get helpCaptionDetail => '點選項目開啟，眼睛顯示，長按查看詳情';
 
   @override
-  String get helpCaptionTitleSearch => '預設：搜尋列僅搜尋項目標題';
+  String get helpCaptionTitleSearch => '搜尋標題';
 
   @override
-  String get helpCaptionFullSearch => '按一下放大鏡切換到搜尋所有欄位；再次按一下返回標題搜尋';
+  String get helpCaptionFullSearch => '點選放大鏡搜尋所有欄位';
 
   @override
-  String get helpCaptionFilter => '使用篩選按鈕僅顯示特定類型的項目';
+  String get helpCaptionFilter => '依類型篩選項目';
 
   @override
-  String get helpCaptionFolders => '使用資料夾選擇依資料夾篩選項目';
+  String get helpCaptionFolders => '依資料夾篩選項目';
 
   @override
-  String get helpCaptionSelect => '長按項目進入選擇模式；新增更多項目後，指派到資料夾或刪除。按一下 X 退出。';
+  String get helpCaptionSelect => '長按選取，然後移到資料夾或刪除';
 
   @override
-  String get helpCaptionJumpToLetter => '按一下索引列中的字母跳轉到該部分';
+  String get helpCaptionJumpToLetter => '點選字母跳轉';
 
   @override
-  String get helpCaptionBreakdown => '按一下眼睛圖示顯示密碼，然後長按查看詳細字元分析';
+  String get helpCaptionBreakdown => '產生密碼或密語';
 
   @override
-  String get helpCaptionManageVaults => '在«管理保險庫»中，您可以重新命名或刪除保險庫，或新增新的';
+  String get helpCaptionManageVaults => '管理保險庫：新增、重新命名、刪除';
 
   @override
-  String get helpCaptionUnlock => '輸入密碼片語解鎖保險庫';
+  String get helpCaptionUnlock => '用密語解鎖';
 
   @override
-  String get helpCaptionVaultSync => '加密保險庫同步流程';
+  String get helpCaptionVaultSync => '同步：此處匯出，彼處從保險庫同步';
+
+  @override
+  String get helpCaptionSyncSettings => '同步設定：自動合併與預設資料夾';
+
+  @override
+  String get helpCaptionExport => '匯出類型與位置';
+
+  @override
+  String get helpCaptionImport => '匯入類型與路徑';
 
   @override
   String get passphraseNoWordlist => '您的語言暫無詞彙列表。使用英語。';
