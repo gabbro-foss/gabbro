@@ -113,6 +113,22 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
     );
   }
 
+  Widget _folderRow(
+      String label, String folder, AppLocalizations l, TextStyle note) {
+    final set = folder.isNotEmpty;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SectionHeader(label: label),
+        const SizedBox(height: 4),
+        Text(
+          set ? folderDisplayLabel(folder) : l.folderNotSet,
+          style: set ? null : note,
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
@@ -173,6 +189,16 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
                 controlAffinity: ListTileControlAffinity.leading,
                 contentPadding: EdgeInsets.zero,
               ),
+              const SizedBox(height: 32),
+
+              // ── Export and import folders, read-only (S5) ─────────────
+              // One place to see every folder; each is changed on its own
+              // screen, so no button and no box here.
+              _folderRow(l.exportFolderLabel, _settings.exportFolder, l, note),
+              const SizedBox(height: 8),
+              _folderRow(l.importFolderLabel, _settings.importFolder, l, note),
+              const SizedBox(height: 8),
+              Text(l.foldersChangedNote, style: note),
             ],
           ),
         ),

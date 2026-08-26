@@ -279,6 +279,21 @@ class AppLocalizationsEs extends AppLocalizations {
   String get rememberFolder => 'Recordar';
 
   @override
+  String get rememberFolderNote => 'La próxima vez empieza en esta carpeta.';
+
+  @override
+  String get exportFolderLabel => 'Carpeta de exportación';
+
+  @override
+  String get importFolderLabel => 'Carpeta de importación';
+
+  @override
+  String get folderNotSet => 'Sin definir';
+
+  @override
+  String get foldersChangedNote => 'Se cambia en Exportar e Importar entradas.';
+
+  @override
   String get aboutTitle => 'Acerca de Gabbro';
 
   @override

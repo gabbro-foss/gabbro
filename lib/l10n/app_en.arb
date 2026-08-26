@@ -170,6 +170,11 @@
     }
   },
   "rememberFolder": "Remember",
+  "rememberFolderNote": "Next time starts in this folder.",
+  "exportFolderLabel": "Export folder",
+  "importFolderLabel": "Import folder",
+  "folderNotSet": "Not set",
+  "foldersChangedNote": "Changed on Export and Import entries.",
   "@rememberFolder": {
     "description": "Checkbox next to a chosen folder: keep it for next time."
   },

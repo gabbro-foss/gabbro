@@ -34,7 +34,7 @@ Widget _androidGabbroScreen(
     isAndroid: true,
     vaultAlias: vaultAlias,
     isKeyProtected: isKeyProtected,
-    initialExportFolderUri: 'content://docs/tree/primary%3ADownload%2FGabbroSync',
+    initialExportFolder: 'content://docs/tree/primary%3ADownload%2FGabbroSync',
     onHasGrant: (_) async => true,
     onExport: (path) async {},
     onExportJson: (path) async {},
@@ -244,7 +244,8 @@ void main() {
       await tester.tap(find.widgetWithText(
           SwitchListTile, 'Export without YubiKey protection (passphrase only)'));
       await tester.pump();
-      await tester.tap(find.text('Export'));
+      await tester.ensureVisible(find.widgetWithText(FilledButton, 'Export'));
+      await tester.tap(find.widgetWithText(FilledButton, 'Export'));
       await tester.pumpAndSettle();
       expect(cap.data, equals(Uint8List.fromList([7, 7, 7])));
       expect(cap.sha256Content, 'DD  x\n');
@@ -421,7 +422,8 @@ void main() {
       // Opting in surfaces the downgrade warning.
       expect(find.textContaining('no YubiKey needed'), findsOneWidget);
 
-      await tester.tap(find.text('Export'));
+      await tester.ensureVisible(find.widgetWithText(FilledButton, 'Export'));
+      await tester.tap(find.widgetWithText(FilledButton, 'Export'));
       await tester.pump();
       expect(downgradedPath, '/home/user/vault.gabbro');
       expect(preserved, isFalse);

@@ -279,6 +279,21 @@ class AppLocalizationsHr extends AppLocalizations {
   String get rememberFolder => 'Zapamti';
 
   @override
+  String get rememberFolderNote => 'Sljedeći put počinje u ovoj mapi.';
+
+  @override
+  String get exportFolderLabel => 'Mapa za izvoz';
+
+  @override
+  String get importFolderLabel => 'Mapa za uvoz';
+
+  @override
+  String get folderNotSet => 'Nije postavljeno';
+
+  @override
+  String get foldersChangedNote => 'Mijenja se u Izvozu i Uvozu stavki.';
+
+  @override
   String get aboutTitle => 'O aplikaciji Gabbro';
 
   @override

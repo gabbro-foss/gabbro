@@ -279,6 +279,22 @@ class AppLocalizationsUk extends AppLocalizations {
   String get rememberFolder => 'Запам\'ятати';
 
   @override
+  String get rememberFolderNote => 'Наступного разу відкриється ця тека.';
+
+  @override
+  String get exportFolderLabel => 'Тека експорту';
+
+  @override
+  String get importFolderLabel => 'Тека імпорту';
+
+  @override
+  String get folderNotSet => 'Не задано';
+
+  @override
+  String get foldersChangedNote =>
+      'Змінюється в розділах Експорт та Імпорт записів.';
+
+  @override
   String get aboutTitle => 'Про Gabbro';
 
   @override

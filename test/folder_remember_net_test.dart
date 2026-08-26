@@ -1,7 +1,8 @@
 // Net for step 3 (remember export/import folders, read-only view in Sync
 // settings). Pins today's picker -> field -> action wiring on the export and
 // import screens, the Android export folder memory, and the absence of folder
-// rows in Sync settings, all green before any change.
+// all green before any change. (N5, the absence of folder rows in Sync
+// settings, was retired when R9 added them.)
 //
 // N6 (vault list opens the export screen with the remembered URI) has a single
 // code path: one PopupMenuButton, one `_openExportScreen`; nothing to pin.
@@ -16,8 +17,6 @@ import 'package:gabbro/linux_file_picker.dart';
 import 'package:gabbro/main.dart' show gabbroLocalizationsDelegates;
 import 'package:gabbro/screens/export_screen.dart';
 import 'package:gabbro/screens/import_screen.dart';
-import 'package:gabbro/screens/sync_settings_screen.dart';
-import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/text_scale.dart';
 
@@ -35,7 +34,8 @@ class _FakeLinuxPicker extends LinuxFilePicker {
   int saves = 0;
 
   @override
-  Future<String?> openFile({List<String>? allowedExtensions}) async {
+  Future<String?> openFile(
+      {List<String>? allowedExtensions, String? currentFolder}) async {
     opens++;
     openFilter = allowedExtensions;
     return answer;
@@ -43,7 +43,9 @@ class _FakeLinuxPicker extends LinuxFilePicker {
 
   @override
   Future<String?> saveFile(
-      {String? fileName, List<String>? allowedExtensions}) async {
+      {String? fileName,
+      List<String>? allowedExtensions,
+      String? currentFolder}) async {
     saves++;
     savedName = fileName;
     saveFilter = allowedExtensions;
@@ -116,7 +118,7 @@ void main() {
       var picks = 0;
       await tester.pumpWidget(testApp(ExportScreen(
         isAndroid: true,
-        initialExportFolderUri: tree,
+        initialExportFolder: tree,
         onHasGrant: (_) async => true,
         onPickExportDir: () async {
           picks++;
@@ -140,7 +142,7 @@ void main() {
         'disarmed', (tester) async {
       await tester.pumpWidget(testApp(ExportScreen(
         isAndroid: true,
-        initialExportFolderUri: tree,
+        initialExportFolder: tree,
         onHasGrant: (_) async => false,
         onExport: (_) async {},
         onExportJson: (_) async {},
@@ -159,7 +161,7 @@ void main() {
         isAndroid: true,
         onPickExportDir: () async =>
             (treeUri: tree, displayName: 'GabbroSync'),
-        onSaveExportFolderUri: (u) async => saved.add(u),
+        onSaveExportFolder: (u) async => saved.add(u),
         onExport: (_) async {},
         onExportJson: (_) async {},
       )));
@@ -183,9 +185,9 @@ void main() {
       await tester.pumpWidget(testApp(ExportScreen(
         isAndroid: true,
         vaultAlias: 'example',
-        initialExportFolderUri: 'content://docs/tree/primary%3AOld',
+        initialExportFolder: 'content://docs/tree/primary%3AOld',
         onHasGrant: (_) async => true,
-        onSaveExportFolderUri: (_) async => saved++,
+        onSaveExportFolder: (_) async => saved++,
         onPickExportDir: () async {
           treePicks++;
           return null;
@@ -240,22 +242,6 @@ void main() {
     });
   });
 
-  group('N5 sync settings', () {
-    testWidgets('shows no export or import folder today', (tester) async {
-      await tester.pumpWidget(testApp(SyncSettingsScreen(
-        settings: const AppSettings(syncFolder: '/home/user/Sync'),
-        onUpdate: (_) {},
-        onPickFolder: () async => null,
-        isAndroid: false,
-      )));
-      await tester.pumpAndSettle();
-      expect(find.textContaining('Export'), findsNothing);
-      expect(find.textContaining('Import'), findsNothing);
-      // The one folder on screen is the sync folder.
-      expect(find.text('/home/user/Sync'), findsOneWidget);
-    });
-  });
-
   group('N7 export at large text', () {
     Future<Object?> overflowFor(
         WidgetTester tester, Locale locale, double scale, bool android) async {
@@ -269,7 +255,7 @@ void main() {
         home: ExportScreen(
           isAndroid: android,
           isKeyProtected: true,
-          initialExportFolderUri:
+          initialExportFolder:
               android ? 'content://docs/tree/primary%3ADownload%2FGabbroSync' : '',
           onHasGrant: (_) async => true,
           onExport: (_) async {},

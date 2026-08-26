@@ -279,6 +279,22 @@ class AppLocalizationsNb extends AppLocalizations {
   String get rememberFolder => 'Husk';
 
   @override
+  String get rememberFolderNote => 'Neste gang starter i denne mappen.';
+
+  @override
+  String get exportFolderLabel => 'Eksportmappe';
+
+  @override
+  String get importFolderLabel => 'Importmappe';
+
+  @override
+  String get folderNotSet => 'Ikke angitt';
+
+  @override
+  String get foldersChangedNote =>
+      'Endres under Eksporter og Importer oppføringer.';
+
+  @override
   String get aboutTitle => 'Om Gabbro';
 
   @override

@@ -274,6 +274,21 @@ class AppLocalizationsKo extends AppLocalizations {
   String get rememberFolder => '기억하기';
 
   @override
+  String get rememberFolderNote => '다음에는 이 폴더에서 시작합니다.';
+
+  @override
+  String get exportFolderLabel => '내보내기 폴더';
+
+  @override
+  String get importFolderLabel => '가져오기 폴더';
+
+  @override
+  String get folderNotSet => '설정되지 않음';
+
+  @override
+  String get foldersChangedNote => '내보내기 및 항목 가져오기에서 변경합니다.';
+
+  @override
   String get aboutTitle => 'Gabbro 정보';
 
   @override

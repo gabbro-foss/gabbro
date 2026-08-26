@@ -280,6 +280,23 @@ class AppLocalizationsEl extends AppLocalizations {
   String get rememberFolder => 'Απομνημόνευση';
 
   @override
+  String get rememberFolderNote =>
+      'Την επόμενη φορά ξεκινά σε αυτόν τον φάκελο.';
+
+  @override
+  String get exportFolderLabel => 'Φάκελος εξαγωγής';
+
+  @override
+  String get importFolderLabel => 'Φάκελος εισαγωγής';
+
+  @override
+  String get folderNotSet => 'Δεν έχει οριστεί';
+
+  @override
+  String get foldersChangedNote =>
+      'Αλλάζει στην Εξαγωγή και στην Εισαγωγή καταχωρήσεων.';
+
+  @override
   String get aboutTitle => 'Σχετικά με το Gabbro';
 
   @override

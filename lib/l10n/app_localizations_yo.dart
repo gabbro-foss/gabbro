@@ -279,6 +279,22 @@ class AppLocalizationsYo extends AppLocalizations {
   String get rememberFolder => 'Rántí';
 
   @override
+  String get rememberFolderNote => 'Nígbà míì yóò bẹ̀rẹ̀ nínú fóldà yìí.';
+
+  @override
+  String get exportFolderLabel => 'Fóldà ìgbéjáde';
+
+  @override
+  String get importFolderLabel => 'Fóldà ìgbéwọlé';
+
+  @override
+  String get folderNotSet => 'Kò tíì ṣètò';
+
+  @override
+  String get foldersChangedNote =>
+      'A máa yí i padà ní Ìgbéjáde àti Ìgbéwọlé àwọn ohun.';
+
+  @override
   String get aboutTitle => 'Nipa Gabbro';
 
   @override

@@ -279,6 +279,22 @@ class AppLocalizationsEu extends AppLocalizations {
   String get rememberFolder => 'Gogoratu';
 
   @override
+  String get rememberFolderNote => 'Hurrengoan karpeta honetan hasiko da.';
+
+  @override
+  String get exportFolderLabel => 'Esportazio-karpeta';
+
+  @override
+  String get importFolderLabel => 'Inportazio-karpeta';
+
+  @override
+  String get folderNotSet => 'Ezarri gabe';
+
+  @override
+  String get foldersChangedNote =>
+      'Esportatu eta Inportatu sarrerak ataletan aldatzen da.';
+
+  @override
   String get aboutTitle => 'Gabbro-ri buruz';
 
   @override

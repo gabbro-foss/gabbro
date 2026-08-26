@@ -279,6 +279,21 @@ class AppLocalizationsBg extends AppLocalizations {
   String get rememberFolder => 'Запомни';
 
   @override
+  String get rememberFolderNote => 'Следващия път започва в тази папка.';
+
+  @override
+  String get exportFolderLabel => 'Папка за експорт';
+
+  @override
+  String get importFolderLabel => 'Папка за импорт';
+
+  @override
+  String get folderNotSet => 'Не е зададена';
+
+  @override
+  String get foldersChangedNote => 'Променя се при Експорт и Импорт на записи.';
+
+  @override
   String get aboutTitle => 'За Gabbro';
 
   @override

@@ -279,6 +279,22 @@ class AppLocalizationsKk extends AppLocalizations {
   String get rememberFolder => 'Есте сақтау';
 
   @override
+  String get rememberFolderNote => 'Келесі жолы осы қалтадан басталады.';
+
+  @override
+  String get exportFolderLabel => 'Экспорт қалтасы';
+
+  @override
+  String get importFolderLabel => 'Импорт қалтасы';
+
+  @override
+  String get folderNotSet => 'Орнатылмаған';
+
+  @override
+  String get foldersChangedNote =>
+      'Экспорт және Жазбаларды импорттау бөлімінде өзгертіледі.';
+
+  @override
   String get aboutTitle => 'Gabbro туралы';
 
   @override

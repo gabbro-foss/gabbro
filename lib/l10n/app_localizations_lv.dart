@@ -279,6 +279,22 @@ class AppLocalizationsLv extends AppLocalizations {
   String get rememberFolder => 'Atcerēties';
 
   @override
+  String get rememberFolderNote => 'Nākamreiz sāk šajā mapē.';
+
+  @override
+  String get exportFolderLabel => 'Eksporta mape';
+
+  @override
+  String get importFolderLabel => 'Importa mape';
+
+  @override
+  String get folderNotSet => 'Nav iestatīta';
+
+  @override
+  String get foldersChangedNote =>
+      'Maina sadaļās Eksportēt un Importēt ierakstus.';
+
+  @override
   String get aboutTitle => 'Par Gabbro';
 
   @override

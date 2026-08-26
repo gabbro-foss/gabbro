@@ -279,6 +279,22 @@ class AppLocalizationsLt extends AppLocalizations {
   String get rememberFolder => 'Įsiminti';
 
   @override
+  String get rememberFolderNote => 'Kitą kartą pradedama šiame aplanke.';
+
+  @override
+  String get exportFolderLabel => 'Eksporto aplankas';
+
+  @override
+  String get importFolderLabel => 'Importo aplankas';
+
+  @override
+  String get folderNotSet => 'Nenustatyta';
+
+  @override
+  String get foldersChangedNote =>
+      'Keičiama Eksportuoti ir Importuoti įrašus skiltyse.';
+
+  @override
   String get aboutTitle => 'Apie Gabbro';
 
   @override

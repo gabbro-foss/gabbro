@@ -279,6 +279,22 @@ class AppLocalizationsSv extends AppLocalizations {
   String get rememberFolder => 'Kom ihåg';
 
   @override
+  String get rememberFolderNote => 'Nästa gång börjar i den här mappen.';
+
+  @override
+  String get exportFolderLabel => 'Exportmapp';
+
+  @override
+  String get importFolderLabel => 'Importmapp';
+
+  @override
+  String get folderNotSet => 'Inte angiven';
+
+  @override
+  String get foldersChangedNote =>
+      'Ändras under Exportera och Importera poster.';
+
+  @override
   String get aboutTitle => 'Om Gabbro';
 
   @override

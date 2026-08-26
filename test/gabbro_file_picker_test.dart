@@ -11,14 +11,17 @@ class _RecordingLinuxPicker extends LinuxFilePicker {
   final calls = <(String, Object?)>[];
 
   @override
-  Future<String?> openFile({List<String>? allowedExtensions}) async {
+  Future<String?> openFile(
+      {List<String>? allowedExtensions, String? currentFolder}) async {
     calls.add(('openFile', allowedExtensions));
     return '/tmp/from-linux.gabbro';
   }
 
   @override
   Future<String?> saveFile(
-      {String? fileName, List<String>? allowedExtensions}) async {
+      {String? fileName,
+      List<String>? allowedExtensions,
+      String? currentFolder}) async {
     calls.add(('saveFile', fileName));
     return '/tmp/saved-linux.gabbro';
   }
@@ -33,11 +36,14 @@ class _RecordingLinuxPicker extends LinuxFilePicker {
 /// Cancels every dialog, so no path is ever read from disk.
 class _CancellingLinuxPicker extends LinuxFilePicker {
   @override
-  Future<String?> openFile({List<String>? allowedExtensions}) async => null;
+  Future<String?> openFile(
+      {List<String>? allowedExtensions, String? currentFolder}) async => null;
 
   @override
   Future<String?> saveFile(
-          {String? fileName, List<String>? allowedExtensions}) async =>
+          {String? fileName,
+          List<String>? allowedExtensions,
+          String? currentFolder}) async =>
       null;
 
   @override
@@ -50,7 +56,8 @@ class _PathReturningLinuxPicker extends LinuxFilePicker {
   final String? path;
 
   @override
-  Future<String?> openFile({List<String>? allowedExtensions}) async => path;
+  Future<String?> openFile(
+      {List<String>? allowedExtensions, String? currentFolder}) async => path;
 }
 
 /// Stands in for the Kotlin picker handler, so a test can see which channel
@@ -86,6 +93,8 @@ void main() {
     GabbroFilePicker.linuxPicker = origLinux;
     GabbroFilePicker.androidPickPath = origAndroidPick;
   });
+
+  rememberedFolderTests();
 
   test('T7: on Linux the facade routes to the portal client, filters intact',
       () async {
@@ -136,7 +145,7 @@ void main() {
     final linux = _RecordingLinuxPicker();
     final channel = _RecordingChannel()
       ..install(tester)
-      ..reply = '/data/cache/gabbro_picker/0/vault.gabbro';
+      ..reply = {'path': '/data/cache/gabbro_picker/0/vault.gabbro', 'uri': 'content://x'};
     GabbroFilePicker.isLinux = () => false;
     GabbroFilePicker.linuxPicker = linux;
 
@@ -251,4 +260,72 @@ void main() {
     expect(linux.calls, isEmpty);
   });
 
+}
+
+// ── Step 3: remembered folders ────────────────────────────────────────────────
+
+/// Records the start folder each dialog was asked to open in.
+class _StartFolderLinuxPicker extends LinuxFilePicker {
+  String? openedIn;
+  String? savedIn;
+
+  @override
+  Future<String?> openFile(
+      {List<String>? allowedExtensions, String? currentFolder}) async {
+    openedIn = currentFolder;
+    return '/home/user/Sync/picked.json';
+  }
+
+  @override
+  Future<String?> saveFile(
+      {String? fileName,
+      List<String>? allowedExtensions,
+      String? currentFolder}) async {
+    savedIn = currentFolder;
+    return '/home/user/Sync/vault.gabbro';
+  }
+}
+
+
+void rememberedFolderTests() {
+  test('T9: Linux: the start folder reaches both dialogs; the picked folder is '
+      'the path\'s directory', () async {
+    final linux = _StartFolderLinuxPicker();
+    GabbroFilePicker.isLinux = () => true;
+    GabbroFilePicker.linuxPicker = linux;
+
+    final picked = await GabbroFilePicker.pickPathWithFolder(
+        allowedExtensions: ['json'], startFolder: '/home/user/Sync');
+    expect(linux.openedIn, '/home/user/Sync');
+    expect(picked, (path: '/home/user/Sync/picked.json', folder: '/home/user/Sync'));
+
+    final saved = await GabbroFilePicker.savePath(
+        fileName: 'vault.gabbro', startFolder: '/home/user/Sync');
+    expect(linux.savedIn, '/home/user/Sync');
+    expect(saved, '/home/user/Sync/vault.gabbro');
+  });
+
+  testWidgets('T10: Android: the start location goes to pick_file; the reply '
+      'carries the cache path and the location', (tester) async {
+    final channel = _RecordingChannel()
+      ..install(tester)
+      ..reply = {
+        'path': '/cache/picker/1/x.json',
+        'uri': 'content://docs/document/primary%3ADownload%2Fx.json',
+      };
+    GabbroFilePicker.isLinux = () => false;
+    GabbroFilePicker.androidPickPathWithFolder = GabbroFilePicker.defaultAndroidPickPathWithFolder;
+
+    final picked = await GabbroFilePicker.pickPathWithFolder(
+        allowedExtensions: ['json'],
+        startFolder: 'content://docs/document/primary%3ADownload');
+    expect(channel.calls.single.method, 'pick_file');
+    final args = channel.calls.single.arguments as Map<Object?, Object?>;
+    expect(args['extensions'], ['json']);
+    expect(args['initial_uri'], 'content://docs/document/primary%3ADownload');
+    expect(picked, (
+      path: '/cache/picker/1/x.json',
+      folder: 'content://docs/document/primary%3ADownload%2Fx.json',
+    ));
+  });
 }

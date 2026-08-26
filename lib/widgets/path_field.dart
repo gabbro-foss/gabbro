@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import '../gabbro_file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
@@ -24,6 +26,14 @@ class PathField extends StatefulWidget {
   /// Fires when the user submits the typed path (Enter / IME done).
   final void Function(String path)? onSubmitted;
 
+  /// Where the native dialog opens: a remembered folder (Linux path, or on
+  /// Android the location the picker last reported). Null = system default.
+  final String? startFolder;
+
+  /// Fires with the picked file's folder (the value to remember) when the
+  /// native picker returns; never while typing.
+  final void Function(String folder)? onFolderPicked;
+
   /// Test seams: override the native dialogs to return a path, `null` (cancel),
   /// or throw (portal unavailable). Default to the real native dialogs.
   final Future<String?> Function()? openPicker;
@@ -40,6 +50,8 @@ class PathField extends StatefulWidget {
     this.validator,
     this.readOnly = false,
     this.onPathPicked,
+    this.onFolderPicked,
+    this.startFolder,
     this.onSubmitted,
     this.openPicker,
     this.savePicker,
@@ -78,28 +90,44 @@ class _PathFieldState extends State<PathField> {
     super.dispose();
   }
 
-  Future<String?> _defaultOpen() =>
-      GabbroFilePicker.pickPath(allowedExtensions: widget.allowedExtensions);
-
-  Future<String?> _defaultSave() => GabbroFilePicker.savePath(
-        fileName: widget.saveFileName,
+  // The folder to remember: the picker's own answer on the open leg (Android
+  // reports a location there); the path's directory otherwise.
+  Future<PickedPath?> _defaultOpen() => GabbroFilePicker.pickPathWithFolder(
         allowedExtensions: widget.allowedExtensions,
+        startFolder: widget.startFolder,
       );
 
+  Future<PickedPath?> _defaultSave() async {
+    final path = await GabbroFilePicker.savePath(
+      fileName: widget.saveFileName,
+      allowedExtensions: widget.allowedExtensions,
+      startFolder: widget.startFolder,
+    );
+    return path == null ? null : (path: path, folder: File(path).parent.path);
+  }
+
+  Future<PickedPath?> _viaSeam(Future<String?> Function() seam) async {
+    final path = await seam();
+    return path == null ? null : (path: path, folder: File(path).parent.path);
+  }
+
   Future<void> _pick() async {
-    final String? picked;
+    final PickedPath? picked;
     try {
-      picked = widget.mode == PathFieldMode.open
-          ? await runPicker(widget.openPicker ?? _defaultOpen)
-          : await runPicker(widget.savePicker ?? _defaultSave);
+      final open = widget.mode == PathFieldMode.open;
+      final seam = open ? widget.openPicker : widget.savePicker;
+      picked = await runPicker(seam != null
+          ? () => _viaSeam(seam)
+          : (open ? _defaultOpen : _defaultSave));
     } on FilePickerUnavailable {
       if (mounted) showPickerUnavailable(context);
       return;
     }
     if (picked != null) {
-      setState(() => _controller.text = picked!);
-      widget.onPathSelected(picked);
-      widget.onPathPicked?.call(picked);
+      setState(() => _controller.text = picked!.path);
+      widget.onPathSelected(picked.path);
+      widget.onPathPicked?.call(picked.path);
+      widget.onFolderPicked?.call(picked.folder);
     }
   }
 

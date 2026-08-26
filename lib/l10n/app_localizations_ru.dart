@@ -279,6 +279,22 @@ class AppLocalizationsRu extends AppLocalizations {
   String get rememberFolder => 'Запомнить';
 
   @override
+  String get rememberFolderNote => 'В следующий раз откроется эта папка.';
+
+  @override
+  String get exportFolderLabel => 'Папка экспорта';
+
+  @override
+  String get importFolderLabel => 'Папка импорта';
+
+  @override
+  String get folderNotSet => 'Не задана';
+
+  @override
+  String get foldersChangedNote =>
+      'Меняется в разделах Экспорт и Импорт записей.';
+
+  @override
   String get aboutTitle => 'О Gabbro';
 
   @override

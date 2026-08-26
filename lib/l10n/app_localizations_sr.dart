@@ -279,6 +279,21 @@ class AppLocalizationsSr extends AppLocalizations {
   String get rememberFolder => 'Запамти';
 
   @override
+  String get rememberFolderNote => 'Следећи пут почиње у овој фасцикли.';
+
+  @override
+  String get exportFolderLabel => 'Фасцикла за извоз';
+
+  @override
+  String get importFolderLabel => 'Фасцикла за увоз';
+
+  @override
+  String get folderNotSet => 'Није подешено';
+
+  @override
+  String get foldersChangedNote => 'Мења се у Извозу и Увозу ставки.';
+
+  @override
   String get aboutTitle => 'О апликацији Gabbro';
 
   @override
@@ -2555,6 +2570,21 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get rememberFolder => 'Zapamti';
+
+  @override
+  String get rememberFolderNote => 'Sledeći put počinje u ovoj fascikli.';
+
+  @override
+  String get exportFolderLabel => 'Fascikla za izvoz';
+
+  @override
+  String get importFolderLabel => 'Fascikla za uvoz';
+
+  @override
+  String get folderNotSet => 'Nije podešeno';
+
+  @override
+  String get foldersChangedNote => 'Menja se u Izvozu i Uvozu stavki.';
 
   @override
   String get aboutTitle => 'O aplikaciji Gabbro';

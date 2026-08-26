@@ -90,16 +90,6 @@ void main() {
       expect(restored.highContrast, original.highContrast);
     });
 
-    test('androidExportFolderUri round-trips and defaults to empty', () {
-      expect(AppSettings.fromJson({}).androidExportFolderUri, '');
-      const original = AppSettings(
-        androidExportFolderUri:
-            'content://com.android.externalstorage.documents/tree/primary%3ADownload%2FGabbroSync',
-      );
-      final restored = AppSettings.fromJson(original.toJson());
-      expect(restored.androidExportFolderUri, original.androidExportFolderUri);
-    });
-
     // S5: the sync settings. Absent keys keep the old file loading, so an
     // upgraded install never loses its other settings.
     test('autoMergeSync defaults to false and round-trips', () {
@@ -140,6 +130,44 @@ void main() {
       final b = base.copyWith(syncFolder: '/x');
       expect(b.syncFolder, '/x');
       expect(b.autoMergeSync, isFalse);
+    });
+
+    // R1: one remembered folder per screen, Linux path or Android tree URI.
+    test('exportFolder and importFolder default to empty and round-trip', () {
+      expect(AppSettings.fromJson({}).exportFolder, '');
+      expect(AppSettings.fromJson({}).importFolder, '');
+      const s = AppSettings(
+        exportFolder: '/home/user/GabbroSync',
+        importFolder: 'content://docs/document/primary%3ADownload%2Fx.json',
+      );
+      final back = AppSettings.fromJson(s.toJson());
+      expect(back.exportFolder, s.exportFolder);
+      expect(back.importFolder, s.importFolder);
+      expect(s.toJson()['export_folder'], s.exportFolder);
+      expect(s.toJson()['import_folder'], s.importFolder);
+    });
+
+    test('an old android_export_folder_uri is read into exportFolder', () {
+      const old = 'content://docs/tree/primary%3ADownload%2FGabbroSync';
+      expect(AppSettings.fromJson({'android_export_folder_uri': old}).exportFolder,
+          old);
+      // The new key wins when both are present.
+      expect(
+        AppSettings.fromJson(
+            {'android_export_folder_uri': old, 'export_folder': '/new'}).exportFolder,
+        '/new',
+      );
+      // Not written any more.
+      expect(AppSettings.defaults.toJson().containsKey('android_export_folder_uri'),
+          isFalse);
+    });
+
+    test('the folders survive the jsonc writer', () {
+      const s = AppSettings(exportFolder: '/tmp/a "b"', importFolder: '/tmp/c');
+      final stripped = AppSettings.stripCommentsForTest(s.toJsoncForTest());
+      final back = AppSettings.fromJson(jsonDecode(stripped) as Map<String, dynamic>);
+      expect(back.exportFolder, '/tmp/a "b"');
+      expect(back.importFolder, '/tmp/c');
     });
   });
 

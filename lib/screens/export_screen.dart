@@ -101,11 +101,17 @@ class ExportScreen extends StatefulWidget {
   final bool isAndroid;
 
   // ── Android SAF `.gabbro` export seams (ADR-013) ──────────────────────────
-  /// Remembered SAF tree URI of the export folder (from settings); empty if none.
-  final String initialExportFolderUri;
+  /// Remembered export folder (from settings): a Linux path, whose
+  /// `<folder>/<name>` pre-fills the path so Export is armed on arrival, or
+  /// an Android SAF tree URI. Empty if none.
+  final String initialExportFolder;
 
-  /// Persist the chosen folder URI (wired to settings by the caller).
-  final Future<void> Function(String treeUri) onSaveExportFolderUri;
+  /// Persist the folder to remember (wired to settings by the caller); an
+  /// empty string forgets it.
+  final Future<void> Function(String folder) onSaveExportFolder;
+
+  /// Test seam for the Linux save dialog (see `PathField.savePicker`).
+  final Future<String?> Function()? savePicker;
 
   /// Launch the SAF folder picker; null if the user cancels.
   final Future<ExportFolder?> Function() onPickExportDir;
@@ -136,13 +142,14 @@ class ExportScreen extends StatefulWidget {
   ExportScreen({
     super.key,
     this.initialPath,
+    this.savePicker,
     this.vaultAlias,
     this.onExport = _defaultExport,
     this.onExportJson = _defaultExportJson,
     this.onExportPassphraseOnly = _defaultExportPassphraseOnly,
     this.isKeyProtected = false,
-    this.initialExportFolderUri = '',
-    this.onSaveExportFolderUri = _noopSaveFolder,
+    this.initialExportFolder = '',
+    this.onSaveExportFolder = _noopSaveFolder,
     this.onPickExportDir = _defaultPickExportDir,
     this.onPickDirectory = _defaultPickDirectory,
     this.onHasGrant = _defaultHasGrant,
@@ -177,6 +184,14 @@ class _ExportScreenState extends State<ExportScreen> {
   String _exportFolderUri = '';
   String? _folderDisplayName;
 
+  // The Remember box: ticked by default, so the first pick is remembered
+  // (Android exported this way already); unticking forgets the folder.
+  bool _remember = true;
+
+  // Linux: the path was derived from the remembered folder, so a format or
+  // date change re-derives it; a user pick or edit stops that.
+  bool _pathFromFolder = false;
+
   // Android `.gabbro` export goes through SAF; JSON + Linux keep raw paths.
   bool get _useSaf => widget.isAndroid && _format != _ExportFormat.json;
 
@@ -188,10 +203,38 @@ class _ExportScreenState extends State<ExportScreen> {
   void initState() {
     super.initState();
     _path = widget.initialPath;
-    _exportFolderUri = widget.initialExportFolderUri;
+    _exportFolderUri = widget.initialExportFolder;
     if (widget.isAndroid && _exportFolderUri.isNotEmpty) {
       _validateGrant();
+    } else if (!widget.isAndroid &&
+        _exportFolderUri.isNotEmpty &&
+        (_path == null || _path!.isEmpty)) {
+      _pathFromFolder = true;
+      _reseedFromFolder();
     }
+  }
+
+  /// Linux: `<remembered folder>/<default name>`, so Export is armed at once.
+  void _reseedFromFolder() {
+    if (!_pathFromFolder || _exportFolderUri.isEmpty) return;
+    _path =
+        '$_exportFolderUri/${_defaultFilename(widget.vaultAlias, _format == _ExportFormat.json, includeDate: _includeDate)}';
+  }
+
+  /// The folder to remember for what is on screen now: the Android tree, or
+  /// the Linux path's directory. Empty when nothing is chosen yet.
+  String _currentFolder() {
+    if (widget.isAndroid) return _exportFolderUri;
+    final p = _path;
+    if (p == null || p.isEmpty) return '';
+    return File(p).parent.path;
+  }
+
+  Future<void> _onRememberChanged(bool? value) async {
+    final on = value == true;
+    setState(() => _remember = on);
+    // Unticked forgets the folder in settings; what is on screen stays usable.
+    await widget.onSaveExportFolder(on ? _currentFolder() : '');
   }
 
   // Drop a remembered folder whose grant the user has revoked in Android Settings,
@@ -225,7 +268,7 @@ class _ExportScreenState extends State<ExportScreen> {
       _folderDisplayName = picked.displayName;
       _error = null;
     });
-    await widget.onSaveExportFolderUri(picked.treeUri);
+    if (_remember) await widget.onSaveExportFolder(picked.treeUri);
   }
 
   /// The picker's display name when it gave one, else the decoded tree URI.
@@ -342,6 +385,7 @@ class _ExportScreenState extends State<ExportScreen> {
                     setState(() {
                       _format = selection.first;
                       _error = null;
+                      _reseedFromFolder();
                     });
                   },
                 ),
@@ -426,7 +470,10 @@ class _ExportScreenState extends State<ExportScreen> {
                   contentPadding: EdgeInsets.zero,
                   title: Text(l.exportIncludeDate),
                   value: _includeDate,
-                  onChanged: (v) => setState(() => _includeDate = v),
+                  onChanged: (v) => setState(() {
+                    _includeDate = v;
+                    _reseedFromFolder();
+                  }),
                 ),
                 Text(
                   isJson
@@ -486,11 +533,29 @@ class _ExportScreenState extends State<ExportScreen> {
                       includeDate: _includeDate,
                     ),
                     initialPath: _path,
+                    startFolder: _remember && _exportFolderUri.isNotEmpty
+                        ? _exportFolderUri
+                        : null,
+                    savePicker: widget.savePicker,
                     onPathSelected: (p) => setState(() {
                       _path = p;
+                      _pathFromFolder = false;
                       _error = null;
                     }),
+                    onFolderPicked: (f) {
+                      if (!_remember) return;
+                      _exportFolderUri = f;
+                      widget.onSaveExportFolder(f);
+                    },
                   ),
+                CheckboxListTile(
+                  title: Text(l.rememberFolder),
+                  subtitle: Text(l.rememberFolderNote),
+                  value: _remember,
+                  onChanged: _onRememberChanged,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  contentPadding: EdgeInsets.zero,
+                ),
                 if (_error != null) ...[
                   const SizedBox(height: 4),
                   Text(

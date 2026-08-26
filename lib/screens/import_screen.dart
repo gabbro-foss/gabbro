@@ -87,6 +87,7 @@ Future<bool> _defaultSourceFormatTooNew(String path) async {
   }
 }
 
+Future<void> _noopSaveFolder(String folder) async {}
 
 /// What the chosen file is. One picker serves all six; the type decides the
 /// file filter, the explanation, the action, and (Gabbro only) the passphrase
@@ -135,6 +136,13 @@ class ImportScreen extends StatefulWidget {
 
   final bool isAndroid;
 
+  /// Remembered import folder (from settings): where the file dialog opens.
+  /// A Linux path or the Android location the picker last reported.
+  final String initialImportFolder;
+
+  /// Persist the folder to remember; an empty string forgets it.
+  final Future<void> Function(String folder) onSaveImportFolder;
+
   /// Pre-selected Gabbro source path. Mainly a test seam (the path is otherwise
   /// chosen via the native picker); when set, source protection is detected at
   /// construction so the YubiKey fields render without a picker round-trip.
@@ -154,6 +162,8 @@ class ImportScreen extends StatefulWidget {
     this.onSourceFormatTooOld = _defaultSourceFormatTooOld,
     this.onSourceFormatTooNew = _defaultSourceFormatTooNew,
     this.initialGabbroPath,
+    this.initialImportFolder = '',
+    this.onSaveImportFolder = _noopSaveFolder,
     bool? isAndroid,
   }) : isAndroid = isAndroid ?? Platform.isAndroid;
 
@@ -164,6 +174,12 @@ class ImportScreen extends StatefulWidget {
 class _ImportScreenState extends State<ImportScreen> {
   ImportType _type = ImportType.gabbro;
   String? _path;
+
+  // The Remember box (ticked by default): the folder of the picked file is
+  // remembered, and the next dialog opens there. Unticking forgets it.
+  bool _remember = true;
+  late String _importFolder = widget.initialImportFolder;
+  String? _lastPickedFolder;
   bool _isImporting = false;
   String? _error;
 
@@ -223,6 +239,27 @@ class _ImportScreenState extends State<ImportScreen> {
       _gabbroFormatTooNew = false;
       _gabbroSourceRecords = [];
     });
+  }
+
+  void _onFolderPicked(String folder) {
+    _lastPickedFolder = folder;
+    if (!_remember) return;
+    _importFolder = folder;
+    widget.onSaveImportFolder(folder);
+  }
+
+  Future<void> _onRememberChanged(bool? value) async {
+    final on = value == true;
+    setState(() => _remember = on);
+    if (!on) {
+      await widget.onSaveImportFolder('');
+      return;
+    }
+    // Re-ticked: remember what is on screen, or what was last picked.
+    final folder = _lastPickedFolder ?? _importFolder;
+    if (folder.isEmpty) return;
+    _importFolder = folder;
+    await widget.onSaveImportFolder(folder);
   }
 
   void _setPath(String p) => setState(() {
@@ -500,7 +537,18 @@ class _ImportScreenState extends State<ImportScreen> {
                 hint: _hint,
                 initialPath: _path,
                 allowedExtensions: [_extension],
+                startFolder:
+                    _remember && _importFolder.isNotEmpty ? _importFolder : null,
                 onPathSelected: _setPath,
+                onFolderPicked: _onFolderPicked,
+              ),
+              CheckboxListTile(
+                title: Text(l.rememberFolder),
+                subtitle: Text(l.rememberFolderNote),
+                value: _remember,
+                onChanged: _onRememberChanged,
+                controlAffinity: ListTileControlAffinity.leading,
+                contentPadding: EdgeInsets.zero,
               ),
               if (_type == ImportType.gabbro) ..._gabbroFields(l),
               if (_error != null) ...[

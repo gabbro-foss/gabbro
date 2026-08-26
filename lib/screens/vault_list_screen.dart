@@ -116,9 +116,26 @@ Future<void> _defaultCancelSync() => cancelSync();
 /// Run the import flow. Returns the number of entries added — 0 when every
 /// entry in the file was already in the vault, `null` when the user backed out
 /// without importing.
-Future<int?> _defaultOpenImport(BuildContext context) => Navigator.of(
-  context,
-).push<int>(MaterialPageRoute(builder: (context) => ImportScreen()));
+Future<int?> _defaultOpenImport(BuildContext context) =>
+    Navigator.of(context).push<int>(
+      MaterialPageRoute(
+        builder: (context) {
+          // Read settings at each use, never a captured copy: the remembered
+          // folder must be the one saved by the previous pick.
+          final app = GabbroApp.maybeOf(context);
+          return ImportScreen(
+            initialImportFolder: app?.settings.importFolder ?? '',
+            onSaveImportFolder: (folder) async {
+              final now = GabbroApp.maybeOf(context);
+              if (now == null) return;
+              await now.updateSettings(
+                now.settings.copyWith(importFolder: folder),
+              );
+            },
+          );
+        },
+      ),
+    );
 
 /// Apply a whole granular-sync review in one FFI call (one vault re-seal for the
 /// entire review, instead of one per decision).
@@ -1126,9 +1143,9 @@ class _VaultListScreenState extends State<VaultListScreen>
           vaultAlias: widget.vaultAlias,
           isKeyProtected: _isYubikeyVault,
           // Remember the Android SAF export folder across runs (ADR-013).
-          initialExportFolderUri: appState.settings.androidExportFolderUri,
-          onSaveExportFolderUri: (uri) => appState.updateSettings(
-            appState.settings.copyWith(androidExportFolderUri: uri),
+          initialExportFolder: appState.settings.exportFolder,
+          onSaveExportFolder: (uri) => appState.updateSettings(
+            appState.settings.copyWith(exportFolder: uri),
           ),
         ),
       ),

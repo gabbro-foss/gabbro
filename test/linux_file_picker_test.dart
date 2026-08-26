@@ -235,4 +235,52 @@ void main() {
     final picker = LinuxFilePicker(clientFactory: fake.clientFactory);
     expect(await picker.pickDirectory(), isNull);
   });
+  _rememberedFolderTests();
+}
+
+// ── Step 3: remembered folders ────────────────────────────────────────────────
+
+/// The portal takes `current_folder` as a NUL-terminated byte string.
+List<int> _folderBytes(Map<String, DBusValue> options) =>
+    (options['current_folder'] as DBusArray).children.map((c) => (c as DBusByte).value).toList();
+
+
+void _rememberedFolderTests() {
+  test('T9: openFile with a start folder sends current_folder, NUL-terminated',
+      () async {
+    final fake = await _startFakePortal(
+      response: 0,
+      uris: ['file:///home/user/Sync/x.json'],
+    );
+    addTearDown(fake.close);
+    final picker = LinuxFilePicker(clientFactory: fake.clientFactory);
+    await picker.openFile(
+        allowedExtensions: ['json'], currentFolder: '/home/user/Sync');
+    expect(_folderBytes(fake.portal.lastOptions!),
+        [...'/home/user/Sync'.codeUnits, 0]);
+  });
+
+  test('T10: saveFile with a start folder sends current_folder, NUL-terminated',
+      () async {
+    final fake = await _startFakePortal(
+      response: 0,
+      uris: ['file:///home/user/Sync/vault.gabbro'],
+    );
+    addTearDown(fake.close);
+    final picker = LinuxFilePicker(clientFactory: fake.clientFactory);
+    await picker.saveFile(fileName: 'vault.gabbro', currentFolder: '/home/user/Sync');
+    final options = fake.portal.lastOptions!;
+    expect((options['current_name'] as DBusString).value, 'vault.gabbro');
+    expect(_folderBytes(options), [...'/home/user/Sync'.codeUnits, 0]);
+  });
+
+  test('T11: no start folder sends no current_folder', () async {
+    final fake = await _startFakePortal(response: 1);
+    addTearDown(fake.close);
+    final picker = LinuxFilePicker(clientFactory: fake.clientFactory);
+    await picker.openFile();
+    expect(fake.portal.lastOptions!.containsKey('current_folder'), isFalse);
+    await picker.saveFile(fileName: 'a');
+    expect(fake.portal.lastOptions!.containsKey('current_folder'), isFalse);
+  });
 }

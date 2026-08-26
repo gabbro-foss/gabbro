@@ -18,4 +18,19 @@ void main() {
   test('empty stays empty', () {
     expect(folderDisplayLabel(''), '');
   });
+
+  test('an Android document URI (a remembered import location) reads as its '
+      'folder, the file name dropped', () {
+    expect(
+      folderDisplayLabel(
+          'content://com.android.externalstorage.documents/document/primary%3ADownload%2FGabbroSync%2Fx.json'),
+      'primary:Download/GabbroSync',
+    );
+    // A file straight under the volume root keeps the volume.
+    expect(
+      folderDisplayLabel('content://docs/document/primary%3Ax.json'),
+      'primary:',
+    );
+  });
 }
+

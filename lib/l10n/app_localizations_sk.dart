@@ -279,6 +279,21 @@ class AppLocalizationsSk extends AppLocalizations {
   String get rememberFolder => 'Zapamätať';
 
   @override
+  String get rememberFolderNote => 'Nabudúce sa otvorí v tomto priečinku.';
+
+  @override
+  String get exportFolderLabel => 'Priečinok exportu';
+
+  @override
+  String get importFolderLabel => 'Priečinok importu';
+
+  @override
+  String get folderNotSet => 'Nenastavené';
+
+  @override
+  String get foldersChangedNote => 'Mení sa v Exporte a Importe položiek.';
+
+  @override
   String get aboutTitle => 'O aplikácii Gabbro';
 
   @override

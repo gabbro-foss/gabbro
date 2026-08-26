@@ -279,6 +279,22 @@ class AppLocalizationsNl extends AppLocalizations {
   String get rememberFolder => 'Onthouden';
 
   @override
+  String get rememberFolderNote => 'De volgende keer begint in deze map.';
+
+  @override
+  String get exportFolderLabel => 'Exportmap';
+
+  @override
+  String get importFolderLabel => 'Importmap';
+
+  @override
+  String get folderNotSet => 'Niet ingesteld';
+
+  @override
+  String get foldersChangedNote =>
+      'Wordt gewijzigd bij Exporteren en Items importeren.';
+
+  @override
   String get aboutTitle => 'Over Gabbro';
 
   @override

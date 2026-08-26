@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'test_helpers.dart';
+import 'package:gabbro/gabbro_file_picker.dart';
+import 'package:gabbro/linux_file_picker.dart';
 import 'package:gabbro/widgets/path_field.dart';
 
 // The English copy shown when the native dialog can't be reached (e.g. the XDG
@@ -11,6 +13,7 @@ const _pickerUnavailableText =
     'File dialog unavailable here. Type or paste the path instead.';
 
 void main() {
+  rememberedFolderTests();
   group('PathField', () {
     testWidgets('displays hint text when no path selected', (tester) async {
       await tester.pumpWidget(
@@ -296,5 +299,100 @@ void main() {
       expect(captured, isNull,
           reason: 'a read-only display field must not accept typed input');
     });
+  });
+}
+// ── Step 3: remembered folders ────────────────────────────────────────────────
+
+/// Records the start folder the facade was asked for.
+class _StartFolderLinuxPicker extends LinuxFilePicker {
+  String? openedIn;
+  String? savedIn;
+
+  @override
+  Future<String?> openFile(
+      {List<String>? allowedExtensions, String? currentFolder}) async {
+    openedIn = currentFolder;
+    return '/home/user/Sync/picked.json';
+  }
+
+  @override
+  Future<String?> saveFile(
+      {String? fileName,
+      List<String>? allowedExtensions,
+      String? currentFolder}) async {
+    savedIn = currentFolder;
+    return '/home/user/Sync/vault.gabbro';
+  }
+}
+
+void rememberedFolderTests() {
+  late bool Function() origIsLinux;
+  late LinuxFilePicker origLinux;
+  setUp(() {
+    origIsLinux = GabbroFilePicker.isLinux;
+    origLinux = GabbroFilePicker.linuxPicker;
+  });
+  tearDown(() {
+    GabbroFilePicker.isLinux = origIsLinux;
+    GabbroFilePicker.linuxPicker = origLinux;
+  });
+
+  testWidgets('open mode: startFolder reaches the dialog; onFolderPicked gets '
+      'the picked file\'s folder', (tester) async {
+    final linux = _StartFolderLinuxPicker();
+    GabbroFilePicker.isLinux = () => true;
+    GabbroFilePicker.linuxPicker = linux;
+    final folders = <String>[];
+    await tester.pumpWidget(testApp(Scaffold(
+      body: PathField(
+        mode: PathFieldMode.open,
+        hint: 'Path',
+        startFolder: '/home/user/Sync',
+        onPathSelected: (_) {},
+        onFolderPicked: folders.add,
+      ),
+    )));
+    await tester.tap(find.byType(IconButton));
+    await tester.pumpAndSettle();
+    expect(linux.openedIn, '/home/user/Sync');
+    expect(folders, ['/home/user/Sync']);
+    expect(find.text('/home/user/Sync/picked.json'), findsOneWidget);
+  });
+
+  testWidgets('save mode: startFolder reaches the dialog; onFolderPicked gets '
+      'the saved file\'s folder', (tester) async {
+    final linux = _StartFolderLinuxPicker();
+    GabbroFilePicker.isLinux = () => true;
+    GabbroFilePicker.linuxPicker = linux;
+    final folders = <String>[];
+    await tester.pumpWidget(testApp(Scaffold(
+      body: PathField(
+        mode: PathFieldMode.save,
+        hint: 'Path',
+        saveFileName: 'vault.gabbro',
+        startFolder: '/home/user/Sync',
+        onPathSelected: (_) {},
+        onFolderPicked: folders.add,
+      ),
+    )));
+    await tester.tap(find.byType(IconButton));
+    await tester.pumpAndSettle();
+    expect(linux.savedIn, '/home/user/Sync');
+    expect(folders, ['/home/user/Sync']);
+  });
+
+  testWidgets('typing a path never fires onFolderPicked', (tester) async {
+    final folders = <String>[];
+    await tester.pumpWidget(testApp(Scaffold(
+      body: PathField(
+        mode: PathFieldMode.open,
+        hint: 'Path',
+        onPathSelected: (_) {},
+        onFolderPicked: folders.add,
+      ),
+    )));
+    await tester.enterText(find.byType(TextFormField), '/tmp/typed.json');
+    await tester.pump();
+    expect(folders, isEmpty);
   });
 }

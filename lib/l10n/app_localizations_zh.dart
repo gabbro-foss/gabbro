@@ -269,6 +269,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get rememberFolder => '记住';
 
   @override
+  String get rememberFolderNote => '下次从此文件夹开始。';
+
+  @override
+  String get exportFolderLabel => '导出文件夹';
+
+  @override
+  String get importFolderLabel => '导入文件夹';
+
+  @override
+  String get folderNotSet => '未设置';
+
+  @override
+  String get foldersChangedNote => '在导出和导入条目中更改。';
+
+  @override
   String get aboutTitle => '关于 Gabbro';
 
   @override
@@ -2450,6 +2465,21 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get rememberFolder => '记住';
 
   @override
+  String get rememberFolderNote => '下次从此文件夹开始。';
+
+  @override
+  String get exportFolderLabel => '导出文件夹';
+
+  @override
+  String get importFolderLabel => '导入文件夹';
+
+  @override
+  String get folderNotSet => '未设置';
+
+  @override
+  String get foldersChangedNote => '在导出和导入条目中更改。';
+
+  @override
   String get aboutTitle => '关于 Gabbro';
 
   @override
@@ -4629,6 +4659,21 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get rememberFolder => '記住';
+
+  @override
+  String get rememberFolderNote => '下次從此資料夾開始。';
+
+  @override
+  String get exportFolderLabel => '匯出資料夾';
+
+  @override
+  String get importFolderLabel => '匯入資料夾';
+
+  @override
+  String get folderNotSet => '未設定';
+
+  @override
+  String get foldersChangedNote => '在匯出和匯入項目中變更。';
 
   @override
   String get aboutTitle => '關於 Gabbro';

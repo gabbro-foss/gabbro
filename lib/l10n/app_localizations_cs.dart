@@ -279,6 +279,21 @@ class AppLocalizationsCs extends AppLocalizations {
   String get rememberFolder => 'Zapamatovat';
 
   @override
+  String get rememberFolderNote => 'Příště se otevře v této složce.';
+
+  @override
+  String get exportFolderLabel => 'Složka exportu';
+
+  @override
+  String get importFolderLabel => 'Složka importu';
+
+  @override
+  String get folderNotSet => 'Nenastaveno';
+
+  @override
+  String get foldersChangedNote => 'Mění se v Exportu a Importu položek.';
+
+  @override
   String get aboutTitle => 'O aplikaci Gabbro';
 
   @override

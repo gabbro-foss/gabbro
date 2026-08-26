@@ -280,6 +280,23 @@ class AppLocalizationsDe extends AppLocalizations {
   String get rememberFolder => 'Merken';
 
   @override
+  String get rememberFolderNote =>
+      'Beim nächsten Mal wird in diesem Ordner begonnen.';
+
+  @override
+  String get exportFolderLabel => 'Exportordner';
+
+  @override
+  String get importFolderLabel => 'Importordner';
+
+  @override
+  String get folderNotSet => 'Nicht festgelegt';
+
+  @override
+  String get foldersChangedNote =>
+      'Wird unter Export und Einträge importieren geändert.';
+
+  @override
   String get aboutTitle => 'Über Gabbro';
 
   @override

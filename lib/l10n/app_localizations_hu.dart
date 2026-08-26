@@ -279,6 +279,22 @@ class AppLocalizationsHu extends AppLocalizations {
   String get rememberFolder => 'Megjegyzés';
 
   @override
+  String get rememberFolderNote => 'Legközelebb ebben a mappában kezd.';
+
+  @override
+  String get exportFolderLabel => 'Exportmappa';
+
+  @override
+  String get importFolderLabel => 'Importmappa';
+
+  @override
+  String get folderNotSet => 'Nincs beállítva';
+
+  @override
+  String get foldersChangedNote =>
+      'Az Exportálás és a Bejegyzések importálása alatt módosítható.';
+
+  @override
   String get aboutTitle => 'A Gabbróról';
 
   @override

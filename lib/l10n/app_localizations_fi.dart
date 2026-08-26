@@ -279,6 +279,22 @@ class AppLocalizationsFi extends AppLocalizations {
   String get rememberFolder => 'Muista';
 
   @override
+  String get rememberFolderNote =>
+      'Seuraavalla kerralla aloitetaan tästä kansiosta.';
+
+  @override
+  String get exportFolderLabel => 'Vientikansio';
+
+  @override
+  String get importFolderLabel => 'Tuontikansio';
+
+  @override
+  String get folderNotSet => 'Ei asetettu';
+
+  @override
+  String get foldersChangedNote => 'Muutetaan kohdissa Vie ja Tuo kohteita.';
+
+  @override
   String get aboutTitle => 'Tietoja Gabbrosta';
 
   @override

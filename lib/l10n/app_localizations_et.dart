@@ -279,6 +279,23 @@ class AppLocalizationsEt extends AppLocalizations {
   String get rememberFolder => 'Jäta meelde';
 
   @override
+  String get rememberFolderNote =>
+      'Järgmine kord alustatakse sellest kaustast.';
+
+  @override
+  String get exportFolderLabel => 'Ekspordikaust';
+
+  @override
+  String get importFolderLabel => 'Impordikaust';
+
+  @override
+  String get folderNotSet => 'Määramata';
+
+  @override
+  String get foldersChangedNote =>
+      'Muudetakse Ekspordi ja Kirjete impordi all.';
+
+  @override
   String get aboutTitle => 'Teave Gabbro kohta';
 
   @override

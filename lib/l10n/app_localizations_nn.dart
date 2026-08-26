@@ -279,6 +279,22 @@ class AppLocalizationsNn extends AppLocalizations {
   String get rememberFolder => 'Hugs';
 
   @override
+  String get rememberFolderNote => 'Neste gong startar i denne mappa.';
+
+  @override
+  String get exportFolderLabel => 'Eksportmappe';
+
+  @override
+  String get importFolderLabel => 'Importmappe';
+
+  @override
+  String get folderNotSet => 'Ikkje sett';
+
+  @override
+  String get foldersChangedNote =>
+      'Vert endra under Eksporter og Importer oppføringar.';
+
+  @override
   String get aboutTitle => 'Om Gabbro';
 
   @override

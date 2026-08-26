@@ -661,6 +661,36 @@ abstract class AppLocalizations {
   /// **'Remember'**
   String get rememberFolder;
 
+  /// No description provided for @rememberFolderNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Next time starts in this folder.'**
+  String get rememberFolderNote;
+
+  /// No description provided for @exportFolderLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Export folder'**
+  String get exportFolderLabel;
+
+  /// No description provided for @importFolderLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Import folder'**
+  String get importFolderLabel;
+
+  /// No description provided for @folderNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get folderNotSet;
+
+  /// No description provided for @foldersChangedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Changed on Export and Import entries.'**
+  String get foldersChangedNote;
+
   /// No description provided for @aboutTitle.
   ///
   /// In en, this message translates to:

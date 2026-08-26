@@ -279,6 +279,21 @@ class AppLocalizationsPl extends AppLocalizations {
   String get rememberFolder => 'Zapamiętaj';
 
   @override
+  String get rememberFolderNote => 'Następnym razem zaczyna w tym folderze.';
+
+  @override
+  String get exportFolderLabel => 'Folder eksportu';
+
+  @override
+  String get importFolderLabel => 'Folder importu';
+
+  @override
+  String get folderNotSet => 'Nie ustawiono';
+
+  @override
+  String get foldersChangedNote => 'Zmieniany w Eksportuj i Importuj wpisy.';
+
+  @override
   String get aboutTitle => 'O Gabbro';
 
   @override

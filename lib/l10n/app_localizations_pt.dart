@@ -279,6 +279,21 @@ class AppLocalizationsPt extends AppLocalizations {
   String get rememberFolder => 'Lembrar';
 
   @override
+  String get rememberFolderNote => 'Da próxima vez começa nesta pasta.';
+
+  @override
+  String get exportFolderLabel => 'Pasta de exportação';
+
+  @override
+  String get importFolderLabel => 'Pasta de importação';
+
+  @override
+  String get folderNotSet => 'Não definida';
+
+  @override
+  String get foldersChangedNote => 'Altera-se em Exportar e Importar entradas.';
+
+  @override
   String get aboutTitle => 'Sobre o Gabbro';
 
   @override
@@ -2565,6 +2580,21 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get rememberFolder => 'Lembrar';
 
   @override
+  String get rememberFolderNote => 'Da próxima vez começa nesta pasta.';
+
+  @override
+  String get exportFolderLabel => 'Pasta de exportação';
+
+  @override
+  String get importFolderLabel => 'Pasta de importação';
+
+  @override
+  String get folderNotSet => 'Não definida';
+
+  @override
+  String get foldersChangedNote => 'Alterada em Exportar e Importar entradas.';
+
+  @override
   String get aboutTitle => 'Sobre o Gabbro';
 
   @override
@@ -4846,6 +4876,21 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get rememberFolder => 'Lembrar';
+
+  @override
+  String get rememberFolderNote => 'Da próxima vez começa nesta pasta.';
+
+  @override
+  String get exportFolderLabel => 'Pasta de exportação';
+
+  @override
+  String get importFolderLabel => 'Pasta de importação';
+
+  @override
+  String get folderNotSet => 'Não definida';
+
+  @override
+  String get foldersChangedNote => 'Altera-se em Exportar e Importar entradas.';
 
   @override
   String get aboutTitle => 'Sobre o Gabbro';

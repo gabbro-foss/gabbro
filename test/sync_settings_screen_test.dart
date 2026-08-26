@@ -114,7 +114,7 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(_buildScreen());
-      expect(find.textContaining('Not set'), findsOneWidget);
+      expect(find.textContaining('asks for the file'), findsOneWidget);
       expect(tester.widget<CheckboxListTile>(_rememberTile()).value, isFalse);
     });
 
@@ -189,7 +189,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(updated?.syncFolder, '');
-      expect(find.textContaining('Not set'), findsOneWidget);
+      expect(find.textContaining('asks for the file'), findsOneWidget);
       expect(tester.widget<CheckboxListTile>(_rememberTile()).value, isFalse);
     });
 

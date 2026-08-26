@@ -274,6 +274,21 @@ class AppLocalizationsJa extends AppLocalizations {
   String get rememberFolder => '記憶する';
 
   @override
+  String get rememberFolderNote => '次回はこのフォルダーから始まります。';
+
+  @override
+  String get exportFolderLabel => 'エクスポートフォルダー';
+
+  @override
+  String get importFolderLabel => 'インポートフォルダー';
+
+  @override
+  String get folderNotSet => '未設定';
+
+  @override
+  String get foldersChangedNote => 'エクスポートと項目のインポートで変更します。';
+
+  @override
   String get aboutTitle => 'Gabbroについて';
 
   @override
