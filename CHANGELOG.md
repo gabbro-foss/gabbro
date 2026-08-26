@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Android edge-to-edge (targetSdk 36): the vault list, its sync snackbar and four other screens no longer run under the navigation bar or a landscape side bar. A new inset net renders every screen with faked system bars on phone and tablet, portrait and landscape.
 
 ### Changed
+- Import screen: one file field and a Source dropdown (Gabbro vault, Generic CSV, Google Password Manager, Dashlane, Enpass, Bitwarden) replace the six stacked sections. Changing the type clears the chosen file.
 - The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
 - Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
 - Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).

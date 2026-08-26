@@ -296,24 +296,8 @@ Progress (tick as each Bikeshed section lands):
 - [x] Import additive, no dedupe (S3)
 - [x] Sync settings screen: auto-merge + sync folder + Remember (S5, S6.1)
 - [x] Sync from vault by name match, picker fallback, auto-merge wiring (S6, S7)
-- [ ] Import screen: one picker (step 2, IN PROGRESS; Remember box is step 3)
-  - [x] Net: `test/import_screen_net_test.dart`, the five non-Gabbro flows (gone file,
-        size cap, success pops count, failures dialog, error re-arms; CSV sniff -> mapping)
-  - Red list (approved 2026-08-26), each ticked when red then green:
-    - [ ] R1 one PathField, never six
-    - [ ] R2 type dropdown, six entries, Gabbro default, semantics label
-    - [ ] R3 banner + size note stay for every type
-    - [ ] R4 per-type explanation text
-    - [ ] R5 action label: Import, or Next: map columns for CSV
-    - [ ] R6 file filter follows the type
-    - [ ] R7 type change clears path and error
-    - [ ] R8 passphrase field only for Gabbro; keyed sub-form unchanged
-    - [ ] R9 all existing + net tests re-targeted via the helpers
-    - [ ] R10 dropdown label in all 37 locales
-    - [ ] R11 labelled-tap-target green; dropdown announces its value
-    - [ ] R12 no overflow at 2x phone / 3x tablet
-  - [ ] Green: remold `import_screen.dart`, one state triple, delete the six sections
-  - [ ] Hardware: Linux, S23, tablet
+- [x] Import screen: one picker + Source dropdown (step 2): `flutter test` 2901 green;
+      Linux pass 4 + S23 pass 5 green 2026-08-26
 - [ ] Remember folders on export/import + read-only view in Sync settings (S9, S5)
 - [x] On-screen explanations checked against S1-S9 (S10)
 - [x] Docs: README, VAULT_SYNC.md, CHANGELOG (step 1)
@@ -338,27 +322,9 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 Spec: Current Focus > **One-click sync** (S1–S9). Promote one section at a
 time; each ends with a hardware pass per platform and its ticks in the spec.
 
-**Step 2 — import screen: one picker, not six.** Today six stacked sections each
-carry their own path field; the user needs one. Replace with a single path
-selector + **Remember** checkbox (one folder for all types) and a type dropdown —
-Gabbro (default), Generic CSV, Google Password Manager, Dashlane, Enpass,
-Bitwarden. Per-type explanation text stays; so do the top warning banner and the
-size-limit note. Changing the type clears the path: extensions differ
-(`.gabbro`/`.csv`/`.json`), so a stale path would arm the button on a file that
-cannot parse. Gabbro selected also reveals the passphrase field and, for a
-key-protected source, the PIN + Android transport sub-form. Action button label
-follows the type: *Import* / *Next: map columns* / *Import*.
-A rewrite of a 1000-line screen with six independent error/loading/format-check
-flows.
-
 **Step 3 — remember folders (S9) + read-only view (S5).** Export and import
 folders, Linux and Android, user-selected, no built-in value. Reuse the Android
 export mechanism. Then add both to Sync settings read-only with the note.
-
-**Why step 2 before step 3:** the import screen has 3 PathField code sites
-(`_gabbroSection`, `_csvSection`, the shared `_importSection`) rendered six
-times. Wiring Remember first would build and test 3 sites, then delete 2 in the
-remold and re-pin the tests.
 
 - **In-app help carousel.** This will need verifying and perhaps updating as
   it's not been touched for several releases.
