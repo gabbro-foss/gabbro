@@ -149,159 +149,37 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**One-click sync** — full spec. Implementation lives in Bikeshed > **Sync family**
-as three sections, promoted here one at a time; tick the list below as each lands.
+**One-click sync, branch `streamline_sync_process`** (off master `263252fd`,
+pushed, NOT merged). Shipped on the branch so far: sync/import split with new
+labels, additive import, Sync settings (auto-merge + sync folder + Remember),
+Sync from vault by export name, edge-to-edge insets, import screen with one file
+field + Source dropdown. Full gate ALL GREEN 2026-08-26; no `--warm` needed.
+Details: CHANGELOG `[Unreleased]`, `docs/VAULT_SYNC.md`.
 
-Goal: feature parity with other password managers' one-click sync. On the
-receiving device, `menu > Sync from vault`, and done.
+**Standing bar for everything below.** Works on Linux and Android (SAF paths
+differ, behaviour must not). Every new string in all 37 locales; every new
+control with a semantics label, a screen-reader test (ADR-015) and the
+large-text ceilings (ADR-016). Net first, then red list, then hardware
+(`.scratchpad`, one pass at a time, one action per row). None of this is a
+follow-up.
 
-**Requirements, every item, from the first test on.** Works on Linux and
-Android (SAF paths differ, behaviour must not). Every new string ships in all
-37 locales; every new control ships with a semantics label and a
-screen-reader test (ADR-015) and holds up at the large-text ceilings (ADR-016).
-None of this is a follow-up.
+**Remaining, in order; merge to master only after all three:**
 
-**S1. Sync and import are distinct operations and stay so.**
-Sync = UUID merge of the *same* vault from another device: same format, same
-entry types, entries carry identity. Import = additive load of foreign data
-(other password managers, or a *different* Gabbro vault): radically different,
-unpredictable, nothing to match on.
-
-**S2. Labels.** `menu > Sync from file` becomes **Sync from vault** (two
-`.gabbro` files are synced). The import screen's Gabbro button becomes
-**Import** (says where the user is, and that it is a different operation).
-
-**S3. Import, all 6 types, Gabbro included: additive, no dedupe.** Every source
-entry is added, duplicates included. A change from today's content-hash skip:
-the skipped-entries dialog and the `skipped` result go. Import is a
-once-at-onboarding act into an empty vault; beyond that it is the user's
-responsibility. Dedupe, if ever, is a separate task.
-
-**S4. Routes for a `.gabbro` file.** Same vault: `menu > Sync from vault`.
-Different Gabbro vault: `menu > Import entries > Gabbro vault > Import`
-(passphrase, plus PIN + tap if the source is keyed).
-
-**S5. Sync settings, a new menu entry**, holding:
-- **Auto-merge** toggle, off by default. On: the sync applies as *Merge
-  automatically* does today, without the chooser or the review. The toggle's
-  description carries the same-passphrase warning (S7), since the chooser
-  that shows it is skipped.
-- **Sync folder** (where the other device's export lands) + **Remember**
-  checkbox.
-- The export and import folders, read-only, with a note that they are changed
-  on `menu > Export` / `menu > Import entries`. One place to see every folder;
-  one place each to change it.
-
-**S6. Sync from vault, the flow.**
-1. Sync folder set: no picker. The source is the file in that folder called
-   `<alias>.gabbro`, this vault's own export name, so both devices agree by
-   construction; it never collides with the on-disk `<alias>_gabbro.gabbro`.
-   No folder set, or Remember unticked: picker, as today.
-2. Source keyed: PIN + tap of the *source's* YubiKey, which may differ from
-   the receiving vault's, if it has one. Passphrase-only source: no prompt.
-3. Auto-merge off: the chooser as today (*Merge automatically* / *Review all
-   changes* / Cancel). Auto-merge on: straight to the automatic merge.
-4. The held passphrase is tried first, silently, either way.
-
-**S7. Passphrase fallback stays, auto-merge on or off.** If the held passphrase
-does not open the source, ask for one and continue with the choice already
-made. Same passphrase does not prove same vault; a same vault may carry a
-rotated passphrase. Import is not a substitute (S3 would duplicate every
-entry). A passphrase-only source keeps today's chooser warning: *Same
-passphrase does not prove same vault.*
-
-**S8. Unchanged, pinned by the net before any change:** the chooser, both its
-paths (automatic; one-by-one review with keep/pick/drop, Merge the rest,
-Cancel-rolls-back), the merge engine, the keyed-source flow, the fallback,
-and import parsing/counts/keyed source for all 6 types.
-
-**S9. Export and import folders** live on their own screens behind a
-**Remember** checkbox (not "Lock": the app already uses *lock* for the vault).
-Android export already remembers silently; that mechanism is reused, its box
-arrives ticked. Export and import may point at the same folder: that is the
-sync case, where the file one device writes is the file the other reads.
-
-**S10. Each screen says what it does.** The import screen explains additive
-(duplicates included), the export screen what leaves and how, Sync settings
-and the chooser what a merge does. Existing text is checked against S1-S9;
-whatever is missing or wrong is fixed in the same section that changes it.
-
-**Handover 2026-08-25 (session stopped here; read before anything).**
-Branch `streamline_sync_process` off master `263252fd`. Full gate ALL GREEN
-2026-08-26 (12m29s). No dependency changed: no `--warm` needed.
-
-Step 1 code is complete: net (S8), labels (S2), import additive (S3, Rust
-`import.rs` + Dart, skipped dialog gone, `content_hash` gone), Sync settings
-screen + `auto_merge_sync`/`sync_folder` (S5), Linux portal folder picker,
-Android SAF tree read (`read_tree_file`, `saf_tree.dart`), Sync from vault by
-export name `<alias>.gabbro` with auto-merge skipping the chooser (S6, S7),
-on-screen texts (S10), plus two finds fixed on hardware: the folder picker
-must go through `runPicker` (portal refuses a non-dumpable process), and
-the edge-to-edge insets below.
-
-Hardware so far: Linux passes 1a-1e all green (passphrase one-click, keyed
-source made with two USB keys swapped on one port, keyed one-click with PIN +
-tap; 1c re-run to make `keyed.gabbro`). Android S23 green: 2a (3-button + gesture,
-insets fixed), 2b (missing file, Remember unticked), 2c (keyed vault, NFC, 1 added).
-
-Next, in order (write ONE pass at a time into `.scratchpad`, one action per
-row; the current `build/app/outputs/flutter-apk` APK already carries the inset fix):
-1. ~~Lenovo tablet~~ done 2026-08-26, pass 3 all green (also covered the S7 passphrase fallback).
-2. Full gate `./gabbro_test`; then docs (README check, VAULT_SYNC done); push the branch.
-Branch stays open through Bikeshed steps 2 and 3 and the help-carousel review
-(the rework changes screens the carousel describes); merge to master only after all four.
-
-
-**In progress: edge-to-edge insets** (found by the Android pass 2a, 2026-08-25;
-latent on master, exposed by targetSdk 36 = Flutter 3.47.x default, enforced on
-Android 15+). Consequence: on the S23 the bottom of the vault list and the
-sync snackbar sit under the navigation buttons.
-
-Wiring (Flutter `scaffold.dart:3032`, `:3104`, `:3220`): the nav-bar inset
-reaches a Scaffold's body and snackbar only as `MediaQuery.padding.bottom`,
-and a Scaffold strips it whenever `bottomNavigationBar != null`; `minInsets`
-is keyboard-only. Offenders, verified in code:
-- Vault list, phone: the passkey-banner slot always holds a widget (zero-size
-  when hidden, always on Android) -> body, snackbar, FAB lose the inset.
-- Vault list, tablet: `TabletVaultLayout` is returned outside the `SafeArea`,
-  pads with fixed `EdgeInsets`.
-- Keyboard shortcuts, adopt vault, change passphrase, manage folders,
-  csv mapping: no `SafeArea`, or none on the side that matters (net: adopt
-  vault + manage folders fail only on a landscape side bar; manage YubiKeys
-  passes); explicit `padding:` on the scroll view disables auto-inset.
-- Fine as is: sheets read `padding.bottom` themselves; dialogs carry Flutter's
-  own `SafeArea`; unlock/save/consent/all other screens have `SafeArea`;
-  manage folders and recovery history use un-padded lists (auto-inset).
-
-Cases: 3-button nav (~48dp bottom), gesture nav (~20dp bottom), landscape
-(inset on a side), tablet two-pane, no inset (Linux). Must not regress: scroll
-to the last entry, FAB tap, snackbar readable, Linux passkey banner visible and
-announced, alphabet bar full height, search with keyboard, tablet divider drag.
-
-- [x] Net: `test/inset_net_test.dart`, every catalogued screen x {phone,
-      tablet} x {portrait, landscape} x {none, gesture 20, buttons 48, side 48
-      (landscape only)}; scrolls each list to its end, then no text, icon,
-      FAB or snackbar in the band. Green at inset 0 on today's code;
-- [x] Red (same file, 25 cases): vault list phone + tablet + wide, tablet layout,
-      keyboard shortcuts, change passphrase (3-button, landscape), adopt vault,
-      manage folders, csv mapping (side bar). Vault-list snackbar, FAB,
-      banner rows
-- [x] Fix: slot null when the banner is hidden; tablet branch inside the
-      SafeArea; SafeArea on the four screens
-- [x] Hardware: S23 3-button + gesture green; Lenovo tablet (gesture, portrait + landscape, two-pane) green
-
-Progress (tick as each Bikeshed section lands):
-- [x] Net (S8), both platforms
-- [x] Labels (S2)
-- [x] Import additive, no dedupe (S3)
-- [x] Sync settings screen: auto-merge + sync folder + Remember (S5, S6.1)
-- [x] Sync from vault by name match, picker fallback, auto-merge wiring (S6, S7)
-- [x] Import screen: one picker + Source dropdown (step 2): `flutter test` 2901 green;
-      Linux pass 4 + S23 pass 5 green 2026-08-26
-- [ ] Remember folders on export/import + read-only view in Sync settings (S9, S5)
-- [x] On-screen explanations checked against S1-S9 (S10)
-- [x] Docs: README, VAULT_SYNC.md, CHANGELOG (step 1)
-- [x] Hardware: Linux 1a-1e green; S23 2a-2c green; tablet pass 3 green
+1. **Step 3: remember folders (S9) + read-only view (S5).** Spec in Bikeshed >
+   Sync family; promote here when picked up.
+   - S9: export and import folders live on their own screens behind a
+     **Remember** checkbox (not "Lock": the app uses *lock* for the vault).
+     Android export already remembers silently; reuse that mechanism, its box
+     arrives ticked. Export and import may point at the same folder (the sync
+     case: the file one device writes is the file the other reads).
+   - S5: Sync settings shows the export and import folders read-only, with a
+     note that they are changed on `menu > Export` / `menu > Import entries`.
+     One place to see every folder; one place each to change it.
+   - S10: the export and import screens say what they do; existing text
+     checked against the above and fixed in the same change.
+2. **Help carousel review** (Bikeshed item): the rework changed the screens it
+   describes; verify every card against the app, fix what is stale.
+3. Full gate, docs, merge to master.
 
 ---
 
