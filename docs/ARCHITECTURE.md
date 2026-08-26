@@ -153,7 +153,8 @@ resolved but never applied — inert, emits no warning.
 pushed, NOT merged). Shipped on the branch so far: sync/import split with new
 labels, additive import, Sync settings (auto-merge + sync folder + Remember),
 Sync from vault by export name, edge-to-edge insets, import screen with one file
-field + Source dropdown. Full gate ALL GREEN 2026-08-26; no `--warm` needed.
+field + Source dropdown, remembered export/import folders. Full gate ALL GREEN
+2026-08-26 after step 3; no `--warm` needed.
 Details: CHANGELOG `[Unreleased]`, `docs/VAULT_SYNC.md`.
 
 **Standing bar for everything below.** Works on Linux and Android (SAF paths
@@ -171,9 +172,11 @@ follow-up.
    Import; dialogs open in the remembered folder (portal `current_folder`,
    Android `EXTRA_INITIAL_URI`); Sync settings shows both read-only. Flutter
    2946 green, Android unit green, Linux pass 6 + S23 pass 7 green.
-2. **In-app help carousel review. NEXT.** Untouched for several releases and
-   the rework changed the screens it describes: verify every card against the
-   app, fix what is stale.
+2. ~~In-app help carousel~~ DONE 2026-08-26: 16 cards re-shot at the current UI
+   (emulator, text scale 1.2, no rings, 1116x2436), three new (Sync settings,
+   Export, Import), sync diagram redrawn transport-agnostic at 3x, terse
+   captions in 37 locales, caption at 16; content net
+   `test/help_content_net_test.dart`. Linux + S23 pass 8 green.
 3. Full gate, docs, merge to master.
 
 ---

@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - One-click sync. Sync settings (vault menu): an auto-merge switch (off by default) and a remembered sync folder with a Remember box. With both set, Sync from vault opens the file named as this vault exports (`<alias>.gabbro`) in that folder and merges it with no picker, no chooser and no review; a YubiKey-protected file still asks for its tap, and a file your passphrase does not open still asks for one. Linux gains a native folder picker (XDG portal); Android reads the folder through its persisted storage grant.
 
 ### Fixed
+- Help: all 16 cards re-shot at the current UI, terse captions, larger caption text; three new cards (Sync settings, Export, Import) and the sync diagram redrawn for the one-tap flow.
+- Export: the two-files note now names the real file (`<alias>.gabbro`), not `vault.gabbro`.
 - Android edge-to-edge (targetSdk 36): the vault list, its sync snackbar and four other screens no longer run under the navigation bar or a landscape side bar. A new inset net renders every screen with faked system bars on phone and tablet, portrait and landscape.
 
 ### Changed
