@@ -165,48 +165,12 @@ follow-up.
 
 **Remaining, in order; merge to master only after all three:**
 
-1. **Step 3: remember folders (S9) + read-only view (S5). IN PROGRESS.**
-   - S9: export and import folders live on their own screens behind a
-     **Remember** checkbox (not "Lock": the app uses *lock* for the vault).
-     Android export already remembers silently; reuse that mechanism, its box
-     arrives ticked. Export and import may point at the same folder (the sync
-     case: the file one device writes is the file the other reads).
-   - S5: Sync settings shows the export and import folders read-only, with a
-     note that they are changed on `menu > Export` / `menu > Import entries`.
-     One place to see every folder; one place each to change it.
-   - S10: the export and import screens say what they do; existing text
-     checked against the above and fixed in the same change.
-   Decisions 2026-08-26: ONE `exportFolder` setting per install (Linux path or
-   Android tree URI, like `syncFolder`; old `android_export_folder_uri` read as
-   fallback); Android import picker opens at the remembered place via Kotlin
-   (`EXTRA_INITIAL_URI`) and reports the picked location back.
-   Progress:
-   - [x] Net (`test/folder_remember_net_test.dart`, 13 green 2026-08-26): N1 Linux save picker -> field -> Export path;
-         N2 Android remembered folder armed, revoked grant disarms, pick saves once;
-         N3 Android JSON keeps its raw picker; N4 import browse -> field (both);
-         N5 Sync settings has no folder rows yet; N6 export opened with the URI from
-         both layout paths; N7 a11y (labels, 48dp, 2x/3x) on the three screens;
-         N8 today's strings on those screens in all 37 locales
-   - Red list (approved 2026-08-26), ticked when red then green:
-     - [ ] R1 settings: `exportFolder`, `importFolder` round-trip; old Android URI read as fallback
-     - [ ] R2 export: Remember box, ticked by default; Linux field pre-filled `<folder>/<name>`
-     - [ ] R3 export: pick with Remember saves the folder once; unticked saves nothing
-     - [ ] R4 export: untick forgets; export still works with the current choice
-     - [ ] R5 export Linux: save dialog starts in the folder (portal `current_folder`, wire-pinned)
-     - [ ] R6 import: Remember box; pick remembers the file's folder (Linux dir / Android location)
-     - [ ] R7 import: Linux open dialog starts there; Android picker launched at the location
-           (Kotlin unit test) and `pick_file` returns the location with the cache path
-     - [ ] R8 import: untick forgets
-     - [ ] R9 sync settings: read-only Export folder / Import folder rows, *Not set*, the note
-     - [ ] R10 new strings in all 37 locales
-     - [ ] R11 labelled + 48dp targets on all three screens; the box announces its state
-     - [ ] R12 no overflow at 2x phone / 3x tablet, all locales, three screens
-   - [ ] Settings: `exportFolder`, `importFolder` + fallback read
-   - [ ] Export screen: Remember box (Linux + Android), portal `current_folder`
-   - [ ] Import screen: Remember box; Kotlin initial URI + picked location back; Kotlin test
-   - [ ] Sync settings: read-only export/import rows + note
-   - [ ] S10 texts; 37 locales; a11y; large text
-   - [ ] Hardware: Linux, S23
+1. ~~Step 3: remember folders (S9) + read-only view (S5)~~ DONE 2026-08-26: one
+   `exportFolder`/`importFolder` setting each (Linux path or Android URI, old
+   `android_export_folder_uri` read as fallback); Remember box on Export and
+   Import; dialogs open in the remembered folder (portal `current_folder`,
+   Android `EXTRA_INITIAL_URI`); Sync settings shows both read-only. Flutter
+   2946 green, Android unit green, Linux pass 6 + S23 pass 7 green.
 2. **Help carousel review** (Bikeshed item): the rework changed the screens it
    describes; verify every card against the app, fix what is stale.
 3. Full gate, docs, merge to master.
@@ -225,11 +189,10 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Features and UI/UX
-#### Sync family — do in this order
-
-Spec: Current Focus > **One-click sync** (S1–S9). Promote one section at a
-time; each ends with a hardware pass per platform and its ticks in the spec.
-
+- **Crypto stack diagram pinned to format v11.** `docs/artefacts/gabbro_crypto_stack_flow.dot`
+  (+ `.svg`, and the `simple_icons` SVG/PNG/PDF if they carry the number) hard-code
+  the vault format version. Update to the current version and, if possible, make
+  them version-agnostic. These files hold no history of earlier formats.
 - **In-app help carousel.** This will need verifying and perhaps updating as
   it's not been touched for several releases.
 - **Emergency sheet.** Printable one-pager in `docs/` (vault location, YubiKey
