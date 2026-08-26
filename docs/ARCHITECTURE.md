@@ -171,8 +171,9 @@ follow-up.
    Import; dialogs open in the remembered folder (portal `current_folder`,
    Android `EXTRA_INITIAL_URI`); Sync settings shows both read-only. Flutter
    2946 green, Android unit green, Linux pass 6 + S23 pass 7 green.
-2. **Help carousel review** (Bikeshed item): the rework changed the screens it
-   describes; verify every card against the app, fix what is stale.
+2. **In-app help carousel review. NEXT.** Untouched for several releases and
+   the rework changed the screens it describes: verify every card against the
+   app, fix what is stale.
 3. Full gate, docs, merge to master.
 
 ---
@@ -193,8 +194,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   (+ `.svg`, and the `simple_icons` SVG/PNG/PDF if they carry the number) hard-code
   the vault format version. Update to the current version and, if possible, make
   them version-agnostic. These files hold no history of earlier formats.
-- **In-app help carousel.** This will need verifying and perhaps updating as
-  it's not been touched for several releases.
 - **Emergency sheet.** Printable one-pager in `docs/` (vault location, YubiKey
   serials, hand-written passphrase blank, storage advice), linked from README.
   Paper only — no code.
