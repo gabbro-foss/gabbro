@@ -568,6 +568,7 @@ dart test integration_test/ -j 1
 - [`docs/AUTOTYPE_AND_AUTOFILL.md`](docs/AUTOTYPE_AND_AUTOFILL.md) — setting up auto-type on Linux and autofill on Android
 - [`docs/VAULT_SYNC.md`](docs/VAULT_SYNC.md) — syncing one vault across devices; worked example with Syncthing (Linux) and Syncthing-Fork (Android)
 - [`docs/VAULT_UPGRADE_PATH.md`](docs/VAULT_UPGRADE_PATH.md) — vault file format versions and what happens to an older vault
+- [`docs/EMERGENCY_SHEET.pdf`](docs/EMERGENCY_SHEET.pdf) — print, fill in by hand, keep on paper: everything needed to open the vault again if the device is lost
 
 **Project**
 

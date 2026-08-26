@@ -76,7 +76,7 @@ gabbro/
 ├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + crash-safety (kill mid-write) + frozen golden fixtures (FIXTURES.md)
 ├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, GabbroCredentialProviderService + GabbroPasskeyActivity (passkey provider; testable core in PasskeyProvider.kt; vendored passkey_privileged_browsers.json in android assets), TapFlow, YubiKeyManager, AppPaths (paths channel), GabbroPicker (picker channel), BiometricHelper + BiometricStore (per-vault; + Robolectric tests), AppPasskeysStore (F1 toggle mirror)
 ├── linux/packaging/      # Desktop integration: render_icons.sh (icon tree); aur/ (AUR gabbro-bin PKGBUILD + gabbro-bin.install; .SRCINFO is generated in the AUR clone), deb/ (build-deb.sh -> binary .deb), udev/ + modules-load.d/ (canonical uhid rule + conf for passkeys)
-├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, VAULT_SYNC, AUTOTYPE_AND_AUTOFILL, AI_*; decisions/ (ADRs); artefacts/
+├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, VAULT_SYNC, AUTOTYPE_AND_AUTOFILL, EMERGENCY_SHEET.pdf (source .svg kept locally, gitignored), AI_*; decisions/ (ADRs); artefacts/
 ├── test/  integration_test/          # Flutter widget/unit + Linux real-FFI suites (dart test)
 ├── test_data/            # Sample import files + migration_vaults/ (refusal corpus at floor v11, one vault per VERSION + MIGRATION_TESTS.md + test_matrix.md)
 ├── assets/               # fonts, images, help/ (public_suffix_list.dat is an Android asset)
@@ -194,9 +194,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   (+ `.svg`, and the `simple_icons` SVG/PNG/PDF if they carry the number) hard-code
   the vault format version. Update to the current version and, if possible, make
   them version-agnostic. These files hold no history of earlier formats.
-- **Emergency sheet.** Printable one-pager in `docs/` (vault location, YubiKey
-  serials, hand-written passphrase blank, storage advice), linked from README.
-  Paper only — no code.
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
