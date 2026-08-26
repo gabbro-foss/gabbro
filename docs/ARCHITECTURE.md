@@ -187,7 +187,20 @@ follow-up.
          N5 Sync settings has no folder rows yet; N6 export opened with the URI from
          both layout paths; N7 a11y (labels, 48dp, 2x/3x) on the three screens;
          N8 today's strings on those screens in all 37 locales
-   - [ ] Red list (to approve after the net)
+   - Red list (approved 2026-08-26), ticked when red then green:
+     - [ ] R1 settings: `exportFolder`, `importFolder` round-trip; old Android URI read as fallback
+     - [ ] R2 export: Remember box, ticked by default; Linux field pre-filled `<folder>/<name>`
+     - [ ] R3 export: pick with Remember saves the folder once; unticked saves nothing
+     - [ ] R4 export: untick forgets; export still works with the current choice
+     - [ ] R5 export Linux: save dialog starts in the folder (portal `current_folder`, wire-pinned)
+     - [ ] R6 import: Remember box; pick remembers the file's folder (Linux dir / Android location)
+     - [ ] R7 import: Linux open dialog starts there; Android picker launched at the location
+           (Kotlin unit test) and `pick_file` returns the location with the cache path
+     - [ ] R8 import: untick forgets
+     - [ ] R9 sync settings: read-only Export folder / Import folder rows, *Not set*, the note
+     - [ ] R10 new strings in all 37 locales
+     - [ ] R11 labelled + 48dp targets on all three screens; the box announces its state
+     - [ ] R12 no overflow at 2x phone / 3x tablet, all locales, three screens
    - [ ] Settings: `exportFolder`, `importFolder` + fallback read
    - [ ] Export screen: Remember box (Linux + Android), portal `current_folder`
    - [ ] Import screen: Remember box; Kotlin initial URI + picked location back; Kotlin test
