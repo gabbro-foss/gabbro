@@ -148,10 +148,6 @@ resolved but never applied — inert, emits no warning.
 
 > Update at the end of each session. First thing to read at the start of the next. Completed items are deleted from this section.
 
-**One-click sync** (branch `streamline_sync_process`) DONE 2026-08-27: full gate
-ALL GREEN, docs updated, merged to master. Details: CHANGELOG `[Unreleased]`,
-`docs/VAULT_SYNC.md`. A release is warranted; not yet cut.
-
 ### Next task
 
 _Empty — pick the next item from the Bikeshed._

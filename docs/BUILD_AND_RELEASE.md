@@ -10,7 +10,13 @@ under **Installation**.
 
 **Critical notes: read before Android or Kotlin sessions.**
 
-- System Java is 26.0.1, incompatible with the Kotlin compiler. Fix: `org.gradle.java.home=/opt/android-studio/jbr` in `android/gradle.properties` (Java 25.0.2 since the 2026-08 android-studio update). Gradle wrapper is 9.3.1: 9.1.0 is the floor for running on Java 25, 9.3.1 is the Flutter SDK's max validated (still 9.3.1 at Flutter 3.47.1; check `maxKnownAndSupportedGradleVersion` in the SDK's `gradle_utils.dart` after an SDK bump).
+- A build box may have **no system JDK at all** (the T430 has none), so `apksigner`
+  dies with `exec: java: not found` and the release-signature check silently prints
+  nothing. Prefix it: `JAVA_HOME=/opt/android-studio/jbr PATH=$JAVA_HOME/bin:$PATH`.
+- Release prerequisites beyond the gate's: `jq`, `osv-scanner`, `docker`. Without
+  `jq`, the privileged-browser step compares two empty strings and reports
+  `UNCHANGED` for a list it never read.
+- Where a system Java exists it is 26.0.1, incompatible with the Kotlin compiler. Fix: `org.gradle.java.home=/opt/android-studio/jbr` in `android/gradle.properties` (Java 25.0.2 since the 2026-08 android-studio update). Gradle wrapper is 9.3.1: 9.1.0 is the floor for running on Java 25, 9.3.1 is the Flutter SDK's max validated (still 9.3.1 at Flutter 3.47.1; check `maxKnownAndSupportedGradleVersion` in the SDK's `gradle_utils.dart` after an SDK bump).
 - Gradle 9 accommodations (nets: `test/android_build_config_test.dart`): cargokit's vendored `plugin.gradle` uses injected `ExecOperations` (`Project.exec` was removed, so re-patch after any flutter_rust_bridge template refresh), and `app/build.gradle.kts` pins Kotlin to JVM 21 to match `compileOptions` (unpinned, Kotlin follows the running JDK and the mismatch is a hard error).
 - AGP 8.11.1 in `android/settings.gradle.kts`. Java and Kotlin JVM target both set to 21 in `app/build.gradle.kts`.
 - `libfido2-sys` and `pub mod fido` are gated behind `cfg(not(target_os = "android"))`: libfido2 is Linux-only; Android uses yubikit-android via Kotlin.
@@ -207,7 +213,7 @@ for a in arm64-v8a armeabi-v7a x86_64; do echo -n "$a: "; unzip -p "gabbro-$ver-
 signature and wrongly reports `Not a signed jar file`):
 
 ```bash
-APKSIGNER=$(ls -d "$HOME"/Android/Sdk/build-tools/*/apksigner | sort -V | tail -1) && for a in arm64-v8a armeabi-v7a x86_64; do echo -n "$a: "; "$APKSIGNER" verify --print-certs "gabbro-$ver-android-$a.apk" 2>/dev/null | grep 'SHA-256 digest'; done
+export JAVA_HOME=/opt/android-studio/jbr && export PATH="$JAVA_HOME/bin:$PATH" && APKSIGNER=$(ls -d "$HOME"/Android/Sdk/build-tools/*/apksigner | sort -V | tail -1) && for a in arm64-v8a armeabi-v7a x86_64; do echo -n "$a: "; "$APKSIGNER" verify --print-certs "gabbro-$ver-android-$a.apk" 2>/dev/null | grep 'SHA-256 digest'; done
 ```
 
 All three must print the same digest, matching the fingerprint in README. The keystore
