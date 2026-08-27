@@ -242,6 +242,59 @@ class AppLocalizationsNb extends AppLocalizations {
   String get securityTitle => 'Sikkerhet';
 
   @override
+  String get syncSettingsTitle => 'Synkroniseringsinnstillinger';
+
+  @override
+  String get sectionAutoMerge => 'Automatisk fletting';
+
+  @override
+  String get autoMergeTitle => 'Flett automatisk';
+
+  @override
+  String get autoMergeDescription =>
+      'Synkroniser fra hvelv tar i bruk innkommende endringer automatisk. Der verdiene i de to hvelvene avviker, vinner de innkommende endringene.';
+
+  @override
+  String get autoMergeNote =>
+      'Du blir likevel spurt om filen hvis den ikke åpner med passfrasen din.';
+
+  @override
+  String get sectionSyncFolder => 'Synkroniseringsmappe';
+
+  @override
+  String syncFolderDescription(String name) {
+    return 'Der den andre enhetens eksport havner. Synkroniser fra hvelv åpner filen $name der, navnet dette hvelvet eksporteres som, uten å spørre.';
+  }
+
+  @override
+  String get syncFolderNotSet =>
+      'Ikke angitt: Synkroniser fra hvelv spør om filen hver gang.';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return 'Ingen fil med navnet $name i synkroniseringsmappen.';
+  }
+
+  @override
+  String get rememberFolder => 'Husk';
+
+  @override
+  String get rememberFolderNote => 'Neste gang starter i denne mappen.';
+
+  @override
+  String get exportFolderLabel => 'Eksportmappe';
+
+  @override
+  String get importFolderLabel => 'Importmappe';
+
+  @override
+  String get folderNotSet => 'Ikke angitt';
+
+  @override
+  String get foldersChangedNote =>
+      'Endres under Eksporter og Importer oppføringer.';
+
+  @override
   String get aboutTitle => 'Om Gabbro';
 
   @override
@@ -249,6 +302,9 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get importTitle => 'Importer oppføringer';
+
+  @override
+  String get importSourceLabel => 'Kilde';
 
   @override
   String get exportTitle => 'Eksporter hvelv';
@@ -511,9 +567,6 @@ class AppLocalizationsNb extends AppLocalizations {
   String get menuImportEntries => 'Importer oppføringer';
 
   @override
-  String get menuSyncFromFile => 'Synkroniser fra fil';
-
-  @override
   String get menuManageVaults => 'Administrer hvelvinger';
 
   @override
@@ -527,6 +580,9 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Sikkerhet';
+
+  @override
+  String get menuSyncSettings => 'Synkroniseringsinnstillinger';
 
   @override
   String get menuManageFolders => 'Administrer mapper';
@@ -752,9 +808,6 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Synkronisering mislyktes';
-
-  @override
-  String get syncFromFileTitle => 'Synkroniser fra fil';
 
   @override
   String get nothingToSync =>
@@ -1277,21 +1330,6 @@ class AppLocalizationsNb extends AppLocalizations {
       'Rediger for å rette og lagre denne oppføringen, eller hopp over for å forkaste den.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count oppføringer hoppet over',
-      one: '1 oppføring hoppet over',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Disse oppføringene finnes allerede i hvelvet ditt og ble ikke overskrevet:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Den andre enheten slettet \'$title\'.\n\nSlett den her også, eller behold den?';
   }
@@ -1514,8 +1552,9 @@ class AppLocalizationsNb extends AppLocalizations {
       'Velg et mål for den eksporterte hvelvfilen.';
 
   @override
-  String get exportTwoFilesNote =>
-      'To filer opprettes: vault.gabbro og vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'To filer skrives: $name og $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Velg et mål.';
@@ -1655,11 +1694,11 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Oppføringer som allerede finnes i hvelvet hoppes over automatisk. Du vil se et sammendrag.';
+      'Hver oppføring i filen legges til, også de hvelvet allerede har. Best gjort én gang, i et tomt hvelv.';
 
   @override
   String get importGabbroSubtitle =>
-      'Importer oppføringer fra et annet Gabbro-hvelv (.gabbro-fil)';
+      'Importer oppføringer fra et annet Gabbro-hvelv (.gabbro-fil). For dette hvelvet fra en annen enhet: bruk Synkroniser fra hvelv.';
 
   @override
   String get importEnpassSubtitle =>
@@ -2056,54 +2095,58 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Opprett et hvelv: angi et navn, passfrase og beskytt eventuelt med en YubiKey';
+      'Opprett hvelv: navn, passfrase, valgfri YubiKey';
 
   @override
-  String get helpCaptionEmpty =>
-      'Trykk på + for å legge til din første oppføring';
+  String get helpCaptionEmpty => 'Trykk + for å legge til en oppføring';
 
   @override
   String get helpCaptionDetail =>
-      'Trykk på øye­ikonet for å avsløre et passord, hold deretter inne for å se en detaljert tegnanalyse';
+      'Trykk på oppføringen for å åpne, øyet for å vise, hold inne for detaljer';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Som standard søker søkefeltet bare i oppførings­titler';
+  String get helpCaptionTitleSearch => 'Søk i titler';
 
   @override
   String get helpCaptionFullSearch =>
-      'Trykk på forstørrelsesglasset for å bytte til søk i alle felt; trykk igjen for å gå tilbake til tittel­søk';
+      'Trykk på forstørrelsesglasset for å søke i alle felt';
 
   @override
-  String get helpCaptionFilter =>
-      'Bruk filter­knappene til bare å vise oppføringer av en bestemt type';
+  String get helpCaptionFilter => 'Filtrer oppføringer etter type';
 
   @override
-  String get helpCaptionFolders =>
-      'Bruk mappevelgeren til å filtrere oppføringer etter mappe';
+  String get helpCaptionFolders => 'Filtrer oppføringer etter mappe';
 
   @override
   String get helpCaptionSelect =>
-      'Hold inne på en oppføring for å gå inn i valg­modus; legg til flere elementer, tilordne deretter til en mappe eller slett. Trykk X for å avslutte.';
+      'Hold inne for å velge; flytt så til en mappe eller slett';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Trykk på en bokstav på indeks­linjen for å hoppe til den delen';
+  String get helpCaptionJumpToLetter => 'Trykk på en bokstav for å hoppe dit';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Trykk på øye­ikonet for å avsløre et passord, hold deretter inne for å se en detaljert tegnanalyse';
+  String get helpCaptionBreakdown => 'Generer et passord eller en passfrase';
 
   @override
   String get helpCaptionManageVaults =>
-      'I Administrer hvelvinger kan du gi nytt navn til eller slette hvelvinger, eller legge til et nytt';
+      'Håndter hvelv: legg til, gi nytt navn, slett';
 
   @override
-  String get helpCaptionUnlock => 'Angi passfrasen din for å låse opp hvelvet';
+  String get helpCaptionUnlock => 'Lås opp med passfrase';
 
   @override
   String get helpCaptionVaultSync =>
-      'Kryptert synkroniseringsprosess for hvelvet';
+      'Synkronisering: Eksporter her, Synkroniser fra hvelv der';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Synkroniseringsinnstillinger: automatisk fletting og standardmapper';
+
+  @override
+  String get helpCaptionExport => 'Eksporttype og plassering';
+
+  @override
+  String get helpCaptionImport => 'Importtype og sti';
 
   @override
   String get passphraseNoWordlist =>

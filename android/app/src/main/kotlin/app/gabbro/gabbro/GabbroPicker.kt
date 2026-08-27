@@ -1,6 +1,11 @@
 package app.gabbro.gabbro
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.provider.DocumentsContract
 import android.webkit.MimeTypeMap
+import androidx.activity.result.contract.ActivityResultContract
 import java.io.File
 import java.io.InputStream
 import java.util.concurrent.atomic.AtomicLong
@@ -19,6 +24,38 @@ import java.util.concurrent.atomic.AtomicLong
 object GabbroPicker {
 
     const val CHANNEL = "app.gabbro.gabbro/picker"
+
+    /** What the open dialog is launched with: the types to show and, when a
+     *  folder is remembered, the location to open at. */
+    data class PickRequest(val mimeTypes: Array<String>, val initialUri: String?)
+
+    /**
+     * `ACTION_OPEN_DOCUMENT` that can start at a remembered location: the
+     * stock `OpenDocument` contract takes only the types. Same intent as the
+     * stock one otherwise, so the picker behaves as before when nothing is
+     * remembered.
+     */
+    class OpenDocumentAt : ActivityResultContract<PickRequest, Uri?>() {
+        override fun createIntent(context: Context, input: PickRequest): Intent {
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+                .addCategory(Intent.CATEGORY_OPENABLE)
+                .setType("*/*")
+                .putExtra(Intent.EXTRA_MIME_TYPES, input.mimeTypes)
+            val initial = input.initialUri
+            if (!initial.isNullOrEmpty()) {
+                intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, Uri.parse(initial))
+            }
+            return intent
+        }
+
+        override fun parseResult(resultCode: Int, intent: Intent?): Uri? =
+            intent?.takeIf { resultCode == android.app.Activity.RESULT_OK }?.data
+    }
+
+    /** The `pick_file` reply: the cache copy Dart reads, plus where the file
+     *  lives, so the next dialog can open there. */
+    fun pickedFileReply(path: String, uri: Uri): Map<String, String> =
+        mapOf("path" to path, "uri" to uri.toString())
 
     /** Cache subdirectory holding copies of picked files. */
     const val CACHE_SUBDIR = "gabbro_picker"
@@ -67,6 +104,19 @@ object GabbroPicker {
             dir = File(File(cacheDir, CACHE_SUBDIR), pickCounter.getAndIncrement().toString())
         } while (!dir.mkdirs())
         return File(dir, safeName)
+    }
+
+    /**
+     * Sync from vault with a remembered folder: the file called [name] in the
+     * granted tree, copied into the cache so Rust can read it by path. Null
+     * when the tree holds no such file, and nothing is written then.
+     * [openChild] resolves a name inside the tree to its contents.
+     */
+    fun cacheTreeChild(cacheDir: File, name: String, openChild: (String) -> InputStream?): String? {
+        val input = openChild(name) ?: return null
+        val target = cacheTarget(cacheDir, name)
+        copyTo(input, target)
+        return target.absolutePath
     }
 
     /** Copies the picked file's contents to [target]. */

@@ -242,6 +242,59 @@ class AppLocalizationsLt extends AppLocalizations {
   String get securityTitle => 'Saugumas';
 
   @override
+  String get syncSettingsTitle => 'Sinchronizavimo nustatymai';
+
+  @override
+  String get sectionAutoMerge => 'Automatinis sujungimas';
+
+  @override
+  String get autoMergeTitle => 'Sujungti automatiškai';
+
+  @override
+  String get autoMergeDescription =>
+      'Sinchronizuoti iš saugyklos automatiškai pritaiko gaunamus pakeitimus. Kur abiejų saugyklų reikšmės skiriasi, laimi gaunami pakeitimai.';
+
+  @override
+  String get autoMergeNote =>
+      'Failo vis tiek bus paprašyta, jei jis neatsidaro su jūsų slaptafraze.';
+
+  @override
+  String get sectionSyncFolder => 'Sinchronizavimo aplankas';
+
+  @override
+  String syncFolderDescription(String name) {
+    return 'Kur patenka kito įrenginio eksportas. Sinchronizuoti iš saugyklos ten atveria failą $name, pavadinimą, kuriuo ši saugykla eksportuojama, neklausdamas.';
+  }
+
+  @override
+  String get syncFolderNotSet =>
+      'Nenustatyta: Sinchronizuoti iš saugyklos kaskart klausia failo.';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return 'Sinchronizavimo aplanke nėra failo pavadinimu $name.';
+  }
+
+  @override
+  String get rememberFolder => 'Įsiminti';
+
+  @override
+  String get rememberFolderNote => 'Kitą kartą pradedama šiame aplanke.';
+
+  @override
+  String get exportFolderLabel => 'Eksporto aplankas';
+
+  @override
+  String get importFolderLabel => 'Importo aplankas';
+
+  @override
+  String get folderNotSet => 'Nenustatyta';
+
+  @override
+  String get foldersChangedNote =>
+      'Keičiama Eksportuoti ir Importuoti įrašus skiltyse.';
+
+  @override
   String get aboutTitle => 'Apie Gabbro';
 
   @override
@@ -249,6 +302,9 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get importTitle => 'Importuoti įrašus';
+
+  @override
+  String get importSourceLabel => 'Šaltinis';
 
   @override
   String get exportTitle => 'Eksportuoti saugyklą';
@@ -513,9 +569,6 @@ class AppLocalizationsLt extends AppLocalizations {
   String get menuImportEntries => 'Importuoti įrašus';
 
   @override
-  String get menuSyncFromFile => 'Sinchronizuoti iš failo';
-
-  @override
   String get menuManageVaults => 'Tvarkyti saugyklas';
 
   @override
@@ -529,6 +582,9 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Saugumas';
+
+  @override
+  String get menuSyncSettings => 'Sinchronizavimo nustatymai';
 
   @override
   String get menuManageFolders => 'Tvarkyti aplankus';
@@ -754,9 +810,6 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Sinchronizavimas nepavyko';
-
-  @override
-  String get syncFromFileTitle => 'Sinchronizuoti iš failo';
 
   @override
   String get nothingToSync =>
@@ -1279,21 +1332,6 @@ class AppLocalizationsLt extends AppLocalizations {
       'Redaguokite, ištaisykite ir išsaugokite šį įrašą arba praleiskite, kad jį atmestumėte.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count įrašai praleisti',
-      one: '1 įrašas praleistas',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Šie įrašai jau yra jūsų saugykloje ir nebuvo perrašyti:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Kitas įrenginys ištrynė «$title».\n\nIštrinti čia taip pat, ar palikti?';
   }
@@ -1518,8 +1556,9 @@ class AppLocalizationsLt extends AppLocalizations {
       'Pasirinkite eksportuoto saugyklos failo paskirties vietą.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Bus sukurti du failai: vault.gabbro ir vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Bus įrašyti du failai: $name ir $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Pasirinkite paskirties vietą.';
@@ -1660,11 +1699,11 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Įrašai, kurie jau yra jūsų saugykloje, bus automatiškai praleisti. Bus parodyta suvestinė.';
+      'Pridedamas kiekvienas failo įrašas, net jau esantys saugykloje. Geriausia vieną kartą, į tuščią saugyklą.';
 
   @override
   String get importGabbroSubtitle =>
-      'Importuoti įrašus iš kitos Gabbro saugyklos (.gabbro failas)';
+      'Importuoti įrašus iš kitos Gabbro saugyklos (.gabbro failas). Šiai pačiai saugyklai iš kito įrenginio naudokite Sinchronizuoti iš saugyklos.';
 
   @override
   String get importEnpassSubtitle =>
@@ -2066,54 +2105,58 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Kurkite saugyklą: įveskite pavadinimą, slaptafrazę ir, jei norite, apsaugokite YubiKey';
+      'Sukurti saugyklą: pavadinimas, slaptafrazė, pasirinktinai YubiKey';
 
   @override
-  String get helpCaptionEmpty => 'Bakstelėkite +, kad pridėtumėte pirmą įrašą';
+  String get helpCaptionEmpty => 'Palieskite +, kad pridėtumėte įrašą';
 
   @override
   String get helpCaptionDetail =>
-      'Bakstelėkite akies piktogramą, kad atskleistumėte slaptažodį, tada ilgai paspauskite, kad matytumėte išsamią simbolių struktūrą';
+      'Palieskite įrašą atidaryti, akį parodyti, palaikykite išsamiau';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Pagal numatytuosius nustatymus paieška ieško tik įrašų pavadinimuose';
+  String get helpCaptionTitleSearch => 'Ieškoti pavadinimuose';
 
   @override
   String get helpCaptionFullSearch =>
-      'Bakstelėkite didinamąjį stiklą, kad persijungtumėte į visų laukų paiešką; bakstelėkite vėl, kad grįžtumėte prie pavadinimų paieškos';
+      'Palieskite lupą ieškoti visuose laukuose';
 
   @override
-  String get helpCaptionFilter =>
-      'Naudokite filtravimo mygtukus, kad rodytumėte tik tam tikro tipo įrašus';
+  String get helpCaptionFilter => 'Filtruoti įrašus pagal tipą';
 
   @override
-  String get helpCaptionFolders =>
-      'Naudokite aplanko pasirinkiklį, kad filtruotumėte įrašus pagal aplanką';
+  String get helpCaptionFolders => 'Filtruoti įrašus pagal aplanką';
 
   @override
   String get helpCaptionSelect =>
-      'Ilgai paspauskite įrašą, kad įjungtumėte pasirinkimo režimą; pridėkite daugiau elementų, tada priskirkite aplanką arba ištrinkite. Bakstelėkite X, kad išeitumėte.';
+      'Palaikykite pasirinkti; tada perkelkite į aplanką arba ištrinkite';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Bakstelėkite abėcėlės juostoje esančią raidę, kad peršoktumėte į tą skyrių';
+  String get helpCaptionJumpToLetter => 'Palieskite raidę, kad peršoktumėte';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Bakstelėkite akies piktogramą, kad atskleistumėte slaptažodį, tada ilgai paspauskite, kad matytumėte išsamią simbolių struktūrą';
+  String get helpCaptionBreakdown => 'Generuoti slaptažodį arba slaptafrazę';
 
   @override
   String get helpCaptionManageVaults =>
-      'Saugyklų valdyme galite pervadinti arba ištrinti saugyklas arba pridėti naują';
+      'Tvarkyti saugyklas: pridėti, pervadinti, ištrinti';
 
   @override
-  String get helpCaptionUnlock =>
-      'Įveskite slaptafrazę, kad atrakintumėte saugyklą';
+  String get helpCaptionUnlock => 'Atrakinti slaptafraze';
 
   @override
   String get helpCaptionVaultSync =>
-      'Užšifruotos saugyklos sinchronizavimo procesas';
+      'Sinchronizacija: čia Eksportuoti, ten Sinchronizuoti iš saugyklos';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Sinchronizavimo nustatymai: automatinis sujungimas ir numatytieji aplankai';
+
+  @override
+  String get helpCaptionExport => 'Eksporto tipas ir vieta';
+
+  @override
+  String get helpCaptionImport => 'Importo tipas ir kelias';
 
   @override
   String get passphraseNoWordlist =>

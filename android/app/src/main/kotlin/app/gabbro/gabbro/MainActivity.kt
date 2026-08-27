@@ -109,6 +109,31 @@ class MainActivity : GabbroUnlockHostActivity() {
                             result.error("EXPORT_WRITE_FAILED", e.message, null)
                         }
                     }
+                    // Sync from vault with a remembered folder: the file of this
+                    // vault's name inside the granted tree, copied to the cache.
+                    // Null when absent. Read off the main thread, answered on it.
+                    "read_tree_file" -> {
+                        val treeUri = call.argument<String>("treeUri")
+                        val name = call.argument<String>("name")
+                        if (treeUri == null || name == null) {
+                            result.error("BAD_ARGS", "treeUri and name required", null)
+                            return@setMethodCallHandler
+                        }
+                        Thread {
+                            val outcome = runCatching {
+                                val dir = DocumentFile.fromTreeUri(this, Uri.parse(treeUri))
+                                GabbroPicker.cacheTreeChild(cacheDir, name) { child ->
+                                    dir?.findFile(child)?.uri?.let { contentResolver.openInputStream(it) }
+                                }
+                            }
+                            runOnUiThread {
+                                outcome.fold(
+                                    { result.success(it) },
+                                    { result.error("TREE_READ_FAILED", it.message, null) },
+                                )
+                            }
+                        }.start()
+                    }
                     else -> result.notImplemented()
                 }
             }

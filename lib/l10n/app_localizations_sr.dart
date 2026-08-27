@@ -242,6 +242,58 @@ class AppLocalizationsSr extends AppLocalizations {
   String get securityTitle => 'Безбедност';
 
   @override
+  String get syncSettingsTitle => 'Подешавања синхронизације';
+
+  @override
+  String get sectionAutoMerge => 'Аутоматско спајање';
+
+  @override
+  String get autoMergeTitle => 'Споји аутоматски';
+
+  @override
+  String get autoMergeDescription =>
+      'Синхронизуј из трезора аутоматски примењује долазне измене. Где се вредности у оба трезора разликују, важе долазне измене.';
+
+  @override
+  String get autoMergeNote =>
+      'Датотека ће ипак бити затражена ако се не отвори вашом лозинком.';
+
+  @override
+  String get sectionSyncFolder => 'Фасцикла за синхронизацију';
+
+  @override
+  String syncFolderDescription(String name) {
+    return 'Где стиже извоз другог уређаја. Синхронизуј из трезора тамо отвара датотеку $name, име под којим се овај трезор извози, без питања.';
+  }
+
+  @override
+  String get syncFolderNotSet =>
+      'Није подешено: Синхронизуј из трезора сваки пут тражи датотеку.';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return 'У фасцикли за синхронизацију нема датотеке са именом $name.';
+  }
+
+  @override
+  String get rememberFolder => 'Запамти';
+
+  @override
+  String get rememberFolderNote => 'Следећи пут почиње у овој фасцикли.';
+
+  @override
+  String get exportFolderLabel => 'Фасцикла за извоз';
+
+  @override
+  String get importFolderLabel => 'Фасцикла за увоз';
+
+  @override
+  String get folderNotSet => 'Није подешено';
+
+  @override
+  String get foldersChangedNote => 'Мења се у Извозу и Увозу ставки.';
+
+  @override
   String get aboutTitle => 'О апликацији Gabbro';
 
   @override
@@ -249,6 +301,9 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get importTitle => 'Увези уносе';
+
+  @override
+  String get importSourceLabel => 'Извор';
 
   @override
   String get exportTitle => 'Извези трезор';
@@ -511,9 +566,6 @@ class AppLocalizationsSr extends AppLocalizations {
   String get menuImportEntries => 'Увези уносе';
 
   @override
-  String get menuSyncFromFile => 'Синхронизуј из датотеке';
-
-  @override
   String get menuManageVaults => 'Управљање трезорима';
 
   @override
@@ -527,6 +579,9 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Безбедност';
+
+  @override
+  String get menuSyncSettings => 'Подешавања синхронизације';
 
   @override
   String get menuManageFolders => 'Управљање мапама';
@@ -753,9 +808,6 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Синхронизација није успела';
-
-  @override
-  String get syncFromFileTitle => 'Синхронизуј из датотеке';
 
   @override
   String get nothingToSync =>
@@ -1276,22 +1328,6 @@ class AppLocalizationsSr extends AppLocalizations {
       'Уредите, исправите и сачувајте овај унос, или прескочите како бисте га одбили.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count уноса прескочено',
-      few: '$count уноса прескочена',
-      one: '1 унос прескочен',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Ови уноси већ постоје у вашем трезору и нису преписани:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Други уређај је обрисао «$title».\n\nОбрисати и овде, или задржати?';
   }
@@ -1518,8 +1554,9 @@ class AppLocalizationsSr extends AppLocalizations {
       'Изаберите одредиште за извезену датотеку трезора.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Биће направљене две датотеке: vault.gabbro и vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Биће уписане две датотеке: $name и $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Изаберите одредиште.';
@@ -1660,11 +1697,11 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Уноси који већ постоје у вашем трезору биће аутоматски прескочени. Приказаће се преглед.';
+      'Сваки унос из датотеке се додаје, и они које трезор већ има. Најбоље једном, у празан трезор.';
 
   @override
   String get importGabbroSubtitle =>
-      'Увези уносе из другог Gabbro трезора (датотека .gabbro)';
+      'Увоз уноса из другог Gabbro трезора (.gabbro датотека). За овај исти трезор са другог уређаја користите Синхронизуј из трезора.';
 
   @override
   String get importEnpassSubtitle => 'JSON извоз из Enpass (Алати → Извези)';
@@ -2059,53 +2096,57 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Направите трезор: унесите назив, приступну фразу и опционо заштитите YubiKey кључем';
+      'Направи трезор: име, фраза, по избору YubiKey';
 
   @override
-  String get helpCaptionEmpty => 'Кликните + за додавање првог уноса';
+  String get helpCaptionEmpty => 'Додирните + да додате ставку';
 
   @override
   String get helpCaptionDetail =>
-      'Кликните икону ока за приказ лозинке, затим задржите за приказ детаљне анализе знакова';
+      'Додирните ставку за отварање, око за приказ, дуги притисак за детаље';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Подразумевано: трака за претрагу претражује само наслове уноса';
+  String get helpCaptionTitleSearch => 'Претражи наслове';
 
   @override
-  String get helpCaptionFullSearch =>
-      'Кликните лупу за пребацивање на претрагу свих поља; кликните поново за повратак на претрагу по наслову';
+  String get helpCaptionFullSearch => 'Додирните лупу за претрагу свих поља';
 
   @override
-  String get helpCaptionFilter =>
-      'Користите дугмад за филтрирање за приказ само уноса одређеног типа';
+  String get helpCaptionFilter => 'Филтрирај ставке по врсти';
 
   @override
-  String get helpCaptionFolders =>
-      'Користите избор мапе за филтрирање уноса по мапи';
+  String get helpCaptionFolders => 'Филтрирај ставке по фасцикли';
 
   @override
   String get helpCaptionSelect =>
-      'Дугим притиском на унос улазите у режим избора; додајте више ставки, затим доделите мапи или обришите. Кликните X за излаз.';
+      'Дуги притисак за избор; затим премести у фасциклу или обриши';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Кликните слово у индексној траци за скок на ту секцију';
+  String get helpCaptionJumpToLetter => 'Додирните слово за скок на њега';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Кликните икону ока за приказ лозинке, затим задржите за приказ детаљне анализе знакова';
+  String get helpCaptionBreakdown => 'Генериши лозинку или фразу';
 
   @override
   String get helpCaptionManageVaults =>
-      'У «Управљању трезорима» можете преименовати или обрисати трезоре, или додати нови';
+      'Управљање трезорима: додај, преименуј, обриши';
 
   @override
-  String get helpCaptionUnlock =>
-      'Унесите приступну фразу за откључавање трезора';
+  String get helpCaptionUnlock => 'Откључај фразом';
 
   @override
-  String get helpCaptionVaultSync => 'Процес синхронизације шифрованог трезора';
+  String get helpCaptionVaultSync =>
+      'Синхронизација: Извоз овде, Синхронизуј из трезора тамо';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Подешавања синхронизације: аутоматско спајање и подразумеване фасцикле';
+
+  @override
+  String get helpCaptionExport => 'Врста и место извоза';
+
+  @override
+  String get helpCaptionImport => 'Врста и путања увоза';
 
   @override
   String get passphraseNoWordlist =>
@@ -2499,6 +2540,58 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   String get securityTitle => 'Bezbednost';
 
   @override
+  String get syncSettingsTitle => 'Podešavanja sinhronizacije';
+
+  @override
+  String get sectionAutoMerge => 'Automatsko spajanje';
+
+  @override
+  String get autoMergeTitle => 'Spoji automatski';
+
+  @override
+  String get autoMergeDescription =>
+      'Sinhronizuj iz trezora automatski primenjuje dolazne izmene. Gde se vrednosti u oba trezora razlikuju, važe dolazne izmene.';
+
+  @override
+  String get autoMergeNote =>
+      'Datoteka će ipak biti zatražena ako se ne otvori vašom lozinkom.';
+
+  @override
+  String get sectionSyncFolder => 'Fascikla za sinhronizaciju';
+
+  @override
+  String syncFolderDescription(String name) {
+    return 'Gde stiže izvoz drugog uređaja. Sinhronizuj iz trezora tamo otvara datoteku $name, ime pod kojim se ovaj trezor izvozi, bez pitanja.';
+  }
+
+  @override
+  String get syncFolderNotSet =>
+      'Nije podešeno: Sinhronizuj iz trezora svaki put traži datoteku.';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return 'U fascikli za sinhronizaciju nema datoteke sa imenom $name.';
+  }
+
+  @override
+  String get rememberFolder => 'Zapamti';
+
+  @override
+  String get rememberFolderNote => 'Sledeći put počinje u ovoj fascikli.';
+
+  @override
+  String get exportFolderLabel => 'Fascikla za izvoz';
+
+  @override
+  String get importFolderLabel => 'Fascikla za uvoz';
+
+  @override
+  String get folderNotSet => 'Nije podešeno';
+
+  @override
+  String get foldersChangedNote => 'Menja se u Izvozu i Uvozu stavki.';
+
+  @override
   String get aboutTitle => 'O aplikaciji Gabbro';
 
   @override
@@ -2506,6 +2599,9 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get importTitle => 'Uvezi unose';
+
+  @override
+  String get importSourceLabel => 'Izvor';
 
   @override
   String get exportTitle => 'Izvezi trezor';
@@ -2769,9 +2865,6 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   String get menuImportEntries => 'Uvezi unose';
 
   @override
-  String get menuSyncFromFile => 'Sinhronizuj iz datoteke';
-
-  @override
   String get menuManageVaults => 'Upravljanje trezorima';
 
   @override
@@ -2785,6 +2878,9 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get menuSecurity => 'Bezbednost';
+
+  @override
+  String get menuSyncSettings => 'Podešavanja sinhronizacije';
 
   @override
   String get menuManageFolders => 'Upravljanje mapama';
@@ -3011,9 +3107,6 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get syncFailedTitle => 'Sinhronizacija nije uspela';
-
-  @override
-  String get syncFromFileTitle => 'Sinhronizuj iz datoteke';
 
   @override
   String get nothingToSync =>
@@ -3534,22 +3627,6 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
       'Uredite, ispravite i sačuvajte ovaj unos, ili preskočite kako biste ga odbili.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count unosa preskočeno',
-      few: '$count unosa preskočena',
-      one: '1 unos preskočen',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Ovi unosi već postoje u vašem trezoru i nisu prepisani:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Drugi uređaj je obrisao «$title».\n\nObrisati i ovde, ili zadržati?';
   }
@@ -3776,8 +3853,9 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
       'Izaberite odredište za izvezenu datoteku trezora.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Biće napravljene dve datoteke: vault.gabbro i vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Biće upisane dve datoteke: $name i $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Izaberite odredište.';
@@ -3919,11 +3997,11 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get importDuplicateWarning =>
-      'Unosi koji već postoje u vašem trezoru biće automatski preskočeni. Prikazaće se pregled.';
+      'Svaki unos iz datoteke se dodaje, i oni koje trezor već ima. Najbolje jednom, u prazan trezor.';
 
   @override
   String get importGabbroSubtitle =>
-      'Uvezi unose iz drugog Gabbro trezora (datoteka .gabbro)';
+      'Uvoz unosa iz drugog Gabbro trezora (.gabbro datoteka). Za ovaj isti trezor sa drugog uređaja koristite Sinhronizuj iz trezora.';
 
   @override
   String get importEnpassSubtitle => 'JSON izvoz iz Enpass (Alati → Izvezi)';
@@ -4318,53 +4396,57 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get helpCaptionCreate =>
-      'Napravite trezor: unesite naziv, pristupnu frazu i opciono zaštitite YubiKey ključem';
+      'Napravi trezor: ime, fraza, po izboru YubiKey';
 
   @override
-  String get helpCaptionEmpty => 'Kliknite + za dodavanje prvog unosa';
+  String get helpCaptionEmpty => 'Dodirnite + da dodate stavku';
 
   @override
   String get helpCaptionDetail =>
-      'Kliknite ikonu oka za prikaz lozinke, zatim zadržite za prikaz detaljne analize znakova';
+      'Dodirnite stavku za otvaranje, oko za prikaz, dugi pritisak za detalje';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Podrazumevano: traka za pretragu pretražuje samo naslove unosa';
+  String get helpCaptionTitleSearch => 'Pretraži naslove';
 
   @override
-  String get helpCaptionFullSearch =>
-      'Kliknite lupu za prebacivanje na pretragu svih polja; kliknite ponovo za povratak na pretragu po naslovu';
+  String get helpCaptionFullSearch => 'Dodirnite lupu za pretragu svih polja';
 
   @override
-  String get helpCaptionFilter =>
-      'Koristite dugmad za filtriranje za prikaz samo unosa određenog tipa';
+  String get helpCaptionFilter => 'Filtriraj stavke po vrsti';
 
   @override
-  String get helpCaptionFolders =>
-      'Koristite izbor mape za filtriranje unosa po mapi';
+  String get helpCaptionFolders => 'Filtriraj stavke po fascikli';
 
   @override
   String get helpCaptionSelect =>
-      'Dugim pritiskom na unos ulazite u režim izbora; dodajte više stavki, zatim dodelite mapi ili obrišite. Kliknite X za izlaz.';
+      'Dugi pritisak za izbor; zatim premesti u fasciklu ili obriši';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Kliknite slovo u indeksnoj traci za skok na tu sekciju';
+  String get helpCaptionJumpToLetter => 'Dodirnite slovo za skok na njega';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Kliknite ikonu oka za prikaz lozinke, zatim zadržite za prikaz detaljne analize znakova';
+  String get helpCaptionBreakdown => 'Generiši lozinku ili frazu';
 
   @override
   String get helpCaptionManageVaults =>
-      'U «Upravljanju trezorima» možete preimenovati ili obrisati trezore, ili dodati novi';
+      'Upravljanje trezorima: dodaj, preimenuj, obriši';
 
   @override
-  String get helpCaptionUnlock =>
-      'Unesite pristupnu frazu za otključavanje trezora';
+  String get helpCaptionUnlock => 'Otključaj frazom';
 
   @override
-  String get helpCaptionVaultSync => 'Proces sinhronizacije šifrovanog trezora';
+  String get helpCaptionVaultSync =>
+      'Sinhronizacija: Izvoz ovde, Sinhronizuj iz trezora tamo';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Podešavanja sinhronizacije: automatsko spajanje i podrazumevane fascikle';
+
+  @override
+  String get helpCaptionExport => 'Vrsta i mesto izvoza';
+
+  @override
+  String get helpCaptionImport => 'Vrsta i putanja uvoza';
 
   @override
   String get passphraseNoWordlist =>

@@ -242,6 +242,59 @@ class AppLocalizationsNn extends AppLocalizations {
   String get securityTitle => 'Tryggleik';
 
   @override
+  String get syncSettingsTitle => 'Synkroniseringsinnstillingar';
+
+  @override
+  String get sectionAutoMerge => 'Automatisk fletting';
+
+  @override
+  String get autoMergeTitle => 'Flett automatisk';
+
+  @override
+  String get autoMergeDescription =>
+      'Synkroniser frå kvelv tek i bruk innkomande endringar automatisk. Der verdiane i dei to kvelva skil seg, vinn dei innkomande endringane.';
+
+  @override
+  String get autoMergeNote =>
+      'Du vert likevel spurd om fila om ho ikkje opnar med passfrasen din.';
+
+  @override
+  String get sectionSyncFolder => 'Synkroniseringsmappe';
+
+  @override
+  String syncFolderDescription(String name) {
+    return 'Der eksporten frå den andre eininga hamnar. Synkroniser frå kvelv opnar fila $name der, namnet dette kvelvet vert eksportert som, utan å spørje.';
+  }
+
+  @override
+  String get syncFolderNotSet =>
+      'Ikkje sett: Synkroniser frå kvelv spør om fila kvar gong.';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return 'Inga fil med namnet $name i synkroniseringsmappa.';
+  }
+
+  @override
+  String get rememberFolder => 'Hugs';
+
+  @override
+  String get rememberFolderNote => 'Neste gong startar i denne mappa.';
+
+  @override
+  String get exportFolderLabel => 'Eksportmappe';
+
+  @override
+  String get importFolderLabel => 'Importmappe';
+
+  @override
+  String get folderNotSet => 'Ikkje sett';
+
+  @override
+  String get foldersChangedNote =>
+      'Vert endra under Eksporter og Importer oppføringar.';
+
+  @override
   String get aboutTitle => 'Om Gabbro';
 
   @override
@@ -249,6 +302,9 @@ class AppLocalizationsNn extends AppLocalizations {
 
   @override
   String get importTitle => 'Importer oppføringer';
+
+  @override
+  String get importSourceLabel => 'Kjelde';
 
   @override
   String get exportTitle => 'Eksporter kvelv';
@@ -511,9 +567,6 @@ class AppLocalizationsNn extends AppLocalizations {
   String get menuImportEntries => 'Importer oppføringer';
 
   @override
-  String get menuSyncFromFile => 'Synkroniser frå fil';
-
-  @override
   String get menuManageVaults => 'Administrer kvelv';
 
   @override
@@ -527,6 +580,9 @@ class AppLocalizationsNn extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Tryggleik';
+
+  @override
+  String get menuSyncSettings => 'Synkroniseringsinnstillingar';
 
   @override
   String get menuManageFolders => 'Administrer mapper';
@@ -752,9 +808,6 @@ class AppLocalizationsNn extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Synkronisering mislukkast';
-
-  @override
-  String get syncFromFileTitle => 'Synkroniser frå fil';
 
   @override
   String get nothingToSync =>
@@ -1277,21 +1330,6 @@ class AppLocalizationsNn extends AppLocalizations {
       'Rediger for å rette og lagre denne oppføringa, eller hopp over for å forkaste ho.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count oppføringer hoppa over',
-      one: '1 oppføring hoppa over',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Desse oppføringane finst allereie i kvelvet ditt og vart ikkje overskrivne:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Den andre eininga sletta \'$title\'.\n\nSlett ho her òg, eller behald ho?';
   }
@@ -1515,8 +1553,9 @@ class AppLocalizationsNn extends AppLocalizations {
       'Vel eit mål for den eksporterte kvelvfila.';
 
   @override
-  String get exportTwoFilesNote =>
-      'To filer vert oppretta: vault.gabbro og vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'To filer vert skrivne: $name og $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Vel eit mål.';
@@ -1656,11 +1695,11 @@ class AppLocalizationsNn extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Oppføringer som allereie finst i kvelvet vert automatisk hoppa over. Du vil sjå eit samandrag.';
+      'Kvar oppføring i fila vert lagd til, òg dei kvelvet alt har. Best gjort éin gong, i eit tomt kvelv.';
 
   @override
   String get importGabbroSubtitle =>
-      'Importer oppføringer frå eit anna Gabbro-kvelv (.gabbro-fil)';
+      'Importer oppføringar frå eit anna Gabbro-kvelv (.gabbro-fil). For dette kvelvet frå ei anna eining: bruk Synkroniser frå kvelv.';
 
   @override
   String get importEnpassSubtitle =>
@@ -2058,54 +2097,58 @@ class AppLocalizationsNn extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Opprett eit kvelv: angi eit namn, passfrase og beskytt eventuelt med ein YubiKey';
+      'Opprett kvelv: namn, passfrase, valfri YubiKey';
 
   @override
-  String get helpCaptionEmpty =>
-      'Trykk på + for å leggje til di første oppføring';
+  String get helpCaptionEmpty => 'Trykk + for å leggje til ei oppføring';
 
   @override
   String get helpCaptionDetail =>
-      'Trykk på augeikon for å avsløre eit passord, hald deretter inne for å sjå ei detaljert teikn­analyse';
+      'Trykk på oppføringa for å opne, auget for å vise, hald inne for detaljar';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Som standard søkjer søkefeltet berre i oppføringstitlar';
+  String get helpCaptionTitleSearch => 'Søk i titlar';
 
   @override
   String get helpCaptionFullSearch =>
-      'Trykk på forstørringsglaset for å byte til søk i alle felt; trykk igjen for å gå tilbake til tittel­søk';
+      'Trykk på forstørringsglaset for å søkje i alle felt';
 
   @override
-  String get helpCaptionFilter =>
-      'Bruk filterknappane til berre å vise oppføringer av ein bestemt type';
+  String get helpCaptionFilter => 'Filtrer oppføringar etter type';
 
   @override
-  String get helpCaptionFolders =>
-      'Bruk mappevelgaren til å filtrere oppføringer etter mappe';
+  String get helpCaptionFolders => 'Filtrer oppføringar etter mappe';
 
   @override
   String get helpCaptionSelect =>
-      'Hald inne på ei oppføring for å gå inn i valmodus; legg til fleire element, tildel deretter til ei mappe eller slett. Trykk X for å avslutte.';
+      'Hald inne for å velje; flytt så til ei mappe eller slett';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Trykk på ein bokstav på indekslinjen for å hoppe til den delen';
+  String get helpCaptionJumpToLetter => 'Trykk på ein bokstav for å hoppe dit';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Trykk på augeikonet for å avsløre eit passord, hald deretter inne for å sjå ei detaljert teiknanalyse';
+  String get helpCaptionBreakdown => 'Generer eit passord eller ein passfrase';
 
   @override
   String get helpCaptionManageVaults =>
-      'I Administrer kvelv kan du endre namn på eller slette kvelv, eller leggje til eit nytt';
+      'Handter kvelv: legg til, gje nytt namn, slett';
 
   @override
-  String get helpCaptionUnlock => 'Angi passfrasen din for å låse opp kvelvet';
+  String get helpCaptionUnlock => 'Lås opp med passfrase';
 
   @override
   String get helpCaptionVaultSync =>
-      'Kryptert synkroniseringsprosess for kvelvet';
+      'Synkronisering: Eksporter her, Synkroniser frå kvelv der';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Synkroniseringsinnstillingar: automatisk fletting og standardmapper';
+
+  @override
+  String get helpCaptionExport => 'Eksporttype og plassering';
+
+  @override
+  String get helpCaptionImport => 'Importtype og sti';
 
   @override
   String get passphraseNoWordlist =>

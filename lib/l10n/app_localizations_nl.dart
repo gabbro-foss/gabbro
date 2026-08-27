@@ -242,6 +242,59 @@ class AppLocalizationsNl extends AppLocalizations {
   String get securityTitle => 'Beveiliging';
 
   @override
+  String get syncSettingsTitle => 'Synchronisatie-instellingen';
+
+  @override
+  String get sectionAutoMerge => 'Automatisch samenvoegen';
+
+  @override
+  String get autoMergeTitle => 'Automatisch samenvoegen';
+
+  @override
+  String get autoMergeDescription =>
+      'Synchroniseren vanuit kluis past inkomende wijzigingen automatisch toe. Waar waarden in beide kluizen verschillen, winnen de inkomende wijzigingen.';
+
+  @override
+  String get autoMergeNote =>
+      'Er wordt alsnog om het bestand gevraagd als het niet opent met uw wachtwoordzin.';
+
+  @override
+  String get sectionSyncFolder => 'Synchronisatiemap';
+
+  @override
+  String syncFolderDescription(String name) {
+    return 'Waar de export van het andere apparaat terechtkomt. Synchroniseren vanuit kluis opent daar het bestand $name, de naam waaronder deze kluis exporteert, zonder te vragen.';
+  }
+
+  @override
+  String get syncFolderNotSet =>
+      'Niet ingesteld: Synchroniseren vanuit kluis vraagt elke keer om het bestand.';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return 'Geen bestand met de naam $name in de synchronisatiemap.';
+  }
+
+  @override
+  String get rememberFolder => 'Onthouden';
+
+  @override
+  String get rememberFolderNote => 'De volgende keer begint in deze map.';
+
+  @override
+  String get exportFolderLabel => 'Exportmap';
+
+  @override
+  String get importFolderLabel => 'Importmap';
+
+  @override
+  String get folderNotSet => 'Niet ingesteld';
+
+  @override
+  String get foldersChangedNote =>
+      'Wordt gewijzigd bij Exporteren en Items importeren.';
+
+  @override
   String get aboutTitle => 'Over Gabbro';
 
   @override
@@ -249,6 +302,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get importTitle => 'Items importeren';
+
+  @override
+  String get importSourceLabel => 'Bron';
 
   @override
   String get exportTitle => 'Kluis exporteren';
@@ -512,9 +568,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get menuImportEntries => 'Items importeren';
 
   @override
-  String get menuSyncFromFile => 'Synchroniseren vanuit bestand';
-
-  @override
   String get menuManageVaults => 'Kluizen beheren';
 
   @override
@@ -528,6 +581,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Beveiliging';
+
+  @override
+  String get menuSyncSettings => 'Synchronisatie-instellingen';
 
   @override
   String get menuManageFolders => 'Mappen beheren';
@@ -753,9 +809,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Synchronisatie mislukt';
-
-  @override
-  String get syncFromFileTitle => 'Synchroniseren vanuit bestand';
 
   @override
   String get nothingToSync =>
@@ -1279,21 +1332,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Bewerk om te corrigeren en sla dit item op, of sla het over om het te verwijderen.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count items overgeslagen',
-      one: '1 item overgeslagen',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Deze items bestaan al in uw kluis en zijn niet overschreven:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Het andere apparaat heeft \'$title\' verwijderd.\n\nHier ook verwijderen, of behouden?';
   }
@@ -1519,8 +1557,9 @@ class AppLocalizationsNl extends AppLocalizations {
       'Kies een bestemming voor uw geëxporteerde kluisbestand.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Er worden twee bestanden geschreven: vault.gabbro en vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Er worden twee bestanden geschreven: $name en $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Selecteer een bestemming.';
@@ -1663,11 +1702,11 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Items die al in uw kluis staan, worden automatisch overgeslagen. Er wordt een samenvatting getoond.';
+      'Elk item uit het bestand wordt toegevoegd, ook wat de kluis al bevat. Doe dit bij voorkeur eenmalig, in een lege kluis.';
 
   @override
   String get importGabbroSubtitle =>
-      'Items importeren vanuit een andere Gabbro-kluis (.gabbro-bestand)';
+      'Items importeren uit een andere Gabbro-kluis (.gabbro-bestand). Voor deze kluis vanaf een ander apparaat: gebruik Synchroniseren vanuit kluis.';
 
   @override
   String get importEnpassSubtitle =>
@@ -2068,53 +2107,59 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Maak een kluis aan: voer een naam en wachtwoordzin in en beveilig deze optioneel met een YubiKey';
+      'Kluis maken: naam, wachtwoordzin, optioneel YubiKey';
 
   @override
-  String get helpCaptionEmpty => 'Tik op + om uw eerste item toe te voegen';
+  String get helpCaptionEmpty => 'Tik op + om een item toe te voegen';
 
   @override
   String get helpCaptionDetail =>
-      'Tik op het oogpictogram om een wachtwoord te onthullen, en houd het lang ingedrukt om een gedetailleerde tekenanalyse te bekijken';
+      'Tik op een item om te openen, het oog om te tonen, houd ingedrukt voor details';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Standaard zoekt de zoekbalk alleen in itemtitels';
+  String get helpCaptionTitleSearch => 'Zoeken in titels';
 
   @override
   String get helpCaptionFullSearch =>
-      'Tik op het vergrootglaspictogram om te wisselen naar zoeken in alle velden; tik opnieuw om terug te keren naar alleen titels';
+      'Tik op het vergrootglas om in alle velden te zoeken';
 
   @override
-  String get helpCaptionFilter =>
-      'Gebruik de filterchips om alleen items van een specifiek type te tonen';
+  String get helpCaptionFilter => 'Items filteren op type';
 
   @override
-  String get helpCaptionFolders =>
-      'Gebruik de mappenkiezer om items op map te filteren';
+  String get helpCaptionFolders => 'Items filteren op map';
 
   @override
   String get helpCaptionSelect =>
-      'Houd een item lang ingedrukt om de selectiemodus te activeren; voeg meer items toe en wijs ze toe aan een map of verwijder ze. Tik op X om af te sluiten.';
+      'Houd ingedrukt om te selecteren; verplaats dan naar een map of verwijder';
 
   @override
   String get helpCaptionJumpToLetter =>
-      'Tik op een letter in de indexbalk om naar dat gedeelte te springen';
+      'Tik op een letter om erheen te springen';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Tik op het oogpictogram om een wachtwoord te onthullen, en houd het lang ingedrukt om een gedetailleerde tekenanalyse te bekijken';
+  String get helpCaptionBreakdown => 'Wachtwoord of wachtwoordzin genereren';
 
   @override
   String get helpCaptionManageVaults =>
-      'Hernoem of verwijder kluizen in Kluizen beheren, of voeg een nieuwe toe';
+      'Kluizen beheren: toevoegen, hernoemen, verwijderen';
 
   @override
-  String get helpCaptionUnlock =>
-      'Voer uw wachtwoordzin in om uw kluis te ontgrendelen';
+  String get helpCaptionUnlock => 'Ontgrendelen met wachtwoordzin';
 
   @override
-  String get helpCaptionVaultSync => 'Versleuteld kluissynchronisatieproces';
+  String get helpCaptionVaultSync =>
+      'Synchronisatie: hier Exporteren, daar Synchroniseren vanuit kluis';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Synchronisatie-instellingen: automatisch samenvoegen en standaardmappen';
+
+  @override
+  String get helpCaptionExport => 'Exporttype en locatie';
+
+  @override
+  String get helpCaptionImport => 'Importtype en pad';
 
   @override
   String get passphraseNoWordlist =>

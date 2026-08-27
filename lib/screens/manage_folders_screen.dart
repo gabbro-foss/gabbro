@@ -237,9 +237,12 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
           semanticLabel: l.addFolderTitle,
         ),
       ),
+      // SafeArea: the Column has no automatic inset, so a landscape side bar
+      // covered the row ends (edge-to-edge Android, 2026-08-25).
       body: _loading
           ? const Center(child: CircularProgressIndicator())
-          : Column(
+          : SafeArea(
+          child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Padding(
@@ -289,6 +292,7 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
                 ),
               ],
             ),
+          ),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/screens/help_screen.dart';
 import 'test_helpers.dart';
 
@@ -19,14 +20,23 @@ void main() {
   testWidgets('HelpScreen shows dot indicators', (tester) async {
     await tester.pumpWidget(testApp(const HelpScreen()));
     await tester.pumpAndSettle();
-    // 13 slides → 13 AnimatedContainer dots in the indicator row.
-    expect(find.byType(AnimatedContainer), findsNWidgets(13));
+    // 16 slides -> 16 AnimatedContainer dots (help_content_net_test derives it).
+    expect(find.byType(AnimatedContainer), findsNWidgets(16));
   });
 
   testWidgets('HelpScreen first slide caption is visible on open', (tester) async {
     await tester.pumpWidget(testApp(const HelpScreen()));
     await tester.pumpAndSettle();
     expect(find.byType(Text), findsWidgets);
+  });
+
+  testWidgets('the caption uses the larger body style, 16 not 14',
+      (tester) async {
+    await tester.pumpWidget(testApp(const HelpScreen()));
+    await tester.pumpAndSettle();
+    final l = AppLocalizations.of(tester.element(find.byType(HelpScreen)));
+    final caption = tester.widget<Text>(find.text(l.helpCaptionCreate));
+    expect(caption.style?.fontSize, greaterThanOrEqualTo(16));
   });
 
   testWidgets('HelpScreen chevron-right advances to the next slide', (tester) async {
@@ -161,3 +171,6 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 }
+
+
+

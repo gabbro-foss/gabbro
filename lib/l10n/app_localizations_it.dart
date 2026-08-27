@@ -242,6 +242,59 @@ class AppLocalizationsIt extends AppLocalizations {
   String get securityTitle => 'Sicurezza';
 
   @override
+  String get syncSettingsTitle => 'Impostazioni di sincronizzazione';
+
+  @override
+  String get sectionAutoMerge => 'Unione automatica';
+
+  @override
+  String get autoMergeTitle => 'Unisci automaticamente';
+
+  @override
+  String get autoMergeDescription =>
+      'Sincronizza da cassaforte applica automaticamente le modifiche in arrivo. Dove i valori delle due casseforti differiscono, vincono le modifiche in arrivo.';
+
+  @override
+  String get autoMergeNote =>
+      'Il file viene comunque richiesto se non si apre con la tua passphrase.';
+
+  @override
+  String get sectionSyncFolder => 'Cartella di sincronizzazione';
+
+  @override
+  String syncFolderDescription(String name) {
+    return 'Dove arriva l\'esportazione dell\'altro dispositivo. Sincronizza da cassaforte apre lì il file $name, il nome con cui questa cassaforte viene esportata, senza chiedere.';
+  }
+
+  @override
+  String get syncFolderNotSet =>
+      'Non impostata: Sincronizza da cassaforte chiede il file ogni volta.';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return 'Nessun file di nome $name nella cartella di sincronizzazione.';
+  }
+
+  @override
+  String get rememberFolder => 'Ricorda';
+
+  @override
+  String get rememberFolderNote =>
+      'La prossima volta parte da questa cartella.';
+
+  @override
+  String get exportFolderLabel => 'Cartella di esportazione';
+
+  @override
+  String get importFolderLabel => 'Cartella di importazione';
+
+  @override
+  String get folderNotSet => 'Non impostata';
+
+  @override
+  String get foldersChangedNote => 'Si cambia in Esporta e Importa voci.';
+
+  @override
   String get aboutTitle => 'Informazioni su Gabbro';
 
   @override
@@ -249,6 +302,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get importTitle => 'Importa voci';
+
+  @override
+  String get importSourceLabel => 'Origine';
 
   @override
   String get exportTitle => 'Esporta archivio';
@@ -512,9 +568,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get menuImportEntries => 'Importa voci';
 
   @override
-  String get menuSyncFromFile => 'Sincronizza da file';
-
-  @override
   String get menuManageVaults => 'Gestisci archivi';
 
   @override
@@ -528,6 +581,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Sicurezza';
+
+  @override
+  String get menuSyncSettings => 'Impostazioni di sincronizzazione';
 
   @override
   String get menuManageFolders => 'Gestisci cartelle';
@@ -753,9 +809,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Sincronizzazione fallita';
-
-  @override
-  String get syncFromFileTitle => 'Sincronizza da file';
 
   @override
   String get nothingToSync =>
@@ -1277,21 +1330,6 @@ class AppLocalizationsIt extends AppLocalizations {
       'Modifica per correggere e salvare questa voce, o salta per scartarla.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count voci saltate',
-      one: '1 voce saltata',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Queste voci esistono già nel tuo archivio e non sono state sovrascritte:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'L\'altro dispositivo ha eliminato «$title».\n\nEliminarlo anche qui, o mantenerlo?';
   }
@@ -1517,8 +1555,9 @@ class AppLocalizationsIt extends AppLocalizations {
       'Scegli una destinazione per il file archivio esportato.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Verranno creati due file: vault.gabbro e vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Verranno scritti due file: $name e $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Seleziona una destinazione.';
@@ -1662,11 +1701,11 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Le voci già presenti nel tuo archivio verranno saltate automaticamente. Ti verrà mostrato un riepilogo.';
+      'Ogni voce del file viene aggiunta, anche quelle già presenti nella cassaforte. Meglio una sola volta, in una cassaforte vuota.';
 
   @override
   String get importGabbroSubtitle =>
-      'Importa voci da un altro archivio Gabbro (file .gabbro)';
+      'Importa voci da un\'altra cassaforte Gabbro (file .gabbro). Per questa stessa cassaforte da un altro dispositivo usa Sincronizza da cassaforte.';
 
   @override
   String get importEnpassSubtitle =>
@@ -2069,54 +2108,58 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Crea un vault: inserisci un nome, una passphrase e proteggilo facoltativamente con un YubiKey';
+      'Crea caveau: nome, passphrase, YubiKey facoltativa';
 
   @override
-  String get helpCaptionEmpty => 'Tocca + per aggiungere la tua prima voce';
+  String get helpCaptionEmpty => 'Tocca + per aggiungere una voce';
 
   @override
   String get helpCaptionDetail =>
-      'Tocca l\'icona occhio per rivelare una password, poi tieni premuto per vedere una scomposizione dettagliata dei caratteri';
+      'Tocca la voce per aprire, l\'occhio per rivelare, tieni premuto per i dettagli';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Per impostazione predefinita, la barra di ricerca cerca solo nei titoli delle voci';
+  String get helpCaptionTitleSearch => 'Cerca nei titoli';
 
   @override
   String get helpCaptionFullSearch =>
-      'Tocca la lente di ingrandimento per cercare in tutti i campi; tocca di nuovo per tornare alla ricerca per titolo';
+      'Tocca la lente per cercare in tutti i campi';
 
   @override
-  String get helpCaptionFilter =>
-      'Usa i filtri per mostrare solo le voci di un tipo specifico';
+  String get helpCaptionFilter => 'Filtra le voci per tipo';
 
   @override
-  String get helpCaptionFolders =>
-      'Usa il selettore di cartelle per filtrare le voci per cartella';
+  String get helpCaptionFolders => 'Filtra le voci per cartella';
 
   @override
   String get helpCaptionSelect =>
-      'Premi a lungo su una voce per entrare in modalità selezione; aggiungi altri elementi, poi assegnali a una cartella o eliminali. Tocca X per uscire.';
+      'Tieni premuto per selezionare; poi sposta in una cartella o elimina';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Tocca una lettera nella barra dell\'indice per passare a quella sezione';
+  String get helpCaptionJumpToLetter => 'Tocca una lettera per saltare lì';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Tocca l\'icona occhio per rivelare una password, poi tieni premuto per vedere una scomposizione dettagliata dei caratteri';
+  String get helpCaptionBreakdown => 'Genera una password o una passphrase';
 
   @override
   String get helpCaptionManageVaults =>
-      'In Gestisci vault, puoi rinominare o eliminare vault, o aggiungerne uno nuovo';
+      'Gestisci caveau: aggiungi, rinomina, elimina';
 
   @override
-  String get helpCaptionUnlock =>
-      'Inserisci la tua passphrase per sbloccare il vault';
+  String get helpCaptionUnlock => 'Sblocca con la passphrase';
 
   @override
   String get helpCaptionVaultSync =>
-      'Processo di sincronizzazione dell\'archivio cifrato';
+      'Sincronizzazione: Esporta qui, Sincronizza dal caveau là';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Impostazioni di sincronizzazione: unione automatica e cartelle predefinite';
+
+  @override
+  String get helpCaptionExport => 'Tipo e posizione dell\'esportazione';
+
+  @override
+  String get helpCaptionImport => 'Tipo e percorso dell\'importazione';
 
   @override
   String get passphraseNoWordlist =>

@@ -34,7 +34,7 @@ Widget _androidGabbroScreen(
     isAndroid: true,
     vaultAlias: vaultAlias,
     isKeyProtected: isKeyProtected,
-    initialExportFolderUri: 'content://docs/tree/primary%3ADownload%2FGabbroSync',
+    initialExportFolder: 'content://docs/tree/primary%3ADownload%2FGabbroSync',
     onHasGrant: (_) async => true,
     onExport: (path) async {},
     onExportJson: (path) async {},
@@ -51,7 +51,16 @@ Widget _androidGabbroScreen(
 }
 
 void main() {
+  twoFilesNoteTests();
   // ── sanitiseAlias unit tests ──────────────────────────────────────────────
+
+  group('exportVaultFileName', () {
+    test('is the sanitised alias plus .gabbro, never the on-disk name', () {
+      expect(exportVaultFileName('example'), 'example.gabbro');
+      expect(exportVaultFileName('My Vault!'), 'My_Vault.gabbro');
+      expect(exportVaultFileName(null), 'vault.gabbro');
+    });
+  });
 
   group('sanitiseAlias', () {
     test('replaces spaces with underscores', () {
@@ -236,7 +245,8 @@ void main() {
       await tester.tap(find.widgetWithText(
           SwitchListTile, 'Export without YubiKey protection (passphrase only)'));
       await tester.pump();
-      await tester.tap(find.text('Export'));
+      await tester.ensureVisible(find.widgetWithText(FilledButton, 'Export'));
+      await tester.tap(find.widgetWithText(FilledButton, 'Export'));
       await tester.pumpAndSettle();
       expect(cap.data, equals(Uint8List.fromList([7, 7, 7])));
       expect(cap.sha256Content, 'DD  x\n');
@@ -413,7 +423,8 @@ void main() {
       // Opting in surfaces the downgrade warning.
       expect(find.textContaining('no YubiKey needed'), findsOneWidget);
 
-      await tester.tap(find.text('Export'));
+      await tester.ensureVisible(find.widgetWithText(FilledButton, 'Export'));
+      await tester.tap(find.widgetWithText(FilledButton, 'Export'));
       await tester.pump();
       expect(downgradedPath, '/home/user/vault.gabbro');
       expect(preserved, isFalse);
@@ -536,5 +547,25 @@ void main() {
 
       expect(exportedPath, '/storage/emulated/0/Download/Gabbro/My_Work.json');
     });
+  });
+}
+
+// The two-files note names the file that will actually be written, never a
+// fixed "vault.gabbro": the alias is the name, and the date toggle changes it.
+void twoFilesNoteTests() {
+  testWidgets('the two-files note names the real export file', (tester) async {
+    await tester.pumpWidget(testApp(ExportScreen(
+      isAndroid: false,
+      vaultAlias: 'example',
+      onExport: (_) async {},
+      onExportJson: (_) async {},
+    )));
+    await tester.pumpAndSettle();
+    expect(find.text('Two files will be written: example.gabbro and example.gabbro.sha256'),
+        findsOneWidget);
+    await tester.tap(find.text('Include date in filename'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('example_'), findsOneWidget);
+    expect(find.textContaining('Two files will be written: vault'), findsNothing);
   });
 }

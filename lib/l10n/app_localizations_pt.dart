@@ -242,6 +242,58 @@ class AppLocalizationsPt extends AppLocalizations {
   String get securityTitle => 'Segurança';
 
   @override
+  String get syncSettingsTitle => 'Configurações de sincronização';
+
+  @override
+  String get sectionAutoMerge => 'Mesclagem automática';
+
+  @override
+  String get autoMergeTitle => 'Mesclar automaticamente';
+
+  @override
+  String get autoMergeDescription =>
+      'Sincronizar do cofre aplica as alterações recebidas automaticamente. Onde os valores dos dois cofres diferem, as alterações recebidas vencem.';
+
+  @override
+  String get autoMergeNote =>
+      'O arquivo ainda será pedido se não abrir com a sua frase-senha.';
+
+  @override
+  String get sectionSyncFolder => 'Pasta de sincronização';
+
+  @override
+  String syncFolderDescription(String name) {
+    return 'Onde chega a exportação do outro dispositivo. Sincronizar do cofre abre ali o arquivo $name, o nome com que este cofre é exportado, sem perguntar.';
+  }
+
+  @override
+  String get syncFolderNotSet =>
+      'Não definida: Sincronizar do cofre pede o arquivo toda vez.';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return 'Nenhum arquivo chamado $name na pasta de sincronização.';
+  }
+
+  @override
+  String get rememberFolder => 'Lembrar';
+
+  @override
+  String get rememberFolderNote => 'Da próxima vez começa nesta pasta.';
+
+  @override
+  String get exportFolderLabel => 'Pasta de exportação';
+
+  @override
+  String get importFolderLabel => 'Pasta de importação';
+
+  @override
+  String get folderNotSet => 'Não definida';
+
+  @override
+  String get foldersChangedNote => 'Altera-se em Exportar e Importar entradas.';
+
+  @override
   String get aboutTitle => 'Sobre o Gabbro';
 
   @override
@@ -249,6 +301,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get importTitle => 'Importar entradas';
+
+  @override
+  String get importSourceLabel => 'Origem';
 
   @override
   String get exportTitle => 'Exportar cofre';
@@ -512,9 +567,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get menuImportEntries => 'Importar entradas';
 
   @override
-  String get menuSyncFromFile => 'Sincronizar de arquivo';
-
-  @override
   String get menuManageVaults => 'Gerenciar cofres';
 
   @override
@@ -528,6 +580,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Segurança';
+
+  @override
+  String get menuSyncSettings => 'Configurações de sincronização';
 
   @override
   String get menuManageFolders => 'Gerenciar pastas';
@@ -753,9 +808,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Sincronização falhou';
-
-  @override
-  String get syncFromFileTitle => 'Sincronizar de arquivo';
 
   @override
   String get nothingToSync =>
@@ -1275,21 +1327,6 @@ class AppLocalizationsPt extends AppLocalizations {
       'Edite para corrigir e salvar esta entrada, ou pule para descartá-la.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count entradas puladas',
-      one: '1 entrada pulada',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Estas entradas já existem no cofre e não foram substituídas:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'O outro dispositivo excluiu \'$title\'.\n\nExcluir aqui também, ou manter?';
   }
@@ -1516,8 +1553,9 @@ class AppLocalizationsPt extends AppLocalizations {
       'Escolha um destino para o arquivo de cofre exportado.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Dois arquivos serão criados: vault.gabbro e vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Serão escritos dois ficheiros: $name e $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Selecione um destino.';
@@ -1659,11 +1697,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Entradas que já estão no cofre serão puladas automaticamente. Será exibido um resumo.';
+      'Cada entrada do arquivo é adicionada, mesmo as que o cofre já tem. Melhor uma única vez, em um cofre vazio.';
 
   @override
   String get importGabbroSubtitle =>
-      'Importar entradas de outro cofre Gabbro (arquivo .gabbro)';
+      'Importar entradas de outro cofre Gabbro (arquivo .gabbro). Para este mesmo cofre de outro dispositivo, use Sincronizar do cofre.';
 
   @override
   String get importEnpassSubtitle =>
@@ -2062,54 +2100,58 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Criar um cofre: insira um nome, frase secreta e opcionalmente proteja com uma YubiKey';
+      'Criar cofre: nome, frase-passe, YubiKey opcional';
 
   @override
-  String get helpCaptionEmpty => 'Toque em + para adicionar a primeira entrada';
+  String get helpCaptionEmpty => 'Toque em + para adicionar uma entrada';
 
   @override
   String get helpCaptionDetail =>
-      'Toque no ícone de olho para revelar uma senha, depois pressione longamente para ver uma análise detalhada dos caracteres';
+      'Toque na entrada para abrir, no olho para revelar, mantenha premido para detalhes';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Por padrão, a barra de pesquisa pesquisa apenas títulos de entradas';
+  String get helpCaptionTitleSearch => 'Pesquisar títulos';
 
   @override
   String get helpCaptionFullSearch =>
-      'Toque na lupa para mudar para pesquisa de campo completo; toque novamente para voltar à pesquisa por título';
+      'Toque na lupa para pesquisar todos os campos';
 
   @override
-  String get helpCaptionFilter =>
-      'Use os filtros para mostrar apenas entradas de um tipo específico';
+  String get helpCaptionFilter => 'Filtrar entradas por tipo';
 
   @override
-  String get helpCaptionFolders =>
-      'Use o seletor de pasta para filtrar entradas por pasta';
+  String get helpCaptionFolders => 'Filtrar entradas por pasta';
 
   @override
   String get helpCaptionSelect =>
-      'Pressione longamente uma entrada para entrar no modo de seleção; adicione mais itens, depois atribua a uma pasta ou exclua. Toque em X para sair.';
+      'Mantenha premido para selecionar; depois mova para uma pasta ou elimine';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Toque em uma letra na barra de índice para pular para aquela seção';
+  String get helpCaptionJumpToLetter => 'Toque numa letra para saltar até lá';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Toque no ícone de olho para revelar uma senha, depois pressione longamente para ver uma análise detalhada dos caracteres';
+  String get helpCaptionBreakdown => 'Gerar uma palavra-passe ou frase-passe';
 
   @override
   String get helpCaptionManageVaults =>
-      'Em Gerenciar cofres, renomeie ou exclua cofres, ou adicione um novo';
+      'Gerir cofres: adicionar, renomear, eliminar';
 
   @override
-  String get helpCaptionUnlock =>
-      'Insira a frase secreta para desbloquear o cofre';
+  String get helpCaptionUnlock => 'Desbloquear com frase-passe';
 
   @override
   String get helpCaptionVaultSync =>
-      'Processo de sincronização do cofre criptografado';
+      'Sincronização: Exportar aqui, Sincronizar a partir do cofre ali';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Definições de sincronização: fusão automática e pastas predefinidas';
+
+  @override
+  String get helpCaptionExport => 'Tipo e localização da exportação';
+
+  @override
+  String get helpCaptionImport => 'Tipo e caminho da importação';
 
   @override
   String get passphraseNoWordlist =>
@@ -2506,6 +2548,58 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get securityTitle => 'Segurança';
 
   @override
+  String get syncSettingsTitle => 'Configurações de sincronização';
+
+  @override
+  String get sectionAutoMerge => 'Mesclagem automática';
+
+  @override
+  String get autoMergeTitle => 'Mesclar automaticamente';
+
+  @override
+  String get autoMergeDescription =>
+      'Sincronizar do cofre aplica as alterações recebidas automaticamente. Onde os valores dos dois cofres diferem, as alterações recebidas vencem.';
+
+  @override
+  String get autoMergeNote =>
+      'O arquivo ainda será pedido se não abrir com a sua frase-senha.';
+
+  @override
+  String get sectionSyncFolder => 'Pasta de sincronização';
+
+  @override
+  String syncFolderDescription(String name) {
+    return 'Onde chega a exportação do outro dispositivo. Sincronizar do cofre abre ali o arquivo $name, o nome com que este cofre é exportado, sem perguntar.';
+  }
+
+  @override
+  String get syncFolderNotSet =>
+      'Não definida: Sincronizar do cofre pede o arquivo toda vez.';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return 'Nenhum arquivo chamado $name na pasta de sincronização.';
+  }
+
+  @override
+  String get rememberFolder => 'Lembrar';
+
+  @override
+  String get rememberFolderNote => 'Da próxima vez começa nesta pasta.';
+
+  @override
+  String get exportFolderLabel => 'Pasta de exportação';
+
+  @override
+  String get importFolderLabel => 'Pasta de importação';
+
+  @override
+  String get folderNotSet => 'Não definida';
+
+  @override
+  String get foldersChangedNote => 'Alterada em Exportar e Importar entradas.';
+
+  @override
   String get aboutTitle => 'Sobre o Gabbro';
 
   @override
@@ -2513,6 +2607,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get importTitle => 'Importar entradas';
+
+  @override
+  String get importSourceLabel => 'Origem';
 
   @override
   String get exportTitle => 'Exportar cofre';
@@ -2776,9 +2873,6 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get menuImportEntries => 'Importar entradas';
 
   @override
-  String get menuSyncFromFile => 'Sincronizar de arquivo';
-
-  @override
   String get menuManageVaults => 'Gerenciar cofres';
 
   @override
@@ -2792,6 +2886,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get menuSecurity => 'Segurança';
+
+  @override
+  String get menuSyncSettings => 'Configurações de sincronização';
 
   @override
   String get menuManageFolders => 'Gerenciar pastas';
@@ -3017,9 +3114,6 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get syncFailedTitle => 'Sincronização falhou';
-
-  @override
-  String get syncFromFileTitle => 'Sincronizar de arquivo';
 
   @override
   String get nothingToSync =>
@@ -3539,21 +3633,6 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
       'Edite para corrigir e salvar esta entrada, ou pule para descartá-la.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count entradas puladas',
-      one: '1 entrada pulada',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Estas entradas já existem no cofre e não foram substituídas:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'O outro dispositivo excluiu \'$title\'.\n\nExcluir aqui também, ou manter?';
   }
@@ -3780,8 +3859,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
       'Escolha um destino para o arquivo de cofre exportado.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Dois arquivos serão criados: vault.gabbro e vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Dois arquivos serão gravados: $name e $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Selecione um destino.';
@@ -3923,11 +4003,11 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get importDuplicateWarning =>
-      'Entradas que já estão no cofre serão puladas automaticamente. Será exibido um resumo.';
+      'Cada entrada do arquivo é adicionada, mesmo as que o cofre já tem. Melhor uma única vez, em um cofre vazio.';
 
   @override
   String get importGabbroSubtitle =>
-      'Importar entradas de outro cofre Gabbro (arquivo .gabbro)';
+      'Importar entradas de outro cofre Gabbro (arquivo .gabbro). Para este mesmo cofre de outro dispositivo, use Sincronizar do cofre.';
 
   @override
   String get importEnpassSubtitle =>
@@ -4325,54 +4405,58 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get helpCaptionCreate =>
-      'Criar um cofre: insira um nome, frase secreta e opcionalmente proteja com uma YubiKey';
+      'Criar cofre: nome, frase-senha, YubiKey opcional';
 
   @override
-  String get helpCaptionEmpty => 'Toque em + para adicionar a primeira entrada';
+  String get helpCaptionEmpty => 'Toque em + para adicionar uma entrada';
 
   @override
   String get helpCaptionDetail =>
-      'Toque no ícone de olho para revelar uma senha, depois pressione longamente para ver uma análise detalhada dos caracteres';
+      'Toque na entrada para abrir, no olho para revelar, segure para detalhes';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Por padrão, a barra de pesquisa pesquisa apenas títulos de entradas';
+  String get helpCaptionTitleSearch => 'Pesquisar títulos';
 
   @override
   String get helpCaptionFullSearch =>
-      'Toque na lupa para mudar para pesquisa de campo completo; toque novamente para voltar à pesquisa por título';
+      'Toque na lupa para pesquisar todos os campos';
 
   @override
-  String get helpCaptionFilter =>
-      'Use os filtros para mostrar apenas entradas de um tipo específico';
+  String get helpCaptionFilter => 'Filtrar entradas por tipo';
 
   @override
-  String get helpCaptionFolders =>
-      'Use o seletor de pasta para filtrar entradas por pasta';
+  String get helpCaptionFolders => 'Filtrar entradas por pasta';
 
   @override
   String get helpCaptionSelect =>
-      'Pressione longamente uma entrada para entrar no modo de seleção; adicione mais itens, depois atribua a uma pasta ou exclua. Toque em X para sair.';
+      'Segure para selecionar; depois mova para uma pasta ou exclua';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Toque em uma letra na barra de índice para pular para aquela seção';
+  String get helpCaptionJumpToLetter => 'Toque em uma letra para pular até lá';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Toque no ícone de olho para revelar uma senha, depois pressione longamente para ver uma análise detalhada dos caracteres';
+  String get helpCaptionBreakdown => 'Gerar uma senha ou frase-senha';
 
   @override
   String get helpCaptionManageVaults =>
-      'Em Gerenciar cofres, renomeie ou exclua cofres, ou adicione um novo';
+      'Gerenciar cofres: adicionar, renomear, excluir';
 
   @override
-  String get helpCaptionUnlock =>
-      'Insira a frase secreta para desbloquear o cofre';
+  String get helpCaptionUnlock => 'Desbloquear com frase-senha';
 
   @override
   String get helpCaptionVaultSync =>
-      'Processo de sincronização do cofre criptografado';
+      'Sincronização: Exportar aqui, Sincronizar do cofre ali';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Configurações de sincronização: mesclagem automática e pastas padrão';
+
+  @override
+  String get helpCaptionExport => 'Tipo e local da exportação';
+
+  @override
+  String get helpCaptionImport => 'Tipo e caminho da importação';
 
   @override
   String get passphraseNoWordlist =>
@@ -4767,6 +4851,58 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   String get securityTitle => 'Segurança';
 
   @override
+  String get syncSettingsTitle => 'Definições de sincronização';
+
+  @override
+  String get sectionAutoMerge => 'Fusão automática';
+
+  @override
+  String get autoMergeTitle => 'Fundir automaticamente';
+
+  @override
+  String get autoMergeDescription =>
+      'Sincronizar do cofre aplica as alterações recebidas automaticamente. Onde os valores dos dois cofres diferem, as alterações recebidas vencem.';
+
+  @override
+  String get autoMergeNote =>
+      'O ficheiro é pedido na mesma se não abrir com a sua frase-passe.';
+
+  @override
+  String get sectionSyncFolder => 'Pasta de sincronização';
+
+  @override
+  String syncFolderDescription(String name) {
+    return 'Onde chega a exportação do outro dispositivo. Sincronizar do cofre abre aí o ficheiro $name, o nome com que este cofre é exportado, sem perguntar.';
+  }
+
+  @override
+  String get syncFolderNotSet =>
+      'Não definida: Sincronizar do cofre pede o ficheiro de cada vez.';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return 'Nenhum ficheiro chamado $name na pasta de sincronização.';
+  }
+
+  @override
+  String get rememberFolder => 'Lembrar';
+
+  @override
+  String get rememberFolderNote => 'Da próxima vez começa nesta pasta.';
+
+  @override
+  String get exportFolderLabel => 'Pasta de exportação';
+
+  @override
+  String get importFolderLabel => 'Pasta de importação';
+
+  @override
+  String get folderNotSet => 'Não definida';
+
+  @override
+  String get foldersChangedNote => 'Altera-se em Exportar e Importar entradas.';
+
+  @override
   String get aboutTitle => 'Sobre o Gabbro';
 
   @override
@@ -4774,6 +4910,9 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get importTitle => 'Importar entradas';
+
+  @override
+  String get importSourceLabel => 'Origem';
 
   @override
   String get exportTitle => 'Exportar cofre';
@@ -5037,9 +5176,6 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   String get menuImportEntries => 'Importar entradas';
 
   @override
-  String get menuSyncFromFile => 'Sincronizar de ficheiro';
-
-  @override
   String get menuManageVaults => 'Gerir cofres';
 
   @override
@@ -5053,6 +5189,9 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get menuSecurity => 'Segurança';
+
+  @override
+  String get menuSyncSettings => 'Definições de sincronização';
 
   @override
   String get menuManageFolders => 'Gerir pastas';
@@ -5278,9 +5417,6 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get syncFailedTitle => 'Sincronização falhou';
-
-  @override
-  String get syncFromFileTitle => 'Sincronizar de ficheiro';
 
   @override
   String get nothingToSync =>
@@ -5800,21 +5936,6 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
       'Edite para corrigir e guardar esta entrada, ou ignore para a descartar.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count entradas ignoradas',
-      one: '1 entrada ignorada',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Estas entradas já existem no cofre e não foram substituídas:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'O outro dispositivo eliminou \'$title\'.\n\nEliminar aqui também, ou manter?';
   }
@@ -6042,8 +6163,9 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
       'Escolha um destino para o ficheiro de cofre exportado.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Serão criados dois ficheiros: vault.gabbro e vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Serão escritos dois ficheiros: $name e $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Selecione um destino.';
@@ -6186,11 +6308,11 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get importDuplicateWarning =>
-      'As entradas que já estão no cofre serão ignoradas automaticamente. Será apresentado um resumo.';
+      'Cada entrada do ficheiro é adicionada, mesmo as que o cofre já tem. Melhor uma única vez, num cofre vazio.';
 
   @override
   String get importGabbroSubtitle =>
-      'Importar entradas de outro cofre Gabbro (ficheiro .gabbro)';
+      'Importar entradas de outro cofre Gabbro (ficheiro .gabbro). Para este mesmo cofre de outro dispositivo, use Sincronizar do cofre.';
 
   @override
   String get importEnpassSubtitle =>
@@ -6590,54 +6712,58 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get helpCaptionCreate =>
-      'Criar um cofre: introduza um nome, frase-passe e opcionalmente proteja com uma YubiKey';
+      'Criar cofre: nome, frase-passe, YubiKey opcional';
 
   @override
-  String get helpCaptionEmpty => 'Toque em + para adicionar a primeira entrada';
+  String get helpCaptionEmpty => 'Toque em + para adicionar uma entrada';
 
   @override
   String get helpCaptionDetail =>
-      'Toque no ícone de olho para revelar uma palavra-passe, depois pressione longamente para ver uma análise detalhada dos caracteres';
+      'Toque na entrada para abrir, no olho para revelar, mantenha premido para detalhes';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Por defeito, a barra de pesquisa pesquisa apenas títulos de entradas';
+  String get helpCaptionTitleSearch => 'Pesquisar títulos';
 
   @override
   String get helpCaptionFullSearch =>
-      'Toque na lupa para mudar para pesquisa de campo completo; toque novamente para voltar a pesquisa por título';
+      'Toque na lupa para pesquisar todos os campos';
 
   @override
-  String get helpCaptionFilter =>
-      'Use os filtros para mostrar apenas entradas de um tipo específico';
+  String get helpCaptionFilter => 'Filtrar entradas por tipo';
 
   @override
-  String get helpCaptionFolders =>
-      'Use o seletor de pasta para filtrar entradas por pasta';
+  String get helpCaptionFolders => 'Filtrar entradas por pasta';
 
   @override
   String get helpCaptionSelect =>
-      'Pressione longamente uma entrada para entrar no modo de seleção; adicione mais itens, depois atribua a uma pasta ou elimine. Toque em X para sair.';
+      'Mantenha premido para selecionar; depois mova para uma pasta ou elimine';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Toque numa letra na barra de índice para saltar para essa secção';
+  String get helpCaptionJumpToLetter => 'Toque numa letra para saltar até lá';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Toque no ícone de olho para revelar uma palavra-passe, depois pressione longamente para ver uma análise detalhada dos caracteres';
+  String get helpCaptionBreakdown => 'Gerar uma palavra-passe ou frase-passe';
 
   @override
   String get helpCaptionManageVaults =>
-      'Em Gerir cofres, renomeie ou elimine cofres, ou adicione um novo';
+      'Gerir cofres: adicionar, renomear, eliminar';
 
   @override
-  String get helpCaptionUnlock =>
-      'Introduza a frase-passe para desbloquear o cofre';
+  String get helpCaptionUnlock => 'Desbloquear com frase-passe';
 
   @override
   String get helpCaptionVaultSync =>
-      'Processo de sincronização do cofre cifrado';
+      'Sincronização: Exportar aqui, Sincronizar a partir do cofre ali';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Definições de sincronização: fusão automática e pastas predefinidas';
+
+  @override
+  String get helpCaptionExport => 'Tipo e localização da exportação';
+
+  @override
+  String get helpCaptionImport => 'Tipo e caminho da importação';
 
   @override
   String get passphraseNoWordlist =>

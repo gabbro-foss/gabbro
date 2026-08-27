@@ -37,11 +37,23 @@ class AppSettings {
   /// Android-only; ignored on Linux.
   final bool appPasskeys;
 
-  /// Persisted SAF tree URI of the Android `.gabbro` export destination folder
-  /// (`content://…/tree/…`). Empty until the user picks a folder. Lets export
-  /// remember the sync folder across runs instead of re-picking each time.
-  /// Android-only; ignored on Linux.
-  final String androidExportFolderUri;
+  /// Remembered export folder: a Linux path or an Android SAF tree URI. Empty
+  /// until the user picks one with Remember ticked (the default); the export
+  /// screen then arrives ready to write there.
+  final String exportFolder;
+
+  /// Remembered import folder: where the file dialog starts next time. A Linux
+  /// path or the Android location the picker reported. Empty = not remembered.
+  final String importFolder;
+
+  /// Apply an incoming sync without the chooser or the review (incoming wins).
+  /// Off by default: a review is the safer first experience.
+  final bool autoMergeSync;
+
+  /// Folder the other device's export lands in. Sync from vault opens the
+  /// file there with this vault's own name and skips the picker. Linux path
+  /// or Android SAF tree URI; empty = not remembered, picker as before.
+  final String syncFolder;
 
   const AppSettings({
     this.theme = ThemeChoice.system,
@@ -57,7 +69,10 @@ class AppSettings {
     this.tabletListPaneWidth = 260.0,
     this.passkeyHintDismissed = false,
     this.appPasskeys = false,
-    this.androidExportFolderUri = '',
+    this.exportFolder = '',
+    this.importFolder = '',
+    this.autoMergeSync = false,
+    this.syncFolder = '',
   });
 
   static AppSettings get defaults => const AppSettings();
@@ -78,7 +93,10 @@ class AppSettings {
     'tablet_list_pane_width': tabletListPaneWidth,
     'passkey_hint_dismissed': passkeyHintDismissed,
     'app_passkeys': appPasskeys,
-    'android_export_folder_uri': androidExportFolderUri,
+    'export_folder': exportFolder,
+    'import_folder': importFolder,
+    'auto_merge_sync': autoMergeSync,
+    'sync_folder': syncFolder,
   };
 
   factory AppSettings.fromJson(Map<String, dynamic> json) {
@@ -111,7 +129,13 @@ class AppSettings {
           260.0,
       passkeyHintDismissed: json['passkey_hint_dismissed'] as bool? ?? false,
       appPasskeys: json['app_passkeys'] as bool? ?? false,
-      androidExportFolderUri: json['android_export_folder_uri'] as String? ?? '',
+      // `android_export_folder_uri` is the pre-step-3 name of the same slot.
+      exportFolder: json['export_folder'] as String? ??
+          json['android_export_folder_uri'] as String? ??
+          '',
+      importFolder: json['import_folder'] as String? ?? '',
+      autoMergeSync: json['auto_merge_sync'] as bool? ?? false,
+      syncFolder: json['sync_folder'] as String? ?? '',
     );
   }
 
@@ -166,7 +190,10 @@ class AppSettings {
     double? tabletListPaneWidth,
     bool? passkeyHintDismissed,
     bool? appPasskeys,
-    String? androidExportFolderUri,
+    String? exportFolder,
+    String? importFolder,
+    bool? autoMergeSync,
+    String? syncFolder,
   }) => AppSettings(
     theme: theme ?? this.theme,
     textScale: textScale ?? this.textScale,
@@ -181,8 +208,10 @@ class AppSettings {
     tabletListPaneWidth: tabletListPaneWidth ?? this.tabletListPaneWidth,
     passkeyHintDismissed: passkeyHintDismissed ?? this.passkeyHintDismissed,
     appPasskeys: appPasskeys ?? this.appPasskeys,
-    androidExportFolderUri:
-        androidExportFolderUri ?? this.androidExportFolderUri,
+    exportFolder: exportFolder ?? this.exportFolder,
+    importFolder: importFolder ?? this.importFolder,
+    autoMergeSync: autoMergeSync ?? this.autoMergeSync,
+    syncFolder: syncFolder ?? this.syncFolder,
   );
 
   // ── File I/O ───────────────────────────────────────────────────────────
@@ -278,9 +307,25 @@ class AppSettings {
   // Options: true | false
   "app_passkeys": $appPasskeys,
 
-  // Android export destination folder (SAF tree URI). Set automatically when you
-  // pick an export folder; remembered so exports go straight there. Android only.
-  "android_export_folder_uri": ${jsonEncode(androidExportFolderUri)}
+  // Remembered export folder (Linux path or Android folder URI). Set when you
+  // pick one on the Export screen with Remember ticked; empty = ask each time.
+  "export_folder": ${jsonEncode(exportFolder)},
+
+  // Remembered import folder: where the file dialog starts on the Import
+  // screen. Linux path or Android location; empty = not remembered.
+  "import_folder": ${jsonEncode(importFolder)},
+
+  // Apply an incoming sync automatically (the other device's value wins where
+  // the two differ), without the chooser or the one-by-one review. Same
+  // passphrase does not prove same vault: the file is still asked for if it
+  // does not open.
+  // Options: true | false
+  "auto_merge_sync": $autoMergeSync,
+
+  // Folder the other device's export lands in. "Sync from vault" opens the
+  // file there that carries this vault's own name and skips the picker.
+  // Linux path or Android folder URI; empty = ask each time.
+  "sync_folder": ${jsonEncode(syncFolder)}
 }
 ''';
 

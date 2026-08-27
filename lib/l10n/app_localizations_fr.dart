@@ -242,6 +242,60 @@ class AppLocalizationsFr extends AppLocalizations {
   String get securityTitle => 'Sécurité';
 
   @override
+  String get syncSettingsTitle => 'Paramètres de synchronisation';
+
+  @override
+  String get sectionAutoMerge => 'Fusion automatique';
+
+  @override
+  String get autoMergeTitle => 'Fusionner automatiquement';
+
+  @override
+  String get autoMergeDescription =>
+      'Synchroniser depuis le coffre applique les changements entrants automatiquement. Là où les valeurs des deux coffres diffèrent, les changements entrants l\'emportent.';
+
+  @override
+  String get autoMergeNote =>
+      'Le fichier sera tout de même demandé s\'il ne s\'ouvre pas avec votre phrase secrète.';
+
+  @override
+  String get sectionSyncFolder => 'Dossier de synchronisation';
+
+  @override
+  String syncFolderDescription(String name) {
+    return 'Là où arrive l\'export de l\'autre appareil. Synchroniser depuis le coffre y ouvre le fichier $name, le nom sous lequel ce coffre s\'exporte, sans rien demander.';
+  }
+
+  @override
+  String get syncFolderNotSet =>
+      'Non défini : Synchroniser depuis le coffre demande le fichier à chaque fois.';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return 'Aucun fichier nommé $name dans le dossier de synchronisation.';
+  }
+
+  @override
+  String get rememberFolder => 'Mémoriser';
+
+  @override
+  String get rememberFolderNote =>
+      'La prochaine fois commence dans ce dossier.';
+
+  @override
+  String get exportFolderLabel => 'Dossier d\'export';
+
+  @override
+  String get importFolderLabel => 'Dossier d\'import';
+
+  @override
+  String get folderNotSet => 'Non défini';
+
+  @override
+  String get foldersChangedNote =>
+      'Se modifie dans Exporter et Importer des entrées.';
+
+  @override
   String get aboutTitle => 'À propos de Gabbro';
 
   @override
@@ -249,6 +303,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get importTitle => 'Importer des entrées';
+
+  @override
+  String get importSourceLabel => 'Source';
 
   @override
   String get exportTitle => 'Exporter le coffre';
@@ -513,9 +570,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get menuImportEntries => 'Importer des entrées';
 
   @override
-  String get menuSyncFromFile => 'Synchroniser depuis un fichier';
-
-  @override
   String get menuManageVaults => 'Gérer les coffres';
 
   @override
@@ -529,6 +583,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Sécurité';
+
+  @override
+  String get menuSyncSettings => 'Paramètres de synchronisation';
 
   @override
   String get menuManageFolders => 'Gérer les dossiers';
@@ -754,9 +811,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Échec de la synchronisation';
-
-  @override
-  String get syncFromFileTitle => 'Synchroniser depuis un fichier';
 
   @override
   String get nothingToSync =>
@@ -1282,21 +1336,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'Modifiez pour corriger et enregistrer cette entrée, ou ignorez pour la supprimer.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count entrées ignorées',
-      one: '1 entrée ignorée',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Ces entrées existent déjà dans votre coffre et n\'ont pas été écrasées :';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'L\'autre appareil a supprimé « $title ».\n\nLe supprimer ici aussi, ou le conserver ?';
   }
@@ -1524,8 +1563,9 @@ class AppLocalizationsFr extends AppLocalizations {
       'Choisissez une destination pour votre fichier de coffre exporté.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Deux fichiers seront créés : vault.gabbro et vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Deux fichiers seront écrits : $name et $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Sélectionnez une destination.';
@@ -1674,11 +1714,11 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Les entrées déjà présentes dans votre coffre seront automatiquement ignorées. Un résumé vous sera présenté.';
+      'Chaque entrée du fichier est ajoutée, même celles déjà dans le coffre. À faire une seule fois, dans un coffre vide.';
 
   @override
   String get importGabbroSubtitle =>
-      'Importer les entrées depuis un autre coffre Gabbro (fichier .gabbro)';
+      'Importer les entrées d\'un autre coffre Gabbro (fichier .gabbro). Pour ce même coffre depuis un autre appareil, utilisez plutôt Synchroniser depuis le coffre.';
 
   @override
   String get importEnpassSubtitle =>
@@ -2081,55 +2121,59 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Créez un coffre : saisissez un nom, une phrase secrète et protégez-le optionnellement avec un YubiKey';
+      'Créer un coffre : nom, phrase secrète, YubiKey facultative';
 
   @override
-  String get helpCaptionEmpty =>
-      'Appuyez sur + pour ajouter votre première entrée';
+  String get helpCaptionEmpty => 'Touchez + pour ajouter une entrée';
 
   @override
   String get helpCaptionDetail =>
-      'Appuyez sur l\'icône œil pour afficher un mot de passe, puis appuyez longuement pour voir une décomposition détaillée des caractères';
+      'Touchez l\'entrée pour ouvrir, l\'œil pour révéler, appui long pour les détails';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Par défaut, la barre de recherche ne cherche que dans les titres des entrées';
+  String get helpCaptionTitleSearch => 'Rechercher dans les titres';
 
   @override
   String get helpCaptionFullSearch =>
-      'Appuyez sur la loupe pour chercher dans tous les champs ; appuyez à nouveau pour revenir à la recherche par titre';
+      'Touchez la loupe pour chercher dans tous les champs';
 
   @override
-  String get helpCaptionFilter =>
-      'Utilisez les filtres pour afficher uniquement les entrées d\'un type spécifique';
+  String get helpCaptionFilter => 'Filtrer les entrées par type';
 
   @override
-  String get helpCaptionFolders =>
-      'Utilisez le sélecteur de dossiers pour filtrer les entrées par dossier';
+  String get helpCaptionFolders => 'Filtrer les entrées par dossier';
 
   @override
   String get helpCaptionSelect =>
-      'Appuyez longuement sur une entrée pour entrer en mode sélection ; ajoutez d\'autres éléments, puis assignez-les à un dossier ou supprimez-les. Appuyez sur X pour quitter.';
+      'Appui long pour sélectionner ; puis déplacer dans un dossier ou supprimer';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Appuyez sur une lettre dans la barre d\'index pour accéder à cette section';
+  String get helpCaptionJumpToLetter => 'Touchez une lettre pour y sauter';
 
   @override
   String get helpCaptionBreakdown =>
-      'Appuyez sur l\'icône œil pour afficher un mot de passe, puis appuyez longuement pour voir une décomposition détaillée des caractères';
+      'Générer un mot de passe ou une phrase secrète';
 
   @override
   String get helpCaptionManageVaults =>
-      'Dans Gérer les coffres, renommez ou supprimez des coffres, ou ajoutez-en un nouveau';
+      'Gérer les coffres : ajouter, renommer, supprimer';
 
   @override
-  String get helpCaptionUnlock =>
-      'Saisissez votre phrase secrète pour déverrouiller votre coffre';
+  String get helpCaptionUnlock => 'Déverrouiller avec la phrase secrète';
 
   @override
   String get helpCaptionVaultSync =>
-      'Processus de synchronisation du coffre chiffré';
+      'Synchronisation : Exporter ici, Synchroniser depuis le coffre là-bas';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Paramètres de synchronisation : fusion automatique et dossiers par défaut';
+
+  @override
+  String get helpCaptionExport => 'Type et emplacement de l\'export';
+
+  @override
+  String get helpCaptionImport => 'Type et chemin de l\'import';
 
   @override
   String get passphraseNoWordlist =>

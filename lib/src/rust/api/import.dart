@@ -6,8 +6,8 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `entry_id_and_title`, `merge_source_into_session`, `stamp_timestamps`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `fmt`, `fmt`, `fmt`
+// These functions are ignored because they are not marked as `pub`: `entry_id_and_title`, `entry_meta_mut`, `merge_source_into_session`, `stamp_timestamps`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `fmt`, `fmt`
 
 /// Sniff the headers and first 3 rows of a CSV string.
 ///
@@ -75,10 +75,9 @@ Future<ImportResult> importFromDashlane({required List<int> data}) =>
 
 /// Import entries from a `.gabbro` vault file into the live session.
 ///
-/// Decrypts the source vault at `path` using `passphrase`, then applies
-/// content-hash deduplication: entries the session already holds are skipped;
-/// new entries are added. Import never updates an existing entry — that is
-/// sync's job. A single vault save is performed at the end.
+/// Decrypts the source vault at `path` using `passphrase`, then adds every
+/// entry, duplicates included (import is additive; sync is the flow that
+/// reconciles). A single vault save is performed at the end.
 ///
 /// The vault must already be unlocked — returns `Err` if no session is active.
 /// Async — triggers a single vault save (Argon2id + encryption) at the end.
@@ -172,21 +171,17 @@ class GabbroImportResult {
   /// Number of entries added to the session.
   final BigInt imported;
 
-  /// Entries that were skipped (UUID already present in the session).
-  final List<SkippedEntryData> skipped;
-
-  const GabbroImportResult({required this.imported, required this.skipped});
+  const GabbroImportResult({required this.imported});
 
   @override
-  int get hashCode => imported.hashCode ^ skipped.hashCode;
+  int get hashCode => imported.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is GabbroImportResult &&
           runtimeType == other.runtimeType &&
-          imported == other.imported &&
-          skipped == other.skipped;
+          imported == other.imported;
 }
 
 /// A single entry that failed domain validation during import.
@@ -239,17 +234,10 @@ class ImportResult {
   /// Entries that failed domain validation and were not imported.
   final List<ImportFailureData> failures;
 
-  /// Entries skipped because the vault already holds identical content.
-  final List<SkippedEntryData> skipped;
-
-  const ImportResult({
-    required this.imported,
-    required this.failures,
-    required this.skipped,
-  });
+  const ImportResult({required this.imported, required this.failures});
 
   @override
-  int get hashCode => imported.hashCode ^ failures.hashCode ^ skipped.hashCode;
+  int get hashCode => imported.hashCode ^ failures.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -257,28 +245,5 @@ class ImportResult {
       other is ImportResult &&
           runtimeType == other.runtimeType &&
           imported == other.imported &&
-          failures == other.failures &&
-          skipped == other.skipped;
-}
-
-/// A single entry skipped during Gabbro → Gabbro import.
-class SkippedEntryData {
-  /// Display title of the skipped entry.
-  ///
-  /// No reason field: there is exactly one reason (the vault already holds this
-  /// content), and the dialog states it once in the user's own language. A
-  /// per-entry reason meant shipping hardcoded English across the bridge.
-  final String title;
-
-  const SkippedEntryData({required this.title});
-
-  @override
-  int get hashCode => title.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is SkippedEntryData &&
-          runtimeType == other.runtimeType &&
-          title == other.title;
+          failures == other.failures;
 }

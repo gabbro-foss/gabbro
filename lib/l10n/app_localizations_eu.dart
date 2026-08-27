@@ -242,6 +242,59 @@ class AppLocalizationsEu extends AppLocalizations {
   String get securityTitle => 'Segurtasuna';
 
   @override
+  String get syncSettingsTitle => 'Sinkronizazio-ezarpenak';
+
+  @override
+  String get sectionAutoMerge => 'Bateratze automatikoa';
+
+  @override
+  String get autoMergeTitle => 'Bateratu automatikoki';
+
+  @override
+  String get autoMergeDescription =>
+      'Kutxatik sinkronizatzeak sarrerako aldaketak automatikoki aplikatzen ditu. Bi kutxetako balioak desberdinak direnean, sarrerako aldaketek irabazten dute.';
+
+  @override
+  String get autoMergeNote =>
+      'Fitxategia eskatuko da hala ere zure pasaesaldiarekin irekitzen ez bada.';
+
+  @override
+  String get sectionSyncFolder => 'Sinkronizazio-karpeta';
+
+  @override
+  String syncFolderDescription(String name) {
+    return 'Beste gailuaren esportazioa non iristen den. Kutxatik sinkronizatzeak hor irekitzen du $name fitxategia, kutxa hau esportatzean duen izena, galdetu gabe.';
+  }
+
+  @override
+  String get syncFolderNotSet =>
+      'Ezarri gabe: kutxatik sinkronizatzeak fitxategia eskatzen du aldiro.';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return 'Ez dago $name izeneko fitxategirik sinkronizazio-karpetan.';
+  }
+
+  @override
+  String get rememberFolder => 'Gogoratu';
+
+  @override
+  String get rememberFolderNote => 'Hurrengoan karpeta honetan hasiko da.';
+
+  @override
+  String get exportFolderLabel => 'Esportazio-karpeta';
+
+  @override
+  String get importFolderLabel => 'Inportazio-karpeta';
+
+  @override
+  String get folderNotSet => 'Ezarri gabe';
+
+  @override
+  String get foldersChangedNote =>
+      'Esportatu eta Inportatu sarrerak ataletan aldatzen da.';
+
+  @override
   String get aboutTitle => 'Gabbro-ri buruz';
 
   @override
@@ -249,6 +302,9 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get importTitle => 'Sarrerak inportatu';
+
+  @override
+  String get importSourceLabel => 'Iturria';
 
   @override
   String get exportTitle => 'Gandegi esportatu';
@@ -512,9 +568,6 @@ class AppLocalizationsEu extends AppLocalizations {
   String get menuImportEntries => 'Sarrerak inportatu';
 
   @override
-  String get menuSyncFromFile => 'Fitxategitik sinkronizatu';
-
-  @override
   String get menuManageVaults => 'Gandegiak kudeatu';
 
   @override
@@ -528,6 +581,9 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Segurtasuna';
+
+  @override
+  String get menuSyncSettings => 'Sinkronizazio-ezarpenak';
 
   @override
   String get menuManageFolders => 'Karpetak kudeatu';
@@ -753,9 +809,6 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Sinkronizazioa huts egin du';
-
-  @override
-  String get syncFromFileTitle => 'Fitxategitik sinkronizatu';
 
   @override
   String get nothingToSync =>
@@ -1278,21 +1331,6 @@ class AppLocalizationsEu extends AppLocalizations {
       'Editatu, zuzendu eta gorde sarrera hau, edo saltatu ukatzeko.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count sarrerak saltatu dira',
-      one: '1 sarrera saltatu da',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Sarrera hauek dagoeneko daude zure gandegian eta ez dira gainidatzi:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Beste gailu batek «$title» ezabatu du.\n\nHemen ere ezabatu, ala gorde?';
   }
@@ -1516,8 +1554,9 @@ class AppLocalizationsEu extends AppLocalizations {
       'Aukeratu esportatutako gandegi-fitxategirako helburua.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Bi fitxategi sortuko dira: vault.gabbro eta vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Bi fitxategi idatziko dira: $name eta $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Aukeratu helburua.';
@@ -1657,11 +1696,11 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Zure gandegian dagoeneko dauden sarrerak automatikoki saltatuko dira. Laburpena erakutsiko da.';
+      'Fitxategiko sarrera guztiak gehitzen dira, kutxak dagoeneko dituenak barne. Hobe behin, kutxa huts batean.';
 
   @override
   String get importGabbroSubtitle =>
-      'Beste Gabbro gandegi batetik sarrerak inportatu (.gabbro fitxategia)';
+      'Inportatu sarrerak beste Gabbro kutxa batetik (.gabbro fitxategia). Kutxa hau beste gailu batetik bada, erabili Kutxatik sinkronizatu.';
 
   @override
   String get importEnpassSubtitle =>
@@ -2059,53 +2098,57 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Sortu gandegiak: sartu izena, pasaesaldia eta aukeran babestu YubiKey-ekin';
+      'Sortu kutxa: izena, pasaesaldia, aukerako YubiKey';
 
   @override
-  String get helpCaptionEmpty => '+ sakatu lehen sarrera gehitzeko';
+  String get helpCaptionEmpty => 'Sakatu + sarrera bat gehitzeko';
 
   @override
   String get helpCaptionDetail =>
-      'Sakatu begi-ikonoa pasahitza ikusteko, gero luze sakatu karaktereen azterketa zehatza ikusteko';
+      'Sakatu sarrera irekitzeko, begia erakusteko, luze sakatu xehetasunetarako';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Lehenespenez: bilaketa-barrak sarrera-izenburuak bakarrik bilatzen ditu';
+  String get helpCaptionTitleSearch => 'Bilatu izenburuetan';
 
   @override
-  String get helpCaptionFullSearch =>
-      'Sakatu lupa eremu guztiak bilatzeko; berriro sakatu izenburuaren araberako bilaketa itzultzeko';
+  String get helpCaptionFullSearch => 'Sakatu lupa eremu guztietan bilatzeko';
 
   @override
-  String get helpCaptionFilter =>
-      'Erabili iragazki-botoiak mota jakineko sarrerak soilik ikusteko';
+  String get helpCaptionFilter => 'Iragazi sarrerak motaren arabera';
 
   @override
-  String get helpCaptionFolders =>
-      'Erabili karpeta hautaketa sarrerak karpetaren arabera iragazteko';
+  String get helpCaptionFolders => 'Iragazi sarrerak karpetaren arabera';
 
   @override
   String get helpCaptionSelect =>
-      'Luze sakatu sarreran hautaketa-modura sartzeko; gehitu elementu gehiago, gero esleitu karpetari edo ezabatu. Sakatu X irteteko.';
+      'Luze sakatu hautatzeko; gero eraman karpeta batera edo ezabatu';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Sakatu indize-barrako letra atal horretara joateko';
+  String get helpCaptionJumpToLetter => 'Sakatu letra bat hara joateko';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Sakatu begi-ikonoa pasahitza ikusteko, gero luze sakatu karaktereen azterketa zehatza ikusteko';
+  String get helpCaptionBreakdown => 'Sortu pasahitz bat edo pasaesaldi bat';
 
   @override
   String get helpCaptionManageVaults =>
-      '«Gandegiak kudeatu»-n gandegiak berrizendatu edo ezabatu ditzakezu, edo berria gehitu';
+      'Kudeatu kutxak: gehitu, izena aldatu, ezabatu';
 
   @override
-  String get helpCaptionUnlock => 'Sartu pasaesaldia gandegiak desblokeatzeko';
+  String get helpCaptionUnlock => 'Desblokeatu pasaesaldiarekin';
 
   @override
   String get helpCaptionVaultSync =>
-      'Enkriptatutako gandegiaren sinkronizazio-prozesua';
+      'Sinkronizazioa: Esportatu hemen, Sinkronizatu kutxatik han';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Sinkronizazio-ezarpenak: bateratze automatikoa eta karpeta lehenetsiak';
+
+  @override
+  String get helpCaptionExport => 'Esportazio mota eta kokapena';
+
+  @override
+  String get helpCaptionImport => 'Inportazio mota eta bidea';
 
   @override
   String get passphraseNoWordlist =>

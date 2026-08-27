@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:gabbro/folder_label.dart';
 import 'package:gabbro/gabbro_file_picker.dart';
+import 'package:gabbro/saf_tree.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
@@ -22,6 +24,12 @@ String sanitiseAlias(String? alias) {
   return sanitised.isEmpty ? 'vault' : sanitised;
 }
 
+/// The name a `.gabbro` export of the vault called [alias] gets (no date):
+/// `<sanitised alias>.gabbro`. Sync from vault looks for exactly this name in
+/// the sync folder, so the two devices agree by construction. It never
+/// collides with the vault on disk, which is `<alias>_gabbro.gabbro`.
+String exportVaultFileName(String? alias) => '${sanitiseAlias(alias)}.gabbro';
+
 String _defaultFilename(String? alias, bool isJson, {bool includeDate = false}) {
   final base = sanitiseAlias(alias);
   if (includeDate) {
@@ -42,21 +50,11 @@ Future<void> _defaultExportPassphraseOnly(String path) =>
 // Raw POSIX paths can't overwrite a file another app created under scoped storage,
 // so Android `.gabbro` export writes via the Storage Access Framework: Rust builds
 // the ciphertext bytes, Kotlin writes them into the user-granted directory tree.
-const _exportChannel = MethodChannel('app.gabbro.gabbro/export');
 
-Future<ExportFolder?> _defaultPickExportDir() async {
-  final r = await _exportChannel.invokeMethod<Map<Object?, Object?>>(
-    'pick_export_dir',
-  );
-  if (r == null) return null; // user cancelled
-  return (
-    treeUri: r['treeUri'] as String,
-    displayName: r['displayName'] as String,
-  );
-}
+Future<ExportFolder?> _defaultPickExportDir() => pickSafTree();
 
 Future<bool> _defaultHasGrant(String treeUri) async =>
-    await _exportChannel.invokeMethod<bool>('has_grant', {
+    await safTreeChannel.invokeMethod<bool>('has_grant', {
       'treeUri': treeUri,
     }) ??
     false;
@@ -67,7 +65,7 @@ Future<void> _defaultWriteExport(
   Uint8List data,
   String sha256Filename,
   String sha256Content,
-) => _exportChannel.invokeMethod<void>('write_export_file', {
+) => safTreeChannel.invokeMethod<void>('write_export_file', {
   'treeUri': treeUri,
   'filename': filename,
   'data': data,
@@ -103,11 +101,17 @@ class ExportScreen extends StatefulWidget {
   final bool isAndroid;
 
   // ── Android SAF `.gabbro` export seams (ADR-013) ──────────────────────────
-  /// Remembered SAF tree URI of the export folder (from settings); empty if none.
-  final String initialExportFolderUri;
+  /// Remembered export folder (from settings): a Linux path, whose
+  /// `<folder>/<name>` pre-fills the path so Export is armed on arrival, or
+  /// an Android SAF tree URI. Empty if none.
+  final String initialExportFolder;
 
-  /// Persist the chosen folder URI (wired to settings by the caller).
-  final Future<void> Function(String treeUri) onSaveExportFolderUri;
+  /// Persist the folder to remember (wired to settings by the caller); an
+  /// empty string forgets it.
+  final Future<void> Function(String folder) onSaveExportFolder;
+
+  /// Test seam for the Linux save dialog (see `PathField.savePicker`).
+  final Future<String?> Function()? savePicker;
 
   /// Launch the SAF folder picker; null if the user cancels.
   final Future<ExportFolder?> Function() onPickExportDir;
@@ -138,13 +142,14 @@ class ExportScreen extends StatefulWidget {
   ExportScreen({
     super.key,
     this.initialPath,
+    this.savePicker,
     this.vaultAlias,
     this.onExport = _defaultExport,
     this.onExportJson = _defaultExportJson,
     this.onExportPassphraseOnly = _defaultExportPassphraseOnly,
     this.isKeyProtected = false,
-    this.initialExportFolderUri = '',
-    this.onSaveExportFolderUri = _noopSaveFolder,
+    this.initialExportFolder = '',
+    this.onSaveExportFolder = _noopSaveFolder,
     this.onPickExportDir = _defaultPickExportDir,
     this.onPickDirectory = _defaultPickDirectory,
     this.onHasGrant = _defaultHasGrant,
@@ -179,6 +184,14 @@ class _ExportScreenState extends State<ExportScreen> {
   String _exportFolderUri = '';
   String? _folderDisplayName;
 
+  // The Remember box: ticked by default, so the first pick is remembered
+  // (Android exported this way already); unticking forgets the folder.
+  bool _remember = true;
+
+  // Linux: the path was derived from the remembered folder, so a format or
+  // date change re-derives it; a user pick or edit stops that.
+  bool _pathFromFolder = false;
+
   // Android `.gabbro` export goes through SAF; JSON + Linux keep raw paths.
   bool get _useSaf => widget.isAndroid && _format != _ExportFormat.json;
 
@@ -190,10 +203,38 @@ class _ExportScreenState extends State<ExportScreen> {
   void initState() {
     super.initState();
     _path = widget.initialPath;
-    _exportFolderUri = widget.initialExportFolderUri;
+    _exportFolderUri = widget.initialExportFolder;
     if (widget.isAndroid && _exportFolderUri.isNotEmpty) {
       _validateGrant();
+    } else if (!widget.isAndroid &&
+        _exportFolderUri.isNotEmpty &&
+        (_path == null || _path!.isEmpty)) {
+      _pathFromFolder = true;
+      _reseedFromFolder();
     }
+  }
+
+  /// Linux: `<remembered folder>/<default name>`, so Export is armed at once.
+  void _reseedFromFolder() {
+    if (!_pathFromFolder || _exportFolderUri.isEmpty) return;
+    _path =
+        '$_exportFolderUri/${_defaultFilename(widget.vaultAlias, _format == _ExportFormat.json, includeDate: _includeDate)}';
+  }
+
+  /// The folder to remember for what is on screen now: the Android tree, or
+  /// the Linux path's directory. Empty when nothing is chosen yet.
+  String _currentFolder() {
+    if (widget.isAndroid) return _exportFolderUri;
+    final p = _path;
+    if (p == null || p.isEmpty) return '';
+    return File(p).parent.path;
+  }
+
+  Future<void> _onRememberChanged(bool? value) async {
+    final on = value == true;
+    setState(() => _remember = on);
+    // Unticked forgets the folder in settings; what is on screen stays usable.
+    await widget.onSaveExportFolder(on ? _currentFolder() : '');
   }
 
   // Drop a remembered folder whose grant the user has revoked in Android Settings,
@@ -227,19 +268,15 @@ class _ExportScreenState extends State<ExportScreen> {
       _folderDisplayName = picked.displayName;
       _error = null;
     });
-    await widget.onSaveExportFolderUri(picked.treeUri);
+    if (_remember) await widget.onSaveExportFolder(picked.treeUri);
   }
 
-  /// Human-readable label for a SAF tree URI, e.g.
-  /// `content://…/tree/primary%3ADownload%2FGabbroSync` -> `primary:Download/GabbroSync`.
+  /// The picker's display name when it gave one, else the decoded tree URI.
   String _folderLabel() {
     if (_folderDisplayName != null && _folderDisplayName!.isNotEmpty) {
       return _folderDisplayName!;
     }
-    final marker = '/tree/';
-    final i = _exportFolderUri.indexOf(marker);
-    if (i < 0) return _exportFolderUri;
-    return Uri.decodeComponent(_exportFolderUri.substring(i + marker.length));
+    return folderDisplayLabel(_exportFolderUri);
   }
 
   String get _exportPath {
@@ -348,6 +385,7 @@ class _ExportScreenState extends State<ExportScreen> {
                     setState(() {
                       _format = selection.first;
                       _error = null;
+                      _reseedFromFolder();
                     });
                   },
                 ),
@@ -432,7 +470,10 @@ class _ExportScreenState extends State<ExportScreen> {
                   contentPadding: EdgeInsets.zero,
                   title: Text(l.exportIncludeDate),
                   value: _includeDate,
-                  onChanged: (v) => setState(() => _includeDate = v),
+                  onChanged: (v) => setState(() {
+                    _includeDate = v;
+                    _reseedFromFolder();
+                  }),
                 ),
                 Text(
                   isJson
@@ -443,7 +484,11 @@ class _ExportScreenState extends State<ExportScreen> {
                 if (!isJson) ...[
                   const SizedBox(height: 4),
                   Text(
-                    l.exportTwoFilesNote,
+                    l.exportTwoFilesNote(_defaultFilename(
+                      widget.vaultAlias,
+                      false,
+                      includeDate: _includeDate,
+                    )),
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
@@ -492,11 +537,29 @@ class _ExportScreenState extends State<ExportScreen> {
                       includeDate: _includeDate,
                     ),
                     initialPath: _path,
+                    startFolder: _remember && _exportFolderUri.isNotEmpty
+                        ? _exportFolderUri
+                        : null,
+                    savePicker: widget.savePicker,
                     onPathSelected: (p) => setState(() {
                       _path = p;
+                      _pathFromFolder = false;
                       _error = null;
                     }),
+                    onFolderPicked: (f) {
+                      if (!_remember) return;
+                      _exportFolderUri = f;
+                      widget.onSaveExportFolder(f);
+                    },
                   ),
+                CheckboxListTile(
+                  title: Text(l.rememberFolder),
+                  subtitle: Text(l.rememberFolderNote),
+                  value: _remember,
+                  onChanged: _onRememberChanged,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  contentPadding: EdgeInsets.zero,
+                ),
                 if (_error != null) ...[
                   const SizedBox(height: 4),
                   Text(

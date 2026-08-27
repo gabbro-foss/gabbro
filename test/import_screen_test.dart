@@ -9,25 +9,30 @@ import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/screens/import_screen.dart';
-import 'package:gabbro/screens/import_skipped_dialog.dart';
 import 'package:gabbro/src/rust/api/import.dart';
 import 'package:gabbro/text_scale.dart';
-import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/widgets/path_field.dart';
+import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/widgets/yubikey_tap.dart';
 
-/// Scrolls to [sectionTitle], then taps the FilledButton in that section.
+// The one action button; Gabbro vault is the default type.
+Finder _gabbroImportButton() => find.widgetWithText(FilledButton, 'Import');
+
+/// Picks [title] in the type dropdown.
+Future<void> _selectType(WidgetTester tester, String title) async {
+  final dd = find.byType(DropdownButton<ImportType>);
+  await tester.ensureVisible(dd);
+  await tester.tap(dd);
+  await tester.pumpAndSettle();
+  await tester.tap(find.text(title).last);
+  await tester.pumpAndSettle();
+}
+
+/// Selects the type [title], then taps the action button.
 Future<void> _tapImportForSection(
-    WidgetTester tester, String sectionTitle) async {
-  await tester.scrollUntilVisible(
-    find.text(sectionTitle),
-    300,
-    scrollable: find.byType(Scrollable).first,
-  );
-  final col = find
-      .ancestor(of: find.text(sectionTitle), matching: find.byType(Column))
-      .first;
-  final btn = find.descendant(of: col, matching: find.byType(FilledButton));
+    WidgetTester tester, String title) async {
+  await _selectType(tester, title);
+  final btn = find.byType(FilledButton);
   await tester.ensureVisible(btn);
   await tester.tap(btn);
   await tester.pump();
@@ -47,25 +52,21 @@ void main() {
             (_) async => ImportResult(
                   imported: BigInt.zero,
                   failures: [],
-                  skipped: [],
                 ),
         onImportBitwarden: onImportBitwarden ??
             (_) async => ImportResult(
                   imported: BigInt.zero,
                   failures: [],
-                  skipped: [],
                 ),
         onImportGooglePm: onImportGooglePm ??
             (_) async => ImportResult(
                   imported: BigInt.zero,
                   failures: [],
-                  skipped: [],
                 ),
         onImportDashlane: onImportDashlane ??
             (_) async => ImportResult(
                   imported: BigInt.zero,
                   failures: [],
-                  skipped: [],
                 ),
         onSniffCsv: onSniffCsv ?? (_) => CsvPreviewData(headers: [], rows: []),
       ));
@@ -74,59 +75,27 @@ void main() {
     testWidgets('shows duplicate warning banner', (tester) async {
       await tester.pumpWidget(buildScreen());
       expect(
-        find.textContaining('Entries your vault already holds'),
+        find.textContaining('even ones your vault already holds'),
         findsOneWidget,
-        reason: 'the banner must describe content matching, not UUIDs',
+        reason: 'the banner must say import is additive',
       );
-    });
-
-    testWidgets('skipped dialog shows entry title and the localized reason',
-        (tester) async {
-      await tester.pumpWidget(testApp(Builder(
-        builder: (context) => TextButton(
-          onPressed: () => showSkippedEntriesDialog(
-            context,
-            [
-              SkippedEntryData(title: 'Dupe Entry'),
-            ],
-          ),
-          child: const Text('show'),
-        ),
-      )));
-      await tester.tap(find.text('show'));
-      await tester.pump();
-      await tester.pump(const Duration(seconds: 1));
-      expect(find.textContaining('Dupe Entry'), findsOneWidget);
-      expect(
-        find.textContaining('already exist in your vault'),
-        findsOneWidget,
-        reason: 'the reason is the localized note, not raw English from Rust',
-      );
-    });
-
-    testWidgets('skipped dialog shows correct entry count in title',
-        (tester) async {
-      await tester.pumpWidget(testApp(Builder(
-        builder: (context) => TextButton(
-          onPressed: () => showSkippedEntriesDialog(
-            context,
-            [
-              SkippedEntryData(title: 'Entry A'),
-              SkippedEntryData(title: 'Entry B'),
-            ],
-          ),
-          child: const Text('show'),
-        ),
-      )));
-      await tester.tap(find.text('show'));
-      await tester.pump();
-      await tester.pump(const Duration(seconds: 1));
-      expect(find.textContaining('2 entries skipped'), findsOneWidget);
     });
 
     testWidgets('warning banner has warning icon', (tester) async {
       await tester.pumpWidget(buildScreen());
       expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
+    });
+
+    testWidgets('the Gabbro section sends the same vault to Sync from vault', (
+      tester,
+    ) async {
+      // S10: import is additive, so importing this vault's own synced file
+      // would duplicate every entry. The section says where that file goes.
+      await tester.pumpWidget(buildScreen());
+      expect(
+        find.textContaining('use Sync from vault instead'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('shows Gabbro vault section', (tester) async {
@@ -144,8 +113,8 @@ void main() {
     testWidgets('shows error when Gabbro import attempted with no file',
         (tester) async {
       await tester.pumpWidget(buildScreen());
-      await tester.ensureVisible(find.text('Sync from vault'));
-      await tester.tap(find.text('Sync from vault'));
+      await tester.ensureVisible(_gabbroImportButton());
+      await tester.tap(_gabbroImportButton());
       await tester.pump();
       expect(find.text('Select a file.'), findsOneWidget);
     });
@@ -167,30 +136,40 @@ void main() {
       return f;
     }
 
-    testWidgets('no skipped dialog when nothing was skipped', (tester) async {
-      // The screen guards the dialog on skipped.isNotEmpty. A clean import must
-      // not interrupt the user with an empty "0 entries skipped" box.
+    testWidgets('an import pops with the count and raises no dialog',
+        (tester) async {
+      // S3: import is additive; nothing is skipped, so nothing to report.
       final tmp = tempGabbroFile();
+      int? popped;
 
-      await tester.pumpWidget(testApp(ImportScreen(
-        isAndroid: false,
-        initialGabbroPath: tmp.path,
-        onDetectSourceRecords: (_) => [],
-        onImportGabbro: (_, _) async =>
-            GabbroImportResult(imported: BigInt.one, skipped: []),
+      await tester.pumpWidget(testApp(Builder(
+        builder: (context) => TextButton(
+          onPressed: () async {
+            popped = await Navigator.of(context).push<int>(MaterialPageRoute(
+              builder: (_) => ImportScreen(
+                isAndroid: false,
+                initialGabbroPath: tmp.path,
+                onDetectSourceRecords: (_) => [],
+                onImportGabbro: (_, _) async =>
+                    GabbroImportResult(imported: BigInt.from(3)),
+              ),
+            ));
+          },
+          child: const Text('Open'),
+        ),
       )));
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
 
       await tester.enterText(
           find.widgetWithText(TextField, 'Vault passphrase'), 'pw');
-      await tester.ensureVisible(find.text('Sync from vault'));
-      await tester.tap(find.text('Sync from vault'));
-      await tester.pump();
-      await tester.pump(const Duration(seconds: 1));
+      await tester.ensureVisible(_gabbroImportButton());
+      await tester.tap(_gabbroImportButton());
+      await tester.pumpAndSettle();
 
       expect(find.byType(AlertDialog), findsNothing);
-      expect(find.textContaining('entries skipped'), findsNothing);
+      expect(popped, 3);
     });
-
     testWidgets('key-protected source shows YubiKey PIN field and info note',
         (tester) async {
       final tmp = tempGabbroFile();
@@ -265,7 +244,7 @@ void main() {
         initialGabbroPath: tmp.path,
         onDetectSourceRecords: (_) => [],
       )));
-      await tester.ensureVisible(find.text('Sync from vault'));
+      await tester.ensureVisible(_gabbroImportButton());
       expect(find.text('YubiKey PIN'), findsNothing);
       expect(find.textContaining('protected by a YubiKey'), findsNothing);
     });
@@ -291,11 +270,11 @@ void main() {
           keyPath = path;
           keyHmac = hmac;
           keyCred = cred;
-          return GabbroImportResult(imported: BigInt.one, skipped: []);
+          return GabbroImportResult(imported: BigInt.one);
         },
         onImportGabbro: (_, _) async {
           plainCalled = true;
-          return GabbroImportResult(imported: BigInt.zero, skipped: []);
+          return GabbroImportResult(imported: BigInt.zero);
         },
       )));
 
@@ -303,8 +282,8 @@ void main() {
           find.widgetWithText(TextField, 'Vault passphrase'), 'pw');
       await tester.enterText(
           find.widgetWithText(TextField, 'YubiKey PIN'), '1234');
-      await tester.ensureVisible(find.text('Sync from vault'));
-      await tester.tap(find.text('Sync from vault'));
+      await tester.ensureVisible(_gabbroImportButton());
+      await tester.tap(_gabbroImportButton());
       await tester.pump();
       await tester.pump();
 
@@ -325,15 +304,15 @@ void main() {
         onDetectSourceRecords: (_) => [fakeRecord()],
         onGetYubikeyHmac: (_, _, _) => gate.future,
         onImportGabbroWithKey: (_, _, _, _) async =>
-            GabbroImportResult(imported: BigInt.one, skipped: []),
+            GabbroImportResult(imported: BigInt.one),
       )));
 
       await tester.enterText(
           find.widgetWithText(TextField, 'Vault passphrase'), 'pw');
       await tester.enterText(
           find.widgetWithText(TextField, 'YubiKey PIN'), '1234');
-      await tester.ensureVisible(find.text('Sync from vault'));
-      await tester.tap(find.text('Sync from vault'));
+      await tester.ensureVisible(_gabbroImportButton());
+      await tester.tap(_gabbroImportButton());
       await tester.pump(); // kick off the async; tap is now pending
 
       expect(find.text('Tap your YubiKey now…'), findsOneWidget);
@@ -344,7 +323,7 @@ void main() {
       await tester.pump();
     });
 
-    // ── R7: Sync from vault demands full credentials ─────────────────────────
+    // ── R7: the Gabbro Import demands full credentials ─────────────────────────
     //
     // Four guards on one button, none of them previously tested. The last one
     // matters most: without it, pressing Sync with an empty PIN box sends that
@@ -357,12 +336,12 @@ void main() {
         onDetectSourceRecords: (_) => [],
         onImportGabbro: (_, _) async {
           imported = true;
-          return GabbroImportResult(imported: BigInt.zero, skipped: []);
+          return GabbroImportResult(imported: BigInt.zero);
         },
       )));
 
-      await tester.ensureVisible(find.text('Sync from vault'));
-      await tester.tap(find.text('Sync from vault'));
+      await tester.ensureVisible(_gabbroImportButton());
+      await tester.tap(_gabbroImportButton());
       await tester.pump();
 
       expect(find.text('Select a file.'), findsOneWidget);
@@ -378,15 +357,15 @@ void main() {
         onDetectSourceRecords: (_) => [],
         onImportGabbro: (_, _) async {
           imported = true;
-          return GabbroImportResult(imported: BigInt.zero, skipped: []);
+          return GabbroImportResult(imported: BigInt.zero);
         },
       )));
       tmp.deleteSync();
 
       await tester.enterText(
           find.widgetWithText(TextField, 'Vault passphrase'), 'pw');
-      await tester.ensureVisible(find.text('Sync from vault'));
-      await tester.tap(find.text('Sync from vault'));
+      await tester.ensureVisible(_gabbroImportButton());
+      await tester.tap(_gabbroImportButton());
       await tester.pump();
 
       expect(find.text('File not found.'), findsOneWidget);
@@ -403,12 +382,12 @@ void main() {
         onDetectSourceRecords: (_) => [],
         onImportGabbro: (_, _) async {
           imported = true;
-          return GabbroImportResult(imported: BigInt.zero, skipped: []);
+          return GabbroImportResult(imported: BigInt.zero);
         },
       )));
 
-      await tester.ensureVisible(find.text('Sync from vault'));
-      await tester.tap(find.text('Sync from vault'));
+      await tester.ensureVisible(_gabbroImportButton());
+      await tester.tap(_gabbroImportButton());
       await tester.pump();
 
       expect(find.text('Enter the passphrase for this vault.'), findsOneWidget);
@@ -430,14 +409,14 @@ void main() {
         },
         onImportGabbroWithKey: (_, _, _, _) async {
           imported = true;
-          return GabbroImportResult(imported: BigInt.one, skipped: []);
+          return GabbroImportResult(imported: BigInt.one);
         },
       )));
 
       await tester.enterText(
           find.widgetWithText(TextField, 'Vault passphrase'), 'pw');
-      await tester.ensureVisible(find.text('Sync from vault'));
-      await tester.tap(find.text('Sync from vault'));
+      await tester.ensureVisible(_gabbroImportButton());
+      await tester.tap(_gabbroImportButton());
       await tester.pump();
 
       expect(find.text('YubiKey PIN is required'), findsOneWidget);
@@ -456,7 +435,7 @@ void main() {
         onDetectSourceRecords: (_) => [],
         onImportGabbro: (_, _) async {
           plainCalled = true;
-          return GabbroImportResult(imported: BigInt.zero, skipped: []);
+          return GabbroImportResult(imported: BigInt.zero);
         },
       )));
       await tester.enterText(
@@ -502,7 +481,7 @@ void main() {
           return (hmac: <int>[9], credentialId: <int>[1, 2]);
         },
         onImportGabbroWithKey: (_, _, _, _) async =>
-            GabbroImportResult(imported: BigInt.one, skipped: []),
+            GabbroImportResult(imported: BigInt.one),
       )));
       await tester.enterText(
           find.widgetWithText(TextField, 'Vault passphrase'), 'pw');
@@ -546,7 +525,7 @@ void main() {
 
       expect(find.textContaining('file version not supported'), findsOneWidget);
       // Still on the import screen: a failure must not pop as a success does.
-      expect(find.text('Sync from vault'), findsOneWidget);
+      expect(_gabbroImportButton(), findsOneWidget);
     });
 
     testWidgets('N2 the spinner clears after a failed Gabbro import',
@@ -557,7 +536,7 @@ void main() {
       // with a dead screen after one bad file.
       expect(find.byType(CircularProgressIndicator), findsNothing);
       final btn = tester.widget<FilledButton>(
-          find.widgetWithText(FilledButton, 'Sync from vault'));
+          _gabbroImportButton());
       expect(btn.onPressed, isNotNull);
     });
 
@@ -847,65 +826,26 @@ void main() {
     testWidgets('shows error when CSV continue attempted with no file',
         (tester) async {
       await tester.pumpWidget(buildScreen());
-      await tester.scrollUntilVisible(
-        find.text('Generic CSV'),
-        300,
-        scrollable: find.byType(Scrollable).first,
-      );
-      final col = find
-          .ancestor(
-              of: find.text('Generic CSV'), matching: find.byType(Column))
-          .first;
-      final btn = find.descendant(of: col, matching: find.byType(FilledButton));
-      await tester.ensureVisible(btn);
-      await tester.tap(btn);
-      await tester.pump();
+      await _tapImportForSection(tester, 'Generic CSV');
       expect(find.text('Select a file.'), findsWidgets);
     });
 
-    // ── Section visibility ────────────────────────────────────────────────────
+    // ── Type selection ───────────────────────────────────────────────────────
 
-    testWidgets('Enpass section is visible when scrolled to', (tester) async {
-      await tester.pumpWidget(buildScreen());
-      await tester.scrollUntilVisible(
-        find.text('Enpass'),
-        300,
-        scrollable: find.byType(Scrollable).first,
-      );
-      expect(find.text('Enpass'), findsOneWidget);
-    });
-
-    testWidgets('Bitwarden section is visible when scrolled to',
-        (tester) async {
-      await tester.pumpWidget(buildScreen());
-      await tester.scrollUntilVisible(
-        find.text('Bitwarden'),
-        300,
-        scrollable: find.byType(Scrollable).first,
-      );
-      expect(find.text('Bitwarden'), findsOneWidget);
-    });
-
-    testWidgets('Google PM section is visible when scrolled to',
-        (tester) async {
-      await tester.pumpWidget(buildScreen());
-      await tester.scrollUntilVisible(
-        find.text('Google Password Manager'),
-        300,
-        scrollable: find.byType(Scrollable).first,
-      );
-      expect(find.text('Google Password Manager'), findsOneWidget);
-    });
-
-    testWidgets('Dashlane section is visible when scrolled to', (tester) async {
-      await tester.pumpWidget(buildScreen());
-      await tester.scrollUntilVisible(
-        find.text('Dashlane'),
-        300,
-        scrollable: find.byType(Scrollable).first,
-      );
-      expect(find.text('Dashlane'), findsOneWidget);
-    });
+    for (final type in [
+      'Enpass',
+      'Bitwarden',
+      'Google Password Manager',
+      'Dashlane',
+    ]) {
+      testWidgets('$type is selectable from the type dropdown',
+          (tester) async {
+        await tester.pumpWidget(buildScreen());
+        await _selectType(tester, type);
+        // Shown once: the collapsed dropdown; the menu is closed again.
+        expect(find.text(type), findsOneWidget);
+      });
+    }
 
     // ── Passphrase field ─────────────────────────────────────────────────────
 
@@ -955,35 +895,5 @@ void main() {
       expect(importLimitLabel(kEnpassImportMaxBytes), '128 MB');
     });
   });
-
-  // Net for the file_picker replacement: pins what this screen asks the
-  // picker for. The replacement must honour the same requests.
-  group('PathField wiring (net)', () {
-    testWidgets(
-        'import sections ask for open dialogs with the right filters: '
-        'one .gabbro, three .csv, two .json', (tester) async {
-      final noResult = ImportResult(
-        imported: BigInt.zero,
-        failures: [],
-        skipped: [],
-      );
-      await tester.pumpWidget(testApp(ImportScreen(
-        onImportEnpass: (_) async => noResult,
-        onImportBitwarden: (_) async => noResult,
-        onImportGooglePm: (_) async => noResult,
-        onImportDashlane: (_) async => noResult,
-        onSniffCsv: (_) => CsvPreviewData(headers: [], rows: []),
-      )));
-      await tester.pumpAndSettle();
-
-      final fields =
-          tester.widgetList<PathField>(find.byType(PathField)).toList();
-      for (final pf in fields) {
-        expect(pf.mode, PathFieldMode.open);
-      }
-      final filters = fields.map((pf) => pf.allowedExtensions?.single).toList()
-        ..sort((a, b) => a!.compareTo(b!));
-      expect(filters, ['csv', 'csv', 'csv', 'gabbro', 'json', 'json']);
-    });
-  });
+  // The picker filters per type are pinned by R6 in import_screen_remold_test.
 }

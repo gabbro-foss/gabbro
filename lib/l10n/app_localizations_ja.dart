@@ -239,6 +239,56 @@ class AppLocalizationsJa extends AppLocalizations {
   String get securityTitle => 'セキュリティ';
 
   @override
+  String get syncSettingsTitle => '同期設定';
+
+  @override
+  String get sectionAutoMerge => '自動マージ';
+
+  @override
+  String get autoMergeTitle => '自動でマージ';
+
+  @override
+  String get autoMergeDescription =>
+      '「保管庫から同期」は受信した変更を自動的に適用します。両方の保管庫で値が異なる場合は、受信した変更が優先されます。';
+
+  @override
+  String get autoMergeNote => 'ファイルがあなたのパスフレーズで開けない場合は、引き続きファイルの指定を求められます。';
+
+  @override
+  String get sectionSyncFolder => '同期フォルダー';
+
+  @override
+  String syncFolderDescription(String name) {
+    return '他のデバイスのエクスポート先です。「保管庫から同期」は、この保管庫のエクスポート名である $name をそこから確認なしに開きます。';
+  }
+
+  @override
+  String get syncFolderNotSet => '未設定：「保管庫から同期」は毎回ファイルを尋ねます。';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return '同期フォルダーに $name という名前のファイルがありません。';
+  }
+
+  @override
+  String get rememberFolder => '記憶する';
+
+  @override
+  String get rememberFolderNote => '次回はこのフォルダーから始まります。';
+
+  @override
+  String get exportFolderLabel => 'エクスポートフォルダー';
+
+  @override
+  String get importFolderLabel => 'インポートフォルダー';
+
+  @override
+  String get folderNotSet => '未設定';
+
+  @override
+  String get foldersChangedNote => 'エクスポートと項目のインポートで変更します。';
+
+  @override
   String get aboutTitle => 'Gabbroについて';
 
   @override
@@ -246,6 +296,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get importTitle => 'エントリをインポート';
+
+  @override
+  String get importSourceLabel => 'ソース';
 
   @override
   String get exportTitle => 'ボルトをエクスポート';
@@ -504,9 +557,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get menuImportEntries => 'エントリをインポート';
 
   @override
-  String get menuSyncFromFile => 'ファイルから同期';
-
-  @override
   String get menuManageVaults => 'ボルトの管理';
 
   @override
@@ -520,6 +570,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get menuSecurity => 'セキュリティ';
+
+  @override
+  String get menuSyncSettings => '同期設定';
 
   @override
   String get menuManageFolders => 'フォルダの管理';
@@ -744,9 +797,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get syncFailedTitle => '同期に失敗しました';
-
-  @override
-  String get syncFromFileTitle => 'ファイルから同期';
 
   @override
   String get nothingToSync => '同期するものはありません — 両方のボルトはすでに最新です。';
@@ -1258,19 +1308,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get importIssueHelp => 'このエントリを編集、修正して保存するか、スキップして拒否してください。';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count件のエントリをスキップしました',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote => '以下のエントリはすでにボルトに存在し、上書きされませんでした:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return '別のデバイスが「$title」を削除しました。\n\nここでも削除しますか、それとも保持しますか?';
   }
@@ -1489,8 +1526,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get exportChooseDestinationVault => 'エクスポートされたボルトファイルの保存先を選択してください。';
 
   @override
-  String get exportTwoFilesNote =>
-      '2つのファイルが作成されます: vault.gabbro と vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return '2つのファイルが書き込まれます: $name と $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => '保存先を選択してください。';
@@ -1623,10 +1661,12 @@ class AppLocalizationsJa extends AppLocalizations {
       'この保管庫は YubiKey で保護されています。同期するには、登録済みのキーをタップする必要があります。';
 
   @override
-  String get importDuplicateWarning => 'すでにボルトにあるエントリは自動的にスキップされます。概要が表示されます。';
+  String get importDuplicateWarning =>
+      'ファイル内のすべての項目が追加されます。保管庫に既にあるものも含みます。空の保管庫に一度だけ行うのが最適です。';
 
   @override
-  String get importGabbroSubtitle => '別のGabbroボルト (.gabbro) からエントリをインポート';
+  String get importGabbroSubtitle =>
+      '別の Gabbro 保管庫（.gabbro ファイル）から項目を読み込みます。この同じ保管庫を別のデバイスから取り込む場合は「保管庫から同期」を使ってください。';
 
   @override
   String get importEnpassSubtitle => 'EnpassからのJSONエクスポート (ツール → エクスポート)';
@@ -2010,45 +2050,52 @@ class AppLocalizationsJa extends AppLocalizations {
   String get menuHelp => 'ヘルプ';
 
   @override
-  String get helpCaptionCreate => 'ボルトを作成: 名前、パスフレーズを入力し、オプションでYubiKeyで保護';
+  String get helpCaptionCreate => 'ボールト作成: 名前、パスフレーズ、任意でYubiKey';
 
   @override
-  String get helpCaptionEmpty => '+をクリックして最初のエントリを追加';
+  String get helpCaptionEmpty => '+ をタップして項目を追加';
 
   @override
-  String get helpCaptionDetail => '目のアイコンをクリックしてパスワードを表示し、長押しで詳細な文字分析を表示';
+  String get helpCaptionDetail => '項目をタップで開く、目で表示、長押しで詳細';
 
   @override
-  String get helpCaptionTitleSearch => 'デフォルト: 検索バーはエントリのタイトルのみを検索します';
+  String get helpCaptionTitleSearch => 'タイトルを検索';
 
   @override
-  String get helpCaptionFullSearch =>
-      '虫眼鏡をクリックしてすべてのフィールドの検索に切り替え; もう一度クリックしてタイトル検索に戻る';
+  String get helpCaptionFullSearch => '虫眼鏡をタップして全フィールドを検索';
 
   @override
-  String get helpCaptionFilter => 'フィルターボタンを使用して特定のタイプのエントリのみを表示';
+  String get helpCaptionFilter => '種類で項目を絞り込む';
 
   @override
-  String get helpCaptionFolders => 'フォルダ選択を使用してフォルダごとにエントリをフィルタリング';
+  String get helpCaptionFolders => 'フォルダーで項目を絞り込む';
 
   @override
-  String get helpCaptionSelect =>
-      'エントリを長押しして選択モードに入る; さらに項目を追加し、フォルダに割り当てるか削除。Xをクリックして終了。';
+  String get helpCaptionSelect => '長押しで選択、フォルダーへ移動または削除';
 
   @override
-  String get helpCaptionJumpToLetter => 'インデックスバーの文字をクリックしてそのセクションに移動';
+  String get helpCaptionJumpToLetter => '文字をタップしてジャンプ';
 
   @override
-  String get helpCaptionBreakdown => '目のアイコンをクリックしてパスワードを表示し、長押しで詳細な文字分析を表示';
+  String get helpCaptionBreakdown => 'パスワードまたはパスフレーズを生成';
 
   @override
-  String get helpCaptionManageVaults => '«ボルトの管理»でボルトの名前変更や削除、または新しいボルトを追加できます';
+  String get helpCaptionManageVaults => 'ボールト管理: 追加、名前変更、削除';
 
   @override
-  String get helpCaptionUnlock => 'パスフレーズを入力してボルトのロックを解除';
+  String get helpCaptionUnlock => 'パスフレーズでロック解除';
 
   @override
-  String get helpCaptionVaultSync => '暗号化されたボルトの同期プロセス';
+  String get helpCaptionVaultSync => '同期: こちらでエクスポート、あちらでボールトから同期';
+
+  @override
+  String get helpCaptionSyncSettings => '同期設定: 自動統合と既定フォルダー';
+
+  @override
+  String get helpCaptionExport => 'エクスポートの種類と場所';
+
+  @override
+  String get helpCaptionImport => 'インポートの種類とパス';
 
   @override
   String get passphraseNoWordlist => 'お使いの言語のワードリストはまだありません。英語を使用しています。';

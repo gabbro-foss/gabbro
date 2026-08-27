@@ -242,6 +242,59 @@ class AppLocalizationsLv extends AppLocalizations {
   String get securityTitle => 'Drošība';
 
   @override
+  String get syncSettingsTitle => 'Sinhronizācijas iestatījumi';
+
+  @override
+  String get sectionAutoMerge => 'Automātiska apvienošana';
+
+  @override
+  String get autoMergeTitle => 'Apvienot automātiski';
+
+  @override
+  String get autoMergeDescription =>
+      'Sinhronizēt no glabātavas automātiski piemēro ienākošās izmaiņas. Kur abu glabātavu vērtības atšķiras, uzvar ienākošās izmaiņas.';
+
+  @override
+  String get autoMergeNote =>
+      'Fails tik un tā tiks prasīts, ja tas neatveras ar jūsu paroles frāzi.';
+
+  @override
+  String get sectionSyncFolder => 'Sinhronizācijas mape';
+
+  @override
+  String syncFolderDescription(String name) {
+    return 'Kur nonāk otras ierīces eksports. Sinhronizēt no glabātavas tur atver failu $name, nosaukumu, ar kādu šī glabātava tiek eksportēta, neprasot.';
+  }
+
+  @override
+  String get syncFolderNotSet =>
+      'Nav iestatīts: Sinhronizēt no glabātavas katru reizi prasa failu.';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return 'Sinhronizācijas mapē nav faila ar nosaukumu $name.';
+  }
+
+  @override
+  String get rememberFolder => 'Atcerēties';
+
+  @override
+  String get rememberFolderNote => 'Nākamreiz sāk šajā mapē.';
+
+  @override
+  String get exportFolderLabel => 'Eksporta mape';
+
+  @override
+  String get importFolderLabel => 'Importa mape';
+
+  @override
+  String get folderNotSet => 'Nav iestatīta';
+
+  @override
+  String get foldersChangedNote =>
+      'Maina sadaļās Eksportēt un Importēt ierakstus.';
+
+  @override
   String get aboutTitle => 'Par Gabbro';
 
   @override
@@ -249,6 +302,9 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get importTitle => 'Importēt ierakstus';
+
+  @override
+  String get importSourceLabel => 'Avots';
 
   @override
   String get exportTitle => 'Eksportēt seifu';
@@ -511,9 +567,6 @@ class AppLocalizationsLv extends AppLocalizations {
   String get menuImportEntries => 'Importēt ierakstus';
 
   @override
-  String get menuSyncFromFile => 'Sinhronizēt no faila';
-
-  @override
   String get menuManageVaults => 'Pārvaldīt seifus';
 
   @override
@@ -527,6 +580,9 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Drošība';
+
+  @override
+  String get menuSyncSettings => 'Sinhronizācijas iestatījumi';
 
   @override
   String get menuManageFolders => 'Pārvaldīt mapes';
@@ -752,9 +808,6 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Sinhronizācija neizdevās';
-
-  @override
-  String get syncFromFileTitle => 'Sinhronizēt no faila';
 
   @override
   String get nothingToSync =>
@@ -1276,21 +1329,6 @@ class AppLocalizationsLv extends AppLocalizations {
       'Rediģējiet, labojiet un saglabājiet šo ierakstu vai izlaidiet, lai to atmestų.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count ieraksti izlaisti',
-      one: '1 ieraksts izlaists',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Šie ieraksti jau pastāv jūsu seifā un netika pārrakstīti:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Otra ierīce izdzēsa \'$title\'.\n\nDzēst arī šeit, vai paturēt?';
   }
@@ -1516,8 +1554,9 @@ class AppLocalizationsLv extends AppLocalizations {
       'Izvēlieties eksportētā seifa faila galamērķi.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Tiks izveidoti divi faili: vault.gabbro un vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Tiks ierakstīti divi faili: $name un $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Izvēlieties galamērķi.';
@@ -1659,11 +1698,11 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Ieraksti, kas jau ir jūsu seifā, tiks automātiski izlaisti. Tiks parādīts kopsavilkums.';
+      'Tiek pievienots katrs faila ieraksts, arī tie, kas glabātavā jau ir. Vislabāk vienreiz, tukšā glabātavā.';
 
   @override
   String get importGabbroSubtitle =>
-      'Importēt ierakstus no cita Gabbro seifa (.gabbro fails)';
+      'Importēt ierakstus no citas Gabbro glabātavas (.gabbro fails). Šai pašai glabātavai no citas ierīces izmantojiet Sinhronizēt no glabātavas.';
 
   @override
   String get importEnpassSubtitle =>
@@ -2064,53 +2103,59 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Izveidojiet seifu: ievadiet nosaukumu, ieejas frāzi un pēc izvēles aizsargājiet ar YubiKey';
+      'Izveidot glabātuvi: nosaukums, paroles frāze, pēc izvēles YubiKey';
 
   @override
-  String get helpCaptionEmpty =>
-      'Pieskarieties +, lai pievienotu pirmo ierakstu';
+  String get helpCaptionEmpty => 'Pieskarieties +, lai pievienotu ierakstu';
 
   @override
   String get helpCaptionDetail =>
-      'Pieskarieties acu ikonai, lai atklātu paroli, pēc tam turiet, lai skatītu detalizētu rakstzīmju sadalījumu';
+      'Pieskarieties ierakstam, lai atvērtu, acij, lai parādītu, turiet detaļām';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Pēc noklusējuma meklēšanas josla meklē tikai ierakstu nosaukumos';
+  String get helpCaptionTitleSearch => 'Meklēt nosaukumos';
 
   @override
   String get helpCaptionFullSearch =>
-      'Pieskarieties palielinošajam stiklam, lai pārslēgtos uz visu lauku meklēšanu; pieskarieties vēlreiz, lai atgrieztos pie nosaukumu meklēšanas';
+      'Pieskarieties lupai, lai meklētu visos laukos';
 
   @override
-  String get helpCaptionFilter =>
-      'Izmantojiet filtrēšanas pogas, lai rādītu tikai noteikta veida ierakstus';
+  String get helpCaptionFilter => 'Filtrēt ierakstus pēc veida';
 
   @override
-  String get helpCaptionFolders =>
-      'Izmantojiet mapju atlasītāju, lai filtrētu ierakstus pēc mapes';
+  String get helpCaptionFolders => 'Filtrēt ierakstus pēc mapes';
 
   @override
   String get helpCaptionSelect =>
-      'Turiet ierakstu, lai ievadītu atlases režīmu; pievienojiet vairāk vienumu, pēc tam piešķiriet mapei vai dzēsiet. Pieskarieties X, lai izietu.';
+      'Turiet, lai atlasītu; tad pārvietojiet uz mapi vai dzēsiet';
 
   @override
   String get helpCaptionJumpToLetter =>
-      'Pieskarieties indeksa joslā esošajam burtam, lai pārietu uz šo sadaļu';
+      'Pieskarieties burtam, lai pārietu uz to';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Pieskarieties acu ikonai, lai atklātu paroli, pēc tam turiet, lai skatītu detalizētu rakstzīmju sadalījumu';
+  String get helpCaptionBreakdown => 'Ģenerēt paroli vai paroles frāzi';
 
   @override
   String get helpCaptionManageVaults =>
-      'Seifa pārvaldībā varat pārdēvēt vai dzēst seifus, vai pievienot jaunu';
+      'Pārvaldīt glabātuves: pievienot, pārdēvēt, dzēst';
 
   @override
-  String get helpCaptionUnlock => 'Ievadiet ieejas frāzi, lai atbloķētu seifu';
+  String get helpCaptionUnlock => 'Atbloķēt ar paroles frāzi';
 
   @override
-  String get helpCaptionVaultSync => 'Šifrēta seifa sinhronizācijas process';
+  String get helpCaptionVaultSync =>
+      'Sinhronizācija: šeit Eksportēt, tur Sinhronizēt no glabātuves';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Sinhronizācijas iestatījumi: automātiska apvienošana un noklusējuma mapes';
+
+  @override
+  String get helpCaptionExport => 'Eksporta veids un vieta';
+
+  @override
+  String get helpCaptionImport => 'Importa veids un ceļš';
 
   @override
   String get passphraseNoWordlist =>

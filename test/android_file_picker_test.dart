@@ -35,11 +35,37 @@ void main() {
     picker = AndroidFilePicker();
   });
 
+  testWidgets('7: open-with-location sends the start location and returns '
+      'path + location; null on cancel', (tester) async {
+    platform
+      ..install(tester)
+      ..reply = {
+        'path': '/cache/picker/2/x.json',
+        'uri': 'content://docs/document/primary%3ADownload%2Fx.json',
+      };
+    final picked = await picker.openFileWithLocation(
+        allowedExtensions: ['json'],
+        initialLocation: 'content://docs/document/primary%3ADownload');
+    expect(platform.calls.single.method, 'pick_file');
+    expect(platform.lastArguments['initial_uri'],
+        'content://docs/document/primary%3ADownload');
+    expect(picked, (
+      path: '/cache/picker/2/x.json',
+      location: 'content://docs/document/primary%3ADownload%2Fx.json',
+    ));
+
+    platform.reply = null;
+    expect(await picker.openFileWithLocation(), isNull);
+  });
+
   testWidgets('1: open sends the requested extensions and returns the path',
       (tester) async {
     platform
       ..install(tester)
-      ..reply = '/data/user/0/app.gabbro.gabbro/cache/picker/1/vault.gabbro';
+      ..reply = {
+        'path': '/data/user/0/app.gabbro.gabbro/cache/picker/1/vault.gabbro',
+        'uri': 'content://docs/document/primary%3ADownload%2Fvault.gabbro',
+      };
 
     final path = await picker.openFile(allowedExtensions: ['gabbro']);
 
@@ -51,7 +77,7 @@ void main() {
   testWidgets('2: open with no filter sends no extensions', (tester) async {
     platform
       ..install(tester)
-      ..reply = '/cache/picker/1/any.bin';
+      ..reply = {'path': '/cache/picker/1/any.bin', 'uri': 'content://x'};
 
     await picker.openFile();
 
@@ -116,3 +142,4 @@ void main() {
     await expectLater(picker.pickDirectory(), throwsA(isException));
   });
 }
+

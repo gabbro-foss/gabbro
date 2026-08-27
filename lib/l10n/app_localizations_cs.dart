@@ -242,6 +242,58 @@ class AppLocalizationsCs extends AppLocalizations {
   String get securityTitle => 'Zabezpečení';
 
   @override
+  String get syncSettingsTitle => 'Nastavení synchronizace';
+
+  @override
+  String get sectionAutoMerge => 'Automatické sloučení';
+
+  @override
+  String get autoMergeTitle => 'Sloučit automaticky';
+
+  @override
+  String get autoMergeDescription =>
+      'Synchronizovat z trezoru použije příchozí změny automaticky. Kde se hodnoty v obou trezorech liší, vyhrávají příchozí změny.';
+
+  @override
+  String get autoMergeNote =>
+      'Pokud se soubor neotevře vaším heslem, bude o něj stále požádáno.';
+
+  @override
+  String get sectionSyncFolder => 'Složka synchronizace';
+
+  @override
+  String syncFolderDescription(String name) {
+    return 'Kam přichází export z druhého zařízení. Synchronizace z trezoru tam otevře soubor $name, název, pod kterým se tento trezor exportuje, aniž by se ptala.';
+  }
+
+  @override
+  String get syncFolderNotSet =>
+      'Nenastaveno: Synchronizace z trezoru se na soubor ptá pokaždé.';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return 'Ve složce synchronizace není žádný soubor s názvem $name.';
+  }
+
+  @override
+  String get rememberFolder => 'Zapamatovat';
+
+  @override
+  String get rememberFolderNote => 'Příště se otevře v této složce.';
+
+  @override
+  String get exportFolderLabel => 'Složka exportu';
+
+  @override
+  String get importFolderLabel => 'Složka importu';
+
+  @override
+  String get folderNotSet => 'Nenastaveno';
+
+  @override
+  String get foldersChangedNote => 'Mění se v Exportu a Importu položek.';
+
+  @override
   String get aboutTitle => 'O aplikaci Gabbro';
 
   @override
@@ -249,6 +301,9 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get importTitle => 'Importovat záznamy';
+
+  @override
+  String get importSourceLabel => 'Zdroj';
 
   @override
   String get exportTitle => 'Exportovat trezor';
@@ -512,9 +567,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get menuImportEntries => 'Importovat záznamy';
 
   @override
-  String get menuSyncFromFile => 'Synchronizovat ze souboru';
-
-  @override
   String get menuManageVaults => 'Správa trezorů';
 
   @override
@@ -528,6 +580,9 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Zabezpečení';
+
+  @override
+  String get menuSyncSettings => 'Nastavení synchronizace';
 
   @override
   String get menuManageFolders => 'Správa složek';
@@ -754,9 +809,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Synchronizace selhala';
-
-  @override
-  String get syncFromFileTitle => 'Synchronizovat ze souboru';
 
   @override
   String get nothingToSync =>
@@ -1278,22 +1330,6 @@ class AppLocalizationsCs extends AppLocalizations {
       'Upravte, opravte a uložte tento záznam, nebo přeskočte, abyste ho odmítli.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count záznamů přeskočeno',
-      few: '$count záznamy přeskočeny',
-      one: '1 záznam přeskočen',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Tyto záznamy již existují ve vašem trezoru a nebyly přepsány:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Druhé zařízení smazalo «$title».\n\nSmazat i zde, nebo ponechat?';
   }
@@ -1517,8 +1553,9 @@ class AppLocalizationsCs extends AppLocalizations {
       'Zvolte cíl pro exportovaný soubor trezoru.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Budou vytvořeny dva soubory: vault.gabbro a vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Budou zapsány dva soubory: $name a $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Zvolte cíl.';
@@ -1660,11 +1697,11 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Záznamy, které již ve svém trezoru máte, budou automaticky přeskočeny. Zobrazí se přehled.';
+      'Každá položka ze souboru se přidá, i ty, které trezor už obsahuje. Nejlépe jednou, do prázdného trezoru.';
 
   @override
   String get importGabbroSubtitle =>
-      'Importovat záznamy z jiného trezoru Gabbro (soubor .gabbro)';
+      'Import položek z jiného trezoru Gabbro (soubor .gabbro). Pro tento trezor z jiného zařízení použijte Synchronizovat z trezoru.';
 
   @override
   String get importEnpassSubtitle =>
@@ -2060,53 +2097,58 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Vytvořte trezor: zadejte název, přístupovou frázi a volitelně chraňte klíčem YubiKey';
+      'Vytvořit trezor: název, heslo, volitelně YubiKey';
 
   @override
-  String get helpCaptionEmpty => 'Klepnutím na + přidejte první záznam';
+  String get helpCaptionEmpty => 'Klepnutím na + přidáte položku';
 
   @override
   String get helpCaptionDetail =>
-      'Klepnutím na ikonu oka zobrazíte heslo, poté podržte pro zobrazení podrobné analýzy znaků';
+      'Klepnutím položku otevřete, oko odhalí, dlouhý stisk pro detaily';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Výchozí nastavení: panel hledání prohledává pouze názvy záznamů';
+  String get helpCaptionTitleSearch => 'Hledat v názvech';
 
   @override
   String get helpCaptionFullSearch =>
-      'Klepnutím na lupu přepnete na hledání ve všech polích; klepnutím znovu se vrátíte na hledání podle názvu';
+      'Klepnutím na lupu hledáte ve všech polích';
 
   @override
-  String get helpCaptionFilter =>
-      'Použijte tlačítka filtrování pro zobrazení pouze záznamů určitého typu';
+  String get helpCaptionFilter => 'Filtrovat položky podle typu';
 
   @override
-  String get helpCaptionFolders =>
-      'Použijte výběr složky pro filtrování záznamů podle složky';
+  String get helpCaptionFolders => 'Filtrovat položky podle složky';
 
   @override
   String get helpCaptionSelect =>
-      'Podržením záznamu přejdete do režimu výběru; přidejte další položky, poté přiřaďte ke složce nebo smažte. Klepnutím X opustíte.';
+      'Dlouhým stiskem vyberte; pak přesuňte do složky nebo smažte';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Klepnutím na písmeno v indexovém panelu přejdete na danou sekci';
+  String get helpCaptionJumpToLetter => 'Klepnutím na písmeno tam skočíte';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Klepnutím na ikonu oka zobrazíte heslo, poté podržte pro zobrazení podrobné analýzy znaků';
+  String get helpCaptionBreakdown => 'Vygenerovat heslo nebo passphrase';
 
   @override
   String get helpCaptionManageVaults =>
-      'Ve «Správě trezorů» můžete přejmenovat nebo smazat trezory, nebo přidat nový';
+      'Správa trezorů: přidat, přejmenovat, smazat';
 
   @override
-  String get helpCaptionUnlock =>
-      'Zadejte přístupovou frázi pro odemknutí trezoru';
+  String get helpCaptionUnlock => 'Odemknout heslem';
 
   @override
-  String get helpCaptionVaultSync => 'Proces synchronizace šifrovaného trezoru';
+  String get helpCaptionVaultSync =>
+      'Synchronizace: Export tady, Synchronizovat z trezoru tam';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Nastavení synchronizace: automatické sloučení a výchozí složky';
+
+  @override
+  String get helpCaptionExport => 'Typ a umístění exportu';
+
+  @override
+  String get helpCaptionImport => 'Typ a cesta importu';
 
   @override
   String get passphraseNoWordlist =>

@@ -242,6 +242,59 @@ class AppLocalizationsSv extends AppLocalizations {
   String get securityTitle => 'Säkerhet';
 
   @override
+  String get syncSettingsTitle => 'Synkroniseringsinställningar';
+
+  @override
+  String get sectionAutoMerge => 'Automatisk sammanslagning';
+
+  @override
+  String get autoMergeTitle => 'Slå ihop automatiskt';
+
+  @override
+  String get autoMergeDescription =>
+      'Synkronisera från valv tillämpar inkommande ändringar automatiskt. Där värdena i de två valven skiljer sig vinner de inkommande ändringarna.';
+
+  @override
+  String get autoMergeNote =>
+      'Du får ändå frågan om filen om den inte öppnas med din lösenfras.';
+
+  @override
+  String get sectionSyncFolder => 'Synkroniseringsmapp';
+
+  @override
+  String syncFolderDescription(String name) {
+    return 'Dit den andra enhetens export hamnar. Synkronisera från valv öppnar filen $name där, namnet det här valvet exporteras som, utan att fråga.';
+  }
+
+  @override
+  String get syncFolderNotSet =>
+      'Inte angiven: Synkronisera från valv frågar efter filen varje gång.';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return 'Ingen fil med namnet $name i synkroniseringsmappen.';
+  }
+
+  @override
+  String get rememberFolder => 'Kom ihåg';
+
+  @override
+  String get rememberFolderNote => 'Nästa gång börjar i den här mappen.';
+
+  @override
+  String get exportFolderLabel => 'Exportmapp';
+
+  @override
+  String get importFolderLabel => 'Importmapp';
+
+  @override
+  String get folderNotSet => 'Inte angiven';
+
+  @override
+  String get foldersChangedNote =>
+      'Ändras under Exportera och Importera poster.';
+
+  @override
   String get aboutTitle => 'Om Gabbro';
 
   @override
@@ -249,6 +302,9 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get importTitle => 'Importera poster';
+
+  @override
+  String get importSourceLabel => 'Källa';
 
   @override
   String get exportTitle => 'Exportera valv';
@@ -511,9 +567,6 @@ class AppLocalizationsSv extends AppLocalizations {
   String get menuImportEntries => 'Importera poster';
 
   @override
-  String get menuSyncFromFile => 'Synkronisera från fil';
-
-  @override
   String get menuManageVaults => 'Hantera valv';
 
   @override
@@ -527,6 +580,9 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Säkerhet';
+
+  @override
+  String get menuSyncSettings => 'Synkroniseringsinställningar';
 
   @override
   String get menuManageFolders => 'Hantera mappar';
@@ -752,9 +808,6 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Synkronisering misslyckades';
-
-  @override
-  String get syncFromFileTitle => 'Synkronisera från fil';
 
   @override
   String get nothingToSync =>
@@ -1276,21 +1329,6 @@ class AppLocalizationsSv extends AppLocalizations {
       'Redigera för att rätta och spara den här posten, eller hoppa över för att kassera den.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count poster överhoppade',
-      one: '1 post överhoppad',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Dessa poster finns redan i ditt valv och skrevs inte över:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Den andra enheten raderade \'$title\'.\n\nRadera den här också, eller behåll den?';
   }
@@ -1513,8 +1551,9 @@ class AppLocalizationsSv extends AppLocalizations {
       'Välj en destination för din exporterade valvfil.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Två filer skapas: vault.gabbro och vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Två filer skrivs: $name och $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Välj en destination.';
@@ -1654,11 +1693,11 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Poster som redan finns i ditt valv hoppas över automatiskt. Du kommer se en sammanfattning.';
+      'Varje post i filen läggs till, även de valvet redan har. Bäst att göra en gång, i ett tomt valv.';
 
   @override
   String get importGabbroSubtitle =>
-      'Importera poster från ett annat Gabbro-valv (.gabbro-fil)';
+      'Importera poster från ett annat Gabbro-valv (.gabbro-fil). För det här valvet från en annan enhet: använd Synkronisera från valv.';
 
   @override
   String get importEnpassSubtitle =>
@@ -2053,55 +2092,58 @@ class AppLocalizationsSv extends AppLocalizations {
   String get menuHelp => 'Hjälp';
 
   @override
-  String get helpCaptionCreate =>
-      'Skapa ett valv: ange ett namn, lösenfras och skydda eventuellt med en YubiKey';
+  String get helpCaptionCreate => 'Skapa valv: namn, lösenfras, valfri YubiKey';
 
   @override
-  String get helpCaptionEmpty =>
-      'Tryck på + för att lägga till din första post';
+  String get helpCaptionEmpty => 'Tryck + för att lägga till en post';
 
   @override
   String get helpCaptionDetail =>
-      'Tryck på ögon­ikonen för att visa ett lösenord, håll sedan inne för att se en detaljerad teckenanalys';
+      'Tryck på posten för att öppna, ögat för att visa, håll intryckt för detaljer';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Som standard söker sökfältet bara i posttitlar';
+  String get helpCaptionTitleSearch => 'Sök i titlar';
 
   @override
   String get helpCaptionFullSearch =>
-      'Tryck på förstoringsglaset för att växla till sökning i alla fält; tryck igen för att återgå till titelsökning';
+      'Tryck på förstoringsglaset för att söka i alla fält';
 
   @override
-  String get helpCaptionFilter =>
-      'Använd filterknapparna för att bara visa poster av en viss typ';
+  String get helpCaptionFilter => 'Filtrera poster efter typ';
 
   @override
-  String get helpCaptionFolders =>
-      'Använd mappväljaren för att filtrera poster efter mapp';
+  String get helpCaptionFolders => 'Filtrera poster efter mapp';
 
   @override
   String get helpCaptionSelect =>
-      'Håll inne på en post för att aktivera valläge; lägg till fler objekt, tilldela sedan till en mapp eller ta bort. Tryck X för att avsluta.';
+      'Håll intryckt för att markera; flytta sedan till en mapp eller ta bort';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Tryck på en bokstav i indexfältet för att hoppa till det avsnittet';
+  String get helpCaptionJumpToLetter => 'Tryck på en bokstav för att hoppa dit';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Tryck på ögon­ikonen för att visa ett lösenord, håll sedan inne för att se en detaljerad teckenanalys';
+  String get helpCaptionBreakdown => 'Skapa ett lösenord eller en lösenfras';
 
   @override
   String get helpCaptionManageVaults =>
-      'I Hantera valv kan du byta namn på eller ta bort valv, eller lägga till ett nytt';
+      'Hantera valv: lägg till, byt namn, ta bort';
 
   @override
-  String get helpCaptionUnlock => 'Ange din lösenfras för att låsa upp valvet';
+  String get helpCaptionUnlock => 'Lås upp med lösenfras';
 
   @override
   String get helpCaptionVaultSync =>
-      'Krypterad synkroniseringsprocess för valvet';
+      'Synkronisering: Exportera här, Synkronisera från valv där';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Synkroniseringsinställningar: automatisk sammanslagning och standardmappar';
+
+  @override
+  String get helpCaptionExport => 'Exporttyp och plats';
+
+  @override
+  String get helpCaptionImport => 'Importtyp och sökväg';
 
   @override
   String get passphraseNoWordlist =>

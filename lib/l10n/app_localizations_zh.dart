@@ -235,6 +235,55 @@ class AppLocalizationsZh extends AppLocalizations {
   String get securityTitle => '安全';
 
   @override
+  String get syncSettingsTitle => '同步设置';
+
+  @override
+  String get sectionAutoMerge => '自动合并';
+
+  @override
+  String get autoMergeTitle => '自动合并';
+
+  @override
+  String get autoMergeDescription => '“从保险库同步”会自动应用传入的更改。两个保险库中的值不同时，以传入的更改为准。';
+
+  @override
+  String get autoMergeNote => '若文件无法用你的口令短语打开，仍会要求你选择文件。';
+
+  @override
+  String get sectionSyncFolder => '同步文件夹';
+
+  @override
+  String syncFolderDescription(String name) {
+    return '另一台设备导出文件所在的位置。“从保险库同步”会直接在那里打开名为 $name 的文件（本保险库的导出名），不再询问。';
+  }
+
+  @override
+  String get syncFolderNotSet => '未设置：“从保险库同步”每次都会询问文件。';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return '同步文件夹中没有名为 $name 的文件。';
+  }
+
+  @override
+  String get rememberFolder => '记住';
+
+  @override
+  String get rememberFolderNote => '下次从此文件夹开始。';
+
+  @override
+  String get exportFolderLabel => '导出文件夹';
+
+  @override
+  String get importFolderLabel => '导入文件夹';
+
+  @override
+  String get folderNotSet => '未设置';
+
+  @override
+  String get foldersChangedNote => '在导出和导入条目中更改。';
+
+  @override
   String get aboutTitle => '关于 Gabbro';
 
   @override
@@ -242,6 +291,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get importTitle => '导入条目';
+
+  @override
+  String get importSourceLabel => '来源';
 
   @override
   String get exportTitle => '导出保险库';
@@ -498,9 +550,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get menuImportEntries => '导入条目';
 
   @override
-  String get menuSyncFromFile => '从文件同步';
-
-  @override
   String get menuManageVaults => '管理保险库';
 
   @override
@@ -514,6 +563,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get menuSecurity => '安全';
+
+  @override
+  String get menuSyncSettings => '同步设置';
 
   @override
   String get menuManageFolders => '管理文件夹';
@@ -738,9 +790,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get syncFailedTitle => '同步失败';
-
-  @override
-  String get syncFromFileTitle => '从文件同步';
 
   @override
   String get nothingToSync => '没有需要同步的内容 — 两个保险库均已是最新状态。';
@@ -1248,19 +1297,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get importIssueHelp => '编辑、修正并保存此条目，或跳过以拒绝。';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '已跳过 $count 个条目',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote => '以下条目已存在于您的保险库中，未被覆盖：';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return '另一台设备已删除«$title»。\n\n在此处也删除，还是保留？';
   }
@@ -1476,7 +1512,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get exportChooseDestinationVault => '选择导出保险库文件的目标位置。';
 
   @override
-  String get exportTwoFilesNote => '将创建两个文件：vault.gabbro 和 vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return '将写入两个文件：$name 和 $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => '选择目标位置。';
@@ -1607,10 +1645,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get importSourceKeyProtected => '此保险库受 YubiKey 保护。同步时需要轻触已注册的密钥。';
 
   @override
-  String get importDuplicateWarning => '您保险库中已有的条目将自动跳过。将显示摘要。';
+  String get importDuplicateWarning => '文件中的每个条目都会添加，包括保险库中已有的。最好只做一次，导入空保险库。';
 
   @override
-  String get importGabbroSubtitle => '从另一个 Gabbro 保险库（.gabbro 文件）导入条目';
+  String get importGabbroSubtitle =>
+      '从另一个 Gabbro 保险库（.gabbro 文件）导入条目。若是来自其他设备的同一个保险库，请改用“从保险库同步”。';
 
   @override
   String get importEnpassSubtitle => '来自 Enpass 的 JSON 导出（工具 → 导出）';
@@ -1983,43 +2022,52 @@ class AppLocalizationsZh extends AppLocalizations {
   String get menuHelp => '帮助';
 
   @override
-  String get helpCaptionCreate => '创建保险库：输入名称、密码短语，可选择使用 YubiKey 保护';
+  String get helpCaptionCreate => '创建保险库：名称、口令短语，可选 YubiKey';
 
   @override
-  String get helpCaptionEmpty => '点击 + 添加第一个条目';
+  String get helpCaptionEmpty => '点击 + 添加条目';
 
   @override
-  String get helpCaptionDetail => '点击眼睛图标显示密码，然后长按查看详细字符分析';
+  String get helpCaptionDetail => '点击条目打开，眼睛显示，长按查看详情';
 
   @override
-  String get helpCaptionTitleSearch => '默认：搜索栏仅搜索条目标题';
+  String get helpCaptionTitleSearch => '搜索标题';
 
   @override
-  String get helpCaptionFullSearch => '点击放大镜切换到搜索所有字段；再次点击返回标题搜索';
+  String get helpCaptionFullSearch => '点击放大镜搜索所有字段';
 
   @override
-  String get helpCaptionFilter => '使用过滤按钮仅显示特定类型的条目';
+  String get helpCaptionFilter => '按类型筛选条目';
 
   @override
-  String get helpCaptionFolders => '使用文件夹选择按文件夹过滤条目';
+  String get helpCaptionFolders => '按文件夹筛选条目';
 
   @override
-  String get helpCaptionSelect => '长按条目进入选择模式；添加更多项目后，分配到文件夹或删除。点击 X 退出。';
+  String get helpCaptionSelect => '长按选择，然后移到文件夹或删除';
 
   @override
-  String get helpCaptionJumpToLetter => '点击索引栏中的字母跳转到该部分';
+  String get helpCaptionJumpToLetter => '点击字母跳转';
 
   @override
-  String get helpCaptionBreakdown => '点击眼睛图标显示密码，然后长按查看详细字符分析';
+  String get helpCaptionBreakdown => '生成密码或口令短语';
 
   @override
-  String get helpCaptionManageVaults => '在«管理保险库»中，您可以重命名或删除保险库，或添加新的';
+  String get helpCaptionManageVaults => '管理保险库：添加、重命名、删除';
 
   @override
-  String get helpCaptionUnlock => '输入密码短语解锁保险库';
+  String get helpCaptionUnlock => '用口令短语解锁';
 
   @override
-  String get helpCaptionVaultSync => '加密保险库同步流程';
+  String get helpCaptionVaultSync => '同步：此处导出，彼处从保险库同步';
+
+  @override
+  String get helpCaptionSyncSettings => '同步设置：自动合并和默认文件夹';
+
+  @override
+  String get helpCaptionExport => '导出类型和位置';
+
+  @override
+  String get helpCaptionImport => '导入类型和路径';
 
   @override
   String get passphraseNoWordlist => '您的语言暂无词汇列表。使用英语。';
@@ -2394,6 +2442,55 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get securityTitle => '安全';
 
   @override
+  String get syncSettingsTitle => '同步设置';
+
+  @override
+  String get sectionAutoMerge => '自动合并';
+
+  @override
+  String get autoMergeTitle => '自动合并';
+
+  @override
+  String get autoMergeDescription => '“从保险库同步”会自动应用传入的更改。两个保险库中的值不同时，以传入的更改为准。';
+
+  @override
+  String get autoMergeNote => '若文件无法用你的口令短语打开，仍会要求你选择文件。';
+
+  @override
+  String get sectionSyncFolder => '同步文件夹';
+
+  @override
+  String syncFolderDescription(String name) {
+    return '另一台设备导出文件所在的位置。“从保险库同步”会直接在那里打开名为 $name 的文件（本保险库的导出名），不再询问。';
+  }
+
+  @override
+  String get syncFolderNotSet => '未设置：“从保险库同步”每次都会询问文件。';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return '同步文件夹中没有名为 $name 的文件。';
+  }
+
+  @override
+  String get rememberFolder => '记住';
+
+  @override
+  String get rememberFolderNote => '下次从此文件夹开始。';
+
+  @override
+  String get exportFolderLabel => '导出文件夹';
+
+  @override
+  String get importFolderLabel => '导入文件夹';
+
+  @override
+  String get folderNotSet => '未设置';
+
+  @override
+  String get foldersChangedNote => '在导出和导入条目中更改。';
+
+  @override
   String get aboutTitle => '关于 Gabbro';
 
   @override
@@ -2401,6 +2498,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get importTitle => '导入条目';
+
+  @override
+  String get importSourceLabel => '来源';
 
   @override
   String get exportTitle => '导出保险库';
@@ -2657,9 +2757,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get menuImportEntries => '导入条目';
 
   @override
-  String get menuSyncFromFile => '从文件同步';
-
-  @override
   String get menuManageVaults => '管理保险库';
 
   @override
@@ -2673,6 +2770,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get menuSecurity => '安全';
+
+  @override
+  String get menuSyncSettings => '同步设置';
 
   @override
   String get menuManageFolders => '管理文件夹';
@@ -2897,9 +2997,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get syncFailedTitle => '同步失败';
-
-  @override
-  String get syncFromFileTitle => '从文件同步';
 
   @override
   String get nothingToSync => '没有需要同步的内容 — 两个保险库均已是最新状态。';
@@ -3407,19 +3504,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get importIssueHelp => '编辑、修正并保存此条目，或跳过以拒绝。';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '已跳过 $count 个条目',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote => '以下条目已存在于您的保险库中，未被覆盖：';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return '另一台设备已删除«$title»。\n\n在此处也删除，还是保留？';
   }
@@ -3635,7 +3719,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get exportChooseDestinationVault => '选择导出保险库文件的目标位置。';
 
   @override
-  String get exportTwoFilesNote => '将创建两个文件：vault.gabbro 和 vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return '将写入两个文件：$name 和 $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => '选择目标位置。';
@@ -3766,10 +3852,11 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get importSourceKeyProtected => '此保险库受 YubiKey 保护。同步时需要轻触已注册的密钥。';
 
   @override
-  String get importDuplicateWarning => '您保险库中已有的条目将自动跳过。将显示摘要。';
+  String get importDuplicateWarning => '文件中的每个条目都会添加，包括保险库中已有的。最好只做一次，导入空保险库。';
 
   @override
-  String get importGabbroSubtitle => '从另一个 Gabbro 保险库（.gabbro 文件）导入条目';
+  String get importGabbroSubtitle =>
+      '从另一个 Gabbro 保险库（.gabbro 文件）导入条目。若是来自其他设备的同一个保险库，请改用“从保险库同步”。';
 
   @override
   String get importEnpassSubtitle => '来自 Enpass 的 JSON 导出（工具 → 导出）';
@@ -4142,43 +4229,52 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get menuHelp => '帮助';
 
   @override
-  String get helpCaptionCreate => '创建保险库：输入名称、密码短语，可选择使用 YubiKey 保护';
+  String get helpCaptionCreate => '创建保险库：名称、口令短语，可选 YubiKey';
 
   @override
-  String get helpCaptionEmpty => '点击 + 添加第一个条目';
+  String get helpCaptionEmpty => '点击 + 添加条目';
 
   @override
-  String get helpCaptionDetail => '点击眼睛图标显示密码，然后长按查看详细字符分析';
+  String get helpCaptionDetail => '点击条目打开，眼睛显示，长按查看详情';
 
   @override
-  String get helpCaptionTitleSearch => '默认：搜索栏仅搜索条目标题';
+  String get helpCaptionTitleSearch => '搜索标题';
 
   @override
-  String get helpCaptionFullSearch => '点击放大镜切换到搜索所有字段；再次点击返回标题搜索';
+  String get helpCaptionFullSearch => '点击放大镜搜索所有字段';
 
   @override
-  String get helpCaptionFilter => '使用过滤按钮仅显示特定类型的条目';
+  String get helpCaptionFilter => '按类型筛选条目';
 
   @override
-  String get helpCaptionFolders => '使用文件夹选择按文件夹过滤条目';
+  String get helpCaptionFolders => '按文件夹筛选条目';
 
   @override
-  String get helpCaptionSelect => '长按条目进入选择模式；添加更多项目后，分配到文件夹或删除。点击 X 退出。';
+  String get helpCaptionSelect => '长按选择，然后移到文件夹或删除';
 
   @override
-  String get helpCaptionJumpToLetter => '点击索引栏中的字母跳转到该部分';
+  String get helpCaptionJumpToLetter => '点击字母跳转';
 
   @override
-  String get helpCaptionBreakdown => '点击眼睛图标显示密码，然后长按查看详细字符分析';
+  String get helpCaptionBreakdown => '生成密码或口令短语';
 
   @override
-  String get helpCaptionManageVaults => '在«管理保险库»中，您可以重命名或删除保险库，或添加新的';
+  String get helpCaptionManageVaults => '管理保险库：添加、重命名、删除';
 
   @override
-  String get helpCaptionUnlock => '输入密码短语解锁保险库';
+  String get helpCaptionUnlock => '用口令短语解锁';
 
   @override
-  String get helpCaptionVaultSync => '加密保险库同步流程';
+  String get helpCaptionVaultSync => '同步：此处导出，彼处从保险库同步';
+
+  @override
+  String get helpCaptionSyncSettings => '同步设置：自动合并和默认文件夹';
+
+  @override
+  String get helpCaptionExport => '导出类型和位置';
+
+  @override
+  String get helpCaptionImport => '导入类型和路径';
 
   @override
   String get passphraseNoWordlist => '您的语言暂无词汇列表。使用英语。';
@@ -4553,6 +4649,55 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get securityTitle => '安全性';
 
   @override
+  String get syncSettingsTitle => '同步設定';
+
+  @override
+  String get sectionAutoMerge => '自動合併';
+
+  @override
+  String get autoMergeTitle => '自動合併';
+
+  @override
+  String get autoMergeDescription => '「從保險庫同步」會自動套用傳入的變更。兩個保險庫中的值不同時，以傳入的變更為準。';
+
+  @override
+  String get autoMergeNote => '若檔案無法以您的密碼片語開啟，仍會要求您選擇檔案。';
+
+  @override
+  String get sectionSyncFolder => '同步資料夾';
+
+  @override
+  String syncFolderDescription(String name) {
+    return '另一部裝置匯出檔案所在的位置。「從保險庫同步」會直接在那裡開啟名為 $name 的檔案（本保險庫的匯出名稱），不再詢問。';
+  }
+
+  @override
+  String get syncFolderNotSet => '未設定：「從保險庫同步」每次都會詢問檔案。';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return '同步資料夾中沒有名為 $name 的檔案。';
+  }
+
+  @override
+  String get rememberFolder => '記住';
+
+  @override
+  String get rememberFolderNote => '下次從此資料夾開始。';
+
+  @override
+  String get exportFolderLabel => '匯出資料夾';
+
+  @override
+  String get importFolderLabel => '匯入資料夾';
+
+  @override
+  String get folderNotSet => '未設定';
+
+  @override
+  String get foldersChangedNote => '在匯出和匯入項目中變更。';
+
+  @override
   String get aboutTitle => '關於 Gabbro';
 
   @override
@@ -4560,6 +4705,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get importTitle => '匯入項目';
+
+  @override
+  String get importSourceLabel => '來源';
 
   @override
   String get exportTitle => '匯出保險庫';
@@ -4816,9 +4964,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get menuImportEntries => '匯入項目';
 
   @override
-  String get menuSyncFromFile => '從檔案同步';
-
-  @override
   String get menuManageVaults => '管理保險庫';
 
   @override
@@ -4832,6 +4977,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get menuSecurity => '安全性';
+
+  @override
+  String get menuSyncSettings => '同步設定';
 
   @override
   String get menuManageFolders => '管理資料夾';
@@ -5056,9 +5204,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get syncFailedTitle => '同步失敗';
-
-  @override
-  String get syncFromFileTitle => '從檔案同步';
 
   @override
   String get nothingToSync => '沒有需要同步的內容 — 兩個保險庫均已是最新狀態。';
@@ -5566,19 +5711,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get importIssueHelp => '編輯、修正並儲存此項目，或跳過以拒絕。';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '已跳過 $count 個項目',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote => '以下項目已存在於您的保險庫中，未被覆寫：';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return '另一台裝置已刪除«$title»。\n\n在此處也刪除，還是保留？';
   }
@@ -5794,7 +5926,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get exportChooseDestinationVault => '選擇匯出保險庫檔案的目標位置。';
 
   @override
-  String get exportTwoFilesNote => '將建立兩個檔案：vault.gabbro 和 vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return '將寫入兩個檔案：$name 和 $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => '選擇目標位置。';
@@ -5925,10 +6059,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get importSourceKeyProtected => '此保險庫受 YubiKey 保護。同步時需要輕觸已註冊的金鑰。';
 
   @override
-  String get importDuplicateWarning => '您保險庫中已有的項目將自動跳過。將顯示摘要。';
+  String get importDuplicateWarning => '檔案中的每個項目都會新增，包括保險庫中已有的。最好只做一次，匯入空的保險庫。';
 
   @override
-  String get importGabbroSubtitle => '從另一個 Gabbro 保險庫（.gabbro 檔案）匯入項目';
+  String get importGabbroSubtitle =>
+      '從另一個 Gabbro 保險庫（.gabbro 檔案）匯入項目。若是來自其他裝置的同一個保險庫，請改用「從保險庫同步」。';
 
   @override
   String get importEnpassSubtitle => '來自 Enpass 的 JSON 匯出（工具 → 匯出）';
@@ -6301,43 +6436,52 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get menuHelp => '說明';
 
   @override
-  String get helpCaptionCreate => '建立保險庫：輸入名稱、密碼片語，可選擇使用 YubiKey 保護';
+  String get helpCaptionCreate => '建立保險庫：名稱、密語，可選 YubiKey';
 
   @override
-  String get helpCaptionEmpty => '按一下 + 新增第一個項目';
+  String get helpCaptionEmpty => '點選 + 新增項目';
 
   @override
-  String get helpCaptionDetail => '按一下眼睛圖示顯示密碼，然後長按查看詳細字元分析';
+  String get helpCaptionDetail => '點選項目開啟，眼睛顯示，長按查看詳情';
 
   @override
-  String get helpCaptionTitleSearch => '預設：搜尋列僅搜尋項目標題';
+  String get helpCaptionTitleSearch => '搜尋標題';
 
   @override
-  String get helpCaptionFullSearch => '按一下放大鏡切換到搜尋所有欄位；再次按一下返回標題搜尋';
+  String get helpCaptionFullSearch => '點選放大鏡搜尋所有欄位';
 
   @override
-  String get helpCaptionFilter => '使用篩選按鈕僅顯示特定類型的項目';
+  String get helpCaptionFilter => '依類型篩選項目';
 
   @override
-  String get helpCaptionFolders => '使用資料夾選擇依資料夾篩選項目';
+  String get helpCaptionFolders => '依資料夾篩選項目';
 
   @override
-  String get helpCaptionSelect => '長按項目進入選擇模式；新增更多項目後，指派到資料夾或刪除。按一下 X 退出。';
+  String get helpCaptionSelect => '長按選取，然後移到資料夾或刪除';
 
   @override
-  String get helpCaptionJumpToLetter => '按一下索引列中的字母跳轉到該部分';
+  String get helpCaptionJumpToLetter => '點選字母跳轉';
 
   @override
-  String get helpCaptionBreakdown => '按一下眼睛圖示顯示密碼，然後長按查看詳細字元分析';
+  String get helpCaptionBreakdown => '產生密碼或密語';
 
   @override
-  String get helpCaptionManageVaults => '在«管理保險庫»中，您可以重新命名或刪除保險庫，或新增新的';
+  String get helpCaptionManageVaults => '管理保險庫：新增、重新命名、刪除';
 
   @override
-  String get helpCaptionUnlock => '輸入密碼片語解鎖保險庫';
+  String get helpCaptionUnlock => '用密語解鎖';
 
   @override
-  String get helpCaptionVaultSync => '加密保險庫同步流程';
+  String get helpCaptionVaultSync => '同步：此處匯出，彼處從保險庫同步';
+
+  @override
+  String get helpCaptionSyncSettings => '同步設定：自動合併與預設資料夾';
+
+  @override
+  String get helpCaptionExport => '匯出類型與位置';
+
+  @override
+  String get helpCaptionImport => '匯入類型與路徑';
 
   @override
   String get passphraseNoWordlist => '您的語言暫無詞彙列表。使用英語。';

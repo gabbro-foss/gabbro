@@ -242,6 +242,59 @@ class AppLocalizationsHu extends AppLocalizations {
   String get securityTitle => 'Biztonság';
 
   @override
+  String get syncSettingsTitle => 'Szinkronizálási beállítások';
+
+  @override
+  String get sectionAutoMerge => 'Automatikus egyesítés';
+
+  @override
+  String get autoMergeTitle => 'Egyesítés automatikusan';
+
+  @override
+  String get autoMergeDescription =>
+      'A Szinkronizálás széfből automatikusan alkalmazza a bejövő változásokat. Ahol a két széf értékei eltérnek, a bejövő változások nyernek.';
+
+  @override
+  String get autoMergeNote =>
+      'A fájlt akkor is kéri, ha nem nyílik meg a jelmondatával.';
+
+  @override
+  String get sectionSyncFolder => 'Szinkronizálási mappa';
+
+  @override
+  String syncFolderDescription(String name) {
+    return 'Ahová a másik eszköz exportja érkezik. A Szinkronizálás széfből ott nyitja meg a $name fájlt, az e széf exportálásakor használt nevet, kérdés nélkül.';
+  }
+
+  @override
+  String get syncFolderNotSet =>
+      'Nincs beállítva: a Szinkronizálás széfből minden alkalommal kéri a fájlt.';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return 'Nincs $name nevű fájl a szinkronizálási mappában.';
+  }
+
+  @override
+  String get rememberFolder => 'Megjegyzés';
+
+  @override
+  String get rememberFolderNote => 'Legközelebb ebben a mappában kezd.';
+
+  @override
+  String get exportFolderLabel => 'Exportmappa';
+
+  @override
+  String get importFolderLabel => 'Importmappa';
+
+  @override
+  String get folderNotSet => 'Nincs beállítva';
+
+  @override
+  String get foldersChangedNote =>
+      'Az Exportálás és a Bejegyzések importálása alatt módosítható.';
+
+  @override
   String get aboutTitle => 'A Gabbróról';
 
   @override
@@ -249,6 +302,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get importTitle => 'Bejegyzések importálása';
+
+  @override
+  String get importSourceLabel => 'Forrás';
 
   @override
   String get exportTitle => 'Széf exportálása';
@@ -511,9 +567,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get menuImportEntries => 'Bejegyzések importálása';
 
   @override
-  String get menuSyncFromFile => 'Szinkronizálás fájlból';
-
-  @override
   String get menuManageVaults => 'Széfek kezelése';
 
   @override
@@ -527,6 +580,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Biztonság';
+
+  @override
+  String get menuSyncSettings => 'Szinkronizálási beállítások';
 
   @override
   String get menuManageFolders => 'Mappák kezelése';
@@ -752,9 +808,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Szinkronizálás sikertelen';
-
-  @override
-  String get syncFromFileTitle => 'Szinkronizálás fájlból';
 
   @override
   String get nothingToSync =>
@@ -1277,21 +1330,6 @@ class AppLocalizationsHu extends AppLocalizations {
       'Szerkeszd, javítsd és mentsd el ezt a bejegyzést, vagy hagyd ki az elvetéséhez.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count bejegyzés kihagyva',
-      one: '1 bejegyzés kihagyva',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Ezek a bejegyzések már léteznek a széfedben, és nem lettek felülírva:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'A másik eszköz törölte a(z) \'$title\' bejegyzést.\n\nTöröld itt is, vagy tartsd meg?';
   }
@@ -1515,8 +1553,9 @@ class AppLocalizationsHu extends AppLocalizations {
       'Válassz célhelyet az exportált széffájlhoz.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Két fájl jön létre: vault.gabbro és vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Két fájl készül: $name és $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Válassz célhelyet.';
@@ -1657,11 +1696,11 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Az olyan bejegyzések, amelyek már megvannak a széfedben, automatikusan kimaradnak. Látni fogsz egy összefoglalót.';
+      'A fájl minden bejegyzése hozzáadódik, a széfben már meglévők is. Legjobb egyszer, üres széfbe.';
 
   @override
   String get importGabbroSubtitle =>
-      'Bejegyzések importálása másik Gabbro széfből (.gabbro fájl)';
+      'Bejegyzések importálása egy másik Gabbro-széfből (.gabbro fájl). Ugyanehhez a széfhez egy másik eszközről a Szinkronizálás széfből való.';
 
   @override
   String get importEnpassSubtitle =>
@@ -2063,54 +2102,58 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Széf létrehozása: add meg a nevet, jelmondatot, és opcionálisan védd YubiKey-jel';
+      'Széf létrehozása: név, jelmondat, opcionális YubiKey';
 
   @override
-  String get helpCaptionEmpty =>
-      'Koppints a + gombra az első bejegyzés hozzáadásához';
+  String get helpCaptionEmpty => 'Koppints a + gombra bejegyzés hozzáadásához';
 
   @override
   String get helpCaptionDetail =>
-      'Koppints a szem ikonra a jelszó felfedéséhez, majd nyomj hosszan a részletes karakterelemzés megtekintéséhez';
+      'Koppints a bejegyzésre a megnyitáshoz, a szemre a felfedéshez, tartsd lenyomva a részletekért';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Alapértelmezés szerint a keresősáv csak a bejegyzések címeiben keres';
+  String get helpCaptionTitleSearch => 'Keresés a címekben';
 
   @override
   String get helpCaptionFullSearch =>
-      'Koppints a nagyítóra az összes mezőben való keresésre való váltáshoz; koppints újra a cím szerinti kereséshez való visszatéréshez';
+      'Koppints a nagyítóra az összes mező kereséséhez';
 
   @override
-  String get helpCaptionFilter =>
-      'Használd a szűrőgombokat, hogy csak egy adott típusú bejegyzéseket jelenítsd meg';
+  String get helpCaptionFilter => 'Bejegyzések szűrése típus szerint';
 
   @override
-  String get helpCaptionFolders =>
-      'Használd a mappaválasztót a bejegyzések mappa szerinti szűréséhez';
+  String get helpCaptionFolders => 'Bejegyzések szűrése mappa szerint';
 
   @override
   String get helpCaptionSelect =>
-      'Nyomj hosszan egy bejegyzésre a kijelölési módba való lépéshez; adj hozzá több elemet, majd rendeld hozzá mappához vagy töröld. Koppints X-re a kilépéshez.';
+      'Tartsd lenyomva a kijelöléshez; majd áthelyezés mappába vagy törlés';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Koppints az indexsávon egy betűre az adott szakaszhoz való ugráshoz';
+  String get helpCaptionJumpToLetter => 'Koppints egy betűre az odaugráshoz';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Koppints a szem ikonra a jelszó felfedéséhez, majd nyomj hosszan a részletes karakterelemzés megtekintéséhez';
+  String get helpCaptionBreakdown => 'Jelszó vagy jelmondat generálása';
 
   @override
   String get helpCaptionManageVaults =>
-      'A Széfek kezelése részben átnevezhetsz vagy törölhetsz széfeket, illetve hozzáadhatsz egy újat';
+      'Széfek kezelése: hozzáadás, átnevezés, törlés';
 
   @override
-  String get helpCaptionUnlock => 'Add meg a jelmondatot a széf feloldásához';
+  String get helpCaptionUnlock => 'Feloldás jelmondattal';
 
   @override
   String get helpCaptionVaultSync =>
-      'Titkosított széf szinkronizálási folyamata';
+      'Szinkronizálás: itt Exportálás, ott Szinkronizálás széfből';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Szinkronizálási beállítások: automatikus egyesítés és alapértelmezett mappák';
+
+  @override
+  String get helpCaptionExport => 'Export típusa és helye';
+
+  @override
+  String get helpCaptionImport => 'Import típusa és útvonala';
 
   @override
   String get passphraseNoWordlist =>

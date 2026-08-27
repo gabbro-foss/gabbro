@@ -239,6 +239,56 @@ class AppLocalizationsKo extends AppLocalizations {
   String get securityTitle => '보안';
 
   @override
+  String get syncSettingsTitle => '동기화 설정';
+
+  @override
+  String get sectionAutoMerge => '자동 병합';
+
+  @override
+  String get autoMergeTitle => '자동으로 병합';
+
+  @override
+  String get autoMergeDescription =>
+      '금고에서 동기화는 수신된 변경 사항을 자동으로 적용합니다. 두 금고의 값이 다르면 수신된 변경 사항이 우선합니다.';
+
+  @override
+  String get autoMergeNote => '파일이 내 암호 문구로 열리지 않으면 파일을 다시 묻습니다.';
+
+  @override
+  String get sectionSyncFolder => '동기화 폴더';
+
+  @override
+  String syncFolderDescription(String name) {
+    return '다른 기기의 내보내기가 저장되는 곳입니다. 금고에서 동기화는 그곳에서 이 금고의 내보내기 이름인 $name 파일을 묻지 않고 엽니다.';
+  }
+
+  @override
+  String get syncFolderNotSet => '설정 안 됨: 금고에서 동기화가 매번 파일을 묻습니다.';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return '동기화 폴더에 $name(이)라는 파일이 없습니다.';
+  }
+
+  @override
+  String get rememberFolder => '기억하기';
+
+  @override
+  String get rememberFolderNote => '다음에는 이 폴더에서 시작합니다.';
+
+  @override
+  String get exportFolderLabel => '내보내기 폴더';
+
+  @override
+  String get importFolderLabel => '가져오기 폴더';
+
+  @override
+  String get folderNotSet => '설정되지 않음';
+
+  @override
+  String get foldersChangedNote => '내보내기 및 항목 가져오기에서 변경합니다.';
+
+  @override
   String get aboutTitle => 'Gabbro 정보';
 
   @override
@@ -246,6 +296,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get importTitle => '항목 가져오기';
+
+  @override
+  String get importSourceLabel => '출처';
 
   @override
   String get exportTitle => '볼트 내보내기';
@@ -504,9 +557,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get menuImportEntries => '항목 가져오기';
 
   @override
-  String get menuSyncFromFile => '파일에서 동기화';
-
-  @override
   String get menuManageVaults => '볼트 관리';
 
   @override
@@ -520,6 +570,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get menuSecurity => '보안';
+
+  @override
+  String get menuSyncSettings => '동기화 설정';
 
   @override
   String get menuManageFolders => '폴더 관리';
@@ -744,9 +797,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get syncFailedTitle => '동기화에 실패했습니다';
-
-  @override
-  String get syncFromFileTitle => '파일에서 동기화';
 
   @override
   String get nothingToSync => '동기화할 것이 없습니다 — 두 볼트 모두 이미 최신 상태입니다.';
@@ -1259,19 +1309,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get importIssueHelp => '이 항목을 편집, 수정하고 저장하거나 건너뛰어 거부하세요.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count개의 항목을 건너뛰었습니다',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote => '다음 항목은 이미 볼트에 존재하며 덮어쓰지 않았습니다:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return '다른 기기에서 «$title»을(를) 삭제했습니다.\n\n여기서도 삭제하시겠습니까, 아니면 유지하시겠습니까?';
   }
@@ -1490,8 +1527,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get exportChooseDestinationVault => '내보낸 볼트 파일의 저장 위치를 선택하세요.';
 
   @override
-  String get exportTwoFilesNote =>
-      '두 개의 파일이 만들어집니다: vault.gabbro 및 vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return '두 개의 파일이 기록됩니다: $name 및 $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => '저장 위치를 선택하세요.';
@@ -1624,10 +1662,12 @@ class AppLocalizationsKo extends AppLocalizations {
       '이 보관함은 YubiKey로 보호됩니다. 동기화하려면 등록된 키를 탭해야 합니다.';
 
   @override
-  String get importDuplicateWarning => '이미 볼트에 있는 항목은 자동으로 건너뜁니다. 요약이 표시됩니다.';
+  String get importDuplicateWarning =>
+      '파일의 모든 항목이 추가됩니다. 이미 금고에 있는 항목도 포함됩니다. 빈 금고에 한 번만 하는 것이 좋습니다.';
 
   @override
-  String get importGabbroSubtitle => '다른 Gabbro 볼트 (.gabbro)에서 항목 가져오기';
+  String get importGabbroSubtitle =>
+      '다른 Gabbro 금고(.gabbro 파일)에서 항목을 가져옵니다. 다른 기기의 이 금고라면 대신 금고에서 동기화를 사용하세요.';
 
   @override
   String get importEnpassSubtitle => 'Enpass에서 JSON 내보내기 (도구 → 내보내기)';
@@ -2012,47 +2052,52 @@ class AppLocalizationsKo extends AppLocalizations {
   String get menuHelp => '도움말';
 
   @override
-  String get helpCaptionCreate => '볼트 만들기: 이름, 암호 문구를 입력하고 선택적으로 YubiKey로 보호';
+  String get helpCaptionCreate => '볼트 만들기: 이름, 패스프레이즈, 선택적 YubiKey';
 
   @override
-  String get helpCaptionEmpty => '+를 클릭하여 첫 번째 항목 추가';
+  String get helpCaptionEmpty => '+를 탭하여 항목 추가';
 
   @override
-  String get helpCaptionDetail => '눈 아이콘을 클릭하여 비밀번호를 표시하고 길게 눌러 자세한 문자 분석 표시';
+  String get helpCaptionDetail => '항목을 탭하여 열기, 눈으로 표시, 길게 눌러 상세 보기';
 
   @override
-  String get helpCaptionTitleSearch => '기본값: 검색창은 항목 제목만 검색합니다';
+  String get helpCaptionTitleSearch => '제목 검색';
 
   @override
-  String get helpCaptionFullSearch =>
-      '돋보기를 클릭하여 모든 필드 검색으로 전환; 다시 클릭하여 제목 검색으로 돌아가기';
+  String get helpCaptionFullSearch => '돋보기를 탭하여 모든 필드 검색';
 
   @override
-  String get helpCaptionFilter => '필터 버튼을 사용하여 특정 유형의 항목만 표시';
+  String get helpCaptionFilter => '유형별로 항목 필터';
 
   @override
-  String get helpCaptionFolders => '폴더 선택을 사용하여 폴더별로 항목 필터링';
+  String get helpCaptionFolders => '폴더별로 항목 필터';
 
   @override
-  String get helpCaptionSelect =>
-      '항목을 길게 눌러 선택 모드로 진입; 더 많은 항목 추가 후 폴더에 할당하거나 삭제. X를 클릭하여 종료.';
+  String get helpCaptionSelect => '길게 눌러 선택한 뒤 폴더로 이동 또는 삭제';
 
   @override
-  String get helpCaptionJumpToLetter => '인덱스 바의 문자를 클릭하여 해당 섹션으로 이동';
+  String get helpCaptionJumpToLetter => '글자를 탭하여 이동';
 
   @override
-  String get helpCaptionBreakdown =>
-      '눈 아이콘을 클릭하여 비밀번호를 표시하고 길게 눌러 자세한 문자 분석 표시';
+  String get helpCaptionBreakdown => '비밀번호 또는 패스프레이즈 생성';
 
   @override
-  String get helpCaptionManageVaults =>
-      '«볼트 관리»에서 볼트 이름을 변경하거나 삭제하거나 새 볼트를 추가할 수 있습니다';
+  String get helpCaptionManageVaults => '볼트 관리: 추가, 이름 변경, 삭제';
 
   @override
-  String get helpCaptionUnlock => '암호 문구를 입력하여 볼트 잠금 해제';
+  String get helpCaptionUnlock => '패스프레이즈로 잠금 해제';
 
   @override
-  String get helpCaptionVaultSync => '암호화된 볼트 동기화 프로세스';
+  String get helpCaptionVaultSync => '동기화: 여기서 내보내기, 저기서 볼트에서 동기화';
+
+  @override
+  String get helpCaptionSyncSettings => '동기화 설정: 자동 병합과 기본 폴더';
+
+  @override
+  String get helpCaptionExport => '내보내기 유형과 위치';
+
+  @override
+  String get helpCaptionImport => '가져오기 유형과 경로';
 
   @override
   String get passphraseNoWordlist => '해당 언어의 단어 목록이 아직 없습니다. 영어를 사용합니다.';

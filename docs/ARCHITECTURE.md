@@ -42,7 +42,7 @@ allowList pre-flights (`options.up=false`) are answered without consent.
 
 **Password generator:** classic (32–256 chars) and passphrase (4–20 words, many languages, EFF-style wordlists embedded at compile time). Classic mode is script-aware (Latin/Greek/Cyrillic pools). All generation in Rust.
 
-**Settings:** `~/.config/gabbro/settings.jsonc` (Linux). JSONC format — human-editable. Theme, text scale (`text_scale`, 0.8-3.0; renders clamp to the device max — 2x under 600dp shortest side, 3x above, `lib/text_scale.dart`), high-contrast, alphabet bar position.
+**Settings:** `~/.config/gabbro/settings.jsonc` (Linux). JSONC format — human-editable. Theme, text scale (`text_scale`, 0.8-3.0; renders clamp to the device max — 2x under 600dp shortest side, 3x above, `lib/text_scale.dart`), high-contrast, alphabet bar position, auto-merge sync + sync folder (`auto_merge_sync`, `sync_folder`).
 
 **Keyboard shortcuts (Linux desktop):** Ctrl+L lock, Ctrl+F / Ctrl+Shift+F search, Ctrl+N new entry, Ctrl+M menu, Ctrl+Q lock and quit (confirms first), Esc dismiss/cancel. No Ctrl+C (copying a secret stays a deliberate, auto-clearing action); no Super key. Listed in-app on the desktop-only Keyboard shortcuts screen.
 
@@ -59,10 +59,10 @@ allowList pre-flights (`options.up=false`) are answered without consent.
 ```
 gabbro/
 ├── lib/                  # Flutter app
-│   ├── screens/          # unlock, vault list, adopt vault, export, import, generator, keyboard shortcuts, settings, manage vaults/folders, …
+│   ├── screens/          # unlock, vault list, adopt vault, export, import, sync settings, generator, keyboard shortcuts, appearance, security, manage vaults/folders, …
 │   ├── widgets/          # path_field, generator_widget, yubikey_tap, password_breakdown_sheet, sync_review, sync_method_dialog, gabbro_dialog (every dialog goes through it), passkey_consent_dialog, passkey_hint_banner, text_size_slider, url_link, …
 │   ├── src/rust/         # Auto-generated bridge (do not edit)
-│   └── *.dart            # main, app_paths (GabbroPaths), settings, text_scale, control_scale, gabbro_contrast (high-contrast theme flag), vault_registry, safe_file_picker, gabbro_file_picker (dialog facade), linux_file_picker (XDG portal client), android_file_picker (picker channel client), autotype_listener, autotype_target, passkey_daemon (Linux daemon orchestrator), app_passkeys_flag (F1 toggle mirror channel), clipboard_clear
+│   └── *.dart            # main, app_paths (GabbroPaths), settings, text_scale, control_scale, gabbro_contrast (high-contrast theme flag), folder_label, saf_tree (Android SAF tree pick/read channel), vault_registry, safe_file_picker, gabbro_file_picker (dialog facade), linux_file_picker (XDG portal client), android_file_picker (picker channel client), autotype_listener, autotype_target, passkey_daemon (Linux daemon orchestrator), app_passkeys_flag (F1 toggle mirror channel), clipboard_clear
 ├── rust/src/
 │   ├── api/              # Bridge surface: vault, vault_bridge, import, *_generator, fido_bridge, passkey_bridge, passkey_daemon_bridge, autofill_bridge, autotype_bridge, entropy, types
 │   ├── crypto/           # Internal (not bridge-exposed): kdf, hkdf, aes_gcm, vault_crypto, webauthn
@@ -76,7 +76,7 @@ gabbro/
 ├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + crash-safety (kill mid-write) + frozen golden fixtures (FIXTURES.md)
 ├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, GabbroCredentialProviderService + GabbroPasskeyActivity (passkey provider; testable core in PasskeyProvider.kt; vendored passkey_privileged_browsers.json in android assets), TapFlow, YubiKeyManager, AppPaths (paths channel), GabbroPicker (picker channel), BiometricHelper + BiometricStore (per-vault; + Robolectric tests), AppPasskeysStore (F1 toggle mirror)
 ├── linux/packaging/      # Desktop integration: render_icons.sh (icon tree); aur/ (AUR gabbro-bin PKGBUILD + gabbro-bin.install; .SRCINFO is generated in the AUR clone), deb/ (build-deb.sh -> binary .deb), udev/ + modules-load.d/ (canonical uhid rule + conf for passkeys)
-├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, VAULT_SYNC, AUTOTYPE_AND_AUTOFILL, AI_*; decisions/ (ADRs); artefacts/
+├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, VAULT_SYNC, AUTOTYPE_AND_AUTOFILL, EMERGENCY_SHEET.pdf (source .svg kept locally, gitignored), AI_*; decisions/ (ADRs); artefacts/
 ├── test/  integration_test/          # Flutter widget/unit + Linux real-FFI suites (dart test)
 ├── test_data/            # Sample import files + migration_vaults/ (refusal corpus at floor v11, one vault per VERSION + MIGRATION_TESTS.md + test_matrix.md)
 ├── assets/               # fonts, images, help/ (public_suffix_list.dat is an Android asset)
@@ -92,7 +92,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 836 | 20 |
+| Rust (`cargo test -q`) | 816 | 20 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 13 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -100,9 +100,9 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2466 | 10 |
+| Flutter (`flutter test`) | 2950 | 171 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 17 | 0 |
-| Android (`./gradlew :app:testDebugUnitTest`) | 178 | 15 |
+| Android (`./gradlew :app:testDebugUnitTest`) | 180 | 15 |
 
 **Real-FFI suites run under plain `dart test`, never `flutter drive` (non-negotiable):** they test
 Dart -> FFI -> crypto -> disk, touch no UI, and so need no window. Needs the release cdylib (debug
@@ -136,6 +136,7 @@ warnings are not noise.**
 | KGP via `buildscript` classpath | `url_launcher_android` | Did not reproduce 2026-08-06; re-check before acting. |
 | Flutter: AGP 8.11.1 support "will soon be dropped" (wants >= 9.0.1) | Flutter tooling, new 2026-08-21 | A future Flutter upgrade refuses to build Android until AGP is bumped. No action yet: 8.11.1 still builds; bump AGP + Kotlin together when forced. |
 | Flutter: Kotlin 2.2.20 support "will soon be dropped" (wants >= 2.3.20) | Flutter tooling, new 2026-08-21 | Same consequence and plan as the AGP row above. |
+| "understands SDK XML versions up to 3 but ... version 4 was encountered" | AGP 8.11.1's SDK reader vs newer Android Studio metadata | Cosmetic; AGP still installs what it needs. Clears with the AGP bump above. |
 
 **AGP note:** every module, `rust_lib_gabbro` included, loads AGP **8.11.1**. The
 `com.android.tools.build:gradle:7.3.0` line in `rust_builder/android/build.gradle` is
@@ -147,89 +148,13 @@ resolved but never applied — inert, emits no warning.
 
 > Update at the end of each session. First thing to read at the start of the next. Completed items are deleted from this section.
 
+**One-click sync** (branch `streamline_sync_process`) DONE 2026-08-27: full gate
+ALL GREEN, docs updated, merged to master. Details: CHANGELOG `[Unreleased]`,
+`docs/VAULT_SYNC.md`. A release is warranted; not yet cut.
+
 ### Next task
 
-**One-click sync** — full spec. Implementation lives in Bikeshed > **Sync family**
-as three sections, promoted here one at a time; tick the list below as each lands.
-
-Goal: feature parity with other password managers' one-click sync. On the
-receiving device, `menu > Sync from vault`, and done.
-
-**Requirements, every item, from the first test on.** Works on Linux and
-Android (SAF paths differ, behaviour must not). Every new string ships in all
-37 locales; every new control ships with a semantics label and a
-screen-reader test (ADR-015) and holds up at the large-text ceilings (ADR-016).
-None of this is a follow-up.
-
-**S1. Sync and import are distinct operations and stay so.**
-Sync = UUID merge of the *same* vault from another device: same format, same
-entry types, entries carry identity. Import = additive load of foreign data
-(other password managers, or a *different* Gabbro vault): radically different,
-unpredictable, nothing to match on.
-
-**S2. Labels.** `menu > Sync from file` becomes **Sync from vault** (two
-`.gabbro` files are synced). The import screen's Gabbro button becomes
-**Import** (says where the user is, and that it is a different operation).
-
-**S3. Import, all 6 types, Gabbro included: additive, no dedupe.** Every source
-entry is added, duplicates included. A change from today's content-hash skip:
-the skipped-entries dialog and the `skipped` result go. Import is a
-once-at-onboarding act into an empty vault; beyond that it is the user's
-responsibility. Dedupe, if ever, is a separate task.
-
-**S4. Routes for a `.gabbro` file.** Same vault: `menu > Sync from vault`.
-Different Gabbro vault: `menu > Import entries > Gabbro vault > Import`
-(passphrase, plus PIN + tap if the source is keyed).
-
-**S5. Sync settings, a new menu entry**, holding:
-- **Auto-merge** toggle, off by default. On: the sync applies as *Merge
-  automatically* does today, without the chooser or the review. The toggle's
-  description carries the same-passphrase warning (S7), since the chooser
-  that shows it is skipped.
-- **Sync folder** (where the other device's export lands) + **Remember**
-  checkbox.
-- The export and import folders, read-only, with a note that they are changed
-  on `menu > Export` / `menu > Import entries`. One place to see every folder;
-  one place each to change it.
-
-**S6. Sync from vault, the flow.**
-1. Sync folder set: no picker. The source is the file in that folder with
-   this vault's own file name (same vault = same name, same passphrase, a
-   different hash). No folder set, or Remember unticked: picker, as today.
-2. Source keyed: PIN + tap of the *source's* YubiKey, which may differ from
-   the receiving vault's, if it has one. Passphrase-only source: no prompt.
-3. Auto-merge off: the chooser as today (*Merge automatically* / *Review all
-   changes* / Cancel). Auto-merge on: straight to the automatic merge.
-4. The held passphrase is tried first, silently, either way.
-
-**S7. Passphrase fallback stays, auto-merge on or off.** If the held passphrase
-does not open the source, ask for one and continue with the choice already
-made. Same passphrase does not prove same vault; a same vault may carry a
-rotated passphrase. Import is not a substitute (S3 would duplicate every
-entry). A passphrase-only source keeps today's chooser warning: *Same
-passphrase does not prove same vault.*
-
-**S8. Unchanged, pinned by the net before any change:** the chooser, both its
-paths (automatic; one-by-one review with keep/pick/drop, Merge the rest,
-Cancel-rolls-back), the merge engine, the keyed-source flow, the fallback,
-and import parsing/counts/keyed source for all 6 types.
-
-**S9. Export and import folders** live on their own screens behind a
-**Remember** checkbox (not "Lock": the app already uses *lock* for the vault).
-Android export already remembers silently; that mechanism is reused, its box
-arrives ticked. Export and import may point at the same folder: that is the
-sync case, where the file one device writes is the file the other reads.
-
-Progress (tick as each Bikeshed section lands):
-- [ ] Net (S8), both platforms
-- [ ] Labels (S2)
-- [ ] Import additive, no dedupe (S3)
-- [ ] Sync settings screen: auto-merge + sync folder + Remember (S5, S6.1)
-- [ ] Sync from vault by name match, picker fallback, auto-merge wiring (S6, S7)
-- [ ] Import screen: one picker (Bikeshed step 2)
-- [ ] Remember folders on export/import + read-only view in Sync settings (S9, S5)
-- [ ] Docs: README, VAULT_SYNC.md, CHANGELOG
-- [ ] Hardware: one pass per platform per section
+_Empty — pick the next item from the Bikeshed._
 
 ---
 
@@ -245,55 +170,10 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Features and UI/UX
-#### Sync family — do in this order
-
-Spec: Current Focus > **One-click sync** (S1–S9). Promote one section at a
-time; each ends with a hardware pass per platform and its ticks in the spec.
-
-**Step 1 — one-click sync (S2, S3, S5, S6, S7).**
-- Net first (S8): `test/vault_list_sync_test.dart`, `test/import_screen_test.dart`,
-  Rust import tests. Pin the chooser, both paths, fallback, keyed flow; pin
-  import parsing/counts for all 6 types.
-- Labels: rename `syncFromFileTitle` -> Sync from vault, `syncFromVault` ->
-  Import, all 37 ARBs.
-- Import additive: red-first in `rust/src/api/import.rs` (drop the content-hash
-  skip in `merge_source_into_session` and the 5 other importers); delete
-  `SkippedEntryData`, `import_skipped_dialog.dart`, their tests.
-- Settings: `auto_merge_sync` (bool, false), `sync_folder` (string, empty),
-  `#[serde(default)]`-equivalent: absent key = default. Linux path; Android
-  SAF tree URI, same mechanism as `android_export_folder_uri`.
-- Sync settings screen: `SwitchListTile` + folder field + Remember; semantics
-  labels; screen-reader + large-text tests; all ARBs.
-- `_syncFromFile` in `vault_list_screen.dart` (one code path, both layouts):
-  folder set -> resolve `<sync folder>/<this vault's file name>`, missing file
-  -> error, no picker; setting on -> `fast = true`, skip `SyncMethodDialog`.
-- Hardware: one pass Linux, one pass Android.
-
-**Step 2 — import screen: one picker, not six.** Today six stacked sections each
-carry their own path field; the user needs one. Replace with a single path
-selector + **Remember** checkbox (one folder for all types) and a type dropdown —
-Gabbro (default), Generic CSV, Google Password Manager, Dashlane, Enpass,
-Bitwarden. Per-type explanation text stays; so do the top warning banner and the
-size-limit note. Changing the type clears the path: extensions differ
-(`.gabbro`/`.csv`/`.json`), so a stale path would arm the button on a file that
-cannot parse. Gabbro selected also reveals the passphrase field and, for a
-key-protected source, the PIN + Android transport sub-form. Action button label
-follows the type: *Import* / *Next: map columns* / *Import*.
-A rewrite of a 1000-line screen with six independent error/loading/format-check
-flows.
-
-**Step 3 — remember folders (S9) + read-only view (S5).** Export and import
-folders, Linux and Android, user-selected, no built-in value. Reuse the Android
-export mechanism. Then add both to Sync settings read-only with the note.
-
-**Why step 2 before step 3:** the import screen has 3 PathField code sites
-(`_gabbroSection`, `_csvSection`, the shared `_importSection`) rendered six
-times. Wiring Remember first would build and test 3 sites, then delete 2 in the
-remold and re-pin the tests.
-
-- **Emergency sheet.** Printable one-pager in `docs/` (vault location, YubiKey
-  serials, hand-written passphrase blank, storage advice), linked from README.
-  Paper only — no code.
+- **Crypto stack diagram pinned to format v11.** `docs/artefacts/gabbro_crypto_stack_flow.dot`
+  (+ `.svg`, and the `simple_icons` SVG/PNG/PDF if they carry the number) hard-code
+  the vault format version. Update to the current version and, if possible, make
+  them version-agnostic. These files hold no history of earlier formats.
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).

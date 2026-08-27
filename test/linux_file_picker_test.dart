@@ -206,4 +206,81 @@ void main() {
 
     expect(path, '/tmp/My Vault/café.gabbro');
   });
+
+  // ── S5: folder picker (sync folder; later export/import folders) ──────────
+
+  test('T7: pickDirectory sends OpenFile with directory=true, returns the path',
+      () async {
+    final fake = await _startFakePortal(
+      response: 0,
+      uris: ['file:///home/user/GabbroSync'],
+    );
+    addTearDown(fake.close);
+
+    final picker = LinuxFilePicker(clientFactory: fake.clientFactory);
+    final path = await picker.pickDirectory();
+
+    expect(path, '/home/user/GabbroSync');
+    expect(fake.portal.lastMethod, 'OpenFile');
+    expect(fake.portal.lastOptions!['directory'], const DBusBoolean(true));
+    expect(fake.portal.lastOptions!['multiple'], const DBusBoolean(false));
+    expect(fake.portal.lastOptions!.containsKey('filters'), isFalse,
+        reason: 'a folder dialog has no file filter');
+  });
+
+  test('T8: pickDirectory returns null when the user cancels', () async {
+    final fake = await _startFakePortal(response: 1);
+    addTearDown(fake.close);
+
+    final picker = LinuxFilePicker(clientFactory: fake.clientFactory);
+    expect(await picker.pickDirectory(), isNull);
+  });
+  _rememberedFolderTests();
+}
+
+// ── Step 3: remembered folders ────────────────────────────────────────────────
+
+/// The portal takes `current_folder` as a NUL-terminated byte string.
+List<int> _folderBytes(Map<String, DBusValue> options) =>
+    (options['current_folder'] as DBusArray).children.map((c) => (c as DBusByte).value).toList();
+
+
+void _rememberedFolderTests() {
+  test('T9: openFile with a start folder sends current_folder, NUL-terminated',
+      () async {
+    final fake = await _startFakePortal(
+      response: 0,
+      uris: ['file:///home/user/Sync/x.json'],
+    );
+    addTearDown(fake.close);
+    final picker = LinuxFilePicker(clientFactory: fake.clientFactory);
+    await picker.openFile(
+        allowedExtensions: ['json'], currentFolder: '/home/user/Sync');
+    expect(_folderBytes(fake.portal.lastOptions!),
+        [...'/home/user/Sync'.codeUnits, 0]);
+  });
+
+  test('T10: saveFile with a start folder sends current_folder, NUL-terminated',
+      () async {
+    final fake = await _startFakePortal(
+      response: 0,
+      uris: ['file:///home/user/Sync/vault.gabbro'],
+    );
+    addTearDown(fake.close);
+    final picker = LinuxFilePicker(clientFactory: fake.clientFactory);
+    await picker.saveFile(fileName: 'vault.gabbro', currentFolder: '/home/user/Sync');
+    final options = fake.portal.lastOptions!;
+    expect((options['current_name'] as DBusString).value, 'vault.gabbro');
+    expect(_folderBytes(options), [...'/home/user/Sync'.codeUnits, 0]);
+  });
+
+  test('T11: no start folder sends no current_folder', () async {
+    final fake = await _startFakePortal(response: 1);
+    addTearDown(fake.close);
+    final picker = LinuxFilePicker(clientFactory: fake.clientFactory);
+    await picker.openFile();
+    expect(fake.portal.lastOptions!.containsKey('current_folder'), isFalse);
+    await picker.saveFile(fileName: 'a');
+    expect(fake.portal.lastOptions!.containsKey('current_folder'), isFalse);
+  });
 }

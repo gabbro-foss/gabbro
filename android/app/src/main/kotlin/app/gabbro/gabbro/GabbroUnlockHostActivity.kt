@@ -69,7 +69,7 @@ abstract class GabbroUnlockHostActivity : FlutterFragmentActivity() {
     private var pendingFilePick: MethodChannel.Result? = null
     private var pendingPickWantsBytes = false
     private var pendingFolderPick: MethodChannel.Result? = null
-    private lateinit var openFileLauncher: ActivityResultLauncher<Array<String>>
+    private lateinit var openFileLauncher: ActivityResultLauncher<GabbroPicker.PickRequest>
     private lateinit var openFolderLauncher: ActivityResultLauncher<Uri?>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,7 +77,7 @@ abstract class GabbroUnlockHostActivity : FlutterFragmentActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
 
         openFileLauncher =
-            registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+            registerForActivityResult(GabbroPicker.OpenDocumentAt()) { uri ->
                 val result = pendingFilePick
                 pendingFilePick = null
                 if (uri == null) {
@@ -125,7 +125,7 @@ abstract class GabbroUnlockHostActivity : FlutterFragmentActivity() {
                 } else {
                     val target = GabbroPicker.cacheTarget(cacheDir, name)
                     GabbroPicker.copyTo(stream, target)
-                    Result.success<Any?>(target.absolutePath)
+                    Result.success<Any?>(GabbroPicker.pickedFileReply(target.absolutePath, uri))
                 }
             } catch (e: Exception) {
                 Result.failure<Any?>(e)
@@ -215,13 +215,16 @@ abstract class GabbroUnlockHostActivity : FlutterFragmentActivity() {
                         pendingFilePick = result
                         pendingPickWantsBytes = false
                         openFileLauncher.launch(
-                            GabbroPicker.mimeTypes(call.argument<List<String>>("extensions")),
+                            GabbroPicker.PickRequest(
+                                GabbroPicker.mimeTypes(call.argument<List<String>>("extensions")),
+                                call.argument<String>("initial_uri"),
+                            ),
                         )
                     }
                     "pick_file_bytes" -> {
                         pendingFilePick = result
                         pendingPickWantsBytes = true
-                        openFileLauncher.launch(GabbroPicker.mimeTypes(null))
+                        openFileLauncher.launch(GabbroPicker.PickRequest(GabbroPicker.mimeTypes(null), null))
                     }
                     "pick_dir" -> {
                         pendingFolderPick = result

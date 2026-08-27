@@ -3894,10 +3894,8 @@ impl SseDecode for crate::api::import::GabbroImportResult {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_imported = <usize>::sse_decode(deserializer);
-        let mut var_skipped = <Vec<crate::api::import::SkippedEntryData>>::sse_decode(deserializer);
         return crate::api::import::GabbroImportResult {
             imported: var_imported,
-            skipped: var_skipped,
         };
     }
 }
@@ -3979,11 +3977,9 @@ impl SseDecode for crate::api::import::ImportResult {
         let mut var_imported = <usize>::sse_decode(deserializer);
         let mut var_failures =
             <Vec<crate::api::import::ImportFailureData>>::sse_decode(deserializer);
-        let mut var_skipped = <Vec<crate::api::import::SkippedEntryData>>::sse_decode(deserializer);
         return crate::api::import::ImportResult {
             imported: var_imported,
             failures: var_failures,
-            skipped: var_skipped,
         };
     }
 }
@@ -4264,20 +4260,6 @@ impl SseDecode for Vec<(String, String)> {
         let mut ans_ = Vec::with_capacity(len_ as usize);
         for idx_ in 0..len_ {
             ans_.push(<(String, String)>::sse_decode(deserializer));
-        }
-        return ans_;
-    }
-}
-
-impl SseDecode for Vec<crate::api::import::SkippedEntryData> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut len_ = <i32>::sse_decode(deserializer);
-        let mut ans_ = Vec::with_capacity(len_ as usize);
-        for idx_ in 0..len_ {
-            ans_.push(<crate::api::import::SkippedEntryData>::sse_decode(
-                deserializer,
-            ));
         }
         return ans_;
     }
@@ -4679,14 +4661,6 @@ impl SseDecode for crate::api::passkey_bridge::RegistrationParts {
             auth_data: var_authData,
             public_key_cose: var_publicKeyCose,
         };
-    }
-}
-
-impl SseDecode for crate::api::import::SkippedEntryData {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_title = <String>::sse_decode(deserializer);
-        return crate::api::import::SkippedEntryData { title: var_title };
     }
 }
 
@@ -5790,11 +5764,7 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::vault::FolderConflictItem>
 // Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::api::import::GabbroImportResult {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        [
-            self.imported.into_into_dart().into_dart(),
-            self.skipped.into_into_dart().into_dart(),
-        ]
-        .into_dart()
+        [self.imported.into_into_dart().into_dart()].into_dart()
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
@@ -5890,7 +5860,6 @@ impl flutter_rust_bridge::IntoDart for crate::api::import::ImportResult {
         [
             self.imported.into_into_dart().into_dart(),
             self.failures.into_into_dart().into_dart(),
-            self.skipped.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -6226,23 +6195,6 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::passkey_bridge::RegistrationP
     for crate::api::passkey_bridge::RegistrationParts
 {
     fn into_into_dart(self) -> crate::api::passkey_bridge::RegistrationParts {
-        self
-    }
-}
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::import::SkippedEntryData {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        [self.title.into_into_dart().into_dart()].into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::import::SkippedEntryData
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<crate::api::import::SkippedEntryData>
-    for crate::api::import::SkippedEntryData
-{
-    fn into_into_dart(self) -> crate::api::import::SkippedEntryData {
         self
     }
 }
@@ -6747,7 +6699,6 @@ impl SseEncode for crate::api::import::GabbroImportResult {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <usize>::sse_encode(self.imported, serializer);
-        <Vec<crate::api::import::SkippedEntryData>>::sse_encode(self.skipped, serializer);
     }
 }
 
@@ -6800,7 +6751,6 @@ impl SseEncode for crate::api::import::ImportResult {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <usize>::sse_encode(self.imported, serializer);
         <Vec<crate::api::import::ImportFailureData>>::sse_encode(self.failures, serializer);
-        <Vec<crate::api::import::SkippedEntryData>>::sse_encode(self.skipped, serializer);
     }
 }
 
@@ -7023,16 +6973,6 @@ impl SseEncode for Vec<(String, String)> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <(String, String)>::sse_encode(item, serializer);
-        }
-    }
-}
-
-impl SseEncode for Vec<crate::api::import::SkippedEntryData> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <i32>::sse_encode(self.len() as _, serializer);
-        for item in self {
-            <crate::api::import::SkippedEntryData>::sse_encode(item, serializer);
         }
     }
 }
@@ -7300,13 +7240,6 @@ impl SseEncode for crate::api::passkey_bridge::RegistrationParts {
         <Vec<u8>>::sse_encode(self.credential_id, serializer);
         <Vec<u8>>::sse_encode(self.auth_data, serializer);
         <Vec<u8>>::sse_encode(self.public_key_cose, serializer);
-    }
-}
-
-impl SseEncode for crate::api::import::SkippedEntryData {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <String>::sse_encode(self.title, serializer);
     }
 }
 

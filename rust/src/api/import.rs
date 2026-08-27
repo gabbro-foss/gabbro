@@ -59,8 +59,6 @@ pub struct ImportResult {
     pub imported: usize,
     /// Entries that failed domain validation and were not imported.
     pub failures: Vec<ImportFailureData>,
-    /// Entries skipped because the vault already holds identical content.
-    pub skipped: Vec<SkippedEntryData>,
 }
 
 // ── Bridge functions ──────────────────────────────────────────────────────────
@@ -96,11 +94,8 @@ pub async fn import_from_csv(
     // Scrub the raw import buffer (holds plaintext secrets) on drop (S-06).
     let input = zeroize::Zeroizing::new(input);
     let entries = import_csv(&input, &csv_config)?;
-    // Grows as rows are added, so a file listing the same row twice imports it once.
-    let mut existing = session::session_entry_content_hashes()?;
 
     let mut imported = 0;
-    let mut skipped = Vec::new();
 
     for csv_entry in entries {
         let now = chrono_now();
@@ -131,22 +126,14 @@ pub async fn import_from_csv(
             app_id: None,
             email: None,
         });
-        let (_, title) = entry_id_and_title(&entry);
-        let hash = entry.content_hash();
-        if existing.contains(&hash) {
-            skipped.push(SkippedEntryData { title });
-        } else {
-            existing.insert(hash);
-            session::session_add_entry_no_save(entry)?;
-            imported += 1;
-        }
+        session::session_add_entry_no_save(entry)?;
+        imported += 1;
     }
 
     session::session_save()?;
     Ok(ImportResult {
         imported,
         failures: vec![],
-        skipped,
     })
 }
 
@@ -167,25 +154,16 @@ fn stamp_timestamps(mut entry: VaultEntry, now: &str) -> VaultEntry {
     entry
 }
 
-/// Extract the UUID and display title from any `VaultEntry` variant.
-fn entry_id_and_title(entry: &crate::vault::entry::VaultEntry) -> (String, String) {
-    use crate::vault::entry::VaultEntry::*;
+/// Mutable access to the common metadata of any `VaultEntry` variant.
+fn entry_meta_mut(entry: &mut VaultEntry) -> &mut EntryMeta {
     match entry {
-        Login(e) => (e.meta.id.clone(), e.title.clone()),
-        Note(e) => (e.meta.id.clone(), e.title.clone()),
-        Identity(e) => (
-            e.meta.id.clone(),
-            format!("{} {}", e.first_name, e.last_name),
-        ),
-        Card(e) => (
-            e.meta.id.clone(),
-            e.card_name
-                .clone()
-                .unwrap_or_else(|| e.cardholder_name.clone()),
-        ),
-        File(e) => (e.meta.id.clone(), e.filename.clone()),
-        Custom(e) => (e.meta.id.clone(), e.title.clone()),
-        Passkey(e) => (e.meta.id.clone(), e.rp_id.clone()),
+        VaultEntry::Login(e) => &mut e.meta,
+        VaultEntry::Note(e) => &mut e.meta,
+        VaultEntry::Identity(e) => &mut e.meta,
+        VaultEntry::Card(e) => &mut e.meta,
+        VaultEntry::File(e) => &mut e.meta,
+        VaultEntry::Custom(e) => &mut e.meta,
+        VaultEntry::Passkey(e) => &mut e.meta,
     }
 }
 
@@ -203,23 +181,12 @@ pub async fn import_from_bitwarden(data: Vec<u8>) -> Result<ImportResult, String
     // Scrub the raw import buffer (holds plaintext secrets) on drop (S-06).
     let data = zeroize::Zeroizing::new(data);
     let (entries, failures) = bitwarden::parse(&data)?;
-    // Grows as entries are added, so a file listing the same credential twice
-    // imports it once.
-    let mut existing = session::session_entry_content_hashes()?;
 
     let mut imported = 0;
-    let mut skipped = Vec::new();
 
     for entry in entries {
-        let (_, title) = entry_id_and_title(&entry);
-        let hash = entry.content_hash();
-        if existing.contains(&hash) {
-            skipped.push(SkippedEntryData { title });
-        } else {
-            existing.insert(hash);
-            session::session_add_entry_no_save(entry)?;
-            imported += 1;
-        }
+        session::session_add_entry_no_save(entry)?;
+        imported += 1;
     }
 
     session::session_save()?;
@@ -234,7 +201,6 @@ pub async fn import_from_bitwarden(data: Vec<u8>) -> Result<ImportResult, String
                 raw_fields: f.raw_fields,
             })
             .collect(),
-        skipped,
     })
 }
 
@@ -252,23 +218,12 @@ pub async fn import_from_enpass(data: Vec<u8>) -> Result<ImportResult, String> {
     // Scrub the raw import buffer (holds plaintext secrets) on drop (S-06).
     let data = zeroize::Zeroizing::new(data);
     let (entries, failures) = enpass::parse(&data)?;
-    // Grows as entries are added, so a file listing the same credential twice
-    // imports it once.
-    let mut existing = session::session_entry_content_hashes()?;
 
     let mut imported = 0;
-    let mut skipped = Vec::new();
 
     for entry in entries {
-        let (_, title) = entry_id_and_title(&entry);
-        let hash = entry.content_hash();
-        if existing.contains(&hash) {
-            skipped.push(SkippedEntryData { title });
-        } else {
-            existing.insert(hash);
-            session::session_add_entry_no_save(entry)?;
-            imported += 1;
-        }
+        session::session_add_entry_no_save(entry)?;
+        imported += 1;
     }
 
     session::session_save()?;
@@ -283,7 +238,6 @@ pub async fn import_from_enpass(data: Vec<u8>) -> Result<ImportResult, String> {
                 raw_fields: f.raw_fields,
             })
             .collect(),
-        skipped,
     })
 }
 
@@ -298,26 +252,15 @@ pub async fn import_from_google_pm(data: Vec<u8>) -> Result<ImportResult, String
     // Scrub the raw import buffer (holds plaintext secrets) on drop (S-06).
     let data = zeroize::Zeroizing::new(data);
     let (entries, failures) = google_pm::parse(&data)?;
-    // Grows as entries are added, so a file listing the same credential twice
-    // imports it once.
-    let mut existing = session::session_entry_content_hashes()?;
 
     let mut imported = 0;
-    let mut skipped = Vec::new();
 
     for entry in entries {
-        let (_, title) = entry_id_and_title(&entry);
-        let hash = entry.content_hash();
-        if existing.contains(&hash) {
-            skipped.push(SkippedEntryData { title });
-        } else {
-            existing.insert(hash);
-            let now = chrono_now();
-            // Google PM entries are freshly assigned UUIDs — stamp timestamps.
-            let entry = stamp_timestamps(entry, &now);
-            session::session_add_entry_no_save(entry)?;
-            imported += 1;
-        }
+        let now = chrono_now();
+        // Google PM entries are freshly assigned UUIDs — stamp timestamps.
+        let entry = stamp_timestamps(entry, &now);
+        session::session_add_entry_no_save(entry)?;
+        imported += 1;
     }
 
     session::session_save()?;
@@ -332,7 +275,6 @@ pub async fn import_from_google_pm(data: Vec<u8>) -> Result<ImportResult, String
                 raw_fields: f.raw_fields,
             })
             .collect(),
-        skipped,
     })
 }
 
@@ -347,25 +289,14 @@ pub async fn import_from_dashlane(data: Vec<u8>) -> Result<ImportResult, String>
     // Scrub the raw import buffer (holds plaintext secrets) on drop (S-06).
     let data = zeroize::Zeroizing::new(data);
     let (entries, failures) = dashlane::parse(&data)?;
-    // Grows as entries are added, so a file listing the same credential twice
-    // imports it once.
-    let mut existing = session::session_entry_content_hashes()?;
 
     let mut imported = 0;
-    let mut skipped = Vec::new();
 
     for entry in entries {
-        let (_, title) = entry_id_and_title(&entry);
-        let hash = entry.content_hash();
-        if existing.contains(&hash) {
-            skipped.push(SkippedEntryData { title });
-        } else {
-            existing.insert(hash);
-            let now = chrono_now();
-            let entry = stamp_timestamps(entry, &now);
-            session::session_add_entry_no_save(entry)?;
-            imported += 1;
-        }
+        let now = chrono_now();
+        let entry = stamp_timestamps(entry, &now);
+        session::session_add_entry_no_save(entry)?;
+        imported += 1;
     }
 
     session::session_save()?;
@@ -380,38 +311,23 @@ pub async fn import_from_dashlane(data: Vec<u8>) -> Result<ImportResult, String>
                 raw_fields: f.raw_fields,
             })
             .collect(),
-        skipped,
     })
 }
 
 // ── Gabbro → Gabbro import ────────────────────────────────────────────────────
-
-/// A single entry skipped during Gabbro → Gabbro import.
-#[derive(Debug)]
-pub struct SkippedEntryData {
-    /// Display title of the skipped entry.
-    ///
-    /// No reason field: there is exactly one reason (the vault already holds this
-    /// content), and the dialog states it once in the user's own language. A
-    /// per-entry reason meant shipping hardcoded English across the bridge.
-    pub title: String,
-}
 
 /// Returned by [`import_from_gabbro`].
 #[derive(Debug)]
 pub struct GabbroImportResult {
     /// Number of entries added to the session.
     pub imported: usize,
-    /// Entries that were skipped (UUID already present in the session).
-    pub skipped: Vec<SkippedEntryData>,
 }
 
 /// Import entries from a `.gabbro` vault file into the live session.
 ///
-/// Decrypts the source vault at `path` using `passphrase`, then applies
-/// content-hash deduplication: entries the session already holds are skipped;
-/// new entries are added. Import never updates an existing entry — that is
-/// sync's job. A single vault save is performed at the end.
+/// Decrypts the source vault at `path` using `passphrase`, then adds every
+/// entry, duplicates included (import is additive; sync is the flow that
+/// reconciles). A single vault save is performed at the end.
 ///
 /// The vault must already be unlocked — returns `Err` if no session is active.
 /// Async — triggers a single vault save (Argon2id + encryption) at the end.
@@ -452,33 +368,31 @@ pub async fn import_from_gabbro_with_key(
     merge_source_into_session(source)
 }
 
-/// Merge a decrypted source vault body into the live session: UUID-based dedup
-/// (existing UUIDs skipped, new entries added), then a single save. Shared by the
-/// passphrase-only and key-protected Gabbro import paths.
+/// Add every entry of a decrypted source vault body to the live session, then
+/// save once. Shared by the passphrase-only and key-protected Gabbro import
+/// paths.
+///
+/// An incoming entry whose UUID the session already holds gets a fresh one:
+/// the vault must never hold two entries under one UUID, or sync (which
+/// matches by UUID) breaks. Other ids are kept, so a later sync with the
+/// source vault still matches them.
 fn merge_source_into_session(
     source: crate::vault::serialization::VaultBody,
 ) -> Result<GabbroImportResult, String> {
-    // Grows as entries are added, so a source holding the same entry twice
-    // imports it once.
-    let mut existing = session::session_entry_content_hashes()?;
-
+    let mut existing = session::session_entry_ids()?;
     let mut imported = 0;
-    let mut skipped = Vec::new();
 
-    for entry in source.entries {
-        let (_, title) = entry_id_and_title(&entry);
-        let hash = entry.content_hash();
-        if existing.contains(&hash) {
-            skipped.push(SkippedEntryData { title });
-        } else {
-            existing.insert(hash);
-            session::session_add_entry_no_save(entry)?;
-            imported += 1;
+    for mut entry in source.entries {
+        if existing.contains(entry_meta_mut(&mut entry).id.as_str()) {
+            entry_meta_mut(&mut entry).id = new_entry_id();
         }
+        existing.insert(entry_meta_mut(&mut entry).id.clone());
+        session::session_add_entry_no_save(entry)?;
+        imported += 1;
     }
 
     session::session_save()?;
-    Ok(GabbroImportResult { imported, skipped })
+    Ok(GabbroImportResult { imported })
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -671,40 +585,6 @@ Sample,https://example.net,user@example.com,s3cr3t,,no";
 
     #[test]
     #[serial]
-    fn import_from_bitwarden_skips_entries_already_in_the_vault() {
-        // The first item's content matches the session's own note, whatever id the
-        // export gave it — so it must be skipped.
-        let bitwarden_with_dupe: &str = r#"{
-            "encrypted": false,
-            "folders": [],
-            "items": [
-                {"id":"bw-any-id","folderId":null,"type":2,"name":"Existing note","notes":"already here","favorite":false,"fields":[],"secureNote":{}},
-                {"id":"bw-new-001","folderId":null,"type":2,"name":"New Note","notes":"brand new","favorite":false,"fields":[],"secureNote":{}}
-            ]
-        }"#;
-
-        let pass = b"bitwarden dedup passphrase";
-        let path = setup_vault(pass);
-        session::unlock_vault(pass, path.clone()).unwrap();
-
-        let result = run(import_from_bitwarden(
-            bitwarden_with_dupe.as_bytes().to_vec(),
-        ))
-        .unwrap();
-
-        assert_eq!(result.imported, 1, "only the new entry should be imported");
-        assert_eq!(result.skipped.len(), 1, "one duplicate should be skipped");
-        assert_eq!(result.skipped[0].title, "Existing note");
-
-        let summaries = session::list_entry_summaries().unwrap();
-        // 1 existing note + 1 new imported note
-        assert_eq!(summaries.len(), 2);
-
-        teardown(&path);
-    }
-
-    #[test]
-    #[serial]
     fn import_never_modifies_an_existing_entry() {
         // Add-only invariant: import adds entries, it never reconciles fields on one
         // already in the vault — that is sync's job. The incoming entry carries the
@@ -768,52 +648,6 @@ Sample,https://example.net,user@example.com,s3cr3t,,no";
 
         let summaries = session::list_entry_summaries().unwrap();
         // 1 existing note + 1 imported login
-        assert_eq!(summaries.len(), 2);
-
-        teardown(&path);
-    }
-
-    #[test]
-    #[serial]
-    fn import_from_enpass_skips_entries_already_in_the_vault() {
-        // The first item's content matches the session's own note, whatever uuid the
-        // export gave it — so it must be skipped.
-        let enpass_with_dupe: &str = r#"{
-            "items": [{
-                "uuid": "enp-any-uuid",
-                "title": "Existing note",
-                "category": "note",
-                "note": "already here",
-                "favorite": 0,
-                "archived": 0,
-                "trashed": 0,
-                "fields": [],
-                "attachments": []
-            }, {
-                "uuid": "enp-new-001",
-                "title": "New Note",
-                "category": "note",
-                "note": "brand new",
-                "favorite": 0,
-                "archived": 0,
-                "trashed": 0,
-                "fields": [],
-                "attachments": []
-            }]
-        }"#;
-
-        let pass = b"enpass dedup passphrase";
-        let path = setup_vault(pass);
-        session::unlock_vault(pass, path.clone()).unwrap();
-
-        let result = run(import_from_enpass(enpass_with_dupe.as_bytes().to_vec())).unwrap();
-
-        assert_eq!(result.imported, 1, "only the new entry should be imported");
-        assert_eq!(result.skipped.len(), 1, "one duplicate should be skipped");
-        assert_eq!(result.skipped[0].title, "Existing note");
-
-        let summaries = session::list_entry_summaries().unwrap();
-        // 1 existing note + 1 new imported note
         assert_eq!(summaries.len(), 2);
 
         teardown(&path);
@@ -905,35 +739,6 @@ Sample,https://example.net,user@example.com,s3cr3t,,no";
         )
         .unwrap();
         path
-    }
-
-    #[test]
-    #[serial]
-    fn import_from_gabbro_skips_entries_already_in_the_vault() {
-        let session_pass = b"session passphrase";
-        let session_path = setup_vault(session_pass);
-        session::unlock_vault(session_pass, session_path.clone()).unwrap();
-
-        let source_pass = b"source passphrase";
-        let source_path = setup_source_vault(source_pass);
-
-        let result = run(import_from_gabbro(
-            source_path.to_str().unwrap().to_string(),
-            source_pass.to_vec(),
-        ))
-        .unwrap();
-
-        // "New note" is new -> imported; "Existing note" matches by content -> skipped
-        assert_eq!(result.imported, 1, "only the new entry should be imported");
-        assert_eq!(result.skipped.len(), 1, "one entry should be skipped");
-        assert_eq!(result.skipped[0].title, "Existing note");
-
-        let summaries = session::list_entry_summaries().unwrap();
-        // 1 original note + 1 new imported note
-        assert_eq!(summaries.len(), 2);
-
-        teardown(&session_path);
-        let _ = std::fs::remove_file(&source_path);
     }
 
     #[test]
@@ -1050,92 +855,62 @@ user@example.com,backup@example.com,,https://example.net,Personal,,s3cr3t,Sample
         assert!(result.is_err());
     }
 
-    // ── S6: re-importing the same file imports nothing ────────────────────────
-    // One per source. Dedup is on content, so it holds whether or not the export
-    // carries an id — the user gets the same answer from every source.
+    // ── S3: import is additive, no dedupe ─────────────────────────────────────
+    // Every source entry is added, duplicates included. Import is a
+    // once-at-onboarding act into an empty vault; dedupe, if ever, is a
+    // separate task. Sync (UUID merge) is the flow that reconciles.
 
-    #[test]
-    #[serial]
-    fn google_pm_reimport_imports_nothing() {
-        let pass = b"google pm reimport passphrase";
-        let path = setup_vault(pass);
-        session::unlock_vault(pass, path.clone()).unwrap();
-
-        let first = run(import_from_google_pm(GOOGLE_PM_CSV.as_bytes().to_vec())).unwrap();
-        let second = run(import_from_google_pm(GOOGLE_PM_CSV.as_bytes().to_vec())).unwrap();
-
-        assert_eq!(first.imported, 2);
-        assert_eq!(second.imported, 0, "the same rows must not import twice");
-        assert_eq!(
-            second.skipped.len(),
-            2,
-            "both rows must be reported skipped"
-        );
-        // 1 existing note + 2 imported once
-        assert_eq!(session::list_entry_summaries().unwrap().len(), 3);
-
-        teardown(&path);
-    }
-
-    #[test]
-    #[serial]
-    fn dashlane_reimport_imports_nothing() {
-        let pass = b"dashlane reimport passphrase";
-        let path = setup_vault(pass);
-        session::unlock_vault(pass, path.clone()).unwrap();
-
-        let first = run(import_from_dashlane(DASHLANE_CSV.as_bytes().to_vec())).unwrap();
-        let second = run(import_from_dashlane(DASHLANE_CSV.as_bytes().to_vec())).unwrap();
-
-        assert_eq!(first.imported, 2);
-        assert_eq!(second.imported, 0, "the same rows must not import twice");
-        assert_eq!(
-            second.skipped.len(),
-            2,
-            "both rows must be reported skipped"
-        );
-        assert_eq!(session::list_entry_summaries().unwrap().len(), 3);
-
-        teardown(&path);
-    }
-
-    #[test]
-    #[serial]
-    fn csv_reimport_imports_nothing_and_reports_the_skips() {
-        let pass = b"csv reimport passphrase";
-        let path = setup_vault(pass);
-        session::unlock_vault(pass, path.clone()).unwrap();
-
-        let config = || CsvImportConfigData {
+    fn csv_config() -> CsvImportConfigData {
+        CsvImportConfigData {
             title_col: Some("name".to_string()),
             url_col: Some("url".to_string()),
             username_col: Some("login".to_string()),
             password_col: Some("password".to_string()),
             notes_col: Some("comments".to_string()),
-        };
+        }
+    }
 
-        let first = run(import_from_csv(SAMPLE_CSV.to_string(), config())).unwrap();
-        let second = run(import_from_csv(SAMPLE_CSV.to_string(), config())).unwrap();
+    #[test]
+    #[serial]
+    fn csv_reimport_adds_every_row_again() {
+        let pass = b"csv reimport passphrase";
+        let path = setup_vault(pass);
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let first = run(import_from_csv(SAMPLE_CSV.to_string(), csv_config())).unwrap();
+        let second = run(import_from_csv(SAMPLE_CSV.to_string(), csv_config())).unwrap();
 
         assert_eq!(first.imported, 2);
-        assert!(
-            first.skipped.is_empty(),
-            "a first import skips nothing on an unrelated vault"
-        );
-        assert_eq!(second.imported, 0, "the same rows must not import twice");
-        assert_eq!(
-            second.skipped.len(),
-            2,
-            "the CSV path must report its skips too"
-        );
-        assert_eq!(session::list_entry_summaries().unwrap().len(), 3);
+        assert_eq!(second.imported, 2, "a re-import adds every row again");
+        // 1 existing note + 2 + 2
+        assert_eq!(session::list_entry_summaries().unwrap().len(), 5);
 
         teardown(&path);
     }
 
     #[test]
     #[serial]
-    fn bitwarden_reimport_imports_nothing() {
+    fn csv_reimport_after_a_reload_adds_every_row_again() {
+        // The app saves, navigates and can auto-lock between two imports.
+        let pass = b"csv reload reimport passphrase";
+        let path = setup_vault(pass);
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let first = run(import_from_csv(SAMPLE_CSV.to_string(), csv_config())).unwrap();
+        assert_eq!(first.imported, 2);
+        session::lock_vault().unwrap();
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let second = run(import_from_csv(SAMPLE_CSV.to_string(), csv_config())).unwrap();
+        assert_eq!(second.imported, 2);
+        assert_eq!(session::list_entry_summaries().unwrap().len(), 5);
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn bitwarden_reimport_adds_every_item_again() {
         let pass = b"bitwarden reimport passphrase";
         let path = setup_vault(pass);
         session::unlock_vault(pass, path.clone()).unwrap();
@@ -1144,16 +919,15 @@ user@example.com,backup@example.com,,https://example.net,Personal,,s3cr3t,Sample
         let second = run(import_from_bitwarden(BITWARDEN_JSON.as_bytes().to_vec())).unwrap();
 
         assert_eq!(first.imported, 4);
-        assert_eq!(second.imported, 0, "the same items must not import twice");
-        assert_eq!(second.skipped.len(), 4);
-        assert_eq!(session::list_entry_summaries().unwrap().len(), 5);
+        assert_eq!(second.imported, 4);
+        assert_eq!(session::list_entry_summaries().unwrap().len(), 9);
 
         teardown(&path);
     }
 
     #[test]
     #[serial]
-    fn enpass_reimport_imports_nothing() {
+    fn enpass_reimport_adds_every_item_again() {
         let pass = b"enpass reimport passphrase";
         let path = setup_vault(pass);
         session::unlock_vault(pass, path.clone()).unwrap();
@@ -1162,16 +936,49 @@ user@example.com,backup@example.com,,https://example.net,Personal,,s3cr3t,Sample
         let second = run(import_from_enpass(ENPASS_JSON.as_bytes().to_vec())).unwrap();
 
         assert_eq!(first.imported, 1);
-        assert_eq!(second.imported, 0, "the same items must not import twice");
-        assert_eq!(second.skipped.len(), 1);
-        assert_eq!(session::list_entry_summaries().unwrap().len(), 2);
+        assert_eq!(second.imported, 1);
+        assert_eq!(session::list_entry_summaries().unwrap().len(), 3);
 
         teardown(&path);
     }
 
     #[test]
     #[serial]
-    fn gabbro_reimport_imports_nothing() {
+    fn google_pm_reimport_adds_every_row_again() {
+        let pass = b"google pm reimport passphrase";
+        let path = setup_vault(pass);
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let first = run(import_from_google_pm(GOOGLE_PM_CSV.as_bytes().to_vec())).unwrap();
+        let second = run(import_from_google_pm(GOOGLE_PM_CSV.as_bytes().to_vec())).unwrap();
+
+        assert_eq!(first.imported, 2);
+        assert_eq!(second.imported, 2);
+        assert_eq!(session::list_entry_summaries().unwrap().len(), 5);
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn dashlane_reimport_adds_every_row_again() {
+        let pass = b"dashlane reimport passphrase";
+        let path = setup_vault(pass);
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let first = run(import_from_dashlane(DASHLANE_CSV.as_bytes().to_vec())).unwrap();
+        let second = run(import_from_dashlane(DASHLANE_CSV.as_bytes().to_vec())).unwrap();
+
+        assert_eq!(first.imported, 2);
+        assert_eq!(second.imported, 2);
+        assert_eq!(session::list_entry_summaries().unwrap().len(), 5);
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn gabbro_reimport_adds_every_entry_again() {
         let session_pass = b"gabbro reimport session passphrase";
         let session_path = setup_vault(session_pass);
         session::unlock_vault(session_pass, session_path.clone()).unwrap();
@@ -1180,203 +987,105 @@ user@example.com,backup@example.com,,https://example.net,Personal,,s3cr3t,Sample
         let source_path = setup_source_vault(source_pass);
         let source = || source_path.to_str().unwrap().to_string();
 
+        // The source holds "Existing note" (same content as the session's own
+        // entry) plus one new note: both import, both times.
         let first = run(import_from_gabbro(source(), source_pass.to_vec())).unwrap();
         let second = run(import_from_gabbro(source(), source_pass.to_vec())).unwrap();
 
-        // The source holds "Existing note" (same content as the session's own entry)
-        // plus one genuinely new note.
-        assert_eq!(first.imported, 1);
-        assert_eq!(second.imported, 0, "the same vault must not import twice");
-        assert_eq!(second.skipped.len(), 2);
-        assert_eq!(session::list_entry_summaries().unwrap().len(), 2);
+        assert_eq!(first.imported, 2);
+        assert_eq!(second.imported, 2);
+        assert_eq!(session::list_entry_summaries().unwrap().len(), 5);
 
         teardown(&session_path);
         let _ = std::fs::remove_file(&source_path);
     }
 
-    // ── S7: a mixed file imports only the entries not already held ────────────
-    // The three sources with no id in their export. The other three are covered by
-    // `import_from_{bitwarden,enpass,gabbro}_skips_entries_already_in_the_vault`,
-    // whose fixtures each pair one duplicate with one new entry.
-
     #[test]
     #[serial]
-    fn google_pm_mixed_file_imports_only_the_new_rows() {
-        // Row 1 repeats a row already imported; row 2 is new. A user who adds one
-        // password at the source and re-exports must get exactly that one entry.
-        const MIXED: &str = "\
-name,url,username,password,note
-Example,https://example.com,user,hunter2,my example
-Third,https://example.org,third,t0ps3cr3t,";
-
-        let pass = b"google pm mixed passphrase";
-        let path = setup_vault(pass);
-        session::unlock_vault(pass, path.clone()).unwrap();
-
-        let first = run(import_from_google_pm(GOOGLE_PM_CSV.as_bytes().to_vec())).unwrap();
-        assert_eq!(first.imported, 2);
-
-        let second = run(import_from_google_pm(MIXED.as_bytes().to_vec())).unwrap();
-        assert_eq!(second.imported, 1, "only the new row imports");
-        assert_eq!(second.skipped.len(), 1, "the repeated row is reported");
-        assert_eq!(second.skipped[0].title, "Example");
-
-        // 1 existing note + 2 + 1
-        assert_eq!(session::list_entry_summaries().unwrap().len(), 4);
-
-        teardown(&path);
-    }
-
-    #[test]
-    #[serial]
-    fn dashlane_mixed_file_imports_only_the_new_rows() {
-        const MIXED: &str = "\
-username,username2,username3,url,category,note,password,title
-user@example.com,,,https://example.com,Work,my example,hunter2,Example
-third@example.com,,,https://example.org,Work,,t0ps3cr3t,Third";
-
-        let pass = b"dashlane mixed passphrase";
-        let path = setup_vault(pass);
-        session::unlock_vault(pass, path.clone()).unwrap();
-
-        let first = run(import_from_dashlane(DASHLANE_CSV.as_bytes().to_vec())).unwrap();
-        assert_eq!(first.imported, 2);
-
-        let second = run(import_from_dashlane(MIXED.as_bytes().to_vec())).unwrap();
-        assert_eq!(second.imported, 1, "only the new row imports");
-        assert_eq!(second.skipped.len(), 1, "the repeated row is reported");
-        assert_eq!(second.skipped[0].title, "Example");
-
-        assert_eq!(session::list_entry_summaries().unwrap().len(), 4);
-
-        teardown(&path);
-    }
-
-    #[test]
-    #[serial]
-    fn csv_mixed_file_imports_only_the_new_rows() {
-        const MIXED: &str = "\
-name,url,login,password,comments,favourite
-Example,https://example.com,user,hunter2,my example,yes
-Third,https://example.org,third,t0ps3cr3t,,no";
-
-        let pass = b"csv mixed passphrase";
-        let path = setup_vault(pass);
-        session::unlock_vault(pass, path.clone()).unwrap();
-
-        let config = || CsvImportConfigData {
-            title_col: Some("name".to_string()),
-            url_col: Some("url".to_string()),
-            username_col: Some("login".to_string()),
-            password_col: Some("password".to_string()),
-            notes_col: Some("comments".to_string()),
-        };
-
-        let first = run(import_from_csv(SAMPLE_CSV.to_string(), config())).unwrap();
-        assert_eq!(first.imported, 2);
-
-        let second = run(import_from_csv(MIXED.to_string(), config())).unwrap();
-        assert_eq!(second.imported, 1, "only the new row imports");
-        assert_eq!(second.skipped.len(), 1, "the repeated row is reported");
-        assert_eq!(second.skipped[0].title, "Example");
-
-        assert_eq!(session::list_entry_summaries().unwrap().len(), 4);
-
-        teardown(&path);
-    }
-
-    // ── S8: duplicate rows within one file ────────────────────────────────────
-    // Three tests, one per distinct dedup site: the shape shared by
-    // bitwarden/enpass/google_pm/dashlane, `merge_source_into_session`, and the
-    // CSV loop. A file listing the same credential twice must leave one entry.
-
-    #[test]
-    #[serial]
-    fn google_pm_duplicate_rows_in_one_file_import_once() {
-        const TWICE: &str = "\
-name,url,username,password,note
-Example,https://example.com,user,hunter2,my example
-Example,https://example.com,user,hunter2,my example";
-
-        let pass = b"google pm self dedup passphrase";
-        let path = setup_vault(pass);
-        session::unlock_vault(pass, path.clone()).unwrap();
-
-        let result = run(import_from_google_pm(TWICE.as_bytes().to_vec())).unwrap();
-
-        assert_eq!(result.imported, 1, "the repeated row must import once");
-        assert_eq!(result.skipped.len(), 1, "the repeat is reported");
-        // 1 existing note + 1
-        assert_eq!(session::list_entry_summaries().unwrap().len(), 2);
-
-        teardown(&path);
-    }
-
-    #[test]
-    #[serial]
-    fn csv_duplicate_rows_in_one_file_import_once() {
+    fn csv_duplicate_rows_in_one_file_import_twice() {
         const TWICE: &str = "\
 name,url,login,password,comments,favourite
 Example,https://example.com,user,hunter2,my example,yes
 Example,https://example.com,user,hunter2,my example,yes";
 
-        let pass = b"csv self dedup passphrase";
+        let pass = b"csv twice passphrase";
         let path = setup_vault(pass);
         session::unlock_vault(pass, path.clone()).unwrap();
 
-        let config = CsvImportConfigData {
-            title_col: Some("name".to_string()),
-            url_col: Some("url".to_string()),
-            username_col: Some("login".to_string()),
-            password_col: Some("password".to_string()),
-            notes_col: Some("comments".to_string()),
-        };
+        let result = run(import_from_csv(TWICE.to_string(), csv_config())).unwrap();
 
-        let result = run(import_from_csv(TWICE.to_string(), config)).unwrap();
-
-        assert_eq!(result.imported, 1, "the repeated row must import once");
-        assert_eq!(result.skipped.len(), 1, "the repeat is reported");
-        assert_eq!(session::list_entry_summaries().unwrap().len(), 2);
+        assert_eq!(result.imported, 2);
+        assert_eq!(session::list_entry_summaries().unwrap().len(), 3);
 
         teardown(&path);
     }
 
     #[test]
     #[serial]
-    fn gabbro_source_holding_the_same_entry_twice_imports_it_once() {
-        // A source vault carrying one note under two different ids. The ids differ,
-        // the content does not, so the user should end up with one entry.
-        let session_pass = b"gabbro self dedup session passphrase";
-        let session_path = setup_vault(session_pass);
+    fn google_pm_duplicate_rows_in_one_file_import_twice() {
+        const TWICE: &str = "\
+name,url,username,password,note
+Example,https://example.com,user,hunter2,my example
+Example,https://example.com,user,hunter2,my example";
 
-        let source_pass = b"gabbro self dedup source passphrase";
-        let mut source_path = temp_dir();
-        source_path.push("gabbro_self_dedup_source.gabbro");
-        let twin = |id: &str| {
-            VaultEntry::Note(NoteEntry {
-                meta: EntryMeta {
-                    id: String::from(id),
-                    created_at: String::from("2025-03-01T00:00:00Z"),
-                    updated_at: String::from("2025-03-01T00:00:00Z"),
-                    folder: String::from("Personal"),
-                    ..Default::default()
-                },
-                title: String::from("Twin note"),
-                content: String::from("same content"),
-                custom_fields: vec![],
-                attachments: vec![],
-            })
-        };
+        let pass = b"google pm twice passphrase";
+        let path = setup_vault(pass);
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let result = run(import_from_google_pm(TWICE.as_bytes().to_vec())).unwrap();
+
+        assert_eq!(result.imported, 2);
+        assert_eq!(session::list_entry_summaries().unwrap().len(), 3);
+
+        teardown(&path);
+    }
+
+    fn save_source_with(entries: Vec<VaultEntry>, pass: &[u8], name: &str) -> std::path::PathBuf {
+        let mut path = temp_dir();
+        path.push(name);
         save_vault(
             &VaultBody {
                 folders: vec![],
-                entries: vec![twin("twin-a"), twin("twin-b")],
+                entries,
                 ..Default::default()
             },
-            source_pass,
-            &source_path,
+            pass,
+            &path,
         )
         .unwrap();
+        path
+    }
+
+    fn note(id: &str, title: &str, content: &str) -> VaultEntry {
+        VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: String::from(id),
+                created_at: String::from("2025-03-01T00:00:00Z"),
+                updated_at: String::from("2025-03-01T00:00:00Z"),
+                folder: String::from("Personal"),
+                ..Default::default()
+            },
+            title: String::from(title),
+            content: String::from(content),
+            custom_fields: vec![],
+            attachments: vec![],
+        })
+    }
+
+    #[test]
+    #[serial]
+    fn gabbro_source_holding_the_same_entry_twice_imports_it_twice() {
+        let session_pass = b"gabbro twin session passphrase";
+        let session_path = setup_vault(session_pass);
+        let source_pass = b"gabbro twin source passphrase";
+        let source_path = save_source_with(
+            vec![
+                note("twin-a", "Twin note", "same content"),
+                note("twin-b", "Twin note", "same content"),
+            ],
+            source_pass,
+            "gabbro_twin_source.gabbro",
+        );
 
         session::unlock_vault(session_pass, session_path.clone()).unwrap();
         let result = run(import_from_gabbro(
@@ -1385,72 +1094,96 @@ Example,https://example.com,user,hunter2,my example,yes";
         ))
         .unwrap();
 
-        assert_eq!(result.imported, 1, "the twin must import once");
-        assert_eq!(result.skipped.len(), 1, "the twin is reported skipped");
-        assert_eq!(session::list_entry_summaries().unwrap().len(), 2);
+        assert_eq!(result.imported, 2);
+        assert_eq!(session::list_entry_summaries().unwrap().len(), 3);
 
         teardown(&session_path);
         let _ = std::fs::remove_file(&source_path);
     }
 
-    // ── S9: a colliding id no longer suppresses a genuinely different entry ────
+    // ── S3: a colliding UUID gets a fresh one ─────────────────────────────────
+    // The vault must never hold two entries under one UUID, or sync (which
+    // matches by UUID) breaks. The incoming entry is still imported, as a new
+    // entry with its own id; the existing entry is untouched.
 
     #[test]
     #[serial]
-    fn an_entry_whose_id_collides_but_content_differs_is_imported() {
-        // Inverts the old behaviour. Under the UUID check this entry was silently
-        // dropped and the user was told a duplicate had been skipped — for an entry
-        // they had never seen. Ids from a file are arbitrary strings; content is not.
-        let collides_by_id_only: &str = r#"{
-            "encrypted": false,
-            "folders": [],
-            "items": [
-                {"id":"existing-001","folderId":null,"type":2,"name":"Different note","notes":"different content","favorite":false,"fields":[],"secureNote":{}}
-            ]
-        }"#;
+    fn a_gabbro_entry_whose_uuid_already_exists_imports_under_a_fresh_uuid() {
+        let session_pass = b"gabbro uuid clash session passphrase";
+        let session_path = setup_vault(session_pass);
+        let source_pass = b"gabbro uuid clash source passphrase";
+        let source_path = save_source_with(
+            vec![note("existing-001", "Changed title", "changed content")],
+            source_pass,
+            "gabbro_uuid_clash_source.gabbro",
+        );
 
-        let pass = b"id collision passphrase";
-        let path = setup_vault(pass);
-        session::unlock_vault(pass, path.clone()).unwrap();
-
-        let result = run(import_from_bitwarden(
-            collides_by_id_only.as_bytes().to_vec(),
+        session::unlock_vault(session_pass, session_path.clone()).unwrap();
+        let before = session::get_entry("existing-001").unwrap();
+        let result = run(import_from_gabbro(
+            source_path.to_str().unwrap().to_string(),
+            source_pass.to_vec(),
         ))
         .unwrap();
 
-        assert_eq!(result.imported, 1, "different content must import");
-        assert!(
-            result.skipped.is_empty(),
-            "a shared id alone must not report a skip"
+        assert_eq!(result.imported, 1, "the clashing entry still imports");
+        let summaries = session::list_entry_summaries().unwrap();
+        assert_eq!(summaries.len(), 2);
+        let ids: std::collections::HashSet<&str> =
+            summaries.iter().map(|s| s.id.as_str()).collect();
+        assert_eq!(ids.len(), 2, "no two entries share a UUID");
+        assert_eq!(
+            session::get_entry("existing-001").unwrap(),
+            before,
+            "the existing entry is untouched"
         );
-        // The original is still there, untouched, alongside the new one.
-        assert_eq!(session::list_entry_summaries().unwrap().len(), 2);
+        let fresh = summaries
+            .iter()
+            .find(|s| s.id != "existing-001")
+            .expect("the import got its own id");
+        uuid::Uuid::parse_str(&fresh.id).expect("fresh id is a UUID");
+        assert_eq!(fresh.title, "Changed title");
 
-        teardown(&path);
+        teardown(&session_path);
+        let _ = std::fs::remove_file(&source_path);
     }
 
-    // ── S10: importing into an empty vault ────────────────────────────────────
+    #[test]
+    #[serial]
+    fn a_gabbro_entry_with_a_new_uuid_keeps_it() {
+        // Only a clash is re-keyed: a different vault's entries keep their ids,
+        // so a later sync with that vault still matches them.
+        let session_pass = b"gabbro keep uuid session passphrase";
+        let session_path = setup_vault(session_pass);
+        let source_pass = b"gabbro keep uuid source passphrase";
+        let source_path = save_source_with(
+            vec![note("foreign-001", "Foreign note", "from elsewhere")],
+            source_pass,
+            "gabbro_keep_uuid_source.gabbro",
+        );
+
+        session::unlock_vault(session_pass, session_path.clone()).unwrap();
+        run(import_from_gabbro(
+            source_path.to_str().unwrap().to_string(),
+            source_pass.to_vec(),
+        ))
+        .unwrap();
+
+        assert!(session::get_entry("foreign-001").is_ok(), "id kept");
+
+        teardown(&session_path);
+        let _ = std::fs::remove_file(&source_path);
+    }
+
+    // ── importing into an empty vault ─────────────────────────────────────────
 
     fn setup_empty_vault(passphrase: &[u8]) -> std::path::PathBuf {
-        let mut path = temp_dir();
-        path.push("gabbro_import_empty_test.gabbro");
-        save_vault(
-            &VaultBody {
-                folders: vec![],
-                entries: vec![],
-                ..Default::default()
-            },
-            passphrase,
-            &path,
-        )
-        .unwrap();
-        path
+        save_source_with(vec![], passphrase, "gabbro_import_empty_test.gabbro")
     }
 
     #[test]
     #[serial]
     fn importing_into_an_empty_vault_imports_everything() {
-        // Nothing to compare against, so dedup must not swallow a first import.
         let pass = b"empty vault import passphrase";
         let path = setup_empty_vault(pass);
         session::unlock_vault(pass, path.clone()).unwrap();
@@ -1458,127 +1191,6 @@ Example,https://example.com,user,hunter2,my example,yes";
         let result = run(import_from_bitwarden(BITWARDEN_JSON.as_bytes().to_vec())).unwrap();
 
         assert_eq!(result.imported, 4, "all four supported items import");
-        assert!(result.skipped.is_empty());
-        assert_eq!(session::list_entry_summaries().unwrap().len(), 4);
-
-        teardown(&path);
-    }
-
-    // ── PROBE: the exact hardware fixture, byte for byte ──────────────────────
-
-    #[test]
-    #[serial]
-    fn hardware_fixture_csv_reimport_imports_nothing() {
-        // The exact file from the hardware matrix, trailing newline included, with
-        // the mapping csv_mapping_screen auto-selects for these headers
-        // (name->title, url->url, login->username, password->password,
-        // comments->notes). Every column is mapped, so custom_fields stays empty —
-        // unlike SAMPLE_CSV, which leaves `favourite` unmapped.
-        const HW: &str = "name,url,login,password,comments\n\
-Alpha,https://alpha.example.com,user@example.com,pw-alpha,first\n\
-Beta,https://beta.example.com,user@example.com,pw-beta,second\n";
-
-        let pass = b"hardware fixture passphrase";
-        let path = setup_vault(pass);
-        session::unlock_vault(pass, path.clone()).unwrap();
-
-        let config = || CsvImportConfigData {
-            title_col: Some("name".to_string()),
-            url_col: Some("url".to_string()),
-            username_col: Some("login".to_string()),
-            password_col: Some("password".to_string()),
-            notes_col: Some("comments".to_string()),
-        };
-
-        let first = run(import_from_csv(HW.to_string(), config())).unwrap();
-        assert_eq!(first.imported, 2, "first import adds both rows");
-
-        let second = run(import_from_csv(HW.to_string(), config())).unwrap();
-        assert_eq!(second.imported, 0, "re-import must add nothing");
-        assert_eq!(second.skipped.len(), 2, "both rows reported skipped");
-        assert_eq!(session::list_entry_summaries().unwrap().len(), 3);
-
-        teardown(&path);
-    }
-
-    // ── PROBE: does a save/reload round trip break the content hash? ──────────
-
-    #[test]
-    #[serial]
-    fn csv_reimport_after_a_reload_still_imports_nothing() {
-        // Hardware found re-import duplicating where the in-session test passes.
-        // The app saves, navigates, and can auto-lock between two imports, so the
-        // second import compares against entries that went through serialization.
-        let pass = b"csv reload reimport passphrase";
-        let path = setup_vault(pass);
-        session::unlock_vault(pass, path.clone()).unwrap();
-
-        let config = || CsvImportConfigData {
-            title_col: Some("name".to_string()),
-            url_col: Some("url".to_string()),
-            username_col: Some("login".to_string()),
-            password_col: Some("password".to_string()),
-            notes_col: Some("comments".to_string()),
-        };
-
-        let first = run(import_from_csv(SAMPLE_CSV.to_string(), config())).unwrap();
-        assert_eq!(first.imported, 2);
-
-        // Round-trip through disk, exactly as the app does.
-        session::lock_vault().unwrap();
-        session::unlock_vault(pass, path.clone()).unwrap();
-
-        let second = run(import_from_csv(SAMPLE_CSV.to_string(), config())).unwrap();
-        assert_eq!(
-            second.imported, 0,
-            "a saved-and-reloaded entry must still hash the same"
-        );
-
-        teardown(&path);
-    }
-
-    // ── S14: the accepted cost of content-based dedup ─────────────────────────
-
-    #[test]
-    #[serial]
-    fn an_entry_edited_after_import_reimports_as_a_second_copy() {
-        // Deliberate, documented behaviour, not a defect. Change the password in
-        // Gabbro and the entry no longer matches the file, so a re-import adds it
-        // back. Import is add-only by design; sync is the flow that reconciles an
-        // edited entry. Pinned so the tradeoff cannot be lost silently.
-        let pass = b"edited then reimported passphrase";
-        let path = setup_vault(pass);
-        session::unlock_vault(pass, path.clone()).unwrap();
-
-        let first = run(import_from_google_pm(GOOGLE_PM_CSV.as_bytes().to_vec())).unwrap();
-        assert_eq!(first.imported, 2);
-
-        // The user changes one imported password in Gabbro.
-        let summaries = session::list_entry_summaries().unwrap();
-        let target = summaries
-            .iter()
-            .find(|s| s.title == "Example")
-            .expect("the imported login should be present");
-        let mut entry = session::get_entry(&target.id).unwrap();
-        match &mut entry {
-            VaultEntry::Login(e) => e.password = String::from("rotated-by-hand"),
-            other => panic!("expected a Login, got {other:?}"),
-        }
-        session::session_update_entry(entry, None).unwrap();
-
-        // Re-importing the same file brings the pre-edit version back.
-        let second = run(import_from_google_pm(GOOGLE_PM_CSV.as_bytes().to_vec())).unwrap();
-
-        assert_eq!(
-            second.imported, 1,
-            "the edited entry no longer matches the file, so it imports again"
-        );
-        assert_eq!(
-            second.skipped.len(),
-            1,
-            "the untouched entry is still recognised"
-        );
-        // 1 existing note + 2 imported + 1 re-added
         assert_eq!(session::list_entry_summaries().unwrap().len(), 4);
 
         teardown(&path);
@@ -1727,7 +1339,6 @@ Beta,https://beta.example.com,user@example.com,pw-beta,second\n";
         .unwrap();
 
         assert_eq!(result.imported, 1, "A's entry must sync into B");
-        assert!(result.skipped.is_empty(), "no UUID collisions expected");
 
         let summaries = session::list_entry_summaries().unwrap();
         assert_eq!(summaries.len(), 2, "B's own entry + A's synced entry");
@@ -1848,58 +1459,5 @@ Beta,https://beta.example.com,user@example.com,pw-beta,second\n";
             }
             _ => panic!("expected Note"),
         }
-    }
-
-    // ── entry_id_and_title unit tests ─────────────────────────────────────────
-
-    #[test]
-    fn entry_id_and_title_identity_concatenates_names() {
-        use crate::vault::entry::{EntryMeta, IdentityEntry, VaultEntry};
-
-        let entry = VaultEntry::Identity(IdentityEntry {
-            meta: EntryMeta {
-                field_times: Default::default(),
-                history: Vec::new(),
-                id: String::from("id-001"),
-                created_at: String::new(),
-                updated_at: String::new(),
-                folder: String::new(),
-            },
-            first_name: String::from("Alex"),
-            last_name: String::from("Example"),
-            email: String::from("user@example.com"),
-            phone: None,
-            address: None,
-            custom_fields: vec![],
-            attachments: vec![],
-        });
-
-        let (id, title) = entry_id_and_title(&entry);
-        assert_eq!(id, "id-001");
-        assert_eq!(title, "Alex Example");
-    }
-
-    #[test]
-    fn entry_id_and_title_file_uses_filename() {
-        use crate::vault::entry::{EntryMeta, FileEntry, VaultEntry};
-
-        let entry = VaultEntry::File(FileEntry {
-            meta: EntryMeta {
-                field_times: Default::default(),
-                history: Vec::new(),
-                id: String::from("file-001"),
-                created_at: String::new(),
-                updated_at: String::new(),
-                folder: String::new(),
-            },
-            filename: String::from("document.pdf"),
-            data: vec![],
-            notes: None,
-            custom_fields: vec![],
-        });
-
-        let (id, title) = entry_id_and_title(&entry);
-        assert_eq!(id, "file-001");
-        assert_eq!(title, "document.pdf");
     }
 }

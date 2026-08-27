@@ -134,4 +134,30 @@ class GabbroPickerTest {
         assertNull(GabbroPicker.rawPathFromDocumentId("Download/Gabbro"))
         assertNull(GabbroPicker.rawPathFromDocumentId(""))
     }
+
+    // ── S6: one-click sync reads the vault by name from the granted tree ──────
+
+    @Test
+    fun `a tree child of the vault's name is copied into the cache`() {
+        val cacheDir = Files.createTempDirectory("gabbro_cache").toFile()
+        val bytes = byteArrayOf(9, 8, 7)
+
+        val path = GabbroPicker.cacheTreeChild(cacheDir, "Gabbro.gabbro") { name ->
+            if (name == "Gabbro.gabbro") ByteArrayInputStream(bytes) else null
+        }
+
+        assertTrue(path!!.startsWith(cacheDir.absolutePath))
+        assertEquals("Gabbro.gabbro", java.io.File(path).name)
+        assertArrayEquals(bytes, java.io.File(path).readBytes())
+    }
+
+    @Test
+    fun `a name absent from the tree yields no path and no file`() {
+        val cacheDir = Files.createTempDirectory("gabbro_cache").toFile()
+
+        val path = GabbroPicker.cacheTreeChild(cacheDir, "Other.gabbro") { null }
+
+        assertNull(path)
+        assertTrue(cacheDir.walk().none { it.isFile })
+    }
 }

@@ -3921,12 +3921,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   GabbroImportResult dco_decode_gabbro_import_result(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-    return GabbroImportResult(
-      imported: dco_decode_usize(arr[0]),
-      skipped: dco_decode_list_skipped_entry_data(arr[1]),
-    );
+    if (arr.length != 1)
+      throw Exception('unexpected arr length: expect 1 but see ${arr.length}');
+    return GabbroImportResult(imported: dco_decode_usize(arr[0]));
   }
 
   @protected
@@ -3988,12 +3985,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ImportResult dco_decode_import_result(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
     return ImportResult(
       imported: dco_decode_usize(arr[0]),
       failures: dco_decode_list_import_failure_data(arr[1]),
-      skipped: dco_decode_list_skipped_entry_data(arr[2]),
     );
   }
 
@@ -4119,12 +4115,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   List<(String, String)> dco_decode_list_record_string_string(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_record_string_string).toList();
-  }
-
-  @protected
-  List<SkippedEntryData> dco_decode_list_skipped_entry_data(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>).map(dco_decode_skipped_entry_data).toList();
   }
 
   @protected
@@ -4401,15 +4391,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       authData: dco_decode_list_prim_u_8_strict(arr[1]),
       publicKeyCose: dco_decode_list_prim_u_8_strict(arr[2]),
     );
-  }
-
-  @protected
-  SkippedEntryData dco_decode_skipped_entry_data(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 1)
-      throw Exception('unexpected arr length: expect 1 but see ${arr.length}');
-    return SkippedEntryData(title: dco_decode_String(arr[0]));
   }
 
   @protected
@@ -5070,8 +5051,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_imported = sse_decode_usize(deserializer);
-    var var_skipped = sse_decode_list_skipped_entry_data(deserializer);
-    return GabbroImportResult(imported: var_imported, skipped: var_skipped);
+    return GabbroImportResult(imported: var_imported);
   }
 
   @protected
@@ -5150,12 +5130,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_imported = sse_decode_usize(deserializer);
     var var_failures = sse_decode_list_import_failure_data(deserializer);
-    var var_skipped = sse_decode_list_skipped_entry_data(deserializer);
-    return ImportResult(
-      imported: var_imported,
-      failures: var_failures,
-      skipped: var_skipped,
-    );
+    return ImportResult(imported: var_imported, failures: var_failures);
   }
 
   @protected
@@ -5409,20 +5384,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var ans_ = <(String, String)>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(sse_decode_record_string_string(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
-  List<SkippedEntryData> sse_decode_list_skipped_entry_data(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <SkippedEntryData>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_skipped_entry_data(deserializer));
     }
     return ans_;
   }
@@ -5815,13 +5776,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       authData: var_authData,
       publicKeyCose: var_publicKeyCose,
     );
-  }
-
-  @protected
-  SkippedEntryData sse_decode_skipped_entry_data(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_title = sse_decode_String(deserializer);
-    return SkippedEntryData(title: var_title);
   }
 
   @protected
@@ -6431,7 +6385,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(self.imported, serializer);
-    sse_encode_list_skipped_entry_data(self.skipped, serializer);
   }
 
   @protected
@@ -6488,7 +6441,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(self.imported, serializer);
     sse_encode_list_import_failure_data(self.failures, serializer);
-    sse_encode_list_skipped_entry_data(self.skipped, serializer);
   }
 
   @protected
@@ -6717,18 +6669,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_record_string_string(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_list_skipped_entry_data(
-    List<SkippedEntryData> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_skipped_entry_data(item, serializer);
     }
   }
 
@@ -7037,15 +6977,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_list_prim_u_8_strict(self.credentialId, serializer);
     sse_encode_list_prim_u_8_strict(self.authData, serializer);
     sse_encode_list_prim_u_8_strict(self.publicKeyCose, serializer);
-  }
-
-  @protected
-  void sse_encode_skipped_entry_data(
-    SkippedEntryData self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.title, serializer);
   }
 
   @protected

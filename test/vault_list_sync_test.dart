@@ -54,12 +54,19 @@ Widget _buildScreen({
   String? pickedPath,
   Future<String?> Function()? onPickSyncFile,
   _Applied? applied,
+  String? syncFolder,
+  bool? autoMergeSync,
+  Future<String?> Function(String folder, String name)? onResolveSyncSource,
 }) => testApp(
   VaultListScreen(
-    vaultPath: '/tmp/test.gabbro',
+    vaultPath: '/tmp/example_gabbro.gabbro',
+    vaultAlias: 'example',
     listEntries: () => [],
     yubikeyRecords: [],
     onPickSyncFile: onPickSyncFile ?? () async => pickedPath,
+    syncFolder: syncFolder,
+    autoMergeSync: autoMergeSync,
+    onResolveSyncSource: onResolveSyncSource ?? (_, _) async => null,
     mergeVault: mergeVault,
     fastMergeVault: fastMergeVault ?? (_, _) async => _summary(),
     // Default to "the held passphrase does not open it", so every pre-existing
@@ -109,7 +116,7 @@ Future<void> _openMenu(WidgetTester tester) async {
 // because `_buildScreen` defaults the held merge to "does not open it".
 Future<void> _startSync(WidgetTester tester) async {
   await _openMenu(tester);
-  await tester.tap(find.text('Sync from file'));
+  await tester.tap(find.text('Sync from vault'));
   await tester.pumpAndSettle();
   // Take the granular review path so the existing assertions (review dialog +
   // per-decision apply) still hold.
@@ -150,10 +157,10 @@ void main() {
         _buildScreen(pickedPath: null, mergeVault: (_, _) async => _summary()),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Sync from file'), findsNothing);
+      expect(find.text('Sync from vault'), findsNothing);
     });
 
     // Sync-from-file has no manual path fallback, so an unavailable picker
@@ -169,7 +176,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       expect(
@@ -197,12 +204,12 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Review all changes'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Sync from file'), findsOneWidget);
+      expect(find.text('Sync from vault'), findsOneWidget);
       expect(find.text('Cancel'), findsOneWidget);
       expect(find.widgetWithText(TextButton, 'Sync'), findsOneWidget);
       expect(find.text('/tmp/other.gabbro'), findsOneWidget);
@@ -221,7 +228,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       expect(
@@ -248,7 +255,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       expect(find.text('How should this sync apply?'), findsOneWidget);
@@ -275,7 +282,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       // The Quick-vs-Review chooser appears.
@@ -308,7 +315,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       expect(find.text('How should this sync apply?'), findsOneWidget);
@@ -332,7 +339,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Review all changes'));
@@ -357,7 +364,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Review all changes'));
@@ -387,7 +394,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Review all changes'));
       await tester.pumpAndSettle();
@@ -428,7 +435,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       expect(find.text('How should this sync apply?'), findsOneWidget);
@@ -449,7 +456,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Review all changes'));
@@ -467,7 +474,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Review all changes'));
@@ -637,7 +644,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Review all changes'));
       await tester.pumpAndSettle();
@@ -665,7 +672,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Review all changes'));
       await tester.pumpAndSettle();
@@ -1212,7 +1219,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Review all changes'));
       await tester.pumpAndSettle();
@@ -1304,7 +1311,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
       expect(find.text('NFC'), findsNothing);
 
@@ -1319,7 +1326,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
       expect(find.text('NFC'), findsOneWidget);
     });
@@ -1331,7 +1338,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       // PIN only: the held passphrase is tried first, so no passphrase field.
@@ -1356,7 +1363,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       expect(find.text("Use incoming vault's YubiKey"), findsOneWidget);
@@ -1379,7 +1386,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       final fields = find.descendant(
@@ -1419,7 +1426,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       expect(revealEyeButtons(), findsOneWidget);
@@ -1438,7 +1445,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.visibility), findsOneWidget);
@@ -1462,7 +1469,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
       await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
       handle.dispose();
@@ -1493,7 +1500,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       final fields = find.descendant(
@@ -1535,7 +1542,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       final fields = find.descendant(
@@ -1564,7 +1571,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       // Leave the PIN empty, then try to sync.
@@ -1591,7 +1598,7 @@ void main() {
         ),
       );
       await _openMenu(tester);
-      await tester.tap(find.text('Sync from file'));
+      await tester.tap(find.text('Sync from vault'));
       await tester.pumpAndSettle();
 
       final fields = find.descendant(
@@ -1633,7 +1640,7 @@ void main() {
           ),
         );
         await _openMenu(tester);
-        await tester.tap(find.text('Sync from file'));
+        await tester.tap(find.text('Sync from vault'));
         await tester.pumpAndSettle();
 
         final fields = find.descendant(
@@ -1650,5 +1657,440 @@ void main() {
         expect(mergeCalled, isFalse);
       },
     );
+  });
+
+  // ── Net (S8): the sync flow is one code path on both platforms ─────────────
+  // The vault-list screen has a single `isAndroid` branch (picker/transport);
+  // the chooser, automatic path, review and fallback must read the same on
+  // Android as on Linux. Pinned before the one-click-sync change.
+  group('VaultListScreen sync flow, Android', () {
+    Widget androidScreen({
+      required Future<MergeSummary> Function(String, List<int>) mergeVault,
+      Future<MergeSummary> Function(String, List<int>)? fastMergeVault,
+      _Applied? applied,
+    }) => testApp(
+      VaultListScreen(
+        vaultPath: '/tmp/test.gabbro',
+        listEntries: () => [],
+        yubikeyRecords: [],
+        isAndroid: true,
+        onPickSyncFile: () async => '/tmp/other.gabbro',
+        mergeVault: mergeVault,
+        fastMergeVault: fastMergeVault ?? (_, _) async => _summary(),
+        mergeVaultHeld: (_) async => null,
+        fastMergeVaultHeld: (_) async => null,
+        applySyncDecisions:
+            ({
+              required fieldResolutions,
+              required historyReplacements,
+              required itemDeletes,
+              required folders,
+              required entryDeletes,
+            }) async {
+              if (applied != null) {
+                applied.called = true;
+                applied.entryDeletes = entryDeletes;
+              }
+            },
+        cancelSync: () async {
+          if (applied != null) applied.cancelCalled = true;
+        },
+      ),
+    );
+
+    testWidgets('the chooser is shown before any merge', (tester) async {
+      var merged = false;
+      await tester.pumpWidget(
+        androidScreen(
+          mergeVault: (_, _) async {
+            merged = true;
+            return _summary();
+          },
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from vault'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('How should this sync apply?'), findsOneWidget);
+      expect(find.text('Merge automatically'), findsOneWidget);
+      expect(find.text('Review all changes'), findsOneWidget);
+      expect(merged, isFalse);
+    });
+
+    testWidgets('Merge automatically runs the fast merge, no review', (
+      tester,
+    ) async {
+      var fastCalled = false;
+      await tester.pumpWidget(
+        androidScreen(
+          mergeVault: (_, _) async =>
+              throw StateError('review merge must not run in fast mode'),
+          fastMergeVault: (_, _) async {
+            fastCalled = true;
+            return _summary(added: 1);
+          },
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from vault'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Merge automatically'));
+      await tester.pumpAndSettle();
+      await _enterSyncPassphrase(tester);
+      await _settle(tester);
+
+      expect(fastCalled, isTrue);
+      expect(find.textContaining('Review changes'), findsNothing);
+      expect(find.textContaining('synced'), findsOneWidget);
+    });
+
+    testWidgets('Review all changes opens the one-by-one review', (
+      tester,
+    ) async {
+      final applied = _Applied();
+      await tester.pumpWidget(
+        androidScreen(
+          mergeVault: (_, _) async => _summary(
+            addedEntries: [
+              const AddedEntryItem(id: 'new-1', title: 'Bank login'),
+            ],
+          ),
+          applied: applied,
+        ),
+      );
+      await _startSync(tester);
+
+      expect(find.textContaining('Bank login'), findsOneWidget);
+      await tester.tap(find.text('OK'));
+      await _settle(tester);
+      expect(applied.called, isTrue, reason: 'the review applies in one call');
+    });
+
+    testWidgets('a failed held passphrase falls back to asking for one', (
+      tester,
+    ) async {
+      List<int>? typed;
+      await tester.pumpWidget(
+        androidScreen(
+          mergeVault: (_, passphrase) async {
+            typed = passphrase;
+            return _summary();
+          },
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from vault'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Review all changes'));
+      await tester.pumpAndSettle();
+
+      // The held passphrase did not open the file (harness default), so the
+      // typed-passphrase box is the next thing on screen.
+      expect(find.byType(AlertDialog), findsOneWidget);
+      await _enterSyncPassphrase(tester);
+      expect(typed, equals(utf8.encode('passphrase')));
+    });
+  });
+
+  // ── Net (S2): today's labels, re-pinned when they change ──────────────────
+  group('sync labels', () {
+    testWidgets('the menu item and the passphrase dialog both say Sync from vault', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _buildScreen(
+          pickedPath: '/tmp/other.gabbro',
+          mergeVault: (_, _) async => _summary(),
+        ),
+      );
+      await _openMenu(tester);
+      expect(find.text('Sync from vault'), findsOneWidget);
+      await tester.tap(find.text('Sync from vault'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Review all changes'));
+      await tester.pumpAndSettle();
+      // The fallback passphrase dialog carries the same title.
+      expect(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.text('Sync from vault'),
+        ),
+        findsOneWidget,
+      );
+    });
+  });
+
+  // ── S6/S7: one-click sync ─────────────────────────────────────────────────
+  // A remembered folder replaces the picker; auto-merge replaces the chooser.
+  group('VaultListScreen one-click sync', () {
+    testWidgets('a remembered folder resolves this vault\'s file, no picker', (
+      tester,
+    ) async {
+      var pickerCalls = 0;
+      String? resolvedFolder;
+      String? resolvedName;
+      String? merged;
+      await tester.pumpWidget(
+        _buildScreen(
+          syncFolder: '/tmp/GabbroSync',
+          onPickSyncFile: () async {
+            pickerCalls++;
+            return '/tmp/wrong.gabbro';
+          },
+          onResolveSyncSource: (folder, name) async {
+            resolvedFolder = folder;
+            resolvedName = name;
+            return '/tmp/GabbroSync/example.gabbro';
+          },
+          mergeVault: (path, _) async {
+            merged = path;
+            return _summary();
+          },
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from vault'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Review all changes'));
+      await tester.pumpAndSettle();
+      await _enterSyncPassphrase(tester);
+
+      expect(pickerCalls, 0, reason: 'the folder replaces the picker');
+      expect(resolvedFolder, '/tmp/GabbroSync');
+      expect(resolvedName, 'example.gabbro', reason: 'the name this vault exports as');
+      expect(merged, '/tmp/GabbroSync/example.gabbro');
+    });
+
+    testWidgets('no file of this vault\'s name in the folder: error, no merge', (
+      tester,
+    ) async {
+      var mergeCalls = 0;
+      var pickerCalls = 0;
+      await tester.pumpWidget(
+        _buildScreen(
+          syncFolder: '/tmp/GabbroSync',
+          onPickSyncFile: () async {
+            pickerCalls++;
+            return null;
+          },
+          onResolveSyncSource: (_, _) async => null,
+          mergeVault: (_, _) async {
+            mergeCalls++;
+            return _summary();
+          },
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from vault'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('No file named example.gabbro in the sync folder.'), findsOneWidget);
+      expect(find.text('How should this sync apply?'), findsNothing);
+      expect(mergeCalls, 0);
+      expect(pickerCalls, 0, reason: 'a missing file is not a reason to pick');
+    });
+
+    testWidgets('no folder remembered: the picker, as before', (tester) async {
+      var pickerCalls = 0;
+      var resolveCalls = 0;
+      await tester.pumpWidget(
+        _buildScreen(
+          syncFolder: '',
+          onPickSyncFile: () async {
+            pickerCalls++;
+            return null;
+          },
+          onResolveSyncSource: (_, _) async {
+            resolveCalls++;
+            return null;
+          },
+          mergeVault: (_, _) async => _summary(),
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from vault'));
+      await tester.pumpAndSettle();
+
+      expect(pickerCalls, 1);
+      expect(resolveCalls, 0);
+    });
+
+    testWidgets('auto-merge on: no chooser, the fast merge runs', (tester) async {
+      var fastCalled = false;
+      await tester.pumpWidget(
+        _buildScreen(
+          pickedPath: '/tmp/other.gabbro',
+          autoMergeSync: true,
+          mergeVault: (_, _) async =>
+              throw StateError('review merge must not run under auto-merge'),
+          fastMergeVault: (_, _) async {
+            fastCalled = true;
+            return _summary(added: 1);
+          },
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from vault'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('How should this sync apply?'), findsNothing);
+      // The held passphrase fails (harness default), so the fallback still asks.
+      expect(find.byType(AlertDialog), findsOneWidget);
+      await _enterSyncPassphrase(tester);
+      await _settle(tester);
+
+      expect(fastCalled, isTrue);
+      expect(find.textContaining('Review changes'), findsNothing);
+      expect(find.textContaining('synced'), findsOneWidget);
+    });
+
+    testWidgets('auto-merge on, held passphrase opens the file: one click', (
+      tester,
+    ) async {
+      var heldCalled = false;
+      await tester.pumpWidget(
+        _buildScreen(
+          syncFolder: '/tmp/GabbroSync',
+          autoMergeSync: true,
+          onResolveSyncSource: (_, _) async => '/tmp/GabbroSync/example.gabbro',
+          mergeVault: (_, _) async => throw StateError('no review merge'),
+          fastMergeVaultHeld: (_) async {
+            heldCalled = true;
+            return _summary(added: 2);
+          },
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from vault'));
+      await _settle(tester);
+
+      expect(heldCalled, isTrue);
+      expect(find.byType(AlertDialog), findsNothing, reason: 'nothing asked');
+      expect(find.textContaining('synced'), findsOneWidget);
+    });
+
+    testWidgets('auto-merge off with a folder: the chooser, as before', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _buildScreen(
+          syncFolder: '/tmp/GabbroSync',
+          autoMergeSync: false,
+          onResolveSyncSource: (_, _) async => '/tmp/GabbroSync/example.gabbro',
+          mergeVault: (_, _) async => _summary(),
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from vault'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('How should this sync apply?'), findsOneWidget);
+    });
+  });
+
+  // ── S6/S7 with a key-protected source ──────────────────────────────────────
+  // Auto-merge removes the how-to-apply question, never the tap: the source's
+  // YubiKey is still asked for, and a rotated passphrase still falls back.
+  group('VaultListScreen one-click sync, key-protected source', () {
+    final sourceRecords = <YubikeyRecordData>[
+      YubikeyRecordData(
+        credentialId: Uint8List.fromList([0xA1]),
+        salt: Uint8List.fromList([0x01]),
+      ),
+    ];
+
+    Widget keyedAutoMergeScreen({
+      Future<MergeSummary?> Function(String, List<int>, List<int>)?
+      fastMergeVaultWithKeyHeld,
+      Future<MergeSummary> Function(String, List<int>, List<int>, List<int>)?
+      fastMergeVaultWithKey,
+    }) => testApp(
+      VaultListScreen(
+        vaultPath: '/tmp/example_gabbro.gabbro',
+        vaultAlias: 'example',
+        listEntries: () => [],
+        yubikeyRecords: [],
+        autoMergeSync: true,
+        syncFolder: '/tmp/GabbroSync',
+        onResolveSyncSource: (_, _) async => '/tmp/GabbroSync/example.gabbro',
+        onPickSyncFile: () async => throw StateError('no picker with a folder'),
+        onDetectSyncSourceRecords: (_) => sourceRecords,
+        onGetSyncYubikeyHmac: (records, pin, transport) async =>
+            (hmac: const [0x11], credentialId: const [0xA1]),
+        mergeVault: (_, _) async => throw StateError('no passphrase-only merge'),
+        fastMergeVault: (_, _) async => throw StateError('no passphrase-only merge'),
+        mergeVaultWithKey: (_, _, _, _) async =>
+            throw StateError('review merge must not run under auto-merge'),
+        mergeVaultWithKeyHeld: (_, _, _) async =>
+            throw StateError('review merge must not run under auto-merge'),
+        fastMergeVaultWithKeyHeld:
+            fastMergeVaultWithKeyHeld ?? (_, _, _) async => null,
+        fastMergeVaultWithKey:
+            fastMergeVaultWithKey ??
+            (_, _, _, _) async => throw StateError('not expected'),
+      ),
+    );
+
+    Future<void> enterPin(WidgetTester tester) async {
+      final fields = find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.byType(TextField),
+      );
+      await tester.enterText(fields.last, '123456');
+      await tester.tap(find.text('Sync'));
+      await _settle(tester);
+    }
+
+    testWidgets('PIN and tap are still asked; then the fast keyed merge, no chooser', (
+      tester,
+    ) async {
+      List<int>? heldHmac;
+      await tester.pumpWidget(
+        keyedAutoMergeScreen(
+          fastMergeVaultWithKeyHeld: (_, hmac, _) async {
+            heldHmac = hmac;
+            return _summary(added: 3);
+          },
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from vault'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(AlertDialog), findsOneWidget, reason: 'PIN dialog');
+      await enterPin(tester);
+
+      expect(find.text('How should this sync apply?'), findsNothing);
+      expect(heldHmac, equals(const [0x11]));
+      expect(find.textContaining('synced'), findsOneWidget);
+    });
+
+    testWidgets('held passphrase fails: typed fallback, then the fast keyed merge', (
+      tester,
+    ) async {
+      List<int>? typed;
+      await tester.pumpWidget(
+        keyedAutoMergeScreen(
+          fastMergeVaultWithKeyHeld: (_, _, _) async => null,
+          fastMergeVaultWithKey: (_, passphrase, hmac, _) async {
+            typed = passphrase;
+            expect(hmac, equals(const [0x11]), reason: 'the one tap is reused');
+            return _summary(added: 1);
+          },
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from vault'));
+      await tester.pumpAndSettle();
+      await enterPin(tester);
+
+      expect(find.text('How should this sync apply?'), findsNothing);
+      expect(find.byType(AlertDialog), findsOneWidget, reason: 'passphrase box');
+      await _enterSyncPassphrase(tester);
+
+      expect(typed, equals(utf8.encode('passphrase')));
+      expect(find.textContaining('synced'), findsOneWidget);
+    });
   });
 }

@@ -7,7 +7,6 @@ import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/screens/csv_mapping_screen.dart';
 import 'package:gabbro/screens/import_failures_dialog.dart';
-import 'package:gabbro/screens/import_skipped_dialog.dart';
 import 'package:gabbro/screens/unlock_screen.dart' show vaultUpgradePathUrl;
 import 'package:gabbro/src/rust/api/import.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -88,6 +87,13 @@ Future<bool> _defaultSourceFormatTooNew(String path) async {
   }
 }
 
+Future<void> _noopSaveFolder(String folder) async {}
+
+/// What the chosen file is. One picker serves all six; the type decides the
+/// file filter, the explanation, the action, and (Gabbro only) the passphrase
+/// and YubiKey sub-form.
+enum ImportType { gabbro, csv, googlePm, dashlane, enpass, bitwarden }
+
 class ImportScreen extends StatefulWidget {
   final Future<ImportResult> Function(List<int> data) onImportEnpass;
   final Future<ImportResult> Function(List<int> data) onImportBitwarden;
@@ -130,6 +136,13 @@ class ImportScreen extends StatefulWidget {
 
   final bool isAndroid;
 
+  /// Remembered import folder (from settings): where the file dialog opens.
+  /// A Linux path or the Android location the picker last reported.
+  final String initialImportFolder;
+
+  /// Persist the folder to remember; an empty string forgets it.
+  final Future<void> Function(String folder) onSaveImportFolder;
+
   /// Pre-selected Gabbro source path. Mainly a test seam (the path is otherwise
   /// chosen via the native picker); when set, source protection is detected at
   /// construction so the YubiKey fields render without a picker round-trip.
@@ -149,6 +162,8 @@ class ImportScreen extends StatefulWidget {
     this.onSourceFormatTooOld = _defaultSourceFormatTooOld,
     this.onSourceFormatTooNew = _defaultSourceFormatTooNew,
     this.initialGabbroPath,
+    this.initialImportFolder = '',
+    this.onSaveImportFolder = _noopSaveFolder,
     bool? isAndroid,
   }) : isAndroid = isAndroid ?? Platform.isAndroid;
 
@@ -157,31 +172,21 @@ class ImportScreen extends StatefulWidget {
 }
 
 class _ImportScreenState extends State<ImportScreen> {
-  String? _enpassPath;
-  String? _bitwardenPath;
-  String? _googlePmPath;
-  String? _dashlanePath;
-  String? _csvPath;
-  String? _gabbroPath;
+  ImportType _type = ImportType.gabbro;
+  String? _path;
 
-  bool _isImportingEnpass = false;
-  bool _isImportingBitwarden = false;
-  bool _isImportingGooglePm = false;
-  bool _isImportingDashlane = false;
-  bool _isSniffingCsv = false;
-  bool _isImportingGabbro = false;
-
-  String? _enpassError;
-  String? _bitwardenError;
-  String? _googlePmError;
-  String? _dashlaneError;
-  String? _csvError;
-  String? _gabbroError;
+  // The Remember box (ticked by default): the folder of the picked file is
+  // remembered, and the next dialog opens there. Unticking forgets it.
+  bool _remember = true;
+  late String _importFolder = widget.initialImportFolder;
+  String? _lastPickedFolder;
+  bool _isImporting = false;
+  String? _error;
 
   // Source intact but written by a newer build: explain "update Gabbro".
   bool _gabbroFormatTooNew = false;
 
-  /// Distinct from [_gabbroError]: the source is intact, just older than this
+  /// Distinct from [_error]: the source is intact, just older than this
   /// build reads. Explained with a link, never shown as a raw failure.
   bool _gabbroFormatTooOld = false;
 
@@ -203,7 +208,7 @@ class _ImportScreenState extends State<ImportScreen> {
     super.initState();
     final initial = widget.initialGabbroPath;
     if (initial != null && initial.isNotEmpty) {
-      _gabbroPath = initial;
+      _path = initial;
       try {
         _gabbroSourceRecords = widget.onDetectSourceRecords(initial);
       } catch (_) {
@@ -220,44 +225,141 @@ class _ImportScreenState extends State<ImportScreen> {
     super.dispose();
   }
 
-  // ── Enpass ───────────────────────────────────────────────────────────────
+  // ── Type ─────────────────────────────────────────────────────────────────
 
-  Future<void> _importEnpass() async {
-    final path = _enpassPath;
-    if (path == null || path.isEmpty) {
-      setState(
-        () => _enpassError = AppLocalizations.of(context).importSelectFile,
-      );
+  /// Extensions differ per type, so a path chosen for one type would arm the
+  /// button on a file the new type cannot parse: the path goes with the type.
+  void _setType(ImportType type) {
+    if (type == _type) return;
+    setState(() {
+      _type = type;
+      _path = null;
+      _error = null;
+      _gabbroFormatTooOld = false;
+      _gabbroFormatTooNew = false;
+      _gabbroSourceRecords = [];
+    });
+  }
+
+  void _onFolderPicked(String folder) {
+    _lastPickedFolder = folder;
+    if (!_remember) return;
+    _importFolder = folder;
+    widget.onSaveImportFolder(folder);
+  }
+
+  Future<void> _onRememberChanged(bool? value) async {
+    final on = value == true;
+    setState(() => _remember = on);
+    if (!on) {
+      await widget.onSaveImportFolder('');
       return;
+    }
+    // Re-ticked: remember what is on screen, or what was last picked.
+    final folder = _lastPickedFolder ?? _importFolder;
+    if (folder.isEmpty) return;
+    _importFolder = folder;
+    await widget.onSaveImportFolder(folder);
+  }
+
+  void _setPath(String p) => setState(() {
+    _path = p;
+    _error = null;
+    _gabbroFormatTooOld = false;
+    _gabbroFormatTooNew = false;
+    if (_type == ImportType.gabbro) {
+      try {
+        _gabbroSourceRecords = widget.onDetectSourceRecords(p);
+      } catch (_) {
+        _gabbroSourceRecords = [];
+      }
+    }
+  });
+
+  String _typeTitle(AppLocalizations l, ImportType t) => switch (t) {
+    ImportType.gabbro => l.gabbroVaultSection,
+    ImportType.csv => l.genericCsvSection,
+    ImportType.googlePm => 'Google Password Manager',
+    ImportType.dashlane => 'Dashlane',
+    ImportType.enpass => 'Enpass',
+    ImportType.bitwarden => 'Bitwarden',
+  };
+
+  String _typeSubtitle(AppLocalizations l) => switch (_type) {
+    ImportType.gabbro => l.importGabbroSubtitle,
+    ImportType.csv => l.importCsvSubtitle,
+    ImportType.googlePm => l.importGooglePmSubtitle,
+    ImportType.dashlane => l.importDashlaneSubtitle,
+    ImportType.enpass => l.importEnpassSubtitle,
+    ImportType.bitwarden => l.importBitwardenSubtitle,
+  };
+
+  String get _extension => switch (_type) {
+    ImportType.gabbro => 'gabbro',
+    ImportType.csv || ImportType.googlePm || ImportType.dashlane => 'csv',
+    ImportType.enpass || ImportType.bitwarden => 'json',
+  };
+
+  String get _hint => switch (_type) {
+    ImportType.gabbro => '/home/user/vault.gabbro',
+    ImportType.csv => '/home/user/passwords.csv',
+    ImportType.googlePm => '/home/user/Google Passwords.csv',
+    ImportType.dashlane => '/home/user/dashlane_credentials.csv',
+    ImportType.enpass => '/home/user/enpass_export.json',
+    ImportType.bitwarden => '/home/user/bitwarden_export.json',
+  };
+
+  Future<void> _runAction() => switch (_type) {
+    ImportType.gabbro => _importGabbro(),
+    ImportType.csv => _sniffAndPushCsvMapping(),
+    ImportType.googlePm => _importJsonOrCsv(widget.onImportGooglePm),
+    ImportType.dashlane => _importJsonOrCsv(widget.onImportDashlane),
+    ImportType.enpass => _importJsonOrCsv(widget.onImportEnpass),
+    ImportType.bitwarden => _importJsonOrCsv(widget.onImportBitwarden),
+  };
+
+  /// The chosen file, once it exists and fits the cap; else the error is set.
+  File? _checkedFile(AppLocalizations l) {
+    final path = _path;
+    if (path == null || path.isEmpty) {
+      setState(() => _error = l.importSelectFile);
+      return null;
     }
     final file = File(path);
     if (!file.existsSync()) {
-      setState(
-        () => _enpassError = AppLocalizations.of(context).importFileNotFound,
-      );
-      return;
+      setState(() => _error = l.importFileNotFound);
+      return null;
     }
-    if (importSizeExceeded(file.lengthSync(), isEnpass: true)) {
-      setState(
-        () => _enpassError = AppLocalizations.of(
-          context,
-        ).importFileTooLarge(importLimitLabel(kEnpassImportMaxBytes)),
-      );
-      return;
+    if (_type != ImportType.gabbro) {
+      final isEnpass = _type == ImportType.enpass;
+      if (importSizeExceeded(file.lengthSync(), isEnpass: isEnpass)) {
+        final cap = isEnpass ? kEnpassImportMaxBytes : kTextImportMaxBytes;
+        setState(
+          () => _error = l.importFileTooLarge(importLimitLabel(cap)),
+        );
+        return null;
+      }
     }
+    return file;
+  }
+
+  // ── Google / Dashlane / Enpass / Bitwarden ───────────────────────────────
+
+  Future<void> _importJsonOrCsv(
+    Future<ImportResult> Function(List<int> data) importer,
+  ) async {
+    final file = _checkedFile(AppLocalizations.of(context));
+    if (file == null) return;
     setState(() {
-      _isImportingEnpass = true;
-      _enpassError = null;
+      _isImporting = true;
+      _error = null;
     });
     try {
       final bytes = await file.readAsBytes();
-      final result = await widget.onImportEnpass(bytes);
+      final result = await importer(bytes);
       var editedCount = 0;
       if (result.failures.isNotEmpty && mounted) {
         editedCount = await showImportFailuresDialog(context, result.failures);
-      }
-      if (result.skipped.isNotEmpty && mounted) {
-        await showSkippedEntriesDialog(context, result.skipped);
       }
       if (mounted) {
         Navigator.of(context).pop(result.imported.toInt() + editedCount);
@@ -265,208 +367,34 @@ class _ImportScreenState extends State<ImportScreen> {
     } catch (e) {
       if (mounted) {
         setState(
-          () => _enpassError = AppLocalizations.of(
-            context,
-          ).importFailed(e.toString()),
+          () => _error = AppLocalizations.of(context).importFailed(e.toString()),
         );
       }
     } finally {
-      if (mounted) setState(() => _isImportingEnpass = false);
+      if (mounted) setState(() => _isImporting = false);
     }
   }
 
-  // ── Bitwarden ────────────────────────────────────────────────────────────
-
-  Future<void> _importBitwarden() async {
-    final path = _bitwardenPath;
-    if (path == null || path.isEmpty) {
-      setState(
-        () => _bitwardenError = AppLocalizations.of(context).importSelectFile,
-      );
-      return;
-    }
-    final file = File(path);
-    if (!file.existsSync()) {
-      setState(
-        () => _bitwardenError = AppLocalizations.of(context).importFileNotFound,
-      );
-      return;
-    }
-    if (importSizeExceeded(file.lengthSync(), isEnpass: false)) {
-      setState(
-        () => _bitwardenError = AppLocalizations.of(
-          context,
-        ).importFileTooLarge(importLimitLabel(kTextImportMaxBytes)),
-      );
-      return;
-    }
-    setState(() {
-      _isImportingBitwarden = true;
-      _bitwardenError = null;
-    });
-    try {
-      final bytes = await file.readAsBytes();
-      final result = await widget.onImportBitwarden(bytes);
-      var editedCount = 0;
-      if (result.failures.isNotEmpty && mounted) {
-        editedCount = await showImportFailuresDialog(context, result.failures);
-      }
-      if (result.skipped.isNotEmpty && mounted) {
-        await showSkippedEntriesDialog(context, result.skipped);
-      }
-      if (mounted) {
-        Navigator.of(context).pop(result.imported.toInt() + editedCount);
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(
-          () => _bitwardenError = AppLocalizations.of(
-            context,
-          ).importFailed(e.toString()),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isImportingBitwarden = false);
-    }
-  }
-
-  // ── Google Password Manager ──────────────────────────────────────────────
-
-  Future<void> _importGooglePm() async {
-    final path = _googlePmPath;
-    if (path == null || path.isEmpty) {
-      setState(
-        () => _googlePmError = AppLocalizations.of(context).importSelectFile,
-      );
-      return;
-    }
-    final file = File(path);
-    if (!file.existsSync()) {
-      setState(
-        () => _googlePmError = AppLocalizations.of(context).importFileNotFound,
-      );
-      return;
-    }
-    if (importSizeExceeded(file.lengthSync(), isEnpass: false)) {
-      setState(
-        () => _googlePmError = AppLocalizations.of(
-          context,
-        ).importFileTooLarge(importLimitLabel(kTextImportMaxBytes)),
-      );
-      return;
-    }
-    setState(() {
-      _isImportingGooglePm = true;
-      _googlePmError = null;
-    });
-    try {
-      final bytes = await file.readAsBytes();
-      final result = await widget.onImportGooglePm(bytes);
-      var editedCount = 0;
-      if (result.failures.isNotEmpty && mounted) {
-        editedCount = await showImportFailuresDialog(context, result.failures);
-      }
-      if (result.skipped.isNotEmpty && mounted) {
-        await showSkippedEntriesDialog(context, result.skipped);
-      }
-      if (mounted) {
-        Navigator.of(context).pop(result.imported.toInt() + editedCount);
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(
-          () => _googlePmError = AppLocalizations.of(
-            context,
-          ).importFailed(e.toString()),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isImportingGooglePm = false);
-    }
-  }
-
-  // ── Dashlane ─────────────────────────────────────────────────────────────
-
-  Future<void> _importDashlane() async {
-    final path = _dashlanePath;
-    if (path == null || path.isEmpty) {
-      setState(
-        () => _dashlaneError = AppLocalizations.of(context).importSelectFile,
-      );
-      return;
-    }
-    final file = File(path);
-    if (!file.existsSync()) {
-      setState(
-        () => _dashlaneError = AppLocalizations.of(context).importFileNotFound,
-      );
-      return;
-    }
-    if (importSizeExceeded(file.lengthSync(), isEnpass: false)) {
-      setState(
-        () => _dashlaneError = AppLocalizations.of(
-          context,
-        ).importFileTooLarge(importLimitLabel(kTextImportMaxBytes)),
-      );
-      return;
-    }
-    setState(() {
-      _isImportingDashlane = true;
-      _dashlaneError = null;
-    });
-    try {
-      final bytes = await file.readAsBytes();
-      final result = await widget.onImportDashlane(bytes);
-      var editedCount = 0;
-      if (result.failures.isNotEmpty && mounted) {
-        editedCount = await showImportFailuresDialog(context, result.failures);
-      }
-      if (result.skipped.isNotEmpty && mounted) {
-        await showSkippedEntriesDialog(context, result.skipped);
-      }
-      if (mounted) {
-        Navigator.of(context).pop(result.imported.toInt() + editedCount);
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(
-          () => _dashlaneError = AppLocalizations.of(
-            context,
-          ).importFailed(e.toString()),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isImportingDashlane = false);
-    }
-  }
-
-  // ── Gabbro ───────────────────────────────────────────────────────────────
+  // ── Gabbro vault ─────────────────────────────────────────────────────────
 
   Future<void> _importGabbro() async {
     final l = AppLocalizations.of(context);
-    final path = _gabbroPath;
-    if (path == null || path.isEmpty) {
-      setState(() => _gabbroError = l.importSelectFile);
-      return;
-    }
-    final file = File(path);
-    if (!file.existsSync()) {
-      setState(() => _gabbroError = l.importFileNotFound);
-      return;
-    }
+    final file = _checkedFile(l);
+    if (file == null) return;
+    final path = file.path;
     final passphrase = _passphraseController.text;
     if (passphrase.isEmpty) {
-      setState(() => _gabbroError = l.importEnterPassphrase);
+      setState(() => _error = l.importEnterPassphrase);
       return;
     }
     // A key-protected source also needs a YubiKey PIN (ADR-013).
     if (_gabbroSourceIsKeyProtected && _yubikeyPinController.text.isEmpty) {
-      setState(() => _gabbroError = l.yubiKeyPinRequired);
+      setState(() => _error = l.yubiKeyPinRequired);
       return;
     }
     setState(() {
-      _isImportingGabbro = true;
-      _gabbroError = null;
+      _isImporting = true;
+      _error = null;
       _gabbroFormatTooOld = false;
       _gabbroFormatTooNew = false;
     });
@@ -489,9 +417,6 @@ class _ImportScreenState extends State<ImportScreen> {
       } else {
         result = await widget.onImportGabbro(path, passphraseBytes);
       }
-      if (result.skipped.isNotEmpty && mounted) {
-        await showSkippedEntriesDialog(context, result.skipped);
-      }
       if (mounted) Navigator.of(context).pop(result.imported.toInt());
     } catch (e) {
       if (!mounted) return;
@@ -504,40 +429,23 @@ class _ImportScreenState extends State<ImportScreen> {
       setState(() {
         _gabbroFormatTooOld = tooOld;
         _gabbroFormatTooNew = tooNew;
-        _gabbroError = (tooOld || tooNew)
+        _error = (tooOld || tooNew)
             ? null
             : AppLocalizations.of(context).importFailed(e.toString());
       });
     } finally {
-      if (mounted) setState(() => _isImportingGabbro = false);
+      if (mounted) setState(() => _isImporting = false);
     }
   }
 
   // ── CSV ──────────────────────────────────────────────────────────────────
 
   Future<void> _sniffAndPushCsvMapping() async {
-    final l = AppLocalizations.of(context);
-    final path = _csvPath;
-    if (path == null || path.isEmpty) {
-      setState(() => _csvError = l.importSelectFile);
-      return;
-    }
-    final file = File(path);
-    if (!file.existsSync()) {
-      setState(() => _csvError = l.importFileNotFound);
-      return;
-    }
-    if (importSizeExceeded(file.lengthSync(), isEnpass: false)) {
-      setState(
-        () => _csvError = l.importFileTooLarge(
-          importLimitLabel(kTextImportMaxBytes),
-        ),
-      );
-      return;
-    }
+    final file = _checkedFile(AppLocalizations.of(context));
+    if (file == null) return;
     setState(() {
-      _isSniffingCsv = true;
-      _csvError = null;
+      _isImporting = true;
+      _error = null;
     });
     try {
       final content = await file.readAsString();
@@ -553,13 +461,11 @@ class _ImportScreenState extends State<ImportScreen> {
     } catch (e) {
       if (mounted) {
         setState(
-          () => _csvError = AppLocalizations.of(
-            context,
-          ).importFailed(e.toString()),
+          () => _error = AppLocalizations.of(context).importFailed(e.toString()),
         );
       }
     } finally {
-      if (mounted) setState(() => _isSniffingCsv = false);
+      if (mounted) setState(() => _isImporting = false);
     }
   }
 
@@ -619,66 +525,80 @@ class _ImportScreenState extends State<ImportScreen> {
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               const SizedBox(height: 20),
-              _gabbroSection(l),
-              const SizedBox(height: 24),
-              const Divider(),
-              const SizedBox(height: 24),
-              _csvSection(l),
-              const SizedBox(height: 24),
-              const Divider(),
-              const SizedBox(height: 24),
-              _importSection(
-                title: 'Google Password Manager',
-                subtitle: l.importGooglePmSubtitle,
-                hint: '/home/user/Google Passwords.csv',
-                allowedExtensions: ['csv'],
-                onPathSelected: (p) => setState(() => _googlePmPath = p),
-                isLoading: _isImportingGooglePm,
-                error: _googlePmError,
-                onImport: _importGooglePm,
-                importLabel: l.import,
+              _typeDropdown(l),
+              const SizedBox(height: 8),
+              Text(_typeSubtitle(l), style: Theme.of(context).textTheme.bodySmall),
+              const SizedBox(height: 12),
+              // Keyed by type: a new type gets a fresh, empty field (the path
+              // was cleared with the type).
+              PathField(
+                key: ValueKey(_type),
+                mode: PathFieldMode.open,
+                hint: _hint,
+                initialPath: _path,
+                allowedExtensions: [_extension],
+                startFolder:
+                    _remember && _importFolder.isNotEmpty ? _importFolder : null,
+                onPathSelected: _setPath,
+                onFolderPicked: _onFolderPicked,
               ),
-              const SizedBox(height: 24),
-              const Divider(),
-              const SizedBox(height: 24),
-              _importSection(
-                title: 'Dashlane',
-                subtitle: l.importDashlaneSubtitle,
-                hint: '/home/user/dashlane_credentials.csv',
-                allowedExtensions: ['csv'],
-                onPathSelected: (p) => setState(() => _dashlanePath = p),
-                isLoading: _isImportingDashlane,
-                error: _dashlaneError,
-                onImport: _importDashlane,
-                importLabel: l.import,
+              CheckboxListTile(
+                title: Text(l.rememberFolder),
+                subtitle: Text(l.rememberFolderNote),
+                value: _remember,
+                onChanged: _onRememberChanged,
+                controlAffinity: ListTileControlAffinity.leading,
+                contentPadding: EdgeInsets.zero,
               ),
-              const SizedBox(height: 24),
-              const Divider(),
-              const SizedBox(height: 24),
-              _importSection(
-                title: 'Enpass',
-                subtitle: l.importEnpassSubtitle,
-                hint: '/home/user/enpass_export.json',
-                allowedExtensions: ['json'],
-                onPathSelected: (p) => setState(() => _enpassPath = p),
-                isLoading: _isImportingEnpass,
-                error: _enpassError,
-                onImport: _importEnpass,
-                importLabel: l.import,
-              ),
-              const SizedBox(height: 24),
-              const Divider(),
-              const SizedBox(height: 24),
-              _importSection(
-                title: 'Bitwarden',
-                subtitle: l.importBitwardenSubtitle,
-                hint: '/home/user/bitwarden_export.json',
-                allowedExtensions: ['json'],
-                onPathSelected: (p) => setState(() => _bitwardenPath = p),
-                isLoading: _isImportingBitwarden,
-                error: _bitwardenError,
-                onImport: _importBitwarden,
-                importLabel: l.import,
+              if (_type == ImportType.gabbro) ..._gabbroFields(l),
+              if (_error != null) ...[
+                const SizedBox(height: 4),
+                Text(
+                  _error!,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.error,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+              if (_type == ImportType.gabbro) ..._gabbroFormatNotes(l),
+              const SizedBox(height: 12),
+              // While syncing a key-protected source we are blocked on a
+              // hardware tap. Surface the "tap now" prompt (matching the
+              // change-passphrase / manage-vaults screens) so the spinner is
+              // never silent — on Android the tap call blocks until a key is
+              // presented; the user can also back out to cancel.
+              if (_type == ImportType.gabbro &&
+                  _isImporting &&
+                  _gabbroSourceIsKeyProtected) ...[
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.touch_app,
+                      size: 20,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        l.tapYubiKeyNow,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+              ],
+              FilledButton(
+                onPressed: _isImporting ? null : _runAction,
+                child: _isImporting
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Text(_type == ImportType.csv ? l.next : l.import),
               ),
             ],
           ),
@@ -687,314 +607,154 @@ class _ImportScreenState extends State<ImportScreen> {
     );
   }
 
-  Widget _gabbroSection(AppLocalizations l) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          l.gabbroVaultSection,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        const SizedBox(height: 4),
-        Text(
-          l.importGabbroSubtitle,
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-        const SizedBox(height: 12),
-        PathField(
-          mode: PathFieldMode.open,
-          hint: '/home/user/vault.gabbro',
-          allowedExtensions: ['gabbro'],
-          onPathSelected: (p) => setState(() {
-            _gabbroPath = p;
-            _gabbroError = null;
-            _gabbroFormatTooOld = false;
-            _gabbroFormatTooNew = false;
-            try {
-              _gabbroSourceRecords = widget.onDetectSourceRecords(p);
-            } catch (_) {
-              _gabbroSourceRecords = [];
-            }
-          }),
-        ),
-        const SizedBox(height: 12),
-        TextField(
-          controller: _passphraseController,
-          obscureText: !_showPassphrase,
-          // A key-protected source still needs a PIN, so advance to it;
-          // otherwise Enter runs the import.
-          onSubmitted: (_) => _gabbroSourceIsKeyProtected
-              ? _yubikeyPinFocus.requestFocus()
-              : _importGabbro(),
-          decoration: InputDecoration(
-            labelText: l.vaultPassphraseLabel,
-            border: const OutlineInputBorder(),
-            suffixIcon: IconButton(
-              iconSize: scaledSuffixIconSize(context),
-              icon: Icon(
-                _showPassphrase ? Icons.visibility_off : Icons.visibility,
-                semanticLabel: _showPassphrase
-                    ? l.tooltipHide
-                    : l.tooltipShow,
-              ),
-              tooltip: _showPassphrase ? l.tooltipHide : l.tooltipShow,
-              onPressed: () =>
-                  setState(() => _showPassphrase = !_showPassphrase),
-            ),
-          ),
-        ),
-        if (_gabbroSourceIsKeyProtected) ...[
-          const SizedBox(height: 12),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(
-                Icons.usb,
-                size: 20,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(width: 8),
-              Expanded(
+  Widget _typeDropdown(AppLocalizations l) {
+    return InputDecorator(
+      decoration: InputDecoration(
+        labelText: l.importSourceLabel,
+        border: const OutlineInputBorder(),
+      ),
+      child: DropdownButton<ImportType>(
+        isExpanded: true,
+        underline: const SizedBox.shrink(),
+        itemHeight: null, // menu items grow to wrapped height at large text
+        value: _type,
+        // Collapsed selection ellipsizes instead of hard-clipping (ADR-016).
+        // minHeight 48 so the collapsed button is a 48dp tap target (a11y
+        // net); open menu items still grow via itemHeight: null.
+        selectedItemBuilder: (context) => ImportType.values
+            .map(
+              (t) => Container(
+                alignment: AlignmentDirectional.centerStart,
+                constraints: const BoxConstraints(minHeight: 48),
                 child: Text(
-                  l.importSourceKeyProtected,
-                  style: Theme.of(context).textTheme.bodySmall,
+                  _typeTitle(l, t),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-            ],
+            )
+            .toList(),
+        items: ImportType.values
+            .map(
+              (t) => DropdownMenuItem(value: t, child: Text(_typeTitle(l, t))),
+            )
+            .toList(),
+        onChanged: (t) {
+          if (t != null) _setType(t);
+        },
+      ),
+    );
+  }
+
+  List<Widget> _gabbroFields(AppLocalizations l) => [
+    const SizedBox(height: 12),
+    TextField(
+      controller: _passphraseController,
+      obscureText: !_showPassphrase,
+      // A key-protected source still needs a PIN, so advance to it;
+      // otherwise Enter runs the import.
+      onSubmitted: (_) => _gabbroSourceIsKeyProtected
+          ? _yubikeyPinFocus.requestFocus()
+          : _importGabbro(),
+      decoration: InputDecoration(
+        labelText: l.vaultPassphraseLabel,
+        border: const OutlineInputBorder(),
+        suffixIcon: IconButton(
+          iconSize: scaledSuffixIconSize(context),
+          icon: Icon(
+            _showPassphrase ? Icons.visibility_off : Icons.visibility,
+            semanticLabel: _showPassphrase ? l.tooltipHide : l.tooltipShow,
           ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _yubikeyPinController,
-            focusNode: _yubikeyPinFocus,
-            obscureText: _yubikeyPinObscured,
-            onSubmitted: (_) => _importGabbro(),
-            decoration: InputDecoration(
-              labelText: l.yubiKeyPinLabel,
-              border: const OutlineInputBorder(),
-              suffixIcon: IconButton(
-                iconSize: scaledSuffixIconSize(context),
-                icon: Icon(
-                  _yubikeyPinObscured ? Icons.visibility : Icons.visibility_off,
-                  semanticLabel: _yubikeyPinObscured
-                      ? l.tooltipShowPin
-                      : l.tooltipHidePin,
-                ),
-                tooltip: _yubikeyPinObscured
-                    ? l.tooltipShowPin
-                    : l.tooltipHidePin,
-                onPressed: () =>
-                    setState(() => _yubikeyPinObscured = !_yubikeyPinObscured),
-              ),
+          tooltip: _showPassphrase ? l.tooltipHide : l.tooltipShow,
+          onPressed: () => setState(() => _showPassphrase = !_showPassphrase),
+        ),
+      ),
+    ),
+    if (_gabbroSourceIsKeyProtected) ...[
+      const SizedBox(height: 12),
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.usb, size: 20, color: Theme.of(context).colorScheme.primary),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              l.importSourceKeyProtected,
+              style: Theme.of(context).textTheme.bodySmall,
             ),
           ),
-          if (widget.isAndroid && nfcAvailable) ...[
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Text(
-                  l.transportLabel,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                const SizedBox(width: 12),
-                SegmentedButton<String>(
-                  segments: [
-                    ButtonSegment(value: 'usb', label: Text(l.transportUsb)),
-                    ButtonSegment(value: 'nfc', label: Text(l.transportNfc)),
-                  ],
-                  selected: {_gabbroTransport},
-                  onSelectionChanged: (s) =>
-                      setState(() => _gabbroTransport = s.first),
-                ),
+        ],
+      ),
+      const SizedBox(height: 12),
+      TextField(
+        controller: _yubikeyPinController,
+        focusNode: _yubikeyPinFocus,
+        obscureText: _yubikeyPinObscured,
+        onSubmitted: (_) => _importGabbro(),
+        decoration: InputDecoration(
+          labelText: l.yubiKeyPinLabel,
+          border: const OutlineInputBorder(),
+          suffixIcon: IconButton(
+            iconSize: scaledSuffixIconSize(context),
+            icon: Icon(
+              _yubikeyPinObscured ? Icons.visibility : Icons.visibility_off,
+              semanticLabel: _yubikeyPinObscured
+                  ? l.tooltipShowPin
+                  : l.tooltipHidePin,
+            ),
+            tooltip: _yubikeyPinObscured ? l.tooltipShowPin : l.tooltipHidePin,
+            onPressed: () =>
+                setState(() => _yubikeyPinObscured = !_yubikeyPinObscured),
+          ),
+        ),
+      ),
+      if (widget.isAndroid && nfcAvailable) ...[
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Text(l.transportLabel, style: Theme.of(context).textTheme.bodyMedium),
+            const SizedBox(width: 12),
+            SegmentedButton<String>(
+              segments: [
+                ButtonSegment(value: 'usb', label: Text(l.transportUsb)),
+                ButtonSegment(value: 'nfc', label: Text(l.transportNfc)),
               ],
+              selected: {_gabbroTransport},
+              onSelectionChanged: (s) =>
+                  setState(() => _gabbroTransport = s.first),
             ),
           ],
-        ],
-        if (_gabbroError != null) ...[
-          const SizedBox(height: 4),
-          Text(
-            _gabbroError!,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.error,
-              fontSize: 12,
-            ),
-          ),
-        ],
-        // The source is intact, just too old: same words and link as the unlock
-        // screen, so one refusal is not two different experiences. Error-red is
-        // right — the import did fail — but the text carries the meaning on its
-        // own (ADR-003), and names no format version (meaningless to the user).
-        if (_gabbroFormatTooOld) ...[
-          const SizedBox(height: 4),
-          Text(
-            l.vaultFormatTooOld,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.error,
-              fontSize: 12,
-            ),
-          ),
-          Align(
-            alignment: AlignmentDirectional.centerStart,
-            child: TextButton.icon(
-              icon: const Icon(Icons.open_in_new, size: 16),
-              label: Text(l.vaultFormatUpgradeLink),
-              onPressed: () => showUrlDialog(
-                context,
-                title: l.vaultFormatUpgradeLink,
-                url: vaultUpgradePathUrl,
-              ),
-            ),
-          ),
-        ],
-        // Same shape for a source from a newer build: explain "update Gabbro".
-        if (_gabbroFormatTooNew) ...[
-          const SizedBox(height: 4),
-          Text(
-            l.vaultFormatTooNew,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.error,
-              fontSize: 12,
-            ),
-          ),
-          Align(
-            alignment: AlignmentDirectional.centerStart,
-            child: TextButton.icon(
-              icon: const Icon(Icons.open_in_new, size: 16),
-              label: Text(l.vaultFormatTooNewLink),
-              onPressed: () => showUrlDialog(
-                context,
-                title: l.vaultFormatTooNewLink,
-                url: vaultUpgradePathUrl,
-              ),
-            ),
-          ),
-        ],
-        const SizedBox(height: 12),
-        // While syncing a key-protected source we are blocked on a hardware tap.
-        // Surface the "tap now" prompt (matching the change-passphrase / manage-
-        // vaults screens) so the spinner is never silent — on Android the tap call
-        // blocks until a key is presented; the user can also back out to cancel.
-        if (_isImportingGabbro && _gabbroSourceIsKeyProtected) ...[
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(
-                Icons.touch_app,
-                size: 20,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  l.tapYubiKeyNow,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-        ],
-        FilledButton(
-          onPressed: _isImportingGabbro ? null : _importGabbro,
-          child: _isImportingGabbro
-              ? const SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : Text(l.syncFromVault),
         ),
       ],
-    );
-  }
+    ],
+  ];
 
-  Widget _importSection({
-    required String title,
-    required String subtitle,
-    required String hint,
-    required List<String> allowedExtensions,
-    required void Function(String) onPathSelected,
-    required bool isLoading,
-    required String? error,
-    required VoidCallback onImport,
-    required String importLabel,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(title, style: Theme.of(context).textTheme.titleMedium),
-        const SizedBox(height: 4),
-        Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
-        const SizedBox(height: 12),
-        PathField(
-          mode: PathFieldMode.open,
-          hint: hint,
-          allowedExtensions: allowedExtensions,
-          onPathSelected: onPathSelected,
-        ),
-        if (error != null) ...[
-          const SizedBox(height: 4),
-          Text(
-            error,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.error,
-              fontSize: 12,
-            ),
-          ),
-        ],
-        const SizedBox(height: 12),
-        FilledButton(
-          onPressed: isLoading ? null : onImport,
-          child: isLoading
-              ? const SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : Text(importLabel),
-        ),
-      ],
-    );
-  }
+  // The source is intact, just too old: same words and link as the unlock
+  // screen, so one refusal is not two different experiences. Error-red is
+  // right — the import did fail — but the text carries the meaning on its
+  // own (ADR-003), and names no format version (meaningless to the user).
+  // Same shape for a source from a newer build: explain "update Gabbro".
+  List<Widget> _gabbroFormatNotes(AppLocalizations l) => [
+    if (_gabbroFormatTooOld)
+      ..._formatNote(l.vaultFormatTooOld, l.vaultFormatUpgradeLink),
+    if (_gabbroFormatTooNew)
+      ..._formatNote(l.vaultFormatTooNew, l.vaultFormatTooNewLink),
+  ];
 
-  Widget _csvSection(AppLocalizations l) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          l.genericCsvSection,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        const SizedBox(height: 4),
-        Text(l.importCsvSubtitle, style: Theme.of(context).textTheme.bodySmall),
-        const SizedBox(height: 12),
-        PathField(
-          mode: PathFieldMode.open,
-          hint: '/home/user/passwords.csv',
-          allowedExtensions: ['csv'],
-          onPathSelected: (p) => setState(() => _csvPath = p),
-        ),
-        if (_csvError != null) ...[
-          const SizedBox(height: 4),
-          Text(
-            _csvError!,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.error,
-              fontSize: 12,
-            ),
-          ),
-        ],
-        const SizedBox(height: 12),
-        FilledButton(
-          onPressed: _isSniffingCsv ? null : _sniffAndPushCsvMapping,
-          child: _isSniffingCsv
-              ? const SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : Text(l.next),
-        ),
-      ],
-    );
-  }
+  List<Widget> _formatNote(String text, String link) => [
+    const SizedBox(height: 4),
+    Text(
+      text,
+      style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 12),
+    ),
+    Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: TextButton.icon(
+        icon: const Icon(Icons.open_in_new, size: 16),
+        label: Text(link),
+        onPressed: () =>
+            showUrlDialog(context, title: link, url: vaultUpgradePathUrl),
+      ),
+    ),
+  ];
 }

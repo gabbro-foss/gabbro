@@ -242,6 +242,59 @@ class AppLocalizationsRu extends AppLocalizations {
   String get securityTitle => 'Безопасность';
 
   @override
+  String get syncSettingsTitle => 'Настройки синхронизации';
+
+  @override
+  String get sectionAutoMerge => 'Автоматическое слияние';
+
+  @override
+  String get autoMergeTitle => 'Объединять автоматически';
+
+  @override
+  String get autoMergeDescription =>
+      'Синхронизировать из хранилища применяет входящие изменения автоматически. Где значения в двух хранилищах различаются, побеждают входящие изменения.';
+
+  @override
+  String get autoMergeNote =>
+      'Файл всё равно будет запрошен, если он не открывается вашей парольной фразой.';
+
+  @override
+  String get sectionSyncFolder => 'Папка синхронизации';
+
+  @override
+  String syncFolderDescription(String name) {
+    return 'Куда попадает экспорт другого устройства. Синхронизировать из хранилища открывает там файл $name, имя, под которым экспортируется это хранилище, не спрашивая.';
+  }
+
+  @override
+  String get syncFolderNotSet =>
+      'Не задана: Синхронизировать из хранилища каждый раз запрашивает файл.';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return 'В папке синхронизации нет файла с именем $name.';
+  }
+
+  @override
+  String get rememberFolder => 'Запомнить';
+
+  @override
+  String get rememberFolderNote => 'В следующий раз откроется эта папка.';
+
+  @override
+  String get exportFolderLabel => 'Папка экспорта';
+
+  @override
+  String get importFolderLabel => 'Папка импорта';
+
+  @override
+  String get folderNotSet => 'Не задана';
+
+  @override
+  String get foldersChangedNote =>
+      'Меняется в разделах Экспорт и Импорт записей.';
+
+  @override
   String get aboutTitle => 'О Gabbro';
 
   @override
@@ -249,6 +302,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get importTitle => 'Импорт записей';
+
+  @override
+  String get importSourceLabel => 'Источник';
 
   @override
   String get exportTitle => 'Экспорт хранилища';
@@ -512,9 +568,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get menuImportEntries => 'Импортировать записи';
 
   @override
-  String get menuSyncFromFile => 'Синхронизировать из файла';
-
-  @override
   String get menuManageVaults => 'Управление хранилищами';
 
   @override
@@ -528,6 +581,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Безопасность';
+
+  @override
+  String get menuSyncSettings => 'Настройки синхронизации';
 
   @override
   String get menuManageFolders => 'Управление папками';
@@ -754,9 +810,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Синхронизация не удалась';
-
-  @override
-  String get syncFromFileTitle => 'Синхронизировать из файла';
 
   @override
   String get nothingToSync =>
@@ -1280,22 +1333,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Отредактируйте, исправьте и сохраните эту запись или пропустите, чтобы отклонить её.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count записей пропущено',
-      few: '$count записи пропущены',
-      one: '1 запись пропущена',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Эти записи уже существуют в вашем хранилище и не были перезаписаны:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Другое устройство удалило «$title».\n\nУдалить здесь тоже или оставить?';
   }
@@ -1519,8 +1556,9 @@ class AppLocalizationsRu extends AppLocalizations {
       'Выберите место назначения для экспортированного файла хранилища.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Будут созданы два файла: vault.gabbro и vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Будут записаны два файла: $name и $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Выберите место назначения.';
@@ -1663,11 +1701,11 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Записи, которые уже есть в вашем хранилище, будут автоматически пропущены. Вы увидите сводку.';
+      'Добавляется каждая запись из файла, даже уже имеющиеся в хранилище. Лучше один раз, в пустое хранилище.';
 
   @override
   String get importGabbroSubtitle =>
-      'Импортировать записи из другого хранилища Gabbro (файл .gabbro)';
+      'Импорт записей из другого хранилища Gabbro (файл .gabbro). Для этого же хранилища с другого устройства используйте «Синхронизировать из хранилища».';
 
   @override
   String get importEnpassSubtitle =>
@@ -2066,54 +2104,57 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Создайте хранилище: введите название, кодовую фразу и при желании защитите ключом YubiKey';
+      'Создать хранилище: имя, парольная фраза, по желанию YubiKey';
 
   @override
-  String get helpCaptionEmpty => 'Нажмите +, чтобы добавить первую запись';
+  String get helpCaptionEmpty => 'Нажмите +, чтобы добавить запись';
 
   @override
   String get helpCaptionDetail =>
-      'Нажмите на значок глаза, чтобы показать пароль, затем удерживайте для просмотра детального анализа символов';
+      'Нажмите запись, чтобы открыть, глаз, чтобы показать, удерживайте для подробностей';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'По умолчанию строка поиска ищет только по названиям записей';
+  String get helpCaptionTitleSearch => 'Поиск по названиям';
 
   @override
-  String get helpCaptionFullSearch =>
-      'Нажмите на лупу для переключения на поиск по всем полям; нажмите снова для возврата к поиску по названию';
+  String get helpCaptionFullSearch => 'Нажмите лупу для поиска по всем полям';
 
   @override
-  String get helpCaptionFilter =>
-      'Используйте кнопки фильтрации для отображения только записей определённого типа';
+  String get helpCaptionFilter => 'Фильтр записей по типу';
 
   @override
-  String get helpCaptionFolders =>
-      'Используйте выбор папки для фильтрации записей по папке';
+  String get helpCaptionFolders => 'Фильтр записей по папке';
 
   @override
   String get helpCaptionSelect =>
-      'Удерживайте запись для входа в режим выбора; добавляйте элементы, затем назначьте папку или удалите. Нажмите X для выхода.';
+      'Удерживайте для выбора; затем переместите в папку или удалите';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Нажмите на букву в индексной панели для перехода к этому разделу';
+  String get helpCaptionJumpToLetter => 'Нажмите букву, чтобы перейти к ней';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Нажмите на значок глаза, чтобы показать пароль, затем удерживайте для просмотра детального анализа символов';
+  String get helpCaptionBreakdown => 'Создать пароль или парольную фразу';
 
   @override
   String get helpCaptionManageVaults =>
-      'В разделе «Управление хранилищами» можно переименовать или удалить хранилища, а также добавить новое';
+      'Управление хранилищами: добавить, переименовать, удалить';
 
   @override
-  String get helpCaptionUnlock =>
-      'Введите кодовую фразу для разблокировки хранилища';
+  String get helpCaptionUnlock => 'Разблокировать парольной фразой';
 
   @override
   String get helpCaptionVaultSync =>
-      'Процесс синхронизации зашифрованного хранилища';
+      'Синхронизация: здесь Экспорт, там Синхронизировать из хранилища';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Настройки синхронизации: автообъединение и папки по умолчанию';
+
+  @override
+  String get helpCaptionExport => 'Тип и место экспорта';
+
+  @override
+  String get helpCaptionImport => 'Тип и путь импорта';
 
   @override
   String get passphraseNoWordlist =>

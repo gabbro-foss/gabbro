@@ -243,6 +243,60 @@ class AppLocalizationsEl extends AppLocalizations {
   String get securityTitle => 'Ασφάλεια';
 
   @override
+  String get syncSettingsTitle => 'Ρυθμίσεις συγχρονισμού';
+
+  @override
+  String get sectionAutoMerge => 'Αυτόματη συγχώνευση';
+
+  @override
+  String get autoMergeTitle => 'Αυτόματη συγχώνευση';
+
+  @override
+  String get autoMergeDescription =>
+      'Ο συγχρονισμός από θησαυροφυλάκιο εφαρμόζει τις εισερχόμενες αλλαγές αυτόματα. Όπου οι τιμές στα δύο θησαυροφυλάκια διαφέρουν, επικρατούν οι εισερχόμενες αλλαγές.';
+
+  @override
+  String get autoMergeNote =>
+      'Το αρχείο θα ζητηθεί ούτως ή άλλως αν δεν ανοίγει με τη φράση πρόσβασής σας.';
+
+  @override
+  String get sectionSyncFolder => 'Φάκελος συγχρονισμού';
+
+  @override
+  String syncFolderDescription(String name) {
+    return 'Όπου καταλήγει η εξαγωγή της άλλης συσκευής. Ο συγχρονισμός από θησαυροφυλάκιο ανοίγει εκεί το αρχείο $name, το όνομα με το οποίο εξάγεται αυτό το θησαυροφυλάκιο, χωρίς να ρωτά.';
+  }
+
+  @override
+  String get syncFolderNotSet =>
+      'Δεν ορίστηκε: ο συγχρονισμός από θησαυροφυλάκιο ζητά το αρχείο κάθε φορά.';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return 'Δεν υπάρχει αρχείο με όνομα $name στον φάκελο συγχρονισμού.';
+  }
+
+  @override
+  String get rememberFolder => 'Απομνημόνευση';
+
+  @override
+  String get rememberFolderNote =>
+      'Την επόμενη φορά ξεκινά σε αυτόν τον φάκελο.';
+
+  @override
+  String get exportFolderLabel => 'Φάκελος εξαγωγής';
+
+  @override
+  String get importFolderLabel => 'Φάκελος εισαγωγής';
+
+  @override
+  String get folderNotSet => 'Δεν έχει οριστεί';
+
+  @override
+  String get foldersChangedNote =>
+      'Αλλάζει στην Εξαγωγή και στην Εισαγωγή καταχωρήσεων.';
+
+  @override
   String get aboutTitle => 'Σχετικά με το Gabbro';
 
   @override
@@ -250,6 +304,9 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get importTitle => 'Εισαγωγή καταχωρίσεων';
+
+  @override
+  String get importSourceLabel => 'Πηγή';
 
   @override
   String get exportTitle => 'Εξαγωγή θησαυροφυλακίου';
@@ -514,9 +571,6 @@ class AppLocalizationsEl extends AppLocalizations {
   String get menuImportEntries => 'Εισαγωγή καταχωρίσεων';
 
   @override
-  String get menuSyncFromFile => 'Συγχρονισμός από αρχείο';
-
-  @override
   String get menuManageVaults => 'Διαχείριση θησαυροφυλακίων';
 
   @override
@@ -530,6 +584,9 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Ασφάλεια';
+
+  @override
+  String get menuSyncSettings => 'Ρυθμίσεις συγχρονισμού';
 
   @override
   String get menuManageFolders => 'Διαχείριση φακέλων';
@@ -756,9 +813,6 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Αποτυχία συγχρονισμού';
-
-  @override
-  String get syncFromFileTitle => 'Συγχρονισμός από αρχείο';
 
   @override
   String get nothingToSync =>
@@ -1285,21 +1339,6 @@ class AppLocalizationsEl extends AppLocalizations {
       'Επεξεργαστείτε, διορθώστε και αποθηκεύστε αυτή την καταχώριση, ή παραλείψτε για να την απορρίψετε.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count καταχωρίσεις παραλείφθηκαν',
-      one: '1 καταχώριση παραλείφθηκε',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Αυτές οι καταχωρίσεις υπάρχουν ήδη στο θησαυροφυλάκιό σας και δεν αντικαταστάθηκαν:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Η άλλη συσκευή διέγραψε «$title».\n\nΔιαγραφή και εδώ, ή διατήρηση;';
   }
@@ -1526,8 +1565,9 @@ class AppLocalizationsEl extends AppLocalizations {
       'Επιλέξτε προορισμό για το εξαχθέν αρχείο θησαυροφυλακίου.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Θα δημιουργηθούν δύο αρχεία: vault.gabbro και vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Θα γραφτούν δύο αρχεία: $name και $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Επιλέξτε προορισμό.';
@@ -1669,11 +1709,11 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Οι καταχωρίσεις που υπάρχουν ήδη στο θησαυροφυλάκιό σας θα παραλειφθούν αυτόματα. Θα εμφανιστεί περίληψη.';
+      'Κάθε καταχώριση του αρχείου προστίθεται, ακόμη κι όσες υπάρχουν ήδη. Κατά προτίμηση μία φορά, σε κενό θησαυροφυλάκιο.';
 
   @override
   String get importGabbroSubtitle =>
-      'Εισαγωγή καταχωρίσεων από άλλο θησαυροφυλάκιο Gabbro (αρχείο .gabbro)';
+      'Εισαγωγή καταχωρίσεων από άλλο θησαυροφυλάκιο Gabbro (αρχείο .gabbro). Για το ίδιο θησαυροφυλάκιο από άλλη συσκευή χρησιμοποιήστε τον συγχρονισμό από θησαυροφυλάκιο.';
 
   @override
   String get importEnpassSubtitle =>
@@ -2078,55 +2118,58 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Δημιουργήστε θησαυροφυλάκιο: εισάγετε όνομα, φράση πρόσβασης και προαιρετικά προστατέψτε με YubiKey';
+      'Δημιουργία θησαυροφυλακίου: όνομα, φράση πρόσβασης, προαιρετικά YubiKey';
 
   @override
-  String get helpCaptionEmpty =>
-      'Κάντε κλικ στο + για προσθήκη πρώτης καταχώρισης';
+  String get helpCaptionEmpty => 'Πατήστε + για νέα καταχώρηση';
 
   @override
   String get helpCaptionDetail =>
-      'Κάντε κλικ στο εικονίδιο ματιού για εμφάνιση κωδικού, μετά κρατήστε πατημένο για λεπτομερή ανάλυση χαρακτήρων';
+      'Πατήστε καταχώρηση για άνοιγμα, μάτι για εμφάνιση, παρατεταμένο πάτημα για λεπτομέρειες';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Προεπιλογή: η γραμμή αναζήτησης ψάχνει μόνο τους τίτλους καταχωρίσεων';
+  String get helpCaptionTitleSearch => 'Αναζήτηση σε τίτλους';
 
   @override
   String get helpCaptionFullSearch =>
-      'Κλικ στον μεγεθυντή για εναλλαγή σε αναζήτηση σε όλα τα πεδία· κλικ ξανά για επιστροφή στην αναζήτηση τίτλου';
+      'Πατήστε τον μεγεθυντή για αναζήτηση σε όλα τα πεδία';
 
   @override
-  String get helpCaptionFilter =>
-      'Χρησιμοποιήστε τα κουμπιά φιλτραρίσματος για εμφάνιση μόνο καταχωρίσεων συγκεκριμένου τύπου';
+  String get helpCaptionFilter => 'Φιλτράρισμα καταχωρήσεων κατά τύπο';
 
   @override
-  String get helpCaptionFolders =>
-      'Χρησιμοποιήστε την επιλογή φακέλου για φιλτράρισμα καταχωρίσεων ανά φάκελο';
+  String get helpCaptionFolders => 'Φιλτράρισμα καταχωρήσεων κατά φάκελο';
 
   @override
   String get helpCaptionSelect =>
-      'Παρατεταμένο πάτημα σε καταχώριση για είσοδο σε λειτουργία επιλογής· προσθέστε περισσότερα στοιχεία, μετά αναθέστε σε φάκελο ή διαγράψτε. Κλικ X για έξοδο.';
+      'Παρατεταμένο πάτημα για επιλογή· μετά μεταφορά σε φάκελο ή διαγραφή';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Κλικ σε γράμμα της αλφαβητικής γραμμής για μετάβαση στην ενότητα';
+  String get helpCaptionJumpToLetter => 'Πατήστε ένα γράμμα για μετάβαση εκεί';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Κάντε κλικ στο εικονίδιο ματιού για εμφάνιση κωδικού, μετά κρατήστε πατημένο για λεπτομερή ανάλυση χαρακτήρων';
+  String get helpCaptionBreakdown => 'Δημιουργία κωδικού ή φράσης πρόσβασης';
 
   @override
   String get helpCaptionManageVaults =>
-      'Στη «Διαχείριση θησαυροφυλακίων» μπορείτε να μετονομάσετε ή διαγράψετε θησαυροφυλάκια ή να προσθέσετε νέο';
+      'Διαχείριση θησαυροφυλακίων: προσθήκη, μετονομασία, διαγραφή';
 
   @override
-  String get helpCaptionUnlock =>
-      'Εισάγετε τη φράση πρόσβασης για ξεκλείδωμα θησαυροφυλακίου';
+  String get helpCaptionUnlock => 'Ξεκλείδωμα με φράση πρόσβασης';
 
   @override
   String get helpCaptionVaultSync =>
-      'Διαδικασία συγχρονισμού κρυπτογραφημένου θησαυροφυλακίου';
+      'Συγχρονισμός: Εξαγωγή εδώ, Συγχρονισμός από θησαυροφυλάκιο εκεί';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Ρυθμίσεις συγχρονισμού: αυτόματη συγχώνευση και προεπιλεγμένοι φάκελοι';
+
+  @override
+  String get helpCaptionExport => 'Τύπος και θέση εξαγωγής';
+
+  @override
+  String get helpCaptionImport => 'Τύπος και διαδρομή εισαγωγής';
 
   @override
   String get passphraseNoWordlist =>

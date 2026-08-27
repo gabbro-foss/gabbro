@@ -7,7 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Emergency sheet: `docs/EMERGENCY_SHEET.pdf`, a printable one-pager to fill in by hand (vault, passphrase, YubiKeys, folders) and keep on paper.
+- Remembered folders. Export and Import entries each get a Remember box (ticked by default): the folder of the file you pick is remembered, the next file dialog opens there, and on Linux the export path is pre-filled so Export is one tap. Sync settings lists the export and import folders read-only. Untick to forget.
+- One-click sync. Sync settings (vault menu): an auto-merge switch (off by default) and a remembered sync folder with a Remember box. With both set, Sync from vault opens the file named as this vault exports (`<alias>.gabbro`) in that folder and merges it with no picker, no chooser and no review; a YubiKey-protected file still asks for its tap, and a file your passphrase does not open still asks for one. Linux gains a native folder picker (XDG portal); Android reads the folder through its persisted storage grant.
+
+### Fixed
+- Help: all 16 cards re-shot at the current UI, terse captions, larger caption text; three new cards (Sync settings, Export, Import) and the sync diagram redrawn for the one-tap flow.
+- Export: the two-files note now names the real file (`<alias>.gabbro`), not `vault.gabbro`.
+- Android edge-to-edge (targetSdk 36): the vault list, its sync snackbar and four other screens no longer run under the navigation bar or a landscape side bar. A new inset net renders every screen with faked system bars on phone and tablet, portrait and landscape.
+
 ### Changed
+- Import screen: one file field and a Source dropdown (Gabbro vault, Generic CSV, Google Password Manager, Dashlane, Enpass, Bitwarden) replace the six stacked sections. Changing the type clears the chosen file.
+- The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
+- Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
+- Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).
 - Export: "Include date in filename" now defaults to off, so a repeat export overwrites the previous file instead of adding a dated copy. Turn it on for dated exports.
 - flutter_rust_bridge 2.12.0 -> 2.13.0 (bridge regenerated; no behaviour change).
 
@@ -41,7 +55,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.0-alpha.20] – 2026-08-11
 
+### Fixed
+- Android edge-to-edge (targetSdk 36): the vault list, its sync snackbar and four other screens no longer run under the navigation bar or a landscape side bar. A new inset net renders every screen with faked system bars on phone and tablet, portrait and landscape.
+
 ### Changed
+- The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
+- Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
+- Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).
 - **The stored text-scale ceiling now matches what the app can show.** Renders always capped at 2x (phone) / 3x (tablet); the settings file could still hold up to 8.0 from an older design. A hand-edited value above 3.0 now loads as 3.0.
 
 ### Fixed
@@ -55,7 +75,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **A link that would not open said nothing, or said the wrong thing.** Opening a URL from an entry gave no message at all when it failed, and at the largest text sizes the message shown elsewhere ran off the bottom of the screen. Both now appear in a dialog that scrolls, and a link that is not a web page says so instead of reporting a failure.
 - **An entry in the vault list at the autofill prompt did nothing (Android).** When Gabbro asked for your passphrase to fill or save a login, the list of vaults also offered "Open a vault file…" — tapping it opened nothing and said nothing. It is no longer offered there, and where you have a single vault the list itself is gone, since it could only reselect the vault you were already unlocking. The app's own unlock screen is unchanged.
 
+### Fixed
+- Android edge-to-edge (targetSdk 36): the vault list, its sync snackbar and four other screens no longer run under the navigation bar or a landscape side bar. A new inset net renders every screen with faked system bars on phone and tablet, portrait and landscape.
+
 ### Changed
+- The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
+- Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
+- Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).
 - **Links open through Gabbro's own code**, not the `url_launcher` plugin: the desktop's handler on Linux, Android's own on Android. Same system browser as before, never an in-app view, one less third-party dependency. Only `http` and `https` links are opened now — a stored `file://`, `ftp://` or `ssh://` address is refused, since this button means "open a web page".
 - **File dialogs now talk to the system directly on both platforms**, instead of going through the `file_picker` plugin: the desktop's file portal on Linux, Android's own picker on Android. Same dialogs, two fewer third-party dependencies in the app.
 - **The app now finds its own data folder** instead of asking the `path_provider` plugin — the same folder as before on both platforms, so nothing moves. This also removes the `jni` plugin whose C code newer compilers reject, which had broken fresh Linux builds.
@@ -78,7 +104,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Three messages appeared in English whatever your language.** The two file-dialog warnings and the notice that changing your passphrase turned biometric unlock off were never translated, so they arrived in English — at the moment something had just failed or a security setting had changed under you. All three are now translated into every language, and a test refuses any string that ships as English everywhere.
 - **Serbian (Cyrillic) was almost entirely written in Latin script.** Choosing Српски gave you the same Latin text as Српски (latinica) — only 85 of 645 strings were actually Cyrillic. All of them are now, so the two Serbian options finally differ. A test refuses any Cyrillic locale that ships Latin-script prose, so this cannot come back.
 
+### Fixed
+- Android edge-to-edge (targetSdk 36): the vault list, its sync snackbar and four other screens no longer run under the navigation bar or a landscape side bar. A new inset net renders every screen with faked system bars on phone and tablet, portrait and landscape.
+
 ### Changed
+- The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
+- Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
+- Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).
 - **Starting a vault switch and changing your mind is now one tap.** Picking another vault in Manage vaults opens its unlock screen over the vault you already had open; a Cancel button in the top-left goes back to it. That corner offered Quit before, which was never the action you wanted there — Quit stays in the vault menu, on `Ctrl+Q`, and on the first-run and locked screens.
 
 ### Security
@@ -125,7 +157,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Native Linux packages.** Arch via the AUR (`yay -S gabbro-bin`) and Debian/Mint via a signed `.deb` (`sudo apt install ./gabbro_<version>_amd64.deb`) — both install system-wide with a menu entry and a `gabbro` command, resolve their dependencies, and uninstall cleanly. The `.deb` carries a detached GPG signature like the tarball.
 
+### Fixed
+- Android edge-to-edge (targetSdk 36): the vault list, its sync snackbar and four other screens no longer run under the navigation bar or a landscape side bar. A new inset net renders every screen with faked system bars on phone and tablet, portrait and landscape.
+
 ### Changed
+- The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
+- Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
+- Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).
 - **The Linux tarball no longer bundles `install.sh`.** The native packages replace it; the tarball is now extract-and-run (use the AUR or `.deb` for app-menu / PATH integration).
 - **Release binaries no longer embed the build machine's file paths** — build-path hygiene, no behaviour change.
 
@@ -148,7 +186,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Sync review: a long password, URL or folder name was cut off in the choice buttons, so you picked between two values you could not read. Value choices are now full-width rows that wrap onto as many lines as needed, at every text size.
 - Tablet, largest text: the "select an entry" placeholder in the detail pane ran off the bottom of the pane. It now scrolls.
 
+### Fixed
+- Android edge-to-edge (targetSdk 36): the vault list, its sync snackbar and four other screens no longer run under the navigation bar or a landscape side bar. A new inset net renders every screen with faked system bars on phone and tablet, portrait and landscape.
+
 ### Changed
+- The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
+- Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
+- Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).
 - **A vault older than VERSION 11 is refused, not damaged.** The file is left untouched and the app explains it needs upgrading rather than reporting corruption. To upgrade: install alpha.14, open each vault once, then return. See [docs/VAULT_UPGRADE_PATH.md](docs/VAULT_UPGRADE_PATH.md).
 - Importing a too-old vault now explains it in your own language with a tappable link to the upgrade steps, instead of showing an untranslated error. Matches the unlock screen.
 - A vault written by a newer Gabbro build is now explained in your own language ("update Gabbro") with a tappable link, on both unlock and import, instead of an untranslated error citing a meaningless format number. Fail-closed behaviour unchanged.
@@ -161,7 +205,13 @@ _Built with Flutter 3.44.6, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21._
 ### Security
 - **Vault format VERSION 11.** New vaults derive the encryption key straight from Argon2id (via HKDF); existing vaults auto-upgrade the first time you unlock them (entries unchanged). Removes the non-load-bearing X25519 + ML-KEM hybrid layer (ADR-018); quantum resistance is unchanged (Argon2id + AES-256-GCM).
 
+### Fixed
+- Android edge-to-edge (targetSdk 36): the vault list, its sync snackbar and four other screens no longer run under the navigation bar or a landscape side bar. A new inset net renders every screen with faked system bars on phone and tablet, portrait and landscape.
+
 ### Changed
+- The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
+- Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
+- Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).
 - Project repository moved to the `gabbro-foss` GitHub organisation; in-app GitHub/Issues links updated (old links redirect).
 - App tagline is now "A quantum-resistant password manager" (all locales). Docs clarified: quantum resistance comes from Argon2id + AES-256-GCM, not the hybrid X25519 + ML-KEM layer (ADR-018).
 
@@ -176,7 +226,13 @@ _Built with Flutter 3.44.6, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21._
 ### Added
 - **Linux desktop auto-type (X11).** With a login open in Gabbro, a global hotkey types `username⇥password↵` into the focused window; uses the login's email when it has no username.
 
+### Fixed
+- Android edge-to-edge (targetSdk 36): the vault list, its sync snackbar and four other screens no longer run under the navigation bar or a landscape side bar. A new inset net renders every screen with faked system bars on phone and tablet, portrait and landscape.
+
 ### Changed
+- The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
+- Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
+- Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).
 - **Smaller, per-device Android downloads.** Releases now ship a separate APK per phone type (modern `arm64-v8a` ~29 MB, old 32-bit `armeabi-v7a`, emulator/Chromebook `x86_64`) instead of one ~76 MB file bundling all three. Download the one for your device — use `arm64-v8a` if unsure. All are signed by the same key (same fingerprint).
 
 ### Fixed
@@ -192,7 +248,13 @@ _Built with Flutter 3.44.6, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21._
 - **Help screens can be pinch-zoomed.** Tap any help screenshot to open it full-screen and pinch to zoom / drag to pan — the images are pictures that the text-size setting can't enlarge, and screenshots are blocked in-app, so this is the way to read small detail.
 - **Buttons and controls grow with the text size too.** At large text, the menu, entry-row, type-picker and navigation-rail icons, the add button, page arrows, app-bar buttons, selection checkboxes and the password show/hide (eye) toggles scale up (so they stay easy to see and tap), touch targets are a full size, and the A–Z index bar's letters enlarge without spilling off their strip. Eye toggles that sit inside a text field grow a little more gently so they stay within the field.
 
+### Fixed
+- Android edge-to-edge (targetSdk 36): the vault list, its sync snackbar and four other screens no longer run under the navigation bar or a landscape side bar. A new inset net renders every screen with faked system bars on phone and tablet, portrait and landscape.
+
 ### Changed
+- The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
+- Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
+- Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).
 - **Sync now offers "Merge automatically" or "Review all changes".** When syncing from a file you pick how to apply it: *Merge automatically* takes all incoming changes with no prompts (the incoming vault wins any clash; the replaced value is kept in history), or *Review all changes* steps through them one by one as before. Nothing is lost either way.
 - **Entry history unified into one place (part of v9).** An entry's past values now live in a single history — one previous value per field, shown under one "History" button — instead of a separate single-slot "Password history" plus a growing "Previous state" list. Old vaults migrate losslessly on load; secret fields still auto-expire per your retention setting.
 - **Vault sync is now field-level (format v8 → v9).** Editing different fields — or different custom key/value pairs — of the same entry on two devices now keeps both, instead of the newer whole entry overwriting the other. A genuine clash (same field changed to different values) and an item another device deleted are surfaced for you to resolve (keep mine / use theirs; keep / delete) — never silent loss. Fixes the false "nothing to sync". Cryptography is unchanged from v8; an older Gabbro refuses a v9 vault rather than opening it and silently dropping the new per-field data. Backed by a deterministic multi-device sync fuzz proof.
@@ -227,7 +289,13 @@ _Built with Flutter 3.44.6, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21._
 - Biometric unlock no longer silently fails after a passphrase change: changing the passphrase now turns biometric off (its stored secret was tied to the old passphrase) and tells you to re-enable it in Settings.
 - Changing the passphrase now accepts a "Fair" passphrase, matching onboarding (it previously required a stronger one); weaker passphrases show an explicit "too weak" line.
 
+### Fixed
+- Android edge-to-edge (targetSdk 36): the vault list, its sync snackbar and four other screens no longer run under the navigation bar or a landscape side bar. A new inset net renders every screen with faked system bars on phone and tablet, portrait and landscape.
+
 ### Changed
+- The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
+- Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
+- Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).
 - Android autofill now fills fields through the current `setField` API on Android 14+, keeping the deprecated `setValue` path for Android 8–13 — so Gabbro keeps building cleanly against newer Android SDKs with no change to how autofill behaves. Hardware-verified on Android 16 (web + native app, locked + unlocked vault).
 
 ### Removed
@@ -253,7 +321,13 @@ _Built with Flutter 3.44.6, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21._
 - **Login entries gain an optional email field, and username is now optional.** A Login now holds both `username` and `email` (only title + password are required). Autofill routes the email to email-typed fields and the username to username-typed fields, each falling back to the other when only one is set — so a form that asks for an email gets the email, not the username. Old vaults load unchanged (no format bump); shown in the editor (reusing "Email (optional)", username relabelled "Username (optional)" across 37 locales), detail, and review-diff. Device-verified on Android.
 - **Autofill: match a vault login to an installed Android app by its package id.** Login entries gain an optional "Android app ID" field; a native app autofills only on an **exact** package match (no loose substring matching — an unset id matches nothing, so no false positives). Apps that request autofill but match no entry are recorded (app-private, capped) and offered as tap-to-fill suggestion chips in the editor, so you needn't hunt for the package name. Field, note, and chips localised across 37 locales. Device-verified on Android (match, no-false-positive, capture); replaces the old loose `extractAppToken` matcher.
 
+### Fixed
+- Android edge-to-edge (targetSdk 36): the vault list, its sync snackbar and four other screens no longer run under the navigation bar or a landscape side bar. A new inset net renders every screen with faked system bars on phone and tablet, portrait and landscape.
+
 ### Changed
+- The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
+- Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
+- Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).
 - **Autofill: web login fields detected from HTML attributes.** `classifyField` now reads the html `id` (catching short field names) and trusts html `name`/`id` only on real form controls, so `<form name="login">` containers are no longer mis-detected. Hardware-verified on Android across six sites; OTP/reCAPTCHA correctly skipped.
 - **Password generator: classic minimum length lowered from 32 to 12 characters.** The length slider now bottoms out at 12 (default stays 32, max 256) and Rust's `MIN_LENGTH` matches. The "Passwords are at least N characters" note updates to 12 across all 37 locales (a numeric-only edit, no translation change) and is now shown **only in classic mode** — it was meaningless in passphrase (word-based) mode, so it is hidden there. Generator widget + Rust unit tests cover the new lower bound and the note's mode-gating. Hardware-verified on Linux and Android.
 - **Password generator: "Capitalise words" is disabled for caseless CJK passphrase languages.** Japanese, Korean, and Chinese (Simplified/Traditional) scripts have no letter case, so the option (Rust's `to_uppercase()` is a no-op there) is now shown off and disabled whenever the selected passphrase language is CJK, derived from the language rather than mutating stored state. Widget tests pin the disabled state and that CJK generation never requests capitalisation. Hardware-verified on Linux and Android.
@@ -275,7 +349,13 @@ _Built with Flutter 3.44.6, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21._
 - Vault parser fuzz harness (`rust/tests/vault_parse_fuzz.rs`): the negative-input safety net for `SealedVault::from_bytes`, complementing the valid-only `vault_backward_compat` gate. Feeds the parser (1) every truncation of a real golden vault, (2) seeded-random garbage, and (3) structurally valid headers with oversized/overflowing body-length fields, asserting it always returns `Err`, never panics. Not `#[ignore]`'d — parsing does no Argon2id work, so it runs in the routine `cargo test` as a permanent guard. Caught the body-length overflow above.
 - **Lock / vault-switch now clear the navigation back stack (locked-vault re-exposure hardening).** Auto-lock already wiped the back stack (`pushAndRemoveUntil`), but the manual lock button and the vault-switch dropdown used `pushReplacement`, which only swaps the top route. A hardware-found edge case (back-press during a stalled YubiKey tap after switching vaults) could leave a previously-unlocked vault's screen reachable underneath. Manual lock (`_lockAndExit`) and `switchToVault` now both `pushAndRemoveUntil((_) => false)` like auto-lock, so no prior route — and no previously-unlocked vault's screen — can survive a lock or a switch, regardless of stack depth or in-flight async state. Defence-in-depth: a failed/locked entry-list load now also clears any retained decrypted summaries from memory (the existing error gate already hid them from the UI). The originally-observed symptom was no longer reproducible after the stalled-tap fix; this closes the class by construction. Widget tests pin "lock/switch leaves nothing to pop back to" and "a locked load renders no entry-list chrome." Hardware-verified on Android.
 
+### Fixed
+- Android edge-to-edge (targetSdk 36): the vault list, its sync snackbar and four other screens no longer run under the navigation bar or a landscape side bar. A new inset net renders every screen with faked system bars on phone and tablet, portrait and landscape.
+
 ### Changed
+- The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
+- Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
+- Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).
 - **Path fields are now editable — type or paste, not pick-only.** The vault-path field in onboarding (and the file-path fields in export/import) previously accepted only a value chosen through the native file dialog. They are now directly editable while still offering the picker — important when the native dialog is unavailable (e.g. under a Wayland bubblewrap sandbox), where typing/pasting a path is the only way in. A caller-requested read-only display mode is preserved, and an external path update (the onboarding alias-driven preview) still flows into the field. Widget tests cover typing, picking, external-update sync, and read-only mode.
 
 ### Fixed
@@ -330,7 +410,13 @@ _Built with Flutter 3.44.6, Rust 1.94.0, AGP 8.11.1, Kotlin 2.2.20, Java 21._
 - `docs/AI_SECURITY_AUDIT.md`: F-01 status corrected from "Reclassified" to "Fixed (VERSION 7)". The architectural incompatibilities cited in the reclassification (alias rename without unlock, key management without reseal) were resolved as part of the VERSION 7 work; the finding is fully addressed. Updated remediation table, "Still open" summary line, and the finding section text.
 - `docs/SECURITY.md`: F-01 "Known limitations" section updated to reflect VERSION 7 header-integrity guarantee; stale "planned for a future version" text removed.
 
+### Fixed
+- Android edge-to-edge (targetSdk 36): the vault list, its sync snackbar and four other screens no longer run under the navigation bar or a landscape side bar. A new inset net renders every screen with faked system bars on phone and tablet, portrait and landscape.
+
 ### Changed
+- The import screen's Gabbro section now says a synced copy of this same vault belongs in Sync from vault, not import.
+- Import is additive: every entry in the file is added, duplicates included. The "entries skipped" dialog is gone. A Gabbro import whose entry UUID the vault already holds gets a fresh UUID, so sync by UUID stays intact.
+- Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).
 - Dependency surface audit (Phase 1): replaced `once_cell::sync::Lazy` with `std::sync::LazyLock` (stabilised in Rust 1.80) in `vault/session.rs`; removed `once_cell` as a direct dependency.
 - Dependency licence audit (Phase 2): ran `cargo update` (65 Cargo.lock entries updated within SemVer ranges; no `Cargo.toml` version bumps required). All Flutter direct deps already current per `flutter pub outdated`. Added missing `intl`, `jni`, and `libfido2-sys` to the Open Source Components list in About screen.
 

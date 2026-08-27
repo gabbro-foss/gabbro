@@ -242,6 +242,60 @@ class AppLocalizationsEt extends AppLocalizations {
   String get securityTitle => 'Turvalisus';
 
   @override
+  String get syncSettingsTitle => 'Sünkroonimise seaded';
+
+  @override
+  String get sectionAutoMerge => 'Automaatne ühendamine';
+
+  @override
+  String get autoMergeTitle => 'Ühenda automaatselt';
+
+  @override
+  String get autoMergeDescription =>
+      'Hoidlast sünkroonimine rakendab sissetulevad muudatused automaatselt. Kus väärtused kahes hoidlas erinevad, võidavad sissetulevad muudatused.';
+
+  @override
+  String get autoMergeNote =>
+      'Faili küsitakse siiski, kui see sinu paroolifraasiga ei avane.';
+
+  @override
+  String get sectionSyncFolder => 'Sünkroonimiskaust';
+
+  @override
+  String syncFolderDescription(String name) {
+    return 'Kuhu teise seadme eksport jõuab. Hoidlast sünkroonimine avab sealt faili $name, nime, millega see hoidla eksporditakse, küsimata.';
+  }
+
+  @override
+  String get syncFolderNotSet =>
+      'Määramata: hoidlast sünkroonimine küsib faili iga kord.';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return 'Sünkroonimiskaustas pole faili nimega $name.';
+  }
+
+  @override
+  String get rememberFolder => 'Jäta meelde';
+
+  @override
+  String get rememberFolderNote =>
+      'Järgmine kord alustatakse sellest kaustast.';
+
+  @override
+  String get exportFolderLabel => 'Ekspordikaust';
+
+  @override
+  String get importFolderLabel => 'Impordikaust';
+
+  @override
+  String get folderNotSet => 'Määramata';
+
+  @override
+  String get foldersChangedNote =>
+      'Muudetakse Ekspordi ja Kirjete impordi all.';
+
+  @override
   String get aboutTitle => 'Teave Gabbro kohta';
 
   @override
@@ -249,6 +303,9 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get importTitle => 'Impordi kirjeid';
+
+  @override
+  String get importSourceLabel => 'Allikas';
 
   @override
   String get exportTitle => 'Ekspordi seif';
@@ -512,9 +569,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get menuImportEntries => 'Impordi kirjeid';
 
   @override
-  String get menuSyncFromFile => 'Sünkrooni failist';
-
-  @override
   String get menuManageVaults => 'Halda seife';
 
   @override
@@ -528,6 +582,9 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Turvalisus';
+
+  @override
+  String get menuSyncSettings => 'Sünkroonimise seaded';
 
   @override
   String get menuManageFolders => 'Halda kaustu';
@@ -753,9 +810,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Sünkroonimine ebaõnnestus';
-
-  @override
-  String get syncFromFileTitle => 'Sünkrooni failist';
 
   @override
   String get nothingToSync =>
@@ -1277,21 +1331,6 @@ class AppLocalizationsEt extends AppLocalizations {
       'Muuda, paranda ja salvesta see kirje või jäta see vahele, et see hüljata.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count kirjet vahele jäetud',
-      one: '1 kirje vahele jäetud',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Need kirjed on juba sinu seifis ja neid ei kirjutatud üle:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Teine seade kustutas kirje \'$title\'.\n\nKustuta ka siit, või hoia alles?';
   }
@@ -1517,8 +1556,9 @@ class AppLocalizationsEt extends AppLocalizations {
       'Vali eksporditud seififaili sihtkoht.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Luuakse kaks faili: vault.gabbro ja vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Kirjutatakse kaks faili: $name ja $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Vali sihtkoht.';
@@ -1658,11 +1698,11 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Kirjed, mis on juba seifis olemas, jäetakse automaatselt vahele. Kuvatakse kokkuvõte.';
+      'Iga faili kirje lisatakse, ka need, mis hoidlas juba on. Parim teha üks kord, tühja hoidlasse.';
 
   @override
   String get importGabbroSubtitle =>
-      'Impordi kirjeid teisest Gabbro seifist (.gabbro fail)';
+      'Impordi kirjed teisest Gabbro hoidlast (.gabbro-fail). Sama hoidla jaoks teisest seadmest kasuta hoidlast sünkroonimist.';
 
   @override
   String get importEnpassSubtitle =>
@@ -2059,52 +2099,58 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Loo seif: sisesta nimi, pääslause ja kaitse soovi korral YubiKey\'ga';
+      'Loo hoidla: nimi, paroolifraas, valikuline YubiKey';
 
   @override
-  String get helpCaptionEmpty => 'Puuduta +, et lisada oma esimene kirje';
+  String get helpCaptionEmpty => 'Puuduta +, et lisada kirje';
 
   @override
   String get helpCaptionDetail =>
-      'Puuduta silmaikooni parooli nägemiseks, seejärel hoia pikalt, et näha üksikasjalikku tähemärkide jaotust';
+      'Puuduta kirjet avamiseks, silma näitamiseks, hoia all üksikasjade jaoks';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Vaikimisi otsib otsinguriba ainult kirjete pealkirju';
+  String get helpCaptionTitleSearch => 'Otsi pealkirjadest';
 
   @override
   String get helpCaptionFullSearch =>
-      'Puuduta luupi, et lülituda kõigi väljade otsimisele; puuduta uuesti pealkirjaotsimisele naasmiseks';
+      'Puuduta luupi, et otsida kõigist väljadest';
 
   @override
-  String get helpCaptionFilter =>
-      'Kasuta filtreerimisnuppe, et kuvada ainult teatud tüüpi kirjeid';
+  String get helpCaptionFilter => 'Filtreeri kirjeid tüübi järgi';
 
   @override
-  String get helpCaptionFolders =>
-      'Kasuta kaustavaliku, et filtreerida kirjeid kausta järgi';
+  String get helpCaptionFolders => 'Filtreeri kirjeid kausta järgi';
 
   @override
   String get helpCaptionSelect =>
-      'Hoia kirjel pikalt, et siseneda valikurežiimi; lisa rohkem üksusi, seejärel määra kausta või kustuta. Puuduta X väljumiseks.';
+      'Hoia all valimiseks; seejärel teisalda kausta või kustuta';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Puuduta registriribal tähte, et hüpata sellele jaotisele';
+  String get helpCaptionJumpToLetter => 'Puuduta tähte sinna hüppamiseks';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Puuduta silmaikooni parooli nägemiseks, seejärel hoia pikalt, et näha üksikasjalikku tähemärkide jaotust';
+  String get helpCaptionBreakdown => 'Genereeri parool või paroolifraas';
 
   @override
   String get helpCaptionManageVaults =>
-      'Halda seife jaotises saad seife ümber nimetada või kustutada või lisada uue';
+      'Halda hoidlaid: lisa, nimeta ümber, kustuta';
 
   @override
-  String get helpCaptionUnlock => 'Sisesta oma pääslause seifi avamiseks';
+  String get helpCaptionUnlock => 'Ava paroolifraasiga';
 
   @override
-  String get helpCaptionVaultSync => 'Krüpteeritud seifi sünkroonimisprotsess';
+  String get helpCaptionVaultSync =>
+      'Sünkroonimine: siin Ekspordi, seal Sünkrooni hoidlast';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Sünkroonimise seaded: automaatne ühendamine ja vaikekaustad';
+
+  @override
+  String get helpCaptionExport => 'Ekspordi tüüp ja asukoht';
+
+  @override
+  String get helpCaptionImport => 'Impordi tüüp ja tee';
 
   @override
   String get passphraseNoWordlist =>

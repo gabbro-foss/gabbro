@@ -242,6 +242,59 @@ class AppLocalizationsFi extends AppLocalizations {
   String get securityTitle => 'Tietoturva';
 
   @override
+  String get syncSettingsTitle => 'Synkronointiasetukset';
+
+  @override
+  String get sectionAutoMerge => 'Automaattinen yhdistäminen';
+
+  @override
+  String get autoMergeTitle => 'Yhdistä automaattisesti';
+
+  @override
+  String get autoMergeDescription =>
+      'Synkronoi holvista ottaa saapuvat muutokset käyttöön automaattisesti. Missä arvot holveissa eroavat, saapuvat muutokset voittavat.';
+
+  @override
+  String get autoMergeNote =>
+      'Tiedostoa kysytään silti, jos se ei avaudu salalauseellasi.';
+
+  @override
+  String get sectionSyncFolder => 'Synkronointikansio';
+
+  @override
+  String syncFolderDescription(String name) {
+    return 'Minne toisen laitteen vienti päätyy. Synkronoi holvista avaa sieltä tiedoston $name, nimen jolla tämä holvi viedään, kysymättä.';
+  }
+
+  @override
+  String get syncFolderNotSet =>
+      'Ei asetettu: Synkronoi holvista kysyy tiedostoa joka kerta.';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return 'Synkronointikansiossa ei ole tiedostoa nimeltä $name.';
+  }
+
+  @override
+  String get rememberFolder => 'Muista';
+
+  @override
+  String get rememberFolderNote =>
+      'Seuraavalla kerralla aloitetaan tästä kansiosta.';
+
+  @override
+  String get exportFolderLabel => 'Vientikansio';
+
+  @override
+  String get importFolderLabel => 'Tuontikansio';
+
+  @override
+  String get folderNotSet => 'Ei asetettu';
+
+  @override
+  String get foldersChangedNote => 'Muutetaan kohdissa Vie ja Tuo kohteita.';
+
+  @override
   String get aboutTitle => 'Tietoja Gabbrosta';
 
   @override
@@ -249,6 +302,9 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get importTitle => 'Tuo merkintöjä';
+
+  @override
+  String get importSourceLabel => 'Lähde';
 
   @override
   String get exportTitle => 'Vie holvi';
@@ -513,9 +569,6 @@ class AppLocalizationsFi extends AppLocalizations {
   String get menuImportEntries => 'Tuo merkintöjä';
 
   @override
-  String get menuSyncFromFile => 'Synkronoi tiedostosta';
-
-  @override
   String get menuManageVaults => 'Hallinnoi holveja';
 
   @override
@@ -529,6 +582,9 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Tietoturva';
+
+  @override
+  String get menuSyncSettings => 'Synkronointiasetukset';
 
   @override
   String get menuManageFolders => 'Hallinnoi kansioita';
@@ -754,9 +810,6 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Synkronointi epäonnistui';
-
-  @override
-  String get syncFromFileTitle => 'Synkronoi tiedostosta';
 
   @override
   String get nothingToSync =>
@@ -1276,21 +1329,6 @@ class AppLocalizationsFi extends AppLocalizations {
       'Muokkaa, korjaa ja tallenna tämä merkintä tai ohita se hylätäksesi sen.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count merkintää ohitettu',
-      one: '1 merkintä ohitettu',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Nämä merkinnät ovat jo holvissasi eikä niitä korvattu:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Toinen laite poisti \'$title\'.\n\nPoistetaanko se myös täältä vai säilytetäänkö?';
   }
@@ -1516,8 +1554,9 @@ class AppLocalizationsFi extends AppLocalizations {
       'Valitse kohde viedylle holvitiedostolle.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Luodaan kaksi tiedostoa: vault.gabbro ja vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Kaksi tiedostoa kirjoitetaan: $name ja $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Valitse kohde.';
@@ -1658,11 +1697,11 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Merkinnät, jotka ovat jo holvissa, ohitetaan automaattisesti. Näet yhteenvedon.';
+      'Tiedoston jokainen kohde lisätään, myös holvissa jo olevat. Parasta tehdä kerran, tyhjään holviin.';
 
   @override
   String get importGabbroSubtitle =>
-      'Tuo merkintöjä toisesta Gabbro-holvista (.gabbro-tiedosto)';
+      'Tuo kohteet toisesta Gabbro-holvista (.gabbro-tiedosto). Tälle samalle holville toiselta laitteelta käytä Synkronoi holvista.';
 
   @override
   String get importEnpassSubtitle => 'JSON-vienti Enpassista (Työkalut → Vie)';
@@ -2061,52 +2100,58 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Luo holvi: syötä nimi, salauslause ja suojaa tarvittaessa YubiKey-avaimella';
+      'Luo holvi: nimi, salalause, valinnainen YubiKey';
 
   @override
-  String get helpCaptionEmpty => 'Kosketa + lisätäksesi ensimmäisen merkinnän';
+  String get helpCaptionEmpty => 'Lisää kohde napauttamalla +';
 
   @override
   String get helpCaptionDetail =>
-      'Kosketa silmäkuvaketta paljastaaksesi salasanan, paina sitten pitkään nähdäksesi yksityiskohtaisen merkkirakennelman';
+      'Napauta kohdetta avataksesi, silmää näyttääksesi, pidä painettuna tietoja varten';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Oletusarvoisesti hakupalkki hakee vain merkintöjen otsikkoja';
+  String get helpCaptionTitleSearch => 'Hae otsikoista';
 
   @override
   String get helpCaptionFullSearch =>
-      'Kosketa suurennuslasia vaihtaaksesi kaikkien kenttien hakuun; kosketa uudelleen palataksesi otsikkohakuun';
+      'Napauta suurennuslasia hakeaksesi kaikista kentistä';
 
   @override
-  String get helpCaptionFilter =>
-      'Käytä suodatinpainikkeita näyttääksesi vain tietyn tyyppiset merkinnät';
+  String get helpCaptionFilter => 'Suodata kohteet tyypin mukaan';
 
   @override
-  String get helpCaptionFolders =>
-      'Käytä kansionvalitsinta suodattaaksesi merkinnät kansion mukaan';
+  String get helpCaptionFolders => 'Suodata kohteet kansion mukaan';
 
   @override
   String get helpCaptionSelect =>
-      'Paina pitkään merkintää siirtyäksesi valintatilaan; lisää kohteita ja määritä kansioon tai poista. Kosketa X poistuaksesi.';
+      'Valitse pitkällä painalluksella; siirrä sitten kansioon tai poista';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Kosketa hakemistopalkissa olevaa kirjainta hypätäksesi kyseiseen osioon';
+  String get helpCaptionJumpToLetter => 'Napauta kirjainta hypätäksesi siihen';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Kosketa silmäkuvaketta paljastaaksesi salasanan, paina sitten pitkään nähdäksesi yksityiskohtaisen merkkirakennelman';
+  String get helpCaptionBreakdown => 'Luo salasana tai salalause';
 
   @override
   String get helpCaptionManageVaults =>
-      'Hallinnoi holveja -kohdassa voit nimetä tai poistaa holveja tai lisätä uuden';
+      'Hallitse holveja: lisää, nimeä uudelleen, poista';
 
   @override
-  String get helpCaptionUnlock => 'Syötä salauslause avataksesi holvin';
+  String get helpCaptionUnlock => 'Avaa salalauseella';
 
   @override
-  String get helpCaptionVaultSync => 'Salatun holvin synkronointiprosessi';
+  String get helpCaptionVaultSync =>
+      'Synkronointi: Vie täällä, Synkronoi holvista siellä';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Synkronointiasetukset: automaattinen yhdistäminen ja oletuskansiot';
+
+  @override
+  String get helpCaptionExport => 'Viennin tyyppi ja sijainti';
+
+  @override
+  String get helpCaptionImport => 'Tuonnin tyyppi ja polku';
 
   @override
   String get passphraseNoWordlist =>

@@ -242,6 +242,58 @@ class AppLocalizationsPl extends AppLocalizations {
   String get securityTitle => 'Bezpieczeństwo';
 
   @override
+  String get syncSettingsTitle => 'Ustawienia synchronizacji';
+
+  @override
+  String get sectionAutoMerge => 'Automatyczne scalanie';
+
+  @override
+  String get autoMergeTitle => 'Scal automatycznie';
+
+  @override
+  String get autoMergeDescription =>
+      'Synchronizuj z sejfu stosuje przychodzące zmiany automatycznie. Tam, gdzie wartości w obu sejfach się różnią, wygrywają zmiany przychodzące.';
+
+  @override
+  String get autoMergeNote =>
+      'O plik i tak zostaniesz zapytany, jeśli nie otworzy się twoim hasłem.';
+
+  @override
+  String get sectionSyncFolder => 'Folder synchronizacji';
+
+  @override
+  String syncFolderDescription(String name) {
+    return 'Gdzie trafia eksport z drugiego urządzenia. Synchronizuj z sejfu otwiera tam plik $name, nazwę, pod jaką ten sejf jest eksportowany, bez pytania.';
+  }
+
+  @override
+  String get syncFolderNotSet =>
+      'Nie ustawiono: Synchronizuj z sejfu pyta o plik za każdym razem.';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return 'Brak pliku o nazwie $name w folderze synchronizacji.';
+  }
+
+  @override
+  String get rememberFolder => 'Zapamiętaj';
+
+  @override
+  String get rememberFolderNote => 'Następnym razem zaczyna w tym folderze.';
+
+  @override
+  String get exportFolderLabel => 'Folder eksportu';
+
+  @override
+  String get importFolderLabel => 'Folder importu';
+
+  @override
+  String get folderNotSet => 'Nie ustawiono';
+
+  @override
+  String get foldersChangedNote => 'Zmieniany w Eksportuj i Importuj wpisy.';
+
+  @override
   String get aboutTitle => 'O Gabbro';
 
   @override
@@ -249,6 +301,9 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get importTitle => 'Importuj wpisy';
+
+  @override
+  String get importSourceLabel => 'Źródło';
 
   @override
   String get exportTitle => 'Eksportuj skarbiec';
@@ -513,9 +568,6 @@ class AppLocalizationsPl extends AppLocalizations {
   String get menuImportEntries => 'Importuj wpisy';
 
   @override
-  String get menuSyncFromFile => 'Synchronizuj z pliku';
-
-  @override
   String get menuManageVaults => 'Zarządzaj skarbcami';
 
   @override
@@ -529,6 +581,9 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Bezpieczeństwo';
+
+  @override
+  String get menuSyncSettings => 'Ustawienia synchronizacji';
 
   @override
   String get menuManageFolders => 'Zarządzaj folderami';
@@ -755,9 +810,6 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Synchronizacja nie powiodła się';
-
-  @override
-  String get syncFromFileTitle => 'Synchronizuj z pliku';
 
   @override
   String get nothingToSync =>
@@ -1281,22 +1333,6 @@ class AppLocalizationsPl extends AppLocalizations {
       'Edytuj, popraw i zapisz ten wpis, lub pomiń, aby go odrzucić.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count wpisów pominiętych',
-      few: '$count wpisy pominięte',
-      one: '1 wpis pominięty',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Te wpisy już istnieją w Twoim skarbcu i nie zostały nadpisane:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Inne urządzenie usunęło «$title».\n\nUsunąć tutaj też, czy zachować?';
   }
@@ -1523,8 +1559,9 @@ class AppLocalizationsPl extends AppLocalizations {
       'Wybierz miejsce docelowe dla eksportowanego pliku skarbca.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Zostaną utworzone dwa pliki: vault.gabbro i vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Zostaną zapisane dwa pliki: $name i $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Wybierz miejsce docelowe.';
@@ -1665,11 +1702,11 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Wpisy, które już są w Twoim skarbcu, zostaną automatycznie pominięte. Zobaczysz podsumowanie.';
+      'Każdy wpis z pliku zostanie dodany, także te już obecne w sejfie. Najlepiej raz, do pustego sejfu.';
 
   @override
   String get importGabbroSubtitle =>
-      'Importuj wpisy z innego skarbca Gabbro (plik .gabbro)';
+      'Importuj wpisy z innego sejfu Gabbro (plik .gabbro). Dla tego samego sejfu z innego urządzenia użyj Synchronizuj z sejfu.';
 
   @override
   String get importEnpassSubtitle =>
@@ -2069,54 +2106,59 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Utwórz skarbiec: wprowadź nazwę, hasło główne i opcjonalnie chroń kluczem YubiKey';
+      'Utwórz skarbiec: nazwa, hasło, opcjonalnie YubiKey';
 
   @override
-  String get helpCaptionEmpty => 'Dotknij +, aby dodać pierwszy wpis';
+  String get helpCaptionEmpty => 'Dotknij +, aby dodać wpis';
 
   @override
   String get helpCaptionDetail =>
-      'Dotknij ikony oka, aby wyświetlić hasło, następnie naciśnij i przytrzymaj, aby zobaczyć szczegółową analizę znaków';
+      'Dotknij wpisu, aby otworzyć, oka, aby odsłonić, przytrzymaj, aby zobaczyć szczegóły';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Domyślnie pasek wyszukiwania przeszukuje tylko tytuły wpisów';
+  String get helpCaptionTitleSearch => 'Szukaj w tytułach';
 
   @override
   String get helpCaptionFullSearch =>
-      'Dotknij lupy, aby przełączyć na wyszukiwanie we wszystkich polach; dotknij ponownie, aby wrócić do wyszukiwania po tytule';
+      'Dotknij lupy, aby szukać we wszystkich polach';
 
   @override
-  String get helpCaptionFilter =>
-      'Użyj przycisków filtrowania, aby wyświetlać tylko wpisy określonego typu';
+  String get helpCaptionFilter => 'Filtruj wpisy według typu';
 
   @override
-  String get helpCaptionFolders =>
-      'Użyj selektora folderu, aby filtrować wpisy według folderu';
+  String get helpCaptionFolders => 'Filtruj wpisy według folderu';
 
   @override
   String get helpCaptionSelect =>
-      'Naciśnij i przytrzymaj wpis, aby wejść w tryb zaznaczania; dodaj więcej elementów, następnie przypisz do folderu lub usuń. Dotknij X, aby wyjść.';
+      'Przytrzymaj, aby zaznaczyć; potem przenieś do folderu lub usuń';
 
   @override
   String get helpCaptionJumpToLetter =>
-      'Dotknij litery na pasku indeksu, aby przeskoczyć do tej sekcji';
+      'Dotknij litery, aby do niej przeskoczyć';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Dotknij ikony oka, aby wyświetlić hasło, następnie naciśnij i przytrzymaj, aby zobaczyć szczegółową analizę znaków';
+  String get helpCaptionBreakdown => 'Wygeneruj hasło lub frazę';
 
   @override
   String get helpCaptionManageVaults =>
-      'W «Zarządzaj skarbcami» możesz zmienić nazwę lub usunąć skarbce, a także dodać nowy';
+      'Zarządzaj skarbcami: dodaj, zmień nazwę, usuń';
 
   @override
-  String get helpCaptionUnlock =>
-      'Wprowadź hasło główne, aby odblokować skarbiec';
+  String get helpCaptionUnlock => 'Odblokuj hasłem';
 
   @override
   String get helpCaptionVaultSync =>
-      'Zaszyfrowany proces synchronizacji skarbca';
+      'Synchronizacja: tu Eksportuj, tam Synchronizuj ze skarbca';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Ustawienia synchronizacji: automatyczne scalanie i foldery domyślne';
+
+  @override
+  String get helpCaptionExport => 'Typ i miejsce eksportu';
+
+  @override
+  String get helpCaptionImport => 'Typ i ścieżka importu';
 
   @override
   String get passphraseNoWordlist =>

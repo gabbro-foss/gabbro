@@ -243,6 +243,60 @@ class AppLocalizationsDe extends AppLocalizations {
   String get securityTitle => 'Sicherheit';
 
   @override
+  String get syncSettingsTitle => 'Sync-Einstellungen';
+
+  @override
+  String get sectionAutoMerge => 'Automatisches Zusammenführen';
+
+  @override
+  String get autoMergeTitle => 'Automatisch zusammenführen';
+
+  @override
+  String get autoMergeDescription =>
+      'Aus Tresor synchronisieren übernimmt eingehende Änderungen automatisch. Wo sich Werte in beiden Tresoren unterscheiden, gewinnen die eingehenden Änderungen.';
+
+  @override
+  String get autoMergeNote =>
+      'Öffnet sich die Datei nicht mit Ihrer Passphrase, wird trotzdem danach gefragt.';
+
+  @override
+  String get sectionSyncFolder => 'Sync-Ordner';
+
+  @override
+  String syncFolderDescription(String name) {
+    return 'Wohin der Export des anderen Geräts gelangt. Aus Tresor synchronisieren öffnet dort die Datei $name, den Namen, unter dem dieser Tresor exportiert wird, ohne nachzufragen.';
+  }
+
+  @override
+  String get syncFolderNotSet =>
+      'Nicht gesetzt: Aus Tresor synchronisieren fragt jedes Mal nach der Datei.';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return 'Keine Datei namens $name im Sync-Ordner.';
+  }
+
+  @override
+  String get rememberFolder => 'Merken';
+
+  @override
+  String get rememberFolderNote =>
+      'Beim nächsten Mal wird in diesem Ordner begonnen.';
+
+  @override
+  String get exportFolderLabel => 'Exportordner';
+
+  @override
+  String get importFolderLabel => 'Importordner';
+
+  @override
+  String get folderNotSet => 'Nicht festgelegt';
+
+  @override
+  String get foldersChangedNote =>
+      'Wird unter Export und Einträge importieren geändert.';
+
+  @override
   String get aboutTitle => 'Über Gabbro';
 
   @override
@@ -250,6 +304,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get importTitle => 'Einträge importieren';
+
+  @override
+  String get importSourceLabel => 'Quelle';
 
   @override
   String get exportTitle => 'Tresor exportieren';
@@ -513,9 +570,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get menuImportEntries => 'Einträge importieren';
 
   @override
-  String get menuSyncFromFile => 'Aus Datei synchronisieren';
-
-  @override
   String get menuManageVaults => 'Tresore verwalten';
 
   @override
@@ -529,6 +583,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Sicherheit';
+
+  @override
+  String get menuSyncSettings => 'Sync-Einstellungen';
 
   @override
   String get menuManageFolders => 'Ordner verwalten';
@@ -754,9 +811,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Synchronisierung fehlgeschlagen';
-
-  @override
-  String get syncFromFileTitle => 'Aus Datei synchronisieren';
 
   @override
   String get nothingToSync =>
@@ -1281,21 +1335,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Bearbeiten, um diesen Eintrag zu korrigieren und zu speichern, oder überspringen, um ihn zu verwerfen.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count Einträge übersprungen',
-      one: '1 Eintrag übersprungen',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Diese Einträge existieren bereits im Tresor und wurden nicht überschrieben:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Das andere Gerät hat «$title» gelöscht.\n\nHier auch löschen oder behalten?';
   }
@@ -1521,8 +1560,9 @@ class AppLocalizationsDe extends AppLocalizations {
       'Ziel für die exportierte Tresordatei wählen.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Zwei Dateien werden erstellt: vault.gabbro und vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Zwei Dateien werden geschrieben: $name und $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Ziel auswählen.';
@@ -1664,11 +1704,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Einträge, die bereits im Tresor vorhanden sind, werden automatisch übersprungen. Eine Zusammenfassung wird angezeigt.';
+      'Jeder Eintrag der Datei wird hinzugefügt, auch bereits vorhandene. Am besten einmalig in einen leeren Tresor.';
 
   @override
   String get importGabbroSubtitle =>
-      'Einträge aus einem anderen Gabbro-Tresor importieren (.gabbro-Datei)';
+      'Einträge aus einem anderen Gabbro-Tresor importieren (.gabbro-Datei). Für diesen Tresor von einem anderen Gerät stattdessen „Aus Tresor synchronisieren“ verwenden.';
 
   @override
   String get importEnpassSubtitle =>
@@ -2073,55 +2113,59 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Tresor erstellen: Name und Passphrase eingeben, optional mit YubiKey schützen';
+      'Tresor anlegen: Name, Passphrase, optional YubiKey';
 
   @override
-  String get helpCaptionEmpty =>
-      'Tippe auf +, um deinen ersten Eintrag hinzuzufügen';
+  String get helpCaptionEmpty => 'Mit + einen Eintrag hinzufügen';
 
   @override
   String get helpCaptionDetail =>
-      'Tippe auf das Augensymbol, um ein Passwort anzuzeigen, dann lange drücken für eine detaillierte Zeichenaufschlüsselung';
+      'Eintrag antippen zum Öffnen, Auge zeigt an, lange drücken für Details';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Standardmäßig durchsucht die Suchleiste nur die Titel der Einträge';
+  String get helpCaptionTitleSearch => 'Titel durchsuchen';
 
   @override
   String get helpCaptionFullSearch =>
-      'Tippe auf die Lupe, um alle Felder zu durchsuchen; erneut tippen für Nur-Titel-Suche';
+      'Lupe antippen, um alle Felder zu durchsuchen';
 
   @override
-  String get helpCaptionFilter =>
-      'Verwende die Filterchips, um nur Einträge eines bestimmten Typs anzuzeigen';
+  String get helpCaptionFilter => 'Einträge nach Typ filtern';
 
   @override
-  String get helpCaptionFolders =>
-      'Verwende die Ordnerauswahl, um Einträge nach Ordner zu filtern';
+  String get helpCaptionFolders => 'Einträge nach Ordner filtern';
 
   @override
   String get helpCaptionSelect =>
-      'Lang auf einen Eintrag tippen, um den Auswahlmodus zu starten; weitere hinzufügen, dann in Ordner verschieben oder löschen. Auf X tippen zum Beenden.';
+      'Lange drücken zum Auswählen; dann in Ordner verschieben oder löschen';
 
   @override
   String get helpCaptionJumpToLetter =>
-      'Tippe auf einen Buchstaben in der Indexleiste, um zu diesem Abschnitt zu springen';
+      'Buchstaben antippen, um dorthin zu springen';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Tippe auf das Augensymbol, um ein Passwort anzuzeigen, dann lange drücken für eine detaillierte Zeichenaufschlüsselung';
+  String get helpCaptionBreakdown => 'Passwort oder Passphrase erzeugen';
 
   @override
   String get helpCaptionManageVaults =>
-      'Unter Tresore verwalten kannst du Tresore umbenennen, löschen oder neue hinzufügen';
+      'Tresore verwalten: hinzufügen, umbenennen, löschen';
 
   @override
-  String get helpCaptionUnlock =>
-      'Gib deine Passphrase ein, um deinen Tresor zu entsperren';
+  String get helpCaptionUnlock => 'Mit Passphrase entsperren';
 
   @override
   String get helpCaptionVaultSync =>
-      'Synchronisierungsprozess für verschlüsselten Tresor';
+      'Sync: hier Exportieren, dort Aus Tresor synchronisieren';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Sync-Einstellungen: automatisch zusammenführen und Standardordner';
+
+  @override
+  String get helpCaptionExport => 'Exporttyp und Speicherort';
+
+  @override
+  String get helpCaptionImport => 'Importtyp und Pfad';
 
   @override
   String get passphraseNoWordlist =>

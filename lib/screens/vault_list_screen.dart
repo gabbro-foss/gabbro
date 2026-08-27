@@ -25,6 +25,8 @@ import 'package:gabbro/screens/export_screen.dart';
 import 'package:gabbro/screens/appearance_screen.dart';
 import 'package:gabbro/screens/language_screen.dart';
 import 'package:gabbro/screens/security_screen.dart';
+import 'package:gabbro/saf_tree.dart';
+import 'package:gabbro/screens/sync_settings_screen.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/screens/change_passphrase_screen.dart';
 import 'package:gabbro/screens/generator_screen.dart';
@@ -114,9 +116,26 @@ Future<void> _defaultCancelSync() => cancelSync();
 /// Run the import flow. Returns the number of entries added — 0 when every
 /// entry in the file was already in the vault, `null` when the user backed out
 /// without importing.
-Future<int?> _defaultOpenImport(BuildContext context) => Navigator.of(
-  context,
-).push<int>(MaterialPageRoute(builder: (context) => ImportScreen()));
+Future<int?> _defaultOpenImport(BuildContext context) =>
+    Navigator.of(context).push<int>(
+      MaterialPageRoute(
+        builder: (context) {
+          // Read settings at each use, never a captured copy: the remembered
+          // folder must be the one saved by the previous pick.
+          final app = GabbroApp.maybeOf(context);
+          return ImportScreen(
+            initialImportFolder: app?.settings.importFolder ?? '',
+            onSaveImportFolder: (folder) async {
+              final now = GabbroApp.maybeOf(context);
+              if (now == null) return;
+              await now.updateSettings(
+                now.settings.copyWith(importFolder: folder),
+              );
+            },
+          );
+        },
+      ),
+    );
 
 /// Apply a whole granular-sync review in one FFI call (one vault re-seal for the
 /// entire review, instead of one per decision).
@@ -146,6 +165,14 @@ Future<YubikeyHmacMatch> _defaultGetSyncYubikeyHmac(
 ) => getAnyYubikeyHmacSecret(records: records, pin: pin, transport: transport);
 Future<String?> _defaultPickSyncFile() =>
     GabbroFilePicker.pickPath(allowedExtensions: ['gabbro']);
+
+/// `<folder>/<name>` as a readable path, or null when absent. On Android the
+/// folder is a granted SAF tree, read through Kotlin into the cache.
+Future<String?> _defaultResolveSyncSource(String folder, String name) async {
+  if (Platform.isAndroid) return readSafTreeFile(folder, name);
+  final path = '$folder${Platform.pathSeparator}$name';
+  return File(path).existsSync() ? path : null;
+}
 
 const _yubikeyChannel = MethodChannel('app.gabbro.gabbro/yubikey');
 const _biometricChannel = MethodChannel('app.gabbro.gabbro/biometric');
@@ -330,6 +357,16 @@ class VaultListScreen extends StatefulWidget {
   onGetSyncYubikeyHmac;
 
   final Future<String?> Function() onPickSyncFile;
+
+  /// S6: the remembered sync folder and the auto-merge policy. `null` reads
+  /// the app settings; tests inject values.
+  final String? syncFolder;
+  final bool? autoMergeSync;
+
+  /// Resolves `<folder>/<name>` to a readable path, or null when the folder
+  /// holds no such file. Linux checks the path; Android copies the file out
+  /// of the granted tree. Seam for tests.
+  final Future<String?> Function(String folder, String name) onResolveSyncSource;
   final bool isAndroid;
 
   final VaultEntryData Function(String id)? getEntryFn;
@@ -397,6 +434,9 @@ class VaultListScreen extends StatefulWidget {
     this.onDetectSyncSourceRecords = _defaultDetectSyncSourceRecords,
     this.onGetSyncYubikeyHmac = _defaultGetSyncYubikeyHmac,
     this.onPickSyncFile = _defaultPickSyncFile,
+    this.syncFolder,
+    this.autoMergeSync,
+    this.onResolveSyncSource = _defaultResolveSyncSource,
     this.getEntryFn,
     this.onDeleteEntryFn,
     this.onRefreshFn,
@@ -762,9 +802,26 @@ class _VaultListScreenState extends State<VaultListScreen>
   /// banner on its own (it reads only names), so its appearance is an event
   /// that must go through [_announce].
   void _announcePasskeyFailure() {
+    if (!mounted) return;
+    // The banner slot is derived from the notifier at build time.
+    setState(() {});
     final reason = passkeyProviderFailure.value;
-    if (reason == null || !mounted || !_passkeyHintVisible()) return;
+    if (reason == null || !_passkeyHintVisible()) return;
     _announce(PasskeyHintBanner.message(AppLocalizations.of(context), reason));
+  }
+
+  /// The passkey-failure banner for the Scaffold's bottom slot, or null.
+  Widget? _passkeyBanner() {
+    final reason = passkeyProviderFailure.value;
+    if (reason == null || !_passkeyHintVisible()) return null;
+    return PasskeyHintBanner(
+      reason: reason,
+      onDismiss: () => setState(() => _passkeyHintSessionDismissed = true),
+      onDismissForever: () {
+        setState(() => _passkeyHintSessionDismissed = true);
+        _dismissPasskeyHintForever();
+      },
+    );
   }
 
   void _dismissPasskeyHintForever() {
@@ -1086,9 +1143,9 @@ class _VaultListScreenState extends State<VaultListScreen>
           vaultAlias: widget.vaultAlias,
           isKeyProtected: _isYubikeyVault,
           // Remember the Android SAF export folder across runs (ADR-013).
-          initialExportFolderUri: appState.settings.androidExportFolderUri,
-          onSaveExportFolderUri: (uri) => appState.updateSettings(
-            appState.settings.copyWith(androidExportFolderUri: uri),
+          initialExportFolder: appState.settings.exportFolder,
+          onSaveExportFolder: (uri) => appState.updateSettings(
+            appState.settings.copyWith(exportFolder: uri),
           ),
         ),
       ),
@@ -1218,12 +1275,36 @@ class _VaultListScreenState extends State<VaultListScreen>
   );
 
   Future<void> _syncFromFile() async {
+    // S6: a remembered folder replaces the picker. The source is the file in
+    // that folder carrying this vault's own name; a missing one is an error,
+    // never a fall-through to the picker (same vault = same name).
+    final settings = GabbroApp.maybeOf(context)?.settings;
+    final syncFolder = widget.syncFolder ?? settings?.syncFolder ?? '';
+    final autoMerge = widget.autoMergeSync ?? settings?.autoMergeSync ?? false;
     final String? picked;
-    try {
-      picked = await runPicker(widget.onPickSyncFile);
-    } on FilePickerUnavailable {
-      if (mounted) showPickerUnavailable(context, hasManualEntry: false);
-      return;
+    if (syncFolder.isNotEmpty) {
+      // The other device's export name, never the on-disk name
+      // (`<alias>_gabbro.gabbro`), which sync must never collide with.
+      final name = exportVaultFileName(_currentAlias(context));
+      picked = await widget.onResolveSyncSource(syncFolder, name);
+      if (!mounted) return;
+      if (picked == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context).syncFolderFileMissing(name),
+            ),
+          ),
+        );
+        return;
+      }
+    } else {
+      try {
+        picked = await runPicker(widget.onPickSyncFile);
+      } on FilePickerUnavailable {
+        if (mounted) showPickerUnavailable(context, hasManualEntry: false);
+        return;
+      }
     }
     if (picked == null || !mounted) return;
     // Bound here (not the try-assigned local) so it promotes to non-null inside
@@ -1255,12 +1336,16 @@ class _VaultListScreenState extends State<VaultListScreen>
     }
 
     // Choose how to apply: automatically (incoming wins, no prompts) or a
-    // granular one-by-one review.
-    final fast = await showGabbroDialog<bool>(
-      context: context,
-      builder: (_) =>
-          SyncMethodDialog(showsPassphraseWarning: !isKeyProtected),
-    );
+    // granular one-by-one review. The auto-merge setting (S7) makes that
+    // choice standing, so the chooser is skipped; its same-passphrase warning
+    // then lives on the Sync settings screen.
+    final bool? fast = autoMerge
+        ? true
+        : await showGabbroDialog<bool>(
+            context: context,
+            builder: (_) =>
+                SyncMethodDialog(showsPassphraseWarning: !isKeyProtected),
+          );
     if (fast == null || !mounted) return;
 
     setState(() => _isSyncing = true);
@@ -1625,6 +1710,17 @@ class _VaultListScreenState extends State<VaultListScreen>
         Navigator.of(
           context,
         ).push(MaterialPageRoute(builder: (context) => const LanguageScreen()));
+      case 'sync_settings':
+        final syncAppState = GabbroApp.of(context);
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => SyncSettingsScreen(
+              settings: syncAppState.settings,
+              onUpdate: (updated) => syncAppState.updateSettings(updated),
+              vaultAlias: _currentAlias(context),
+            ),
+          ),
+        );
       case 'security':
         final appState = GabbroApp.of(context);
         Navigator.of(context).push(
@@ -1962,23 +2058,11 @@ class _VaultListScreenState extends State<VaultListScreen>
       // list rather than shrink the body (which overflowed the header). The
       // search field stays visible above the keyboard.
       resizeToAvoidBottomInset: false,
-      bottomNavigationBar: ValueListenableBuilder<PasskeyFailureReason?>(
-        valueListenable: passkeyProviderFailure,
-        builder: (context, reason, _) {
-          if (reason == null || !_passkeyHintVisible()) {
-            return const SizedBox.shrink();
-          }
-          return PasskeyHintBanner(
-            reason: reason,
-            onDismiss: () =>
-                setState(() => _passkeyHintSessionDismissed = true),
-            onDismissForever: () {
-              setState(() => _passkeyHintSessionDismissed = true);
-              _dismissPasskeyHintForever();
-            },
-          );
-        },
-      ),
+      // Null when hidden, never an empty box: a Scaffold strips the system
+      // bar inset from its body and snackbar whenever this slot is filled, so
+      // an empty box here put the list and the sync snackbar under Android's
+      // nav bar (edge-to-edge, 2026-08-25). The notifier listener rebuilds.
+      bottomNavigationBar: _passkeyBanner(),
       appBar: AppBar(
         title: Text(
           _isSelecting
@@ -2048,7 +2132,17 @@ class _VaultListScreenState extends State<VaultListScreen>
                       children: [
                         Icon(Icons.sync, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
-                        Expanded(child: Text(ml.menuSyncFromFile)),
+                        Expanded(child: Text(ml.syncFromVault)),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'sync_settings',
+                    child: Row(
+                      children: [
+                        Icon(Icons.sync_alt, size: scaledIconSize(context, 20)),
+                        const SizedBox(width: 12),
+                        Expanded(child: Text(ml.menuSyncSettings)),
                       ],
                     ),
                   ),
@@ -2254,7 +2348,10 @@ class _VaultListScreenState extends State<VaultListScreen>
                 semanticLabel: l.newEntryTitle,
               ),
             ),
-      body: LayoutBuilder(
+      // SafeArea outside the LayoutBuilder so the tablet two-pane branch gets
+      // the system-bar insets too (it pads with fixed EdgeInsets itself).
+      body: SafeArea(
+        child: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth >= 600) {
             return TabletVaultLayout(
@@ -2621,12 +2718,13 @@ class _VaultListScreenState extends State<VaultListScreen>
           // no body-scoped Actions override (it failed on hardware, round 10).
           return body;
         },
+        ),
       ),
     );
   }
 }
 
-/// Passphrase dialog for "Sync from file".
+/// Passphrase dialog for "Sync from vault".
 ///
 /// Owns its TextEditingController so Flutter can dispose it safely during the
 /// dialog exit animation via State.dispose(), avoiding use-after-dispose errors.
@@ -2755,7 +2853,7 @@ class SyncPassphraseDialogState extends State<SyncPassphraseDialog> {
       // scrollable scrolls title + content + actions together so neither the
       // soft keyboard nor large text strands the action buttons (ADR-016).
       scrollable: true,
-      title: Text(l.syncFromFileTitle),
+      title: Text(l.syncFromVault),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,

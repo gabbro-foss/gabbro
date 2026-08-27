@@ -242,6 +242,59 @@ class AppLocalizationsKk extends AppLocalizations {
   String get securityTitle => 'Қауіпсіздік';
 
   @override
+  String get syncSettingsTitle => 'Синхрондау баптаулары';
+
+  @override
+  String get sectionAutoMerge => 'Автоматты біріктіру';
+
+  @override
+  String get autoMergeTitle => 'Автоматты біріктіру';
+
+  @override
+  String get autoMergeDescription =>
+      'Қоймадан синхрондау кіріс өзгерістерді автоматты түрде қолданады. Екі қоймадағы мәндер әртүрлі болса, кіріс өзгерістер басым.';
+
+  @override
+  String get autoMergeNote =>
+      'Файл құпия сөз тіркесіңізбен ашылмаса, ол бәрібір сұралады.';
+
+  @override
+  String get sectionSyncFolder => 'Синхрондау қалтасы';
+
+  @override
+  String syncFolderDescription(String name) {
+    return 'Басқа құрылғының экспорты түсетін орын. Қоймадан синхрондау сол жерден осы қойма экспортталатын $name файлын сұрамай ашады.';
+  }
+
+  @override
+  String get syncFolderNotSet =>
+      'Орнатылмаған: Қоймадан синхрондау файлды әр жолы сұрайды.';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return 'Синхрондау қалтасында $name атты файл жоқ.';
+  }
+
+  @override
+  String get rememberFolder => 'Есте сақтау';
+
+  @override
+  String get rememberFolderNote => 'Келесі жолы осы қалтадан басталады.';
+
+  @override
+  String get exportFolderLabel => 'Экспорт қалтасы';
+
+  @override
+  String get importFolderLabel => 'Импорт қалтасы';
+
+  @override
+  String get folderNotSet => 'Орнатылмаған';
+
+  @override
+  String get foldersChangedNote =>
+      'Экспорт және Жазбаларды импорттау бөлімінде өзгертіледі.';
+
+  @override
   String get aboutTitle => 'Gabbro туралы';
 
   @override
@@ -249,6 +302,9 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get importTitle => 'Жазбаларды импорттау';
+
+  @override
+  String get importSourceLabel => 'Дереккөз';
 
   @override
   String get exportTitle => 'Сейфті экспорттау';
@@ -511,9 +567,6 @@ class AppLocalizationsKk extends AppLocalizations {
   String get menuImportEntries => 'Жазбаларды импорттау';
 
   @override
-  String get menuSyncFromFile => 'Файлдан синхрондау';
-
-  @override
   String get menuManageVaults => 'Сейфтерді басқару';
 
   @override
@@ -527,6 +580,9 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Қауіпсіздік';
+
+  @override
+  String get menuSyncSettings => 'Синхрондау баптаулары';
 
   @override
   String get menuManageFolders => 'Қалталарды басқару';
@@ -751,9 +807,6 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Синхрондау сәтсіз болды';
-
-  @override
-  String get syncFromFileTitle => 'Файлдан синхрондау';
 
   @override
   String get nothingToSync =>
@@ -1275,20 +1328,6 @@ class AppLocalizationsKk extends AppLocalizations {
       'Бұл жазбаны өңдеп, түзетіп сақтаңыз немесе бас тарту үшін өткізіп жіберіңіз.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count жазба өткізіп жіберілді',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'Бұл жазбалар сейфте бар болғандықтан қайта жазылмады:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'Басқа құрылғы «$title» жойды.\n\nМұнда да жою керек пе, әлде сақтап қалу керек пе?';
   }
@@ -1515,8 +1554,9 @@ class AppLocalizationsKk extends AppLocalizations {
       'Экспортталған сейф файлының орнын таңдаңыз.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Екі файл жасалады: vault.gabbro және vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Екі файл жазылады: $name және $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Орнын таңдаңыз.';
@@ -1657,11 +1697,11 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Сейфте бұрыннан бар жазбалар автоматты өткізіп жіберіледі. Қорытынды көрсетіледі.';
+      'Файлдағы әрбір жазба қосылады, қоймада бар болса да. Бос қоймаға бір рет жасаған дұрыс.';
 
   @override
   String get importGabbroSubtitle =>
-      'Басқа Gabbro сейфінен жазбаларды импорттау (.gabbro файлы)';
+      'Басқа Gabbro қоймасынан жазбаларды импорттау (.gabbro файлы). Осы қойманы басқа құрылғыдан алу үшін Қоймадан синхрондауды қолданыңыз.';
 
   @override
   String get importEnpassSubtitle =>
@@ -2059,53 +2099,58 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Сейф жасау: атау мен кілт фразасын енгізіп, қалаусаңыз YubiKey арқылы қорғаңыз';
+      'Қойма жасау: атауы, құпия фраза, қалауыңызша YubiKey';
 
   @override
-  String get helpCaptionEmpty => 'Бірінші жазба қосу үшін + басыңыз';
+  String get helpCaptionEmpty => 'Жазба қосу үшін + түртіңіз';
 
   @override
   String get helpCaptionDetail =>
-      'Құпия сөзді көрсету үшін көз белгішесін басыңыз, таңбалардың толық талдауы үшін ұзақ басыңыз';
+      'Ашу үшін жазбаны, көрсету үшін көзді түртіңіз, мәліметтер үшін ұзақ басыңыз';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'Әдепкі бойынша: іздеу жолағы тек жазба тақырыптарын іздейді';
+  String get helpCaptionTitleSearch => 'Атаулардан іздеу';
 
   @override
   String get helpCaptionFullSearch =>
-      'Барлық өрістерде іздеуге ауысу үшін үлкейткішті басыңыз; тақырыпты іздеуге оралу үшін қайта басыңыз';
+      'Барлық өрістерден іздеу үшін лупаны түртіңіз';
 
   @override
-  String get helpCaptionFilter =>
-      'Белгілі бір түрдегі жазбаларды ғана көрсету үшін сүзгі түймелерін пайдаланыңыз';
+  String get helpCaptionFilter => 'Жазбаларды түрі бойынша сүзу';
 
   @override
-  String get helpCaptionFolders =>
-      'Жазбаларды қалта бойынша сүзу үшін қалта таңдауды пайдаланыңыз';
+  String get helpCaptionFolders => 'Жазбаларды қалта бойынша сүзу';
 
   @override
   String get helpCaptionSelect =>
-      'Таңдау режиміне өту үшін жазбаны ұзақ басыңыз; қосымша элементтер қосып, қалтаға тағайындаңыз немесе жойыңыз. Шығу үшін X басыңыз.';
+      'Таңдау үшін ұзақ басыңыз; содан кейін қалтаға жылжытыңыз немесе жойыңыз';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Сол бөлімге өту үшін индекс жолағындағы әріпті басыңыз';
+  String get helpCaptionJumpToLetter => 'Әріпке түртіп сонда өтіңіз';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Құпия сөзді көрсету үшін көз белгішесін басыңыз, таңбалардың толық талдауы үшін ұзақ басыңыз';
+  String get helpCaptionBreakdown => 'Құпиясөз немесе құпия фраза жасау';
 
   @override
   String get helpCaptionManageVaults =>
-      '«Сейфтерді басқарuda» сейфтерді қайта атауға, жоюға немесе жаңасын қосуға болады';
+      'Қоймаларды басқару: қосу, атын өзгерту, жою';
 
   @override
-  String get helpCaptionUnlock =>
-      'Сейфтің бекітуін ашу үшін кілт фразасын енгізіңіз';
+  String get helpCaptionUnlock => 'Құпия фразамен ашу';
 
   @override
-  String get helpCaptionVaultSync => 'Шифрланған сейфті синхрондау процесі';
+  String get helpCaptionVaultSync =>
+      'Синхрондау: мұнда Экспорт, онда Қоймадан синхрондау';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Синхрондау параметрлері: автоматты біріктіру және әдепкі қалталар';
+
+  @override
+  String get helpCaptionExport => 'Экспорт түрі мен орны';
+
+  @override
+  String get helpCaptionImport => 'Импорт түрі мен жолы';
 
   @override
   String get passphraseNoWordlist =>

@@ -29,6 +29,7 @@ import 'package:gabbro/screens/manage_vaults_screen.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/screens/recovery_history_screen.dart';
 import 'package:gabbro/screens/security_screen.dart';
+import 'package:gabbro/screens/sync_settings_screen.dart';
 import 'package:gabbro/screens/tablet_vault_layout.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
@@ -44,7 +45,6 @@ import 'package:gabbro/passkey_daemon.dart';
 import 'package:gabbro/widgets/sync_method_dialog.dart';
 import 'package:gabbro/widgets/url_link.dart';
 import 'package:gabbro/screens/import_failures_dialog.dart';
-import 'package:gabbro/screens/import_skipped_dialog.dart';
 import 'package:gabbro/widgets/path_field.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
 import 'package:gabbro/widgets/text_size_slider.dart';
@@ -168,6 +168,14 @@ final Map<String, Widget Function()> screens = {
   'security': () => SecurityScreen(
     settings: const AppSettings(),
     onUpdate: (_) {},
+    isAndroid: false,
+  ),
+  'sync_settings': () => SyncSettingsScreen(
+    settings: const AppSettings(
+      syncFolder: '/home/user/a/rather/long/folder/path/that/wraps/GabbroSync',
+    ),
+    onUpdate: (_) {},
+    onPickFolder: () async => null,
     isAndroid: false,
   ),
   'manage_folders': () => ManageFoldersScreen(
@@ -528,11 +536,6 @@ final Map<String, Future<void> Function(BuildContext)> dialogs = {
     context: ctx,
     builder: (_) => const SyncMethodDialog(),
   ),
-  'import_skipped_dialog': (ctx) => showSkippedEntriesDialog(ctx, const [
-    SkippedEntryData(
-      title: 'An entry title long enough to stress the row at max text',
-    ),
-  ]),
   'import_failures_dialog': (ctx) => showImportFailuresDialog(ctx, const [
     ImportFailureData(
       title: 'An entry title long enough to stress the row at max text',
@@ -574,6 +577,7 @@ const Map<String, String> covers = {
   'export': 'export_screen',
   'change_passphrase': 'change_passphrase_screen',
   'security': 'security_screen',
+  'sync_settings': 'sync_settings_screen',
   'manage_folders': 'manage_folders_screen',
   'manage_vaults': 'manage_vaults_screen',
   'entry_detail': 'entry_detail_screen',
@@ -592,7 +596,6 @@ const Map<String, String> covers = {
   'sync_review': 'sync_review',
   'gabbro_dialog': 'gabbro_dialog',
   'sync_method_dialog': 'sync_method_dialog',
-  'import_skipped_dialog': 'import_skipped_dialog',
   'import_failures_dialog': 'import_failures_dialog',
   'passkey_consent_dialog': 'passkey_consent_dialog',
   'passkey_hint_banner': 'passkey_hint_banner',

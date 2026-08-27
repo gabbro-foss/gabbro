@@ -241,6 +241,58 @@ class AppLocalizationsEn extends AppLocalizations {
   String get securityTitle => 'Security';
 
   @override
+  String get syncSettingsTitle => 'Sync settings';
+
+  @override
+  String get sectionAutoMerge => 'Automatic merge';
+
+  @override
+  String get autoMergeTitle => 'Merge automatically';
+
+  @override
+  String get autoMergeDescription =>
+      'Sync from vault applies incoming changes automatically. Where values in both vaults differ, incoming changes win.';
+
+  @override
+  String get autoMergeNote =>
+      'The file is still asked for if it does not open with your passphrase.';
+
+  @override
+  String get sectionSyncFolder => 'Sync folder';
+
+  @override
+  String syncFolderDescription(String name) {
+    return 'Where the other device\'s export lands. Sync from vault opens the file there called $name, the name this vault exports as, without asking for it.';
+  }
+
+  @override
+  String get syncFolderNotSet =>
+      'Not set: Sync from vault asks for the file each time.';
+
+  @override
+  String syncFolderFileMissing(String name) {
+    return 'No file named $name in the sync folder.';
+  }
+
+  @override
+  String get rememberFolder => 'Remember';
+
+  @override
+  String get rememberFolderNote => 'Next time starts in this folder.';
+
+  @override
+  String get exportFolderLabel => 'Export folder';
+
+  @override
+  String get importFolderLabel => 'Import folder';
+
+  @override
+  String get folderNotSet => 'Not set';
+
+  @override
+  String get foldersChangedNote => 'Changed on Export and Import entries.';
+
+  @override
   String get aboutTitle => 'About Gabbro';
 
   @override
@@ -248,6 +300,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get importTitle => 'Import entries';
+
+  @override
+  String get importSourceLabel => 'Source';
 
   @override
   String get exportTitle => 'Export vault';
@@ -510,9 +565,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get menuImportEntries => 'Import entries';
 
   @override
-  String get menuSyncFromFile => 'Sync from file';
-
-  @override
   String get menuManageVaults => 'Manage vaults';
 
   @override
@@ -526,6 +578,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get menuSecurity => 'Security';
+
+  @override
+  String get menuSyncSettings => 'Sync settings';
 
   @override
   String get menuManageFolders => 'Manage folders';
@@ -751,9 +806,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get syncFailedTitle => 'Sync failed';
-
-  @override
-  String get syncFromFileTitle => 'Sync from file';
 
   @override
   String get nothingToSync =>
@@ -1273,21 +1325,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Edit to correct and save this entry, or skip to discard it.';
 
   @override
-  String entriesSkipped(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count entries skipped',
-      one: '1 entry skipped',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get skippedEntriesNote =>
-      'These entries already exist in your vault and were not overwritten:';
-
-  @override
   String syncDeleteEntryContent(String title) {
     return 'The other device deleted \'$title\'.\n\nDelete it here too, or keep it?';
   }
@@ -1510,8 +1547,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Choose a destination for your exported vault file.';
 
   @override
-  String get exportTwoFilesNote =>
-      'Two files will be written: vault.gabbro and vault.gabbro.sha256';
+  String exportTwoFilesNote(String name) {
+    return 'Two files will be written: $name and $name.sha256';
+  }
 
   @override
   String get exportSelectDestination => 'Select a destination.';
@@ -1651,11 +1689,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get importDuplicateWarning =>
-      'Entries your vault already holds will be skipped automatically. You will be shown a summary.';
+      'Every entry in the file is added, even ones your vault already holds. Best done once, into an empty vault.';
 
   @override
   String get importGabbroSubtitle =>
-      'Import entries from another Gabbro vault (.gabbro file)';
+      'Import entries from a different Gabbro vault (.gabbro file). For this same vault from another device, use Sync from vault instead.';
 
   @override
   String get importEnpassSubtitle => 'JSON export from Enpass (Tools → Export)';
@@ -2046,52 +2084,55 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get helpCaptionCreate =>
-      'Create a vault: enter a name, passphrase, and optionally protect it with a YubiKey';
+      'Create vault, name, passphrase, optional YubiKey';
 
   @override
-  String get helpCaptionEmpty => 'Tap + to add your first entry';
+  String get helpCaptionEmpty => 'Tap + to add an entry';
 
   @override
   String get helpCaptionDetail =>
-      'Tap the eye icon to reveal a password, then long-press it to view a detailed character breakdown';
+      'Tap entry to open, eye to reveal, long-press for details';
 
   @override
-  String get helpCaptionTitleSearch =>
-      'By default, the search bar searches entry titles only';
+  String get helpCaptionTitleSearch => 'Search titles';
 
   @override
-  String get helpCaptionFullSearch =>
-      'Tap the magnifying glass to switch to full-field search; tap again to return to title-only';
+  String get helpCaptionFullSearch => 'Tap magnifier to search all fields';
 
   @override
-  String get helpCaptionFilter =>
-      'Use the filter chips to show only entries of a specific type';
+  String get helpCaptionFilter => 'Filter entries by type';
 
   @override
-  String get helpCaptionFolders =>
-      'Use the folder picker to filter entries by folder';
+  String get helpCaptionFolders => 'Filter entries by folder';
 
   @override
   String get helpCaptionSelect =>
-      'Long-tap an entry to enter select mode; add more items, then assign to a folder or delete. Tap X to exit.';
+      'Long-press to select; then move to a folder or delete';
 
   @override
-  String get helpCaptionJumpToLetter =>
-      'Tap a letter on the index bar to jump to that section';
+  String get helpCaptionJumpToLetter => 'Tap a letter to jump there';
 
   @override
-  String get helpCaptionBreakdown =>
-      'Tap the eye icon to reveal a password, then long-press it to view a detailed character breakdown';
+  String get helpCaptionBreakdown => 'Generate a password or a passphrase';
 
   @override
-  String get helpCaptionManageVaults =>
-      'In Manage vaults, rename or delete vaults, or add a new one';
+  String get helpCaptionManageVaults => 'Manage vaults: add, rename, delete';
 
   @override
-  String get helpCaptionUnlock => 'Enter your passphrase to unlock your vault';
+  String get helpCaptionUnlock => 'Unlock with passphrase';
 
   @override
-  String get helpCaptionVaultSync => 'Encrypted vault sync process';
+  String get helpCaptionVaultSync => 'Sync: Export here, Sync from vault there';
+
+  @override
+  String get helpCaptionSyncSettings =>
+      'Sync settings: auto-merge and default folders';
+
+  @override
+  String get helpCaptionExport => 'Export type and location';
+
+  @override
+  String get helpCaptionImport => 'Import type and path';
 
   @override
   String get passphraseNoWordlist =>

@@ -24,10 +24,10 @@ test `rust/src/vault/session.rs::sync_test_corpus_converges_without_loss`.
 
 ## Walk 1 — granular review
 
-1. **Sync B:** Menu → **Sync from file** → `sync_test_B.gabbro` → **Review all
+1. **Sync B:** Menu → **Sync from vault** → `sync_test_B.gabbro` → **Review all
    changes**. On every screen leave the default and tap **Continue**; the first
    screen (**New on B**) leave as **Keep**. Tap **OK**.
-2. **Sync C:** Menu → **Sync from file** → `sync_test_C.gabbro` → **Review all
+2. **Sync C:** Menu → **Sync from vault** → `sync_test_C.gabbro` → **Review all
    changes**. Match each screen by its **title** and do what the table says, then
    **Continue**. Tap **OK** at the end. (Rows default to **Use other vault**.)
 
@@ -63,7 +63,7 @@ GABBRO_WALK_JSON=/tmp/sync_walk.json cargo test --release --lib check_sync_walk_
 ## Walk 2 — fast auto-merge
 
 From the shared start:
-1. **Sync B:** Menu → **Sync from file** → `sync_test_B.gabbro` → **Merge
+1. **Sync B:** Menu → **Sync from vault** → `sync_test_B.gabbro` → **Merge
    automatically** (no review).
 2. **Sync C:** `sync_test_C.gabbro` → **Merge automatically**.
 3. Export to **JSON**, save as `/tmp/fast_sync_walk.json`.
@@ -93,12 +93,12 @@ These behaviours are proven by automated Rust tests in the release gate. Run the
 for extra on-device confidence.
 
 - **Cancel = nothing changes** (`cancel_sync_rolls_back_to_pre_sync_state`). Shared
-  start → **Sync from file** → `sync_test_B.gabbro` → **Review all changes** →
+  start → **Sync from vault** → `sync_test_B.gabbro` → **Review all changes** →
   **Cancel** → **Cancel sync**. Expect a **Sync cancelled** snackbar and no change
   (**New on B** absent; **Email** still shows `p0`).
 
 - **"Merge the rest" mid-review** (`fast_merge_walk...`). Like Walk 2 but reach the
-  fast path from inside the review: for B and C, **Sync from file** → **Review all
+  fast path from inside the review: for B and C, **Sync from vault** → **Review all
   changes** → **Cancel** → **Merge automatically**. Export to `/tmp/fast_sync_walk.json`
   and run Walk 2's command — expect the **same** green result.
 
@@ -106,7 +106,7 @@ for extra on-device confidence.
   per-field times until it is first edited, so a freshly created one is the shape most
   likely to be synced un-edited. On device A: new vault, add one Login **`Fresh Entry`**,
   do **not** edit it, export. On device B: new vault with one Login **`Local Only`** →
-  **Sync from file** → A's export → **Review all changes** → keep **Fresh Entry**.
+  **Sync from vault** → A's export → **Review all changes** → keep **Fresh Entry**.
   Expect both entries present, nothing lost.
 
   (Was "Cross-version source", syncing from `migration_vaults/v8.gabbro`. RT-3 raised the

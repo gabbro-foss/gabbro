@@ -601,6 +601,96 @@ abstract class AppLocalizations {
   /// **'Security'**
   String get securityTitle;
 
+  /// No description provided for @syncSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync settings'**
+  String get syncSettingsTitle;
+
+  /// No description provided for @sectionAutoMerge.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic merge'**
+  String get sectionAutoMerge;
+
+  /// Label of the auto-merge switch on the Sync settings screen. Same wording as the chooser button it replaces.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge automatically'**
+  String get autoMergeTitle;
+
+  /// No description provided for @autoMergeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync from vault applies incoming changes automatically. Where values in both vaults differ, incoming changes win.'**
+  String get autoMergeDescription;
+
+  /// No description provided for @autoMergeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The file is still asked for if it does not open with your passphrase.'**
+  String get autoMergeNote;
+
+  /// No description provided for @sectionSyncFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync folder'**
+  String get sectionSyncFolder;
+
+  /// No description provided for @syncFolderDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Where the other device\'s export lands. Sync from vault opens the file there called {name}, the name this vault exports as, without asking for it.'**
+  String syncFolderDescription(String name);
+
+  /// No description provided for @syncFolderNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set: Sync from vault asks for the file each time.'**
+  String get syncFolderNotSet;
+
+  /// Sync from vault with a remembered folder: the folder holds no file of this vault's name. The user exports from the other device first, or checks the folder.
+  ///
+  /// In en, this message translates to:
+  /// **'No file named {name} in the sync folder.'**
+  String syncFolderFileMissing(String name);
+
+  /// Checkbox next to a chosen folder: keep it for next time.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember'**
+  String get rememberFolder;
+
+  /// No description provided for @rememberFolderNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Next time starts in this folder.'**
+  String get rememberFolderNote;
+
+  /// No description provided for @exportFolderLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Export folder'**
+  String get exportFolderLabel;
+
+  /// No description provided for @importFolderLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Import folder'**
+  String get importFolderLabel;
+
+  /// No description provided for @folderNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get folderNotSet;
+
+  /// No description provided for @foldersChangedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Changed on Export and Import entries.'**
+  String get foldersChangedNote;
+
   /// No description provided for @aboutTitle.
   ///
   /// In en, this message translates to:
@@ -618,6 +708,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Import entries'**
   String get importTitle;
+
+  /// No description provided for @importSourceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Source'**
+  String get importSourceLabel;
 
   /// No description provided for @exportTitle.
   ///
@@ -1123,12 +1219,6 @@ abstract class AppLocalizations {
   /// **'Import entries'**
   String get menuImportEntries;
 
-  /// No description provided for @menuSyncFromFile.
-  ///
-  /// In en, this message translates to:
-  /// **'Sync from file'**
-  String get menuSyncFromFile;
-
   /// No description provided for @menuManageVaults.
   ///
   /// In en, this message translates to:
@@ -1158,6 +1248,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Security'**
   String get menuSecurity;
+
+  /// No description provided for @menuSyncSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync settings'**
+  String get menuSyncSettings;
 
   /// No description provided for @menuManageFolders.
   ///
@@ -1572,12 +1668,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sync failed'**
   String get syncFailedTitle;
-
-  /// No description provided for @syncFromFileTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Sync from file'**
-  String get syncFromFileTitle;
 
   /// No description provided for @nothingToSync.
   ///
@@ -2467,18 +2557,6 @@ abstract class AppLocalizations {
   /// **'Edit to correct and save this entry, or skip to discard it.'**
   String get importIssueHelp;
 
-  /// No description provided for @entriesSkipped.
-  ///
-  /// In en, this message translates to:
-  /// **'{count, plural, one{1 entry skipped} other{{count} entries skipped}}'**
-  String entriesSkipped(int count);
-
-  /// No description provided for @skippedEntriesNote.
-  ///
-  /// In en, this message translates to:
-  /// **'These entries already exist in your vault and were not overwritten:'**
-  String get skippedEntriesNote;
-
   /// No description provided for @syncDeleteEntryContent.
   ///
   /// In en, this message translates to:
@@ -2884,8 +2962,8 @@ abstract class AppLocalizations {
   /// No description provided for @exportTwoFilesNote.
   ///
   /// In en, this message translates to:
-  /// **'Two files will be written: vault.gabbro and vault.gabbro.sha256'**
-  String get exportTwoFilesNote;
+  /// **'Two files will be written: {name} and {name}.sha256'**
+  String exportTwoFilesNote(String name);
 
   /// No description provided for @exportSelectDestination.
   ///
@@ -3130,13 +3208,13 @@ abstract class AppLocalizations {
   /// No description provided for @importDuplicateWarning.
   ///
   /// In en, this message translates to:
-  /// **'Entries your vault already holds will be skipped automatically. You will be shown a summary.'**
+  /// **'Every entry in the file is added, even ones your vault already holds. Best done once, into an empty vault.'**
   String get importDuplicateWarning;
 
   /// No description provided for @importGabbroSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Import entries from another Gabbro vault (.gabbro file)'**
+  /// **'Import entries from a different Gabbro vault (.gabbro file). For this same vault from another device, use Sync from vault instead.'**
   String get importGabbroSubtitle;
 
   /// No description provided for @importEnpassSubtitle.
@@ -3814,80 +3892,98 @@ abstract class AppLocalizations {
   /// No description provided for @helpCaptionCreate.
   ///
   /// In en, this message translates to:
-  /// **'Create a vault: enter a name, passphrase, and optionally protect it with a YubiKey'**
+  /// **'Create vault, name, passphrase, optional YubiKey'**
   String get helpCaptionCreate;
 
   /// No description provided for @helpCaptionEmpty.
   ///
   /// In en, this message translates to:
-  /// **'Tap + to add your first entry'**
+  /// **'Tap + to add an entry'**
   String get helpCaptionEmpty;
 
   /// No description provided for @helpCaptionDetail.
   ///
   /// In en, this message translates to:
-  /// **'Tap the eye icon to reveal a password, then long-press it to view a detailed character breakdown'**
+  /// **'Tap entry to open, eye to reveal, long-press for details'**
   String get helpCaptionDetail;
 
   /// No description provided for @helpCaptionTitleSearch.
   ///
   /// In en, this message translates to:
-  /// **'By default, the search bar searches entry titles only'**
+  /// **'Search titles'**
   String get helpCaptionTitleSearch;
 
   /// No description provided for @helpCaptionFullSearch.
   ///
   /// In en, this message translates to:
-  /// **'Tap the magnifying glass to switch to full-field search; tap again to return to title-only'**
+  /// **'Tap magnifier to search all fields'**
   String get helpCaptionFullSearch;
 
   /// No description provided for @helpCaptionFilter.
   ///
   /// In en, this message translates to:
-  /// **'Use the filter chips to show only entries of a specific type'**
+  /// **'Filter entries by type'**
   String get helpCaptionFilter;
 
   /// No description provided for @helpCaptionFolders.
   ///
   /// In en, this message translates to:
-  /// **'Use the folder picker to filter entries by folder'**
+  /// **'Filter entries by folder'**
   String get helpCaptionFolders;
 
   /// No description provided for @helpCaptionSelect.
   ///
   /// In en, this message translates to:
-  /// **'Long-tap an entry to enter select mode; add more items, then assign to a folder or delete. Tap X to exit.'**
+  /// **'Long-press to select; then move to a folder or delete'**
   String get helpCaptionSelect;
 
   /// No description provided for @helpCaptionJumpToLetter.
   ///
   /// In en, this message translates to:
-  /// **'Tap a letter on the index bar to jump to that section'**
+  /// **'Tap a letter to jump there'**
   String get helpCaptionJumpToLetter;
 
   /// No description provided for @helpCaptionBreakdown.
   ///
   /// In en, this message translates to:
-  /// **'Tap the eye icon to reveal a password, then long-press it to view a detailed character breakdown'**
+  /// **'Generate a password or a passphrase'**
   String get helpCaptionBreakdown;
 
   /// No description provided for @helpCaptionManageVaults.
   ///
   /// In en, this message translates to:
-  /// **'In Manage vaults, rename or delete vaults, or add a new one'**
+  /// **'Manage vaults: add, rename, delete'**
   String get helpCaptionManageVaults;
 
   /// No description provided for @helpCaptionUnlock.
   ///
   /// In en, this message translates to:
-  /// **'Enter your passphrase to unlock your vault'**
+  /// **'Unlock with passphrase'**
   String get helpCaptionUnlock;
 
   /// No description provided for @helpCaptionVaultSync.
   ///
   /// In en, this message translates to:
-  /// **'Encrypted vault sync process'**
+  /// **'Sync: Export here, Sync from vault there'**
   String get helpCaptionVaultSync;
+
+  /// No description provided for @helpCaptionSyncSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync settings: auto-merge and default folders'**
+  String get helpCaptionSyncSettings;
+
+  /// No description provided for @helpCaptionExport.
+  ///
+  /// In en, this message translates to:
+  /// **'Export type and location'**
+  String get helpCaptionExport;
+
+  /// No description provided for @helpCaptionImport.
+  ///
+  /// In en, this message translates to:
+  /// **'Import type and path'**
+  String get helpCaptionImport;
 
   /// No description provided for @passphraseNoWordlist.
   ///

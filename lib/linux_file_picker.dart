@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dbus/dbus.dart';
 
 /// Native file dialogs on Linux, spoken directly to the XDG Desktop Portal
@@ -15,25 +17,44 @@ class LinuxFilePicker {
   int _tokenCounter = 0;
 
   /// Shows the open-file dialog. Returns the picked path, or null if the
-  /// user cancelled. [allowedExtensions] become a glob filter (`*.ext`).
-  Future<String?> openFile({List<String>? allowedExtensions}) =>
-      _request('OpenFile', _options(allowedExtensions));
+  /// user cancelled. [allowedExtensions] become a glob filter (`*.ext`);
+  /// [currentFolder] is where the dialog opens (a remembered folder).
+  Future<String?> openFile(
+          {List<String>? allowedExtensions, String? currentFolder}) =>
+      _request('OpenFile', _options(allowedExtensions, currentFolder));
 
-  /// Shows the save-as dialog, suggesting [fileName]. Returns the chosen
-  /// path, or null if the user cancelled.
+  /// Shows the save-as dialog, suggesting [fileName], opening in
+  /// [currentFolder] when given. Returns the chosen path, or null if the user
+  /// cancelled.
   Future<String?> saveFile(
-      {String? fileName, List<String>? allowedExtensions}) {
-    final options = _options(allowedExtensions);
+      {String? fileName,
+      List<String>? allowedExtensions,
+      String? currentFolder}) {
+    final options = _options(allowedExtensions, currentFolder);
     if (fileName != null) {
       options['current_name'] = DBusString(fileName);
     }
     return _request('SaveFile', options);
   }
 
-  Map<String, DBusValue> _options(List<String>? allowedExtensions) {
+  /// Shows the folder dialog (`OpenFile` with `directory`). Returns the
+  /// picked folder path, or null if the user cancelled.
+  Future<String?> pickDirectory() => _request('OpenFile', {
+        'multiple': const DBusBoolean(false),
+        'directory': const DBusBoolean(true),
+      });
+
+  Map<String, DBusValue> _options(
+      List<String>? allowedExtensions, String? currentFolder) {
     final options = <String, DBusValue>{
       'multiple': const DBusBoolean(false),
     };
+    // The portal takes the folder as a NUL-terminated byte string; a portal
+    // too old to know the option ignores it.
+    if (currentFolder != null && currentFolder.isNotEmpty) {
+      options['current_folder'] =
+          DBusArray.byte([...utf8.encode(currentFolder), 0]);
+    }
     if (allowedExtensions != null && allowedExtensions.isNotEmpty) {
       options['filters'] = DBusArray(DBusSignature('(sa(us))'), [
         for (final ext in allowedExtensions)
