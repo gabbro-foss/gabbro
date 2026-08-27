@@ -336,7 +336,7 @@ void main() {
   });
 
   // R4: a tooltip is not an accessible name — on Linux a screen reader reads
-  // only the name (LEARNINGS.md), so the icon carries a semanticLabel too.
+  // only the name, so the icon carries a semanticLabel too.
   testWidgets('Cancel carries a localized accessible name', (tester) async {
     final handle = tester.ensureSemantics();
     await tester.pumpWidget(_nestedUnlock(onQuit: () {}));

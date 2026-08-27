@@ -305,7 +305,7 @@ void main() {
   // ── Linux only: events have to be announced ──────────────────────────────
   // A shortcut firing or a sheet opening is an EVENT, not a place, so there is
   // no node for a reader to land on and read. Linux ignores liveRegion
-  // entirely (LEARNINGS.md), which leaves SemanticsService as the only way to
+  // entirely, which leaves SemanticsService as the only way to
   // say anything at all. Android is excluded throughout: it has deprecated
   // announcement events, and TalkBack already passes.
   //

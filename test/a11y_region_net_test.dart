@@ -203,7 +203,7 @@ void main() {
     );
     // On Linux the name carries everything: what the box IS and what it does.
     // A hint here would be dead text — the Linux embedder never reads one
-    // (round 16, LEARNINGS.md). Android's hint is pinned in section F.
+    // (round 16). Android's hint is pinned in section F.
     expect(
       data.hint,
       isEmpty,
@@ -474,7 +474,7 @@ void main() {
   // Linux embedder reads only the label. The fix moves the outcome text into
   // the label ON LINUX. TalkBack passed 4/4 with the hint, so Android must be
   // left exactly as it is — these pin that, green before the fix and after.
-  // See LEARNINGS.md, "On Linux a screen reader gets the semantics NAME".
+  // On Linux a screen reader gets the semantics NAME, not the hint.
 
   testWidgets('Android: the search box keeps its hint', (t) async {
     final handle = await pumpVaultList(t, isAndroid: true);

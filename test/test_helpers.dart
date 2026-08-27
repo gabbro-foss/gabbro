@@ -55,7 +55,7 @@ List<String> liveRegionLabels(WidgetTester t) => allSemanticsNodes(t)
     .toList();
 
 /// The hint a screen reader reads for the node [finder] resolves to. Android
-/// only: the Linux embedder never reads a node's hint (see LEARNINGS.md).
+/// only: the Linux embedder never reads a node's hint.
 String hintOf(WidgetTester t, Finder finder) =>
     t.getSemantics(finder).getSemanticsData().hint;
 
@@ -74,7 +74,7 @@ int occurrencesOf(String haystack, String needle) => needle.isEmpty
 /// beneath it — a "named container". This is what actually reaches Orca when
 /// focus lands on a control inside it: the Linux embedder reads only names, so
 /// a region is audible because it is a named ancestor, not because it is a
-/// live region (which Linux ignores entirely — see LEARNINGS.md).
+/// live region (which Linux ignores entirely).
 List<String> namedContainerLabels(WidgetTester t) => allSemanticsNodes(t)
     .where((n) => n.childrenCount > 0)
     .map((n) => n.getSemanticsData().label)

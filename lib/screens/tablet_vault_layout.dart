@@ -444,7 +444,7 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
   bool get _keyboardNav => widget.listScope != null;
 
   /// Makes a control say what it DOES. A Linux screen reader is given only a
-  /// node's NAME — the embedder never reads a semantics hint (LEARNINGS.md) —
+  /// node's NAME — the embedder never reads a semantics hint —
   /// so there the outcome goes inside the name, after the control's own name.
   /// Android does read hints and keeps its own, unchanged. `_keyboardNav` is
   /// the same Linux gate the focus frame already rides on.

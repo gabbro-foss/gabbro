@@ -2,8 +2,7 @@
 
 Status: built. Every phase, D5 (highlight gated to Linux) and the a11y layer are
 hardware-passed on branch `keyboard_accessibility_sweep` (rounds 13-31; NOT yet
-merged). Why each mechanism is what it is — and what failed on hardware first —
-is in LEARNINGS.md. Supersedes the ad-hoc Tab behaviour surfaced in round-2
+merged). Supersedes the ad-hoc Tab behaviour surfaced in round-2
 hardware testing (illogical order, no visible focus).
 
 ## Model in one sentence
@@ -149,7 +148,7 @@ never be the only cue. D5 splits this in two, because regions only exist on Linu
 2. **Focus frame** (qtile-style region border) — DONE, hardware-passed.
 3. **Region Tab-cycle + within-region arrows (both layouts) + Ctrl+N/Ctrl+M —
    DONE, hardware-passed (round 13).** Rounds 10–12 each found one defect on
-   hardware that no headless test could see; causes are in LEARNINGS.md.
+   hardware that no headless test could see.
 4. **a11y layer** — control labels/hints on both platforms; region Semantics,
    region-entry announcement and focus-frame contrast on Linux only (D5); a11y-net
    extension; Orca pass. **Net-first floor done; canon-TDD not started** — see

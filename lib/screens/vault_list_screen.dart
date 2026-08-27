@@ -553,7 +553,7 @@ class _VaultListScreenState extends State<VaultListScreen>
   /// Makes a control say what it DOES, not just what it is.
   ///
   /// A Linux screen reader is given only a node's NAME — the embedder never
-  /// reads a semantics hint at all (LEARNINGS.md), which is why Orca spoke
+  /// reads a semantics hint at all, which is why Orca spoke
   /// none of these in round 16. So on Linux the outcome goes inside the name,
   /// after the control's own name. Android does read hints and TalkBack
   /// already passes, so there the hint is left exactly as it was.
@@ -1843,7 +1843,7 @@ class _VaultListScreenState extends State<VaultListScreen>
   /// nothing at all (the "space" Orca said was its echo of the key). It
   /// therefore speaks the selection count the app bar is already showing —
   /// nothing takes focus afterwards, which is the condition an announcement
-  /// has to meet to be heard on Linux at all (LEARNINGS.md).
+  /// has to meet to be heard on Linux at all.
   void _toggleSelection(String id) {
     setState(() {
       if (_selectedIds.contains(id)) {

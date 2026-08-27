@@ -410,7 +410,7 @@ void main() {
   // labeledTapTargetGuideline above accepts a tooltip as a label, so every
   // icon-only button in the app passed it while Orca said just "button" for
   // all of them (round 22). The Linux embedder copies a node's label and
-  // ignores its tooltip entirely (LEARNINGS.md), so an icon button whose text
+  // ignores its tooltip entirely, so an icon button whose text
   // lives only in the tooltip has no name a screen reader can reach: a user
   // cannot tell Copy from Delete entry. The tooltip stays — it is what a mouse
   // user sees — the name is added beside it.

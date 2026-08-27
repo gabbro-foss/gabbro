@@ -107,8 +107,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 **Real-FFI suites run under plain `dart test`, never `flutter drive` (non-negotiable):** they test
 Dart -> FFI -> crypto -> disk, touch no UI, and so need no window. Needs the release cdylib (debug
 Argon2id blows the timeouts) and `-j 1` (the Rust session is process-global; parallel suites clobber
-each other). Under `flutter drive` they were blind (a failure exited 0) and crashed on a WM resize
-— see LEARNINGS.md.
+each other). Under `flutter drive` they were blind (a failure exited 0) and crashed on a WM resize.
 
 **Test isolation (non-negotiable):** no test may touch real settings or vault folders. All
 config/data resolves through `GabbroPaths` (`lib/app_paths.dart`); `test/flutter_test_config.dart`

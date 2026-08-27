@@ -300,8 +300,8 @@ void main() {
         'a-correct-passphrase');
     await tester.pump();
     // Creation saves the registry with real (sandboxed) file I/O, which the
-    // fake-clock test zone would never complete — see LEARNINGS "Async dart:io
-    // inside testWidgets".
+    // fake-clock test zone would never complete (async dart:io inside
+    // testWidgets).
     await tester.runAsync(() async {
       await tester.tap(find.widgetWithText(FilledButton, 'Create vault'));
       await Future.delayed(const Duration(milliseconds: 300));

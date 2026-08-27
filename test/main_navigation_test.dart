@@ -115,8 +115,8 @@ void main() {
 
     // Drive production's registration callback exactly as the screen would.
     // runAsync: the callback saves the registry with real (sandboxed) file
-    // I/O, which the fake-clock test zone would otherwise never complete —
-    // see LEARNINGS "Async dart:io inside testWidgets".
+    // I/O, which the fake-clock test zone would otherwise never complete
+    // (async dart:io inside testWidgets).
     final screen = tester.widget<AdoptVaultScreen>(find.byType(AdoptVaultScreen));
     await tester.runAsync(
       () => screen.onRegistered('/nonexistent-sandbox/adopted.gabbro', 'Adopted'),

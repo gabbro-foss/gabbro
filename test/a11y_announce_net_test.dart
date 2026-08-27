@@ -21,7 +21,7 @@ import 'test_helpers.dart';
 //
 // Why this file exists at all, beyond a11y_region_net_test.dart: that file
 // proves region entry works by asserting `liveRegion`, and the Linux embedder
-// ignores liveRegion completely (LEARNINGS.md, proven from engine source). What
+// ignores liveRegion completely (proven from engine source). What
 // actually reaches Orca is the NAMED CONTAINER that FocusRegion wraps each
 // region in — and that container is also what repeats on every arrow press, so
 // it is exactly what the announcement work will remove. Nothing pinned it.

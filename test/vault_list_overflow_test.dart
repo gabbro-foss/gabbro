@@ -65,8 +65,8 @@ Future<void> _pumpWithKeyboard(
 /// any child's width changes every sibling's height: a narrower left-hand
 /// column gives the detail pane more room, its placeholder wraps onto fewer
 /// lines, and the vertical extent changes throughout. That is what made a
-/// previous overflow look like the nav rail's fault when it was not (see
-/// LEARNINGS, "A layout fix that 'works' can be pure correlation"), so any
+/// previous overflow look like the nav rail's fault when it was not — a layout
+/// fix that "works" can be pure correlation — so any
 /// change to the row's children needs this pinned before and after.
 Future<void> _pumpAtTextScale(
   WidgetTester tester, {

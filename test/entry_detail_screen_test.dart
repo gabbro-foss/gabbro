@@ -732,8 +732,8 @@ void main() {
     await tester.enterText(
       find.byType(TextField), '${blocker.path}/sub/secret.txt');
     // Confirm via onPressed inside runAsync: the failing write is real IO,
-    // which the fake-clock test zone never completes (see LEARNINGS "Async
-    // dart:io inside testWidgets"); a plain pump after - pumpAndSettle would
+    // which the fake-clock test zone never completes (async dart:io inside
+    // testWidgets); a plain pump after - pumpAndSettle would
     // run the message's auto-dismiss timer to the end and report it missing.
     final confirm = tester.widget<FilledButton>(
       find.widgetWithText(FilledButton, 'Export'),

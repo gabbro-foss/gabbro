@@ -20,7 +20,7 @@ import '../l10n/app_localizations.dart';
 /// the one explanation available cannot be read. Dialogs scroll as a whole.
 ///
 /// The message is also announced on Linux, where a screen reader never reads a
-/// transient notice (see LEARNINGS.md); on Android TalkBack reads it already.
+/// transient notice; on Android TalkBack reads it already.
 Future<void> openUrlAndReport(BuildContext context, String url) async {
   final result = await GabbroUrlOpener.open(url);
   if (!context.mounted) return;

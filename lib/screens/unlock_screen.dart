@@ -1357,7 +1357,7 @@ class _UnlockScreenState extends State<UnlockScreen>
           alignment: Alignment.topLeft,
           child: IconButton(
             // semanticLabel, not just the tooltip: a Linux screen reader reads
-            // only the accessible name (LEARNINGS.md).
+            // only the accessible name.
             icon: Icon(Icons.close, semanticLabel: l.tooltipCancel),
             tooltip: l.tooltipCancel,
             onPressed: () => Navigator.of(context).pop(),
