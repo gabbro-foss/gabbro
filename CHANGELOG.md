@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.23] – 2026-08-27
+
 ### Added
 - Emergency sheet: `docs/EMERGENCY_SHEET.pdf`, a printable one-pager to fill in by hand (vault, passphrase, YubiKeys, folders) and keep on paper.
 - Remembered folders. Export and Import entries each get a Remember box (ticked by default): the folder of the file you pick is remembered, the next file dialog opens there, and on Linux the export path is pre-filled so Export is one tap. Sync settings lists the export and import folders read-only. Untick to forget.
@@ -24,6 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Labels: the vault menu's "Sync from file" is now "Sync from vault"; the import screen's Gabbro button "Sync from vault" is now "Import" (it imports, it does not sync).
 - Export: "Include date in filename" now defaults to off, so a repeat export overwrites the previous file instead of adding a dated copy. Turn it on for dated exports.
 - flutter_rust_bridge 2.12.0 -> 2.13.0 (bridge regenerated; no behaviour change).
+
+*Built with Flutter 3.47.1, Rust 1.98.0, AGP 8.11.1, Kotlin 2.2.20, Java 21.*
 
 ## [0.1.0-alpha.22] – 2026-08-23
 
