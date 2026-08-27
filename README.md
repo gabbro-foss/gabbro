@@ -512,9 +512,12 @@ nothing to fix and nothing lost. If the wrong LED bothers you, your desktop's
 
 ### Prerequisites
 
+To run the app:
+
 - [Flutter](https://docs.flutter.dev/get-started/install)
 - [Rust](https://rustup.rs/) (`rustup toolchain install stable`)
 - [flutter_rust_bridge_codegen](https://crates.io/crates/flutter_rust_bridge_codegen)
+- `libfido2` (Linux YubiKey support)
 
 On Arch Linux, install Flutter via the AUR (`flutter-bin`) and Rust
 via pacman (`pacman -S rustup`). Add yourself to the `flutter` group:
@@ -523,6 +526,40 @@ via pacman (`pacman -S rustup`). Add yourself to the `flutter` group:
 sudo usermod -aG flutter $USER
 # log out and back in
 ```
+
+To run the full test gate (`./gabbro_test`), also:
+
+```bash
+cargo install cargo-audit cargo-deny      # advisory + licence legs
+rustup target add aarch64-linux-android   # Android cfg-leak leg
+```
+
+Plus the Android toolchain, from [Android Studio](https://developer.android.com/studio):
+
+- Android Studio in `/opt/android-studio` — `android/gradle.properties` points
+  `org.gradle.java.home` there. Its bundled JBR is a full JDK; no separate one needed.
+- SDK at the default location (`$HOME/Android/Sdk`) — the gate globs that path.
+- NDK **28.2.13676358**, matching Flutter's pin (`ndkVersion = flutter.ndkVersion`).
+  Pick it under SDK Tools -> NDK (Side by side) -> Show Package Details.
+- `export JAVA_HOME=/opt/android-studio/jbr` in your shell profile. The `gradlew`
+  launcher needs a JVM to start; `org.gradle.java.home` only picks the daemon's.
+
+Then, once, before the first gate run:
+
+```bash
+flutter build apk   # creates android/gradlew (gitignored, injected by Flutter)
+./gabbro_test --warm   # warms the crate, advisory and Gradle caches (online)
+```
+
+The gate calls `./gradlew` directly rather than through Flutter, so nothing
+recreates the wrapper for it — hence the one build first. `--warm` is also
+needed after any dependency change; the offline `cargo audit` leg is only as
+fresh as the last one.
+
+Signing is not part of the gate but is read at configure time, so
+`android/key.properties` and its keystore must exist for **any** Gradle task,
+unit tests included. Both are gitignored: generate your own
+([Flutter signing guide](https://docs.flutter.dev/deployment/android#signing-the-app)).
 
 ### Run locally
 
@@ -547,17 +584,16 @@ adb install build/app/outputs/flutter-apk/app-arm64-v8a-release.apk # install on
 
 ### Tests
 
+One script runs every suite — Flutter, real-FFI, Rust, Android — and reports
+each pass or fail without stopping early. From the repo root:
+
 ```bash
-# Rust unit tests
-cd rust && cargo test
-
-# Flutter tests
-flutter test
-
-# Real-FFI suites (need the release Rust lib; -j 1 as the Rust session is global)
-cd rust && cargo build --release --lib && cd ..
-dart test integration_test/ -j 1
+./gabbro_test          # full gate
+./gabbro_test --warm   # warm caches first (online); needed after a dependency change
 ```
+
+The Rust and Android legs run in a no-network namespace, proving they need no
+network. See **Prerequisites** above for what the gate requires.
 
 ---
 

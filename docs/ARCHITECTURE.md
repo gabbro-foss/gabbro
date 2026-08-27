@@ -100,7 +100,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2867 | 171 |
+| Flutter (`flutter test`) | 2950 | 171 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 17 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 180 | 15 |
 
@@ -136,6 +136,7 @@ warnings are not noise.**
 | KGP via `buildscript` classpath | `url_launcher_android` | Did not reproduce 2026-08-06; re-check before acting. |
 | Flutter: AGP 8.11.1 support "will soon be dropped" (wants >= 9.0.1) | Flutter tooling, new 2026-08-21 | A future Flutter upgrade refuses to build Android until AGP is bumped. No action yet: 8.11.1 still builds; bump AGP + Kotlin together when forced. |
 | Flutter: Kotlin 2.2.20 support "will soon be dropped" (wants >= 2.3.20) | Flutter tooling, new 2026-08-21 | Same consequence and plan as the AGP row above. |
+| "understands SDK XML versions up to 3 but ... version 4 was encountered" | AGP 8.11.1's SDK reader vs newer Android Studio metadata | Cosmetic; AGP still installs what it needs. Clears with the AGP bump above. |
 
 **AGP note:** every module, `rust_lib_gabbro` included, loads AGP **8.11.1**. The
 `com.android.tools.build:gradle:7.3.0` line in `rust_builder/android/build.gradle` is
@@ -147,37 +148,13 @@ resolved but never applied — inert, emits no warning.
 
 > Update at the end of each session. First thing to read at the start of the next. Completed items are deleted from this section.
 
+**One-click sync** (branch `streamline_sync_process`) DONE 2026-08-27: full gate
+ALL GREEN, docs updated, merged to master. Details: CHANGELOG `[Unreleased]`,
+`docs/VAULT_SYNC.md`. A release is warranted; not yet cut.
+
 ### Next task
 
-**One-click sync, branch `streamline_sync_process`** (off master `263252fd`,
-pushed, NOT merged). Shipped on the branch so far: sync/import split with new
-labels, additive import, Sync settings (auto-merge + sync folder + Remember),
-Sync from vault by export name, edge-to-edge insets, import screen with one file
-field + Source dropdown, remembered export/import folders. Full gate ALL GREEN
-2026-08-26 after step 3; no `--warm` needed.
-Details: CHANGELOG `[Unreleased]`, `docs/VAULT_SYNC.md`.
-
-**Standing bar for everything below.** Works on Linux and Android (SAF paths
-differ, behaviour must not). Every new string in all 37 locales; every new
-control with a semantics label, a screen-reader test (ADR-015) and the
-large-text ceilings (ADR-016). Net first, then red list, then hardware
-(`.scratchpad`, one pass at a time, one action per row). None of this is a
-follow-up.
-
-**Remaining, in order; merge to master only after all three:**
-
-1. ~~Step 3: remember folders (S9) + read-only view (S5)~~ DONE 2026-08-26: one
-   `exportFolder`/`importFolder` setting each (Linux path or Android URI, old
-   `android_export_folder_uri` read as fallback); Remember box on Export and
-   Import; dialogs open in the remembered folder (portal `current_folder`,
-   Android `EXTRA_INITIAL_URI`); Sync settings shows both read-only. Flutter
-   2946 green, Android unit green, Linux pass 6 + S23 pass 7 green.
-2. ~~In-app help carousel~~ DONE 2026-08-26: 16 cards re-shot at the current UI
-   (emulator, text scale 1.2, no rings, 1116x2436), three new (Sync settings,
-   Export, Import), sync diagram redrawn transport-agnostic at 3x, terse
-   captions in 37 locales, caption at 16; content net
-   `test/help_content_net_test.dart`. Linux + S23 pass 8 green.
-3. Full gate, docs, merge to master.
+_Empty — pick the next item from the Bikeshed._
 
 ---
 
