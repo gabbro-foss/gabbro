@@ -165,10 +165,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Features and UI/UX
-- **Crypto stack diagram pinned to format v11.** `docs/artefacts/gabbro_crypto_stack_flow.dot`
-  (+ `.svg`, and the `simple_icons` SVG/PNG/PDF if they carry the number) hard-code
-  the vault format version. Update to the current version and, if possible, make
-  them version-agnostic. These files hold no history of earlier formats.
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).

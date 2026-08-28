@@ -2,7 +2,8 @@
 <!--
   Gabbro crypto stack - SIMPLE view WITH ICONS + plain-language LAYER bands.
   Hand-authored, self-contained SVG (this file IS the source; there is no .dot).
-  Reflects file-format VERSION 11 (ADR-018): the vault key is derived straight from
+  Reflects the crypto since file-format v11 (ADR-018), unchanged by later bumps
+  (v12: Passkey entries only): the vault key is derived straight from
   the Argon2id output via HKDF; the X25519 + ML-KEM-1024 hybrid layer was removed.
   Palette: viridis (perceptually uniform, colour-blind + greyscale friendly, ADR-003).
   6 layers map dark->light top->bottom. Meaning never rests on colour alone: each

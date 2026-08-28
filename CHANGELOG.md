@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Crypto stack diagrams no longer pinned to format v11: labelled v11+ with a note that later bumps (v12) change the body schema, not the key path.
+
 ## [0.1.0-alpha.23] – 2026-08-27
 
 ### Added

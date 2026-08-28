@@ -84,7 +84,7 @@ Unlocking your vault involves these steps:
 
 ### The technical version
 
-Diagram: [full crypto stack, VERSION 11](artefacts/gabbro_crypto_stack_flow.svg).
+Diagram: [full crypto stack, format v11+](artefacts/gabbro_crypto_stack_flow.svg).
 
 Both modes share the same first phase. The second phase differs.
 
