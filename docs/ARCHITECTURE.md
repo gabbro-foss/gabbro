@@ -190,7 +190,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - **Wayland auto-type** — blocked: Wayland breaks global input injection
   (https://gist.github.com/probonopd/9feb7c20257af5dd915e3a9f2d1f2277).
   Revisit only if Mint defaults to Wayland.
-- **Linux biometric unlock** (laptop fingerprint readers, e.g. libfido2/PAM or `fprintd`). Fits the current per-device model unchanged: Linux would just get its own local per-vault secret store; the vault file carries no biometric state, so nothing else changes.
 - **Windows support.**
 - **Yubico partnership.**
 - **Donation/sustainability model**: GitHub Sponsors is live; Monero possible later (a large, dedicated effort). Liberapay ruled out (2026-07-22 — Stripe forces business-type onboarding for individuals and has suspended Liberapay-linked accounts; no PayPal). Don't re-propose Liberapay.
