@@ -169,7 +169,7 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
 
-### Housekeepingb
+### Housekeeping
 - **Shorten comments and user-facing messages.** Sweep the whole stack: code
   comments trimmed to what the code can't say; UI strings terse.
 - **Permanent USB product id (Linux passkeys).** 0x1209:0x0001 is pid.codes'
