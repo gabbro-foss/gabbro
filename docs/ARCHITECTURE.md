@@ -149,7 +149,8 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-_Empty — pick the next item from the Bikeshed._
+- **Shorten comments and user-facing messages.** Sweep the whole stack: code
+  comments trimmed to what the code can't say; UI strings terse.
 
 ---
 
@@ -170,8 +171,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
 
 ### Housekeeping
-- **Shorten comments and user-facing messages.** Sweep the whole stack: code
-  comments trimmed to what the code can't say; UI strings terse.
 - **Permanent USB product id (Linux passkeys).** 0x1209:0x0001 is pid.codes'
   shared TEST id; another dev gadget with it could confuse the YubiKey filter.
   PR requesting 0x1209:0x6ABB awaits external review (volunteer-run, can take
