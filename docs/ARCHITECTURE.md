@@ -168,19 +168,9 @@ resolved but never applied — inert, emits no warning.
    **Kotlin: done.** 1075 -> 420 comment lines, 6148 -> 5449 LOC, 0 non-ASCII;
    comment-stripped sources identical before and after.
 
-   **Rust survey (2026-08-29, against the rules):** 4412 comment lines in
-   61 files. Top: `vault/session.rs` 785/9411, `api/vault_bridge.rs` 434,
-   `api/vault.rs` 317, `vault/io.rs` 222, `vault/file_format.rs` 185,
-   `tests/vault_backward_compat.rs` 184. Violations: 709 non-ASCII lines
-   (box-drawing rules, em-dashes, arrows, 11 check-mark glyphs in the
-   backward-compat header), 13 dated lines, 21 history lines. Cut: file
-   headers over 15 lines (`vault_backward_compat.rs` 73, `file_format.rs`
-   42, the two fuzzers 34 + 33, `mem_forensics.rs` + `entropy.rs` 28 each)
-   to the invariant plus a pointer; bridge doc comments restating the
-   signature or repeating "reads from in-memory session, no I/O" per fn;
-   step narration; every date and "found on" (keep the reason, drop the
-   when). Keep the why: refused-format reasons, VERSION invariants, "why
-   not X". Target ~3500 lines.
+   **Rust: done.** 4412 -> 3197 comment lines, 37356 -> 36027 LOC, non-ASCII
+   only in wordlist data; comment-stripped sources identical before and after;
+   clippy clean.
 
    **Dart survey (2026-08-29, against the rules):** 5987 comment lines in
    262 files (generated bridge and `app_localizations*.dart` excluded):
