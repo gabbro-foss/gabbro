@@ -11,30 +11,17 @@ import java.io.InputStream
 import java.util.concurrent.atomic.AtomicLong
 
 /**
- * The file-dialog side of the `app.gabbro.gabbro/picker` channel: what the
- * picker offers the user, and where their choice ends up.
- *
  * Android hands an app a `content://` reference rather than a path, so a
- * picked file is copied into the app's own cache and that path is what Dart
- * receives — every caller keeps working with plain paths.
- *
- * Replaces the `file_picker` plugin's Android side; the behaviour it must
- * match is pinned in `GabbroPickerTest`.
+ * picked file is copied into the app cache and Dart receives that path;
+ * every caller keeps working with plain paths.
  */
 object GabbroPicker {
 
     const val CHANNEL = "app.gabbro.gabbro/picker"
 
-    /** What the open dialog is launched with: the types to show and, when a
-     *  folder is remembered, the location to open at. */
     data class PickRequest(val mimeTypes: Array<String>, val initialUri: String?)
 
-    /**
-     * `ACTION_OPEN_DOCUMENT` that can start at a remembered location: the
-     * stock `OpenDocument` contract takes only the types. Same intent as the
-     * stock one otherwise, so the picker behaves as before when nothing is
-     * remembered.
-     */
+    /** The stock `OpenDocument` contract cannot start at a remembered folder. */
     class OpenDocumentAt : ActivityResultContract<PickRequest, Uri?>() {
         override fun createIntent(context: Context, input: PickRequest): Intent {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
@@ -52,26 +39,21 @@ object GabbroPicker {
             intent?.takeIf { resultCode == android.app.Activity.RESULT_OK }?.data
     }
 
-    /** The `pick_file` reply: the cache copy Dart reads, plus where the file
-     *  lives, so the next dialog can open there. */
+    /** The uri lets the next dialog open where this file lives. */
     fun pickedFileReply(path: String, uri: Uri): Map<String, String> =
         mapOf("path" to path, "uri" to uri.toString())
 
-    /** Cache subdirectory holding copies of picked files. */
     const val CACHE_SUBDIR = "gabbro_picker"
 
     private const val CSV_EXTENSION = "csv"
     private const val CSV_MIME_TYPE = "text/csv"
     private const val ALL_FILES = "*/*"
 
-    // Keeps concurrent picks of the same filename apart within a run.
     private val pickCounter = AtomicLong(0)
 
     /**
-     * Types to offer in the open dialog for [extensions]. Android filters by
-     * type, not by extension, so an extension it does not know (`.gabbro`)
-     * would filter every vault out of view — those fall back to showing all
-     * files, exactly as `file_picker` did.
+     * Android filters by type, not extension, so an extension it does not
+     * know (`.gabbro`) would hide every vault; those fall back to all files.
      */
     fun mimeTypes(
         extensions: List<String>?,
@@ -92,10 +74,8 @@ object GabbroPicker {
     }
 
     /**
-     * A fresh destination for a picked file called [name], inside [cacheDir].
-     * Each pick gets its own subdirectory, so picking two files with the same
-     * name (both `export.csv`, say) keeps both — an import screen holds
-     * several picked paths at once.
+     * A subdirectory per pick, so two files with the same name both survive;
+     * an import screen holds several picked paths at once.
      */
     fun cacheTarget(cacheDir: File, name: String?): File {
         val safeName = File(name ?: "picked_file").name.ifEmpty { "picked_file" }
@@ -106,12 +86,7 @@ object GabbroPicker {
         return File(dir, safeName)
     }
 
-    /**
-     * Sync from vault with a remembered folder: the file called [name] in the
-     * granted tree, copied into the cache so Rust can read it by path. Null
-     * when the tree holds no such file, and nothing is written then.
-     * [openChild] resolves a name inside the tree to its contents.
-     */
+    /** Copied into the cache so Rust can read it by path. Null writes nothing. */
     fun cacheTreeChild(cacheDir: File, name: String, openChild: (String) -> InputStream?): String? {
         val input = openChild(name) ?: return null
         val target = cacheTarget(cacheDir, name)
@@ -119,7 +94,6 @@ object GabbroPicker {
         return target.absolutePath
     }
 
-    /** Copies the picked file's contents to [target]. */
     fun copyTo(input: InputStream, target: File) {
         input.use { source ->
             target.outputStream().use { source.copyTo(it) }
@@ -127,10 +101,8 @@ object GabbroPicker {
     }
 
     /**
-     * The filesystem path of a picked folder, from the identifier the folder
-     * picker returns (`primary:Download/Gabbro`). The JSON export and the file
-     * export write there directly, so a wrong path means nothing is saved.
-     * Null when the identifier carries no volume.
+     * Document id `primary:Download/Gabbro` to a filesystem path. Exports
+     * write there directly, so a wrong path means nothing is saved.
      */
     fun rawPathFromDocumentId(documentId: String): String? {
         val separator = documentId.indexOf(':')

@@ -8,14 +8,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 
-/**
- * One-shot cleanup of the removed "recently used apps" capture store. An install
- * upgraded from a build that shipped the suggestion chips still carries the
- * SharedPreferences file listing apps the user tried to log into; nothing reads it
- * any more, so it must be deleted rather than left behind as stale metadata.
- * MainActivity itself is a FlutterActivity with no test harness, hence the free
- * function.
- */
+/** Nothing reads the store any more; left behind it lists the apps the user logged into. */
 @RunWith(RobolectricTestRunner::class)
 class LegacyPurgeTest {
 

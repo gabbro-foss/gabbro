@@ -10,11 +10,6 @@ import androidx.documentfile.provider.DocumentFile
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
-/**
- * MainActivity — the app's main Flutter surface. Inherits the shared unlock
- * plumbing (YubiKey + biometric channels, NFC NDEF suppression, FLAG_SECURE)
- * from [GabbroUnlockHostActivity] and adds the main-app-only channel: SAF export.
- */
 class MainActivity : GabbroUnlockHostActivity() {
 
     private companion object {
@@ -22,8 +17,6 @@ class MainActivity : GabbroUnlockHostActivity() {
         const val APP_PASSKEYS_CHANNEL = "app.gabbro.gabbro/app_passkeys"
     }
 
-    // SAF directory picker: the result arrives asynchronously, so we stash the
-    // pending Flutter result and complete it in the launcher callback.
     private var pendingDirPickResult: MethodChannel.Result? = null
     private lateinit var openTreeLauncher: ActivityResultLauncher<Uri?>
 
@@ -32,15 +25,14 @@ class MainActivity : GabbroUnlockHostActivity() {
 
         purgeLegacyRecentApps(applicationContext)
 
-        // ACTION_OPEN_DOCUMENT_TREE picker for choosing the export folder. The
-        // grant is scoped to exactly the folder the user picks — no manifest
-        // storage permission. We persist it so future exports skip the picker.
+        // The grant is scoped to the picked folder, so no manifest storage
+        // permission; persisted so later exports skip the picker.
         openTreeLauncher =
             registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
                 val result = pendingDirPickResult
                 pendingDirPickResult = null
                 if (uri == null) {
-                    result?.success(null) // user cancelled the picker
+                    result?.success(null)
                     return@registerForActivityResult
                 }
                 contentResolver.takePersistableUriPermission(
@@ -54,11 +46,10 @@ class MainActivity : GabbroUnlockHostActivity() {
     }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
-        // Registers the shared YubiKey + biometric channels and NFC suppression.
         super.configureFlutterEngine(flutterEngine)
 
-        // Mirrors the Dart app-passkeys toggle (F1) into SharedPreferences,
-        // where the Flutter-less credential provider reads it.
+        // The Flutter-less credential provider reads the F1 toggle from
+        // SharedPreferences, so Dart mirrors it there.
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, APP_PASSKEYS_CHANNEL)
             .setMethodCallHandler { call, result ->
                 when (call.method) {
@@ -109,9 +100,7 @@ class MainActivity : GabbroUnlockHostActivity() {
                             result.error("EXPORT_WRITE_FAILED", e.message, null)
                         }
                     }
-                    // Sync from vault with a remembered folder: the file of this
-                    // vault's name inside the granted tree, copied to the cache.
-                    // Null when absent. Read off the main thread, answered on it.
+                    // Read off the main thread, answered on it as Flutter requires.
                     "read_tree_file" -> {
                         val treeUri = call.argument<String>("treeUri")
                         val name = call.argument<String>("name")
@@ -139,11 +128,9 @@ class MainActivity : GabbroUnlockHostActivity() {
             }
     }
 
-    // Write `data` to `filename` inside the granted directory tree. Finds an
-    // existing child by name and overwrites it in place (preserves the document, so
-    // a sync client sees the same file with new content); only creates when absent.
-    // Never blind-creates over an existing name — that would trip SAF's "(1)"
-    // de-duplication and break a fixed-name sync target.
+    // Overwrites an existing child in place so a sync client sees the same
+    // document with new content; creating over an existing name would trip
+    // SAF's "(1)" de-duplication and break a fixed-name sync target.
     private fun writeViaSaf(treeUri: Uri, filename: String, data: ByteArray) {
         val dir = DocumentFile.fromTreeUri(this, treeUri)
             ?: throw IllegalStateException("Cannot open export folder")
@@ -153,23 +140,18 @@ class MainActivity : GabbroUnlockHostActivity() {
         val target = dir.findFile(filename)
             ?: dir.createFile("application/octet-stream", filename)
             ?: throw IllegalStateException("Cannot create $filename")
-        // "wt" = write + truncate, so an overwrite fully replaces prior content.
+        // "wt" truncates, so an overwrite leaves no tail of the old content.
         contentResolver.openOutputStream(target.uri, "wt")?.use { it.write(data) }
             ?: throw IllegalStateException("Cannot open $filename for writing")
     }
 }
 
-/** SharedPreferences file of the removed autofill "recently used apps" store. */
 internal const val LEGACY_RECENT_APPS_PREFS = "gabbro_recent_autofill_apps"
 
 /**
- * Delete the leftover capture store on installs upgraded from a build that shipped
- * the app-id suggestion chips. It listed apps the user had tried to log into and
- * nothing reads it any more, so it would otherwise sit on disk forever. No-op once
- * absent. A free function because MainActivity is a FlutterActivity and cannot be
- * driven under Robolectric; nets in `LegacyPurgeTest`.
- *
- * Remove at v1.0 — no pre-1.0 install will still be around to upgrade.
+ * Nothing reads this store any more; without the purge it would list the
+ * apps the user logged into, on disk, forever. A free function because a
+ * FlutterActivity cannot run under Robolectric. Remove at v1.0.
  */
 internal fun purgeLegacyRecentApps(context: Context) {
     context.deleteSharedPreferences(LEGACY_RECENT_APPS_PREFS)

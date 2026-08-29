@@ -9,12 +9,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 
-/**
- * The mirrored app-passkeys opt-in (F1). The credential provider runs without
- * Flutter, so this SharedPreferences slot — written over the app_passkeys
- * channel — is the only place it can read the toggle. Absent must mean OFF:
- * a fresh install refuses native-app passkeys until the user opts in.
- */
+/** Absent must mean off: a fresh install refuses native-app passkeys until opted in. */
 @RunWith(RobolectricTestRunner::class)
 class AppPasskeysStoreTest {
 

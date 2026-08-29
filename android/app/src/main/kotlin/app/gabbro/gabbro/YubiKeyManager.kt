@@ -137,7 +137,7 @@ object YubiKeyManager {
             val pinProtocol = pinProtocolFor(info)
             val clientPin = ClientPin(session, pinProtocol)
 
-            // Separate key agreement for hmac-secret salt encryption (not the PIN UV key agreement)
+            // hmac-secret needs its own key agreement, distinct from the PIN one.
             val keyAgreementResult = clientPin.getSharedSecret()
             val platformKey = keyAgreementResult.first
             val sharedSecret = keyAgreementResult.second
@@ -185,15 +185,10 @@ object YubiKeyManager {
     }
 
     /**
-     * Multi-credential hmac-secret assertion — one tap regardless of which registered key is
-     * inserted.
-     *
-     * For 2+ records, all C(n,2) credential pairs are tried sequentially using a 64-byte combined
-     * salt (salt_i ∥ salt_j). The authenticator returns NO_CREDENTIALS immediately (no tap) for
-     * non-matching pairs and taps once for the matching pair. The correct 32-byte half is
-     * extracted based on which credential matched.
-     *
-     * Mirrors [get_hmac_secret_any_of] in rust/src/fido/device.rs.
+     * One tap whichever registered key is inserted: every credential pair is
+     * tried with a 64-byte combined salt, and the authenticator answers
+     * NO_CREDENTIALS without a tap for pairs that do not match. Mirrors
+     * get_hmac_secret_any_of in rust/src/fido/device.rs.
      */
     fun getHmacSecretAny(
         connection: YubiKeyConnection,
@@ -216,13 +211,11 @@ object YubiKeyManager {
             val nonNullPin = pin ?: run { mainHandler.post { onError("PIN required") }; return }
             val pinToken = clientPin.getPinToken(nonNullPin, ClientPin.PIN_PERMISSION_GA, RP_ID)
 
-            // One key-agreement for the whole session.
             val keyAgreementResult = clientPin.getSharedSecret()
             val platformKey = keyAgreementResult.first
             val sharedSecret = keyAgreementResult.second
 
             if (records.size == 1) {
-                // Single-credential path: 32-byte salt, mirrors getHmacSecret.
                 val (credId, salt) = records[0]
                 val encryptedSalt = pinProtocol.encrypt(sharedSecret, salt)
                 val saltAuth = pinProtocol.authenticate(sharedSecret, encryptedSalt)
@@ -239,8 +232,6 @@ object YubiKeyManager {
                 return
             }
 
-            // 2+ records: try all C(n,2) pairs. Non-matching pairs throw CtapException
-            // (NO_CREDENTIALS) before user interaction — loop continues without a tap.
             for (i in records.indices) {
                 for (j in (i + 1) until records.size) {
                     try {
@@ -301,7 +292,7 @@ object YubiKeyManager {
                         return
 
                     } catch (_: Exception) {
-                        continue  // NO_CREDENTIALS or transient failure — try next pair
+                        continue
                     }
                 }
             }

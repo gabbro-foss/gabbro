@@ -20,21 +20,10 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 /**
- * GabbroUnlockHostActivity — shared base for every activity that hosts the
- * unlock UI: the main app ([MainActivity]) and the autofill auth wall
- * ([UnlockActivity]).
- *
- * It provides the parts both need so they cannot drift apart:
- *  - the `…/yubikey` MethodChannel (register / unlock taps, USB + NFC), bounded
- *    and cancellable via [TapFlow];
- *  - the `…/biometric` MethodChannel (BiometricPrompt — needs a FragmentActivity);
- *  - YubiKey NDEF/OTP suppression: foreground dispatch on resume, and re-arming it
- *    after NFC reader mode stops so a stray OTP-URL tap routes to onNewIntent
- *    instead of opening the browser (demo.yubico.com).
- *  - FLAG_SECURE (no screenshots / no recents thumbnail) on the unlock surface.
- *
- * Subclasses override [configureFlutterEngine], call `super` first (registers the
- * shared channels), then add their own channels on the same engine.
+ * Shared base for [MainActivity] and [UnlockActivity], so YubiKey, biometric,
+ * NDEF suppression and FLAG_SECURE cannot drift between them.
+ * FlutterFragmentActivity because BiometricPrompt needs a FragmentActivity.
+ * Subclasses call `super.configureFlutterEngine` first, then add channels.
  */
 abstract class GabbroUnlockHostActivity : FlutterFragmentActivity() {
 
@@ -42,16 +31,13 @@ abstract class GabbroUnlockHostActivity : FlutterFragmentActivity() {
         private const val CHANNEL = "app.gabbro.gabbro/yubikey"
         private const val BIOMETRIC_CHANNEL = "app.gabbro.gabbro/biometric"
 
-        // A YubiKey tap blocks until a key is presented; bound the wait so a
-        // stalled tap (no key) cannot strand the UI on an endless spinner.
+        // A tap blocks until a key is presented; unbounded, a missing key
+        // would strand the UI on a spinner.
         private const val TAP_TIMEOUT_MS = 30_000L
     }
 
     private var nfcAdapter: NfcAdapter? = null
 
-    // In-flight YubiKey tap state machine (shared, testable). Arms USB/NFC
-    // discovery, retries once on a transient error, bounds the flow with a
-    // timeout, and is abortable via cancel_tap.
     private val tapHandler = Handler(Looper.getMainLooper())
     private val tapFlow: TapFlow by lazy {
         TapFlow(
@@ -64,8 +50,8 @@ abstract class GabbroUnlockHostActivity : FlutterFragmentActivity() {
         )
     }
 
-    // File dialogs: the result arrives asynchronously, so the pending Flutter
-    // result is stashed and completed in the launcher callback.
+    // The dialog result arrives asynchronously; the Flutter result is completed
+    // in the launcher callback.
     private var pendingFilePick: MethodChannel.Result? = null
     private var pendingPickWantsBytes = false
     private var pendingFolderPick: MethodChannel.Result? = null
@@ -81,7 +67,7 @@ abstract class GabbroUnlockHostActivity : FlutterFragmentActivity() {
                 val result = pendingFilePick
                 pendingFilePick = null
                 if (uri == null) {
-                    result?.success(null) // user cancelled the picker
+                    result?.success(null)
                     return@registerForActivityResult
                 }
                 deliverPickedFile(uri, pendingPickWantsBytes, result)
@@ -92,7 +78,7 @@ abstract class GabbroUnlockHostActivity : FlutterFragmentActivity() {
                 val result = pendingFolderPick
                 pendingFolderPick = null
                 if (uri == null) {
-                    result?.success(null) // user cancelled the picker
+                    result?.success(null)
                     return@registerForActivityResult
                 }
                 result?.success(
@@ -104,10 +90,8 @@ abstract class GabbroUnlockHostActivity : FlutterFragmentActivity() {
     }
 
     /**
-     * Reads the picked file off the main thread — a large attachment would
-     * otherwise freeze the UI — and answers Dart back on it, as Flutter
-     * requires. [wantsBytes] returns the contents; otherwise the file is copied
-     * into the app cache and its path returned.
+     * Reads off the main thread (a large attachment would freeze the UI) and
+     * answers on it, as Flutter requires.
      */
     private fun deliverPickedFile(
         uri: Uri,
@@ -139,7 +123,6 @@ abstract class GabbroUnlockHostActivity : FlutterFragmentActivity() {
         }.start()
     }
 
-    /** The picked file's own name, as the file dialog displays it. */
     private fun pickedFileName(uri: Uri): String? =
         contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
             ?.use { cursor ->
@@ -147,10 +130,8 @@ abstract class GabbroUnlockHostActivity : FlutterFragmentActivity() {
                 if (column >= 0 && cursor.moveToFirst()) cursor.getString(column) else null
             }
 
-    // Suppress the YubiKey NDEF URL from opening the browser while the unlock
-    // surface is in the foreground. When yubikit's reader mode is active it takes
-    // priority; when it is stopped (after a CTAP2 op) foreground dispatch routes
-    // NDEF intents to onNewIntent instead of the browser.
+    // Foreground dispatch routes a YubiKey's NDEF OTP URL to onNewIntent
+    // instead of the browser. Reader mode takes priority while it is active.
     override fun onResume() {
         super.onResume()
         val adapter = NfcAdapter.getDefaultAdapter(this) ?: return
@@ -163,9 +144,8 @@ abstract class GabbroUnlockHostActivity : FlutterFragmentActivity() {
         nfcAdapter?.disableForegroundDispatch(this)
     }
 
-    // NFC intents (NDEF) are delivered here via foreground dispatch.
-    // Calling super is enough — no browser launch occurs because we don't
-    // forward the tag URI.
+    // The NDEF intent lands here; not forwarding the tag URI is what keeps
+    // the browser closed.
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
     }
@@ -179,8 +159,8 @@ abstract class GabbroUnlockHostActivity : FlutterFragmentActivity() {
         registerUrlChannel(flutterEngine)
     }
 
-    // Links. On the shared base because the unlock surface itself shows URL
-    // dialogs (the vault-upgrade link), which the autofill prompts reuse.
+    // On the base because the unlock surface shows URL dialogs (the
+    // vault-upgrade link) and the autofill prompts reuse it.
     private fun registerUrlChannel(flutterEngine: FlutterEngine) {
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, GabbroUrl.CHANNEL)
             .setMethodCallHandler { call, result ->
@@ -195,8 +175,7 @@ abstract class GabbroUnlockHostActivity : FlutterFragmentActivity() {
                             startActivity(GabbroUrl.viewIntent(url))
                             result.success(true)
                         } catch (e: ActivityNotFoundException) {
-                            // Nothing installed that opens links: Dart says so
-                            // rather than the tap appearing to do nothing.
+                            // Dart reports it, so the tap does not look inert.
                             result.success(false)
                         }
                     }
@@ -205,8 +184,7 @@ abstract class GabbroUnlockHostActivity : FlutterFragmentActivity() {
             }
     }
 
-    // File dialogs. Registered on the shared base so the autofill unlock screen
-    // can restore a vault from a picked backup too, not just the main app.
+    // On the base so the autofill unlock screen can restore from a backup too.
     private fun registerPickerChannel(flutterEngine: FlutterEngine) {
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, GabbroPicker.CHANNEL)
             .setMethodCallHandler { call, result ->
@@ -363,8 +341,8 @@ abstract class GabbroUnlockHostActivity : FlutterFragmentActivity() {
                         result.success(null)
                     }
                     "has_nfc" -> {
-                        // Hardware presence (not enabled-state): drives whether the
-                        // UI offers the NFC transport at all. Null adapter = no NFC.
+                        // Hardware presence, not enabled state: decides whether
+                        // the UI offers NFC at all.
                         result.success(NfcAdapter.getDefaultAdapter(this) != null)
                     }
                     else -> result.notImplemented()
@@ -384,8 +362,8 @@ abstract class GabbroUnlockHostActivity : FlutterFragmentActivity() {
     private fun stopDiscovery(transport: String) = when (transport) {
         "nfc" -> {
             YubiKeyManager.stopNfcDiscovery(this)
-            // Reader mode is now off; re-arm foreground dispatch so any stray NDEF
-            // intents (OTP URL still on key) route to onNewIntent, not the browser.
+            // Reader mode off: re-arm dispatch so a stray OTP URL stays out of
+            // the browser.
             nfcAdapter?.enableForegroundDispatch(this, foregroundDispatchIntent(), null, null)
         }
         else -> YubiKeyManager.stopUsbDiscovery()

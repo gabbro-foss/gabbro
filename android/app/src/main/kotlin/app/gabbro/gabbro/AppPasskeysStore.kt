@@ -3,11 +3,9 @@ package app.gabbro.gabbro
 import android.content.Context
 
 /**
- * The mirrored app-passkeys opt-in (F1). Dart owns the setting
- * (settings.jsonc) and pushes changes over the app_passkeys channel; the
- * credential provider runs without Flutter, so this SharedPreferences slot is
- * the only place it can read the toggle. Absent means OFF — a fresh install
- * refuses native-app passkeys until the user opts in.
+ * Dart owns the F1 toggle (settings.jsonc); the credential provider runs
+ * without Flutter, so this mirror is the only place it can read it. Absent
+ * means off: a fresh install refuses native-app passkeys until opted in.
  */
 object AppPasskeysStore {
     private const val PREFS_FILE = "gabbro_app_passkeys"

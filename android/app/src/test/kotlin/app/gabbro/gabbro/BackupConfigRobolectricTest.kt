@@ -10,28 +10,17 @@ import org.robolectric.RuntimeEnvironment
 import org.xmlpull.v1.XmlPullParser
 
 /**
- * Guards finding R-02 (AI_SECURITY_AUDIT_REVIEW.md): with android:allowBackup
- * unset the manifest defaults to true, and Android Auto Backup silently copies
- * the vault (app-private files/) to the user's Google Drive — and migrates it
- * via device-to-device transfer.
- *
- * The OS consults different encodings of "no backup" at different decision
- * points (allowBackup for cloud backup, dataExtractionRules <device-transfer>
- * for D2D migration, fullBackupContent on API <= 30), and OEM transfer tools
- * do not all honour the blanket flag — so the intent is asserted at every
- * layer, not just one.
- *
- * Robolectric reads the *merged* manifest (isIncludeAndroidResources = true),
- * so the flag test also fails if a plugin's manifest ever re-enables backup
- * through the manifest merger. The manifest -> rules-file *linkage* is not
- * testable here (ApplicationInfo.fullBackupContent / dataExtractionRulesRes
- * are @hide): that is covered by the hardware step `aapt dump xmltree` on the
- * built APK.
+ * R-02: allowBackup defaults to true, and Auto Backup would copy the vault to
+ * Google Drive. The OS reads "no backup" from three places (allowBackup,
+ * dataExtractionRules, fullBackupContent on API <= 30) and OEM transfer tools
+ * do not all honour the flag, so every layer is asserted. Robolectric reads
+ * the merged manifest, so a plugin re-enabling backup fails here too. The
+ * manifest-to-rules linkage is @hide; the hardware step `aapt dump xmltree`
+ * covers it.
  */
 @RunWith(RobolectricTestRunner::class)
 class BackupConfigRobolectricTest {
 
-    /** Every domain the backup framework can extract from app-private storage. */
     private val allDomains = setOf("root", "file", "database", "sharedpref", "external")
 
     @Test
@@ -74,7 +63,6 @@ class BackupConfigRobolectricTest {
 
     private data class BackupRule(val section: String, val action: String, val domain: String)
 
-    /** Flattens an xml backup-rules resource into (section, include|exclude, domain) rows. */
     private fun parseRulesXml(resName: String): List<BackupRule> {
         val app = RuntimeEnvironment.getApplication()
         val resId = app.resources.getIdentifier(resName, "xml", app.packageName)

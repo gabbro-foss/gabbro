@@ -20,15 +20,10 @@ import java.security.MessageDigest
 import javax.net.ssl.HttpsURLConnection
 
 /**
- * Phase 2 of the passkey flows: the OS routes the user's picker tap here.
- * Runs the Flutter unlock/consent UI (passkeyUnlockMain entrypoint); once Dart
- * reports the vault is unlocked and the user consented, the subclass performs
- * the operation via RustBridge and hands the result back to the OS.
- *
- * Caller validation happens HERE, before any crypto: a privileged browser may
- * assert its own web origin; a native app must be vouched for by the site's
- * Digital Asset Links file. Anyone else is refused — the vault never signs
- * for a caller the relying party didn't authorise.
+ * Runs the Flutter unlock and consent UI for a picker tap, then the subclass
+ * performs the operation via RustBridge. Caller validation happens here,
+ * before any crypto, so the vault never signs for a caller the relying party
+ * did not authorise.
  */
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 abstract class GabbroPasskeyActivity : GabbroUnlockHostActivity() {
@@ -36,14 +31,14 @@ abstract class GabbroPasskeyActivity : GabbroUnlockHostActivity() {
     companion object {
         const val EXTRA_ENTRY_ID = "app.gabbro.gabbro.EXTRA_PASSKEY_ENTRY_ID"
 
-        // Stamped on picker rows rebuilt after an in-flow unlock: that unlock
-        // left the session open, so the row's get flow must relock when done —
-        // Gabbro ends locked, exactly as the user left it.
+        // An in-flow unlock leaves the session open; rows rebuilt after it
+        // carry this so their get flow relocks, leaving Gabbro as the user
+        // left it.
         const val EXTRA_RELOCK_AFTER = "app.gabbro.gabbro.EXTRA_PASSKEY_RELOCK_AFTER"
         private const val CHANNEL = "app.gabbro.gabbro/passkey"
 
-        // Field-debuggable by design: caller identity, branch taken and refusal
-        // reasons are public material; never log request JSON or user names.
+        // Caller identity, branch and refusal reason are public material;
+        // never log request JSON or user names.
         internal const val TAG = "GabbroPasskey"
     }
 
@@ -62,12 +57,10 @@ abstract class GabbroPasskeyActivity : GabbroUnlockHostActivity() {
                 Log.i(TAG, "channel: ${call.method}")
                 when (call.method) {
                     "isUnlocked" -> result.success(RustBridge.isVaultUnlocked())
-                    // Dart asks what to show on the consent line.
                     "getRequestInfo" -> result.success(requestInfo())
-                    // Dart: vault is unlocked and the user approved. Sets the
-                    // OS result but does NOT finish — Dart may still need to
-                    // lock a session this activity opened (see RT-5 in the
-                    // autofill unlock flow), then calls "finish".
+                    // Sets the OS result without finishing: Dart may still
+                    // have to lock a session this activity opened (RT-5),
+                    // then calls "finish".
                     "approve" -> {
                         performOperation()
                         result.success(null)
@@ -85,16 +78,15 @@ abstract class GabbroPasskeyActivity : GabbroUnlockHostActivity() {
             }
     }
 
-    /** {"mode": "create"|"get", "rpId": ..., "userName": ...} for the Dart UI. */
+    /** {"mode": "create"|"get"|"unlock", "rpId", "userName"} for the consent line. */
     protected abstract fun requestInfo(): Map<String, String>
 
-    /** Validate the caller, run the RustBridge operation, set the result, finish. */
+    /** Validates the caller, runs the RustBridge operation, sets the result. */
     protected abstract fun performOperation()
 
-    /** Finish with the flow-appropriate failure result. */
     protected abstract fun refuse(reason: String)
 
-    /** SHA-256 of the caller's signing cert, colon-hex, or null if unreadable. */
+    /** Colon-hex, the form the allowlist and asset links use. */
     protected fun callerCertSha256(info: CallingAppInfo): String? {
         val signatures = info.signingInfo.apkContentsSigners
         val first = signatures.firstOrNull() ?: return null
@@ -102,19 +94,14 @@ abstract class GabbroPasskeyActivity : GabbroUnlockHostActivity() {
         return digest.joinToString(":") { "%02X".format(it) }
     }
 
-    /** base64url(SHA-256 of signing cert) — the android origin key hash form. */
+    /** The android:apk-key-hash origin form. */
     protected fun callerApkKeyHashB64(info: CallingAppInfo): String? {
         val first = info.signingInfo.apkContentsSigners.firstOrNull() ?: return null
         val digest = MessageDigest.getInstance("SHA-256").digest(first.toByteArray())
         return Base64.encodeToString(digest, Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP)
     }
 
-    /**
-     * Blocking fetch of a site's assetlinks.json; null on any failure
-     * (refuses). The network call runs off-main via [runOffMain] — on the
-     * main thread Android would throw NetworkOnMainThreadException and every
-     * native-app caller would be refused.
-     */
+    /** Null on any failure, which refuses. */
     protected fun fetchAssetLinks(url: String): String? = runOffMain {
         val conn = java.net.URL(url).openConnection() as HttpsURLConnection
         conn.connectTimeout = 5000
@@ -123,7 +110,6 @@ abstract class GabbroPasskeyActivity : GabbroUnlockHostActivity() {
     }
 }
 
-/** Creation flow: mint + store, return the registration response. */
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 class GabbroPasskeyCreateActivity : GabbroPasskeyActivity() {
 
@@ -167,7 +153,6 @@ class GabbroPasskeyCreateActivity : GabbroPasskeyActivity() {
         )
         val responseJson: String
         if (clientDataHash != null && allowlist.isPrivileged(info.packageName, cert)) {
-            // Privileged browser: it attaches its own clientDataJSON.
             responseJson = RustBridge.registerPasskey(requestJson, null)
         } else {
             val keyHash = callerApkKeyHashB64(info) ?: return refuse("caller certificate unreadable")
@@ -200,7 +185,6 @@ class GabbroPasskeyCreateActivity : GabbroPasskeyActivity() {
         )
         setResult(RESULT_OK, result)
         Log.i(TAG, "create result set (${responseJson.length} chars)")
-        // No finish() here: Dart locks a session it opened, then calls "finish".
     }
 
     override fun refuse(reason: String) {
@@ -214,7 +198,6 @@ class GabbroPasskeyCreateActivity : GabbroPasskeyActivity() {
     }
 }
 
-/** Sign-in flow: sign the challenge with the picked (or only) credential. */
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 class GabbroPasskeyGetActivity : GabbroPasskeyActivity() {
 
@@ -222,9 +205,8 @@ class GabbroPasskeyGetActivity : GabbroPasskeyActivity() {
     private var clientDataHash: ByteArray? = null
     private var callingAppInfo: CallingAppInfo? = null
 
-    // The picker's "Unlock Gabbro" action: it carries no get request, only the
-    // original begin request. This activity can then only unlock and hand
-    // rebuilt picker rows back to the OS — never a signed credential.
+    // The picker's unlock action carries only the begin request, so this
+    // activity can hand back rebuilt rows but never a signed credential.
     private var unlockMode = false
     private var beginOptions: List<androidx.credentials.provider.BeginGetPublicKeyCredentialOption> =
         emptyList()
@@ -269,7 +251,6 @@ class GabbroPasskeyGetActivity : GabbroPasskeyActivity() {
             "relockAfter" to intent.getBooleanExtra(EXTRA_RELOCK_AFTER, false).toString(),
         )
 
-    /** Unlock mode: return rebuilt rows, stamped to relock after their get. */
     private fun performUnlockRefresh() {
         val response = buildBeginGetResponse(this, beginOptions, relockAfter = true) {
             RustBridge.passkeysForRequest(it)
@@ -278,7 +259,6 @@ class GabbroPasskeyGetActivity : GabbroPasskeyActivity() {
         PendingIntentHandler.setBeginGetCredentialResponse(result, response)
         setResult(RESULT_OK, result)
         Log.i(TAG, "unlock result set: ${response.credentialEntries.size} row(s)")
-        // No finish() here: Dart calls "finish", mirroring the other flows.
     }
 
     override fun performOperation() {
@@ -293,7 +273,7 @@ class GabbroPasskeyGetActivity : GabbroPasskeyActivity() {
                 "cdh=${clientDataHash != null} rpId=$rpId",
         )
 
-        // Resolve the entry: the picker tap carries it; the unlock path re-queries.
+        // A picker tap carries the entry; the unlock path has to re-query.
         val entryId = intent.getStringExtra(EXTRA_ENTRY_ID) ?: run {
             val parsed = parsePasskeyMatches(RustBridge.passkeysForRequest(requestJson))
             (parsed as? PasskeyRustResult.Matches)?.matches?.firstOrNull()?.entryId
@@ -337,13 +317,12 @@ class GabbroPasskeyGetActivity : GabbroPasskeyActivity() {
         )
         setResult(RESULT_OK, result)
         Log.i(TAG, "get result set (${responseJson.length} chars)")
-        // No finish() here: Dart locks a session it opened, then calls "finish".
     }
 
     override fun refuse(reason: String) {
         Log.i(TAG, "get refuse: $reason")
         if (unlockMode) {
-            // No get request to answer; a plain cancel keeps the picker usable.
+            // No get request to answer; a cancel keeps the picker usable.
             setResult(RESULT_CANCELED)
             finish()
             return

@@ -3,22 +3,16 @@ package app.gabbro.gabbro
 import android.content.Context
 
 /**
- * Public Suffix List matcher (publicsuffix.org). Computes the registrable domain
- * (eTLD+1) of a host so unrelated sites under a shared suffix never collide
- * (bbc.co.uk vs hsbc.co.uk). Replaces the old naive "last two labels" rule that
- * collapsed both to co.uk (audit F-10). The list is vendored at
- * assets/public_suffix_list.dat — see docs/MAINTENANCE.md for the refresh procedure.
+ * publicsuffix.org matcher, so unrelated sites under a shared suffix never
+ * collide (bbc.co.uk vs hsbc.co.uk, audit F-10). Refresh procedure for the
+ * vendored list: docs/MAINTENANCE.md.
  */
 class PublicSuffixList private constructor(
-    private val rules: Set<String>,      // normal + wildcard (e.g. "co.uk", "*.ck")
-    private val exceptions: Set<String>, // exception rules, '!' stripped (e.g. "www.ck")
+    private val rules: Set<String>,
+    private val exceptions: Set<String>,
 ) {
 
-    /**
-     * Registrable domain (public suffix + one label) of [host], or null when [host]
-     * is itself a public suffix (no registrable label) or blank/malformed.
-     * [host] must already be a clean lowercase hostname (no scheme, port, or path).
-     */
+    /** [host] must already be a clean lowercase hostname. */
     fun registrableDomain(host: String): String? {
         if (host.isBlank()) return null
         val labels = host.split(".")
@@ -28,12 +22,11 @@ class PublicSuffixList private constructor(
         return labels.subList(labels.size - suffixLabelCount - 1, labels.size).joinToString(".")
     }
 
-    /** True only for a host that matches a real listed rule (not the implicit "*"). */
+    /** A real listed rule only, not the implicit "*". */
     fun isListedSuffix(host: String): Boolean = rules.contains(host.lowercase())
 
-    /** Label count of the prevailing public suffix; implicit "*" yields 1. */
     private fun publicSuffixLabelCount(labels: List<String>): Int {
-        // Exception rules win outright; the longest (leftmost start) matches first.
+        // Exception rules win outright.
         for (i in labels.indices) {
             val suffix = labels.subList(i, labels.size).joinToString(".")
             if (exceptions.contains(suffix)) return labels.size - i - 1
@@ -44,13 +37,12 @@ class PublicSuffixList private constructor(
             if (rules.contains(suffixLabels.joinToString("."))) {
                 best = maxOf(best, suffixLabels.size)
             }
-            // Wildcard "*.<rest>" consumes labels[i]; <rest> is labels after it.
             if (i + 1 < labels.size) {
                 val wildcard = "*." + labels.subList(i + 1, labels.size).joinToString(".")
                 if (rules.contains(wildcard)) best = maxOf(best, suffixLabels.size)
             }
         }
-        // No rule matched: the implicit "*" rule makes the last label the suffix.
+        // The implicit "*" rule: the last label is the suffix.
         return if (best == -1) 1 else best
     }
 

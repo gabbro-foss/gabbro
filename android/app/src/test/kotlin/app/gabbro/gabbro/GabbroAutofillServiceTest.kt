@@ -6,15 +6,10 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-// extractRegistrableDomain, parseSummariesJson, and matchingCredentials depend on
-// real framework classes (android.net.Uri, org.json) that are stubbed to throw in
-// plain JVM unit tests — they are exercised under Robolectric in
-// GabbroAutofillServiceRobolectricTest. The pure-Kotlin helpers below need no
-// framework and cover the data-model + classification layer only.
+// Helpers touching android.net.Uri or org.json are tested under Robolectric in
+// GabbroAutofillServiceRobolectricTest; those classes throw in plain JVM tests.
 
 class GabbroAutofillServiceTest {
-
-    // ── CredentialSummary ─────────────────────────────────────────────────────
 
     @Test
     fun credentialSummary_copy_updates_password() {
@@ -32,8 +27,6 @@ class GabbroAutofillServiceTest {
         assertEquals(a, b)
     }
 
-    // ── ParsedStructure.isEmpty ───────────────────────────────────────────────
-
     @Test
     fun parsedStructure_isEmpty_true_when_both_id_lists_empty() {
         val ps = ParsedStructure(
@@ -47,7 +40,6 @@ class GabbroAutofillServiceTest {
 
     @Test
     fun parsedStructure_isEmpty_true_even_when_webDomain_set() {
-        // isEmpty only checks id lists — webDomain alone does not make it non-empty
         val ps = ParsedStructure(
             usernameIds = emptyList(),
             passwordIds = emptyList(),
@@ -57,18 +49,11 @@ class GabbroAutofillServiceTest {
         assertTrue(ps.isEmpty())
     }
 
-    // ── classifyField ─────────────────────────────────────────────────────────
-    // Pure per-field decision lifted out of the AssistStructure walk. android.*
-    // constants used below are compile-time-inlined, so this runs in the fast
-    // JVM lane with no Robolectric. The ViewNode glue that feeds these signals
-    // is device-verified.
-
-    // password-class inputType (TYPE_CLASS_TEXT | TYPE_TEXT_VARIATION_PASSWORD)
+    // The android.* constants are compile-time inlined, so no Robolectric needed.
     private val passwordInputType =
         android.text.InputType.TYPE_CLASS_TEXT or
             android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
 
-    // email-class inputType (TYPE_CLASS_TEXT | TYPE_TEXT_VARIATION_EMAIL_ADDRESS)
     private val emailInputType =
         android.text.InputType.TYPE_CLASS_TEXT or
             android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
@@ -93,65 +78,54 @@ class GabbroAutofillServiceTest {
         htmlId = htmlId,
     )
 
-    // (1) autofill hint username — preserved
     @Test
     fun classifyField_autofill_hint_username_is_username() {
         assertEquals(FieldKind.USERNAME, classify(hints = listOf("username")))
     }
 
-    // (2) autofill hint password — preserved
     @Test
     fun classifyField_autofill_hint_password_is_password() {
         assertEquals(FieldKind.PASSWORD, classify(hints = listOf("password")))
     }
 
-    // (3) the web miss: HTML type=password, no hints, inputType 0 -> Password
     @Test
     fun classifyField_html_type_password_with_no_other_signal_is_password() {
         assertEquals(FieldKind.PASSWORD, classify(htmlType = "password", inputType = 0))
     }
 
-    // (4) HTML type=email -> Email (routed to the entry's email value)
     @Test
     fun classifyField_html_type_email_is_email() {
         assertEquals(FieldKind.EMAIL, classify(htmlType = "email"))
     }
 
-    // (5) autocomplete current-/new-password -> Password
     @Test
     fun classifyField_autocomplete_current_and_new_password_is_password() {
         assertEquals(FieldKind.PASSWORD, classify(htmlAutocomplete = "current-password"))
         assertEquals(FieldKind.PASSWORD, classify(htmlAutocomplete = "new-password"))
     }
 
-    // (6) autocomplete username -> Username
     @Test
     fun classifyField_autocomplete_username_is_username() {
         assertEquals(FieldKind.USERNAME, classify(htmlAutocomplete = "username"))
     }
 
-    // (7) inputType password variation — preserved
     @Test
     fun classifyField_inputtype_password_variation_is_password() {
         assertEquals(FieldKind.PASSWORD, classify(inputType = passwordInputType))
     }
 
-    // (8) inputType email variation -> Email
     @Test
     fun classifyField_inputtype_email_variation_is_email() {
         assertEquals(FieldKind.EMAIL, classify(inputType = emailInputType))
     }
 
-    // (9) keyword password in name/id -> Password. html name/id are only trusted
-    // on a real form control (htmlType present); type=text marks an input without
-    // tripping the earlier Tier-2 html-type rule.
+    // htmlType = "text" marks a real control without tripping the html-type tier.
     @Test
     fun classifyField_keyword_password_in_name_or_id_is_password() {
         assertEquals(FieldKind.PASSWORD, classify(idEntry = "loginPassword"))
         assertEquals(FieldKind.PASSWORD, classify(htmlName = "user_password", htmlType = "text"))
     }
 
-    // (10) keyword username/login/phone -> Username (email keyword is EMAIL, below)
     @Test
     fun classifyField_keyword_user_signals_are_username() {
         assertEquals(FieldKind.USERNAME, classify(idEntry = "user_login"))
@@ -159,7 +133,6 @@ class GabbroAutofillServiceTest {
         assertEquals(FieldKind.USERNAME, classify(hint = "Phone number"))
     }
 
-    // (10b) email keyword/signals -> Email
     @Test
     fun classifyField_email_signals_are_email() {
         assertEquals(FieldKind.EMAIL, classify(hints = listOf("emailAddress")))
@@ -169,14 +142,12 @@ class GabbroAutofillServiceTest {
         assertEquals(FieldKind.EMAIL, classify(htmlName = "email_field", htmlType = "text"))
     }
 
-    // (10c) email keyword outranks a username keyword on the same field
     @Test
     fun classifyField_email_keyword_outranks_username_keyword() {
         assertEquals(FieldKind.EMAIL, classify(idEntry = "login_email"))
     }
 
-    // (13) html id carries the username truth where name is too short to match
-    // (aur.archlinux.org: name="user", id="id_username", type="text").
+    // aur.archlinux.org: name="user" is too short, id="id_username" carries it.
     @Test
     fun classifyField_html_id_username_on_input_is_username() {
         assertEquals(
@@ -185,22 +156,19 @@ class GabbroAutofillServiceTest {
         )
     }
 
-    // (14) container guard: a <form name="login"> carries an html name but no
-    // html type. It must not be classified as a username field (bbs/wiki false
-    // positive that produced an extra username target).
+    // A <form name="login"> container has a name but no type and must not
+    // become a username target.
     @Test
     fun classifyField_html_name_without_type_is_none() {
         assertEquals(FieldKind.NONE, classify(htmlName = "login"))
         assertEquals(FieldKind.NONE, classify(htmlName = "userlogin"))
     }
 
-    // (11) no signal at all -> None
     @Test
     fun classifyField_no_signal_is_none() {
         assertEquals(FieldKind.NONE, classify())
     }
 
-    // (12) precedence: HTML type=password beats a stray "username" keyword
     @Test
     fun classifyField_html_password_beats_stray_username_keyword() {
         assertEquals(
@@ -208,13 +176,6 @@ class GabbroAutofillServiceTest {
             classify(htmlType = "password", idEntry = "username_field"),
         )
     }
-
-    // ── formatNodeDiagnostic ──────────────────────────────────────────────────
-    // Pure formatter for the debug-only structure dump. Turns one node's signals
-    // into a single stable log line so a logcat capture on a failing SPA page
-    // shows exactly what (if anything) the browser exposed. Metadata only — never
-    // an AutofillValue / typed text. Side-effecting emission (Log.d) and the walk
-    // are device-verified, not unit-tested.
 
     private fun diag(
         className: String? = null,
@@ -244,7 +205,6 @@ class GabbroAutofillServiceTest {
         childCount = childCount,
     )
 
-    // (1) html attributes are rendered into the line
     @Test
     fun formatNodeDiagnostic_includes_html_attributes() {
         val line = diag(
@@ -259,7 +219,6 @@ class GabbroAutofillServiceTest {
         assertTrue(line, line.contains("id=pwField"))
     }
 
-    // (2) autofill hints are rendered into the line
     @Test
     fun formatNodeDiagnostic_includes_autofill_hints() {
         val line = diag(hints = listOf("username", "emailAddress"))
@@ -267,22 +226,18 @@ class GabbroAutofillServiceTest {
         assertTrue(line, line.contains("emailAddress"))
     }
 
-    // (3) inputType is rendered as hex
     @Test
     fun formatNodeDiagnostic_renders_inputtype_as_hex() {
         val line = diag(inputType = passwordInputType)
         assertTrue(line, line.contains(Integer.toHexString(passwordInputType)))
     }
 
-    // (4) autofillId presence is marked yes/no
     @Test
     fun formatNodeDiagnostic_marks_autofill_id_presence() {
         assertTrue(diag(hasAutofillId = true).contains("afId=yes"))
         assertTrue(diag(hasAutofillId = false).contains("afId=no"))
     }
 
-    // (5) the SPA-miss case: a node with no signals still yields a stable,
-    // non-crashing line that shows the emptiness
     @Test
     fun formatNodeDiagnostic_no_signal_node_is_stable() {
         val line = diag(className = "android.view.View")
@@ -292,18 +247,13 @@ class GabbroAutofillServiceTest {
         assertTrue(line, line.contains("hints[]"))
     }
 
-    // (6) null/blank fields do not throw and are shown empty
     @Test
     fun formatNodeDiagnostic_null_fields_do_not_throw() {
-        val line = diag() // everything default/null
+        val line = diag()
         assertTrue(line.isNotBlank())
         assertTrue(line, line.contains("html[]"))
         assertTrue(line, line.contains("hints[]"))
     }
-
-    // ── nativeAppIdMatches ────────────────────────────────────────────────────
-    // Native-app match is EXACT package-name equality. The cardinal rule: an
-    // unset (blank) app id matches nothing — no loose/substring matching.
 
     @Test
     fun nativeAppIdMatches_exact_package_matches() {
@@ -328,9 +278,6 @@ class GabbroAutofillServiceTest {
     fun nativeAppIdMatches_trims_surrounding_whitespace() {
         assertTrue(nativeAppIdMatches("  com.company.app  ", "com.company.app"))
     }
-
-    // ── fillValueFor ──────────────────────────────────────────────────────────
-    // Routes the right identifier to a field, each falling back to the other.
 
     @Test
     fun fillValueFor_email_field_uses_email() {
@@ -359,11 +306,6 @@ class GabbroAutofillServiceTest {
         assertEquals("", fillValueFor(FieldKind.EMAIL, "", ""))
         assertEquals("", fillValueFor(FieldKind.USERNAME, "", ""))
     }
-
-    // ── Layer B: capturedLoginFrom (typed values out of a SaveRequest) ─────────
-    // Faithful capture: username and email kept separate (no cross-fallback here —
-    // the effective-identifier fallback lives in the create-vs-update decision).
-    // Password is mandatory: no password means nothing worth saving as a Login.
 
     @Test
     fun capturedLogin_maps_username_email_password_fields() {
@@ -416,10 +358,6 @@ class GabbroAutofillServiceTest {
         assertEquals(CapturedLogin("alice", "", "secret"), captured)
     }
 
-    // ── Layer C: suggested save action (create / update / no-op) ──────────────
-    // Pure decision only — never a write. The suggestion pre-selects a default in the
-    // Flutter confirm screen, which the user can always override (save-new / pick / cancel).
-
     @Test
     fun effectiveIdentifier_uses_username_when_present() {
         assertEquals("alice", effectiveIdentifier("  Alice ", "a@b.com"))
@@ -450,11 +388,6 @@ class GabbroAutofillServiceTest {
         assertEquals(SaveDecision.NoOp, decideSave("id-1", "same", "same"))
     }
 
-    // ── Layer E: shouldOfferSave (onSaveRequest launch guard) ─────────────────
-    // The single drop-or-launch decision: a save needs a captured password AND a
-    // usable context (web eTLD+1 or app_id) to be matchable later. No password or
-    // no context -> drop silently (onSuccess, no SaveActivity).
-
     @Test
     fun shouldOfferSave_false_when_no_password() {
         assertFalse(shouldOfferSave(null, "example.com", "com.company.app"))
@@ -478,7 +411,6 @@ class GabbroAutofillServiceTest {
         assertTrue(shouldOfferSave(captured, "", "com.company.app"))
     }
 
-    // candidateLabel — picker display label for an existing login.
     @Test
     fun candidateLabel_prefers_username_then_email_then_url() {
         assertEquals(

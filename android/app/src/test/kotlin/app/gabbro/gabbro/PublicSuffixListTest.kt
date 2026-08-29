@@ -6,15 +6,9 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/**
- * Pure-JVM tests for the Public Suffix List matcher (no Android dependency).
- * A tiny inline rule set exercises normal, wildcard (*.), and exception (!) rules
- * plus the implicit "*" default. End-to-end coverage against the real vendored
- * list lives in GabbroAutofillServiceRobolectricTest (extractRegistrableDomain).
- */
+// The real vendored list is exercised in GabbroAutofillServiceRobolectricTest.
 class PublicSuffixListTest {
 
-    // Minimal stand-in for the real list: normal rules, a wildcard, an exception.
     private val psl = PublicSuffixList.parse(
         listOf(
             "// a comment line is ignored",
@@ -51,14 +45,12 @@ class PublicSuffixListTest {
 
     @Test
     fun registrable_wildcard_rule_consumes_one_label() {
-        // *.ck makes foo.ck a public suffix, so www.foo.ck is the registrable domain.
         assertEquals("www.foo.ck", psl.registrableDomain("www.foo.ck"))
         assertNull(psl.registrableDomain("foo.ck"))
     }
 
     @Test
     fun registrable_exception_rule_overrides_wildcard() {
-        // !www.ck exempts www.ck from *.ck, making ck the suffix and www.ck registrable.
         assertEquals("www.ck", psl.registrableDomain("www.ck"))
     }
 

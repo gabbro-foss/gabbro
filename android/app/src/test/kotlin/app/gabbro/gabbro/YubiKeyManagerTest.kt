@@ -5,7 +5,7 @@ import org.junit.Test
 
 class YubiKeyManagerTest {
 
-    // ── Hardware (USB-C YubiKey 5C plugged into S23) ──────────────────────────────
+    // Hardware-only: the When/Then lines are the test bodies.
 
     @Test
     @Ignore("Requires USB-C YubiKey 5C plugged into S23")
@@ -28,8 +28,6 @@ class YubiKeyManagerTest {
         // Then: both outputs are byte-for-byte equal
     }
 
-    // ── Hardware (NFC YubiKey 5 NFC tapped against S23) ──────────────────────────
-
     @Test
     @Ignore("Requires NFC YubiKey 5 NFC tapped against S23")
     fun nfc_register_returns_non_empty_credential_id() {
@@ -50,8 +48,6 @@ class YubiKeyManagerTest {
         // When: getHmacSecret() called twice via NFC with identical credentialId and salt
         // Then: both outputs are byte-for-byte equal
     }
-
-    // ── Cross-transport (YubiKey 5 NFC USB-C: register on one transport, get HMAC on the other) ──
 
     @Test
     @Ignore("Requires YubiKey 5 NFC USB-C: plug in via USB-C, then tap via NFC")

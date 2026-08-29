@@ -4,23 +4,9 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 /**
- * SaveActivity — the autofill SAVE counterpart to [UnlockActivity].
- *
- * Launched by [GabbroAutofillService.onSaveRequest] after the user submits a login
- * the vault lacks (or a changed password). A [GabbroUnlockHostActivity] subclass, so
- * it inherits the YubiKey + biometric channels, NFC NDEF suppression, and FLAG_SECURE.
- *
- * Flow:
- *   1. Runs the `autofillSaveMain` Flutter entrypoint. If the vault is locked the
- *      reused UnlockScreen unlocks it; if already unlocked it goes straight to the
- *      SaveConfirmScreen.
- *   2. Dart calls `getSaveContext` (post-unlock); we match the captured login against
- *      the session here — the single source of truth — and return the suggested action
- *      + same-site candidates.
- *   3. Dart performs the write (create/update) so it follows the in-app
- *      `passwordHistoryExpiry`, then calls `done` (or `cancel`); we finish.
- *
- * The captured login + web/app context arrive as intent extras from onSaveRequest.
+ * Launched by [GabbroAutofillService.onSaveRequest]. Matching happens here
+ * (the one source of truth); Dart performs the write so it follows the
+ * in-app `passwordHistoryExpiry`.
  */
 class SaveActivity : GabbroUnlockHostActivity() {
 
@@ -33,13 +19,11 @@ class SaveActivity : GabbroUnlockHostActivity() {
         const val EXTRA_APP_ID = "app.gabbro.gabbro.SAVE_APP_ID"
     }
 
-    // Backs eTLD+1 matching — the same vendored list the autofill service loads.
     private val publicSuffixList: PublicSuffixList by lazy { PublicSuffixList.fromAsset(this) }
 
     override fun getDartEntrypointFunctionName(): String = "autofillSaveMain"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
-        // Registers the shared YubiKey + biometric channels and NFC suppression.
         super.configureFlutterEngine(flutterEngine)
 
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
@@ -47,9 +31,9 @@ class SaveActivity : GabbroUnlockHostActivity() {
                 when (call.method) {
                     "isUnlocked" -> result.success(RustBridge.isVaultUnlocked())
                     "getSaveContext" -> result.success(buildSaveContext())
-                    // finishAndRemoveTask (not finish): onSaveRequest launches us in our
-                    // own task (FLAG_ACTIVITY_NEW_TASK), so a bare finish() leaves the task
-                    // behind and re-focusing Gabbro resurfaces this screen.
+                    // Launched in its own task (FLAG_ACTIVITY_NEW_TASK); a bare
+                    // finish() would leave it behind and re-focusing Gabbro
+                    // would resurface this screen.
                     "done" -> {
                         setResult(RESULT_OK)
                         finishAndRemoveTask()
@@ -65,12 +49,7 @@ class SaveActivity : GabbroUnlockHostActivity() {
             }
     }
 
-    /**
-     * Builds the `/autofill_save` payload: matches the captured login (intent extras)
-     * against the unlocked session and serialises the suggested [SaveDecision] plus the
-     * same-site candidates for the "choose another" picker. Runs post-unlock; matching
-     * uses password-free summaries and decrypts only the one identifier-matched entry.
-     */
+    /** Password-free summaries; only the one matched entry is decrypted. */
     private fun buildSaveContext(): String {
         val captured = CapturedLogin(
             username = intent?.getStringExtra(EXTRA_USERNAME).orEmpty(),

@@ -13,16 +13,9 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
 
-/**
- * Robolectric tests for the shared YubiKey tap state machine. Pins the
- * invariants the host activities (main app + autofill) rely on: exactly one of
- * success / error / timeout / cancel completes the Flutter result, a transient
- * error retries once, and discovery is dispatched to the requested transport.
- */
 @RunWith(RobolectricTestRunner::class)
 class TapFlowTest {
 
-    // Counting fake of MethodChannel.Result — records exactly what the flow returned.
     private class FakeResult : MethodChannel.Result {
         var successCount = 0
         var errorCount = 0
@@ -39,8 +32,6 @@ class TapFlowTest {
 
     private val fakeConn = object : YubiKeyConnection { override fun close() {} }
 
-    // Captures the discovery callbacks so a test can drive connect/error, and
-    // records the transports discovery was started/stopped with.
     private class FakeDiscovery {
         var onConnected: ((YubiKeyConnection) -> Unit)? = null
         var onError: ((String) -> Unit)? = null

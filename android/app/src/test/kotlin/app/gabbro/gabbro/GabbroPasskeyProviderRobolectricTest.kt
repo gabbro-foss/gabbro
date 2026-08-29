@@ -15,18 +15,12 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-/**
- * K7-K11: the passkey provider's registration, picker rows, and caller
- * validation. Everything here runs without the native library — the Rust seam
- * is a lambda, exactly like the autofill tests.
- */
+/** The Rust seam is a lambda, so nothing here loads the native library. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
 class GabbroPasskeyProviderRobolectricTest {
 
     private val context: android.content.Context = org.robolectric.RuntimeEnvironment.getApplication()
-
-    // ── K7: registered with Android as a passkey provider ────────────────────
 
     @Test
     fun `service is declared with the system-only binding permission`() {
@@ -41,8 +35,6 @@ class GabbroPasskeyProviderRobolectricTest {
             info.metaData?.get("android.credentials.provider"),
         )
     }
-
-    // ── K8/K9: picker rows ───────────────────────────────────────────────────
 
     private fun option(requestJson: String) =
         BeginGetPublicKeyCredentialOption(Bundle(), "test-id", requestJson)
@@ -74,8 +66,6 @@ class GabbroPasskeyProviderRobolectricTest {
         assertEquals(0, response.authenticationActions.size)
     }
 
-    // ── K13: post-unlock rebuilt rows carry the relock stamp ─────────────────
-
     private val oneMatch = """{"matches": [
         {"entryId": "e1", "rpId": "example.com", "userName": "a@example.com",
          "userDisplayName": "A", "credentialIdB64": "YQ"}
@@ -103,16 +93,12 @@ class GabbroPasskeyProviderRobolectricTest {
         assertFalse(serviceIntent.hasExtra(GabbroPasskeyActivity.EXTRA_RELOCK_AFTER))
     }
 
-    // ── K10: create flow offers the save row ─────────────────────────────────
-
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     @Test
     fun `creation request yields the save-in-Gabbro entry`() {
         val response = buildBeginCreateResponse(context)
         assertEquals(1, response.createEntries.size)
     }
-
-    // ── K11: caller validation ───────────────────────────────────────────────
 
     private val braveRelease =
         "9C:2D:B7:05:13:51:5F:DB:FB:BC:58:5B:3E:DF:3D:71:23:D4:DC:67:C9:4F:FD:30:63:61:C1:D7:9B:BF:18:AC"
@@ -182,9 +168,8 @@ class GabbroPasskeyProviderRobolectricTest {
         )
     }
 
-    // ── App-passkeys toggle (F1): the informed opt-in. Android grants the
-    // INTERNET permission silently, so with the toggle off a native app must
-    // be refused BEFORE any fetch — zero packets without consent. ────────────
+    // F1: Android grants INTERNET silently, so the toggle is the only consent
+    // gate before a fetch.
 
     @Test
     fun `toggle off refuses an app before any fetch`() {
@@ -209,10 +194,6 @@ class GabbroPasskeyProviderRobolectricTest {
         assertTrue(decision is CallerDecision.PrivilegedBrowser)
     }
 
-    // ── Off-main fetch: a network call on the caller's thread would throw
-    // NetworkOnMainThreadException, so a native-app caller could only ever be
-    // refused. The runner must execute the block on another thread. ──────────
-
     @Test
     fun `runOffMain executes the block on another thread and returns its value`() {
         val caller = Thread.currentThread().name
@@ -225,8 +206,6 @@ class GabbroPasskeyProviderRobolectricTest {
     fun `runOffMain returns null when the block throws`() {
         assertEquals(null, runOffMain<String> { throw RuntimeException("boom") })
     }
-
-    // ── Bridge envelope parsing ──────────────────────────────────────────────
 
     @Test
     fun `bridge envelope distinguishes locked from error from matches`() {

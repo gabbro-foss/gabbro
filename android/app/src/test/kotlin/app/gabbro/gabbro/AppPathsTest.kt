@@ -7,11 +7,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 
-/**
- * Pins the app-support directory the `app.gabbro.gabbro/paths` channel hands
- * to Dart: it must be `filesDir` — exactly what path_provider_android
- * returned — or every existing install loses sight of its vaults.
- */
+/** Anything but `filesDir` and every existing install loses sight of its vaults. */
 @RunWith(RobolectricTestRunner::class)
 class AppPathsTest {
 

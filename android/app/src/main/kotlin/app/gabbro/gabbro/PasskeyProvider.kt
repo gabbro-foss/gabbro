@@ -3,16 +3,9 @@ package app.gabbro.gabbro
 import org.json.JSONArray
 import org.json.JSONObject
 
-/**
- * PasskeyProvider — the testable core of GabbroCredentialProviderService.
- *
- * Pure functions and small classes with no service dependencies, mirroring the
- * autofill service's split: the OS-facing service stays thin, everything with
- * logic lives here where Robolectric/JVM tests can reach it without loading
- * the native library.
- */
+// The logic behind GabbroCredentialProviderService, kept free of service
+// dependencies so JVM tests reach it without loading the native library.
 
-/** One vault passkey answering a sign-in request, as parsed from RustBridge. */
 internal data class PasskeyMatch(
     val entryId: String,
     val rpId: String,
@@ -21,17 +14,13 @@ internal data class PasskeyMatch(
     val credentialIdB64: String,
 )
 
-/** Outcome of a RustBridge passkey call. */
 internal sealed class PasskeyRustResult {
     data class Matches(val matches: List<PasskeyMatch>) : PasskeyRustResult()
     object Locked : PasskeyRustResult()
     data class Error(val message: String) : PasskeyRustResult()
 }
 
-/**
- * Parse the `passkeysForRequest` JSON envelope. A locked vault is its own
- * outcome — the service turns it into an unlock action, never an empty list.
- */
+/** A locked vault is its own outcome: the service offers unlock, never an empty list. */
 internal fun parsePasskeyMatches(json: String): PasskeyRustResult {
     val obj = runCatching { JSONObject(json) }.getOrNull()
         ?: return PasskeyRustResult.Error("unparseable bridge reply")
@@ -58,9 +47,9 @@ internal fun parsePasskeyMatches(json: String): PasskeyRustResult {
 }
 
 /**
- * The vendored privileged-browser allowlist (Google's reference list, asset
- * `passkey_privileged_browsers.json`). A caller found here may assert its own
- * web origin; everyone else must prove app identity via Digital Asset Links.
+ * Google's reference list, vendored as `passkey_privileged_browsers.json`. A
+ * browser found here may assert its own web origin; every other caller must
+ * prove app identity via Digital Asset Links.
  */
 internal class PrivilegedBrowserAllowlist(json: String) {
     private val fingerprintsByPackage: Map<String, Set<String>> = buildMap {
@@ -80,18 +69,12 @@ internal class PrivilegedBrowserAllowlist(json: String) {
     fun isPrivileged(packageName: String, certSha256: String): Boolean =
         fingerprintsByPackage[packageName]?.contains(normalizeFingerprint(certSha256)) == true
 
-    /** The raw allowlist JSON is also what androidx's getOrigin() consumes. */
     companion object {
         fun normalizeFingerprint(fp: String): String = fp.uppercase().replace(":", "")
     }
 }
 
-/**
- * Does a site's Digital Asset Links file authorise this app for its
- * credentials? `assetLinksJson` is the body of
- * `https://<rpId>/.well-known/assetlinks.json`; refusal on any parse problem —
- * a site that can't vouch for the app gets no passkey.
- */
+/** Any parse problem refuses: a site that cannot vouch for the app gets no passkey. */
 internal fun assetLinksPermitsApp(
     assetLinksJson: String,
     packageName: String,
@@ -125,25 +108,19 @@ internal fun assetLinksPermitsApp(
     return false
 }
 
-/** Who is asking for a passkey, and on what authority. */
 internal sealed class CallerDecision {
-    /** A trusted browser; use the origin it asserted and its clientDataHash. */
+    /** Uses the origin the browser asserted and its own clientDataHash. */
     object PrivilegedBrowser : CallerDecision()
 
-    /** A native app proven by the site's asset links; origin is the apk-key-hash form. */
+    /** Origin is the apk-key-hash form. */
     data class VerifiedApp(val origin: String) : CallerDecision()
 
     data class Refused(val reason: String) : CallerDecision()
 }
 
 /**
- * Decide whether `packageName`/`certSha256` may operate on `rpId`'s
- * credentials. `fetchAssetLinks` returns the body of the site's
- * assetlinks.json, or null on any network/HTTP failure (which refuses —
- * fail closed).
- *
- * Consequence of a Refused: the user's passkey never signs for a caller the
- * site didn't vouch for — a lookalike app gets nothing.
+ * Fails closed: a null `fetchAssetLinks` (any network or HTTP failure)
+ * refuses, so a lookalike app the site never vouched for gets no signature.
  */
 internal fun decideCaller(
     rpId: String,
@@ -157,9 +134,8 @@ internal fun decideCaller(
     if (allowlist.isPrivileged(packageName, certSha256)) {
         return CallerDecision.PrivilegedBrowser
     }
-    // F1: the toggle is the user's informed opt-in to the one network fetch —
-    // off means refuse BEFORE touching the network, so zero packets without
-    // consent. Browsers never reach here (offline allowlist above).
+    // F1: the toggle is the opt-in to the one network fetch, so off refuses
+    // before any packet is sent. Browsers never reach here.
     if (!appPasskeysEnabled) {
         return CallerDecision.Refused("app passkeys are disabled in settings")
     }
@@ -172,11 +148,7 @@ internal fun decideCaller(
     }
 }
 
-/**
- * The clientDataJSON the provider builds for a verified native app (privileged
- * browsers build their own). `challengeB64` comes straight from the request
- * JSON — base64url, relayed untouched.
- */
+/** For verified native apps only; privileged browsers build their own. Challenge relayed untouched. */
 internal fun buildClientDataJson(type: String, challengeB64: String, origin: String): String {
     val o = JSONObject()
     o.put("type", type)
@@ -185,16 +157,13 @@ internal fun buildClientDataJson(type: String, challengeB64: String, origin: Str
     return o.toString()
 }
 
-/** The `challenge` field of a WebAuthn request JSON, or null. */
 internal fun challengeFromRequestJson(requestJson: String): String? =
     runCatching { JSONObject(requestJson).getString("challenge") }.getOrNull()
 
 /**
- * Run `block` on a worker thread and wait for its result; null if it throws.
- * Android kills a network call made on the main thread
- * (NetworkOnMainThreadException), which made every native-app caller's
- * asset-links check fail — and so refused callers the site actually vouches
- * for. The wait is bounded by the block's own timeouts.
+ * Android throws NetworkOnMainThreadException for a fetch on the main thread,
+ * which would refuse every native-app caller. The wait is bounded by the
+ * block's own timeouts.
  */
 internal fun <T> runOffMain(block: () -> T): T? = runCatching {
     val task = java.util.concurrent.FutureTask(block)

@@ -5,18 +5,9 @@ import com.yubico.yubikit.core.YubiKeyConnection
 import io.flutter.plugin.common.MethodChannel
 
 /**
- * TapFlow — the YubiKey tap state machine, lifted out of the host activity so it
- * is unit-testable and shared by every unlock host (main app + autofill).
- *
- * One tap operation (register or unlock) arms USB/NFC discovery and waits for a
- * connection callback. The whole flow is bounded by [timeoutMs] and abortable via
- * [cancel]. Exactly one of timeout / cancel / success / final-error completes the
- * Flutter result — all funnel through [finish], a no-op once the result is already
- * answered (first to fire wins). A transient transport/CTAP error retries once.
- *
- * [startDiscovery] / [stopDiscovery] are injected so the host supplies the real
- * transport wiring (and, for NFC, the foreground-dispatch re-arm) while the state
- * machine stays framework-light.
+ * Exactly one of timeout, cancel, success or final error completes the
+ * Flutter result: all funnel through [finish], first to fire wins. Discovery
+ * is injected so the host owns the transport wiring and this stays testable.
  */
 class TapFlow(
     private val handler: Handler,
@@ -32,14 +23,9 @@ class TapFlow(
     private var pendingResult: MethodChannel.Result? = null
     private var pendingTransport: String? = null
 
-    /** Transport of the in-flight tap, or null if none is pending. */
     val activeTransport: String?
         get() = pendingTransport
 
-    /**
-     * Runs one tap operation. [invoke] performs the actual CTAP2 call once a
-     * connection is up, reporting through `onOk` (success payload) / `onErr` (msg).
-     */
     fun run(
         result: MethodChannel.Result,
         transport: String,
@@ -56,7 +42,6 @@ class TapFlow(
         attempt(transport, errorCode, invoke, retriesLeft = 1)
     }
 
-    /** Aborts an in-flight tap (e.g. the user pressed Cancel). */
     fun cancel() {
         pendingTransport?.let { t ->
             finish(t) { it.error("TAP_CANCELLED", "Tap cancelled by user", null) }
@@ -69,7 +54,7 @@ class TapFlow(
         invoke: (YubiKeyConnection, (Any?) -> Unit, (String) -> Unit) -> Unit,
         retriesLeft: Int,
     ) {
-        if (pendingResult == null) return // timed out / cancelled meanwhile
+        if (pendingResult == null) return
         startDiscovery(
             transport,
             { conn ->
@@ -112,7 +97,6 @@ class TapFlow(
         handler.postDelayed(r, timeoutMs)
     }
 
-    /** Complete the pending result once, stop discovery, clear timeout/state. */
     private fun finish(transport: String, complete: (MethodChannel.Result) -> Unit) {
         timeoutRunnable?.let { handler.removeCallbacks(it) }
         timeoutRunnable = null

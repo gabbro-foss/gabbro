@@ -13,10 +13,8 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 
 /**
- * Step 3, remembered import folder on Android: the file dialog is opened at
- * the location the user picked last time, and reports the new location back
- * so it can be remembered in turn. Without the extra the dialog opens wherever
- * the system chooses; without the reply nothing can be remembered.
+ * Without the extra the dialog opens wherever the system chooses; without the
+ * reply nothing can be remembered.
  */
 @RunWith(RobolectricTestRunner::class)
 class GabbroPickerLocationTest {

@@ -23,13 +23,9 @@ import androidx.credentials.provider.CredentialProviderService
 import androidx.credentials.provider.PublicKeyCredentialEntry
 
 /**
- * GabbroCredentialProviderService — Android's entry point into the vault for
- * passkeys. The OS binds it (API 34+) whenever an app or browser creates or
- * uses a passkey and the user has enabled Gabbro as a credential provider.
- *
- * Thin by design: query/build logic lives in PasskeyProvider.kt (testable);
- * unlock, consent, caller validation and the actual crypto happen in the
- * phase-2 activities this service points its PendingIntents at.
+ * Kept thin: the logic is in PasskeyProvider.kt where tests reach it, and
+ * unlock, consent, caller validation and crypto live in the activities the
+ * PendingIntents target.
  */
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 class GabbroCredentialProviderService : CredentialProviderService() {
@@ -67,12 +63,12 @@ class GabbroCredentialProviderService : CredentialProviderService() {
         cancellationSignal: CancellationSignal,
         callback: OutcomeReceiver<Void?, androidx.credentials.exceptions.ClearCredentialException>,
     ) {
-        // Nothing cached outside the vault; sign-out state lives with the RP.
+        // Nothing is cached outside the vault; sign-out state lives with the RP.
         callback.onError(ClearCredentialUnsupportedException())
     }
 }
 
-/** Distinct request codes per entry keep every PendingIntent unique. */
+// Distinct request codes keep every PendingIntent unique.
 private var nextRequestCode = 1000
 
 private fun pendingIntentFor(
@@ -93,9 +89,8 @@ private fun pendingIntentFor(
 }
 
 /**
- * The picker rows for a sign-in request. Locked vault -> a single unlock
- * action (never an empty list, which would read as "no passkeys here" and
- * push the user to a rival provider); unlocked -> one row per match.
+ * A locked vault yields an unlock action, never an empty list, which would
+ * read as "no passkeys here" and push the user to a rival provider.
  */
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 internal fun buildBeginGetResponse(
@@ -143,7 +138,6 @@ internal fun buildBeginGetResponse(
     return BeginGetCredentialResponse(credentialEntries = entries)
 }
 
-/** The single "Save passkey in Gabbro" row for a creation request. */
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 internal fun buildBeginCreateResponse(context: Context): BeginCreateCredentialResponse =
     BeginCreateCredentialResponse(

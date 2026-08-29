@@ -5,28 +5,20 @@ import android.util.Base64
 import java.security.MessageDigest
 
 /**
- * Per-vault SharedPreferences bookkeeping for biometric enrolment: the
- * encrypted-passphrase ciphertext + iv + the owning vault path, namespaced by a hash
- * of the vault path so each vault has its own slot.
- *
- * Deliberately free of any AndroidKeyStore calls so the per-vault storage contract is
- * unit-testable under Robolectric. The KeyStore key lifecycle (generate/delete/cipher)
- * lives in [BiometricHelper]; this object only names the alias and holds the prefs.
+ * Free of AndroidKeyStore calls so the per-vault storage contract is testable
+ * under Robolectric; the key lifecycle lives in [BiometricHelper].
  */
 object BiometricStore {
 
     private const val PREFS_FILE = "gabbro_biometric"
 
-    /** Stable per-vault suffix: hex SHA-256 of the vault path. */
     fun suffix(vaultPath: String): String =
         MessageDigest.getInstance("SHA-256")
             .digest(vaultPath.toByteArray())
             .joinToString("") { "%02x".format(it.toInt() and 0xff) }
 
-    /** AndroidKeyStore alias for this vault's biometric key. */
     fun keyAlias(vaultPath: String): String = "gabbro_biometric_key_${suffix(vaultPath)}"
 
-    /** True iff a complete enrolment (ciphertext + iv + matching path) exists for [vaultPath]. */
     fun has(context: Context, vaultPath: String): Boolean {
         val s = suffix(vaultPath)
         val p = prefs(context)
@@ -35,7 +27,6 @@ object BiometricStore {
             p.getString(pathKey(s), null) == vaultPath
     }
 
-    /** The stored (ciphertext, iv) for [vaultPath], or null if not fully enrolled. */
     fun read(context: Context, vaultPath: String): Pair<ByteArray, ByteArray>? {
         val s = suffix(vaultPath)
         val p = prefs(context)
@@ -54,7 +45,6 @@ object BiometricStore {
             .apply()
     }
 
-    /** Drop this vault's enrolment slot, leaving every other vault's slot untouched. */
     fun forget(context: Context, vaultPath: String) {
         val s = suffix(vaultPath)
         prefs(context).edit()

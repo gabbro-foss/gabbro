@@ -9,26 +9,10 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 /**
- * UnlockActivity — the autofill authentication wall.
- *
- * Launched by the OS when GabbroAutofillService returns a Dataset with an
- * IntentSender (i.e. the vault is locked and a fill request has arrived).
- *
- * Flow:
- *   1. OS launches this activity via the IntentSender from buildAuthResponse().
- *   2. We run the `autofillUnlockMain` Flutter entrypoint, which shows the full
- *      reused UnlockScreen (vault picker, passphrase, YubiKey, biometric).
- *   3a. Flutter unlocks the shared vault session (generated bridge) and then calls
- *       the `"unlock"` method here; we build a FillResponse with the requested
- *       credential and finish with RESULT_OK.
- *   3b. User cancels / back-presses → finish with RESULT_CANCELED. The OS
- *       delivers nothing to the target field.
- *
- * Inherits the YubiKey + biometric channels, NFC NDEF suppression, and FLAG_SECURE
- * from [GabbroUnlockHostActivity] — so YubiKey (USB + NFC) and biometric unlock
- * work here exactly as in the main app, and an NFC OTP tap cannot escape to the
- * browser. This activity must never finish with RESULT_OK unless the vault is
- * confirmed unlocked and a valid credential has been selected.
+ * The autofill authentication wall, opened by the IntentSender from
+ * [GabbroAutofillService.buildAuthResponse]. Flutter unlocks the shared
+ * session and calls "unlock" here; RESULT_OK is set only with a matched
+ * credential, otherwise the OS delivers nothing to the field.
  */
 class UnlockActivity : GabbroUnlockHostActivity() {
 
@@ -41,28 +25,24 @@ class UnlockActivity : GabbroUnlockHostActivity() {
         const val EXTRA_PACKAGE_NAME = "app.gabbro.gabbro.EXTRA_PACKAGE_NAME"
     }
 
-    // Backs eTLD+1 matching — the same vendored list the autofill service loads.
     private val publicSuffixList: PublicSuffixList by lazy { PublicSuffixList.fromAsset(this) }
 
     override fun getDartEntrypointFunctionName(): String = "autofillUnlockMain"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
-        // Registers the shared YubiKey + biometric channels and NFC suppression.
         super.configureFlutterEngine(flutterEngine)
 
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
             .setMethodCallHandler { call, result ->
                 when (call.method) {
                     "unlock" -> {
-                        // Flutter has already unlocked the shared vault session; build the
-                        // fill response. Return whether a credential matched so Dart can show
-                        // a localized "no credentials" dialog itself — a native AlertDialog
-                        // cannot be localized against the Flutter ARBs.
+                        // Returns whether a credential matched so Dart shows the
+                        // localized "no credentials" dialog; a native AlertDialog
+                        // cannot use the Flutter ARBs.
                         //
-                        // Deliberately does NOT finish (RT-5): this activity unlocked the
-                        // vault, and its Dart isolate dies with the activity, so Dart must
-                        // lock the session before we go. It calls "finish" once it has.
-                        // Finishing here would race the engine teardown against that lock.
+                        // Must not finish here (RT-5): the Dart isolate dies with
+                        // the activity, so Dart locks the session first and then
+                        // calls "finish". Finishing now would race that lock.
                         val fillIntent = buildFillIntent()
                         if (fillIntent != null) {
                             setResult(RESULT_OK, fillIntent)
@@ -72,7 +52,6 @@ class UnlockActivity : GabbroUnlockHostActivity() {
                         }
                     }
                     "finish" -> {
-                        // The result is already set by "unlock"; Dart has now locked.
                         finish()
                         result.success(null)
                     }
@@ -87,19 +66,9 @@ class UnlockActivity : GabbroUnlockHostActivity() {
     }
 
     /**
-     * Runs domain/package matching after unlock and builds a FillResponse.
-     *
-     * GabbroAutofillService passes the parsed AutofillIds, web domain, and
-     * app package name as intent extras when building the PendingIntent for
-     * the auth wall. We read those extras here — no AssistStructure needed.
-     *
-     * Matching uses the shared matchingCredentials — identical to the unlocked
-     * GabbroAutofillService path (browser: PSL eTLD+1; native: exact app_id), so the
-     * two can't drift. Matching runs on password-free summaries; only the chosen
-     * entry's password is decrypted. Multiple matches: first match wins (v2: picker).
-     *
-     * Returns null if extras are missing or no Login entries match — caller sets
-     * RESULT_CANCELED in that case.
+     * The AutofillIds and context arrive as intent extras, so no
+     * AssistStructure is needed. Multiple matches: first wins (a picker is
+     * v2). Null when nothing matches.
      */
     private fun buildFillIntent(): Intent? {
         val usernameIds: ArrayList<android.view.autofill.AutofillId> =
@@ -141,7 +110,7 @@ class UnlockActivity : GabbroUnlockHostActivity() {
 
         if (matches.isEmpty()) return null
 
-        // Decrypt only the chosen entry's password — never the whole vault.
+        // Only the chosen entry's password is decrypted, never the whole vault.
         val cred = matches.first().let { it.copy(password = fetchPassword(it.id)) }
         val presentation = RemoteViews(packageName, R.layout.autofill_unlock_item)
         val dataset = buildFillDataset(usernameIds, emailIds, passwordIds, cred, presentation)
@@ -155,10 +124,6 @@ class UnlockActivity : GabbroUnlockHostActivity() {
         }
     }
 
-    /**
-     * User pressed back or cancelled the unlock flow.
-     * RESULT_CANCELED tells the OS to deliver nothing to the target field.
-     */
     @Suppress("OVERRIDE_DEPRECATION")
     override fun onBackPressed() {
         setResult(RESULT_CANCELED)

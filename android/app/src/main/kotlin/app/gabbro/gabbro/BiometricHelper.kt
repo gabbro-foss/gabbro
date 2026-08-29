@@ -15,19 +15,15 @@ import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 
 /**
- * Biometric enrolment is per vault: each vault gets its own AndroidKeyStore key
- * (alias via [BiometricStore.keyAlias]) and its own SharedPreferences slot (via
- * [BiometricStore]). Enrolling or unenrolling one vault never touches another.
- * Biometric is also per device — the key is hardware-bound and never travels with the
- * vault file, so a vault synced across devices carries no biometric state.
+ * Per vault (own KeyStore key and prefs slot) so enrolling one never touches
+ * another, and per device: the key is hardware-bound and never travels with
+ * the vault file.
  */
 object BiometricHelper {
 
     private const val KEYSTORE_PROVIDER = "AndroidKeyStore"
     private const val TRANSFORMATION = "AES/GCM/NoPadding"
     private const val GCM_TAG_BITS = 128
-
-    // ── Public API ────────────────────────────────────────────────────────────
 
     fun isAvailable(context: Context): Boolean =
         BiometricManager.from(context)
@@ -72,7 +68,7 @@ object BiometricHelper {
                     onError(msg.toString())
                 }
 
-                override fun onAuthenticationFailed() { /* retry handled by system */ }
+                override fun onAuthenticationFailed() {}
             }).authenticate(buildPromptInfo(promptTitle, promptSubtitle, activity),
                 BiometricPrompt.CryptoObject(cipher))
         } catch (e: Exception) {
@@ -131,8 +127,6 @@ object BiometricHelper {
         BiometricStore.forget(context, vaultPath)
         deleteKey(vaultPath)
     }
-
-    // ── Private helpers ───────────────────────────────────────────────────────
 
     private fun generateKey(vaultPath: String) {
         KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, KEYSTORE_PROVIDER).apply {

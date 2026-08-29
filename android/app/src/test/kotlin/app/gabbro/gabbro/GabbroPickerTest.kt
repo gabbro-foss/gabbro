@@ -10,16 +10,11 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * Pins the pieces of the `app.gabbro.gabbro/picker` channel that decide what
- * the user sees and where their file lands.
- *
- * The `.gabbro` case is the one that matters most: Android has no registered
- * type for it, so filtering by type would show the user an empty picker with
- * none of their vaults in it.
+ * Android has no registered type for `.gabbro`, so filtering by type would
+ * show an empty picker with none of the user's vaults in it.
  */
 class GabbroPickerTest {
 
-    // A stand-in for Android's own extension -> type table.
     private val androidTypes = mapOf(
         "csv" to "text/comma-separated-values",
         "json" to "application/json",
@@ -135,7 +130,6 @@ class GabbroPickerTest {
         assertNull(GabbroPicker.rawPathFromDocumentId(""))
     }
 
-    // ── S6: one-click sync reads the vault by name from the granted tree ──────
 
     @Test
     fun `a tree child of the vault's name is copied into the cache`() {

@@ -12,12 +12,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 
-/**
- * Per-vault biometric SharedPreferences bookkeeping. No AndroidKeyStore calls here, so
- * the multi-vault storage contract (each vault its own slot) is fully unit-testable —
- * the exact gap that let the single-slot bug through. The key-material lifecycle stays
- * in BiometricHelper (hardware-tested).
- */
+/** The per-vault slot contract; a single shared slot once let one vault unlock another. */
 @RunWith(RobolectricTestRunner::class)
 class BiometricStoreTest {
 
@@ -34,7 +29,6 @@ class BiometricStoreTest {
             .edit().clear().apply()
     }
 
-    // 11: two vaults each keep their own enrolment (single-slot design fails this).
     @Test
     fun store_two_vaults_both_enrolled() {
         BiometricStore.store(context, vaultA, ct, iv)
@@ -43,7 +37,6 @@ class BiometricStoreTest {
         assertTrue(BiometricStore.has(context, vaultB))
     }
 
-    // 12: forgetting one vault leaves the other enrolled.
     @Test
     fun forget_one_vault_leaves_the_other() {
         BiometricStore.store(context, vaultA, ct, iv)
@@ -53,7 +46,6 @@ class BiometricStoreTest {
         assertTrue(BiometricStore.has(context, vaultB))
     }
 
-    // 13: each vault gets a distinct AndroidKeyStore alias.
     @Test
     fun key_alias_is_distinct_per_vault() {
         assertNotEquals(BiometricStore.keyAlias(vaultA), BiometricStore.keyAlias(vaultB))

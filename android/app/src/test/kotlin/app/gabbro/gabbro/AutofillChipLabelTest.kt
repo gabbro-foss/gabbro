@@ -9,16 +9,9 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 
 /**
- * Guards localization of the autofill suggestion chip (autofill_unlock_label).
- *
- * The chip is a RemoteViews rendered by the system UI, so it has no Flutter
- * engine and cannot read the Flutter ARBs — its text comes from Android string
- * resources (res/values-XX/), resolved by the OS against the DEVICE locale.
- * These tests pin that every supported locale resolves a non-blank label and
- * that the translated folders actually wire up (no silent fallback to English).
- *
- * Caveat (not testable, documented in ARCHITECTURE.md): the OS picks the folder
- * by device locale, never by Gabbro's in-app language override.
+ * The chip is a RemoteViews drawn by the system UI, so its text comes from
+ * res/values-XX/ resolved against the device locale, never the Flutter ARBs
+ * or the in-app language override.
  */
 @RunWith(RobolectricTestRunner::class)
 class AutofillChipLabelTest {
@@ -44,7 +37,6 @@ class AutofillChipLabelTest {
 
     @Test
     fun serbian_scripts_resolve_distinctly() {
-        // Cyrillic base vs Latin script variant must not collapse to one folder.
         assertNotEquals(
             "values-b+sr+Latn (Latin) must differ from Cyrillic values-b+sr",
             label("+b+sr"),
@@ -61,10 +53,8 @@ class AutofillChipLabelTest {
     }
 
     companion object {
-        // Android resource qualifiers for every locale Gabbro's ARBs support.
-        // Region/script variants fall back to their base folder where the chip
-        // text is identical (pt-BR/pt-PT -> pt, zh-CN -> zh); only zh-TW and
-        // sr-Latn carry their own folder.
+        // Every ARB locale. Variants with identical chip text share the base
+        // folder; only zh-TW and sr-Latn carry their own.
         private val SUPPORTED_QUALIFIERS = listOf(
             "bg", "cs", "da", "de", "el", "en", "es", "et", "eu", "fi", "fr",
             "hr", "hu", "it", "ja", "kk", "ko", "lt", "lv", "nb", "nl", "nn",
