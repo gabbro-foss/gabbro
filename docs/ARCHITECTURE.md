@@ -149,8 +149,67 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-- **Shorten comments and user-facing messages.** Sweep the whole stack: code
-  comments trimmed to what the code can't say; UI strings terse.
+**Shorten comments and user-facing messages.** Two sub-tasks, in sequence:
+
+1. **Code comments.** Scope: `*.rs` (62, `frb_generated.rs` excluded),
+   `*.dart` (279, tests included, `lib/src/rust/` and `lib/l10n/app_localizations*.dart`
+   excluded - both generated), `*.kt` (34; `.kts` build scripts excluded).
+   Zero test impact - doc-comment fences are all `text`, no doctests compile.
+   Order: kt -> rs -> dart, a survey per layer, reviewed before edits.
+
+   **Rules.** Code states the what and the how; a comment states only the
+   why, never the when (no dates, no "was added in", no session history -
+   git holds that). No comment by default: add one only where the why is
+   not evident from the code. ASCII only, no emojis, no em-dashes or
+   arrows. Plain wording, no stock LLM phrases. Language-mandated forms
+   stay: Rust `//!`/`///` doc comments per rustdoc, Dart `///` per
+   Effective Dart, Kotlin KDoc - each used only when there is a why to say.
+
+   **Kotlin survey (2026-08-29, against the rules):** 1075 comment lines;
+   top 5 files hold 52% (`GabbroAutofillService.kt` 261/992, its two test
+   files 89 + 66, `RustBridge.kt` 54/78, `PasskeyProvider.kt` 54/203).
+   Violations: 180 non-ASCII lines (`// -- Section ----` box-drawing rules
+   and em-dashes), 5 history lines ("same session as this file"), 0 dates.
+   Cut: class headers restating the name, doc comments paraphrasing the
+   signature, inline narration mirroring the next line, lifecycle headers
+   (Autofill 14, UnlockActivity 22, SaveActivity 19 lines) beyond the
+   OS-driven control flow that the code cannot show. Keep the why:
+   Ctap2Session over Ctap2Client, SAF EPERM, NDEF skip, privileged-browser
+   fallback, "metadata only, never field values", debug compile-out. Target
+   ~500 lines.
+
+   **Rust survey (2026-08-29, against the rules):** 4412 comment lines in
+   61 files. Top: `vault/session.rs` 785/9411, `api/vault_bridge.rs` 434,
+   `api/vault.rs` 317, `vault/io.rs` 222, `vault/file_format.rs` 185,
+   `tests/vault_backward_compat.rs` 184. Violations: 709 non-ASCII lines
+   (box-drawing rules, em-dashes, arrows, 11 check-mark glyphs in the
+   backward-compat header), 13 dated lines, 21 history lines. Cut: file
+   headers over 15 lines (`vault_backward_compat.rs` 73, `file_format.rs`
+   42, the two fuzzers 34 + 33, `mem_forensics.rs` + `entropy.rs` 28 each)
+   to the invariant plus a pointer; bridge doc comments restating the
+   signature or repeating "reads from in-memory session, no I/O" per fn;
+   step narration; every date and "found on" (keep the reason, drop the
+   when). Keep the why: refused-format reasons, VERSION invariants, "why
+   not X". Target ~3500 lines.
+
+   **Dart survey (2026-08-29, against the rules):** 5987 comment lines in
+   262 files (generated bridge and `app_localizations*.dart` excluded):
+   lib ~2700, tests ~3200. Top: `vault_list_screen.dart` 445/3086,
+   `unlock_screen.dart` 243, `main.dart` 242, `test/unlock_screen_test.dart`
+   201, `tablet_vault_layout.dart` 134/575. Violations: 975 non-ASCII lines
+   (mostly `// -- Section ----` rules, ~230 of them; em-dashes; the Cyrillic
+   and CJK hits are test data, allowed), 431 ASCII banner lines
+   (`// -----` boxes), 21 dated lines, 31 history lines, 30 hardware
+   anecdotes. Cut: banner boxes to a plain one-line heading or nothing,
+   integration-test preambles of 18-22 lines, the five near-identical "Set
+   by the active vault list so the GLOBAL Ctrl+X handler" blocks in
+   `vault_list_screen.dart` (say it once), test preambles restating group
+   names, anecdotes reduced to the failure mode (no dates, no quotes). Keep
+   the why: ADR refs, the `// ignore:` lint lines (70, directives not
+   comments). Target ~4500.
+2. **User-facing strings**: terse UI strings. Not free - each change touches
+   `lib/l10n/app_*.arb` (all locales) and the tests quoting the literal
+   (~1.6k `find.text` assertions). Scope and weigh before starting.
 
 ---
 
@@ -163,7 +222,7 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 
 ## Bikeshed / Backlog
 
-**Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
+**Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely - the git log is the record.
 
 ### Features and UI/UX
 - **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
@@ -176,16 +235,16 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   PR requesting 0x1209:0x6ABB awaits external review (volunteer-run, can take
   months; not release-blocking): https://github.com/pidcodes/pidcodes.github.com/pull/1265
   On grant: TDD the constants in `rust/src/uhid.rs`, hardware-verify on Linux.
-- **Delete `purgeLegacyRecentApps` at v1.0** (`MainActivity.kt` + `LegacyPurgeTest.kt`) — the one-shot cleanup of the removed suggestion-chip store. No pre-1.0 install will still be upgrading by then.
+- **Delete `purgeLegacyRecentApps` at v1.0** (`MainActivity.kt` + `LegacyPurgeTest.kt`) - the one-shot cleanup of the removed suggestion-chip store. No pre-1.0 install will still be upgrading by then.
 
 ### Security (pre-v1)
-- **Human expert cryptography review** of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
+- **Human expert cryptography review** of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) - **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
 
 ### V2+ / Defer
-- **Wayland auto-type** — blocked: Wayland breaks global input injection
+- **Wayland auto-type** - blocked: Wayland breaks global input injection
   (https://gist.github.com/probonopd/9feb7c20257af5dd915e3a9f2d1f2277).
   Revisit only if Mint defaults to Wayland.
 - **Windows support.**
 - **Yubico partnership.**
-- **Donation/sustainability model**: GitHub Sponsors is live; Monero possible later (a large, dedicated effort). Liberapay ruled out (2026-07-22 — Stripe forces business-type onboarding for individuals and has suspended Liberapay-linked accounts; no PayPal). Don't re-propose Liberapay.
+- **Donation/sustainability model**: GitHub Sponsors is live; Monero possible later (a large, dedicated effort). Liberapay ruled out (2026-07-22 - Stripe forces business-type onboarding for individuals and has suspended Liberapay-linked accounts; no PayPal). Don't re-propose Liberapay.
 - **Support model** (GitHub Issues + SUPPORT.md for v1; revisit when user base exists).
