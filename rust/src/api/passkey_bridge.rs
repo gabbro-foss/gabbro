@@ -1,17 +1,12 @@
-//! Passkey provider bridge — the WebAuthn request/response layer.
-//!
-//! The Android Credential Manager (and later the Linux virtual authenticator)
-//! hands over the relying party's request JSON verbatim; this module parses it,
-//! drives the vault session and `crypto::webauthn`, and assembles the response
-//! JSON the caller sends back. All parsing and crypto stay behind the bridge —
-//! Kotlin passes strings through and never sees key material.
+//! WebAuthn request and response JSON, parsed and assembled here so Kotlin
+//! passes strings through and never sees key material.
 
 use base64::Engine;
 use serde::Deserialize;
 
 const ES256: i64 = -7;
 
-/// A parsed WebAuthn registration request — only the fields Gabbro needs to
+/// A parsed WebAuthn registration request - only the fields Gabbro needs to
 /// mint and store a credential.
 #[derive(Debug)]
 pub struct CreationRequest {
@@ -89,7 +84,7 @@ pub fn parse_creation_request(json: &str) -> Result<CreationRequest, String> {
 }
 
 /// What Kotlin needs to assemble the registration response. Everything here is
-/// public material — the private key stayed in the vault entry.
+/// public material - the private key stayed in the vault entry.
 #[derive(Debug)]
 pub struct RegistrationParts {
     pub credential_id: Vec<u8>,
@@ -103,7 +98,7 @@ pub use crate::crypto::webauthn::attestation_object;
 /// Register a new passkey from a relying party's creation request: mint the
 /// key pair, store the credential as a vault entry (persisted like any entry),
 /// and return the public parts for the response. Fails when the vault is
-/// locked — the caller shows the unlock flow and retries.
+/// locked - the caller shows the unlock flow and retries.
 pub fn register_passkey(request_json: &str) -> Result<RegistrationParts, String> {
     let req = parse_creation_request(request_json)?;
     register_passkey_parts(
@@ -286,7 +281,7 @@ fn placeholder_client_data() -> String {
 }
 
 /// SubjectPublicKeyInfo DER wrapping the ES256 key from our pinned 77-byte
-/// COSE layout (x at 10..42, y at 45..77) — the `response.publicKey` easy
+/// COSE layout (x at 10..42, y at 45..77) - the `response.publicKey` easy
 /// accessor. Constant P-256 prefix, no ASN.1 dependency.
 fn spki_from_cose(cose: &[u8]) -> Vec<u8> {
     const P256_SPKI_PREFIX: [u8; 26] = [
@@ -311,7 +306,7 @@ pub fn registration_response_json(
 ) -> Result<String, String> {
     let parts = register_passkey(request_json)?;
     let id = b64url_encode(&parts.credential_id);
-    // Every member the W3C RegistrationResponseJSON shape requires — browsers
+    // Every member the W3C RegistrationResponseJSON shape requires - browsers
     // parse this strictly, and a missing member fails the whole ceremony.
     let response = serde_json::json!({
         "clientDataJSON": client_data_json_b64url.unwrap_or_else(placeholder_client_data),
@@ -335,8 +330,8 @@ pub fn registration_response_json(
 /// Sign and return the complete W3C `AuthenticationResponseJSON`.
 ///
 /// Exactly one client-data source: the provider-built clientDataJSON (native
-/// apps — we hash it ourselves and include it), or the caller's pre-computed
-/// hash (privileged browsers — they attach their own clientDataJSON).
+/// apps - we hash it ourselves and include it), or the caller's pre-computed
+/// hash (privileged browsers - they attach their own clientDataJSON).
 pub fn assertion_response_json(
     entry_id: &str,
     client_data_json_b64url: Option<String>,
@@ -349,7 +344,7 @@ pub fn assertion_response_json(
             (Sha256::digest(&raw).to_vec(), cdj)
         }
         // Privileged caller: it substitutes its own clientDataJSON, but the
-        // member must exist for strict parsers — placeholder, never absent.
+        // member must exist for strict parsers - placeholder, never absent.
         (None, Some(h)) => (b64url("clientDataHash", &h)?, placeholder_client_data()),
         _ => {
             return Err(String::from(
@@ -432,8 +427,6 @@ mod tests {
         assert!(parse_creation_request(&json).is_err());
     }
 
-    // ── Registration against a live session ──────────────────────────────────
-
     use crate::api::vault::save_vault;
     use crate::api::vault_bridge::{list_entry_summaries, lock_vault, unlock_vault};
     use crate::vault::serialization::VaultBody;
@@ -514,8 +507,6 @@ mod tests {
         assert!(err.contains("locked"), "got: {err}");
     }
 
-    // ── Assertion (sign-in) ──────────────────────────────────────────────────
-
     fn assertion_json(rp_id: &str) -> String {
         format!(
             r#"{{"challenge": "Y2hhbGxlbmdlLWJ5dGVz", "rpId": "{rp_id}", "allowCredentials": []}}"#
@@ -548,7 +539,7 @@ mod tests {
         assert_eq!(matches.len(), 1);
         assert_eq!(matches[0].user_name, "user@example.com");
 
-        // R6: lookalikes and subdomains match nothing — a passkey for
+        // R6: lookalikes and subdomains match nothing - a passkey for
         // example.com must never answer for anyone else.
         assert!(passkeys_for_request(&assertion_json("app.example.com"))
             .unwrap()
@@ -615,8 +606,6 @@ mod tests {
         let err = passkeys_for_request(&assertion_json("example.com")).unwrap_err();
         assert!(err.contains("locked"), "got: {err}");
     }
-
-    // ── Full W3C response JSON (what Kotlin relays verbatim) ─────────────────
 
     #[test]
     #[serial]
@@ -696,7 +685,7 @@ mod tests {
     #[serial]
     fn assertion_response_with_caller_hash_uses_placeholder_client_data() {
         // Privileged browsers hand us a pre-computed hash and substitute their
-        // own clientDataJSON — but the field must still be present as a
+        // own clientDataJSON - but the field must still be present as a
         // placeholder, or the browser's strict JSON parse fails (Android
         // credential-provider docs; S23 "unknown error").
         let path = with_unlocked_vault("assert_hash");
@@ -765,7 +754,7 @@ mod tests {
     }
 
     /// Fetch the stored COSE public key of an entry via the bridge DTO's b64
-    /// credential id sibling — test-only, through get_entry.
+    /// credential id sibling - test-only, through get_entry.
     fn register_cose_of(entry_id: &str) -> Vec<u8> {
         match &crate::vault::session::get_entry(entry_id).unwrap() {
             crate::vault::entry::VaultEntry::Passkey(e) => e.public_key_cose.clone(),
@@ -782,7 +771,7 @@ mod tests {
     }
 }
 
-/// JNI surface for GabbroCredentialProviderService — same pattern as
+/// JNI surface for GabbroCredentialProviderService - same pattern as
 /// `autofill_bridge::jni`: Kotlin passes JSON strings through, errors come back
 /// as `{"error": "..."}` (check for the "error" key before using a result).
 #[cfg(target_os = "android")]

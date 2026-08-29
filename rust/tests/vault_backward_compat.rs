@@ -1,76 +1,11 @@
-//! Vault-format backward-compatibility harness — the safety net for the
-//! 2026-06-08 vault-brick incident.
-//!
-//! # Why this file exists
-//!
-//! Every other "backward-compat" test in the crate *re-seals in-process with the
-//! current code* and then opens it — a round-trip. That can never catch a brick,
-//! because the same build both seals and opens. This harness instead loads
-//! **frozen golden vault files committed to git** (`tests/fixtures/vaults/*.gabbro`)
-//! that were sealed by the code that shipped each format VERSION. If any future
-//! change to seal/open, `file_format.rs`, `serialization.rs`, the YubiKey keyslot,
-//! AAD binding, or KDF / ML-KEM derivation stops the *current* code from reading a
-//! committed fixture, the test goes red — before it can brick a real user's vault.
-//!
-//! The guarantee: **every future release must be able to read every v11+ vault and
-//! re-seal it as the newest VERSION, and must refuse anything older without touching
-//! the file.** RT-3 raised the floor to v11 — the X25519 + ML-KEM derivation that
-//! opened v2–v10 is gone, so those vaults cannot be read by any code path. The kept
-//! `v10_*` fixtures are REJECTION inputs, not compatibility inputs: they prove the
-//! refusal is polite (clear error naming the upgrade path, file left byte-identical),
-//! so the documented recovery still works — see `docs/VAULT_UPGRADE_PATH.md`.
-//!
-//! VERSION 12 (Passkey entries; header unchanged) landed: v11 is now the old
-//! format this harness holds open forever, v12 goldens carry a passkey canary on
-//! top of the login canary, and ≤v10 stays cleanly refused. See
-//! `tests/fixtures/FIXTURES.md` for how each fixture was generated and how to add
-//! a fixture when a new VERSION ships.
-//!
-//! Everything is driven through the real public bridge functions in
-//! `rust_lib_gabbro::api::vault` (the exact functions the Flutter app calls), so
-//! the harness exercises the full release stack: file IO, (de)serialisation,
-//! `from_bytes`/`to_bytes`, open, the mandatory re-seal, AAD, and the version bump.
-//!
-//! ---
-//!
-//! # The headline scenario (must pass as a minimum)
-//!
-//! A user's YubiKey vault must survive key loss *and* version bumps between any
-//! step. Starting from a vault A created with passphrase + YK1 + YK2:
-//!
-//!   1. User creates vault A with passphrase, YK1 and YK2.
-//!   2. User loses YK2, so the user adds YK3.
-//!   3. User can still unlock vault A with **both** YK1 and YK3.
-//!   4. User loses YK1, so the user adds YK4.
-//!   5. User can still unlock vault A with **both** YK3 and YK4.
-//!   6. A passphrase-less add/remove re-seals the body within the vault's own
-//!      derivation era, so a v11 vault stays AT VERSION and still opens with every
-//!      surviving key.
-//!
-//! Encoded in `yubikey_rotation_survives_key_loss_and_version_bumps`.
-//!
-//! ---
-//!
-//! # Test list (canon TDD — implement one at a time, red → green → refactor)
-//!
-//!   ✓ v11_passphrase_only_opens
-//!   ✓ v11_multikey_opens_with_each_registered_key
-//!   ✓ v10_passphrase_only_is_refused
-//!   ✓ v10_multikey_is_refused
-//!   ✓ refusing_an_old_vault_does_not_touch_the_file
-//!   ✓ refusal_is_distinguishable_from_a_wrong_passphrase
-//!   ✓ yubikey_rotation_survives_key_loss_and_version_bumps
-//!   ✓ cannot_remove_the_last_yubikey
-//!   ✓ passphrase_change_survives                             (vault A)
-//!   ✓ wrong_old_passphrase_rejected_and_vault_left_openable
-//!   ✓ passphrase_rotation_interleaved_with_key_loss          (vault B)
-//!
-//! See also the opt-in (`#[ignore]`'d) state-machine fuzzer in
-//! `tests/vault_state_machine_fuzz.rs`, which randomises the ORDER of
-//! {change_passphrase, add_key, remove_key} over these same fixtures (seeded `rand`,
-//! no `proptest` dependency) and whose failures get promoted back into this
-//! deterministic gate as fixed regression tests. Run it in release:
-//! `cargo test --release --test vault_state_machine_fuzz -- --ignored`.
+//! Opens frozen golden vaults committed under `tests/fixtures/vaults/`, sealed by
+//! the code that shipped each format VERSION. A round-trip test seals and opens
+//! with the same build and can never catch a brick; this can. The `v10_*`
+//! fixtures are rejection inputs: a pre-floor vault must be refused with a clear
+//! error and left byte-identical (docs/VAULT_UPGRADE_PATH.md). Everything runs
+//! through the public `api::vault` functions the app calls. Fixture recipe:
+//! `tests/fixtures/FIXTURES.md`. Failures of the opt-in
+//! `vault_state_machine_fuzz` are promoted here as fixed regressions.
 
 use rust_lib_gabbro::api::vault::{
     add_yubikey_to_vault, change_passphrase, change_passphrase_with_keys, load_vault,
@@ -83,9 +18,7 @@ use rust_lib_gabbro::vault::serialization::serialize_vault_body;
 use rust_lib_gabbro::vault::serialization::VaultBody;
 use std::path::PathBuf;
 
-// Shared fixture spec (passphrase, canary body contents, YubiKey material).
-// The generator in `examples/gen_fixtures.rs` includes the same file, so the
-// values used to seal the fixtures can never drift from the values asserted here.
+// Shared with `examples/gen_fixtures.rs`, so seal-time and asserted values cannot drift.
 include!("fixtures/fixture_spec.rs");
 
 /// Absolute path to a committed golden vault fixture.
@@ -125,7 +58,7 @@ fn temp_copy(fixture_name: &str) -> TempVault {
     TempVault { path }
 }
 
-/// Assert the decrypted body still contains the canary login entry — proof the
+/// Assert the decrypted body still contains the canary login entry - proof the
 /// body genuinely decrypted, not merely that the header parsed.
 fn assert_canary(body: &VaultBody) {
     let found = body.entries.iter().any(|e| {
@@ -136,7 +69,7 @@ fn assert_canary(body: &VaultBody) {
 }
 
 /// Open a multi-key vault on disk with one key's material and assert the canary
-/// survived — i.e. the body genuinely decrypted via that key's keyslot.
+/// survived - i.e. the body genuinely decrypted via that key's keyslot.
 fn assert_opens_with(path: &std::path::Path, hmac: &[u8; 32], cred: &[u8], who: &str) {
     let (body, _master, _wrapping) =
         load_vault_with_key_record(FIXTURE_PASSPHRASE, hmac, cred, path)
@@ -177,7 +110,7 @@ fn v11_multikey_opens_with_each_registered_key() {
 }
 
 /// Assert the decrypted body carries the passkey canary with its key material
-/// byte-identical — proof the v12 format round-trips a credential intact. A
+/// byte-identical - proof the v12 format round-trips a credential intact. A
 /// passkey that loses a byte of key material is a dead login on some website.
 fn assert_passkey_canary(body: &VaultBody) {
     let found = body.entries.iter().any(|e| {
@@ -223,15 +156,10 @@ fn v12_multikey_opens_with_each_registered_key_and_keeps_the_passkey() {
     assert_passkey_canary(&body);
 }
 
-// ── Floor v11: ≤v10 vaults are refused, never damaged ─────────────────────────
 //
-// RT-3 dropped the ml-kem + x25519-dalek layer, so a ≤v10 vault can no longer be
-// opened by any code path. The v10 fixtures below are kept as REJECTION inputs —
-// real old vaults, not synthetic bytes — proving the refusal is polite: a clear
-// error pointing at the upgrade path, and the file left untouched on disk so the
-// documented recovery (reinstall alpha.14, open, migrate) still works.
+// Real old vaults, not synthetic bytes: the refusal must be polite (error names
+// the upgrade path, file untouched) so the documented recovery still works.
 
-/// The link the error must carry, so a user who hits it knows what to do.
 const UPGRADE_PATH_URL: &str =
     "https://github.com/gabbro-foss/gabbro/blob/master/docs/VAULT_UPGRADE_PATH.md";
 
@@ -257,7 +185,7 @@ fn v10_passphrase_only_is_refused() {
 
 #[test]
 fn v10_multikey_is_refused() {
-    // The YubiKey path must refuse too — not just the passphrase-only path.
+    // The YubiKey path must refuse too - not just the passphrase-only path.
     let err = load_vault_with_key_record(
         FIXTURE_PASSPHRASE,
         YK1_HMAC,
@@ -272,7 +200,7 @@ fn v10_multikey_is_refused() {
 fn refusing_an_old_vault_does_not_touch_the_file() {
     // The recovery documented in VAULT_UPGRADE_PATH.md (reinstall alpha.14, open,
     // migrate) only holds if the refusal writes nothing. Byte-compare the file
-    // either side of a refused open — including the .bak the writer would rotate.
+    // either side of a refused open - including the .bak the writer would rotate.
     let tv = temp_copy("v10_passphrase.gabbro");
     let before = std::fs::read(&tv.path).expect("read fixture copy");
 
@@ -384,7 +312,7 @@ fn run_rotation_scenario_with(fixture_name: &str, check_version: impl Fn(u8)) {
 fn yubikey_rotation_survives_key_loss_and_version_bumps() {
     // The headline guarantee: create -> lose YK2/add YK3 -> lose YK1/add YK4, and the
     // vault opens with every surviving key at each step. Proven from the v11 golden
-    // vault — the only format that can exist at floor v11.
+    // vault - the only format that can exist at floor v11.
     run_rotation_scenario_with("v11_multikey_2keys.gabbro", |v| {
         assert_eq!(
             v, VERSION,
@@ -421,16 +349,10 @@ fn cannot_remove_the_last_yubikey() {
     assert_opens_with(path, YK1_HMAC, YK1_CRED, "YK1 (sole remaining key)");
 }
 
-// ── Passphrase change + key rotation ──────────────────────────────────────────
-//
-// A v4 multi-key vault layers the YubiKey ON TOP of the passphrase: the passphrase
-// unwraps the `passphrase_blob` to a `wrapping_key`, then `wrapping_key` + a
-// registered key unwraps that key's `key_blob` to the `vault_key_master` that
-// decrypts the body. So opening always needs BOTH a passphrase and a registered
-// key. `change_passphrase_with_keys` rewraps the SAME wrapping_key under the new
-// passphrase, leaving every key_blob and the body untouched, then re-seals/migrates
-// the file to the current VERSION. These tests prove that property survives a real
-// loss/rotation journey, starting from frozen v6 and v7 golden vaults.
+// Opening a multi-key vault always needs both a passphrase and a registered
+// key; a passphrase change rewraps the same wrapping_key and leaves every
+// key_blob untouched. These prove that survives a real loss and rotation
+// journey from frozen goldens.
 
 /// Assert a passphrase-only vault opens with `pass` and yields the canary.
 fn assert_opens_with_passphrase(path: &std::path::Path, pass: &[u8], who: &str) {
@@ -486,7 +408,7 @@ fn passphrase_change_survives() {
 #[test]
 fn wrong_old_passphrase_rejected_and_vault_left_openable() {
     // A change attempted with the wrong old passphrase must fail at the decrypt
-    // step and leave the vault byte-for-byte usable under the ORIGINAL passphrase —
+    // step and leave the vault byte-for-byte usable under the ORIGINAL passphrase -
     // no partial write, no half-applied new passphrase.
     const WRONG: &[u8] = b"not the real old passphrase";
     const WOULD_BE_NEW: &[u8] = b"the passphrase that must never take effect";
@@ -503,14 +425,9 @@ fn wrong_old_passphrase_rejected_and_vault_left_openable() {
     );
 }
 
-/// Vault B: the headline multi-key journey with a passphrase change interleaved.
-/// The journey: created with passphrase + YK1 + YK2 (the fixture); lose YK2 ->
-/// remove YK2, add YK3; change the passphrase (multi-key path); lose YK1 -> remove
-/// YK1, add YK4.
-///
-/// At the end the vault has a NEW passphrase AND new keys (YK3, YK4) and must still
-/// open with `new passphrase + YK3/YK4`; the old passphrase and the removed keys
-/// must all be refused; the canary survives every step.
+/// Lose YK2, add YK3; change passphrase; lose YK1, add YK4. The end state must
+/// open with the new passphrase and either new key, refuse everything old,
+/// and keep the canary throughout.
 fn run_passphrase_rotation_scenario_with(fixture_name: &str, step2_version_check: impl Fn(u8)) {
     const NEW_PASSPHRASE: &[u8] = b"vault B rotated passphrase -- mid journey";
     let tv = temp_copy(fixture_name);
@@ -520,7 +437,7 @@ fn run_passphrase_rotation_scenario_with(fixture_name: &str, step2_version_check
     assert_opens_with(path, YK1_HMAC, YK1_CRED, "YK1 (initial)");
     assert_opens_with(path, YK2_HMAC, YK2_CRED, "YK2 (initial)");
 
-    // Step 2: lose YK2, add YK3 — authorise with surviving YK1.
+    // Step 2: lose YK2, add YK3 - authorise with surviving YK1.
     let (body, master, wrapping) =
         load_vault_with_key_record(FIXTURE_PASSPHRASE, YK1_HMAC, YK1_CRED, path)
             .expect("authorise rotation with YK1");
@@ -577,7 +494,7 @@ fn run_passphrase_rotation_scenario_with(fixture_name: &str, step2_version_check
         "YK3 + new passphrase",
     );
 
-    // Step 4: lose YK1, add YK4 — authorise with surviving YK3 under the NEW passphrase.
+    // Step 4: lose YK1, add YK4 - authorise with surviving YK3 under the NEW passphrase.
     let (body, master, wrapping) =
         load_vault_with_key_record(NEW_PASSPHRASE, YK3_HMAC, YK3_CRED, path)
             .expect("authorise second rotation with YK3 + new passphrase");

@@ -2,7 +2,7 @@
 //!
 //! Takes the payload of a reassembled CTAPHID CBOR message (command byte +
 //! CBOR request), performs it, and returns status byte + CBOR response.
-//! Map keys verified against CTAP 2.1 §6.4 and OpenSK's response encoder.
+//! Map keys verified against CTAP 2.1 section 6.4 and OpenSK's response encoder.
 
 use ciborium::value::Value;
 
@@ -22,7 +22,7 @@ const MAX_MSG_SIZE: i32 = 2048;
 
 /// Per-operation user consent. The daemon hands this to the Flutter layer,
 /// which shows the consent screen (site, create/sign-in, approve/cancel);
-/// every create and every assertion asks — no silent signing.
+/// every create and every assertion asks - no silent signing.
 pub trait Consent {
     fn approve_create(&self, rp_id: &str, user_name: &str) -> bool;
     fn approve_assert(&self, rp_id: &str, user_name: &str) -> bool;
@@ -34,7 +34,7 @@ pub trait Consent {
 
 /// What the daemon should do with a request before any signing. Either ask
 /// the user (Dart shows the consent screen) or send these bytes straight back
-/// (locked vault, no match, malformed — no user choice applies).
+/// (locked vault, no match, malformed - no user choice applies).
 pub enum RequestPlan {
     Ask {
         is_create: bool,
@@ -49,7 +49,7 @@ pub enum RequestPlan {
 /// (locked, malformed, unsupported algorithm, no matching credential).
 pub fn describe_request(payload: &[u8]) -> RequestPlan {
     match payload.first() {
-        // getInfo carries no user choice — answer straight away.
+        // getInfo carries no user choice - answer straight away.
         Some(&CMD_GET_INFO) => RequestPlan::Respond(get_info()),
         Some(&CMD_MAKE_CREDENTIAL) => match parse_create(&payload[1..]) {
             Ok(c) => RequestPlan::Ask {
@@ -60,7 +60,7 @@ pub fn describe_request(payload: &[u8]) -> RequestPlan {
             Err(bytes) => RequestPlan::Respond(bytes),
         },
         // Silent authentication (CTAP 2.1 options.up=false): a browser
-        // pre-flight, answered with no user interaction — a consent dialog
+        // pre-flight, answered with no user interaction - a consent dialog
         // here costs the user a second click per sign-in. AllowList probes
         // only: without one, answering would hand any site a signed
         // assertion for a discoverable credential with zero user involvement.
@@ -93,7 +93,7 @@ fn has_allow_list(body: &[u8]) -> bool {
     matches!(int_key(&req, 3), Some(Value::Array(a)) if !a.is_empty())
 }
 
-/// True when the getAssertion options map (key 5) carries `up: false` —
+/// True when the getAssertion options map (key 5) carries `up: false` -
 /// the CTAP 2.1 silent-authentication marker.
 fn up_option_is_false(body: &[u8]) -> bool {
     let Ok(Value::Map(req)) = ciborium::de::from_reader::<Value, _>(body) else {
@@ -130,7 +130,7 @@ pub fn denied_response() -> Vec<u8> {
     vec![CTAP2_ERR_OPERATION_DENIED]
 }
 
-/// Handle one CTAP2 request end to end (Rust drives consent via the trait —
+/// Handle one CTAP2 request end to end (Rust drives consent via the trait -
 /// used by tests and any in-process caller). getInfo needs no user choice;
 /// everything else goes through the same describe -> consent -> perform seam
 /// the Dart daemon uses.
@@ -234,7 +234,7 @@ fn parse_create(body: &[u8]) -> Result<CreateFields, Vec<u8>> {
 /// Register an approved credential and build the makeCredential response.
 fn perform_create(c: CreateFields) -> Vec<u8> {
     // excludeList (key 5): the site refuses a duplicate for this account.
-    // Checked after consent — the user-presence gate the spec demands, so a
+    // Checked after consent - the user-presence gate the spec demands, so a
     // background process cannot silently probe which sites the user is on.
     if let Some(Value::Array(exclude)) = int_key(&c.raw, 5) {
         let ours = match crate::vault::session::session_passkeys_for_rp(&c.rp_id) {
@@ -306,7 +306,7 @@ fn assertion_matches(
         Ok(m) => m,
         Err(_) => return Err(vec![CTAP2_ERR_OPERATION_DENIED]),
     };
-    // allowList (key 3): the site names the credentials it will accept — its
+    // allowList (key 3): the site names the credentials it will accept - its
     // choice wins, so the user is never signed into the wrong account.
     if let Some(Value::Array(allow)) = int_key(&req, 3) {
         if !allow.is_empty() {
@@ -497,8 +497,6 @@ mod tests {
         out
     }
 
-    // ── Dart-driven seam (20a): describe -> consent -> perform ──────────────
-
     #[test]
     #[serial]
     fn describe_a_create_asks_with_the_site_and_account() {
@@ -550,7 +548,7 @@ mod tests {
     #[test]
     #[serial]
     fn describe_responds_immediately_when_no_user_choice_applies() {
-        // Locked, no-match, and garbage never reach a consent screen — the
+        // Locked, no-match, and garbage never reach a consent screen - the
         // daemon just sends these bytes back.
         let _ = lock_vault();
         let RequestPlan::Respond(locked) =
@@ -638,7 +636,7 @@ mod tests {
         assert_eq!(denied_response(), vec![0x27]);
     }
 
-    /// authenticatorMakeCredential request map (CTAP 2.1 §6.1 keys).
+    /// authenticatorMakeCredential request map (CTAP 2.1 section 6.1 keys).
     fn make_credential_value() -> Value {
         Value::Map(vec![
             (Value::Integer(1.into()), Value::Bytes(vec![0x11; 32])),
@@ -703,7 +701,7 @@ mod tests {
         assert!(names.contains(&"FIDO_2_0"), "got: {names:?}");
         assert!(names.contains(&"FIDO_2_1"), "got: {names:?}");
 
-        // 0x03 aaguid: 16 zero bytes — none attestation, same as the core.
+        // 0x03 aaguid: 16 zero bytes - none attestation, same as the core.
         let Value::Bytes(aaguid) = map_get(&map, 3) else {
             panic!("aaguid is bytes")
         };
@@ -791,7 +789,7 @@ mod tests {
         assert_eq!(resp, vec![0x27], "CTAP2_ERR_OPERATION_DENIED, nothing else");
     }
 
-    /// authenticatorGetAssertion request map (CTAP 2.1 §6.2 keys).
+    /// authenticatorGetAssertion request map (CTAP 2.1 section 6.2 keys).
     fn get_assertion_value(rp_id: &str, hash: &[u8]) -> Value {
         Value::Map(vec![
             (Value::Integer(1.into()), Value::Text(rp_id.into())),
@@ -827,7 +825,7 @@ mod tests {
     #[serial]
     fn allow_list_picks_the_site_named_credential() {
         // Two accounts on one site; the site names the second one. The
-        // first-stored key must NOT answer — that would log the user into
+        // first-stored key must NOT answer - that would log the user into
         // the wrong account.
         let path = with_unlocked_vault("allowlist");
         let _ = minted_cred_id(&handle_request(
@@ -960,7 +958,7 @@ mod tests {
         // Brave pre-flights a filled-username sign-in with an allowList
         // getAssertion carrying options.up=false (CTAP 2.1 silent
         // authentication). It must be answered with no consent and with UP
-        // and UV clear — otherwise the user pays a second consent click for
+        // and UV clear - otherwise the user pays a second consent click for
         // every such sign-in (matrix D1 row 5b).
         let path = with_unlocked_vault("silent_probe");
         let cred = minted_cred_id(&handle_request(
@@ -1073,7 +1071,7 @@ mod tests {
         };
         assert_eq!(&ad[..32], Sha256::digest(b"example.com").as_slice());
         assert_eq!(ad[32], 0x1d, "UP|UV|BE|BS");
-        // 0x03 signature: DER, verifies over authData || clientDataHash —
+        // 0x03 signature: DER, verifies over authData || clientDataHash -
         // exactly what the site checks before accepting the login.
         let Value::Bytes(sig) = map_get(&map, 3) else {
             panic!("signature is bytes")
@@ -1102,7 +1100,7 @@ mod tests {
         let cred_id = make_ad[55..87].to_vec();
 
         // Same request again, now with an excludeList naming that credential
-        // (key 5) — the site saying "not if the user already has this one".
+        // (key 5) - the site saying "not if the user already has this one".
         let Value::Map(mut req) = make_credential_value() else {
             panic!("request is a map")
         };

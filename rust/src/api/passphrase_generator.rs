@@ -1,10 +1,7 @@
 pub use super::types::Language;
 use rand::Rng;
 
-// ---------------------------------------------------------------------------
-// Wordlists — embedded at compile time, one word per line
-// ---------------------------------------------------------------------------
-
+// Wordlists - embedded at compile time, one word per line
 const WORDLIST_EN: &str = include_str!("../../assets/wordlist_en.txt");
 const WORDLIST_FR: &str = include_str!("../../assets/wordlist_fr.txt");
 const WORDLIST_DE: &str = include_str!("../../assets/wordlist_de.txt");
@@ -35,10 +32,7 @@ const WORDLIST_LT: &str = include_str!("../../assets/wordlist_lt.txt");
 const WORDLIST_LV: &str = include_str!("../../assets/wordlist_lv.txt");
 const WORDLIST_KK: &str = include_str!("../../assets/wordlist_kk.txt");
 
-// ---------------------------------------------------------------------------
 // Public types
-// ---------------------------------------------------------------------------
-
 pub struct PassphraseConfig {
     pub word_count: u32,
     pub separator: String,
@@ -47,10 +41,7 @@ pub struct PassphraseConfig {
     pub language: Language,
 }
 
-// ---------------------------------------------------------------------------
 // Internal helpers
-// ---------------------------------------------------------------------------
-
 fn wordlist_for(language: &Language) -> Vec<&'static str> {
     let raw = match language {
         Language::English => WORDLIST_EN,
@@ -86,10 +77,7 @@ fn wordlist_for(language: &Language) -> Vec<&'static str> {
     raw.lines().filter(|l| !l.is_empty()).collect()
 }
 
-// ---------------------------------------------------------------------------
 // Public API (exposed to Flutter via flutter_rust_bridge)
-// ---------------------------------------------------------------------------
-
 /// Generate a passphrase from the given config.
 /// Returns Err if word_count is 0 or the wordlist is empty.
 pub fn generate_passphrase(config: PassphraseConfig) -> Result<String, String> {
@@ -152,10 +140,7 @@ pub fn passphrase_entropy_bits(word_count: u32, language: Language) -> f64 {
     (word_count as f64) * list_size.log2()
 }
 
-// ---------------------------------------------------------------------------
 // Tests
-// ---------------------------------------------------------------------------
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -197,7 +182,7 @@ mod tests {
     #[test]
     fn test_capitalise() {
         // Over many runs, we must see at least one capitalised word and at
-        // least one lowercase word — proving it is random, not all-or-nothing.
+        // least one lowercase word - proving it is random, not all-or-nothing.
         let mut saw_upper = false;
         let mut saw_lower = false;
         for _ in 0..200 {
@@ -241,7 +226,7 @@ mod tests {
             };
             let result = generate_passphrase(config).unwrap();
             let digit_count = result.chars().filter(|c| c.is_ascii_digit()).count();
-            // word_count=4 → num_dig ∈ [4, 6]
+            // word_count=4 -> num_dig in [4, 6]
             assert!(
                 (4..=6).contains(&digit_count),
                 "Expected 4–6 digits, got {} in \"{}\"",
@@ -271,7 +256,7 @@ mod tests {
 
     #[test]
     fn test_entropy_english() {
-        // 4 words from 7776-word list: 4 * log2(7776) ≈ 51.7 bits
+        // 4 words from 7776-word list: 4 * log2(7776) ~ 51.7 bits
         let entropy = passphrase_entropy_bits(4, Language::English);
         assert!((entropy - 51.7).abs() < 0.1, "Got: {}", entropy);
     }
@@ -285,7 +270,7 @@ mod tests {
 
     #[test]
     fn test_entropy_estonian() {
-        // 4 words from 7052-word list: 4 * log2(7052) ≈ 51.1 bits
+        // 4 words from 7052-word list: 4 * log2(7052) ~ 51.1 bits
         let entropy = passphrase_entropy_bits(4, Language::Estonian);
         let expected = 4.0 * (7052_f64).log2();
         assert!((entropy - expected).abs() < 0.1, "Got: {}", entropy);
@@ -293,7 +278,7 @@ mod tests {
 
     #[test]
     fn test_entropy_bulgarian() {
-        // 4 words from 7527-word list: 4 * log2(7527) ≈ 51.5 bits
+        // 4 words from 7527-word list: 4 * log2(7527) ~ 51.5 bits
         let entropy = passphrase_entropy_bits(4, Language::Bulgarian);
         let expected = 4.0 * (7527_f64).log2();
         assert!((entropy - expected).abs() < 0.1, "Got: {}", entropy);
@@ -347,7 +332,7 @@ mod tests {
 
     #[test]
     fn test_entropy_dutch() {
-        // 4 words from 7776-word list: 4 * log2(7776) ≈ 51.7 bits
+        // 4 words from 7776-word list: 4 * log2(7776) ~ 51.7 bits
         let entropy = passphrase_entropy_bits(4, Language::Dutch);
         let expected = 4.0 * (7776_f64).log2();
         assert!((entropy - expected).abs() < 0.1, "Got: {}", entropy);
@@ -370,8 +355,8 @@ mod tests {
 
     #[test]
     fn test_entropy_chinese_simplified() {
-        // 4 words from 7775-word cfbao list: 4 * log2(7775) ≈ 51.7 bits
-        // (7775, not 7776 — the entry containing a fullwidth Latin Q was dropped)
+        // 4 words from 7775-word cfbao list: 4 * log2(7775) ~ 51.7 bits
+        // (7775, not 7776 - the entry containing a fullwidth Latin Q was dropped)
         let entropy = passphrase_entropy_bits(4, Language::ChineseSimplified);
         let expected = 4.0 * (7775_f64).log2();
         assert!((entropy - expected).abs() < 0.1, "Got: {}", entropy);
@@ -387,7 +372,7 @@ mod tests {
 
     #[test]
     fn test_entropy_croatian() {
-        // 4 words from 7776-word list: 4 * log2(7776) ≈ 51.7 bits
+        // 4 words from 7776-word list: 4 * log2(7776) ~ 51.7 bits
         let entropy = passphrase_entropy_bits(4, Language::Croatian);
         let expected = 4.0 * (7776_f64).log2();
         assert!((entropy - expected).abs() < 0.1, "Got: {}", entropy);
@@ -395,7 +380,7 @@ mod tests {
 
     #[test]
     fn test_entropy_lithuanian() {
-        // 4 words from 7776-word list: 4 * log2(7776) ≈ 51.7 bits
+        // 4 words from 7776-word list: 4 * log2(7776) ~ 51.7 bits
         let entropy = passphrase_entropy_bits(4, Language::Lithuanian);
         let expected = 4.0 * (7776_f64).log2();
         assert!((entropy - expected).abs() < 0.1, "Got: {}", entropy);
@@ -403,7 +388,7 @@ mod tests {
 
     #[test]
     fn test_entropy_latvian() {
-        // 4 words from 7776-word list: 4 * log2(7776) ≈ 51.7 bits
+        // 4 words from 7776-word list: 4 * log2(7776) ~ 51.7 bits
         let entropy = passphrase_entropy_bits(4, Language::Latvian);
         let expected = 4.0 * (7776_f64).log2();
         assert!((entropy - expected).abs() < 0.1, "Got: {}", entropy);
@@ -411,7 +396,7 @@ mod tests {
 
     #[test]
     fn test_entropy_kazakh() {
-        // 4 words from 4311-word list (limited corpus): 4 * log2(4311) ≈ 48.3 bits
+        // 4 words from 4311-word list (limited corpus): 4 * log2(4311) ~ 48.3 bits
         let entropy = passphrase_entropy_bits(4, Language::Kazakh);
         let expected = 4.0 * (4311_f64).log2();
         assert!((entropy - expected).abs() < 0.1, "Got: {}", entropy);
@@ -426,20 +411,13 @@ mod tests {
         assert!(generate_passphrase(config).is_err());
     }
 
-    // -----------------------------------------------------------------
-    // Wordlist integrity net
-    //
-    // Nothing else pins the embedded lists. A regenerate that introduces
-    // duplicates or truncates a list would silently cut real entropy while
-    // the UI keeps showing the old figure, and stray characters produce
-    // passphrases that read as broken.
-    // -----------------------------------------------------------------
-
+    // A regenerated list with duplicates or missing words would cut real
+    // entropy while the UI keeps showing the old figure.
     struct Spec {
         name: &'static str,
         raw: &'static str,
         size: usize,
-        /// Allowed characters, explicit per language — never a blanket `a-z`,
+        /// Allowed characters, explicit per language - never a blanket `a-z`,
         /// so a missing or foreign letter fails loudly. Empty for CJK, which
         /// is checked by script range instead.
         alphabet: &'static str,
@@ -499,7 +477,7 @@ mod tests {
         alpha("sv", WORDLIST_SV, 7776, "abcdefghijklmnopqrstuvwxyzåäö", 4, 12),
         alpha("da", WORDLIST_DA, 7776, "abcdefghijklmnopqrstuvwxyzåæø", 4, 12),
         alpha("nb", WORDLIST_NB, 7776, "abcdefghijklmnopqrstuvwxyzåæø", 4, 12),
-        // The 24 letters of native Finnish — q w x z å appear only in loanwords.
+        // The 24 letters of native Finnish - q w x z å appear only in loanwords.
         alpha("fi", WORDLIST_FI, 7776, "abcdefghijklmnoprstuvyäö", 4, 12),
         alpha("cs", WORDLIST_CS, 7776, "abcdefghijklmnopqrstuvwxyzáčďéěíňóřšťúůýž", 4, 12),
         alpha("sk", WORDLIST_SK, 6642, "abcdefghijklmnopqrstuvwxyzáäčďéíĺľňóôŕšťúýž", 3, 17),

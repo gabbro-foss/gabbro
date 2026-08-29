@@ -1,4 +1,4 @@
-//! Vault API — bridge-facing functions for creating and managing vault entries.
+//! Vault API - bridge-facing functions for creating and managing vault entries.
 //!
 //! These functions are the only way Flutter interacts with vault data.
 //! Internal domain types (LoginEntry, etc.) are never exposed directly.
@@ -14,8 +14,6 @@ use crate::vault::entry::{
 use crate::vault::io::{atomic_write_0600, read_vault, write_vault};
 use crate::vault::serialization::{deserialize_vault_body, serialize_vault_body, VaultBody};
 
-// ── Bridge-facing DTOs ────────────────────────────────────────────────────────
-
 /// A custom field as seen by Flutter.
 pub struct CustomFieldData {
     pub label: String,
@@ -24,7 +22,7 @@ pub struct CustomFieldData {
 }
 
 /// Attachment metadata as seen by Flutter. The bytes never ride in an entry
-/// DTO — they cross the bridge only through the dedicated attachment calls —
+/// DTO - they cross the bridge only through the dedicated attachment calls -
 /// so opening an entry stays fast however large its attachments are.
 pub struct AttachmentMetaData {
     pub uuid: String,
@@ -36,7 +34,7 @@ pub struct AttachmentMetaData {
 }
 
 /// A recovery-history record for Flutter: a value replaced during sync, kept so
-/// the user can restore it. `value` is plaintext — Flutter masks secret fields.
+/// the user can restore it. `value` is plaintext - Flutter masks secret fields.
 pub struct HistoryRecordData {
     pub field: String,
     pub value: String,
@@ -51,7 +49,7 @@ pub struct LoginEntryData {
     pub updated_at: String,
     pub folder: String,
     /// Human-readable item title (e.g. "Example", "Sample").
-    /// Distinct from the URL — used as the primary display label in list views.
+    /// Distinct from the URL - used as the primary display label in list views.
     pub title: String,
     pub url: String,
     pub username: String,
@@ -138,7 +136,7 @@ pub struct CustomEntryData {
     pub attachments: Vec<AttachmentMetaData>,
 }
 
-/// A passkey entry as seen by Flutter. Key material never rides in this DTO —
+/// A passkey entry as seen by Flutter. Key material never rides in this DTO -
 /// the private key stays behind the bridge (signing happens in Rust), and
 /// `update_entry` restores it from the stored entry, like attachments.
 pub struct PasskeyEntryData {
@@ -146,11 +144,11 @@ pub struct PasskeyEntryData {
     pub created_at: String,
     pub updated_at: String,
     pub folder: String,
-    /// Relying-party id (e.g. "example.com") — the site this passkey signs for.
+    /// Relying-party id (e.g. "example.com") - the site this passkey signs for.
     pub rp_id: String,
     pub user_name: String,
     pub user_display_name: String,
-    /// Base64url credential id — display/identification only, not editable.
+    /// Base64url credential id - display/identification only, not editable.
     pub credential_id_b64: String,
     pub notes: Option<String>,
     pub custom_fields: Vec<CustomFieldData>,
@@ -168,7 +166,7 @@ pub struct PendingDeleteItem {
 /// A true field-level clash discovered during vault merge: the same field of the
 /// same entry was changed on both devices at the same instant to different values.
 /// The local value is kept; Flutter prompts the user to keep mine / keep theirs.
-/// `local_value` / `incoming_value` are decrypted plaintext — mask in the UI like
+/// `local_value` / `incoming_value` are decrypted plaintext - mask in the UI like
 /// any other secret. `field` is the field key (e.g. "password", "custom_fields:PIN").
 pub struct FieldConflictItem {
     pub id: String,
@@ -180,13 +178,13 @@ pub struct FieldConflictItem {
 
 /// An item (custom pair / attachment) the incoming side deleted more recently than
 /// the local side last changed it. Surfaced as a keep/delete prompt; the item is
-/// kept until the user confirms — never silently dropped. `field` is the item key,
+/// kept until the user confirms - never silently dropped. `field` is the item key,
 /// for example "custom_fields:PIN" (a custom pair) or "attachments:ID" (an attachment).
 pub struct PendingItemDeleteItem {
     pub id: String,
     pub title: String,
     pub field: String,
-    /// Human-readable name of the item — the attachment's filename or the
+    /// Human-readable name of the item - the attachment's filename or the
     /// custom pair's label. The keep/delete prompt shows this, never the key.
     pub label: String,
 }
@@ -210,14 +208,9 @@ pub struct AddedEntryItem {
     pub title: String,
 }
 
-/// A non-conflicting value brought over from the incoming vault during sync: the
-/// other device edited this field/pair/attachment and this side did not, so the
-/// incoming value wins additively. Surfaced so the user can review and drop it
-/// (drop = restore `old_value`). `field` is the field key (e.g. "password",
-/// "custom_fields:Tag", "attachments:ID"). For a newly added pair/attachment,
-/// `old_value` is empty and `new_value` is the item's value/name. Values are
-/// decrypted plaintext — mask secrets in the UI. Genuine clashes are NOT here;
-/// see `field_conflicts`.
+/// A value only the other device edited, taken additively and surfaced so the
+/// user can drop it (restoring `old_value`). Plaintext: mask secrets in the
+/// UI. Genuine clashes are in `field_conflicts`.
 pub struct BroughtOverItem {
     pub id: String,
     pub title: String,
@@ -226,7 +219,6 @@ pub struct BroughtOverItem {
     pub new_value: String,
 }
 
-// ── Granular-sync apply inputs ────────────────────────────────────────────────
 // The user's review decisions, batched so the whole review applies in one vault
 // re-seal instead of one per decision.
 
@@ -274,7 +266,7 @@ pub struct MergeSummary {
     /// Non-conflicting values brought over from the incoming vault, listed for
     /// review so the user can drop any (drop = restore the old value).
     pub brought_over: Vec<BroughtOverItem>,
-    /// Incoming tombstones that matched local entries — awaiting user consent.
+    /// Incoming tombstones that matched local entries - awaiting user consent.
     /// Flutter shows a Delete/Keep dialog for each; no deletion occurs automatically.
     pub pending_deletes: Vec<PendingDeleteItem>,
     /// Same-UUID entries with different folder assignments on each device.
@@ -287,8 +279,6 @@ pub struct MergeSummary {
     /// than this side edited them. The item is kept; Flutter prompts keep / delete.
     pub pending_item_deletes: Vec<PendingItemDeleteItem>,
 }
-
-// ── Conversion helpers (internal → DTO) ──────────────────────────────────────
 
 // All conversion helpers take references to avoid moving out of types that
 // implement Drop (via ZeroizeOnDrop). Fields are cloned explicitly.
@@ -328,12 +318,10 @@ fn login_entry_to_data(e: &LoginEntry) -> LoginEntryData {
     }
 }
 
-// ── Public API ────────────────────────────────────────────────────────────────
-
 /// Creates a new login entry with a generated UUID and current timestamp.
 ///
 /// Called by Flutter when the user saves a new login. Returns a
-/// `LoginEntryData` DTO — the internal `LoginEntry` never crosses the bridge.
+/// `LoginEntryData` DTO - the internal `LoginEntry` never crosses the bridge.
 pub fn create_login_entry(
     folder: String,
     title: String,
@@ -374,8 +362,6 @@ pub fn create_login_entry(
     };
     login_entry_to_data(&entry)
 }
-
-// ── Entry retrieval ───────────────────────────────────────────────────────────
 
 /// Fixed placeholder used instead of the real value when masked display
 /// is requested. Length is intentionally decoupled from actual value length
@@ -460,7 +446,7 @@ pub(crate) fn entry_attachments_mut(
 /// Field keys that differ between `old` and `new` (assumed same entry type).
 /// Scalar fields are keyed by their serde name; custom pairs by
 /// "custom_fields:<label>"; attachments by "attachments:<uuid>". Derived secrets
-/// (`previous_*`) are intentionally excluded — they follow their parent field.
+/// (`previous_*`) are intentionally excluded - they follow their parent field.
 fn changed_field_keys(old: &VaultEntry, new: &VaultEntry) -> Vec<String> {
     use crate::vault::entry::{CustomField, EntryAttachment};
 
@@ -592,7 +578,7 @@ fn changed_field_keys(old: &VaultEntry, new: &VaultEntry) -> Vec<String> {
                 o.user_display_name != n.user_display_name,
             );
             push_if(&mut out, "notes", o.notes != n.notes);
-            // Key material is one atomic sync field — see credential_blob().
+            // Key material is one atomic sync field - see credential_blob().
             push_if(
                 &mut out,
                 "credential",
@@ -606,7 +592,7 @@ fn changed_field_keys(old: &VaultEntry, new: &VaultEntry) -> Vec<String> {
 }
 
 /// All item keys ("custom_fields:<label>" / "attachments:<uuid>") present on an
-/// entry — used to detect item deletions for granular-sync tombstones.
+/// entry - used to detect item deletions for granular-sync tombstones.
 fn item_keys(entry: &VaultEntry) -> std::collections::HashSet<String> {
     use crate::vault::entry::{CustomField, EntryAttachment};
     fn add_custom(keys: &mut std::collections::HashSet<String>, fields: &[CustomField]) {
@@ -823,15 +809,8 @@ pub(crate) fn remove_entry_item_by_key(entry: &mut VaultEntry, key: &str) {
     }
 }
 
-/// Replace an existing entry in the vault with an updated version.
-///
-/// Matches by UUID — the updated entry must carry the same id as the
-/// one being replaced. Updates `updated_at` to the current timestamp.
-/// For Login and Card entries, snapshots any changed sensitive field
-/// (password, CVV, PIN) into the corresponding `previous_*` field.
-/// `expiry_days`: `Some(n)` sets `expires_at` to now + n days;
-/// `None` means keep until manually deleted.
-/// Returns `Err` if no entry with that id exists.
+/// A changed password, CVV or PIN is snapshotted into `previous_*`;
+/// `expiry_days` `None` keeps it until manually deleted.
 #[flutter_rust_bridge::frb(ignore)]
 pub fn update_entry(
     entries: &mut [VaultEntry],
@@ -855,8 +834,8 @@ pub fn update_entry(
         *dst = entry_attachments(&entries[pos]).to_vec();
     }
 
-    // Passkey key material is not round-tripped by Flutter either — the private
-    // key never crosses the bridge — so the stored entry is the source of truth.
+    // Passkey key material is not round-tripped by Flutter either - the private
+    // key never crosses the bridge - so the stored entry is the source of truth.
     if let (VaultEntry::Passkey(dst), VaultEntry::Passkey(src)) = (&mut updated, &entries[pos]) {
         dst.user_handle = src.user_handle.clone();
         dst.credential_id = src.credential_id.clone();
@@ -998,7 +977,7 @@ pub fn delete_entry(entries: &mut Vec<VaultEntry>, id: &str) -> Result<(), Strin
 /// Wipe the vault file from disk permanently.
 ///
 /// This is a destructive, irreversible operation. The confirmation
-/// logic (two explicit user confirmations) lives in Flutter — Rust
+/// logic (two explicit user confirmations) lives in Flutter - Rust
 /// executes the deletion unconditionally when this is called.
 #[flutter_rust_bridge::frb(ignore)]
 pub fn delete_whole_vault(path: &Path) -> Result<(), String> {
@@ -1012,7 +991,7 @@ pub fn delete_whole_vault(path: &Path) -> Result<(), String> {
 /// Return all entries from the vault, optionally masking sensitive values.
 ///
 /// When `masked` is true, password and CVV fields are replaced with
-/// `MASKED_VALUE` — a fixed-length placeholder that deliberately reveals
+/// `MASKED_VALUE` - a fixed-length placeholder that deliberately reveals
 /// nothing about the actual value's length.
 #[flutter_rust_bridge::frb(ignore)]
 pub fn list_entries(entries: &[VaultEntry], masked: bool) -> Vec<VaultEntry> {
@@ -1106,17 +1085,11 @@ fn mask_entry(entry: &VaultEntry) -> VaultEntry {
                 })
                 .collect(),
         }),
-        // Identity and Custom carry no password-class fields — return a plain clone.
+        // Identity and Custom carry no password-class fields - return a plain clone.
         other => other.clone(),
     }
 }
 
-/// Re-encrypt the vault under a new passphrase.
-///
-/// Reads and decrypts the vault with the old passphrase, then
-/// re-seals and writes it under the new passphrase. The vault body
-/// is not re-encrypted from scratch — only the key encapsulation
-/// layer changes, which is the standard pattern for passphrase changes.
 #[flutter_rust_bridge::frb(ignore)]
 pub fn change_passphrase(
     path: &Path,
@@ -1127,17 +1100,9 @@ pub fn change_passphrase(
     save_vault(&entries, new_passphrase, path)
 }
 
-/// Export a vault as a passphrase-only `.gabbro` artifact + `.gabbro.sha256`
-/// companion — the opt-in security **downgrade** path (ADR-013).
-///
-/// Re-seals `body` under `passphrase` alone, dropping any YubiKey requirement, so
-/// the resulting file opens with the passphrase only. This is reached only via the
-/// explicit, warned export toggle; the default export ([`export_vault_preserving`])
-/// keeps the source's protection. The alias is not carried into this standalone copy.
-///
-/// The hash is computed over the raw bytes of the encrypted vault file, following
-/// the Linux ISO verification convention (ADR-002), so integrity can be verified
-/// before decryption with standard tools (`sha256sum`, `certutil`).
+/// The opt-in downgrade (ADR-013); [`export_vault_preserving`] is the default.
+/// The alias is not carried. The hash covers the encrypted bytes (ADR-002) so
+/// `sha256sum` can verify integrity before decryption.
 #[flutter_rust_bridge::frb(ignore)]
 pub fn export_vault(body: &VaultBody, passphrase: &[u8], export_path: &Path) -> Result<(), String> {
     let vault_bytes = build_passphrase_only_bytes(body, passphrase)?;
@@ -1146,7 +1111,7 @@ pub fn export_vault(body: &VaultBody, passphrase: &[u8], export_path: &Path) -> 
 }
 
 /// Build the passphrase-only export ciphertext for `body` (ADR-013 downgrade),
-/// without touching the filesystem. Re-seals under `passphrase` alone — no
+/// without touching the filesystem. Re-seals under `passphrase` alone - no
 /// YubiKey requirement, no alias (a standalone copy). Shared by the Linux
 /// path-write ([`export_vault`]) and the Android byte-return path so neither can
 /// drift from the other.
@@ -1175,16 +1140,9 @@ pub fn sha256_line(vault_bytes: &[u8], filename: &str) -> String {
     )
 }
 
-/// Export a vault preserving its exact on-disk protection (ADR-013).
-///
-/// This is the DEFAULT export path. It copies the sealed `.gabbro` file at
-/// `source_path` to `export_path` **byte-for-byte**, so the registered YubiKey
-/// keyslots and the vault alias are retained — a key-protected vault stays
-/// key-protected and the copy is provably no weaker than the original. The
-/// detached `.gabbro.sha256` companion (ADR-002) is written alongside.
-///
-/// Callers in a live session must ensure committed mutations are persisted before
-/// calling this — every CRUD op already saves, so the on-disk file is current.
+/// The default export (ADR-013): a byte-for-byte copy, so it is provably no
+/// weaker than the original. Every CRUD op saves, so the on-disk file is
+/// current.
 #[flutter_rust_bridge::frb(ignore)]
 pub fn export_vault_preserving(source_path: &Path, export_path: &Path) -> Result<(), String> {
     let vault_bytes =
@@ -1205,12 +1163,10 @@ fn write_sha256_companion(export_path: &Path, vault_bytes: &[u8]) -> Result<(), 
     atomic_write_0600(&hash_path, hash_hex.as_bytes())
 }
 
-// ── Vault persistence ─────────────────────────────────────────────────────────
-
 /// Serialize, encrypt, and write a vault to disk in one operation.
 ///
 /// This is the top-level save operation Flutter will call.
-/// Entries → JSON → AES-256-GCM encrypted → .gabbro file on disk.
+/// Entries -> JSON -> AES-256-GCM encrypted -> .gabbro file on disk.
 #[flutter_rust_bridge::frb(ignore)]
 pub fn save_vault(body: &VaultBody, passphrase: &[u8], path: &Path) -> Result<(), String> {
     // Preserve the alias from the existing on-disk vault so CRUD saves do not
@@ -1224,7 +1180,7 @@ pub fn save_vault(body: &VaultBody, passphrase: &[u8], path: &Path) -> Result<()
 /// Read, decrypt, and deserialize a vault from disk in one operation.
 ///
 /// This is the top-level load operation Flutter will call.
-/// .gabbro file → AES-256-GCM decrypt → JSON → VaultBody.
+/// .gabbro file -> AES-256-GCM decrypt -> JSON -> VaultBody.
 #[flutter_rust_bridge::frb(ignore)]
 pub fn load_vault(passphrase: &[u8], path: &Path) -> Result<VaultBody, String> {
     let sealed = read_vault(path)?;
@@ -1346,12 +1302,7 @@ pub fn reseal_vault_body(
     write_vault(&sealed, path)
 }
 
-/// Change the passphrase on a multi-key vault.
-///
-/// Reads the vault from disk, verifies the old passphrase via `passphrase_blob`,
-/// generates fresh passphrase material, re-encrypts `wrapping_key` as the new
-/// `passphrase_blob`, then re-seals the body so the updated header (new
-/// argon2_salt, hkdf_salt, passphrase_blob) is committed as AES-GCM AAD.
+/// The body is re-sealed so the new header is committed as AES-GCM AAD.
 #[flutter_rust_bridge::frb(ignore)]
 pub fn change_passphrase_with_keys(
     old_passphrase: &[u8],
@@ -1374,10 +1325,8 @@ pub fn change_passphrase_with_keys(
     write_vault(&new_sealed, path)
 }
 
-// ── Timestamp helper ──────────────────────────────────────────────────────────
-
 /// Returns the current UTC time as an ISO 8601 string.
-/// Uses std only — no chrono dependency needed at this stage.
+/// Uses std only - no chrono dependency needed at this stage.
 pub fn chrono_now() -> String {
     // std::time gives us seconds since UNIX epoch; format manually.
     use std::time::{SystemTime, UNIX_EPOCH};
@@ -1439,7 +1388,7 @@ fn is_leap(year: u64) -> bool {
 
 /// Returns `true` if `expires_at` is set and the timestamp is in the past.
 ///
-/// `None` means keep-forever — never expired.
+/// `None` means keep-forever - never expired.
 /// An unparseable string is treated as not expired (conservative).
 pub(crate) fn is_expired(expires_at: Option<&str>) -> bool {
     use std::time::{SystemTime, UNIX_EPOCH};
@@ -1462,7 +1411,7 @@ pub(crate) fn is_expired(expires_at: Option<&str>) -> bool {
 
 /// Purge expired records from every entry's unified `meta.history`.
 ///
-/// Called on every unlock — silent, no-op for entries with no history
+/// Called on every unlock - silent, no-op for entries with no history
 /// or future/keep-forever expiry.
 pub(crate) fn purge_expired_history(entries: &mut [VaultEntry]) {
     for entry in entries.iter_mut() {
@@ -1474,8 +1423,6 @@ pub(crate) fn purge_expired_history(entries: &mut [VaultEntry]) {
             .retain(|h| !is_expired(h.expires_at.as_deref()));
     }
 }
-
-// ── Tests ─────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
 mod tests {
@@ -1581,7 +1528,7 @@ mod tests {
     }
 
     // R-03 P0 (failure #4 characterization): a YubiKey-sealed vault whose bytes
-    // have been overwritten with garbage must NOT open — not silently, and never
+    // have been overwritten with garbage must NOT open - not silently, and never
     // to an empty-but-valid vault. Proves the AES-GCM auth-tag / parse gate holds
     // on the (multi-key) YubiKey unlock path, ruling out the Rust layer as the
     // source of the device report "garbage both files -> unlocks fine to an EMPTY vault."
@@ -1613,7 +1560,7 @@ mod tests {
             },
         ];
 
-        // A real, non-empty body — so "opened empty" would be a detectable change.
+        // A real, non-empty body - so "opened empty" would be a detectable change.
         let body = VaultBody {
             entries: vec![VaultEntry::Note(NoteEntry {
                 meta: EntryMeta {
@@ -1777,7 +1724,6 @@ mod tests {
         let _ = std::fs::remove_file(&path);
     }
 
-    // ── Net for "sync without a second unlock" ───────────────────────────────
     //
     // A passphrase-only vault is re-sealed whole on every save, so it carries no
     // stable per-vault fingerprint. That is why a passphrase-only sync can only
@@ -1975,8 +1921,6 @@ mod tests {
         }
     }
 
-    // ── per-field change-time stamping (granular sync, v9) ────────────────────
-
     fn note_with(id: &str, title: &str, content: &str) -> crate::vault::entry::VaultEntry {
         use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
         VaultEntry::Note(NoteEntry {
@@ -2052,7 +1996,7 @@ mod tests {
     #[test]
     fn update_entry_preserves_prior_field_times() {
         // A field stamped on an earlier edit must survive a later edit to a
-        // different field — field_times accumulates, it is never reset.
+        // different field - field_times accumulates, it is never reset.
         let mut entries = vec![note_with("id-1", "Title", "old")];
         if let crate::vault::entry::VaultEntry::Note(n) = &mut entries[0] {
             n.meta.field_times.insert(String::from("title"), 100);
@@ -3210,7 +3154,6 @@ mod tests {
         }
     }
 
-    // ── export_vault_preserving — ADR-013 default (protection-preserving) ──────
     //
     // The security boundary: exporting a key-protected vault must keep the YubiKey
     // requirement (byte-for-byte copy of the sealed file), and exporting any vault

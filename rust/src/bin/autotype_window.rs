@@ -1,11 +1,5 @@
-//! Hardware diagnostic for ADR-017 Phase 2a: report the active window.
-//!
-//! Usage:
-//!   cargo run --bin autotype_window
-//!
-//! Prints the focused window's id, WM_CLASS and title once a second for ten
-//! seconds. Run it, then click around (browser, editor, terminal) and confirm
-//! it tracks focus and reads each app correctly on your X11/qtile session.
+//! `cargo run --bin autotype_window`: prints the focused window once a second
+//! for ten seconds while you click around.
 
 #[cfg(target_os = "linux")]
 fn main() {

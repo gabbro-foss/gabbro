@@ -1,4 +1,4 @@
-//! Import bridge — flutter_rust_bridge-facing wrappers for all importers.
+//! Import bridge - flutter_rust_bridge-facing wrappers for all importers.
 //!
 //! These functions are what Flutter actually calls. Each function delegates
 //! to the relevant importer in `rust/src/import/` and uses the bulk
@@ -13,9 +13,7 @@ use crate::import::google_pm;
 use crate::vault::entry::{new_entry_id, CustomField, EntryMeta, LoginEntry, VaultEntry};
 use crate::vault::session;
 
-// ── CSV preview ───────────────────────────────────────────────────────────────
-
-/// Preview of a CSV file — headers and up to 3 sample rows.
+/// Preview of a CSV file - headers and up to 3 sample rows.
 /// Returned by [`sniff_csv_file`] for Flutter's column-mapping UI.
 pub struct CsvPreviewData {
     pub headers: Vec<String>,
@@ -31,8 +29,6 @@ pub struct CsvImportConfigData {
     pub notes_col: Option<String>,
 }
 
-// ── Import result types ───────────────────────────────────────────────────────
-
 /// A single entry that failed domain validation during import.
 ///
 /// Carries enough information for Flutter to show the user what was rejected
@@ -43,7 +39,7 @@ pub struct ImportFailureData {
     pub title: String,
     /// Source category string (e.g. `"creditcard"`, `"login"`).
     pub category: String,
-    /// Human-readable rejection reason (e.g. `"card number must be 12–19 digits"`).
+    /// Human-readable rejection reason (e.g. `"card number must be 12-19 digits"`).
     pub reason: String,
     /// Raw field values from the source file, as `(key, value)` pairs.
     /// Keys use Gabbro's canonical names where mappable
@@ -61,11 +57,9 @@ pub struct ImportResult {
     pub failures: Vec<ImportFailureData>,
 }
 
-// ── Bridge functions ──────────────────────────────────────────────────────────
-
 /// Sniff the headers and first 3 rows of a CSV string.
 ///
-/// Sync — no I/O, pure string parsing.
+/// Sync - no I/O, pure string parsing.
 #[flutter_rust_bridge::frb(sync)]
 pub fn sniff_csv_file(input: String) -> Result<CsvPreviewData, String> {
     let preview = csv_sniff(&input)?;
@@ -77,8 +71,8 @@ pub fn sniff_csv_file(input: String) -> Result<CsvPreviewData, String> {
 
 /// Import all rows from a CSV string into the live session, then persist once.
 ///
-/// The vault must already be unlocked — returns `Err` if no session is active.
-/// Async — triggers a single vault save (Argon2id + encryption) at the end.
+/// The vault must already be unlocked - returns `Err` if no session is active.
+/// Async - triggers a single vault save (Argon2id + encryption) at the end.
 pub async fn import_from_csv(
     input: String,
     config: CsvImportConfigData,
@@ -167,16 +161,8 @@ fn entry_meta_mut(entry: &mut VaultEntry) -> &mut EntryMeta {
     }
 }
 
-/// Import all entries from a Bitwarden unencrypted JSON export into the
-/// live session, then persist once.
-///
-/// `data` is the raw bytes of the Bitwarden `.json` export file.
-/// The vault must already be unlocked — returns `Err` if no session is active.
-///
-/// Entries that fail domain validation are collected into `ImportResult.failures`
-/// rather than aborting the whole import.
-///
-/// Async — triggers a single vault save (Argon2id + encryption) at the end.
+/// Entries failing validation land in `ImportResult.failures` rather than
+/// aborting the import. One save at the end.
 pub async fn import_from_bitwarden(data: Vec<u8>) -> Result<ImportResult, String> {
     // Scrub the raw import buffer (holds plaintext secrets) on drop (S-06).
     let data = zeroize::Zeroizing::new(data);
@@ -204,16 +190,7 @@ pub async fn import_from_bitwarden(data: Vec<u8>) -> Result<ImportResult, String
     })
 }
 
-/// Import all entries from an Enpass JSON export into the live session,
-/// then persist once.
-///
-/// `data` is the raw bytes of the Enpass `.json` export file.
-/// The vault must already be unlocked — returns `Err` if no session is active.
-///
-/// Entries that fail domain validation are collected into `ImportResult.failures`
-/// rather than aborting the whole import.
-///
-/// Async — triggers a single vault save (Argon2id + encryption) at the end.
+/// As [`import_from_bitwarden`].
 pub async fn import_from_enpass(data: Vec<u8>) -> Result<ImportResult, String> {
     // Scrub the raw import buffer (holds plaintext secrets) on drop (S-06).
     let data = zeroize::Zeroizing::new(data);
@@ -241,13 +218,7 @@ pub async fn import_from_enpass(data: Vec<u8>) -> Result<ImportResult, String> {
     })
 }
 
-/// Import all entries from a Google Password Manager CSV export into the
-/// live session, then persist once.
-///
-/// `data` is the raw bytes of the `.csv` export from passwords.google.com.
-/// The vault must already be unlocked — returns `Err` if no session is active.
-///
-/// Async — triggers a single vault save (Argon2id + encryption) at the end.
+/// As [`import_from_bitwarden`].
 pub async fn import_from_google_pm(data: Vec<u8>) -> Result<ImportResult, String> {
     // Scrub the raw import buffer (holds plaintext secrets) on drop (S-06).
     let data = zeroize::Zeroizing::new(data);
@@ -257,7 +228,7 @@ pub async fn import_from_google_pm(data: Vec<u8>) -> Result<ImportResult, String
 
     for entry in entries {
         let now = chrono_now();
-        // Google PM entries are freshly assigned UUIDs — stamp timestamps.
+        // Google PM entries are freshly assigned UUIDs - stamp timestamps.
         let entry = stamp_timestamps(entry, &now);
         session::session_add_entry_no_save(entry)?;
         imported += 1;
@@ -278,13 +249,7 @@ pub async fn import_from_google_pm(data: Vec<u8>) -> Result<ImportResult, String
     })
 }
 
-/// Import all entries from a Dashlane credentials CSV export into the
-/// live session, then persist once.
-///
-/// `data` is the raw bytes of the `.csv` credentials export from Dashlane.
-/// The vault must already be unlocked — returns `Err` if no session is active.
-///
-/// Async — triggers a single vault save (Argon2id + encryption) at the end.
+/// As [`import_from_bitwarden`].
 pub async fn import_from_dashlane(data: Vec<u8>) -> Result<ImportResult, String> {
     // Scrub the raw import buffer (holds plaintext secrets) on drop (S-06).
     let data = zeroize::Zeroizing::new(data);
@@ -314,8 +279,6 @@ pub async fn import_from_dashlane(data: Vec<u8>) -> Result<ImportResult, String>
     })
 }
 
-// ── Gabbro → Gabbro import ────────────────────────────────────────────────────
-
 /// Returned by [`import_from_gabbro`].
 #[derive(Debug)]
 pub struct GabbroImportResult {
@@ -323,14 +286,7 @@ pub struct GabbroImportResult {
     pub imported: usize,
 }
 
-/// Import entries from a `.gabbro` vault file into the live session.
-///
-/// Decrypts the source vault at `path` using `passphrase`, then adds every
-/// entry, duplicates included (import is additive; sync is the flow that
-/// reconciles). A single vault save is performed at the end.
-///
-/// The vault must already be unlocked — returns `Err` if no session is active.
-/// Async — triggers a single vault save (Argon2id + encryption) at the end.
+/// Additive, duplicates included: sync is the flow that reconciles.
 pub async fn import_from_gabbro(
     path: String,
     passphrase: Vec<u8>,
@@ -342,15 +298,9 @@ pub async fn import_from_gabbro(
     merge_source_into_session(source)
 }
 
-/// Import/sync from a **key-protected** `.gabbro` vault (ADR-013).
-///
-/// Opens the source at `path` with the source passphrase AND a registered YubiKey
-/// (its hmac-secret output + credential id), then merges into the session exactly
-/// as [`import_from_gabbro`]. This is the path for syncing a vault created with
-/// YubiKey protection: passphrase alone is refused by the crypto, so the source's
-/// chosen protection is upheld across the sync. `hmac_secret` must be 32 bytes.
-///
-/// The vault must already be unlocked — returns `Err` if no session is active.
+/// [`import_from_gabbro`] for a key-protected source (ADR-013): the crypto
+/// refuses passphrase alone, so the source's protection holds. `hmac_secret`
+/// must be 32 bytes.
 pub async fn import_from_gabbro_with_key(
     path: String,
     passphrase: Vec<u8>,
@@ -368,14 +318,9 @@ pub async fn import_from_gabbro_with_key(
     merge_source_into_session(source)
 }
 
-/// Add every entry of a decrypted source vault body to the live session, then
-/// save once. Shared by the passphrase-only and key-protected Gabbro import
-/// paths.
-///
-/// An incoming entry whose UUID the session already holds gets a fresh one:
-/// the vault must never hold two entries under one UUID, or sync (which
-/// matches by UUID) breaks. Other ids are kept, so a later sync with the
-/// source vault still matches them.
+/// A UUID the session already holds gets a fresh one: two entries under one
+/// UUID break sync. Other ids are kept so a later sync with the source still
+/// matches them.
 fn merge_source_into_session(
     source: crate::vault::serialization::VaultBody,
 ) -> Result<GabbroImportResult, String> {
@@ -394,8 +339,6 @@ fn merge_source_into_session(
     session::session_save()?;
     Ok(GabbroImportResult { imported })
 }
-
-// ── Tests ─────────────────────────────────────────────────────────────────────
 
 // NOTE: ImportResult and ImportFailureData are defined here as stubs so the
 // test below can be written first (TDD red state). The real definitions will
@@ -587,7 +530,7 @@ Sample,https://example.net,user@example.com,s3cr3t,,no";
     #[serial]
     fn import_never_modifies_an_existing_entry() {
         // Add-only invariant: import adds entries, it never reconciles fields on one
-        // already in the vault — that is sync's job. The incoming entry carries the
+        // already in the vault - that is sync's job. The incoming entry carries the
         // same id as "existing-001" but different content; the stored entry must be
         // byte-identical afterwards.
         let bitwarden_collides_and_differs: &str = r#"{
@@ -625,7 +568,7 @@ Sample,https://example.net,user@example.com,s3cr3t,,no";
         session::unlock_vault(pass, path.clone()).unwrap();
 
         let result = run(import_from_bitwarden(BITWARDEN_JSON.as_bytes().to_vec())).unwrap();
-        assert_eq!(result.imported, 4); // login, note, card, identity — unknown type skipped
+        assert_eq!(result.imported, 4); // login, note, card, identity - unknown type skipped
         assert!(result.failures.is_empty());
 
         let summaries = session::list_entry_summaries().unwrap();
@@ -670,8 +613,8 @@ Sample,https://example.net,user@example.com,s3cr3t,,no";
         assert!(result.is_err());
     }
 
-    // Enpass JSON with a card whose number has only 4 digits — invalid per
-    // CardEntry::new() (requires 12–19 digits). The entry must appear in
+    // Enpass JSON with a card whose number has only 4 digits - invalid per
+    // CardEntry::new() (requires 12-19 digits). The entry must appear in
     // ImportResult.failures, not be silently dropped.
     const ENPASS_INVALID_CARD_JSON: &str = r#"{
         "items": [{
@@ -692,7 +635,7 @@ Sample,https://example.net,user@example.com,s3cr3t,,no";
 
     // A minimal valid .gabbro vault containing two entries:
     // - "existing-001" (already in the session from setup_vault)
-    // - "new-entry-001" (not in the session — should be imported)
+    // - "new-entry-001" (not in the session - should be imported)
     fn setup_source_vault(passphrase: &[u8]) -> std::path::PathBuf {
         let mut path = temp_dir();
         path.push("gabbro_import_source_test.gabbro");
@@ -855,7 +798,6 @@ user@example.com,backup@example.com,,https://example.net,Personal,,s3cr3t,Sample
         assert!(result.is_err());
     }
 
-    // ── S3: import is additive, no dedupe ─────────────────────────────────────
     // Every source entry is added, duplicates included. Import is a
     // once-at-onboarding act into an empty vault; dedupe, if ever, is a
     // separate task. Sync (UUID merge) is the flow that reconciles.
@@ -1101,7 +1043,6 @@ Example,https://example.com,user,hunter2,my example";
         let _ = std::fs::remove_file(&source_path);
     }
 
-    // ── S3: a colliding UUID gets a fresh one ─────────────────────────────────
     // The vault must never hold two entries under one UUID, or sync (which
     // matches by UUID) breaks. The incoming entry is still imported, as a new
     // entry with its own id; the existing entry is untouched.
@@ -1175,8 +1116,6 @@ Example,https://example.com,user,hunter2,my example";
         let _ = std::fs::remove_file(&source_path);
     }
 
-    // ── importing into an empty vault ─────────────────────────────────────────
-
     fn setup_empty_vault(passphrase: &[u8]) -> std::path::PathBuf {
         save_source_with(vec![], passphrase, "gabbro_import_empty_test.gabbro")
     }
@@ -1195,8 +1134,6 @@ Example,https://example.com,user,hunter2,my example";
 
         teardown(&path);
     }
-
-    // ── Locked-vault error paths for remaining importers ──────────────────────
 
     #[test]
     #[serial]
@@ -1234,12 +1171,8 @@ Example,https://example.com,user,hunter2,my example";
         let _ = std::fs::remove_file(&source_path);
     }
 
-    // ── ADR-013: syncing a key-protected export upholds its protection ─────────
-    //
-    // A vault created with passphrase + YubiKeys, exported with protection
-    // preserved (the default), must NOT be syncable with the passphrase alone — a
-    // registered key is required. This is the patch for the second-factor bypass
-    // found on 2026-06-10. The opt-in passphrase-only downgrade is a separate path.
+    // Second-factor bypass guard: an export with protection preserved must not
+    // sync with the passphrase alone. The passphrase-only downgrade is opt-in.
 
     /// Build a key-protected source vault (passphrase + YK1 + YK2), export it
     /// PRESERVING protection (ADR-013 default), and return `(artifact, source)`
@@ -1301,7 +1234,7 @@ Example,https://example.com,user,hunter2,my example";
         let path_b = setup_vault(pass_b); // 1 pre-existing note
         session::unlock_vault(pass_b, path_b.clone()).unwrap();
 
-        // Passphrase alone must NOT open a key-protected export → sync refused.
+        // Passphrase alone must NOT open a key-protected export -> sync refused.
         let result = run(import_from_gabbro(
             artifact.to_str().unwrap().to_string(),
             pass_a.to_vec(),
@@ -1310,7 +1243,7 @@ Example,https://example.com,user,hunter2,my example";
             result.is_err(),
             "syncing a key-protected export with passphrase alone must be refused"
         );
-        // The session is untouched — nothing leaked in.
+        // The session is untouched - nothing leaked in.
         assert_eq!(session::list_entry_summaries().unwrap().len(), 1);
 
         teardown(&path_b);
@@ -1352,8 +1285,6 @@ Example,https://example.com,user,hunter2,my example";
         let _ = std::fs::remove_file(&artifact);
         let _ = std::fs::remove_file(artifact.with_extension("gabbro.sha256"));
     }
-
-    // ── stamp_timestamps unit tests ───────────────────────────────────────────
 
     #[test]
     fn stamp_timestamps_fills_empty_created_and_updated_at() {

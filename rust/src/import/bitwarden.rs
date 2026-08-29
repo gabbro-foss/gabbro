@@ -1,7 +1,7 @@
 //! Bitwarden JSON vault importer.
 //!
 //! Parses the unencrypted `.json` export format produced by Bitwarden
-//! (Tools → Export Vault → Format: .json) and converts items into
+//! (Tools -> Export Vault -> Format: .json) and converts items into
 //! `Vec<VaultEntry>`.
 
 use indexmap::IndexMap;
@@ -11,8 +11,6 @@ use std::collections::HashMap;
 use crate::vault::entry::{
     CardEntry, CustomEntry, CustomField, EntryMeta, LoginEntry, NoteEntry, VaultEntry,
 };
-
-// ── Serde structs (mirrors the Bitwarden JSON schema) ────────────────────────
 
 #[derive(Deserialize)]
 struct BwExport {
@@ -90,11 +88,9 @@ struct BwIdentity {
     company: Option<String>,
 }
 
-// ── Public API ────────────────────────────────────────────────────────────────
-
 /// An item that failed domain validation during parsing.
 ///
-/// Kept internal to this module — the bridge layer maps it to
+/// Kept internal to this module - the bridge layer maps it to
 /// `ImportFailureData` in `api/import.rs`.
 pub(crate) struct ParseFailure {
     pub(crate) title: String,
@@ -105,12 +101,7 @@ pub(crate) struct ParseFailure {
     pub(crate) raw_fields: Vec<(String, String)>,
 }
 
-/// Parse a Bitwarden unencrypted JSON export.
-///
-/// Returns `Ok((entries, failures))` on success, `Err(String)` if the
-/// JSON is malformed or the top-level structure is missing.
-/// Items that fail domain validation are collected into `failures` rather
-/// than aborting the whole import.
+/// `Err` only for malformed JSON; items failing validation go to `failures`.
 pub(crate) fn parse(data: &[u8]) -> Result<(Vec<VaultEntry>, Vec<ParseFailure>), String> {
     if data.len() > super::TEXT_IMPORT_MAX_BYTES {
         return Err(format!(
@@ -121,7 +112,7 @@ pub(crate) fn parse(data: &[u8]) -> Result<(Vec<VaultEntry>, Vec<ParseFailure>),
     let export: BwExport =
         serde_json::from_slice(data).map_err(|e| format!("Bitwarden JSON parse error: {e}"))?;
 
-    // Build a folder-id → folder-name lookup table.
+    // Build a folder-id -> folder-name lookup table.
     let folders: HashMap<String, String> =
         export.folders.into_iter().map(|f| (f.id, f.name)).collect();
 
@@ -161,7 +152,7 @@ pub(crate) fn parse(data: &[u8]) -> Result<(Vec<VaultEntry>, Vec<ParseFailure>),
             3 => {
                 match convert_card(meta, &item.name, item.notes, custom_fields, item.card) {
                     Ok(Some(entry)) => entries.push(VaultEntry::Card(entry)),
-                    Ok(None) => {} // no card data present — skip silently
+                    Ok(None) => {} // no card data present - skip silently
                     Err(f) => failures.push(f),
                 }
             }
@@ -175,15 +166,13 @@ pub(crate) fn parse(data: &[u8]) -> Result<(Vec<VaultEntry>, Vec<ParseFailure>),
                 )));
             }
             _ => {
-                // Unknown item type — skip silently.
+                // Unknown item type - skip silently.
             }
         }
     }
 
     Ok((entries, failures))
 }
-
-// ── Conversion helpers ────────────────────────────────────────────────────────
 
 fn convert_fields(fields: &[BwField]) -> Vec<CustomField> {
     fields
@@ -352,8 +341,6 @@ fn convert_identity(
         attachments: vec![],
     }
 }
-
-// ── Tests ─────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
 mod tests {
@@ -539,7 +526,7 @@ mod tests {
     fn unknown_type_is_skipped() {
         let (entries, _) = parse(BITWARDEN_EXPORT.as_bytes()).expect("parse failed");
         // fixture has 5 items: login, note, card, identity, unknown(99)
-        // unknown should be silently dropped → 4 entries
+        // unknown should be silently dropped -> 4 entries
         assert_eq!(entries.len(), 4);
     }
 
@@ -604,8 +591,6 @@ mod tests {
         assert!(result.is_err());
     }
 
-    // ── Robustness / parser hardening ─────────────────────────────────────────
-
     #[test]
     fn empty_byte_input_returns_err() {
         assert!(parse(b"").is_err());
@@ -620,7 +605,7 @@ mod tests {
 
     #[test]
     fn login_item_without_login_block_is_silently_skipped() {
-        // type=1 but no "login" key → convert_login returns None → skipped, no panic
+        // type=1 but no "login" key -> convert_login returns None -> skipped, no panic
         let json = br#"{
             "items":[{
                 "id":"skip-me","type":1,"name":"Orphan",
@@ -637,7 +622,7 @@ mod tests {
 
     #[test]
     fn card_item_without_card_block_is_silently_skipped() {
-        // type=3 but no "card" key → convert_card returns Ok(None) → skipped
+        // type=3 but no "card" key -> convert_card returns Ok(None) -> skipped
         let json = br#"{
             "items":[{
                 "id":"no-card","type":3,"name":"Ghost Card",
@@ -689,7 +674,7 @@ mod tests {
 
     #[test]
     fn note_without_notes_field_gets_empty_content() {
-        // notes: null → NoteEntry.content defaults to ""
+        // notes: null -> NoteEntry.content defaults to ""
         let json = br#"{
             "items":[{
                 "id":"note1","type":2,"name":"Silent Note",
@@ -707,7 +692,7 @@ mod tests {
 
     #[test]
     fn custom_field_with_null_name_and_value_does_not_panic() {
-        // Bitwarden allows null field names/values — must not panic, must
+        // Bitwarden allows null field names/values - must not panic, must
         // produce empty-string label/value via unwrap_or_default().
         let json = br#"{
             "items":[{

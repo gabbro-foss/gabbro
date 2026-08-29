@@ -1,27 +1,12 @@
-//! Process hardening (R-04 — Linux core-dump hardening).
-//!
-//! While a vault is unlocked, decrypted secrets (the master key, plaintext
-//! entries) live in process RAM. Two escape routes for that material are
-//! closed here:
-//!   * a crash core dump would snapshot the whole address space to disk
-//!     -> `RLIMIT_CORE = 0` tells the kernel never to write one;
-//!   * a same-uid process could `ptrace` / read `/proc/<pid>/mem` to scrape
-//!     it from the live process -> `PR_SET_DUMPABLE(0)` blocks both.
-//!
-//! Belt and suspenders: the two cover different escape routes.
-//!
-//! Linux-only syscalls; a no-op on other targets (production Android processes
-//! are already non-dumpable). Must be called once, early, before any secret is
-//! in memory — wired into the flutter_rust_bridge `init_app()` hook so every
-//! Dart entrypoint (`main.dart`, `autofill_unlock_main.dart`) reaches it before
-//! `runApp` / any unlock work.
+//! R-04. Two routes out of RAM for an unlocked vault's secrets are closed:
+//! `RLIMIT_CORE = 0` so a crash never writes a core dump, and
+//! `PR_SET_DUMPABLE(0)` so a same-uid process cannot `ptrace` or read
+//! `/proc/<pid>/mem`. Wired into the frb `init_app()` hook so every Dart
+//! entrypoint runs it before any secret exists. No-op off Linux (Android
+//! processes are already non-dumpable).
 
-/// Harden the current process against in-memory secret disclosure.
-///
-/// Returns `Ok(())` on success, and on non-Linux targets where it is a no-op.
 #[cfg(target_os = "linux")]
 pub fn harden_process() -> Result<(), String> {
-    // Block ptrace attach and /proc/<pid>/mem reads by same-uid processes.
     // SAFETY: PR_SET_DUMPABLE takes an integer arg (0), no pointers.
     let rc = unsafe { libc::prctl(libc::PR_SET_DUMPABLE, 0 as libc::c_ulong) };
     if rc != 0 {
@@ -31,8 +16,7 @@ pub fn harden_process() -> Result<(), String> {
         ));
     }
 
-    // Stop the kernel from writing a core dump of this process — both the soft
-    // and hard limit to 0 so it cannot be raised again.
+    // Hard limit 0 too, so it cannot be raised again.
     let limit = libc::rlimit {
         rlim_cur: 0,
         rlim_max: 0,
@@ -49,29 +33,16 @@ pub fn harden_process() -> Result<(), String> {
     Ok(())
 }
 
-/// No-op on non-Linux targets (Android production processes are already
-/// non-dumpable; these are Linux syscalls).
 #[cfg(not(target_os = "linux"))]
 pub fn harden_process() -> Result<(), String> {
     Ok(())
 }
 
-/// Raise or lower the process `PR_SET_DUMPABLE` flag.
-///
-/// `harden_process` clears it (0) so a same-uid process cannot `ptrace` us or
-/// read `/proc/<pid>/mem`. That same flag, however, makes the kernel reassign
-/// `/proc/<pid>/{root,cwd,exe}` to a `ptrace`-gated state: a same-uid peer
-/// without `CAP_SYS_PTRACE` gets `EACCES` reading them. `xdg-desktop-portal`
-/// reads exactly those entries to build the caller's app-info when servicing a
-/// FileChooser request, so a non-dumpable process cannot open a native file
-/// dialog at all (it fails as "portal unreachable").
-///
-/// The picker layer therefore raises the flag (`true`) only for the brief,
-/// user-initiated window a file dialog is open, then lowers it (`false`) again.
-/// During that window the kernel's yama `ptrace_scope` (>= 1 on Debian/Mint and
-/// Arch defaults) still blocks any non-ancestor same-uid tracer, so the
-/// exposure is negligible. `RLIMIT_CORE` stays 0 throughout — the no-core-dump
-/// guarantee is independent of this flag.
+/// A non-dumpable process has `/proc/<pid>/{root,cwd,exe}` gated behind
+/// ptrace, and `xdg-desktop-portal` reads those to service a FileChooser, so
+/// the native file dialog fails as "portal unreachable". The picker raises the
+/// flag only while a dialog is open; yama `ptrace_scope >= 1` still blocks
+/// non-ancestor tracers in that window, and `RLIMIT_CORE` stays 0 throughout.
 #[cfg(target_os = "linux")]
 pub fn set_process_dumpable(dumpable: bool) -> Result<(), String> {
     let arg = if dumpable { 1 } else { 0 } as libc::c_ulong;
@@ -194,7 +165,7 @@ mod tests {
 
     /// Fork a child that sets its own dumpable flag to `child_dumpable`, signal
     /// readiness over a pipe, then probe whether this (same-uid, parent) process
-    /// can dereference the child's `/proc/<pid>/root` — the exact access
+    /// can dereference the child's `/proc/<pid>/root` - the exact access
     /// `xdg-desktop-portal` performs to read a caller's app-info. Returns true
     /// iff the `read_link` succeeds.
     fn child_proc_root_accessible(child_dumpable: bool) -> bool {
@@ -245,13 +216,8 @@ mod tests {
     #[test]
     #[serial]
     fn proc_root_access_tracks_dumpable_flag() {
-        // The negative half (non-dumpable -> NOT accessible) is an
-        // unprivileged-only kernel rule: a caller with CAP_SYS_PTRACE (i.e.
-        // root) bypasses the dumpable gate and can always reach
-        // /proc/<pid>/root. Only assert it when we are actually unprivileged,
-        // otherwise it would spuriously fail under the offline gate's
-        // `unshare -r` (uid mapped to 0). The dumpable-flag mechanics
-        // themselves stay covered by the other tests, which pass either way.
+        // CAP_SYS_PTRACE bypasses the dumpable gate, so the negative half
+        // would fail spuriously under the offline gate's `unshare -r`.
         if caller_is_privileged() {
             eprintln!(
                 "skipping the non-dumpable denial assertion: caller is root \

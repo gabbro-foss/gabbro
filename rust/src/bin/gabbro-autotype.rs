@@ -1,11 +1,6 @@
-//! `gabbro-autotype` (ADR-017): the user-bound trigger client.
-//!
-//! Bind it to a key in your window manager / desktop shortcuts, e.g. qtile:
+//! The user-bound trigger client (ADR-017), e.g. qtile:
 //!   Key([mod], "<key>", lazy.spawn("<path>/gabbro-autotype"))
-//!
-//! It connects to the running Gabbro's socket, sends the trigger, and exits.
-//! It never opens a window. If Gabbro isn't running it prints a message and
-//! exits non-zero.
+//! Never opens a window; exits non-zero if Gabbro is not running.
 
 #[cfg(target_os = "linux")]
 fn main() {

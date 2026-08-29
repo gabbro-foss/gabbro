@@ -1,40 +1,19 @@
-//! Memory-forensics self-test harness (audit L-6 / Appendix C item 6).
+//! Memory-forensics self-test (audit L-6): proves against a real core dump that
+//! `lock_vault()` scrubs the passphrase and entry secrets. Driven by
+//! `scripts/mem_forensics.sh` after
+//! `cargo build --release --features forensics --bin mem_forensics`.
 //!
-//! Validates empirically that the master passphrase is scrubbed from process
-//! memory when a vault is locked — i.e. that `VaultSession`'s `Zeroizing` fields
-//! and `lock_vault()` actually work against a real core dump, not just in theory.
-//!
-//! NOT part of normal builds. Build and run via the driver script:
-//!
-//! ```text
-//! cargo build --release --features forensics --bin mem_forensics
-//! scripts/mem_forensics.sh
-//! ```
-//!
-//! The driver uses two distinct high-entropy **canaries**: one as the vault
-//! passphrase (validates `Zeroizing` + `lock_vault`), one as a Login entry's
-//! password (validates `ZeroizeOnDrop` on `VaultEntry` via `entries.clear()`).
-//! The passphrase canary is never written to disk; the entry canary lives only
-//! inside the encrypted vault and, once unlocked, the in-memory session — so
-//! neither has disk/argv false positives. Canaries reach the harness via
-//! **stdin** (never argv) so they cannot leak through `/proc/<pid>/cmdline`.
-//!
-//! Subcommands:
-//!   create <path>   seal a passphrase vault (line 1) containing one Login entry
-//!                   whose password is the entry canary (line 2), then exit —
-//!                   this process's plaintext dies with it, polluting nothing.
-//!   test   <path>   unlock (passphrase canary on stdin) → print "UNLOCKED <pid>"
-//!                   → wait → lock → print "LOCKED" → wait → exit. The driver runs
-//!                   `gcore` at each wait and greps the dumps for both canaries.
+//! Canaries arrive on stdin, never argv, so `/proc/<pid>/cmdline` cannot leak
+//! them; `create` seals then exits so its own plaintext dies with it. `test`
+//! prints UNLOCKED then LOCKED, waiting at each so the driver can `gcore`.
 
 use rust_lib_gabbro::api::vault::LoginEntryData;
 use rust_lib_gabbro::api::vault_bridge::VaultEntryData;
 use std::io::{BufRead, Write};
 use std::path::PathBuf;
 
-/// `prctl(2)` option: nominate which process may `ptrace` us. Passing
-/// `PR_SET_PTRACER_ANY` (-1) lets an unrelated `gcore` attach even under
-/// `yama` `ptrace_scope=1`, so the self-test needs no sudo.
+/// With `PR_SET_PTRACER_ANY` an unrelated `gcore` can attach under yama
+/// `ptrace_scope=1`, so the self-test needs no sudo.
 const PR_SET_PTRACER: libc::c_int = 0x59616d61;
 
 fn main() {
@@ -80,15 +59,15 @@ fn main() {
             let path = PathBuf::from(args.next().expect("usage: mem_forensics test <path>"));
 
             // Allow any same-uid process (the driver's gcore) to ptrace us,
-            // despite yama ptrace_scope=1 — no sudo required.
+            // despite yama ptrace_scope=1 - no sudo required.
             unsafe {
                 libc::prctl(PR_SET_PTRACER, -1i64 as libc::c_ulong, 0, 0, 0);
             }
 
             let canary = read_canary_from_stdin();
             rust_lib_gabbro::vault::session::unlock_vault(&canary, path).expect("unlock failed");
-            // Drop our local copy now (Zeroizing → zeroized on drop). From here the
-            // canary should live ONLY inside the global VaultSession — the thing
+            // Drop our local copy now (Zeroizing -> zeroized on drop). From here the
+            // canary should live ONLY inside the global VaultSession - the thing
             // under test.
             drop(canary);
 

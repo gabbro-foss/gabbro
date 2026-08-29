@@ -1,12 +1,5 @@
-//! Character -> X11 keysym planning for auto-type (ADR-017).
-//!
-//! Pure, host-testable logic with no X server involved: it maps each character
-//! of a secret to the X11 keysym that the injection layer binds to a scratch
-//! keycode and "presses". The mapping is the standard UCS rule used by libX11
-//! and xdotool: the Latin-1 printable ranges map to the codepoint directly;
-//! everything else uses the Unicode keysym `0x01000000 + codepoint`. Binding
-//! the exact keysym at level 0 of a scratch keycode is why arbitrary scripts
-//! (Greek, Cyrillic, CJK) inject uniformly, with no modifier juggling.
+//! The libX11/xdotool UCS rule: Latin-1 printables map to the codepoint,
+//! everything else to `0x01000000 + codepoint`. Pure, so host-testable.
 
 /// Map a single character to its X11 keysym (see module docs for the rule).
 pub fn char_to_keysym(c: char) -> u32 {

@@ -1,21 +1,11 @@
-//! Vault file I/O — writing and reading `.gabbro` files on disk.
-//!
-//! These functions are thin wrappers around `SealedVault::to_bytes()`
-//! and `SealedVault::from_bytes()`. All crypto happens in `vault_crypto.rs`;
-//! all serialization happens in `file_format.rs`. This module only touches
-//! the filesystem.
-
 use std::fs;
 use std::path::{Path, PathBuf};
 
 use crate::vault::file_format::{SealedVault, YubiKeyRecord};
 
-/// Reject a path that already holds a file — for vault **creation** only.
-///
-/// Creating seals an *empty* vault, so pointing it at an existing vault replaces
-/// that vault with nothing; the old bytes survive only as the rotated `.bak`,
-/// which the app offers only for a vault that is corrupt. Export, restore and
-/// saving an open vault all overwrite deliberately and must not use this.
+/// Creation only: it seals an empty vault, so an existing vault at the path
+/// would be replaced with nothing. Export, restore and save overwrite by
+/// design and must not use this.
 pub(crate) fn refuse_if_path_taken(path: &Path) -> Result<(), String> {
     if fs::symlink_metadata(path).is_ok() {
         return Err(format!(
@@ -87,7 +77,7 @@ fn bak_path(path: &Path) -> PathBuf {
 }
 
 /// R-03: before overwriting an existing vault, keep the previous sealed bytes
-/// as a sibling `.bak`. Crash/corruption insurance for the save path — not a
+/// as a sibling `.bak`. Crash/corruption insurance for the save path - not a
 /// backup (same disk) and not undo (advances on every save).
 fn rotate_backup(path: &Path) -> Result<(), String> {
     if fs::symlink_metadata(path).is_err() {
@@ -102,12 +92,9 @@ fn rotate_backup(path: &Path) -> Result<(), String> {
     atomic_write_0600(&bak, &previous).map_err(|e| format!("Vault backup rotation failed: {e}"))
 }
 
-/// R-03: make the `.bak` identical to the current on-disk vault.
-///
-/// Used after credential-changing operations (passphrase change, YubiKey
-/// add/remove): a rotated `.bak` would hold the *old* credential set, which
-/// the user may no longer remember or hold — so those operations forfeit the
-/// one-save rollback window and refresh the safety copy to match instead.
+/// R-03: after a credential change the rotated `.bak` would hold a credential
+/// set the user may not remember or hold, so the rollback window is forfeited
+/// and the safety copy refreshed instead.
 pub(crate) fn sync_backup_to_current(path: &Path) -> Result<(), String> {
     let bak = bak_path(path);
     check_not_symlink(&bak).map_err(|e| format!("Vault backup refresh failed: {e}"))?;
@@ -116,12 +103,9 @@ pub(crate) fn sync_backup_to_current(path: &Path) -> Result<(), String> {
     atomic_write_0600(&bak, &current).map_err(|e| format!("Vault backup refresh failed: {e}"))
 }
 
-/// R-03: refresh the `.bak` after a credential change that already persisted.
-///
-/// If the refresh fails, the stale `.bak` is removed — it holds the *old*
-/// credential set, which the user may no longer remember or hold, and a
-/// misleading backup is worse than none. The error states explicitly that the
-/// credential change itself succeeded, so the user is not tempted to retry it.
+/// A misleading backup is worse than none, so a failed refresh removes the
+/// stale `.bak`. The error says the change itself succeeded, so the user does
+/// not retry it.
 pub(crate) fn refresh_backup_after_credential_change(path: &Path) -> Result<(), String> {
     if let Err(e) = sync_backup_to_current(path) {
         let _ = remove_backup(path);
@@ -133,14 +117,9 @@ pub(crate) fn refresh_backup_after_credential_change(path: &Path) -> Result<(), 
     Ok(())
 }
 
-/// R-03 P1: after the main vault is written, confirm the bytes read back as a
-/// valid vault, then advance the `.bak` to match — so the safety copy always
-/// equals the last *verified* save, never one save behind (the defect that
-/// lost a just-made edit when a user restored after corruption).
-///
-/// If the just-written bytes do not parse, the `.bak` is left at the previous
-/// good save and a loud error is returned: this is the 2026-06-08 brick class
-/// firing at the moment of the bad save instead of silently propagating into
+/// R-03 P1: the `.bak` equals the last verified save, never one behind (which
+/// lost a just-made edit on restore). Unparseable bytes leave the `.bak` at
+/// the previous good save and fail loudly, so a brick cannot propagate into
 /// the safety copy.
 fn verify_and_sync_backup(path: &Path) -> Result<(), String> {
     let written = fs::read(path).map_err(|e| {
@@ -155,15 +134,9 @@ fn verify_and_sync_backup(path: &Path) -> Result<(), String> {
     sync_backup_to_current(path)
 }
 
-/// Write a sealed vault to a `.gabbro` file at the given path.
-///
-/// Refuses symlinks. Rotates the previous save to `.bak` as mid-write crash
-/// insurance (fail-closed: a rotation error aborts the save, leaving the
-/// on-disk vault untouched), writes atomically with mode 0600 on Unix, then
-/// verifies the just-written bytes parse and syncs the `.bak` to them — so the
-/// safety copy always equals the last verified save (R-03 P1). A write that
-/// does not read back as a valid vault leaves the `.bak` at the previous good
-/// save and returns an error.
+/// Fail-closed: a `.bak` rotation error aborts the save with the on-disk vault
+/// untouched. After the atomic 0600 write the bytes are re-read and verified
+/// before the `.bak` advances (R-03 P1).
 pub fn write_vault(sealed: &SealedVault, path: &Path) -> Result<(), String> {
     check_not_symlink(path)?;
     rotate_backup(path)?;
@@ -196,20 +169,15 @@ pub(crate) fn remove_pre_restore(path: &Path) -> Result<(), String> {
 
 /// R-03: does a `.bak` safety copy exist for this vault path?
 ///
-/// Reports `false` for a symlinked `.bak` — restore would refuse it anyway,
+/// Reports `false` for a symlinked `.bak` - restore would refuse it anyway,
 /// so the unlock screen must not offer it.
 pub fn backup_exists(path: &Path) -> bool {
     matches!(fs::symlink_metadata(bak_path(path)), Ok(m) if m.is_file())
 }
 
-/// R-03 P3: is the `.bak` a *usable* vault — present, not a symlink, and
-/// parseable as a Gabbro vault?
-///
-/// Drives whether the unlock screen may offer a restore. Mere existence is not
-/// enough: a `.bak` that has itself rotted to garbage must never be advertised
-/// as "a safety copy is available", or the offer lies and a confirmed restore
-/// is then refused (hardware-found 2026-06-11). Parsing does no KDF work, so
-/// this is cheap to call before passphrase entry.
+/// R-03 P3: existence is not enough; a rotted `.bak` advertised as a safety
+/// copy makes the restore offer a lie. Parsing does no KDF work, so this is
+/// cheap before passphrase entry.
 pub fn backup_usable(path: &Path) -> bool {
     let bak = bak_path(path);
     if check_not_symlink(&bak).is_err() {
@@ -225,7 +193,7 @@ pub fn backup_usable(path: &Path) -> bool {
 ///
 /// Only called from the unlock screen's explicit restore flow, after the user
 /// has confirmed. Refuses symlinks on both paths. The restored vault still
-/// requires full credentials to open — restoring grants no access.
+/// requires full credentials to open - restoring grants no access.
 pub fn restore_vault_backup(path: &Path) -> Result<(), String> {
     check_not_symlink(path)?;
     let bak = bak_path(path);
@@ -247,7 +215,7 @@ fn pre_restore_path(path: &Path) -> PathBuf {
 }
 
 /// H2: before restore-from-file overwrites a vault, preserve the old vault's
-/// best remaining copy as a single `.pre-restore` sibling — the undo for a
+/// best remaining copy as a single `.pre-restore` sibling - the undo for a
 /// mis-picked file. The `.bak` (last good save) is preferred when usable.
 fn preserve_pre_restore(path: &Path) -> Result<(), String> {
     let pre = pre_restore_path(path);
@@ -255,7 +223,7 @@ fn preserve_pre_restore(path: &Path) -> Result<(), String> {
     let bytes = if backup_usable(path) {
         fs::read(bak_path(path)).map_err(|e| format!("Pre-restore preservation failed: {e}"))?
     } else if fs::symlink_metadata(path).is_ok() {
-        // No usable safety copy: keep the old main bytes, however corrupt —
+        // No usable safety copy: keep the old main bytes, however corrupt -
         // they are the only copy left.
         fs::read(path).map_err(|e| format!("Pre-restore preservation failed: {e}"))?
     } else {
@@ -264,22 +232,11 @@ fn preserve_pre_restore(path: &Path) -> Result<(), String> {
     atomic_write_0600(&pre, &bytes).map_err(|e| format!("Pre-restore preservation failed: {e}"))
 }
 
-/// R-03: replace the vault file at `path` with an external backup file the user
-/// picked (their own off-device 3-2-1 copy).
-///
-/// Validates that `source` parses as a vault before overwriting — never replace
-/// an unreadable vault with another unreadable file. Refuses symlinks on both
-/// paths. The restored vault still requires full credentials to open, so this
-/// grants no access by itself.
-///
-/// The `.bak` is refreshed to the restored bytes, not rotated: it belongs to
-/// whatever vault sits at this path, and the file just replaced may be an
-/// entirely different vault. Left alone it would be offered as this vault's
-/// safety copy and hand the user the previous vault back.
-///
-/// H2: before anything is overwritten, the old vault's best remaining copy is
-/// preserved as `.pre-restore` (see [`preserve_pre_restore`]) — without it a
-/// mis-picked file would destroy the old vault with no undo.
+/// R-03. `source` must parse before anything is overwritten, so an unreadable
+/// vault is never replaced by another. The `.bak` is refreshed, not rotated:
+/// the replaced file may be a different vault, and rotated it would be offered
+/// back as this vault's safety copy. H2: the old vault is kept as
+/// `.pre-restore` first, or a mis-picked file would destroy it with no undo.
 pub fn restore_vault_from_file(path: &Path, source: &Path) -> Result<(), String> {
     check_not_symlink(path)?;
     check_not_symlink(source)?;
@@ -292,7 +249,7 @@ pub fn restore_vault_from_file(path: &Path, source: &Path) -> Result<(), String>
 }
 
 /// Adopt: copy a picked `.gabbro` file to a fresh destination inside app
-/// storage (Android — the picker only hands out a cache copy) so it can be
+/// storage (Android - the picker only hands out a cache copy) so it can be
 /// registered as a vault. Unlike a restore, adopt must never overwrite:
 /// the destination has no previous vault to preserve. The copy gets its own
 /// `.bak` immediately, and opening it still requires full credentials.
@@ -318,12 +275,8 @@ pub fn read_vault(path: &Path) -> Result<SealedVault, String> {
     SealedVault::from_bytes(&bytes)
 }
 
-/// Whether the vault file at `path` predates the readable floor (see
-/// [`crate::vault::file_format::is_format_too_old`]).
-///
-/// Lets the unlock screen tell "intact but too old to open" apart from "corrupt",
-/// so an old vault is explained rather than reported as damaged with an offer to
-/// delete it. Reads the first bytes only; decrypts nothing.
+/// Tells "too old" apart from "corrupt", so an old vault is never offered for
+/// deletion. Reads the first bytes only.
 pub fn vault_format_too_old(path: &Path) -> Result<bool, String> {
     check_not_symlink(path)?;
     let bytes = fs::read(path).map_err(|e| format!("Failed to read vault: {e}"))?;
@@ -477,7 +430,7 @@ mod tests {
     }
 
     // R-03 P1: after a second save the .bak equals the CURRENT save (synced),
-    // not the previous one — so a restore returns the user's latest state.
+    // not the previous one - so a restore returns the user's latest state.
     #[test]
     fn second_write_syncs_bak_to_current_save() {
         let path = {
@@ -534,7 +487,7 @@ mod tests {
         );
     }
 
-    // R-03 P1: the very first save creates a .bak equal to that save — the
+    // R-03 P1: the very first save creates a .bak equal to that save - the
     // safety copy mirrors the last verified save from the first one on.
     #[test]
     fn first_write_creates_bak_matching_save() {
@@ -561,7 +514,7 @@ mod tests {
         );
     }
 
-    // R-03 P1: each save syncs the .bak to the current vault — after the third
+    // R-03 P1: each save syncs the .bak to the current vault - after the third
     // save it holds the third save, not an older one.
     #[test]
     fn third_write_syncs_bak_to_current_save() {
@@ -593,7 +546,7 @@ mod tests {
     }
 
     // R-03 P1: if a save's bytes land on disk but do not parse, the .bak must
-    // be left at the last good save and a loud error returned — the brick class
+    // be left at the last good save and a loud error returned - the brick class
     // firing at the bad save, not silently propagating into the safety copy.
     #[test]
     fn unparseable_written_vault_keeps_bak_at_last_good_and_errors() {
@@ -794,7 +747,7 @@ mod tests {
         );
     }
 
-    // R-03 (discovered): never restore a .bak that does not parse as a vault —
+    // R-03 (discovered): never restore a .bak that does not parse as a vault -
     // replacing one corrupt file with another would destroy the evidence too
     #[test]
     fn restore_vault_backup_refuses_unparseable_bak() {
@@ -848,7 +801,7 @@ mod tests {
         assert!(after_second, ".bak still present after the second save");
     }
 
-    // R-03 P3: backup_usable is true only when the .bak parses as a vault — a
+    // R-03 P3: backup_usable is true only when the .bak parses as a vault - a
     // garbage .bak must report false so the unlock screen cannot lie about it.
     #[test]
     fn backup_usable_true_only_for_parseable_bak() {
@@ -911,7 +864,7 @@ mod tests {
     }
 
     // R-03: restoring from a file that is not a vault must be refused and must
-    // leave the existing (corrupt) vault untouched — never replace one
+    // leave the existing (corrupt) vault untouched - never replace one
     // unreadable file with another.
     #[test]
     fn restore_vault_from_file_refuses_unparseable_source() {
@@ -940,10 +893,8 @@ mod tests {
         );
     }
 
-    // R10: the `.bak` beside a vault is that vault's safety copy. A
-    // restore-from-file replaces the vault but used to leave the `.bak` holding
-    // the *previous, unrelated* vault — which the unlock screen then offers as
-    // this vault's backup, handing the user the old vault back.
+    // R10: a `.bak` still holding the previous, unrelated vault would be offered
+    // as this vault's backup.
     #[test]
     fn restore_from_file_refreshes_the_backup_to_the_restored_vault() {
         let dir = temp_dir();
@@ -1024,7 +975,7 @@ mod tests {
     }
 
     // H2 R2: when no usable `.bak` exists, the old main bytes (however corrupt)
-    // are preserved as `.pre-restore` — evidence, and the only copy left.
+    // are preserved as `.pre-restore` - evidence, and the only copy left.
     #[test]
     fn restore_from_file_preserves_old_main_when_no_usable_bak() {
         let dir = temp_dir();
@@ -1087,7 +1038,7 @@ mod tests {
         );
     }
 
-    // H2 R4: a second restore overwrites the `.pre-restore` — there is only
+    // H2 R4: a second restore overwrites the `.pre-restore` - there is only
     // ever one, holding the vault replaced by the LATEST restore.
     #[test]
     fn second_restore_overwrites_the_pre_restore() {
@@ -1141,7 +1092,7 @@ mod tests {
     }
 
     // H2 R5: a symlink planted at `.pre-restore` aborts the restore fail-closed
-    // — main and `.bak` untouched, the symlink target never written through.
+    // - main and `.bak` untouched, the symlink target never written through.
     #[cfg(unix)]
     #[test]
     fn symlinked_pre_restore_aborts_restore_untouched() {
@@ -1222,13 +1173,8 @@ mod tests {
         );
     }
 
-    // ── R5: the file-adoption entry point vs a format it cannot open ──────────
-    //
-    // `restore_vault_from_file` is the only existing "take a file the user
-    // picked" path, so adoption will reuse it. Unlock already explains a pre-v11
-    // or too-new vault instead of calling it corrupt (unlock_screen.dart, and
-    // the backward-compat gate). These pin what THIS path does with the same
-    // files today.
+    // Adoption reuses `restore_vault_from_file`; these pin what it does with
+    // a pre-floor or too-new file.
 
     fn version_fixture(name: &str) -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -1280,7 +1226,7 @@ mod tests {
         );
     }
 
-    // R5 (3): a vault written by a newer build is refused the same way — fail
+    // R5 (3): a vault written by a newer build is refused the same way - fail
     // closed rather than write bytes this build cannot read back.
     #[test]
     fn restore_vault_from_file_refuses_a_too_new_source() {
@@ -1470,7 +1416,7 @@ mod tests {
     }
 
     // Adopt R2: a destination that already exists is refused and left
-    // untouched — adopt registers new vaults, it never overwrites one.
+    // untouched - adopt registers new vaults, it never overwrites one.
     #[test]
     fn adopt_vault_file_refuses_existing_dest() {
         let dir = temp_dir();
@@ -1505,7 +1451,7 @@ mod tests {
     }
 
     // Adopt R3: a picked file that is not a usable vault is refused and no
-    // destination is created — a broken file must never become a registered
+    // destination is created - a broken file must never become a registered
     // vault the unlock screen then reports as corrupt.
     #[test]
     fn adopt_vault_file_refuses_unparseable_source() {
@@ -1536,7 +1482,7 @@ mod tests {
     }
 
     // Adopt R4: symlinks are refused on both sides, as everywhere else in
-    // vault I/O (F-09) — a symlinked source could smuggle in a file the picker
+    // vault I/O (F-09) - a symlinked source could smuggle in a file the picker
     // never showed, a symlinked dest counts as occupied.
     #[cfg(unix)]
     #[test]
@@ -1580,7 +1526,7 @@ mod tests {
         );
     }
 
-    // Adopt R5: the v11 readable floor holds through adopt — a pre-v11 file is
+    // Adopt R5: the v11 readable floor holds through adopt - a pre-v11 file is
     // refused (it must go through the upgrade path first), not registered as a
     // vault that can never open.
     #[test]
@@ -1593,7 +1539,7 @@ mod tests {
         }
 
         // Well-formed vault bytes with the version byte (offset 6, after the
-        // magic) patched below the floor — from_bytes refuses on version alone.
+        // magic) patched below the floor - from_bytes refuses on version alone.
         let mut bytes = seal_vault(b"old pw", b"old body", None).unwrap().to_bytes();
         bytes[6] = 10;
         fs::write(&source, &bytes).unwrap();

@@ -1,10 +1,6 @@
-//! Linux bridge for FIDO2 hardware key operations via libfido2.
-//!
-//! These functions are called directly by Flutter on Linux. On Android,
-//! the equivalent operations are handled by yubikit-android via the
-//! `app.gabbro.gabbro/yubikey` MethodChannel — these functions are never
-//! called there, but Android stubs are provided so the generated Dart
-//! bindings compile on all platforms.
+//! libfido2 bridge, Linux only. Android uses yubikit via the `yubikey`
+//! MethodChannel instead; the stubs exist so the generated Dart bindings
+//! compile everywhere.
 
 /// Credential record returned by `fido_register`.
 pub struct FidoCredentialData {
@@ -27,13 +23,11 @@ pub struct FidoHmacMatch {
     pub credential_id: Vec<u8>,
 }
 
-// ── Linux implementations ─────────────────────────────────────────────────────
-
 #[cfg(not(target_os = "android"))]
 /// Enumerate FIDO2 HID devices and return their paths (e.g. `/dev/hidraw5`).
 ///
-/// Returns an empty list when no FIDO2 devices are present — not an error.
-/// Sync — fast device scan, no I/O.
+/// Returns an empty list when no FIDO2 devices are present - not an error.
+/// Sync - fast device scan, no I/O.
 #[flutter_rust_bridge::frb(sync)]
 pub fn fido_list_devices() -> Result<Vec<String>, String> {
     use std::ffi::CStr;
@@ -87,8 +81,8 @@ pub fn fido_list_devices() -> Result<Vec<String>, String> {
 /// Register a new FIDO2 credential on the YubiKey at `device_path`.
 ///
 /// Triggers one YubiKey tap. Returns credential ID and a fresh random
-/// 32-byte salt — both must be stored in the vault header.
-/// Async — blocks until the user taps the key.
+/// 32-byte salt - both must be stored in the vault header.
+/// Async - blocks until the user taps the key.
 pub async fn fido_register(device_path: String, pin: String) -> Result<FidoCredentialData, String> {
     let record = crate::fido::register(&device_path, &pin)?;
     Ok(FidoCredentialData {
@@ -102,7 +96,7 @@ pub async fn fido_register(device_path: String, pin: String) -> Result<FidoCrede
 ///
 /// `credential_id` and `salt` come from `FidoCredentialData` (stored in the
 /// vault header). Triggers one YubiKey tap.
-/// Async — blocks until the user taps the key.
+/// Async - blocks until the user taps the key.
 pub async fn fido_get_hmac_secret(
     device_path: String,
     credential_id: Vec<u8>,
@@ -124,14 +118,7 @@ pub async fn fido_get_hmac_secret(
 }
 
 #[cfg(not(target_os = "android"))]
-/// Obtain the 32-byte hmac-secret for whichever registered YubiKey is inserted.
-///
-/// For 2 records, sends a single CTAP2 assertion with both credential IDs in
-/// the `allowList` and a 64-byte combined salt. The YubiKey taps once and the
-/// matching half is extracted. For >2 records, C(n,2) pair attempts are tried
-/// until the inserted key is identified; non-matching pairs return immediately
-/// without a tap. For 1 record, falls back to the single-credential path.
-/// Async — blocks until the user taps the key.
+/// One tap whichever registered key is inserted; see `get_hmac_secret_any_of`.
 pub async fn fido_get_hmac_secret_any(
     device_path: String,
     records: Vec<FidoRecordInput>,
@@ -161,8 +148,6 @@ pub async fn fido_get_hmac_secret_any(
         credential_id: m.credential_id,
     })
 }
-
-// ── Android stubs (never called; Flutter guards with Platform.isLinux) ─────────
 
 #[cfg(target_os = "android")]
 #[flutter_rust_bridge::frb(sync)]
@@ -197,8 +182,6 @@ pub async fn fido_get_hmac_secret_any(
     Err("fido_get_hmac_secret_any is not available on Android".to_string())
 }
 
-// ── Tests ─────────────────────────────────────────────────────────────────────
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -209,7 +192,7 @@ mod tests {
     #[serial]
     #[ignore = "creates a real uhid device; needs the dev udev rule"]
     fn fido_list_devices_filters_our_virtual_authenticator() {
-        // With the virtual key up, the unlock scan must not list it —
+        // With the virtual key up, the unlock scan must not list it -
         // otherwise Gabbro offers ITSELF as an unlock key and the tap waits
         // on a device that never answers.
         use std::io::Write;
@@ -224,7 +207,7 @@ mod tests {
             .expect("create device");
         let ours = crate::uhid::test_wait_for("our hidraw node", crate::uhid::test_find_our_hidraw);
         // Wait until the node is accessible (fido_id/uaccess applied), so the
-        // scan below is deterministic — then scan exactly once.
+        // scan below is deterministic - then scan exactly once.
         let _ = crate::uhid::test_wait_for("hidraw to become accessible", || {
             std::fs::OpenOptions::new().read(true).open(&ours).ok()
         });
@@ -240,7 +223,7 @@ mod tests {
     #[test]
     #[cfg(not(target_os = "android"))]
     fn fido_list_devices_returns_ok() {
-        // No hardware required — returns empty list when no FIDO2 devices present.
+        // No hardware required - returns empty list when no FIDO2 devices present.
         let result = fido_list_devices();
         assert!(
             result.is_ok(),

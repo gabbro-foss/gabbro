@@ -82,7 +82,7 @@ pub fn parse_output(event: &[u8]) -> Option<Vec<u8>> {
 }
 
 /// Test helper (crate-wide): retry `f` every 10ms until it yields, or panic
-/// with `what` after 5s — bounded waits only, a test can never hang on it.
+/// with `what` after 5s - bounded waits only, a test can never hang on it.
 #[cfg(test)]
 pub(crate) fn test_wait_for<T>(what: &str, mut f: impl FnMut() -> Option<T>) -> T {
     let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
@@ -234,7 +234,7 @@ mod tests {
         dev.write_all(&create2_event()).expect("create device");
 
         // Host side: the fido_id udev builtin tags the new node and logind
-        // grants us access — the same path a browser relies on.
+        // grants us access - the same path a browser relies on.
         let hidraw = wait_for("our hidraw node to appear", find_our_hidraw);
         let mut host = wait_for("hidraw node to become accessible", || {
             std::fs::OpenOptions::new()

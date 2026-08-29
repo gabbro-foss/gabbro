@@ -1,23 +1,9 @@
-//! Google Password Manager CSV importer.
-//!
-//! Parses the fixed-schema CSV exported from passwords.google.com.
-//!
-//! ## Expected header row
-//! `name,url,username,password,note`
-//!
-//! Additional columns (e.g. a `type` column added in some export variants)
-//! are accepted and carried over as custom fields rather than causing a
-//! parse error.
-//!
-//! ## What is dropped on import
-//! - Empty rows
-//! - Entries where both `name` and `url` are absent (title falls back
-//!   to `"MISSING TITLE"` rather than being dropped)
+//! passwords.google.com CSV, header `name,url,username,password,note`. Extra
+//! columns (some exports add `type`) become custom fields rather than errors;
+//! a row with neither name nor url gets the title "MISSING TITLE".
 
 use crate::import::csv::parse_csv_line;
 use crate::vault::entry::{new_entry_id, CustomField, EntryMeta, LoginEntry, VaultEntry};
-
-// ── Public API ────────────────────────────────────────────────────────────────
 
 /// An item that failed parsing during import.
 pub(crate) struct ParseFailure {
@@ -139,8 +125,6 @@ pub(crate) fn parse(data: &[u8]) -> Result<(Vec<VaultEntry>, Vec<ParseFailure>),
 
     Ok((entries, failures))
 }
-
-// ── Tests ─────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
 mod tests {

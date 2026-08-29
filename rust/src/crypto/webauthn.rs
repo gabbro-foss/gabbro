@@ -1,10 +1,5 @@
-//! WebAuthn authenticator crypto for the passkey provider (ADR-009).
-//!
-//! Platform-independent core shared by the Android Credential Manager provider
-//! and the Linux virtual FIDO2 authenticator: ES256 key generation, COSE_Key
-//! encoding, authenticatorData assembly, and assertion signing. The private key
-//! never leaves this module except as vault-entry bytes; relying parties only
-//! ever receive the public key and signatures.
+//! ES256 authenticator core (ADR-009) shared by Android and Linux. The private
+//! key leaves only as vault-entry bytes.
 
 use p256::ecdsa::signature::Signer;
 use p256::ecdsa::{Signature, SigningKey};
@@ -57,18 +52,15 @@ pub fn generate_es256() -> Es256KeyPair {
     }
 }
 
-/// authenticatorData for an assertion: rpIdHash(32) || flags(1) || counter(4).
-///
-/// Flags UP|UV|BE|BS (0x1d): presence and verification are satisfied by the
-/// vault unlock + per-operation consent, and a vault passkey is by definition
-/// synced (backup eligible and backed up). Counter stays 0 — the sanctioned
-/// constant for synced passkeys.
+/// Flags UP|UV|BE|BS: unlock plus consent satisfy presence and verification,
+/// and a vault passkey is synced by definition. Counter 0 is the sanctioned
+/// value for synced passkeys.
 pub fn assertion_authenticator_data(rp_id: &str) -> Vec<u8> {
     assertion_auth_data_with_flags(rp_id, 0x1d)
 }
 
 /// authenticatorData for a silent assertion (CTAP 2.1 `options.up=false`):
-/// BE|BS only (0x18) — no user presence or verification was performed, and
+/// BE|BS only (0x18) - no user presence or verification was performed, and
 /// claiming either on a browser pre-flight would be lying to the relying
 /// party.
 // Only the Linux daemon's silent pre-flight calls this; dead on Android.
@@ -194,9 +186,9 @@ mod tests {
         assert_eq!(&ad[..32], Sha256::digest(b"example.com").as_slice());
         // UP (0x01) + UV (0x04) + BE (0x08) + BS (0x10) = 0x1d: user present,
         // verified by the vault unlock, and the credential is synced (backup
-        // eligible + backed up) — the truthful flags for a vault passkey.
+        // eligible + backed up) - the truthful flags for a vault passkey.
         assert_eq!(ad[32], 0x1d);
-        // Constant zero counter — the WebAuthn-sanctioned value for synced
+        // Constant zero counter - the WebAuthn-sanctioned value for synced
         // passkeys; relying parties must tolerate it.
         assert_eq!(&ad[33..37], &[0, 0, 0, 0]);
     }
@@ -223,7 +215,7 @@ mod tests {
         let der = sign_assertion(&kp.private_key, &auth_data, &client_data_hash)
             .expect("signing with a freshly generated key must succeed");
 
-        // Verify over exactly authenticatorData || clientDataHash — what the
+        // Verify over exactly authenticatorData || clientDataHash - what the
         // relying party reconstructs.
         let vk = verifying_key_from_cose(&kp.public_key_cose);
         let mut message = auth_data.clone();

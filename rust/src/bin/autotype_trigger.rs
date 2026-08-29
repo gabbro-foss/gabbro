@@ -1,11 +1,6 @@
-//! Diagnostic for ADR-017 Phase 2b: the single-instance trigger IPC.
-//!
-//! Two terminals:
-//!   cargo run --bin autotype_trigger            # listen; prints "triggered!" per hit
-//!   cargo run --bin autotype_trigger -- --send  # send one trigger to the listener
-//!
-//! The unit tests already prove the round-trip deterministically; this is just
-//! a manual sanity check.
+//! Manual check of the trigger IPC (the unit tests already prove it):
+//!   cargo run --bin autotype_trigger            # listen
+//!   cargo run --bin autotype_trigger -- --send  # send one trigger
 
 #[cfg(target_os = "linux")]
 fn main() {

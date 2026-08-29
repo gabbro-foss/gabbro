@@ -1,12 +1,7 @@
-//! Active-window inspection for auto-type (ADR-017), Linux-only.
-//!
-//! At trigger time Gabbro captures the focused window so a later phase can
-//! refocus it after the picker steals focus and abort if focus moved (the
-//! wrong-window safeguard). The window id comes from the EWMH
-//! `_NET_ACTIVE_WINDOW` property the window manager publishes on the root; the
-//! app's identity (for diagnostics) comes from `WM_CLASS` and its title from
-//! `_NET_WM_NAME`. The decode helpers here are pure and host-testable; the
-//! X server round-trips are hardware-only.
+//! Captures the focused window at trigger time (EWMH `_NET_ACTIVE_WINDOW`,
+//! `WM_CLASS`, `_NET_WM_NAME`) so the fill can refocus it after the picker and
+//! abort if focus moved. Decode helpers are pure; the round-trips are
+//! hardware-only.
 
 use x11rb::connection::Connection;
 use x11rb::protocol::xproto::{AtomEnum, ConnectionExt as _, Window};

@@ -1,26 +1,10 @@
-//! Dashlane CSV importer.
-//!
-//! Parses the credentials CSV exported from Dashlane's export feature
-//! (Settings → Export Data → Credentials).
-//!
-//! ## Expected header row
-//! `username,username2,username3,url,category,note,password,title`
-//!
-//! Column order is determined by position in the header row, not by index,
-//! so minor column reordering in future Dashlane versions is handled
-//! gracefully.
-//!
-//! ## What is dropped on import
-//! - `category` — Dashlane categories have no direct Gabbro equivalent
-//! - Empty rows
-//!
-//! ## What becomes custom fields
-//! - `username2` and `username3` when non-empty (alternate credentials)
+//! Dashlane credentials CSV (Settings -> Export Data -> Credentials), header
+//! `username,username2,username3,url,category,note,password,title`. Columns
+//! are found by header name so reordering survives. `category` has no Gabbro
+//! equivalent and is dropped; `username2`/`username3` become custom fields.
 
 use crate::import::csv::parse_csv_line;
 use crate::vault::entry::{new_entry_id, CustomField, EntryMeta, LoginEntry, VaultEntry};
-
-// ── Public API ────────────────────────────────────────────────────────────────
 
 /// An item that failed parsing during import.
 pub(crate) struct ParseFailure {
@@ -61,11 +45,11 @@ pub(crate) fn parse(data: &[u8]) -> Result<(Vec<VaultEntry>, Vec<ParseFailure>),
     let password_idx = col("password")?;
     let title_idx = col("title")?;
 
-    // Optional columns — absent in some export variants
+    // Optional columns - absent in some export variants
     let username2_idx = col("username2").ok();
     let username3_idx = col("username3").ok();
     let note_idx = col("note").ok();
-    // category intentionally ignored — no Gabbro equivalent
+    // category intentionally ignored - no Gabbro equivalent
 
     let mut entries = Vec::new();
     let failures = Vec::new();
@@ -142,8 +126,6 @@ pub(crate) fn parse(data: &[u8]) -> Result<(Vec<VaultEntry>, Vec<ParseFailure>),
 
     Ok((entries, failures))
 }
-
-// ── Tests ─────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
 mod tests {
@@ -240,7 +222,7 @@ user@example.com,backup@example.com,,https://example.net,Personal,,s3cr3t,Sample
         let VaultEntry::Login(ref e) = entries[0] else {
             panic!("expected Login")
         };
-        // normalise_field trims whitespace, so " https://example.com" → "https://example.com"
+        // normalise_field trims whitespace, so " https://example.com" -> "https://example.com"
         assert!(!e.title.is_empty());
         assert_ne!(e.title, "MISSING TITLE");
     }

@@ -1,9 +1,5 @@
-//! CTAPHID framing for the Linux virtual FIDO2 authenticator.
-//!
-//! Bytes in, bytes out: the browser talks in 64-byte HID reports; this state
-//! machine turns them into (command, payload) messages and back. Constants
-//! pinned against libfido2's `fido/param.h` (system copy) and CTAP 2.1 §11.2.
-//! Pure logic — no device I/O here (that is the uhid transport's job).
+//! 64-byte HID reports to (command, payload) messages and back. Constants
+//! pinned against libfido2's `fido/param.h` and CTAP 2.1 section 11.2. Pure.
 
 const BROADCAST_CID: u32 = 0xffff_ffff;
 const FRAME_INIT: u8 = 0x80;
@@ -119,7 +115,7 @@ impl Ctaphid {
                 self.complete = Some((cid, cmd, buf));
                 Vec::new()
             }
-            // Everything else — including MSG (U2F), which NMSG disclaims —
+            // Everything else - including MSG (U2F), which NMSG disclaims -
             // gets the standard refusal instead of a browser-hanging silence.
             _ => encode_message(cid, CMD_ERROR, &[ERR_INVALID_COMMAND]),
         }
@@ -136,7 +132,7 @@ impl Ctaphid {
         r[7..15].copy_from_slice(&report[7..15]); // nonce, echoed verbatim
         r[15..19].copy_from_slice(&cid.to_be_bytes());
         r[19] = PROTOCOL_VERSION;
-        // r[20..23]: device version major/minor/build — zeros, like the AAGUID.
+        // r[20..23]: device version major/minor/build - zeros, like the AAGUID.
         r[23] = CAP_CBOR | CAP_NMSG;
         r
     }
@@ -213,7 +209,7 @@ mod tests {
 
     #[test]
     fn init_on_broadcast_echoes_nonce_and_allocates_a_channel() {
-        // CTAP 2.1 §11.2.9.1.3: INIT on the broadcast channel (0xffffffff)
+        // CTAP 2.1 section 11.2.9.1.3: INIT on the broadcast channel (0xffffffff)
         // answers on the broadcast channel with a 17-byte payload:
         // nonce(8) | new CID(4) | protocol(1) | major(1) | minor(1) |
         // build(1) | capabilities(1).
@@ -238,7 +234,7 @@ mod tests {
         assert_ne!(cid, 0, "allocated CID is not reserved zero");
         assert_eq!(r[19], 2, "CTAPHID protocol version");
         assert_eq!(&r[20..23], &[0, 0, 0], "device version major/minor/build");
-        // Capabilities: CBOR (0x04) set, NMSG (0x08) set — no U2F. WINK unset.
+        // Capabilities: CBOR (0x04) set, NMSG (0x08) set - no U2F. WINK unset.
         assert_eq!(r[23], 0x04 | 0x08);
     }
 
@@ -421,7 +417,7 @@ mod tests {
     #[test]
     fn stray_continuation_is_ignored_and_the_current_message_survives() {
         // Born green: the current code already ignores strays. Pinned here
-        // because the spec demands silence — an error reply would let any
+        // because the spec demands silence - an error reply would let any
         // same-user process disrupt a live browser exchange.
         let mut hid = Ctaphid::new();
         let a = init_channel(&mut hid);

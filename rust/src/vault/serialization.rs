@@ -1,12 +1,5 @@
-//! Vault entry serialization — converting between `VaultBody` and bytes.
-//!
-//! This is the glue between the domain model and the crypto stack:
-//!   serialize_vault_body() → seal_vault()   → write_vault()
-//!   read_vault()           → open_vault()   → deserialize_vault_body()
-//!
-//! Legacy vaults (bare JSON array) are migrated on first load:
-//!   - Default folders are applied.
-//!   - Entries with folder="Personal" are migrated to folder="".
+//! A bare-JSON-array body (the original format) is migrated on load: default
+//! folders applied, folder "Personal" becomes "".
 
 use crate::vault::entry::VaultEntry;
 use serde::{Deserialize, Serialize};
@@ -27,7 +20,7 @@ pub struct DeletedEntry {
     pub deleted_at: String,
 }
 
-/// The complete decrypted vault body — folders list plus all entries.
+/// The complete decrypted vault body - folders list plus all entries.
 ///
 /// `yubikey_aliases`, `vault_updated_at`, and `deleted_ids` are optional at
 /// the JSON level (`#[serde(default)]`) so vaults written by older builds
@@ -66,17 +59,11 @@ pub fn serialize_vault_body(body: &VaultBody) -> Result<Vec<u8>, String> {
     serde_json::to_vec(body).map_err(|e| format!("Failed to serialize vault body: {e}"))
 }
 
-/// Deserialize JSON bytes (from decryption) back into a `VaultBody`.
-///
-/// Handles two formats:
-/// - New format: `{"folders":[...],"entries":[...]}` — deserialised directly.
-/// - Legacy format: bare JSON array `[...]` — wrapped with default folders;
-///   entries with `folder == "Personal"` are migrated to `folder == ""`.
 pub fn deserialize_vault_body(bytes: &[u8]) -> Result<VaultBody, String> {
     // Detect legacy format by checking the first non-whitespace byte.
     let first = bytes.iter().find(|&&b| !b.is_ascii_whitespace());
     if first == Some(&b'[') {
-        // Legacy bare array — migrate folders + fold previous_* into history.
+        // Legacy bare array - migrate folders + fold previous_* into history.
         let mut value: serde_json::Value = serde_json::from_slice(bytes)
             .map_err(|e| format!("Failed to deserialize legacy entries: {e}"))?;
         if let Some(arr) = value.as_array_mut() {
@@ -200,8 +187,6 @@ mod tests {
             folder: String::from("Personal"),
         }
     }
-
-    // ── VaultBody tests ───────────────────────────────────────────────────────
 
     #[test]
     fn vault_body_roundtrips_with_folders() {

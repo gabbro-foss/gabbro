@@ -33,7 +33,7 @@ pub fn register_credential(device_path: &str, pin: &str) -> Result<YubiKeyRecord
     let mut client_data_hash = [0u8; 32];
     rand::thread_rng().fill_bytes(&mut client_data_hash);
 
-    // A fixed user ID is fine — Gabbro has one user per vault.
+    // A fixed user ID is fine - Gabbro has one user per vault.
     let user_id = b"gabbro-user";
 
     let device_path_c = CString::new(device_path).map_err(|e| e.to_string())?;
@@ -45,7 +45,6 @@ pub fn register_credential(device_path: &str, pin: &str) -> Result<YubiKeyRecord
     unsafe {
         fido_init(0);
 
-        // --- Device ---
         let dev = fido_dev_new();
         if dev.is_null() {
             return Err("fido_dev_new failed".to_string());
@@ -57,7 +56,6 @@ pub fn register_credential(device_path: &str, pin: &str) -> Result<YubiKeyRecord
             return Err(format!("fido_dev_open failed: {r}"));
         }
 
-        // --- Credential ---
         let cred = fido_cred_new();
         if cred.is_null() {
             fido_dev_close(dev);
@@ -100,7 +98,7 @@ pub fn register_credential(device_path: &str, pin: &str) -> Result<YubiKeyRecord
             return Err(format!("fido_cred_set_extensions failed: {r}"));
         }
 
-        // Make the credential — this triggers the YubiKey tap.
+        // Make the credential - this triggers the YubiKey tap.
         let r = fido_dev_make_cred(dev, cred, pin_c.as_ptr());
         if r != FIDO_OK {
             fido_cred_free(&mut (cred as *mut _));
@@ -120,7 +118,7 @@ pub fn register_credential(device_path: &str, pin: &str) -> Result<YubiKeyRecord
         }
         let credential_id = std::slice::from_raw_parts(id_ptr, id_len).to_vec();
 
-        // Generate a fresh random 32-byte salt — stored in the vault header.
+        // Generate a fresh random 32-byte salt - stored in the vault header.
         let mut salt = [0u8; 32];
         rand::thread_rng().fill_bytes(&mut salt);
 
@@ -161,7 +159,6 @@ pub fn get_hmac_secret(
     unsafe {
         fido_init(0);
 
-        // --- Device ---
         let dev = fido_dev_new();
         if dev.is_null() {
             return Err("fido_dev_new failed".to_string());
@@ -173,7 +170,6 @@ pub fn get_hmac_secret(
             return Err(format!("fido_dev_open failed: {r}"));
         }
 
-        // --- Assertion ---
         let assert = fido_assert_new();
         if assert.is_null() {
             fido_dev_close(dev);
@@ -216,7 +212,7 @@ pub fn get_hmac_secret(
             return Err(format!("fido_assert_set_hmac_salt failed: {r}"));
         }
 
-        // Get the assertion — this triggers the YubiKey tap.
+        // Get the assertion - this triggers the YubiKey tap.
         let r = fido_dev_get_assert(dev, assert, pin_c.as_ptr());
         if r != FIDO_OK {
             fido_assert_free(&mut (assert as *mut _));
@@ -250,13 +246,8 @@ pub fn get_hmac_secret(
     }
 }
 
-/// Two-credential assertion using a 64-byte combined salt.
-///
-/// Both credential IDs go into the CTAP2 `allowList`. The 64-byte salt is
-/// `records[0].salt ∥ records[1].salt`. The YubiKey taps once, picks whichever
-/// credential it owns, and returns 64 bytes of hmac-secret output. We read
-/// `fido_assert_id_ptr` to identify the matched credential and extract the
-/// correct 32-byte half.
+/// Both credentials in the allowList with `salt0 || salt1`: one tap, and the
+/// key picks whichever it owns. `fido_assert_id_ptr` says which half is ours.
 pub fn get_hmac_secret_for_pair(
     device_path: &str,
     records: [&YubiKeyRecord; 2],
@@ -308,7 +299,7 @@ pub fn get_hmac_secret_for_pair(
             return Err(format!("fido_assert_set_rp failed: {r}"));
         }
 
-        // Both credentials in the allowList — key picks whichever it owns.
+        // Both credentials in the allowList - key picks whichever it owns.
         for record in &records {
             let r = fido_assert_allow_cred(
                 assert,
@@ -325,13 +316,13 @@ pub fn get_hmac_secret_for_pair(
             return Err(format!("fido_assert_set_extensions failed: {r}"));
         }
 
-        // 64-byte salt → 64-byte output (two independent 32-byte HMACs).
+        // 64-byte salt -> 64-byte output (two independent 32-byte HMACs).
         let r = fido_assert_set_hmac_salt(assert, combined_salt.as_ptr(), combined_salt.len());
         if r != FIDO_OK {
             return Err(format!("fido_assert_set_hmac_salt failed: {r}"));
         }
 
-        // One tap — the YubiKey self-identifies which credential it owns.
+        // One tap - the YubiKey self-identifies which credential it owns.
         let r = fido_dev_get_assert(dev, assert, pin_c.as_ptr());
         if r != FIDO_OK {
             fido_assert_free(&mut (assert as *mut _));
@@ -364,7 +355,7 @@ pub fn get_hmac_secret_for_pair(
         }
         let secret_slice = std::slice::from_raw_parts(secret_ptr, 64);
 
-        // Pick the correct half: index 0 → first 32 bytes, index 1 → last 32 bytes.
+        // Pick the correct half: index 0 -> first 32 bytes, index 1 -> last 32 bytes.
         let result = select_hmac_half(secret_slice, &matched_id, records);
 
         fido_assert_free(&mut (assert as *mut _));
@@ -381,12 +372,7 @@ pub fn get_hmac_secret_for_pair(
     }
 }
 
-/// Given a 64-byte combined HMAC output, extract the 32-byte half that belongs
-/// to `matched_id`.
-///
-/// Returns `None` if `matched_id` matches neither record — this guards against
-/// firmware anomalies or protocol confusion where the YubiKey returns a
-/// credential ID that was never in the allow-list.
+/// `None` when the key returns a credential that was never in the allowList.
 fn select_hmac_half(
     secret: &[u8],
     matched_id: &[u8],
@@ -406,12 +392,8 @@ fn select_hmac_half(
     }
 }
 
-/// Dispatch to the appropriate hmac-secret strategy based on record count.
-///
-/// 1 record: single 32-byte salt assertion (existing path). 2 records:
-/// `get_hmac_secret_for_pair` — one tap, 64-byte combined salt. >2 records:
-/// try all C(n,2) pairs; non-matching pairs fail without a tap (CTAP2
-/// NO_CREDENTIALS is returned before user interaction).
+/// One tap whichever key is inserted: pairs are tried and a non-matching pair
+/// fails with NO_CREDENTIALS before any user interaction.
 pub fn get_hmac_secret_any_of(
     device_path: &str,
     records: &[YubiKeyRecord],
@@ -441,8 +423,6 @@ pub fn get_hmac_secret_any_of(
     }
 }
 
-// ── Tests ─────────────────────────────────────────────────────────────────────
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -463,8 +443,6 @@ mod tests {
             key_blob: vec![],
         }
     }
-
-    // ── fido_err_hint ─────────────────────────────────────────────────────────
 
     #[test]
     fn fido_err_hint_known_codes_contain_human_description() {
@@ -493,14 +471,12 @@ mod tests {
         assert!(hint.contains("wrong PIN"), "got: {hint}");
     }
 
-    // ── select_hmac_half ──────────────────────────────────────────────────────
-
     #[test]
     fn select_hmac_half_first_record_gets_first_32_bytes() {
         let mut secret = [0u8; 64];
         secret[0] = 0xAA;
         secret[31] = 0xBB;
-        secret[32] = 0xCC; // start of second half — must NOT appear in result
+        secret[32] = 0xCC; // start of second half - must NOT appear in result
 
         let rec0 = record_with_id(&[1, 2, 3]);
         let rec1 = record_with_id(&[4, 5, 6]);
@@ -514,7 +490,7 @@ mod tests {
     #[test]
     fn select_hmac_half_second_record_gets_last_32_bytes() {
         let mut secret = [0u8; 64];
-        secret[31] = 0xAA; // end of first half — must NOT appear in result
+        secret[31] = 0xAA; // end of first half - must NOT appear in result
         secret[32] = 0xCC;
         secret[63] = 0xDD;
 
@@ -560,8 +536,6 @@ mod tests {
         assert!(h1.iter().all(|&b| b == 0xBB));
     }
 
-    // ── NUL-byte rejection (pure Rust, no FFI) ────────────────────────────────
-
     #[test]
     fn register_credential_rejects_nul_in_device_path() {
         let result = register_credential("/dev/hidraw\x005", "pin");
@@ -585,8 +559,6 @@ mod tests {
         let result = get_hmac_secret("/dev/hidraw5", &fake_record(), "pin\x00bad");
         assert!(result.is_err());
     }
-
-    // ── get_hmac_secret_any_of dispatcher ────────────────────────────────────
 
     #[test]
     fn get_hmac_secret_any_of_empty_records_errors() {

@@ -1,13 +1,6 @@
-//! Hardware spike for ADR-017 Linux auto-type: prove arbitrary-Unicode
-//! keystroke injection into the currently focused X11 window.
-//!
-//! Usage:
-//!   cargo run --bin autotype_spike -- ["text to type"]
-//!
-//! Run it, then focus a text field (browser, editor, terminal) during the
-//! countdown; the text is synthesised into that window. The default sample
-//! exercises Latin, accented Latin, Greek, Cyrillic, CJK, digits and symbols
-//! -- the arbitrary-Unicode case the ADR must prove on real hardware.
+//! ADR-017 hardware spike: `cargo run --bin autotype_spike -- ["text"]`, then
+//! focus a text field during the countdown. The default sample covers the
+//! scripts the ADR must prove.
 
 #[cfg(target_os = "linux")]
 fn main() {

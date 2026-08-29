@@ -1,10 +1,6 @@
-//! Vault bridge — flutter_rust_bridge-facing wrappers for vault persistence.
-//!
-//! These functions are what Flutter actually calls. They translate between
-//! bridge-friendly types (String paths, Vec<u8> passphrases, DTO enums) and
-//! the internal Rust types used by the vault backend.
-//!
-//! The internal vault.rs functions are never called directly from Flutter.
+//! The functions Flutter calls; they translate bridge types (String paths,
+//! Vec<u8> passphrases, DTO enums) to the internal ones. `vault.rs` is never
+//! called from Flutter directly.
 
 use std::path::PathBuf;
 
@@ -20,7 +16,7 @@ use crate::vault::session;
 
 /// Lightweight entry summary returned by `list_entry_summaries()`.
 ///
-/// Contains just enough for Flutter to render a list row — no secrets.
+/// Contains just enough for Flutter to render a list row - no secrets.
 /// `search_blob` is a lowercase, space-joined string of all searchable
 /// non-secret fields; Flutter uses it for opt-in full-text search.
 pub struct EntrySummaryData {
@@ -31,13 +27,11 @@ pub struct EntrySummaryData {
     pub search_blob: String,
 }
 
-// ── Bridge-facing VaultEntry enum ────────────────────────────────────────────
-
 /// A vault entry as seen by Flutter.
 ///
 /// This is a bridge-facing enum that wraps the existing DTOs.
 /// flutter_rust_bridge generates a Dart sealed class hierarchy from this,
-/// which Flutter code can switch/match on — one case per entry type.
+/// which Flutter code can switch/match on - one case per entry type.
 #[allow(clippy::large_enum_variant)]
 pub enum VaultEntryData {
     Login(LoginEntryData),
@@ -49,9 +43,7 @@ pub enum VaultEntryData {
     Passkey(PasskeyEntryData),
 }
 
-// ── Conversion: internal VaultEntry → VaultEntryData DTO ─────────────────────
-
-// Metadata only — the bytes stay behind the bridge (see AttachmentMetaData).
+// Metadata only - the bytes stay behind the bridge (see AttachmentMetaData).
 fn attachment_meta(atts: &[crate::vault::entry::EntryAttachment]) -> Vec<AttachmentMetaData> {
     atts.iter()
         .map(|a| AttachmentMetaData {
@@ -220,8 +212,6 @@ fn vault_entry_to_data(entry: &VaultEntry) -> VaultEntryData {
     }
 }
 
-// ── Conversion: VaultEntryData DTO → internal VaultEntry ─────────────────────
-
 fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
     match data {
         VaultEntryData::Login(d) => Ok(VaultEntry::Login(LoginEntry {
@@ -386,7 +376,7 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
         })),
         // Key material is deliberately absent from the DTO: it is restored from
         // the stored entry by `update_entry` (like attachments). An entry built
-        // here alone is not a usable credential — `create_entry` refuses it.
+        // here alone is not a usable credential - `create_entry` refuses it.
         VaultEntryData::Passkey(d) => Ok(VaultEntry::Passkey(PasskeyEntry {
             meta: EntryMeta {
                 field_times: Default::default(),
@@ -418,34 +408,24 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
     }
 }
 
-// ── Bridge-facing API ─────────────────────────────────────────────────────────
-
 /// Decrypt the vault at `path` and store it in the session.
-///
-/// Async — Argon2id takes ~667ms on target hardware.
 pub async fn unlock_vault(passphrase: Vec<u8>, path: String) -> Result<(), String> {
     session::unlock_vault(&passphrase, PathBuf::from(path))
 }
 
 /// Drop the session state, locking the vault.
-///
-/// Sync — instant, no I/O.
 #[flutter_rust_bridge::frb(sync)]
 pub fn lock_vault() -> Result<(), String> {
     session::lock_vault()
 }
 
-/// Return lightweight summaries of all entries — no secrets.
-///
-/// Sync — reads from in-memory session, no I/O.
+/// Return lightweight summaries of all entries - no secrets.
 #[flutter_rust_bridge::frb(sync)]
 pub fn list_entry_summaries() -> Result<Vec<EntrySummaryData>, String> {
     session::list_entry_summaries()
 }
 
 /// Return the list of folder names from the current session.
-///
-/// Sync — reads from in-memory session, no I/O.
 #[flutter_rust_bridge::frb(sync)]
 pub fn list_folders() -> Result<Vec<String>, String> {
     session::session_list_folders()
@@ -455,7 +435,6 @@ pub fn list_folders() -> Result<Vec<String>, String> {
 ///
 /// Returns `Err` if `old_name` does not exist, `new_name` is empty,
 /// or `new_name` already exists.
-/// Async — triggers a full vault save.
 pub async fn rename_folder(old_name: String, new_name: String) -> Result<(), String> {
     session::session_rename_folder(old_name, new_name)
 }
@@ -465,7 +444,6 @@ pub async fn rename_folder(old_name: String, new_name: String) -> Result<(), Str
 ///
 /// Returns `Err` if `name` does not exist, or if `reassign_to` names a
 /// folder that does not exist.
-/// Async — triggers a full vault save.
 pub async fn delete_folder(name: String, reassign_to: Option<String>) -> Result<(), String> {
     session::session_delete_folder(name, reassign_to)
 }
@@ -473,14 +451,11 @@ pub async fn delete_folder(name: String, reassign_to: Option<String>) -> Result<
 /// Add a new folder to the session and persist the vault to disk.
 ///
 /// Returns `Err` if the name is empty or already exists.
-/// Async — triggers a full vault save.
 pub async fn create_folder(name: String) -> Result<(), String> {
     session::session_create_folder(name)
 }
 
 /// Return one full entry DTO by UUID.
-///
-/// Sync — reads from in-memory session, no I/O.
 #[flutter_rust_bridge::frb(sync)]
 pub fn get_entry(id: String) -> Result<VaultEntryData, String> {
     let entry = session::get_entry(&id)?;
@@ -488,12 +463,10 @@ pub fn get_entry(id: String) -> Result<VaultEntryData, String> {
 }
 
 /// Add a new entry to the session and persist the vault to disk.
-///
-/// Async — triggers a full vault save (Argon2id + encryption).
 pub async fn create_entry(entry: VaultEntryData) -> Result<EntrySummaryData, String> {
     use crate::api::vault::chrono_now;
     use crate::vault::entry::new_entry_id;
-    // A passkey minted here would carry no key material — an unusable
+    // A passkey minted here would carry no key material - an unusable
     // credential. Passkeys are created only by the provider registration flow.
     if matches!(entry, VaultEntryData::Passkey(_)) {
         return Err(String::from(
@@ -503,7 +476,7 @@ pub async fn create_entry(entry: VaultEntryData) -> Result<EntrySummaryData, Str
     let mut internal = vault_entry_from_data(entry)?;
     let now = chrono_now();
     let id = new_entry_id();
-    // `ref mut e` borrows the inner value rather than moving it — required
+    // `ref mut e` borrows the inner value rather than moving it - required
     // because VaultEntry now implements Drop via ZeroizeOnDrop.
     match &mut internal {
         VaultEntry::Login(ref mut e) => {
@@ -550,7 +523,6 @@ pub async fn create_entry(entry: VaultEntryData) -> Result<EntrySummaryData, Str
 ///
 /// `expiry_days`: how long to retain the previous sensitive value.
 /// `None` = keep until manually deleted. `Some(n)` = purge after n days.
-/// Async — triggers a full vault save.
 pub async fn update_entry(entry: VaultEntryData, expiry_days: Option<u32>) -> Result<(), String> {
     let internal = vault_entry_from_data(entry)?;
     session::session_update_entry(internal, expiry_days)
@@ -558,9 +530,9 @@ pub async fn update_entry(entry: VaultEntryData, expiry_days: Option<u32>) -> Re
 
 /// Add an attachment to an entry and persist. Returns the new attachment uuid.
 ///
-/// Bytes cross the bridge only here and in `extract_attachment` — entry DTOs
+/// Bytes cross the bridge only here and in `extract_attachment` - entry DTOs
 /// carry metadata alone. Size-capped (same limit as Enpass import); a `File`
-/// entry is refused. Async — triggers a full vault save.
+/// entry is refused. Async - triggers a full vault save.
 pub async fn add_attachment(
     entry_id: String,
     name: String,
@@ -571,8 +543,6 @@ pub async fn add_attachment(
 }
 
 /// Remove an attachment and persist. The removal syncs (tombstoned).
-///
-/// Async — triggers a full vault save.
 pub async fn remove_attachment(entry_id: String, uuid: String) -> Result<(), String> {
     session::session_remove_attachment(&entry_id, &uuid)
 }
@@ -580,21 +550,17 @@ pub async fn remove_attachment(entry_id: String, uuid: String) -> Result<(), Str
 /// Return an attachment's raw bytes for saving to disk.
 ///
 /// The only path besides `add_attachment` where attachment bytes cross the
-/// bridge — on demand, when the user extracts. Read-only, synchronous.
+/// bridge - on demand, when the user extracts. Read-only, synchronous.
 pub fn extract_attachment(entry_id: String, uuid: String) -> Result<Vec<u8>, String> {
     session::session_extract_attachment(&entry_id, &uuid)
 }
 
 /// Remove an entry by UUID and persist.
-///
-/// Async — triggers a full vault save.
 pub async fn delete_entry(id: String) -> Result<(), String> {
     session::session_delete_entry(&id)
 }
 
 /// Remove multiple entries by UUID in one pass and persist once.
-///
-/// Async — triggers a single vault save regardless of how many entries
 /// are deleted. Use this instead of calling delete_entry in a loop.
 pub async fn delete_entries(ids: Vec<String>) -> Result<(), String> {
     session::session_delete_entries_no_save(&ids)?;
@@ -602,15 +568,11 @@ pub async fn delete_entries(ids: Vec<String>) -> Result<(), String> {
 }
 
 /// Wipe the vault file from disk and drop the session.
-///
-/// Async — filesystem operation.
 pub async fn delete_whole_vault() -> Result<(), String> {
     session::session_delete_whole_vault()
 }
 
 /// Re-seal the vault under a new passphrase. Session remains live.
-///
-/// Async — triggers a full vault save.
 pub async fn change_passphrase(
     old_passphrase: Vec<u8>,
     new_passphrase: Vec<u8>,
@@ -618,13 +580,8 @@ pub async fn change_passphrase(
     session::session_change_passphrase(&old_passphrase, &new_passphrase)
 }
 
-/// R-03 P3: is the automatic safety copy (`.bak`) a *usable* vault — present
-/// and parseable, not just present?
-///
-/// Drives whether the unlock screen may offer a restore when the vault file
-/// itself cannot be parsed. Returns false for a missing, symlinked, or
-/// unparseable `.bak`, so the offer can never claim a safety copy that a
-/// confirmed restore would then refuse. Safe to call with no session.
+/// R-03 P3: false for an unparseable `.bak`, so the restore offer never claims
+/// a copy a confirmed restore would refuse. Safe with no session.
 pub async fn vault_backup_usable(path: String) -> bool {
     crate::vault::io::backup_usable(std::path::Path::new(&path))
 }
@@ -632,18 +589,14 @@ pub async fn vault_backup_usable(path: String) -> bool {
 /// R-03: replace a corrupt vault file with its `.bak` safety copy.
 ///
 /// Explicit user action from the unlock screen's restore flow. Refuses an
-/// unparseable `.bak`. The restored vault still requires full credentials —
+/// unparseable `.bak`. The restored vault still requires full credentials -
 /// restoring grants no access.
 pub async fn restore_vault_backup(path: String) -> Result<(), String> {
     crate::vault::io::restore_vault_backup(std::path::Path::new(&path))
 }
 
-/// R-03: restore the vault at `path` from an external backup file the user
-/// picked (their own off-device 3-2-1 copy).
-///
-/// Refuses a `source` that is not a usable Gabbro vault, so a corrupt vault is
-/// never replaced by another unreadable file. The restored vault still requires
-/// full credentials to open.
+/// R-03: refuses an unusable `source`, so a corrupt vault is never replaced by
+/// another. Grants no access by itself.
 pub async fn restore_vault_from_file(path: String, source: String) -> Result<(), String> {
     crate::vault::io::restore_vault_from_file(
         std::path::Path::new(&path),
@@ -651,13 +604,9 @@ pub async fn restore_vault_from_file(path: String, source: String) -> Result<(),
     )
 }
 
-/// Adopt: copy a picked `.gabbro` file to a fresh destination so it can be
-/// registered as a vault (Android — the picker only hands out a cache copy;
-/// Linux registers the picked path in place and never calls this).
-///
-/// Refuses an occupied destination (adopt never overwrites) and a source that
-/// is not a usable Gabbro vault. Opening the adopted vault still requires full
-/// credentials — adopting grants no access.
+/// Android only: the picker hands out a cache copy, so the file is copied to
+/// its registered home. Never overwrites; refuses an unusable source; grants
+/// no access by itself.
 pub async fn adopt_vault_file(source: String, dest: String) -> Result<(), String> {
     crate::vault::io::adopt_vault_file(std::path::Path::new(&source), std::path::Path::new(&dest))
 }
@@ -666,7 +615,6 @@ pub async fn adopt_vault_file(source: String, dest: String) -> Result<(), String
 ///
 /// Pass `folder: ""` to move entries to unfoldered.
 /// Returns `Err` if the folder name does not exist (empty string always valid).
-/// Async — triggers a full vault save.
 pub async fn assign_folder_to_entries(ids: Vec<String>, folder: String) -> Result<(), String> {
     session::session_assign_folder_to_entries(&ids, folder)
 }
@@ -675,45 +623,34 @@ pub async fn assign_folder_to_entries(ids: Vec<String>, folder: String) -> Resul
 ///
 /// The default export: copies the sealed on-disk vault byte-for-byte, so a
 /// key-protected vault stays key-protected (its keyslots and alias are retained).
-/// Async — filesystem operation.
 pub async fn export_vault(path: String) -> Result<(), String> {
     session::session_export_vault(PathBuf::from(path))
 }
 
-/// Write a **passphrase-only** .gabbro + .gabbro.sha256 — the opt-in security
-/// downgrade (ADR-013).
-///
-/// Re-seals the current session under the passphrase alone, dropping any YubiKey
-/// requirement so the artifact opens with the passphrase only. The original vault
-/// is never mutated. Flutter must only reach this via the explicit, warned export
-/// toggle (shown for key-protected vaults). Async — filesystem operation.
+/// The opt-in downgrade (ADR-013); Flutter reaches it only via the warned
+/// export toggle. The original vault is never mutated.
 pub async fn export_vault_passphrase_only(path: String) -> Result<(), String> {
     session::session_export_vault_passphrase_only(PathBuf::from(path))
 }
 
 /// Serialize the current session to a plaintext JSON file at `path`.
 ///
-/// WARNING: the output file is completely unencrypted — all secrets appear
+/// WARNING: the output file is completely unencrypted - all secrets appear
 /// in plain text. Flutter must surface a visible warning before calling this.
-/// Async — filesystem write.
 pub async fn export_vault_json(path: String) -> Result<(), String> {
     session::session_export_vault_json(PathBuf::from(path))
 }
 
-/// The bytes of an export plus its detached SHA-256 line (ADR-002/013).
-///
-/// Returned by the Android byte-return export path: Rust produces the ciphertext
-/// (`vault_bytes`, safe to cross the bridge) and the `sha256_line`, and the Kotlin
-/// SAF layer writes both `<filename>` and `<filename>.sha256` into the user's
-/// granted directory tree (raw-path writes can't overwrite a file another app
-/// created under scoped storage).
+/// For the Android SAF path: Kotlin writes the file and its `.sha256`, since a
+/// raw-path write cannot overwrite another app's file under scoped storage.
+/// The bytes are ciphertext, so they may cross the bridge.
 pub struct ExportArtifact {
     pub vault_bytes: Vec<u8>,
     pub sha256_line: String,
 }
 
 /// Build the protection-preserving export artifact for the current session
-/// without writing (ADR-013 default) — Android SAF path. `vault_filename` (e.g.
+/// without writing (ADR-013 default) - Android SAF path. `vault_filename` (e.g.
 /// `Gabbro.gabbro`) names the file in the SHA line. Returns ciphertext bytes.
 pub async fn build_export_bytes(vault_filename: String) -> Result<ExportArtifact, String> {
     let (vault_bytes, sha256_line) = session::session_export_vault_bytes(&vault_filename)?;
@@ -724,7 +661,7 @@ pub async fn build_export_bytes(vault_filename: String) -> Result<ExportArtifact
 }
 
 /// Build the opt-in passphrase-only downgrade export artifact for the current
-/// session without writing (ADR-013) — Android SAF path. Re-seals under the
+/// session without writing (ADR-013) - Android SAF path. Re-seals under the
 /// passphrase alone; bytes are ciphertext. Reach only via the explicit, warned
 /// downgrade toggle.
 pub async fn build_export_passphrase_only_bytes(
@@ -749,9 +686,8 @@ pub struct YubikeyRecordData {
 
 /// Read the vault header at `path` and return any YubiKey records it contains.
 ///
-/// Does **not** decrypt the vault body — safe to call before the user enters
+/// Does **not** decrypt the vault body - safe to call before the user enters
 /// their passphrase. Returns an empty list for passphrase-only vaults.
-/// Sync — file I/O + header parse, no crypto.
 #[flutter_rust_bridge::frb(sync)]
 pub fn list_vault_yubikey_records(path: String) -> Result<Vec<YubikeyRecordData>, String> {
     use crate::vault::io::read_vault;
@@ -777,10 +713,9 @@ pub struct VaultHeaderData {
 
 /// Read the vault header at `path` and return alias + YubiKey records.
 ///
-/// Does **not** decrypt the vault body — safe to call before passphrase entry.
+/// Does **not** decrypt the vault body - safe to call before passphrase entry.
 /// Replaces `list_vault_yubikey_records` for the unlock screen so alias and
 /// YubiKey records are fetched in one call.
-/// Sync — file I/O + header parse, no crypto.
 #[flutter_rust_bridge::frb(sync)]
 pub fn read_vault_header(path: String) -> Result<VaultHeaderData, String> {
     use crate::vault::io::read_vault_header as io_read_vault_header;
@@ -798,14 +733,9 @@ pub fn read_vault_header(path: String) -> Result<VaultHeaderData, String> {
     })
 }
 
-/// Whether the vault at `path` is an intact Gabbro vault that is too old for this
-/// build to open (format below the readable floor).
-///
-/// The unlock screen calls this when the header fails to parse, to tell "too old"
-/// apart from "corrupt": an old vault is intact and recoverable by migrating it with
-/// an older release, so it must never surface the corruption banner's restore/delete
-/// offers. Returns `Err` if the file is not a Gabbro vault at all.
-/// Sync — reads the first bytes, no crypto.
+/// Tells "too old" apart from "corrupt": an old vault is intact and must never
+/// get the corruption banner's restore or delete offers. `Err` means not a
+/// Gabbro vault at all.
 pub fn vault_format_too_old(path: String) -> Result<bool, String> {
     crate::vault::io::vault_format_too_old(&PathBuf::from(path))
 }
@@ -813,7 +743,7 @@ pub fn vault_format_too_old(path: String) -> Result<bool, String> {
 /// The unlock and import screens call this to tell "too new" apart from a generic
 /// failure: a vault written by a newer Gabbro build is intact, and the fix is to
 /// update the app, not to retry the passphrase or delete the file. Returns `Err`
-/// if the file is not a Gabbro vault at all. Sync — reads the first bytes, no crypto.
+/// if the file is not a Gabbro vault at all. Sync - reads the first bytes, no crypto.
 pub fn vault_format_too_new(path: String) -> Result<bool, String> {
     crate::vault::io::vault_format_too_new(&PathBuf::from(path))
 }
@@ -821,20 +751,14 @@ pub fn vault_format_too_new(path: String) -> Result<bool, String> {
 /// Rename the active vault: updates the alias in the file header and re-seals
 /// the body so the new alias is bound to the ciphertext via AES-GCM AAD.
 ///
-/// Requires an unlocked session — returns `Err("Vault is locked")` if called
+/// Requires an unlocked session - returns `Err("Vault is locked")` if called
 /// without an active session. Passing an empty string clears the alias.
-/// Async — file I/O + re-seal.
 pub async fn set_vault_alias(alias: String) -> Result<(), String> {
     session::session_set_vault_alias(alias)
 }
 
-/// Decrypt the vault at `path` using the passphrase and one registered YubiKey.
-///
-/// Caches `vault_key_master` in the session so CRUD saves never require a
-/// YubiKey re-tap. The per-key salt is read from the vault record, not passed in.
-///
-/// `hmac_secret` must be exactly 32 bytes (FIDO2 hmac-secret output).
-/// Async — Argon2id takes ~667ms on target hardware.
+/// Caches `vault_key_master` so CRUD saves never need a re-tap. `hmac_secret`
+/// must be exactly 32 bytes.
 pub async fn unlock_vault_with_yubikey(
     passphrase: Vec<u8>,
     hmac_secret: Vec<u8>,
@@ -850,7 +774,7 @@ pub async fn unlock_vault_with_yubikey(
 /// Create a new empty vault at `path`, sealed with `passphrase`.
 ///
 /// `alias` is stored in the VERSION 5 plaintext header and travels with the file.
-/// Called during onboarding. Async — runs Argon2id + encryption.
+/// Called during onboarding. Async - runs Argon2id + encryption.
 pub async fn init_vault(
     passphrase: Vec<u8>,
     path: String,
@@ -872,8 +796,8 @@ pub async fn init_vault(
 /// Key material for one YubiKey, supplied during multi-key vault creation.
 pub struct YubiKeyInitData {
     pub credential_id: Vec<u8>,
-    pub hmac_secret: Vec<u8>, // 32 bytes — FIDO2 hmac-secret output
-    pub hkdf_salt: Vec<u8>,   // 32 bytes — per-key CTAP2 challenge salt
+    pub hmac_secret: Vec<u8>, // 32 bytes - FIDO2 hmac-secret output
+    pub hkdf_salt: Vec<u8>,   // 32 bytes - per-key CTAP2 challenge salt
 }
 
 /// Create a new empty vault sealed with a passphrase and two or more YubiKeys.
@@ -881,7 +805,6 @@ pub struct YubiKeyInitData {
 /// Enforces ADR-010: minimum 2 registered keys at vault creation.
 /// `alias` is stored in the VERSION 5 plaintext header and travels with the file.
 /// After creation, unlocks into session immediately using the first key.
-/// Async — runs Argon2id + encryption.
 pub async fn init_vault_with_keys(
     passphrase: Vec<u8>,
     keys: Vec<YubiKeyInitData>,
@@ -940,8 +863,6 @@ pub async fn init_vault_with_keys(
     )
 }
 
-// ── YubiKey key-management bridge ─────────────────────────────────────────────
-
 /// Alias record for one registered YubiKey, returned by `list_yubikey_aliases`.
 pub struct YubikeyAliasData {
     /// Hex-encoded credential ID (map key in the vault body).
@@ -951,8 +872,6 @@ pub struct YubikeyAliasData {
 }
 
 /// Return all YubiKey aliases stored in the current session.
-///
-/// Sync — reads from in-memory session, no I/O.
 #[flutter_rust_bridge::frb(sync)]
 pub fn list_yubikey_aliases() -> Result<Vec<YubikeyAliasData>, String> {
     let map = session::session_list_yubikey_aliases()?;
@@ -968,7 +887,6 @@ pub fn list_yubikey_aliases() -> Result<Vec<YubikeyAliasData>, String> {
 /// Set or update the display alias for a registered YubiKey.
 ///
 /// `credential_id_hex` is the hex-encoded credential ID.
-/// Async — triggers a full vault body save.
 pub async fn set_yubikey_alias(credential_id_hex: String, alias: String) -> Result<(), String> {
     session::session_set_yubikey_alias(credential_id_hex, alias)
 }
@@ -978,7 +896,6 @@ pub async fn set_yubikey_alias(credential_id_hex: String, alias: String) -> Resu
 /// Requires a VERSION 4 vault (wrapping_key must be cached from unlock).
 /// Returns `Err` if the vault already has 4 keys or `new_cred_id` is already registered.
 /// `new_hmac_secret` and `new_salt` must each be exactly 32 bytes.
-/// Async — writes the updated vault header to disk.
 pub async fn add_yubikey(
     new_cred_id: Vec<u8>,
     new_hmac_secret: Vec<u8>,
@@ -990,23 +907,10 @@ pub async fn add_yubikey(
 /// Remove a YubiKey from the vault by credential ID.
 ///
 /// Enforces a minimum of 1 remaining key.
-/// Async — writes the updated vault header to disk.
 pub async fn remove_yubikey(cred_id: Vec<u8>) -> Result<(), String> {
     session::session_remove_yubikey(cred_id)
 }
 
-// ── Vault sync ────────────────────────────────────────────────────────────────
-
-/// Merge an incoming `.gabbro` file into the current session and persist.
-///
-/// Loads and decrypts the file at `path` using `passphrase`, then runs the
-/// entry-level merge algorithm against the live session.  Returns a summary
-/// for Flutter to display in the pre-merge confirmation dialog.
-///
-/// Returns `Err` if:
-/// - the vault is locked
-/// - `path` cannot be read or is not a valid Gabbro file
-/// - the passphrase is wrong (decryption failure)
 pub async fn merge_vault_from_file(
     path: String,
     passphrase: Vec<u8>,
@@ -1016,16 +920,9 @@ pub async fn merge_vault_from_file(
     session::session_merge_vault_from_body(incoming_body)
 }
 
-/// Merge a `.gabbro` file using the passphrase the unlocked session already holds,
-/// so the user types nothing to sync their own vault.
-///
-/// `None` means that passphrase does not open the file — a different vault, a
-/// key-protected file, or a passphrase changed on the other device — and the caller
-/// should ask for credentials. `Err` is reserved for a file that cannot be used at
-/// all (missing, not a Gabbro vault, a refused old format), which is a different
-/// message to the user. The file at `path` is only ever read.
-///
-/// The vault must be unlocked — returns `Err` if auto-lock fired meanwhile.
+/// `None`: the held passphrase does not open the file, so ask for credentials.
+/// `Err` is reserved for an unusable file or a locked session, a different
+/// message to the user.
 pub async fn merge_vault_from_file_held(
     path: String,
 ) -> Result<Option<crate::api::vault::MergeSummary>, String> {
@@ -1034,21 +931,15 @@ pub async fn merge_vault_from_file_held(
 
 /// Fast auto-merge (incoming wins, no prompts) using the passphrase the session
 /// already holds. The analogue of [`merge_vault_from_file_held`] for the "Merge
-/// automatically" path. Persists (async — a single vault save).
+/// automatically" path. Persists (async - a single vault save).
 pub async fn fast_merge_vault_from_file_held(
     path: String,
 ) -> Result<Option<crate::api::vault::MergeSummary>, String> {
     session::session_fast_merge_from_file_held(&PathBuf::from(path))
 }
 
-/// Merge a **key-protected** `.gabbro` file using the passphrase the unlocked
-/// session already holds plus a tap's hmac output, so only the PIN was typed
-/// (ADR-013). `hmac_secret` must be exactly 32 bytes.
-///
-/// `None` means the held passphrase + credential do not open the file, and the
-/// caller should ask for a typed passphrase, reusing the same tap. `Err` is
-/// reserved for an unusable file and a locked session, as in
-/// [`merge_vault_from_file_held`]. The file at `path` is only ever read.
+/// `None`: ask for a typed passphrase, reusing the same tap. `Err` as in
+/// [`merge_vault_from_file_held`]. `hmac_secret` must be exactly 32 bytes.
 pub async fn merge_vault_from_file_with_key_held(
     path: String,
     hmac_secret: Vec<u8>,
@@ -1067,7 +958,7 @@ pub async fn merge_vault_from_file_with_key_held(
 /// Fast auto-merge of a **key-protected** `.gabbro` file using the held
 /// passphrase plus a tap's hmac output. The analogue of
 /// [`merge_vault_from_file_with_key_held`] for the "Merge automatically" path.
-/// Persists (async — a single vault save).
+/// Persists (async - a single vault save).
 pub async fn fast_merge_vault_from_file_with_key_held(
     path: String,
     hmac_secret: Vec<u8>,
@@ -1086,7 +977,7 @@ pub async fn fast_merge_vault_from_file_with_key_held(
 /// Apply a whole granular-sync review in one call: field resolutions, kept-value
 /// history replacements, item deletes, folder picks, and whole-entry deletes.
 /// Re-seals the vault once for the entire review instead of once per decision.
-/// Persists (async — a single vault save).
+/// Persists (async - a single vault save).
 pub async fn apply_sync_decisions(
     field_resolutions: Vec<crate::api::vault::SyncFieldResolutionInput>,
     history_replacements: Vec<crate::api::vault::SyncHistoryReplacementInput>,
@@ -1105,7 +996,7 @@ pub async fn apply_sync_decisions(
 
 /// Cancel an in-progress granular sync: roll the session and the vault file back
 /// to the pre-sync snapshot the merge took, discarding the additive merge and any
-/// partial review picks. No-op if no sync is in progress. Persists (async — a
+/// partial review picks. No-op if no sync is in progress. Persists (async - a
 /// single vault save).
 pub async fn cancel_sync() -> Result<(), String> {
     session::session_cancel_sync()
@@ -1129,20 +1020,9 @@ pub async fn get_entry_history(
     session::session_get_entry_history(id)
 }
 
-/// Merge a **key-protected** incoming `.gabbro` file into the current session (ADR-013).
-///
-/// The analogue of [`merge_vault_from_file`] for a source created with YubiKey
-/// protection: passphrase alone is refused by the crypto, so the source's chosen
-/// protection is upheld across the sync. Opens the file at `path` with the source
-/// passphrase AND a registered YubiKey (its hmac-secret output + credential id),
-/// then runs the entry-level merge against the live session.
-///
+/// [`merge_vault_from_file`] for a key-protected source (ADR-013): the crypto
+/// refuses passphrase alone, so the source's protection holds across the sync.
 /// `hmac_secret` must be exactly 32 bytes.
-///
-/// Returns `Err` if:
-/// - the vault is locked
-/// - `path` cannot be read or is not a valid Gabbro file
-/// - the passphrase + key combination does not unlock the file
 pub async fn merge_vault_from_file_with_key(
     path: String,
     passphrase: Vec<u8>,
@@ -1165,7 +1045,7 @@ pub async fn merge_vault_from_file_with_key(
 /// Fast auto-merge a `.gabbro` file into the current session: apply everything
 /// automatically, incoming wins (no prompts). The analogue of
 /// [`merge_vault_from_file`] for the fast path. Returns the summary of what was
-/// applied. Persists (async — vault save).
+/// applied. Persists (async - vault save).
 pub async fn fast_merge_vault_from_file(
     path: String,
     passphrase: Vec<u8>,
@@ -1177,7 +1057,7 @@ pub async fn fast_merge_vault_from_file(
 
 /// Fast auto-merge a **key-protected** `.gabbro` file (ADR-013). The analogue of
 /// [`merge_vault_from_file_with_key`] for the fast path. `hmac_secret` must be 32
-/// bytes. Persists (async — vault save).
+/// bytes. Persists (async - vault save).
 pub async fn fast_merge_vault_from_file_with_key(
     path: String,
     passphrase: Vec<u8>,
@@ -1196,8 +1076,6 @@ pub async fn fast_merge_vault_from_file_with_key(
     )?;
     session::session_fast_merge_from_body(incoming_body)
 }
-
-// ── Tests ─────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
 mod tests {
@@ -1242,7 +1120,7 @@ mod tests {
             "restore must bring back the last verified save (B), not an older one"
         );
 
-        // R-03 P3: a rotted .bak must report not usable — the offer cannot lie.
+        // R-03 P3: a rotted .bak must report not usable - the offer cannot lie.
         std::fs::write(&bak, b"rotted backup").unwrap();
         assert!(!run(vault_backup_usable(path_s)));
 
@@ -1337,14 +1215,9 @@ mod tests {
         assert!(refused.is_err(), "an occupied destination must be refused");
     }
 
-    // ── R6: creating a vault must never destroy one ───────────────────────────
-    //
-    // The create screen auto-picks a free filename, so this fires only when the
-    // user deliberately types or picks an existing `.gabbro` — which is exactly
-    // what someone tries when they mean to open their vault on a second device.
-    // Today the file is replaced by an empty vault and the old bytes survive only
-    // as the rotated `.bak`, which the app offers only for a *corrupt* vault.
-    // Export, restore and save all overwrite by design and are untouched.
+    // Creating over an existing `.gabbro` is what someone does when they mean
+    // to open their vault on a second device; it must not replace it with an
+    // empty one.
 
     /// Existing bytes at `path`, plus the paths to clean up afterwards.
     fn occupied_vault_path(suffix: &str) -> (PathBuf, &'static [u8]) {
@@ -1824,8 +1697,6 @@ mod tests {
         println!("Test vault written to {:?}", path);
     }
 
-    // ── YubiKey bridge tests ──────────────────────────────────────────────────
-
     #[test]
     #[serial]
     fn list_yubikey_records_empty_for_passphrase_only_vault() {
@@ -2007,7 +1878,7 @@ mod tests {
         let sealed_after = read_vault(&path).unwrap();
         // Alias must be written to the header.
         assert_eq!(sealed_after.alias, Some(String::from("My Vault")));
-        // Body must be re-sealed (fresh nonce → different ciphertext).
+        // Body must be re-sealed (fresh nonce -> different ciphertext).
         assert_ne!(
             sealed_after.ciphertext, ciphertext_before,
             "ciphertext must be refreshed after alias re-seal"
@@ -2075,8 +1946,6 @@ mod tests {
         let _ = std::fs::remove_file(&path);
         let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
-
-    // ── Custom-field roundtrip tests ──────────────────────────────────────────
 
     #[test]
     fn card_entry_from_data_preserves_custom_fields() {
@@ -2162,8 +2031,6 @@ mod tests {
             _ => panic!("expected Login variant"),
         }
     }
-
-    // ── Error-path and CRUD tests ─────────────────────────────────────────────
 
     #[test]
     #[serial]
@@ -2263,7 +2130,7 @@ mod tests {
         let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
-    // Scenario 2 (attachments task) — red first: Flutter can only show an
+    // Scenario 2 (attachments task) - red first: Flutter can only show an
     // attachment if its metadata rides in the entry DTO. Bytes stay behind
     // the bridge; only uuid/name/kind/size cross.
     #[test]
@@ -2396,7 +2263,7 @@ mod tests {
         let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
-    // Scenario 3 (attachments task) — red first: an added attachment must
+    // Scenario 3 (attachments task) - red first: an added attachment must
     // persist across lock/unlock and carry a sync stamp, or another device
     // would never receive it.
     #[test]
@@ -2473,7 +2340,7 @@ mod tests {
         let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
-    // Scenario 3 (attachments task) — red first: the cap keeps a vault
+    // Scenario 3 (attachments task) - red first: the cap keeps a vault
     // loadable on a phone; a File entry is its own payload and takes none.
     #[test]
     #[serial]
@@ -2550,9 +2417,9 @@ mod tests {
         let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
-    // Scenario 8b (attachments task) — red first: the 4th in-app add is
+    // Scenario 8b (attachments task) - red first: the 4th in-app add is
     // refused (count cap 3). Import/merge are exempt, so an over-cap entry
-    // must still extract — refusing there would destroy imported data.
+    // must still extract - refusing there would destroy imported data.
     #[test]
     #[serial]
     fn add_attachment_refuses_a_fourth_but_overcap_entries_still_extract() {
@@ -2641,7 +2508,7 @@ mod tests {
         let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
-    // Scenario 4 (attachments task) — red first: extraction must hand back the
+    // Scenario 4 (attachments task) - red first: extraction must hand back the
     // exact stored bytes; a wrong uuid or a locked vault errors, never junk.
     #[test]
     #[serial]
@@ -2702,8 +2569,8 @@ mod tests {
         let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
-    // Scenario 5 (attachments task) — red first: a deliberate removal must
-    // persist AND stamp the `del:` tombstone — without it, the next sync
+    // Scenario 5 (attachments task) - red first: a deliberate removal must
+    // persist AND stamp the `del:` tombstone - without it, the next sync
     // quietly brings the attachment back.
     #[test]
     #[serial]
@@ -2781,7 +2648,7 @@ mod tests {
         let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
-    // Scenario 1 (attachments task) — red first: an app edit must not destroy
+    // Scenario 1 (attachments task) - red first: an app edit must not destroy
     // stored attachments or stamp deletion tombstones that sync the loss.
     #[test]
     #[serial]
@@ -3060,7 +2927,7 @@ mod tests {
         let mut path = temp_dir();
         path.push("gabbro_bridge_yubikey_size_test.gabbro");
 
-        // 31-byte hmac_secret — must be rejected before any file I/O.
+        // 31-byte hmac_secret - must be rejected before any file I/O.
         let result = run(unlock_vault_with_yubikey(
             b"passphrase".to_vec(),
             vec![0u8; 31],
@@ -3079,7 +2946,7 @@ mod tests {
         path.push("gabbro_bridge_init_keys_min_test.gabbro");
         let _ = std::fs::remove_file(&path);
 
-        // Single key — must fail (ADR-010: minimum 2 keys at creation).
+        // Single key - must fail (ADR-010: minimum 2 keys at creation).
         let result = run(init_vault_with_keys(
             b"init-keys-min-pass".to_vec(),
             vec![YubiKeyInitData {
@@ -3169,14 +3036,9 @@ mod tests {
         let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
-    // ── ADR-013: key-protected vault SYNC (the import-path fix, mirrored) ──────
-    //
-    // The bug found on 2026-06-10: ADR-013 taught the import-entries path to open
-    // a key-protected source (passphrase + YubiKey), but the SYNC path
-    // (`merge_vault_from_file`) still tried passphrase alone. A key-protected file
-    // is correctly refused by the crypto, so sync surfaced a misleading "different
-    // passphrase" error and never asked for the key. The fix:
-    // `merge_vault_from_file_with_key` mirrors `import_from_gabbro_with_key`.
+    // The sync path once tried passphrase alone on a key-protected source and
+    // surfaced a misleading "different passphrase" error instead of asking for
+    // the key.
 
     /// Build a key-protected source vault (passphrase + YK1 + YK2), export it
     /// PRESERVING protection (ADR-013 default), and return the artifact + source
@@ -3278,7 +3140,7 @@ mod tests {
         let pass_b = b"vault B passphrase -- yubikeyless";
         let path_b = setup_session_b(pass_b, "sync_refuse");
 
-        // Passphrase alone must NOT open a key-protected export → sync refused.
+        // Passphrase alone must NOT open a key-protected export -> sync refused.
         let result = run(merge_vault_from_file(
             artifact.to_str().unwrap().to_string(),
             pass_a.to_vec(),
@@ -3287,7 +3149,7 @@ mod tests {
             result.is_err(),
             "syncing a key-protected export with passphrase alone must be refused"
         );
-        // Session untouched — nothing leaked in.
+        // Session untouched - nothing leaked in.
         assert_eq!(list_entry_summaries().unwrap().len(), 1);
 
         lock_vault().unwrap();
@@ -3331,15 +3193,8 @@ mod tests {
         let _ = std::fs::remove_file(artifact.with_extension("gabbro.sha256"));
     }
 
-    // ── R1-R3: the sync net (faster sync, attempt 2) ──────────────────────────
-    //
-    // R1: a passphrase-only sync from a DIFFERENT vault file succeeds. Only the
-    //     refusal was pinned before, so the path silent sync will rely on was
-    //     untested.
-    // R2: the fast-merge bridge pair had no test at all.
-    // R3: a merge never changes the RECEIVING vault's own protection — both merge
-    //     paths re-seal with the session's own passphrase and keys
-    //     (`session.rs:3472`, `:3563`).
+    // A merge never changes the receiving vault's own protection: both merge
+    // paths re-seal with the session's own passphrase and keys.
 
     /// A Note entry. `content_edited_ms` sets the per-field edit stamp
     /// (`field_times["content"]`); both sides stamped with different values is a
@@ -3380,7 +3235,7 @@ mod tests {
         }
     }
 
-    /// Write a passphrase-only vault holding `entries` — the incoming file.
+    /// Write a passphrase-only vault holding `entries` - the incoming file.
     fn sync_source_file(
         pass: &[u8],
         suffix: &str,
@@ -3392,7 +3247,7 @@ mod tests {
         path
     }
 
-    /// Create and unlock a passphrase-only session holding `entries` — the
+    /// Create and unlock a passphrase-only session holding `entries` - the
     /// receiving vault.
     fn sync_session(
         pass: &[u8],
@@ -3426,7 +3281,7 @@ mod tests {
             .collect()
     }
 
-    /// Ids of the Note entries in a decrypted body — every entry these tests
+    /// Ids of the Note entries in a decrypted body - every entry these tests
     /// build is a Note.
     fn note_ids(body: &VaultBody) -> Vec<String> {
         body.entries
@@ -3438,7 +3293,7 @@ mod tests {
             .collect()
     }
 
-    // R1 (1): the case silent sync depends on — two independently created vaults
+    // R1 (1): the case silent sync depends on - two independently created vaults
     // that share a passphrase. The merge succeeds on the passphrase alone and the
     // result reaches disk.
     #[test]
@@ -3766,7 +3621,7 @@ mod tests {
         sync_cleanup(&[&artifact, &source, &recv]);
     }
 
-    // ── Android SAF export: build-bytes path (the file write happens in Kotlin) ─
+    // Android SAF export: build-bytes path (the file write happens in Kotlin)
 
     #[test]
     #[serial]
@@ -3840,7 +3695,7 @@ mod tests {
         .unwrap();
 
         // Write the returned bytes and prove they open with the passphrase ALONE
-        // and carry no YubiKey keyslots — i.e. the downgrade really dropped the key.
+        // and carry no YubiKey keyslots - i.e. the downgrade really dropped the key.
         let mut out = temp_dir();
         out.push("gabbro_bridge_export_bytes_downgrade_out.gabbro");
         std::fs::write(&out, &artifact.vault_bytes).unwrap();
@@ -3859,7 +3714,6 @@ mod tests {
         let _ = std::fs::remove_file(&out);
     }
 
-    // ── Custom entry field ordering ───────────────────────────────────────────
     // A Custom entry's fields must render in a stable, consistent order so two
     // Gabbro instances viewing the same vault agree (Bikeshed bug: fields not
     // consistently ordered). The store must preserve insertion/creation order.
@@ -3981,8 +3835,6 @@ mod tests {
         assert_eq!(dto_field_labels(&back), vec!["One", "Two", "Four", "Five"]);
     }
 
-    // ── Passkey DTO: key material never crosses the bridge ───────────────────
-
     fn sample_passkey_internal() -> VaultEntry {
         VaultEntry::Passkey(PasskeyEntry {
             meta: EntryMeta {
@@ -4019,7 +3871,7 @@ mod tests {
                     .decode(&d.credential_id_b64)
                     .expect("credential id is base64url");
                 assert_eq!(decoded, vec![9u8; 32]);
-                // No key-material fields exist on the DTO type — this test
+                // No key-material fields exist on the DTO type - this test
                 // documents that the private key stays behind the bridge.
             }
             _ => panic!("expected a Passkey DTO"),

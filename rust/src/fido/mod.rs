@@ -1,12 +1,4 @@
-//! FIDO2 hmac-secret integration via libfido2.
-//!
-//! Provides two operations:
-//! - `register`: create a new FIDO2 credential on a YubiKey, returning a
-//!   `YubiKeyRecord` ready to store in the vault header.
-//! - `get_hmac_secret`: given a `YubiKeyRecord`, obtain the 32-byte
-//!   hmac-secret output from the YubiKey for use in `combine_yubikey`.
-//! - `get_hmac_secret_any_of`: multi-credential assertion — one tap regardless
-//!   of which registered key is inserted (two-salt CTAP2 trick for ≥2 keys).
+//! FIDO2 hmac-secret via libfido2.
 
 use crate::vault::file_format::YubiKeyRecord;
 
@@ -16,25 +8,12 @@ pub use device::{get_hmac_secret_any_of, HmacMatch};
 /// Relying party ID used for all Gabbro FIDO2 credentials.
 pub const RP_ID: &str = "app.gabbro.gabbro";
 
-/// Register a new FIDO2 credential on the YubiKey at `device_path`.
-///
-/// Returns a `YubiKeyRecord` containing the credential ID and a fresh
-/// random 32-byte salt. The salt must be stored in the vault header.
-/// On each unlock, the same salt is sent back to the YubiKey to
-/// reproduce the hmac-secret output deterministically.
-///
-/// `pin` is the FIDO2 PIN set on the YubiKey.
+/// The fresh salt in the record must be stored: the same salt reproduces the
+/// hmac-secret on every unlock.
 pub fn register(device_path: &str, pin: &str) -> Result<YubiKeyRecord, String> {
     device::register_credential(device_path, pin)
 }
 
-/// Obtain the 32-byte hmac-secret output from the YubiKey.
-///
-/// `record` is the `YubiKeyRecord` stored in the vault header for this key.
-/// `pin` is the FIDO2 PIN set on the YubiKey.
-///
-/// The returned bytes are fed directly into `combine_yubikey` alongside
-/// the Argon2id output to reconstruct the vault key.
 pub fn get_hmac_secret(
     device_path: &str,
     record: &YubiKeyRecord,

@@ -1,10 +1,5 @@
-//! Linux desktop auto-type (ADR-017): X11-only, opt-in.
-//!
-//! Gabbro does not grab a global key; a user-bound `gabbro --autotype` trigger
-//! (later phase) drives the fill. This module holds the pieces: `keysym` maps a
-//! secret's characters to X11 keysyms (pure, host-testable), and the injection
-//! layer (later) binds them to a scratch keycode and synthesises key events via
-//! `XTEST`. Gated behind `cfg(target_os = "linux")` at the crate root.
+//! Linux X11 auto-type (ADR-017). No global key grab: the user binds the
+//! `gabbro-autotype` trigger in their window manager.
 
 pub mod fill;
 pub mod inject;
@@ -13,14 +8,9 @@ pub mod sequence;
 pub mod trigger;
 pub mod window;
 
-/// Render a [`ReplyError`] without the value the server objected to.
-///
-/// x11rb's own `Display` Debug-prints the whole `X11Error`, `bad_value`
-/// included. The one checked request carrying secret-derived data is
-/// `ChangeKeyboardMapping` (`inject.rs`), whose payload is the password's
-/// keysyms -- so a server that echoed one back would put a password character
-/// on a terminal, since `lib/main.dart` prints fill errors in release builds.
-/// Keep what a tester needs (the kind and the request) and drop the value.
+/// x11rb's `Display` prints `bad_value`, and for `ChangeKeyboardMapping` that
+/// is a password keysym; `lib/main.dart` prints fill errors in release, so
+/// the value must be dropped.
 pub(crate) fn redact_reply(e: &x11rb::errors::ReplyError) -> String {
     match e {
         x11rb::errors::ReplyError::ConnectionError(e) => format!("X11 connection error: {e}"),

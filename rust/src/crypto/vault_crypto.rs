@@ -1,11 +1,5 @@
-//! High-level vault seal and open operations.
-//!
-//! Orchestrates the full crypto stack (ADR-018):
-//! passphrase → Argon2id → HKDF → AES-256-GCM
-//!
-//! The X25519 + ML-KEM hybrid layer that v2–v10 vaults used was deleted at RT-3,
-//! along with the version dispatchers that selected between derivation eras. v11 is
-//! the oldest readable format, so there is exactly one derivation path here.
+//! passphrase -> Argon2id -> HKDF -> AES-256-GCM (ADR-018). One derivation
+//! path: v11 is the oldest readable format.
 
 use rand::rngs::OsRng;
 use rand::RngCore;
@@ -19,7 +13,7 @@ use crate::vault::file_format::{SealedVault, YubiKeyRecord, VERSION};
 
 /// Encrypts plaintext under the given passphrase.
 ///
-/// `alias` is stored in the plaintext header and bound to the body via AAD —
+/// `alias` is stored in the plaintext header and bound to the body via AAD -
 /// it must be the final alias so that the file written to disk is immediately
 /// self-consistent.  Pass `None` if no alias is required.
 pub fn seal_vault(
@@ -59,10 +53,10 @@ pub(crate) fn seal_vault_with_params(
         params,
         argon2_salt,
         hkdf_salt,
-        nonce: [0u8; 12],   // placeholder — updated below
-        ciphertext: vec![], // placeholder — updated below
+        nonce: [0u8; 12],   // placeholder - updated below
+        ciphertext: vec![], // placeholder - updated below
         yubikey_records: vec![],
-        alias, // bound to body via AAD — must be the final alias
+        alias, // bound to body via AAD - must be the final alias
         passphrase_blob: vec![],
     };
     let (ciphertext, nonce) =
@@ -80,7 +74,7 @@ pub fn open_vault(passphrase: &[u8], sealed: &SealedVault) -> Result<Vec<u8>, St
     // Step 2: re-derive the vault key straight from the Argon2id output (ADR-018).
     let vault_key = Zeroizing::new(derive_vault_key_v11(&kdf_output, &sealed.hkdf_salt));
 
-    // Step 3: AES-256-GCM decrypt — the AAD verifies header integrity.
+    // Step 3: AES-256-GCM decrypt - the AAD verifies header integrity.
     aes_gcm::decrypt_with_aad(
         &vault_key,
         &sealed.ciphertext,
@@ -89,8 +83,6 @@ pub fn open_vault(passphrase: &[u8], sealed: &SealedVault) -> Result<Vec<u8>, St
     )
 }
 
-// ── Multi-key vault (VERSION 3, minimum 2 keys) ───────────────────────────────
-
 /// Key material supplied at vault creation for one YubiKey.
 pub struct YubiKeyRegistration {
     pub credential_id: Vec<u8>,
@@ -98,13 +90,9 @@ pub struct YubiKeyRegistration {
     pub salt: [u8; 32],
 }
 
-/// Encrypts plaintext under the given passphrase and two or more YubiKeys (VERSION 4).
-///
-/// Generates a random `wrapping_key` and a random `vault_key_master`.
-/// `passphrase_blob` = AES-GCM(wrapping_key, intermediate_key) — enables
-/// passphrase change without requiring all registered keys.
-/// Each key's `key_blob` = AES-GCM(vault_key_master, combine_yubikey(wrapping_key, hmac_i, salt_i)).
-/// Returns `Err` if fewer than 2 keys are supplied.
+/// `passphrase_blob` = AES-GCM(wrapping_key, intermediate_key), so the
+/// passphrase can change without every registered key. Each `key_blob` =
+/// AES-GCM(vault_key_master, combine_yubikey(wrapping_key, hmac_i, salt_i)).
 pub fn seal_vault_with_keys(
     passphrase: &[u8],
     keys: &[YubiKeyRegistration],
@@ -127,8 +115,8 @@ pub fn seal_vault_with_keys(
     let intermediate_key = Zeroizing::new(derive_vault_key_v11(&kdf_output, &hkdf_salt));
 
     // wrapping_key: stable random key that mediates between passphrase and YubiKeys.
-    // Encrypted under intermediate_key → passphrase_blob (enables single-tap passphrase change).
-    // Used in combine_yubikey instead of intermediate_key → key_blobs survive passphrase changes.
+    // Encrypted under intermediate_key -> passphrase_blob (enables single-tap passphrase change).
+    // Used in combine_yubikey instead of intermediate_key -> key_blobs survive passphrase changes.
     let mut wrapping_key = Zeroizing::new([0u8; 32]);
     OsRng.fill_bytes(&mut *wrapping_key);
 
@@ -179,13 +167,9 @@ pub fn seal_vault_with_keys(
     Ok(sealed)
 }
 
-/// Decrypts a multi-key vault (VERSION 4+, passphrase_blob present) using the
-/// passphrase and one registered YubiKey:
-///   intermediate_key → decrypt passphrase_blob → wrapping_key →
-///   combine_yubikey(wrapping_key, hmac, salt) → decrypt key_blob → vault_key_master → body.
-///
-/// Returns `(plaintext, vault_key_master, wrapping_key)`.  The caller should cache
-/// both in the session for CRUD re-seals and future key-add operations.
+/// intermediate_key -> passphrase_blob -> wrapping_key -> combine_yubikey ->
+/// key_blob -> vault_key_master -> body. Returns the two keys too, for the
+/// session to cache.
 #[allow(clippy::type_complexity)]
 pub fn open_vault_with_key_record(
     passphrase: &[u8],
@@ -210,7 +194,7 @@ pub fn open_vault_with_key_record(
         return Err("unsupported legacy single-key vault (empty key_blob)".to_string());
     }
 
-    // VERSION 4: decrypt passphrase_blob → wrapping_key, then unwrap key_blob.
+    // VERSION 4: decrypt passphrase_blob -> wrapping_key, then unwrap key_blob.
     if sealed.passphrase_blob.len() != 60 {
         return Err(format!(
             "invalid passphrase_blob length: {} (expected 60 for VERSION 4 multi-key vault)",
@@ -259,12 +243,7 @@ pub fn open_vault_with_key_record(
     Ok((plaintext, vault_key_master, Some(wrapping_key)))
 }
 
-/// Add a new YubiKey record to a VERSION 4 vault without re-sealing the body.
-///
-/// Requires `wrapping_key` and `vault_key_master` from the active session — both
-/// are cached at unlock time so the user needs only one existing-key tap to authorise.
-/// Returns `Err` if the vault already has 4 keys or the credential_id is already
-/// registered.
+/// Uses the session's cached keys, so one existing-key tap authorises it.
 pub fn add_key_to_sealed(
     sealed: &SealedVault,
     new_cred_id: Vec<u8>,
@@ -303,12 +282,7 @@ pub fn add_key_to_sealed(
     })
 }
 
-/// Remove a YubiKey record from a vault.
-///
-/// Enforces a minimum of 1 remaining record — callers that wish to enforce
-/// the ADR-010 minimum-2 invariant at vault creation should do so before calling
-/// this.  Returns `Err` if the credential_id is not found or only one record
-/// remains.
+/// Floor of one record here; the ADR-010 minimum of two is a creation rule.
 pub fn remove_key_from_sealed(sealed: &SealedVault, cred_id: &[u8]) -> Result<SealedVault, String> {
     let pos = sealed
         .yubikey_records
@@ -326,12 +300,8 @@ pub fn remove_key_from_sealed(sealed: &SealedVault, cred_id: &[u8]) -> Result<Se
     })
 }
 
-/// Re-seals a vault body using a cached `vault_key_master` and the existing header.
-///
-/// Tags the vault at the current VERSION. Safe unconditionally at floor v11: every
-/// readable vault is v11+, a single derivation era, so a body-only re-seal (which
-/// does not rebuild the passphrase material) can never strand the header on a
-/// derivation the next open will not use.
+/// Safe to tag at the current VERSION without rebuilding passphrase material:
+/// every readable vault shares one derivation.
 pub fn reseal_vault_body(
     sealed: &mut SealedVault,
     vault_key_master: &[u8; 32],
@@ -345,19 +315,14 @@ pub fn reseal_vault_body(
     Ok(())
 }
 
-/// Changes the passphrase for a VERSION 4 multi-key vault.
-///
-/// Verifies the old passphrase by decrypting `passphrase_blob` → `wrapping_key`.
-/// Generates fresh PQ material for the new passphrase, re-encrypts `wrapping_key`
-/// as the new `passphrase_blob`. All `key_blob`s and the vault body are unchanged —
-/// any single registered key continues to work with the new passphrase.
+/// Only `passphrase_blob` changes, so every registered key keeps working.
 pub fn change_vault_passphrase_with_keys(
     sealed: &SealedVault,
     old_passphrase: &[u8],
     new_passphrase: &[u8],
 ) -> Result<SealedVault, String> {
     // Step 1: Re-derive the OLD intermediate_key to decrypt the existing
-    // passphrase_blob — straight from Argon2id (ADR-018).
+    // passphrase_blob - straight from Argon2id (ADR-018).
     let old_kdf = Zeroizing::new(derive_key(
         old_passphrase,
         &sealed.argon2_salt,
@@ -365,7 +330,7 @@ pub fn change_vault_passphrase_with_keys(
     )?);
     let old_intermediate_key = Zeroizing::new(derive_vault_key_v11(&old_kdf, &sealed.hkdf_salt));
 
-    // Step 2: Decrypt passphrase_blob → wrapping_key (verifies old passphrase).
+    // Step 2: Decrypt passphrase_blob -> wrapping_key (verifies old passphrase).
     if sealed.passphrase_blob.len() != 60 {
         return Err(
             "vault does not support single-key passphrase change — not a VERSION 4 multi-key vault"
@@ -407,7 +372,7 @@ pub fn change_vault_passphrase_with_keys(
     new_passphrase_blob.extend_from_slice(&new_pb_ct);
 
     // Step 5: Return new SealedVault with fresh passphrase material and passphrase_blob.
-    // key_blobs, body, and alias are unchanged — vault_key_master is stable.
+    // key_blobs, body, and alias are unchanged - vault_key_master is stable.
     Ok(SealedVault {
         version: VERSION,
         params: new_params,
@@ -481,8 +446,6 @@ mod tests {
         );
     }
 
-    // ── Multi-key vault (minimum 2 keys) ─────────────────────────────────────
-
     fn two_test_keys() -> [YubiKeyRegistration; 2] {
         [
             YubiKeyRegistration {
@@ -500,7 +463,7 @@ mod tests {
 
     /// N5 (RT-3 net), as observable behaviour: a body-only re-seal tags the current
     /// VERSION and never invents one. This replaces the old `capped_reseal_version_for`
-    /// unit test — the era cap it pinned died with the multi-era derivation, but the
+    /// unit test - the era cap it pinned died with the multi-era derivation, but the
     /// guarantee it protected (a re-seal never strands the header on a version the next
     /// open cannot derive) still has to hold, so it is pinned through the public API.
     #[test]
@@ -535,7 +498,6 @@ mod tests {
         );
     }
 
-    // ── Net for "sync without a second unlock" ───────────────────────────────
     //
     // The shipped held-merge sync skips re-entering credentials when the
     // session's cached vault_key_master opens the incoming file. That is only
@@ -660,7 +622,7 @@ mod tests {
 
     /// The alias is NOT a cryptographic gate across files: the AAD binds a header
     /// to its own body, and is computed from whichever file is being opened. A
-    /// copy whose alias was changed still opens under the same master key — so the
+    /// copy whose alias was changed still opens under the same master key - so the
     /// alias comparison the feature relies on has to be written as explicit policy.
     #[test]
     fn the_same_master_opens_a_copy_whose_alias_changed() {
@@ -681,7 +643,7 @@ mod tests {
         )
         .unwrap();
 
-        // Rename, then re-seal the body under the SAME master — what set_vault_alias
+        // Rename, then re-seal the body under the SAME master - what set_vault_alias
         // does for a key-protected vault.
         sealed.alias = Some(String::from("Work"));
         reseal_vault_body(&mut sealed, &master, plaintext).unwrap();
@@ -884,8 +846,6 @@ mod tests {
         assert_eq!(recovered, new_plaintext);
     }
 
-    // ── change_vault_passphrase_with_keys ─────────────────────────────────────
-
     #[test]
     fn change_passphrase_with_keys_key_blobs_unchanged() {
         let keys = two_test_keys();
@@ -953,7 +913,7 @@ mod tests {
             change_vault_passphrase_with_keys(&sealed, b"old-pass", b"new-pass").unwrap();
 
         // Re-seal body so the new header (new argon2_salt, hkdf_salt, etc.) is
-        // committed as AAD — mirrors what api::vault::change_passphrase_with_keys does.
+        // committed as AAD - mirrors what api::vault::change_passphrase_with_keys does.
         reseal_vault_body(&mut new_sealed, &master, plaintext).unwrap();
 
         let (pt0, _, _) = open_vault_with_key_record(
@@ -1013,8 +973,6 @@ mod tests {
         .unwrap();
         assert_eq!(pt, plaintext);
     }
-
-    // ── add_key_to_sealed / remove_key_from_sealed ────────────────────────────
 
     #[test]
     fn add_key_to_sealed_adds_third_record() {
@@ -1194,8 +1152,6 @@ mod tests {
         assert!(result.unwrap_err().contains("not found"));
     }
 
-    // ── VERSION 7 AAD / header-integrity tests ────────────────────────────────
-
     #[test]
     fn seal_vault_v7_header_tamper_detected() {
         let passphrase = b"integrity test";
@@ -1250,8 +1206,6 @@ mod tests {
         assert_eq!(recovered, plaintext);
     }
 
-    // ── Body integrity and tamper detection ───────────────────────────────────
-
     #[test]
     fn tampered_ciphertext_body_is_rejected() {
         // AES-GCM auth tag must catch any modification to the encrypted body,
@@ -1264,8 +1218,6 @@ mod tests {
             "bit flip in ciphertext body must be rejected by AES-GCM auth tag"
         );
     }
-
-    // ── Alias field: storage, retrieval, and AAD binding ─────────────────────
 
     #[test]
     fn seal_with_alias_preserves_alias_in_header() {
@@ -1296,8 +1248,6 @@ mod tests {
         );
     }
 
-    // ── Edge cases ────────────────────────────────────────────────────────────
-
     #[test]
     fn empty_plaintext_roundtrip() {
         // An empty body (e.g., freshly created vault with no entries) must
@@ -1316,8 +1266,6 @@ mod tests {
         let recovered = open_vault(b"", &sealed).unwrap();
         assert_eq!(recovered, b"data");
     }
-
-    // ── Multi-key: tampered key_blob ─────────────────────────────────────────
 
     #[test]
     fn tampered_key_blob_fails_gracefully() {
@@ -1340,13 +1288,13 @@ mod tests {
     fn any_header_modification_breaks_body_decryption_for_all_keys() {
         // The entire plaintext header is bound as AES-GCM AAD. Modifying ANY
         // header byte (including an individual key_blob) makes the body unreadable
-        // to ALL keys — not just the one whose blob was changed. This prevents a
+        // to ALL keys - not just the one whose blob was changed. This prevents a
         // partial header-substitution attack.
         let keys = two_test_keys();
         let mut sealed =
             seal_vault_with_keys(b"passphrase", &keys, b"protected body", None).unwrap();
 
-        sealed.yubikey_records[0].key_blob[0] ^= 0xFF; // header changed → AAD broken
+        sealed.yubikey_records[0].key_blob[0] ^= 0xFF; // header changed -> AAD broken
 
         assert!(open_vault_with_key_record(
             b"passphrase",

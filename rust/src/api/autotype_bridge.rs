@@ -1,11 +1,6 @@
-//! Bridge surface for Linux desktop auto-type (ADR-017).
-//!
-//! This module compiles on **all** platforms so the generated flutter_rust_bridge
-//! glue links everywhere. The public bridge fns delegate to `pub(crate)`
-//! `impl_*` fns that are defined on *every* target via `cfg` (real on Linux, a
-//! "Linux-only" stub elsewhere) — so frb's generated code, which may reference
-//! either the public fn or the impl, compiles on Android too. Only the Linux
-//! impls touch the `cfg(target_os = "linux")`-gated `autotype` module.
+//! Auto-type bridge (ADR-017). Compiles on every platform because the generated
+//! frb glue references these fns unconditionally; off Linux each `impl_*` is
+//! a "Linux-only" stub.
 
 /// The window captured at trigger time, flattened for the bridge.
 pub struct CapturedWindowData {
@@ -34,8 +29,6 @@ pub fn autotype_socket_path() -> String {
 pub fn autotype_trigger_token() -> String {
     impl_token()
 }
-
-// ── Linux implementations ───────────────────────────────────────────────────
 
 #[cfg(target_os = "linux")]
 pub(crate) fn impl_capture() -> Result<Option<CapturedWindowData>, String> {
@@ -74,8 +67,6 @@ fn captured_to_data(w: crate::autotype::window::CapturedWindow) -> CapturedWindo
         title: w.title.unwrap_or_default(),
     }
 }
-
-// ── Non-Linux stubs (keep the symbols present so frb glue links) ─────────────
 
 #[cfg(not(target_os = "linux"))]
 pub(crate) fn impl_capture() -> Result<Option<CapturedWindowData>, String> {

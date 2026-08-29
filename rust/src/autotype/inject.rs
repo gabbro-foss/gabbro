@@ -1,23 +1,9 @@
-//! X11 keystroke injection for auto-type (ADR-017), Linux-only.
-//!
-//! Synthesises key events with the XTEST extension. It binds temporary "scratch"
-//! keycodes (ones with no keysyms mapped) to the target keysyms at every level,
-//! then "presses" them -- the xdotool technique. Binding at every level means no
-//! modifier state can alter the produced character, so arbitrary Unicode
-//! (accented Latin, Greek, Cyrillic, CJK) types uniformly regardless of the
-//! user's keyboard layout. Events reach whatever window currently holds focus.
-//!
-//! Crucially, each *distinct* keysym gets its **own** scratch keycode, bound once
-//! up front and never rebound while typing (see [`plan_batches`]). The earlier
-//! approach reused one keycode, remapping it between every keystroke; the target
-//! app could then resolve a keycode against a stale keymap, duplicating the
-//! previous character and dropping the next (`abc.f` -> `abc..`). A secret with
-//! more distinct characters than there are free keycodes is split into batches,
-//! restored and settled at each seam.
-//!
-//! This is the raw injection primitive only. The ADR-017 safeguards that live
-//! at a higher layer -- capturing the target window at trigger time and
-//! aborting if focus moved, and the unlock-then-type flow -- are NOT here.
+//! XTEST injection (ADR-017). Scratch keycodes are bound to the target keysyms
+//! at every level (the xdotool technique) so no modifier state or layout can
+//! alter the character. Each distinct keysym gets its own keycode, bound once
+//! per batch and never rebound mid-typing: remapping one keycode between
+//! keystrokes let the target app resolve against a stale keymap (`abc.f` ->
+//! `abc..`). The ADR-017 focus and unlock safeguards live in a higher layer.
 
 use std::{
     thread,
@@ -272,7 +258,6 @@ fn find_all_scratch_keycodes(conn: &impl Connection) -> Result<(Vec<u8>, u8), In
     Ok((pool, per))
 }
 
-// ── Stable-keycode planner ──────────────────────────────────────────────────
 // The remap-one-scratch-keycode-per-keystroke technique lets the target app
 // resolve a keycode against a stale keymap between taps, duplicating the
 // previous character and dropping the next. The planner assigns each *distinct*
@@ -314,7 +299,7 @@ fn plan_batches(slots: &[Slot], pool: &[u8]) -> Vec<Batch> {
             Slot::Real(kc) => taps.push(kc),
             Slot::Scratch(ks) => {
                 if let Some(&kc) = assigned.get(&ks) {
-                    taps.push(kc); // already bound in this batch — reuse it
+                    taps.push(kc); // already bound in this batch - reuse it
                 } else {
                     if assigned.len() == pool.len() {
                         // No free pool slot left: close this batch and start a
@@ -403,8 +388,6 @@ mod tests {
     fn all_zero_is_empty() {
         assert!(modifier_keycodes(&[0, 0, 0, 0]).is_empty());
     }
-
-    // ── Stable-keycode planner ──────────────────────────────────────────────
 
     #[test]
     fn single_batch_when_distinct_fits_pool() {

@@ -1,30 +1,13 @@
-//! HKDF-SHA256 key derivation for the vault.
-//!
-//! Two derivations live here:
-//! - `derive_vault_key_v11` — the vault key, straight from the Argon2id output (ADR-018).
-//! - `combine_yubikey` — folds a YubiKey's hmac-secret response into a wrapping key.
-//!
-//! The v2–v10 hybrid combiners (ML-KEM + X25519, labels `gabbro-hybrid-kex-v1`/`-v2`)
-//! were deleted at RT-3 with the hybrid layer itself; v11 is the oldest readable format.
-
 use hkdf::Hkdf;
 use sha2::Sha256;
 
 const INFO_YUBIKEY: &[u8] = b"gabbro-yubikey-v1";
 /// VERSION 11 vault-key label (ADR-018): the vault key is derived straight from the
-/// Argon2id output. Frozen — changing it bricks every v11 vault.
+/// Argon2id output. Frozen - changing it bricks every v11 vault.
 const INFO_VAULT_KEY_V11: &[u8] = b"gabbro-vault-key-from-argon2id-v1";
 
-/// Derives the 32-byte vault key for VERSION 11 vaults (ADR-018), directly from the
-/// Argon2id output — no X25519 + ML-KEM hybrid layer.
-///
-/// `km` is the full Argon2id output (the same `derive_key` call as legacy formats,
-/// byte-identical; only this post-Argon2id step changes). `salt` is the random
-/// 32-byte `hkdf_salt` stored in the vault header.
-///
-/// `vault_key = HKDF-SHA256(salt = hkdf_salt, ikm = KM, info = INFO_VAULT_KEY_V11)`.
-/// Used by the passphrase-only path (as the vault key) and the multi-key path (as
-/// the `intermediate_key` that wraps the `wrapping_key`).
+/// ADR-018. The vault key for passphrase-only vaults, and the
+/// `intermediate_key` wrapping the `wrapping_key` for multi-key vaults.
 pub fn derive_vault_key_v11(km: &[u8; 96], salt: &[u8; 32]) -> [u8; 32] {
     let hkdf = Hkdf::<Sha256>::new(Some(salt), km);
 
@@ -96,11 +79,10 @@ mod tests {
         assert_ne!(a, b);
     }
 
-    // ── derive_vault_key_v11 (VERSION 11, no KEM — ADR-018) ────────────────────
     // vault_key = HKDF-SHA256(salt = hkdf_salt, ikm = KM, info = v11 label),
     // where KM is the full Argon2id output. A representative KM is 96 bytes.
 
-    /// A1 — known-answer test. Pins the exact VERSION 11 derivation forever: if the
+    /// A1 - known-answer test. Pins the exact VERSION 11 derivation forever: if the
     /// label, hash, or input ordering ever changes, every v11 vault becomes
     /// unopenable, so the output is frozen here as a tripwire.
     #[test]
@@ -147,7 +129,7 @@ mod tests {
         assert_ne!(a, b, "a different HKDF salt must change the derived key");
     }
 
-    /// A2 — domain separation: the v11 label must not collide with the YubiKey
+    /// A2 - domain separation: the v11 label must not collide with the YubiKey
     /// combiner even when fed the same 32-byte material and salt.
     #[test]
     fn v11_vault_key_differs_from_yubikey_combiner() {

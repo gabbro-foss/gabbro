@@ -3,7 +3,7 @@
 //! Parses CSV exports from arbitrary password managers into
 //! Gabbro vault entries. Treats all input as untrusted.
 
-/// Preview of a parsed CSV file — headers and up to 3 sample rows.
+/// Preview of a parsed CSV file - headers and up to 3 sample rows.
 /// Returned by [`sniff_csv`] for Flutter's mapping UI.
 pub struct CsvPreview {
     pub headers: Vec<String>,
@@ -20,7 +20,7 @@ pub struct CsvImportConfig {
     pub notes_col: Option<String>,
 }
 
-/// A single imported entry — flat struct ready for conversion to LoginEntry.
+/// A single imported entry - flat struct ready for conversion to LoginEntry.
 pub struct CsvEntry {
     pub title: String,
     pub url: String,
@@ -48,7 +48,7 @@ pub fn import_csv(input: &str, config: &CsvImportConfig) -> Result<Vec<CsvEntry>
         return Err("CSV has no headers".to_string());
     }
 
-    // Build a lookup: column name → index
+    // Build a lookup: column name -> index
     let col_index = |name: &str| -> Option<usize> { headers.iter().position(|h| h == name) };
 
     // Identify which indices are claimed by the config
@@ -297,7 +297,7 @@ uid, name, login, password, type, number, comments, favourite
 
     #[test]
     fn import_row_with_extra_columns_is_handled() {
-        // Row has more fields than headers — extra fields ignored cleanly
+        // Row has more fields than headers - extra fields ignored cleanly
         let csv = "name,password\nVisa,secret,extra1,extra2";
         let config = CsvImportConfig {
             title_col: Some("name".to_string()),

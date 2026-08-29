@@ -1,9 +1,4 @@
-//! AES-256-GCM authenticated encryption for the vault body.
-//!
-//! Encrypts and decrypts the vault body using a 32-byte key derived
-//! from the HKDF combiner. The nonce is randomly generated per
-//! encryption and stored in the vault header alongside the ciphertext.
-//! The GCM authentication tag detects any tampering.
+//! Nonce is random per encryption and stored in the header.
 
 use aes_gcm::aead::{Aead, KeyInit, Payload};
 use aes_gcm::{Aes256Gcm, Key, Nonce};
@@ -13,7 +8,7 @@ use rand::RngCore;
 /// Encrypts plaintext with AES-256-GCM.
 ///
 /// Returns `(ciphertext, nonce)`. The nonce is 12 bytes and must be
-/// stored in the vault header — it is required for decryption.
+/// stored in the vault header - it is required for decryption.
 /// A fresh random nonce is generated for every encryption operation.
 pub fn encrypt(key: &[u8; 32], plaintext: &[u8]) -> Result<(Vec<u8>, [u8; 12]), String> {
     let key = Key::<Aes256Gcm>::from_slice(key);
@@ -33,7 +28,7 @@ pub fn encrypt(key: &[u8; 32], plaintext: &[u8]) -> Result<(Vec<u8>, [u8; 12]), 
 /// Decrypts ciphertext with AES-256-GCM.
 ///
 /// Returns the plaintext if the key and nonce are correct and the
-/// authentication tag is valid. Returns `Err` if the tag fails —
+/// authentication tag is valid. Returns `Err` if the tag fails -
 /// this means either the wrong key or tampered ciphertext.
 pub fn decrypt(key: &[u8; 32], ciphertext: &[u8], nonce: &[u8; 12]) -> Result<Vec<u8>, String> {
     let key = Key::<Aes256Gcm>::from_slice(key);
@@ -47,7 +42,7 @@ pub fn decrypt(key: &[u8; 32], ciphertext: &[u8], nonce: &[u8; 12]) -> Result<Ve
 
 /// Encrypts plaintext with AES-256-GCM and additional authenticated data (AAD).
 ///
-/// Returns `(ciphertext, nonce)`. The AAD is authenticated but not encrypted —
+/// Returns `(ciphertext, nonce)`. The AAD is authenticated but not encrypted -
 /// any modification to the AAD causes decryption to fail. Used for VERSION 7+
 /// vaults to bind the plaintext header to the encrypted body.
 pub fn encrypt_with_aad(
@@ -78,7 +73,7 @@ pub fn encrypt_with_aad(
 /// Decrypts ciphertext with AES-256-GCM and additional authenticated data (AAD).
 ///
 /// Returns the plaintext only if the key, nonce, AAD, and authentication tag
-/// all match. Any mismatch — wrong key, tampered ciphertext, or modified AAD —
+/// all match. Any mismatch - wrong key, tampered ciphertext, or modified AAD -
 /// returns `Err`. Used for VERSION 7+ vaults to detect plaintext-header tampering.
 pub fn decrypt_with_aad(
     key: &[u8; 32],
@@ -149,8 +144,6 @@ mod tests {
         let (_ct2, nonce2) = encrypt(&key, b"same plaintext").unwrap();
         assert_ne!(nonce1, nonce2);
     }
-
-    // ── AAD variants ──────────────────────────────────────────────────────────
 
     #[test]
     fn encrypt_with_aad_decrypt_with_aad_roundtrip() {

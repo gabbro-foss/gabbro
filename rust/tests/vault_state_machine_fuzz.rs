@@ -1,37 +1,16 @@
-//! Vault state-machine fuzzer — the exploratory layer above the deterministic
-//! `vault_backward_compat` gate.
+//! Applies a random order of `{change_passphrase, add_key, remove_key}` to a
+//! golden v11 vault and checks the brick-prevention invariants after every step.
 //!
-//! # What this does
-//!
-//! The gate proves two *hand-picked* journeys (vault A passphrase change, vault B
-//! interleaved change + rotation). This fuzzer instead applies a *random* order of
-//! `{change_passphrase, add_key, remove_key}` to a frozen golden v11 vault and, after
-//! every single step, asserts the brick-prevention invariants hold. It is the
-//! Hypothesis-style "find the interleaving I didn't think of" net for the multi-key
-//! state machine.
-//!
-//! # Why it is `#[ignore]`'d
-//!
-//! Every `change_passphrase` re-seals with production-strength Argon2id (the public
-//! seal API hard-codes `Argon2idParams::default()`), which is ~18 s/op in a *debug*
-//! `cargo test` build and ~sub-second in `--release`. So it must NOT run in the
-//! routine debug `cargo test -q`. Run it explicitly, in release:
+//! `#[ignore]`'d because each `change_passphrase` runs production-strength
+//! Argon2id (~18 s per op in a debug build). Run in release:
 //!
 //! ```text
 //! cargo test --release --test vault_state_machine_fuzz -- --ignored
 //! ```
 //!
-//! Widen the search with `GABBRO_FUZZ_CASES=64 cargo test --release \
-//!   --test vault_state_machine_fuzz -- --ignored`.
-//!
-//! # Determinism
-//!
-//! The RNG is seeded from a fixed constant, so a given `(seed, cases)` always walks
-//! the same sequences — a gate must never flake. When a run fails it prints the
-//! exact case index + operation log; reproduce it, minimise by hand, and promote it
-//! into `vault_backward_compat.rs` as a fixed regression test. No `proptest`
-//! dependency: `rand` (already a direct dependency) gives us `SliceRandom::choose`
-//! (the `np.random.choice` analogue) and a seedable `StdRng`.
+//! `GABBRO_FUZZ_CASES=64` widens the search. The RNG seed is fixed so a gate
+//! never flakes; a failure prints the case index and op log, which is minimised
+//! by hand and promoted into `vault_backward_compat.rs`.
 
 use rand::rngs::StdRng;
 use rand::seq::SliceRandom;
@@ -63,9 +42,8 @@ struct KeyMat {
     name: &'static str,
 }
 
-/// The four keys available to the fuzzer. The fixture registers YK1+YK2; YK3/YK4
-/// start unregistered. A removed key returns to the pool, so re-registration of a
-/// previously-removed credential is exercised too.
+/// A removed key returns to the pool, so re-registering a removed credential
+/// is exercised too.
 fn key_pool() -> [KeyMat; 4] {
     [
         KeyMat {
@@ -177,8 +155,8 @@ fn assert_unlockable(path: &Path, model: &Model, pool: &[KeyMat; 4], log: &[Stri
 
 /// After every mutation: the vault is never bricked (opens with every registered
 /// key, canary intact) and stays at the current VERSION. Every openable vault is
-/// v11+, a single key-derivation era, so every re-seal — with or without a
-/// passphrase rebuild — tags the current VERSION.
+/// v11+, a single key-derivation era, so every re-seal - with or without a
+/// passphrase rebuild - tags the current VERSION.
 fn assert_invariants(path: &Path, model: &Model, pool: &[KeyMat; 4], log: &[String]) {
     let on_disk = read_vault(path)
         .unwrap_or_else(|e| panic!("read_vault failed after [{}]: {e}", log.join(" -> ")));
@@ -264,7 +242,7 @@ fn random_op_sequences_preserve_unlockability() {
             let op = *choices.choose(&mut rng).unwrap();
 
             // Authorise the mutation with a random currently-registered key under the
-            // current passphrase — the same one-tap authorisation the app performs.
+            // current passphrase - the same one-tap authorisation the app performs.
             let auth = *model.registered.choose(&mut rng).unwrap();
             let ak = &pool[auth];
             let (body, master, wrapping) =
@@ -316,7 +294,7 @@ fn random_op_sequences_preserve_unlockability() {
                     log.push(format!("add({}, auth={})", nk.name, ak.name));
                 }
                 "remove_key" => {
-                    // Remove any registered key (possibly the one we authorised with —
+                    // Remove any registered key (possibly the one we authorised with -
                     // master is already in hand), keeping the floor of one.
                     let victim = *model.registered.choose(&mut rng).unwrap();
                     let vk = &pool[victim];

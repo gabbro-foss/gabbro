@@ -1,9 +1,5 @@
-//! Crash-safety test helper — NOT shipped logic.
-//!
-//! Reads a vault once, then rewrites it through the real `write_vault` path in a
-//! tight loop (no KDF: it re-writes the already-sealed bytes). The crash-safety
-//! integration test (`tests/crash_safety.rs`) spawns this, `SIGKILL`s it at
-//! varied moments, and confirms the vault on disk is never left torn.
+//! Rewrites an already-sealed vault through `write_vault` in a tight loop (no
+//! KDF) for `tests/crash_safety.rs` to `SIGKILL`. Not shipped.
 
 use rust_lib_gabbro::vault::io::{read_vault, write_vault};
 use std::path::PathBuf;

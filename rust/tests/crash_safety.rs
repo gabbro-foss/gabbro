@@ -1,15 +1,6 @@
-//! Process-crash safety of the vault write path.
-//!
-//! Spawns `crash_writer`, which rewrites a vault in a tight loop, and `SIGKILL`s
-//! it at varied moments so some kills land mid-write (temp written, rename or
-//! `.bak` rotation in flight). After every kill the vault on disk must still
-//! parse as a complete sealed vault — never torn.
-//!
-//! This proves crash safety against a *process* death (app killed, OOM,
-//! force-quit). A real power cut also loses the OS page cache, which a kill does
-//! not; that case is covered by `write_vault`'s `fsync`-before-`rename` ordering
-//! (you get a complete old-or-new vault, never a torn one), resting on the
-//! kernel's atomic `rename` — the same guarantee under every save.
+//! `SIGKILL`s `crash_writer` mid-write at varied moments; the vault on disk must
+//! always parse. This covers process death only. A power cut also loses the
+//! page cache, which rests on `write_vault`'s fsync-before-rename ordering.
 
 use rust_lib_gabbro::api::vault::save_vault;
 use rust_lib_gabbro::vault::io::read_vault;
@@ -28,7 +19,7 @@ fn vault_survives_repeated_process_kills_mid_write() {
     let _ = std::fs::remove_file(&bak);
 
     // One real seal so there is a valid vault on disk. The writer loop below does
-    // no KDF — it rewrites these sealed bytes via the real write path.
+    // no KDF - it rewrites these sealed bytes via the real write path.
     save_vault(&VaultBody::default(), b"crash-pass", &path).expect("seal initial vault");
 
     let exe = env!("CARGO_BIN_EXE_crash_writer");

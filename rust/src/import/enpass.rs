@@ -1,18 +1,7 @@
-//! Enpass JSON importer.
-//!
-//! Parses an Enpass `.json` export file and converts each item into a
-//! `VaultEntry`. Parsing lives in Rust because untrusted external data
-//! mapping into the domain model belongs where the domain model lives.
-//!
-//! ## What is dropped on import
-//! - `archived` / `trashed` — Gabbro has no soft-delete; archived/trashed
-//!   items are silently skipped
-//! - `auto_submit`, `subtitle`, `category_name`, `icon` — no Gabbro equivalent
-//! - `totp` fields — Gabbro deliberately excludes TOTP
-//! - `section` fields — Enpass visual dividers, not data
-//! - `.Android#` fields — autofill hints, not user data
-//! - `deleted` fields — soft-deleted fields inside an item
-//! - `history` — password history not yet in Gabbro domain model
+//! Enpass `.json` export. Dropped: archived and trashed items (no soft-delete
+//! in Gabbro), `totp` (excluded by design), `section` dividers, `.Android#`
+//! autofill hints, `deleted` fields, `history`, and the cosmetic
+//! `auto_submit`/`subtitle`/`category_name`/`icon`.
 
 use crate::vault::entry::{
     CardEntry, CustomEntry, CustomField, EntryAttachment, EntryMeta, LoginEntry, NoteEntry,
@@ -21,8 +10,6 @@ use crate::vault::entry::{
 use base64::{engine::general_purpose::STANDARD as BASE64, Engine as _};
 use indexmap::IndexMap;
 use serde::Deserialize;
-
-// ── Enpass JSON structs ───────────────────────────────────────────────────────
 
 /// Top-level export file: `{ "items": [...] }`
 #[derive(Debug, Deserialize)]
@@ -72,11 +59,9 @@ struct EnpassAttachment {
     data: String,
 }
 
-// ── Public API ────────────────────────────────────────────────────────────────
-
 /// An item that failed domain validation during parsing.
 ///
-/// Kept internal to this module — the bridge layer maps it to
+/// Kept internal to this module - the bridge layer maps it to
 /// `ImportFailureData` in `api/import.rs`.
 pub(crate) struct ParseFailure {
     pub(crate) title: String,
@@ -87,12 +72,7 @@ pub(crate) struct ParseFailure {
     pub(crate) raw_fields: Vec<(String, String)>,
 }
 
-/// Parse raw Enpass JSON export bytes into a list of vault entries and a list
-/// of validation failures.
-///
-/// Returns `Err` only if the JSON itself is malformed. Individual items that
-/// fail domain validation are collected into the second element of the tuple
-/// rather than aborting the whole import.
+/// `Err` only for malformed JSON; items failing validation go to `failures`.
 pub(crate) fn parse(data: &[u8]) -> Result<(Vec<VaultEntry>, Vec<ParseFailure>), String> {
     if data.len() > super::ENPASS_IMPORT_MAX_BYTES {
         return Err(format!(
@@ -118,8 +98,6 @@ pub(crate) fn parse(data: &[u8]) -> Result<(Vec<VaultEntry>, Vec<ParseFailure>),
 
     Ok((entries, failures))
 }
-
-// ── Item conversion ───────────────────────────────────────────────────────────
 
 /// Convert active Enpass fields into raw `(key, value)` pairs for failure reporting.
 ///
@@ -151,7 +129,7 @@ fn extract_raw_fields(fields: &[&EnpassField]) -> Vec<(String, String)> {
 }
 
 fn convert_item(item: EnpassItem) -> Result<VaultEntry, ParseFailure> {
-    // Active fields only — drop soft-deleted fields before any mapping.
+    // Active fields only - drop soft-deleted fields before any mapping.
     let fields: Vec<&EnpassField> = item
         .fields
         .iter()
@@ -199,8 +177,6 @@ fn convert_item(item: EnpassItem) -> Result<VaultEntry, ParseFailure> {
     }
 }
 
-// ── Per-type converters ───────────────────────────────────────────────────────
-
 fn convert_login(
     meta: EntryMeta,
     title: &str,
@@ -245,7 +221,7 @@ fn convert_card(
 ) -> Result<CardEntry, String> {
     let card_number = find_field_value(fields, &["ccNumber"]);
 
-    // Fields that map to dedicated CardEntry slots — everything else overflows
+    // Fields that map to dedicated CardEntry slots - everything else overflows
     // to custom_fields so no data is silently dropped on import.
     let cc_skip = [
         "ccName",
@@ -316,12 +292,10 @@ fn convert_custom(
     }
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 /// Decode a list of Enpass attachments into `EntryAttachment` values.
 ///
 /// Attachments whose base64 `data` field cannot be decoded are silently
-/// skipped — a corrupt attachment should not fail the whole import.
+/// skipped - a corrupt attachment should not fail the whole import.
 fn decode_attachments(raw: &[EnpassAttachment]) -> Vec<EntryAttachment> {
     raw.iter()
         .filter_map(|a| {
@@ -407,7 +381,7 @@ fn non_empty(s: &str) -> Option<String> {
 }
 
 /// Build an `EntryMeta` from Enpass item-level fields.
-/// Timestamps are left empty — Rust will stamp them on first save.
+/// Timestamps are left empty - Rust will stamp them on first save.
 fn make_meta(uuid: &str) -> EntryMeta {
     EntryMeta {
         field_times: Default::default(),
@@ -433,8 +407,6 @@ fn normalise_expiry(expiry: &str) -> String {
     }
     expiry.to_string()
 }
-
-// ── Tests ─────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
 mod tests {
@@ -555,8 +527,6 @@ mod tests {
         let result = parse(b"not json at all");
         assert!(result.is_err());
     }
-
-    // ── TDD tests for field mapping against real export schema ────────────────
 
     #[test]
     fn login_username_field_populates_username() {
@@ -876,8 +846,6 @@ mod tests {
         );
     }
 
-    // ── Pure-function unit tests ───────────────────────────────────────────────
-
     #[test]
     fn normalise_expiry_mm_yyyy_converts_to_mm_yy() {
         assert_eq!(normalise_expiry("01/2027"), "01/27");
@@ -894,7 +862,7 @@ mod tests {
     fn normalise_expiry_unrecognised_format_is_returned_unchanged() {
         assert_eq!(normalise_expiry(""), "");
         assert_eq!(normalise_expiry("bad"), "bad");
-        assert_eq!(normalise_expiry("01/202"), "01/202"); // 3-digit year → unchanged
+        assert_eq!(normalise_expiry("01/202"), "01/202"); // 3-digit year -> unchanged
     }
 
     #[test]
@@ -1014,8 +982,6 @@ mod tests {
         assert!(!should_drop_field("url"));
         assert!(!should_drop_field(""));
     }
-
-    // ── Robustness / parser hardening ─────────────────────────────────────────
 
     #[test]
     fn empty_byte_input_returns_err() {

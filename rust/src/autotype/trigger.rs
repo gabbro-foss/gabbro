@@ -1,11 +1,5 @@
-//! Single-instance trigger IPC for auto-type (ADR-017), Linux-only.
-//!
-//! The running Gabbro listens on a unix-domain socket; the user-bound
-//! `gabbro --autotype` command (wired in a later phase) connects and sends a
-//! fixed token, which tells the running instance to capture the active window
-//! and show the picker. There is no key grab -- the user binds the command in
-//! their window manager. Plain sockets, so this whole module is host-testable
-//! with no X server involved.
+//! Trigger IPC (ADR-017): the running Gabbro listens on a unix socket and the
+//! user-bound client sends a fixed token. Plain sockets, so host-testable.
 
 use std::io::{Read, Write};
 use std::os::unix::net::{UnixListener, UnixStream};

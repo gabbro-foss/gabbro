@@ -1,22 +1,16 @@
-//! Bridge surface for the Linux passkey daemon (ADR-009).
+//! Linux passkey daemon seam (ADR-009): `passkey_plan` decides whether to ask
+//! the user, `passkey_perform` runs an approved request, `passkey_denied` is
+//! the cancel reply. Only opaque CTAP2 response bytes cross; never the key.
 //!
-//! The Dart daemon pumps the uhid device and reassembles CTAPHID messages,
-//! then drives each CTAP2 request across this seam: `passkey_plan` says
-//! whether to ask the user or reply immediately; `passkey_perform` runs the
-//! approved request; `passkey_denied` is the cancel response. The private key
-//! never crosses the bridge — only these opaque CTAP2 response bytes do.
-//!
-//! The module itself compiles on EVERY platform: FRB's generated code
-//! references these fns unconditionally, so gating the module broke the
-//! Android target build (found 2026-08-23, first real Android compile since
-//! the daemon landed). Only the bodies are Linux; elsewhere each fn is an
-//! inert stub Dart never calls (the daemon starts behind Platform.isLinux).
+//! Compiles on every platform because FRB's generated code references these
+//! fns unconditionally; gating the module breaks the Android build. Off Linux
+//! each fn is an inert stub Dart never calls.
 
 #[cfg(target_os = "linux")]
 use crate::ctap2::{self, RequestPlan};
 use crate::frb_generated::StreamSink;
 
-/// CTAP2_ERR_OPERATION_DENIED — the safe answer a stub can always give.
+/// CTAP2_ERR_OPERATION_DENIED - the safe answer a stub can always give.
 #[cfg(not(target_os = "linux"))]
 const DENIED: u8 = 0x27;
 
@@ -95,7 +89,7 @@ pub fn passkey_denied() -> Vec<u8> {
 
 /// The fallible half of daemon startup: instance lock + `/dev/uhid` + device
 /// create. Awaitable so Dart catches the Err and can say why the provider is
-/// inactive (F2) — a stream fn's Err is lost on an unawaited FRB future.
+/// inactive (F2) - a stream fn's Err is lost on an unawaited FRB future.
 pub fn passkey_daemon_open() -> Result<(), String> {
     #[cfg(target_os = "linux")]
     {

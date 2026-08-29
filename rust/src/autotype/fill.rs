@@ -1,10 +1,6 @@
-//! The auto-type fill orchestration (ADR-017), Linux-only.
-//!
-//! Given the window captured at trigger time and an entry id: read the Login's
-//! secret from the session, build the `username` Tab `password` Return keystroke
-//! sequence, re-assert focus on the captured window and verify it actually holds
-//! focus, and only then inject. The secret never leaves Rust. If focus is not on
-//! the captured window, we abort rather than type it somewhere else.
+//! Fill orchestration (ADR-017). Focus is re-asserted on the captured window
+//! and verified before injecting, so the secret is never typed elsewhere; it
+//! never leaves Rust.
 
 use std::{thread, time::Duration};
 
@@ -62,7 +58,7 @@ fn login_identifier<'a>(username: &'a str, email: Option<&'a str>) -> &'a str {
 
 /// Build the keysym sequence for an entry. The single place that decides which
 /// entry types may auto-type: Login builds, everything else is refused. The
-/// match is deliberately exhaustive — a new entry type must take this decision
+/// match is deliberately exhaustive - a new entry type must take this decision
 /// here, and in the per-variant tests below.
 fn login_sequence(entry: &VaultEntry) -> Result<Zeroizing<Vec<u32>>, FillError> {
     match entry {
@@ -174,7 +170,6 @@ mod tests {
         assert_eq!(login_identifier("", Some("")), "");
     }
 
-    // ── Which entry types may auto-type ──────────────────────────────────────
     // `login_sequence` is the single classifier: Login builds a keysym
     // sequence, every other variant is refused. Pinned per variant so a new
     // entry type must take this decision explicitly, not inherit a wildcard.
@@ -300,7 +295,6 @@ mod tests {
         }
     }
 
-    // ── No fill error may carry secret material to stdout ────────────────────
     // `lib/main.dart` debugPrints this text, in release builds too, so every
     // variant's rendering is pinned here.
 

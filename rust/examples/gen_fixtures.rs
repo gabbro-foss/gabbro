@@ -1,18 +1,9 @@
-//! One-time golden-vault fixture generator for the backward-compatibility
-//! harness (`tests/vault_backward_compat.rs`).
-//!
-//! Fixtures are committed binary `.gabbro` files, sealed by the code that ships
-//! each format VERSION, and then frozen forever. They are NOT regenerated on each
-//! test run — that is the whole point (a round-trip can't catch a brick).
-//!
-//! Files are named by the compiled-in `VERSION`, so the SAME generator produces
-//! the v7 pair on `master` and the v6 pair when compiled in a worktree checked out
-//! at the tag that shipped VERSION 6 (`v0.1.0-alpha.4`). See
-//! `tests/fixtures/FIXTURES.md` for the full recipe, including the transient
-//! Argon2id-default lowering that keeps the committed fixtures cheap to open.
-//!
-//! Seal-time values come from the shared `fixture_spec.rs`, the same file the
-//! harness asserts against, so they cannot drift.
+//! Golden-vault generator for `tests/vault_backward_compat.rs`. Fixtures are
+//! sealed once by the code shipping each VERSION and frozen; regenerating them
+//! per run would turn the gate into a round-trip that cannot catch a brick.
+//! Named by the compiled-in `VERSION`, so the same generator builds older pairs
+//! from a checkout at the shipping tag. Recipe: `tests/fixtures/FIXTURES.md`.
+//! Values come from the shared `fixture_spec.rs` so they cannot drift.
 
 use rust_lib_gabbro::api::vault::{load_vault_with_key_record, reseal_vault_body, save_vault};
 use rust_lib_gabbro::api::vault_bridge::init_vault_with_keys;
@@ -32,14 +23,12 @@ async fn main() {
     std::fs::create_dir_all(&dir).expect("create fixtures/vaults dir");
     let v = VERSION;
 
-    // ── Passphrase-only ──────────────────────────────────────────────────────
     let pp_path = dir.join(format!("v{v}_passphrase.gabbro"));
     save_vault(&canary_body(), FIXTURE_PASSPHRASE, &pp_path).expect("seal passphrase fixture");
     println!("wrote {}", pp_path.display());
 
-    // ── Multi-key (passphrase + YK1 + YK2) ───────────────────────────────────
     // init_vault_with_keys seals an EMPTY body, so we then open with YK1 to get
-    // the cached vault_key_master and re-seal with the canary added — exactly the
+    // the cached vault_key_master and re-seal with the canary added - exactly the
     // CRUD path the app uses. reseal runs no Argon2 (cheap).
     let mk_path = dir.join(format!("v{v}_multikey_2keys.gabbro"));
     init_vault_with_keys(

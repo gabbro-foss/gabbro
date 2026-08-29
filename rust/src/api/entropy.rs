@@ -1,72 +1,20 @@
-//! Entropy estimation for user-typed passwords.
-//!
-//! # What this module does
-//!
-//! Given a password string, it detects which character classes are present,
-//! computes a pool size, and returns an estimated entropy in bits using the
-//! standard formula:
-//!
-//! ```text
-//! entropy = length × log₂(pool_size)
-//! ```
-//!
-//! # Important caveat
-//!
-//! This is a **lower-bound estimate**, not a true entropy value. It assumes
-//! the password was drawn uniformly at random from the detected character
-//! classes. User-chosen passwords are not random, so actual guessability is
-//! often lower than the number reported here. The UI must label this clearly
-//! as "estimated entropy" to avoid false precision.
-//!
-//! # References
-//!
-//! - Wikipedia — Password strength:
-//!   https://en.wikipedia.org/wiki/Password_strength
-//! - Red Kestrel — Random Password Strength (entropy formula and pool sizes):
-//!   https://redkestrel.co.uk/articles/random-password-strength
-//! - NIST — 8-character minimum threshold (~52 bits):
-//!   https://www.passbolt.com/blog/show-me-your-entropy-and-ill-break-your-password-part1
+//! `entropy = length x log2(pool_size)` over the detected character classes.
+//! A lower bound that assumes uniform random choice; user-chosen passwords are
+//! weaker, so the UI must label it "estimated". References:
+//! https://en.wikipedia.org/wiki/Password_strength,
+//! https://redkestrel.co.uk/articles/random-password-strength.
 
-// ── Character class pool sizes ────────────────────────────────────────────────
-//
-// Full pool sizes per class. We always use the full class size, never the
-// reduced ambiguous-excluded variant, because `estimate_entropy` only sees
-// the typed string — it has no way to know whether the user had
-// `exclude_ambiguous` enabled in the generator. Using the full pool size
-// is the conservative choice: it may slightly overestimate entropy for
-// passwords generated with ambiguous chars excluded, but it avoids
-// underestimating entropy for passwords typed manually or generated without
-// that flag. This is consistent with the lower-bound framing of the estimate.
-//
-//   lowercase a-z        : 26  (vs 23 with exclude_ambiguous: removes i, l, o)
-//   uppercase A-Z        : 26  (vs 24 with exclude_ambiguous: removes I, O)
-//   digits    0-9        : 10  (vs  8 with exclude_ambiguous: removes 0, 1)
-//   symbols (printable
-//     ASCII non-alnum)   : 32  (no ambiguous symbols defined — unchanged)
-//   non-ASCII            : 128 (conservative proxy for extended character sets)
-
+// Full class sizes, never the ambiguous-excluded ones: this only sees the
+// typed string and cannot know whether `exclude_ambiguous` was on. Non-ASCII
+// is a conservative proxy for extended character sets.
 const POOL_LOWERCASE: u32 = 26;
 const POOL_UPPERCASE: u32 = 26;
 const POOL_DIGITS: u32 = 10;
 const POOL_SYMBOLS: u32 = 32;
 const POOL_NON_ASCII: u32 = 128;
 
-// ── Public types ──────────────────────────────────────────────────────────────
-
-/// A coarse strength label for a password, derived from its estimated entropy.
-///
-/// Tier boundaries (in bits), anchored to published references:
-///
-///  <  28 bits → Terrible
-///  <  36 bits → Weak
-///  <  52 bits → Fair     (NIST 8-char minimum sits around 52 bits)
-///  <  80 bits → Strong
-///  < 128 bits → VeryStrong
-///  ≥ 128 bits → Centuries (128-bit threshold = infeasible brute-force per NIST)
-///
-/// Display strings for these variants are intentionally kept in Flutter,
-/// following the same pattern as the `Language` enum — Rust owns the
-/// classification logic, Flutter owns the UI text.
+/// Boundaries: 28, 36, 52 (NIST 8-char minimum), 80, 128 bits (infeasible
+/// brute force). Display strings live in Flutter, as for `Language`.
 #[derive(Debug, Clone, PartialEq)]
 pub enum StrengthTier {
     Terrible,
@@ -77,28 +25,13 @@ pub enum StrengthTier {
     Centuries,
 }
 
-/// The result of an entropy estimate.
 #[derive(Debug, Clone)]
 pub struct EntropyResult {
-    /// Estimated entropy in bits. This is a lower-bound estimate based on
-    /// detected character classes. Label it "estimated entropy" in the UI.
+    /// A lower bound; label it "estimated" in the UI.
     pub bits: f64,
-    /// Coarse strength tier derived from `bits`.
     pub tier: StrengthTier,
 }
 
-// ── Public API ────────────────────────────────────────────────────────────────
-
-/// Estimate the entropy of a user-typed password.
-///
-/// Detects which character classes are present in `password`, builds a pool
-/// size from those classes, then applies:
-///
-/// ```text
-/// entropy = length × log₂(pool_size)
-/// ```
-///
-/// Returns `EntropyResult { bits: 0.0, tier: Terrible }` for an empty string.
 #[flutter_rust_bridge::frb(sync)]
 pub fn estimate_entropy(password: &str) -> EntropyResult {
     if password.is_empty() {
@@ -119,8 +52,6 @@ pub fn estimate_entropy(password: &str) -> EntropyResult {
     let tier = tier_for(bits);
     EntropyResult { bits, tier }
 }
-
-// ── Internal helpers ──────────────────────────────────────────────────────────
 
 /// Detect which character classes are present and sum their pool sizes.
 fn pool_size(password: &str) -> u32 {
@@ -157,8 +88,6 @@ fn tier_for(bits: f64) -> StrengthTier {
     }
 }
 
-// ── Tests ─────────────────────────────────────────────────────────────────────
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -172,7 +101,7 @@ mod tests {
 
     #[test]
     fn digits_only_short_is_terrible() {
-        // "1234" — pool=10, length=4 → 4 × 3.32 ≈ 13.3 bits
+        // "1234" - pool=10, length=4 -> 4 x 3.32 ~ 13.3 bits
         let result = estimate_entropy("1234");
         assert!(result.bits < 28.0, "Got: {}", result.bits);
         assert_eq!(result.tier, StrengthTier::Terrible);
@@ -180,7 +109,7 @@ mod tests {
 
     #[test]
     fn lowercase_only_short_is_weak() {
-        // "abcdef" — pool=26, length=6 → 6 × 4.7 ≈ 28.2 bits
+        // "abcdef" - pool=26, length=6 -> 6 x 4.7 ~ 28.2 bits
         let result = estimate_entropy("abcdef");
         assert!(
             result.bits >= 28.0 && result.bits < 36.0,
@@ -192,9 +121,9 @@ mod tests {
 
     #[test]
     fn mixed_case_digits_medium_is_fair() {
-        // "Abcde1" — pool=62, length=6 → 6 × 5.95 ≈ 35.7 bits
-        // just below Fair — bump length to 7 to land in Fair
-        // "Abcde12" — pool=62, length=7 → 7 × 5.95 ≈ 41.7 bits
+        // "Abcde1" - pool=62, length=6 -> 6 x 5.95 ~ 35.7 bits
+        // just below Fair - bump length to 7 to land in Fair
+        // "Abcde12" - pool=62, length=7 -> 7 x 5.95 ~ 41.7 bits
         let result = estimate_entropy("Abcde12");
         assert!(
             result.bits >= 36.0 && result.bits < 52.0,
@@ -206,8 +135,8 @@ mod tests {
 
     #[test]
     fn mixed_case_digits_symbols_longer_is_strong() {
-        // "Abcde1!" — pool=94, length=7 → 7 × 6.55 ≈ 45.8 bits (Fair)
-        // push to 10 chars: "Abcde12!@#" → 10 × 6.55 ≈ 65.5 bits (Strong)
+        // "Abcde1!" - pool=94, length=7 -> 7 x 6.55 ~ 45.8 bits (Fair)
+        // push to 10 chars: "Abcde12!@#" -> 10 x 6.55 ~ 65.5 bits (Strong)
         let result = estimate_entropy("Abcde12!@#");
         assert!(
             result.bits >= 52.0 && result.bits < 80.0,
@@ -219,7 +148,7 @@ mod tests {
 
     #[test]
     fn long_mixed_is_very_strong() {
-        // 16 chars, pool=94 → 16 × 6.55 ≈ 104.8 bits
+        // 16 chars, pool=94 -> 16 x 6.55 ~ 104.8 bits
         let result = estimate_entropy("Abcde12!@#XyZ$%^");
         assert!(
             result.bits >= 80.0 && result.bits < 128.0,
@@ -231,7 +160,7 @@ mod tests {
 
     #[test]
     fn very_long_password_is_centuries() {
-        // 20 chars, pool=94 → 20 × 6.55 ≈ 131 bits
+        // 20 chars, pool=94 -> 20 x 6.55 ~ 131 bits
         let result = estimate_entropy("Abcde12!@#XyZ$%^&*()");
         assert!(result.bits >= 128.0, "Got: {}", result.bits);
         assert_eq!(result.tier, StrengthTier::Centuries);

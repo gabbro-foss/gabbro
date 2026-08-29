@@ -1,12 +1,5 @@
-//! Login fill sequences for auto-type (ADR-017), Linux-only.
-//!
-//! Turns a login entry's `username`/`password` into the ordered list of X11
-//! keysyms to inject: `username` Tab `password` Return. Character mapping is
-//! delegated to [`super::keysym`]; the field separators are the function keysyms
-//! `Tab` and `Return` -- inserted as explicit constants, *not* mapped from
-//! `'\t'`/`'\n'` (those control codes would wrongly become Unicode keysyms). The
-//! injection of the returned list is the hardware layer's job
-//! ([`super::inject`]).
+//! `username` Tab `password` Return. The separators are explicit function
+//! keysyms: mapping `'\t'`/`'\n'` would wrongly produce Unicode keysyms.
 
 use super::keysym::plan_string;
 

@@ -1,15 +1,6 @@
-//! Argon2id parameter benchmark.
-//!
-//! Run with: cargo run --bin bench_kdf --release
-//!
-//! Used to validate that the KDF parameters in ADR-006 produce an
-//! acceptable derivation time on the target hardware. Re-run this
-//! when changing m_cost, t_cost, or p_cost, or when targeting a
-//! new minimum device. Target range: 0.5s – 1.0s on the development
-//! machine; expect 1.5–2.5s on a mid-range Android phone.
-//!
-//! One-shot Argon2id benchmark — run with:
-//! cargo run --bin bench_kdf --release
+//! `cargo run --bin bench_kdf --release`. Re-run when the ADR-006 Argon2id
+//! parameters or the minimum target device change. Target: 0.5-1.0 s on the
+//! dev machine, 1.5-2.5 s on a mid-range phone.
 
 use argon2::{Algorithm, Argon2, Params, Version};
 use std::time::Instant;

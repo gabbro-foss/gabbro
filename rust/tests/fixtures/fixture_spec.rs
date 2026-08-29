@@ -1,14 +1,8 @@
-// Shared fixture specification — `include!`d by BOTH the harness
-// (`tests/vault_backward_compat.rs`) and the generator (`examples/gen_fixtures.rs`)
-// so the values used to SEAL each fixture can never drift from the values the
-// harness ASSERTS.
-//
-// Because this file is textually included (not compiled as its own module), keep
-// every item self-contained: fully-qualified type paths and no top-level `use`,
-// so it never clashes with the imports of the including file. Items unused by one
-// of the two includers carry `#[allow(dead_code)]`.
+// `include!`d by both the harness and `examples/gen_fixtures.rs` so seal-time
+// and asserted values cannot drift. Textually included, so: fully-qualified
+// paths, no top-level `use`, and `#[allow(dead_code)]` on items one includer
+// does not use.
 
-/// Passphrase used to seal every fixture.
 const FIXTURE_PASSPHRASE: &[u8] = b"correct horse battery staple -- gabbro fixture";
 
 /// Alias stored in the plaintext header of the multi-key fixtures.
@@ -17,17 +11,15 @@ const FIXTURE_ALIAS: &str = "Backward-Compat Fixture Vault";
 
 /// Canary login entry baked into every fixture body. Opening a fixture and
 /// recovering these exact values proves the body genuinely decrypted under the
-/// current code path — not merely that the header parsed. Crucially, the rotation
+/// current code path - not merely that the header parsed. Crucially, the rotation
 /// test asserts this entry SURVIVES every key add/remove and version bump.
 const CANARY_TITLE: &str = "gabbro-backward-compat-canary";
 const CANARY_PASSWORD: &str = "canary-pw-do-not-change-7Hk2qZ";
 #[allow(dead_code)]
 const CANARY_FOLDER: &str = "Personal";
 
-// ── Fixed YubiKey material (fake bytes — safe to commit; protects format
-//    compatibility, not real secrets). YK1 + YK2 seal the multi-key fixtures;
-//    YK3 + YK4 are added live during the rotation test. credential_id lengths
-//    are deliberately varied to exercise the variable-length record encoding. ──
+// Fake YubiKey bytes, safe to commit: they protect format compatibility, not
+// secrets. credential_id lengths vary to exercise the variable-length encoding.
 #[allow(dead_code)]
 const YK1_CRED: &[u8] = &[0x11; 64];
 #[allow(dead_code)]
@@ -81,7 +73,6 @@ fn canary_entry() -> rust_lib_gabbro::vault::entry::VaultEntry {
     })
 }
 
-// ── Passkey canary (v12+) ────────────────────────────────────────────────────
 // Fixed bytes prove the FORMAT round-trips key material intact; they are not a
 // signing-valid key pair. v11 fixtures are frozen without it.
 #[allow(dead_code)]

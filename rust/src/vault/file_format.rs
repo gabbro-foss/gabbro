@@ -1,4 +1,4 @@
-//! `.gabbro` vault file format — serialization and deserialization.
+//! `.gabbro` vault file format - serialization and deserialization.
 //!
 //! Layout (all fields fixed-size except the ciphertext body):
 //!
@@ -13,41 +13,28 @@
 //! | HKDF salt              | 32           |
 //! | AES-GCM nonce          | 12           |
 //! | YubiKey record count   | 1            |
-//! | YubiKeyRecord × count  | variable     |
+//! | YubiKeyRecord x count  | variable     |
 //! |   credential_id length | 2            |
 //! |   credential_id        | variable     |
 //! |   salt                 | 32           |
 //! |   key_blob length      | 2            |
 //! |   key_blob             | 0 or 60      |
 //! | alias length           | 2            |
-//! | alias                  | 0–512 UTF-8  |
+//! | alias                  | 0-512 UTF-8  |
 //! | passphrase_blob length | 2            |
 //! | passphrase_blob        | 0 or 60      |
 //! | Body length            | 8            |
 //! | Body (ciphertext)      | variable     |
 //!
-//! VERSION 12 (adds Passkey entries) is the write format; v11 also opens and is
-//! re-sealed as v12 on the next save. The vault key is derived straight from the
-//! Argon2id output via HKDF (ADR-018), and the AES-256-GCM body is sealed with the
-//! serialised header as AAD, so any change to a plaintext header field (alias, YubiKey
-//! records, Argon2id params) fails body decryption with an authentication error.
-//!
-//! RT-3 raised the floor from v2 to v11 and deleted the X25519 + ML-KEM hybrid layer
-//! those older formats derived their keys through; their headers also carried an ML-KEM
-//! ciphertext (1568 bytes) and an X25519 ephemeral pubkey (32) between the nonce and the
-//! YubiKey records. A v2–v10 file is now refused intact, with a pointer to the upgrade
-//! path — see [`VERSION_MIN_READABLE`] and docs/VAULT_UPGRADE_PATH.md. The per-version
-//! history lives in git and CHANGELOG.md.
-//!
-//! Reads v11–v12; always writes VERSION 12.
+//! Reads v11-v12, writes VERSION 12. The body is sealed with the serialised
+//! header as AAD, so any change to a plaintext header field fails decryption
+//! with an authentication error. Older formats derived keys through a removed
+//! X25519 + ML-KEM layer and are refused intact ([`VERSION_MIN_READABLE`],
+//! docs/VAULT_UPGRADE_PATH.md).
 
 use crate::crypto::kdf::Argon2idParams;
 
-/// One YubiKey's credential ID, hmac-secret salt, and encrypted vault key blob.
-///
-/// `key_blob` is empty for VERSION 2 (legacy single-key) vaults.
-/// For VERSION 3 multi-key vaults, `key_blob` is 60 bytes:
-/// nonce (12) + AES-256-GCM ciphertext of the vault_key_master (32 + 16 tag).
+/// `key_blob` is nonce (12) + AES-256-GCM ciphertext of the vault_key_master (32 + 16 tag).
 #[derive(Debug, Clone, PartialEq)]
 pub struct YubiKeyRecord {
     pub credential_id: Vec<u8>,
@@ -55,27 +42,14 @@ pub struct YubiKeyRecord {
     pub key_blob: Vec<u8>,
 }
 
-/// Magic bytes that identify a Gabbro vault file.
 pub const MAGIC: &[u8; 6] = b"GABBRO";
 
-/// Current file format version (written by this build).
-///
-/// VERSION 12 (ADR-009): the body may contain `Passkey` entries; the header
-/// layout is unchanged from v11. The bump makes a v11 build refuse a
-/// passkey-carrying vault cleanly ("update Gabbro") instead of failing
-/// mid-JSON on an unknown entry type.
-///
-/// VERSION 11 (ADR-018): the vault key is derived straight from the Argon2id
-/// output via HKDF, with no X25519 + ML-KEM layer; the header omits the ML-KEM
-/// ciphertext and X25519 ephemeral pubkey.
+/// 12 adds Passkey entries with the v11 header unchanged; the bump makes an
+/// older build refuse cleanly ("update Gabbro") instead of failing mid-JSON.
 pub const VERSION: u8 = 12;
 
-/// Oldest version this build can still read.
-///
-/// RT-3 raised this 2 -> 11: the X25519 + ML-KEM derivation that opened v2–v10 is
-/// gone, so those vaults are refused (never damaged) and the user is pointed at the
-/// upgrade path — install alpha.14, open each vault once to migrate it to v11, then
-/// return. See docs/VAULT_UPGRADE_PATH.md.
+/// Older vaults derived keys through a removed layer; they are refused, never
+/// damaged, and pointed at docs/VAULT_UPGRADE_PATH.md.
 const VERSION_MIN_READABLE: u8 = 11;
 
 /// Where a user with a pre-v11 vault is sent to recover it. Carried in the refusal
@@ -83,15 +57,9 @@ const VERSION_MIN_READABLE: u8 = 11;
 const UPGRADE_PATH_URL: &str =
     "https://github.com/gabbro-foss/gabbro/blob/master/docs/VAULT_UPGRADE_PATH.md";
 
-/// Read the format version from a vault file's first bytes, with **no floor check**.
-///
-/// [`SealedVault::from_bytes`] refuses anything below [`VERSION_MIN_READABLE`] before
-/// it returns a header, so a caller cannot learn a pre-v11 vault's version from it.
-/// Without this, the app treats "too old to open" as "corrupt" and offers to delete a
-/// perfectly intact vault. Reads magic + the version byte only; decrypts nothing.
-///
-/// `Err` means the file is not a Gabbro vault (bad magic) or is too short to have a
-/// version — i.e. genuinely unreadable rather than merely old.
+/// No floor check: `from_bytes` refuses old vaults before returning a header,
+/// and without this the app would call an intact old vault corrupt and offer
+/// to delete it. `Err` means genuinely not a Gabbro vault.
 pub fn peek_version(data: &[u8]) -> Result<u8, String> {
     if data.len() < 7 {
         return Err("File too short to be a Gabbro vault".to_string());
@@ -105,7 +73,7 @@ pub fn peek_version(data: &[u8]) -> Result<u8, String> {
 /// Whether the vault file at `data` is readable by this build, or predates the floor.
 ///
 /// `Ok(true)` = intact Gabbro vault, too old to open (the user must migrate it with an
-/// older release first — see [`UPGRADE_PATH_URL`]). `Ok(false)` = current enough to try.
+/// older release first - see [`UPGRADE_PATH_URL`]). `Ok(false)` = current enough to try.
 /// `Err` = not a Gabbro vault at all.
 pub fn is_format_too_old(data: &[u8]) -> Result<bool, String> {
     Ok(peek_version(data)? < VERSION_MIN_READABLE)
@@ -114,7 +82,7 @@ pub fn is_format_too_old(data: &[u8]) -> Result<bool, String> {
 /// Whether the vault file at `data` was written by a newer build than this one.
 ///
 /// `Ok(true)` = intact Gabbro vault, too new to open (the user must update Gabbro;
-/// this build fails closed rather than silently downgrade — see `from_bytes`).
+/// this build fails closed rather than silently downgrade - see `from_bytes`).
 /// `Ok(false)` = this build's version or older. `Err` = not a Gabbro vault at all.
 pub fn is_format_too_new(data: &[u8]) -> Result<bool, String> {
     Ok(peek_version(data)? > VERSION)
@@ -123,12 +91,8 @@ pub fn is_format_too_new(data: &[u8]) -> Result<bool, String> {
 /// The complete contents of a sealed vault file.
 #[derive(Debug, Clone, PartialEq)]
 pub struct SealedVault {
-    /// File-format version this vault was sealed with.
-    ///
-    /// Set to the parsed version on read and to [`VERSION`] for freshly sealed
-    /// vaults. At floor v11 every readable vault shares one key derivation, so
-    /// nothing dispatches on it; it remains the fail-closed check against a file
-    /// written by a newer or older build.
+    /// Nothing dispatches on it; it is the fail-closed check against a file
+    /// from a newer or older build.
     pub version: u8,
     pub params: Argon2idParams,
     pub argon2_salt: [u8; 32],
@@ -136,35 +100,19 @@ pub struct SealedVault {
     pub nonce: [u8; 12],
     pub ciphertext: Vec<u8>,
     pub yubikey_records: Vec<YubiKeyRecord>,
-    /// Human-readable vault alias stored in the plaintext header (VERSION 5+).
-    ///
-    /// Travels with the file so aliases survive export/import across devices.
-    /// `None` for new vaults without an alias, and for VERSION 2–4 files on read.
+    /// In the header so the alias survives export and import across devices.
     pub alias: Option<String>,
-    /// AES-256-GCM ciphertext of the wrapping_key under intermediate_key.
-    ///
-    /// Layout: nonce (12) + ciphertext+tag (48) = 60 bytes.
-    /// Empty for passphrase-only vaults and VERSION 2/3 files.
-    /// Present (60 bytes) for VERSION 4+ multi-key vaults — enables single-tap
-    /// passphrase change without requiring all registered keys.
+    /// wrapping_key sealed under intermediate_key: nonce (12) + ciphertext and
+    /// tag (48). Empty for passphrase-only vaults. Lets a multi-key vault change
+    /// its passphrase with one tap instead of every registered key.
     pub passphrase_blob: Vec<u8>,
 }
 
 impl SealedVault {
-    /// Canonical header bytes used as AES-256-GCM AAD (VERSION 7+).
-    ///
-    /// Covers every field in the plaintext header that should be tamper-evident:
-    /// magic, version, Argon2id parameters, salts, YubiKey records, alias, and
-    /// passphrase_blob.
-    ///
-    /// The AES-GCM nonce is excluded — AES-GCM authenticates the nonce implicitly
-    /// (a modified nonce produces a different keystream whose GCM tag fails).
-    /// The ciphertext and body-length prefix are excluded because they ARE the
-    /// encrypted body being sealed.
-    ///
-    /// At seal time this is computed on a partial `SealedVault` with an empty
-    /// ciphertext placeholder; at open time it is computed from the full struct.
-    /// Both produce identical bytes because the ciphertext field is excluded.
+    /// The nonce is excluded because GCM authenticates it implicitly; the
+    /// ciphertext and its length because they are the body being sealed. That
+    /// exclusion is what makes the seal-time (placeholder ciphertext) and
+    /// open-time bytes identical.
     pub fn header_aad(&self) -> Vec<u8> {
         let mut out = Vec::new();
         out.extend_from_slice(MAGIC);
@@ -174,7 +122,7 @@ impl SealedVault {
         out.extend_from_slice(&self.params.p_cost.to_be_bytes());
         out.extend_from_slice(&self.argon2_salt);
         out.extend_from_slice(&self.hkdf_salt);
-        // nonce excluded — authenticated implicitly by AES-GCM
+        // nonce excluded - authenticated implicitly by AES-GCM
         out.push(self.yubikey_records.len() as u8);
         for record in &self.yubikey_records {
             let id_len = record.credential_id.len() as u16;
@@ -198,12 +146,12 @@ impl SealedVault {
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut out = Vec::new();
 
-        // Header identity — write self.version (not the const) so a vault read
+        // Header identity - write self.version (not the const) so a vault read
         // as VERSION 5 round-trips as VERSION 5 until explicitly migrated.
         out.extend_from_slice(MAGIC);
         out.push(self.version);
 
-        // Argon2id parameters — each u32 written as 4 big-endian bytes
+        // Argon2id parameters - each u32 written as 4 big-endian bytes
         out.extend_from_slice(&self.params.m_cost.to_be_bytes());
         out.extend_from_slice(&self.params.t_cost.to_be_bytes());
         out.extend_from_slice(&self.params.p_cost.to_be_bytes());
@@ -213,7 +161,7 @@ impl SealedVault {
         out.extend_from_slice(&self.hkdf_salt);
         out.extend_from_slice(&self.nonce);
 
-        // YubiKey records — count byte then each record
+        // YubiKey records - count byte then each record
         out.push(self.yubikey_records.len() as u8);
         for record in &self.yubikey_records {
             let id_len = record.credential_id.len() as u16;
@@ -225,18 +173,18 @@ impl SealedVault {
             out.extend_from_slice(&record.key_blob);
         }
 
-        // alias — length prefix then UTF-8 bytes (VERSION 5+); empty string encodes None
+        // alias - length prefix then UTF-8 bytes (VERSION 5+); empty string encodes None
         let alias_bytes = self.alias.as_deref().unwrap_or("").as_bytes();
         let alias_len = alias_bytes.len() as u16;
         out.extend_from_slice(&alias_len.to_be_bytes());
         out.extend_from_slice(alias_bytes);
 
-        // passphrase_blob — length prefix then the bytes themselves (VERSION 4+)
+        // passphrase_blob - length prefix then the bytes themselves (VERSION 4+)
         let pb_len = self.passphrase_blob.len() as u16;
         out.extend_from_slice(&pb_len.to_be_bytes());
         out.extend_from_slice(&self.passphrase_blob);
 
-        // Body — length prefix then the bytes themselves
+        // Body - length prefix then the bytes themselves
         let body_len = self.ciphertext.len() as u64;
         out.extend_from_slice(&body_len.to_be_bytes());
         out.extend_from_slice(&self.ciphertext);
@@ -248,7 +196,6 @@ impl SealedVault {
     pub fn from_bytes(data: &[u8]) -> Result<Self, String> {
         let mut pos = 0usize;
 
-        // --- Magic bytes ---
         if data.len() < 6 {
             return Err("File too short to be a Gabbro vault".to_string());
         }
@@ -257,7 +204,6 @@ impl SealedVault {
         }
         pos += 6;
 
-        // --- Version ---
         if data.len() < pos + 1 {
             return Err("File truncated at version byte".to_string());
         }
@@ -280,7 +226,6 @@ impl SealedVault {
         }
         pos += 1;
 
-        // --- Argon2id parameters (3 x u32 = 12 bytes) ---
         if data.len() < pos + 12 {
             return Err("File truncated at Argon2id params".to_string());
         }
@@ -291,28 +236,24 @@ impl SealedVault {
         let p_cost = u32::from_be_bytes(data[pos..pos + 4].try_into().unwrap());
         pos += 4;
 
-        // --- Argon2id salt (32 bytes) ---
         if data.len() < pos + 32 {
             return Err("File truncated at Argon2id salt".to_string());
         }
         let argon2_salt: [u8; 32] = data[pos..pos + 32].try_into().unwrap();
         pos += 32;
 
-        // --- HKDF salt (32 bytes) ---
         if data.len() < pos + 32 {
             return Err("File truncated at HKDF salt".to_string());
         }
         let hkdf_salt: [u8; 32] = data[pos..pos + 32].try_into().unwrap();
         pos += 32;
 
-        // --- Nonce (12 bytes) ---
         if data.len() < pos + 12 {
             return Err("File truncated at nonce".to_string());
         }
         let nonce: [u8; 12] = data[pos..pos + 12].try_into().unwrap();
         pos += 12;
 
-        // --- YubiKey records ---
         if data.len() < pos + 1 {
             return Err("File truncated at YubiKey record count".to_string());
         }
@@ -358,7 +299,6 @@ impl SealedVault {
             });
         }
 
-        // --- alias ---
         if data.len() < pos + 2 {
             return Err("File truncated at alias length".to_string());
         }
@@ -378,7 +318,6 @@ impl SealedVault {
             Some(alias_str)
         };
 
-        // --- passphrase_blob ---
         if data.len() < pos + 2 {
             return Err("File truncated at passphrase_blob length".to_string());
         }
@@ -390,14 +329,12 @@ impl SealedVault {
         let passphrase_blob = data[pos..pos + pb_len].to_vec();
         pos += pb_len;
 
-        // --- Body length (8 bytes) ---
         if data.len() < pos + 8 {
             return Err("File truncated at body length".to_string());
         }
         let body_len = u64::from_be_bytes(data[pos..pos + 8].try_into().unwrap()) as usize;
         pos += 8;
 
-        // --- Body ---
         // body_len is attacker-controlled (8 bytes straight off disk), so compute
         // the end with a checked add: `pos + body_len` would otherwise overflow
         // usize for a huge body_len, wrapping the guard below and turning the slice
@@ -540,9 +477,8 @@ mod tests {
         assert_eq!(recovered.passphrase_blob.len(), 60);
     }
 
-    // ── N4 (RT-3 net): absolute pin of the VERSION 11 layout ──────────────────
     // The expected streams are rebuilt field by field from the format spec at the
-    // top of this file rather than copied from `to_bytes` output — so a change to
+    // top of this file rather than copied from `to_bytes` output - so a change to
     // `to_bytes` cannot quietly redefine v11. Self-contained on purpose: they must
     // not inherit from `test_vault()`, so re-pinning that fixture (as RT-3 did,
     // v10 -> v11) can never silently move the pin.
@@ -565,9 +501,8 @@ mod tests {
         }
     }
 
-    // ── peek_version: tell "too old" apart from "corrupt" ────────────────────
     // `from_bytes` refuses a pre-v11 vault before it returns anything, so the app
-    // cannot learn the version from it and would report an old vault as corrupt —
+    // cannot learn the version from it and would report an old vault as corrupt -
     // then offer to delete it. `peek_version` reads magic + the version byte only,
     // with no floor check, so the refusal can be explained instead.
 
@@ -725,7 +660,6 @@ mod tests {
         assert_eq!(bytes.len(), 176);
     }
 
-    // ── VERSION 12 (Passkey entry type) ──────────────────────────────────────
     // v12 changes nothing in the header layout; the bump exists so a v11 build
     // refuses a vault that may contain Passkey entries instead of failing
     // mid-JSON (see serialization::unknown_entry_variant_returns_a_clean_error).
@@ -769,8 +703,6 @@ mod tests {
         let err = SealedVault::from_bytes(&bytes).unwrap_err();
         assert!(err.contains("file version not supported"), "got: {err}");
     }
-
-    // ── header_aad tests ──────────────────────────────────────────────────────
 
     #[test]
     fn header_aad_does_not_include_nonce() {

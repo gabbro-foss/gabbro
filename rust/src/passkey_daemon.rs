@@ -1,13 +1,7 @@
-//! Runtime for the Linux virtual FIDO2 authenticator (ADR-009).
-//!
-//! Rust owns the uhid device, the CTAPHID reassembly, and the KEEPALIVE timer
-//! so none of that sits on the Dart event loop. The pump thread reads host
-//! reports, answers PING/framing errors itself, and streams each complete
-//! CTAP2 request up to Dart; while one waits on the user it sends KEEPALIVE so
-//! the browser does not time out. Dart shows consent and calls `respond`.
-//!
-//! Byte plumbing is unit-tested in `uhid` and `ctaphid`; this thread/fd glue
-//! is proven in the hardware matrix (no headless path to a real browser).
+//! Rust owns the uhid device, CTAPHID reassembly and the KEEPALIVE timer so
+//! none of it sits on the Dart event loop; KEEPALIVE keeps the browser from
+//! timing out while the user decides. This thread and fd glue has no headless
+//! path to a real browser and is proven in the hardware matrix.
 
 use std::io::{Read, Write};
 use std::os::unix::fs::OpenOptionsExt;
@@ -57,7 +51,7 @@ static OPENED: Mutex<Option<Opened>> = Mutex::new(None);
 
 /// The fallible half of startup (F2): take the instance lock, open
 /// `/dev/uhid`, create the virtual device. Split from `start()` so the Err
-/// reaches Dart through an awaitable bridge fn — a stream fn's Err lands on
+/// reaches Dart through an awaitable bridge fn - a stream fn's Err lands on
 /// an unawaited FRB future and is lost, leaving the provider silently dead.
 /// Idempotent-safe: an already-running daemon is stopped first.
 pub fn open() -> Result<(), String> {
@@ -297,11 +291,10 @@ mod tests {
         assert!(err.contains("instance"), "names the cause, got: {err}");
     }
 
-    // The whole pump over the real kernel pipe, host side only: start() owns
-    // /dev/uhid, we speak through hidraw exactly as a browser would. Pins that
-    // pump writes are INPUT2-wrapped and the hidraw report-number byte is
-    // stripped — either miss and the device enumerates but never answers
-    // (Brave offers only Cancel; found in the 2026-08-21 hardware matrix).
+    // The pump over the real kernel pipe, spoken through hidraw as a browser
+    // would. Pins INPUT2 wrapping and the stripped report-number byte: miss
+    // either and the device enumerates but never answers (Brave shows only
+    // Cancel).
     #[test]
     #[ignore = "needs the dev udev rule on /dev/uhid; real hardware pipe"]
     fn real_uhid_pump_answers_init_via_hidraw() {

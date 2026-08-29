@@ -1,7 +1,7 @@
-//! Vault session — in-memory state between bridge calls.
+//! Vault session - in-memory state between bridge calls.
 //!
 //! The decrypted vault lives here after unlock. Flutter never holds the
-//! decrypted vault — it calls functions in this module to read and write
+//! decrypted vault - it calls functions in this module to read and write
 //! entries. Only the secrets the user actively views cross the bridge.
 
 use std::path::PathBuf;
@@ -21,16 +21,8 @@ use crate::vault::serialization::{DeletedEntry, VaultBody};
 // passphrase-only session. Extracted from the session before a save.
 type YubikeyTriple = Option<Zeroizing<[u8; 32]>>;
 
-// ── Session state ─────────────────────────────────────────────────────────────
-
-/// YubiKey material cached in memory for the duration of an unlocked (multi-key)
-/// session.
-///
-/// `vault_key_master` holds the random master key that encrypts the vault body;
-/// CRUD saves use it directly (no re-tap). `wrapping_key` mediates between the
-/// passphrase and the per-key blobs; it is needed to add a new key without
-/// Argon2id re-derivation (`None` for the rare v3 multi-key vault without a
-/// passphrase_blob).
+/// Cached for the unlocked session so CRUD saves need no re-tap and a key can
+/// be added without Argon2id re-derivation.
 pub struct YubikeyMaterial {
     /// Cached master key for CRUD re-seals.
     pub vault_key_master: Zeroizing<[u8; 32]>,
@@ -66,11 +58,9 @@ pub struct VaultSession {
 
 static VAULT_SESSION: LazyLock<Mutex<Option<VaultSession>>> = LazyLock::new(|| Mutex::new(None));
 
-// ── Session API ───────────────────────────────────────────────────────────────
-
 /// Decrypt the vault at `path` and store it in memory.
 ///
-/// Flutter awaits this — Argon2id takes ~667ms on target hardware.
+/// Flutter awaits this - Argon2id takes ~667ms on target hardware.
 pub fn unlock_vault(passphrase: &[u8], path: PathBuf) -> Result<(), String> {
     let mut body = load_vault(passphrase, &path)?;
     crate::api::vault::purge_expired_history(&mut body.entries);
@@ -125,7 +115,7 @@ pub fn unlock_vault_with_key_record(
 pub fn is_vault_unlocked() -> bool {
     match VAULT_SESSION.lock() {
         Ok(session) => session.is_some(),
-        Err(_) => false, // mutex poisoned — treat as locked
+        Err(_) => false, // mutex poisoned - treat as locked
     }
 }
 
@@ -134,7 +124,7 @@ pub fn lock_vault() -> Result<(), String> {
     if let Some(ref mut s) = *session {
         // Cryptographic-grade zero: volatile writes the compiler cannot optimise away.
         // Covers the passphrase bytes fully. The entries vec is cleared via clear(),
-        // which drops each element — triggering ZeroizeOnDrop on every VaultEntry.
+        // which drops each element - triggering ZeroizeOnDrop on every VaultEntry.
         s.passphrase.zeroize();
         if let Some(ref mut yk) = s.yubikey {
             yk.vault_key_master.zeroize();
@@ -221,20 +211,9 @@ fn push_custom_fields<'a>(parts: &mut Vec<&'a str>, fields: &'a [CustomField]) {
     }
 }
 
-/// Builds a lightweight summary DTO from any entry variant.
-///
-/// Display title selection per type:
-/// - Login:    `title` field; falls back to `url` if empty, then UUID
-/// - Note:     `title` field
-/// - Identity: `first_name + " " + last_name`
-/// - Card:     `card_name` if present; falls back to `cardholder_name`
-/// - File:     `filename`
-/// - Custom:   `title` field
-///
-/// `search_blob` is a lowercase union of all searchable non-secret field
-/// *values*. Field labels (incl. custom field labels) are excluded so search
-/// matches values, not labels. Passwords, card numbers, CVVs, PINs, and hidden
-/// custom field values are excluded.
+/// `search_blob` holds values only, never labels, so a search for a label word
+/// does not match every entry carrying that field. Secrets and hidden custom
+/// values are excluded.
 fn entry_to_summary(entry: &VaultEntry) -> EntrySummaryData {
     match entry {
         VaultEntry::Login(e) => {
@@ -356,8 +335,8 @@ fn entry_to_summary(entry: &VaultEntry) -> EntrySummaryData {
 
 /// Return lightweight summaries of all entries in the session.
 ///
-/// No passwords, no file data — just enough for Flutter to render a list.
-/// Sync — reads from in-memory session, no I/O.
+/// No passwords, no file data - just enough for Flutter to render a list.
+/// Sync - reads from in-memory session, no I/O.
 pub fn list_entry_summaries() -> Result<Vec<EntrySummaryData>, String> {
     let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     let session = session.as_ref().ok_or("Vault is locked")?;
@@ -366,7 +345,7 @@ pub fn list_entry_summaries() -> Result<Vec<EntrySummaryData>, String> {
 
 /// Return one full entry by UUID.
 ///
-/// Sync — reads from in-memory session, no I/O.
+/// Sync - reads from in-memory session, no I/O.
 pub fn get_entry(id: &str) -> Result<VaultEntry, String> {
     let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     let session = session.as_ref().ok_or("Vault is locked")?;
@@ -378,7 +357,7 @@ pub fn get_entry(id: &str) -> Result<VaultEntry, String> {
         .ok_or_else(|| format!("No entry found with id: {id}"))
 }
 
-/// Remove multiple entries by UUID from the in-memory session only — no disk write.
+/// Remove multiple entries by UUID from the in-memory session only - no disk write.
 ///
 /// Used by bulk delete: remove all entries in one pass, then call
 /// `session_save()` once rather than once per entry.
@@ -403,7 +382,7 @@ pub fn session_delete_entries_no_save(ids: &[String]) -> Result<(), String> {
 /// Return the ids of all entries currently in the session.
 ///
 /// Used by the Gabbro import to re-key an incoming entry whose UUID the vault
-/// already holds. Sync — reads from in-memory session, no I/O.
+/// already holds. Sync - reads from in-memory session, no I/O.
 pub fn session_entry_ids() -> Result<std::collections::HashSet<String>, String> {
     let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     let session = session.as_ref().ok_or("Vault is locked")?;
@@ -414,12 +393,7 @@ pub fn session_entry_ids() -> Result<std::collections::HashSet<String>, String> 
         .collect())
 }
 
-/// Add a new entry to the in-memory session only — no disk write.
-///
-/// Used by bulk operations (e.g. import) that add many entries and
-/// want to save once at the end rather than once per entry.
-/// Clones of every Passkey entry whose rp_id matches EXACTLY. Clones carry key
-/// material — they exist only for the passkey provider flow and zeroize on drop.
+/// Exact rp_id match. The clones carry key material and zeroize on drop.
 pub fn session_passkeys_for_rp(
     rp_id: &str,
 ) -> Result<Vec<crate::vault::entry::PasskeyEntry>, String> {
@@ -465,7 +439,7 @@ pub fn session_save() -> Result<(), String> {
 
 /// Add a new entry to the session and persist the vault to disk.
 ///
-/// Async — triggers a full vault save (Argon2id + encryption).
+/// Async - triggers a full vault save (Argon2id + encryption).
 pub fn session_create_entry(entry: VaultEntry) -> Result<EntrySummaryData, String> {
     let summary;
     let (body, passphrase, path, yubikey) = {
@@ -481,14 +455,14 @@ pub fn session_create_entry(entry: VaultEntry) -> Result<EntrySummaryData, Strin
             session.path.clone(),
             yubikey,
         )
-    }; // ← lock released here
+    }; // <- lock released here
     do_save(&body, &passphrase, &path, yubikey)?;
     Ok(summary)
 }
 
 /// Replace an existing entry by UUID and persist.
 ///
-/// Async — triggers a full vault save.
+/// Async - triggers a full vault save.
 pub fn session_update_entry(updated: VaultEntry, expiry_days: Option<u32>) -> Result<(), String> {
     let (body, passphrase, path, yubikey) = {
         let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
@@ -502,20 +476,18 @@ pub fn session_update_entry(updated: VaultEntry, expiry_days: Option<u32>) -> Re
             session.path.clone(),
             yubikey,
         )
-    }; // ← lock released here
+    }; // <- lock released here
     do_save(&body, &passphrase, &path, yubikey)?;
     Ok(())
 }
 
-/// Add an attachment to an entry and persist. Returns the new attachment uuid.
-///
-/// Size-capped like Enpass import — the same limit keeps a vault loadable on a
-/// phone. A `File` entry takes none: the file IS its payload. Stamps
-/// `attachments:<uuid>` in field_times so the addition syncs to other devices.
-/// In-app adds stop at this many attachments per entry. Import and merge are
-/// exempt: refusing there would destroy data that already exists elsewhere.
+/// In-app adds only. Import and merge are exempt: refusing there would destroy
+/// data that already exists elsewhere.
 pub const ENTRY_ATTACHMENT_MAX_COUNT: usize = 3;
 
+/// Same size cap as Enpass import, which keeps a vault loadable on a phone. A
+/// `File` entry takes none: the file is its payload. Stamps
+/// `attachments:<uuid>` in field_times so the addition syncs.
 pub fn session_add_attachment(
     id: &str,
     name: &str,
@@ -564,13 +536,13 @@ pub fn session_add_attachment(
             session.path.clone(),
             yubikey,
         )
-    }; // ← lock released here
+    }; // <- lock released here
     do_save(&body, &passphrase, &path, yubikey)?;
     Ok(uuid)
 }
 
 /// Remove an attachment and persist. Stamps `del:attachments:<uuid>` so the
-/// removal syncs — without the tombstone the next sync would restore it.
+/// removal syncs - without the tombstone the next sync would restore it.
 pub fn session_remove_attachment(id: &str, uuid: &str) -> Result<(), String> {
     let (body, passphrase, path, yubikey) = {
         let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
@@ -601,12 +573,12 @@ pub fn session_remove_attachment(id: &str, uuid: &str) -> Result<(), String> {
             session.path.clone(),
             yubikey,
         )
-    }; // ← lock released here
+    }; // <- lock released here
     do_save(&body, &passphrase, &path, yubikey)?;
     Ok(())
 }
 
-/// Return an attachment's raw bytes. Read-only — no save.
+/// Return an attachment's raw bytes. Read-only - no save.
 pub fn session_extract_attachment(id: &str, uuid: &str) -> Result<Vec<u8>, String> {
     let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     let session = session.as_ref().ok_or("Vault is locked")?;
@@ -624,7 +596,7 @@ pub fn session_extract_attachment(id: &str, uuid: &str) -> Result<Vec<u8>, Strin
 
 /// Remove an entry by UUID and persist.
 ///
-/// Async — triggers a full vault save.
+/// Async - triggers a full vault save.
 pub fn session_delete_entry(id: &str) -> Result<(), String> {
     let (body, passphrase, path, yubikey) = {
         let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
@@ -642,7 +614,7 @@ pub fn session_delete_entry(id: &str) -> Result<(), String> {
             session.path.clone(),
             yubikey,
         )
-    }; // ← lock released here
+    }; // <- lock released here
     do_save(&body, &passphrase, &path, yubikey)?;
     Ok(())
 }
@@ -656,12 +628,8 @@ pub fn session_delete_whole_vault() -> Result<(), String> {
     Ok(())
 }
 
-/// Re-seal the vault under a new passphrase. Session remains live.
-///
-/// Multi-key vaults: only the passphrase_blob is re-encrypted; all key_blobs and
-/// the vault body are unchanged, so any registered key continues to work.  Old
-/// passphrase verified by decrypting passphrase_blob.
-/// Passphrase-only vaults: full re-seal via save_vault.
+/// Multi-key: only the passphrase_blob is re-encrypted, so every registered key
+/// keeps working. Passphrase-only: full re-seal.
 pub fn session_change_passphrase(
     old_passphrase: &[u8],
     new_passphrase: &[u8],
@@ -694,8 +662,8 @@ pub fn session_change_passphrase(
     // can still fail, so session and disk can never disagree.
     session.passphrase = Zeroizing::new(new_passphrase.to_vec());
 
-    // R-03: the save above rotated the pre-change vault into `.bak`, which the
-    // user may no longer be able to open. Refresh it to the new credentials.
+    // R-03: the `.bak` now holds the old credential set, which the user may not
+    // be able to open.
     crate::vault::io::refresh_backup_after_credential_change(&path)?;
     Ok(())
 }
@@ -792,30 +760,18 @@ pub fn session_delete_history(id: String, index: u32) -> Result<(), String> {
     Ok(())
 }
 
-/// Write .gabbro + .gabbro.sha256, preserving the vault's protection (ADR-013).
-///
-/// The default export copies the sealed on-disk vault byte-for-byte, so a
-/// key-protected vault stays key-protected (its keyslots and alias are retained)
-/// and the copy is never weaker than the original. Every committed CRUD op already
-/// persists to disk, so the on-disk file reflects current session state.
-///
-/// The opt-in passphrase-only *downgrade* is a separate path (see ADR-013) and is
-/// not reachable here.
+/// ADR-013 default: a byte-for-byte copy of the on-disk vault, so the export is
+/// never weaker than the original. Every CRUD op already persists, so the file
+/// is current.
 pub fn session_export_vault(export_path: PathBuf) -> Result<(), String> {
     let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     let session = session.as_ref().ok_or("Vault is locked")?;
     crate::api::vault::export_vault_preserving(&session.path, &export_path)
 }
 
-/// Write a passphrase-only `.gabbro` + `.gabbro.sha256` — the opt-in security
-/// downgrade (ADR-013).
-///
-/// Re-seals the current session body under the session passphrase **alone**,
-/// dropping any YubiKey requirement, so the artifact opens with the passphrase
-/// only. Reached solely via the explicit, warned export toggle; the original
-/// vault on disk is never mutated (it stays in its protection class). The user is
-/// already authenticated this session — a key-protected vault required a YubiKey
-/// tap to unlock — so no extra hardware gate is imposed here.
+/// The opt-in downgrade (ADR-013), reached only via the warned export toggle.
+/// The on-disk vault is never mutated. No extra hardware gate: unlocking a
+/// key-protected vault already took a tap.
 pub fn session_export_vault_passphrase_only(export_path: PathBuf) -> Result<(), String> {
     let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     let session = session.as_ref().ok_or("Vault is locked")?;
@@ -825,7 +781,7 @@ pub fn session_export_vault_passphrase_only(export_path: PathBuf) -> Result<(), 
 
 /// Serialize the current session to a plaintext JSON file at `export_path`.
 ///
-/// The output is completely unencrypted — all secrets appear in plain text.
+/// The output is completely unencrypted - all secrets appear in plain text.
 /// Flutter must surface a visible warning before calling this.
 pub fn session_export_vault_json(export_path: PathBuf) -> Result<(), String> {
     let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
@@ -851,14 +807,8 @@ pub fn session_export_vault_json(export_path: PathBuf) -> Result<(), String> {
     Ok(())
 }
 
-/// Build the protection-preserving export artifact (ciphertext bytes + SHA-256
-/// line) for the current session **without writing** — the Android SAF path,
-/// where the file write happens in Kotlin via the granted directory tree.
-///
-/// Mirrors [`session_export_vault`] but returns the bytes instead of writing to a
-/// path. `vault_filename` (e.g. `Gabbro.gabbro`) names the file in the SHA line;
-/// the companion is `<vault_filename>.sha256`. The bytes are ciphertext — safe to
-/// cross the Flutter/Rust bridge.
+/// [`session_export_vault`] for Android SAF, where Kotlin does the write. The
+/// bytes are ciphertext, so they may cross the bridge.
 pub fn session_export_vault_bytes(vault_filename: &str) -> Result<(Vec<u8>, String), String> {
     let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     let session = session.as_ref().ok_or("Vault is locked")?;
@@ -869,7 +819,7 @@ pub fn session_export_vault_bytes(vault_filename: &str) -> Result<(Vec<u8>, Stri
 }
 
 /// Build the opt-in passphrase-only downgrade export artifact (ADR-013) for the
-/// current session **without writing** — the Android SAF counterpart to
+/// current session **without writing** - the Android SAF counterpart to
 /// [`session_export_vault_passphrase_only`]. Re-seals the body under the
 /// passphrase alone; the bytes are ciphertext.
 pub fn session_export_vault_passphrase_only_bytes(
@@ -886,7 +836,7 @@ pub fn session_export_vault_passphrase_only_bytes(
 /// Lightweight login summary for the autofill fill path.
 ///
 /// Contains only the fields needed for domain matching and credential delivery.
-/// Passwords never appear here — the fill path fetches the full entry by id
+/// Passwords never appear here - the fill path fetches the full entry by id
 /// only after the user has selected a match.
 #[derive(Debug, Clone)]
 pub struct LoginAutofillSummary {
@@ -899,12 +849,8 @@ pub struct LoginAutofillSummary {
     pub email: Option<String>,
 }
 
-/// Serialize autofill summaries to the JSON array the autofill service reads.
-///
-/// Shape: `[{"id","username","url","app_id"}]`. `app_id` is the empty string
-/// when unset (Kotlin treats empty as "no native-app match"). Extracted from
-/// the JNI bridge so it is host-compiled and unit-testable. Kotlin parses this
-/// with `org.json.JSONArray` — no new Android dependency.
+/// `[{"id","username","url","app_id"}]`; `app_id` empty means no native-app
+/// match. Outside the JNI bridge so it is host-testable.
 pub fn login_summaries_json(summaries: &[LoginAutofillSummary]) -> String {
     // Build with serde_json so backslashes and control characters are escaped
     // correctly (S-07): a hand-rolled escaper that only handled `"` produced
@@ -928,7 +874,7 @@ pub fn login_summaries_json(summaries: &[LoginAutofillSummary]) -> String {
 ///
 /// Used by GabbroAutofillService (via JNI) to find candidates for domain
 /// matching without crossing passwords over the JNI boundary.
-/// Sync — reads from in-memory session, no I/O.
+/// Sync - reads from in-memory session, no I/O.
 pub fn login_summaries_for_autofill() -> Result<Vec<LoginAutofillSummary>, String> {
     let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     let session = session.as_ref().ok_or("Vault is locked")?;
@@ -951,15 +897,7 @@ pub fn login_summaries_for_autofill() -> Result<Vec<LoginAutofillSummary>, Strin
         .collect())
 }
 
-/// Return a JSON string encoding the id, username, and password for a
-/// single Login entry, looked up by UUID.
-///
-/// Used by GabbroAutofillService (via JNI) to fetch the password for a
-/// matched credential immediately before filling. The password only crosses
-/// the JNI boundary at the moment the user has explicitly selected an entry.
-///
-/// Returns `Err` if the vault is locked, the id is not found, or the entry
-/// is not a Login entry.
+/// The password crosses JNI only once the user has selected this entry.
 pub fn get_entry_for_autofill(id: &str) -> Result<Zeroizing<String>, String> {
     let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     let session = session.as_ref().ok_or("Vault is locked")?;
@@ -992,11 +930,9 @@ pub fn get_entry_for_autofill(id: &str) -> Result<Zeroizing<String>, String> {
     }
 }
 
-// ── Folder management ─────────────────────────────────────────────────────────
-
 /// Return the list of folder names from the current session.
 ///
-/// Sync — reads from in-memory session, no I/O.
+/// Sync - reads from in-memory session, no I/O.
 pub fn session_list_folders() -> Result<Vec<String>, String> {
     let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     let session = session.as_ref().ok_or("Vault is locked")?;
@@ -1007,7 +943,7 @@ pub fn session_list_folders() -> Result<Vec<String>, String> {
 ///
 /// Returns `Err` if `old_name` does not exist, `new_name` is empty,
 /// or `new_name` already exists.
-/// Async — triggers a full vault save.
+/// Async - triggers a full vault save.
 pub fn session_rename_folder(old_name: String, new_name: String) -> Result<(), String> {
     if new_name.is_empty() {
         return Err(String::from("Folder name must not be empty"));
@@ -1049,17 +985,11 @@ pub fn session_rename_folder(old_name: String, new_name: String) -> Result<(), S
             session.path.clone(),
             yubikey,
         )
-    }; // ← lock released here
+    }; // <- lock released here
     do_save(&body, &passphrase, &path, yubikey)?;
     Ok(())
 }
 
-/// Delete a folder and either reassign its entries to another folder or
-/// clear them to `""` (unfoldered).
-///
-/// Returns `Err` if `name` does not exist, or if `reassign_to` names a
-/// folder that does not exist.
-/// Async — triggers a full vault save.
 pub fn session_delete_folder(name: String, reassign_to: Option<String>) -> Result<(), String> {
     let (body, passphrase, path, yubikey) = {
         let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
@@ -1096,7 +1026,7 @@ pub fn session_delete_folder(name: String, reassign_to: Option<String>) -> Resul
             session.path.clone(),
             yubikey,
         )
-    }; // ← lock released here
+    }; // <- lock released here
     do_save(&body, &passphrase, &path, yubikey)?;
     Ok(())
 }
@@ -1105,7 +1035,7 @@ pub fn session_delete_folder(name: String, reassign_to: Option<String>) -> Resul
 ///
 /// Entries not in `ids` are unchanged. Returns `Err` if the vault is locked
 /// or `folder` names a folder that does not exist (empty string is always
-/// valid — it means unfoldered).
+/// valid - it means unfoldered).
 pub fn session_assign_folder_to_entries(ids: &[String], folder: String) -> Result<(), String> {
     let (body, passphrase, path, yubikey) = {
         let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
@@ -1135,7 +1065,7 @@ pub fn session_assign_folder_to_entries(ids: &[String], folder: String) -> Resul
             session.path.clone(),
             yubikey,
         )
-    }; // ← lock released here
+    }; // <- lock released here
     do_save(&body, &passphrase, &path, yubikey)?;
     Ok(())
 }
@@ -1143,7 +1073,7 @@ pub fn session_assign_folder_to_entries(ids: &[String], folder: String) -> Resul
 /// Add a new folder to the session and persist the vault to disk.
 ///
 /// Returns `Err` if the name is empty or already exists.
-/// Async — triggers a full vault save.
+/// Async - triggers a full vault save.
 pub fn session_create_folder(name: String) -> Result<(), String> {
     if name.is_empty() {
         return Err(String::from("Folder name must not be empty"));
@@ -1163,12 +1093,10 @@ pub fn session_create_folder(name: String) -> Result<(), String> {
             session.path.clone(),
             yubikey,
         )
-    }; // ← lock released here
+    }; // <- lock released here
     do_save(&body, &passphrase, &path, yubikey)?;
     Ok(())
 }
-
-// ── YubiKey key-management ────────────────────────────────────────────────────
 
 /// Add a new YubiKey to the vault header and re-seal the body.
 ///
@@ -1215,7 +1143,7 @@ pub fn session_add_yubikey(
         salt,
         &path,
     )?;
-    // R-03: credential change — refresh .bak to the post-change vault.
+    // R-03: credential change - refresh .bak to the post-change vault.
     crate::vault::io::refresh_backup_after_credential_change(&path)
 }
 
@@ -1238,13 +1166,13 @@ pub fn session_remove_yubikey(cred_id: Vec<u8>) -> Result<(), String> {
         crate::vault::serialization::serialize_vault_body(&body).map_err(|e| e.to_string())?,
     );
     remove_yubikey_from_vault(&plaintext, &vault_key_master, &cred_id, &path)?;
-    // R-03: credential change — refresh .bak to the post-change vault.
+    // R-03: credential change - refresh .bak to the post-change vault.
     crate::vault::io::refresh_backup_after_credential_change(&path)
 }
 
 /// Rename the vault and re-seal the body bound to the updated header.
 ///
-/// Requires an unlocked session — the cached key material is used to re-seal
+/// Requires an unlocked session - the cached key material is used to re-seal
 /// the body so the new alias is committed as AES-GCM AAD for VERSION 7+ vaults.
 /// Passing an empty string clears the alias.
 pub fn session_set_vault_alias(alias: String) -> Result<(), String> {
@@ -1316,8 +1244,6 @@ pub fn session_list_yubikey_aliases() -> Result<std::collections::HashMap<String
     Ok(session.yubikey_aliases.clone())
 }
 
-// ── Vault sync merge ──────────────────────────────────────────────────────────
-
 /// Return the folder of any entry variant.
 fn entry_folder(entry: &VaultEntry) -> &str {
     match entry {
@@ -1367,8 +1293,6 @@ fn entry_display_title(entry: &VaultEntry) -> String {
     }
 }
 
-// ── Granular (field-level) merge of a same-UUID entry pair (v9) ───────────────
-
 use crate::api::vault::{FieldConflictItem, PendingItemDeleteItem};
 use crate::vault::entry::{
     CardEntry, CustomEntry, EntryAttachment, EntryMeta, FileEntry, IdentityEntry, LoginEntry,
@@ -1405,19 +1329,10 @@ fn meta_of_mut(e: &mut VaultEntry) -> &mut EntryMeta {
     }
 }
 
-/// Decide one field, by EDIT-MARK PRESENCE, not by timestamp value. A field that
-/// was edited carries a change-stamp (`Some`); an untouched field does not (`None`).
-/// Returns the winning side, the stamp to record on the merged field, and whether
-/// this is a collision the user must resolve.
-///
-/// Rules (values that are equal are never a collision):
-/// - both sides edited it (both stamped), values differ -> COLLISION, keep local.
-///   A clock is never used to pick a winner (a real same-instant edit is near
-///   impossible; the realistic case is two edits at different times, both kept
-///   until the user chooses).
-/// - exactly one side edited it -> take that side's value (additive), no prompt.
-/// - neither side carries a stamp (pre-v9, or both untouched): fall back to the
-///   whole-entry `updated_at`; an exact tie with differing values is a collision.
+/// Decided by edit-mark presence, not timestamp value: two edits at different
+/// times are both real, so a clock never picks a winner. Both stamped and
+/// differing is a collision (local kept until the user chooses); one stamped
+/// takes that side; neither stamped falls back to the entry `updated_at`.
 fn decide_field(
     lt: Option<u64>,
     it: Option<u64>,
@@ -1821,7 +1736,7 @@ pub(crate) fn merge_entry_pair(
             // Text fields merge like any entry. The key-material block is ONE
             // atomic field ("credential"): it rides the resolution path as
             // base64 like File `data`, and the winning side supplies every
-            // byte — half a credential signs for nobody.
+            // byte - half a credential signs for nobody.
             use base64::Engine;
             let b64 = base64::engine::general_purpose::STANDARD;
             let l_blob = l.credential_blob();
@@ -2036,12 +1951,9 @@ fn assert_walk_end_state(ents: &[VaultEntry]) {
 mod field_merge_tests {
     use super::*;
 
-    // Loads the SAME three divergent vaults shipped for hardware testing
-    // (test_data/sync_test_vaults/ — 12 shared entries, two of every type, plus a
-    // B-only new entry and a C-tombstoned entry; see its README), converges them,
-    // and asserts the full result: non-colliding edits all survive, every type's
-    // colliding edit clashes, the item-delete is flagged, no entry is lost.
-    // Read-only + cheap Argon2 params, so it runs in the normal suite.
+    // The same corpus the hardware walk uses (test_data/sync_test_vaults/, see
+    // its README). Read-only with cheap Argon2 params, so it runs in the normal
+    // suite.
     #[test]
     fn sync_test_corpus_converges_without_loss() {
         use crate::vault::serialization::VaultBody;
@@ -2105,7 +2017,7 @@ mod field_merge_tests {
                 .collect()
         };
 
-        // Several sync orders, like the backward-compat harness — the result must not
+        // Several sync orders, like the backward-compat harness - the result must not
         // depend on which direction you sync first.
         for order in [[&a, &b, &c], [&c, &b, &a], [&b, &a, &c], [&c, &a, &b]] {
             let (acc, collisions, pending) = converge(&order);
@@ -2279,9 +2191,8 @@ mod field_merge_tests {
         assert_eq!(c2.added, 0);
     }
 
-    // A File-content clash must carry the incoming bytes (base64) so the user's
-    // "use other" can actually restore them — not the "<binary>" placeholder,
-    // which made the choice a silent no-op (found 2026-06-30).
+    // With the "<binary>" placeholder instead of the bytes, "use other" was a
+    // silent no-op.
     #[test]
     fn file_data_clash_carries_incoming_bytes_as_base64() {
         use crate::vault::entry::FileEntry;
@@ -2337,13 +2248,9 @@ mod field_merge_tests {
         assert_walk_end_state(&export.entries);
     }
 
-    // ── Sync-test corpus generator ────────────────────────────────────────
-    // Mints the three divergent vaults in test_data/sync_test_vaults/ that the
-    // converge test above and the hardware walk both use. Run on demand:
+    // Regenerates test_data/sync_test_vaults/ on demand:
     //   cargo test --release regenerate_sync_test_corpus -- --ignored
-    // Presence in `field_times` marks the side that edited a field (see
-    // decide_field): both present + differ = clash; one present = brought over;
-    // a "del:<key>" time = a deletion. A oldest, then B, then C.
+    // A oldest, then B, then C.
     const TA: u64 = 1000;
     const TB: u64 = 2000;
     const TC: u64 = 3000;
@@ -2756,7 +2663,7 @@ mod field_merge_tests {
             .expect("seal");
             crate::vault::io::write_vault(&sealed, &dir.join(format!("sync_test_{name}.gabbro")))
                 .expect("write");
-            // write_vault rotates a .bak alongside the vault — correct for a real
+            // write_vault rotates a .bak alongside the vault - correct for a real
             // vault, just an untracked stray for the committed corpus. Drop it.
             // Absent on a first-ever mint, so a missing file is not an error.
             let bak = dir.join(format!("sync_test_{name}.gabbro.bak"));
@@ -2812,7 +2719,7 @@ mod field_merge_tests {
 
     #[test]
     fn merge_two_devices_edit_different_fields_keeps_both() {
-        // local edited title, incoming edited content — the headline fix.
+        // local edited title, incoming edited content - the headline fix.
         let local = note("n1", "T-local", "C", "t", &[("title", 200)]);
         let incoming = note("n1", "T", "C-remote", "t", &[("content", 300)]);
         let (merged, conflicts, _dels, _bo) = merge_entry_pair(&local, &incoming);
@@ -2989,8 +2896,6 @@ mod field_merge_tests {
         assert_eq!(ab, ba, "merge order must not change the result");
     }
 
-    // ── brought-over: non-conflicting incoming values surfaced for review ─────
-
     #[test]
     fn merge_lists_brought_over_field_with_old_and_new() {
         // Incoming edited content; local never touched it -> the new value comes
@@ -3078,7 +2983,7 @@ mod field_merge_tests {
         );
     }
 
-    // Scenario 9 (attachments task) — red first: a pending attachment delete
+    // Scenario 9 (attachments task) - red first: a pending attachment delete
     // must carry the display name, or the keep/delete prompt shows a bare uuid
     // and the user cannot tell what they are deleting.
     #[test]
@@ -3593,20 +3498,9 @@ mod field_merge_tests {
     }
 }
 
-/// Apply the entry-level merge algorithm to `session`, mutating it in place.
-///
-/// Merge rules (all timestamps are ISO 8601 strings; lexicographic ordering
-/// is equivalent to temporal ordering for the format produced by `chrono_now`):
-///
-/// - **Entries — UNION + LWW**: always add incoming entries not present locally;
-///   for same-UUID conflicts the newer `updated_at` wins as a whole.
-/// - **Deletions — user consent**: incoming tombstones matching local entries are
-///   collected in `pending_deletes`; no entry is ever deleted automatically.
-/// - **Folders — UNION**: all folder names from both sides are kept; no auto-deletion.
-/// - **Folder conflicts**: same-UUID entries with different folder assignments on each
-///   device are collected in `folder_conflicts`; Flutter lets the user pick.
-/// - **Tombstones**: union of both `deleted_ids` lists, deduped by id (newer
-///   `deleted_at` kept when the same id appears on both sides).
+/// Timestamps are `chrono_now` ISO 8601 strings, so lexicographic order is
+/// temporal order. Nothing is deleted automatically: incoming tombstones and
+/// folder disagreements are collected for the user to decide.
 fn do_merge(session: &mut VaultSession, incoming: VaultBody) -> MergeSummary {
     let mut added: u32 = 0;
     let mut updated: u32 = 0;
@@ -3630,12 +3524,11 @@ fn do_merge(session: &mut VaultSession, incoming: VaultBody) -> MergeSummary {
 
     let mut result_entries: Vec<VaultEntry> = Vec::new();
 
-    // --- Process local entries ---
     for local_entry in &session.entries {
         let id = entry_id(local_entry);
 
         if let Some(inc_entry) = incoming_by_id.get(id) {
-            // Same UUID on both sides — check for folder conflict, then LWW on content.
+            // Same UUID on both sides - check for folder conflict, then LWW on content.
             let local_folder = entry_folder(local_entry);
             let incoming_folder = entry_folder(inc_entry);
             if local_folder != incoming_folder {
@@ -3659,23 +3552,22 @@ fn do_merge(session: &mut VaultSession, incoming: VaultBody) -> MergeSummary {
             brought_over.append(&mut carried);
             result_entries.push(merged);
         } else if incoming_deletions.contains_key(id) {
-            // Incoming tombstone — requires user consent before deletion; keep entry for now.
+            // Incoming tombstone - requires user consent before deletion; keep entry for now.
             pending_deletes.push(crate::api::vault::PendingDeleteItem {
                 id: id.to_string(),
                 title: entry_display_title(local_entry),
             });
             result_entries.push(local_entry.clone());
         } else {
-            // Only on local side, no incoming tombstone — keep it.
+            // Only on local side, no incoming tombstone - keep it.
             result_entries.push(local_entry.clone());
         }
     }
 
-    // --- Process incoming-only entries (UNION) ---
     for inc_entry in &incoming.entries {
         let id = entry_id(inc_entry);
         if !local_by_id.contains_key(id) {
-            // Not present locally — always add, even if a local tombstone exists.
+            // Not present locally - always add, even if a local tombstone exists.
             added_entries.push(crate::api::vault::AddedEntryItem {
                 id: id.to_string(),
                 title: entry_display_title(inc_entry),
@@ -3685,7 +3577,6 @@ fn do_merge(session: &mut VaultSession, incoming: VaultBody) -> MergeSummary {
         }
     }
 
-    // --- Merge folders (UNION, dedup by name) ---
     let mut merged_folders = session.folders.clone();
     for folder in &incoming.folders {
         if !merged_folders.contains(folder) {
@@ -3693,7 +3584,6 @@ fn do_merge(session: &mut VaultSession, incoming: VaultBody) -> MergeSummary {
         }
     }
 
-    // --- Union deleted_ids (keep newer deleted_at for the same id) ---
     let mut merged_tombstones: std::collections::HashMap<String, String> = session
         .deleted_ids
         .iter()
@@ -3728,21 +3618,15 @@ fn do_merge(session: &mut VaultSession, incoming: VaultBody) -> MergeSummary {
     }
 }
 
-/// Opens `path` with the passphrase the live session already holds, so the user
-/// types nothing to sync a file that is their own vault.
-///
-/// `Ok(None)` means that passphrase does not open the file — a different vault, a
-/// key-protected file, or a passphrase changed on the other device — so the caller
-/// asks the user for one. `Err` is kept for a genuinely unusable file (missing,
-/// not a Gabbro vault, too old), which is a different message to the user.
-///
-/// Reads only; the file on disk is never written.
+/// `Ok(None)`: the held passphrase does not open the file, so the caller asks
+/// for one. `Err` is kept for an unusable file, which is a different message
+/// to the user. Never writes.
 fn open_with_held_passphrase(path: &std::path::Path) -> Result<Option<VaultBody>, String> {
     let passphrase = {
         let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_ref().ok_or("Vault is locked")?;
         session.passphrase.clone()
-    }; // ← lock released before the Argon2id derivation below
+    }; // <- lock released before the Argon2id derivation below
     let sealed = crate::vault::io::read_vault(path)?;
     let plaintext = match crate::crypto::vault_crypto::open_vault(&passphrase, &sealed) {
         Ok(p) => zeroize::Zeroizing::new(p),
@@ -3752,7 +3636,7 @@ fn open_with_held_passphrase(path: &std::path::Path) -> Result<Option<VaultBody>
 }
 
 /// Granular sync of `path` using the session's own passphrase. `Ok(None)` when
-/// that passphrase does not open the file — see [`open_with_held_passphrase`].
+/// that passphrase does not open the file - see [`open_with_held_passphrase`].
 pub fn session_merge_vault_from_file_held(
     path: &std::path::Path,
 ) -> Result<Option<MergeSummary>, String> {
@@ -3773,16 +3657,9 @@ pub fn session_fast_merge_from_file_held(
     }
 }
 
-/// Opens a key-protected `path` with the passphrase the live session already
-/// holds plus a tap's hmac output, so only the PIN was typed.
-///
-/// `Ok(None)` covers every open failure — a different passphrase, or a
-/// credential the file does not know (it may have changed on disk since the
-/// header read) — so the caller falls back to the typed-passphrase dialog,
-/// reusing the same tap. `Err` is kept for an unusable file and a locked
-/// session, as in [`open_with_held_passphrase`].
-///
-/// Reads only; the file on disk is never written.
+/// `Ok(None)` covers every open failure (the file may have changed on disk
+/// since the header read) so the caller falls back to a typed passphrase,
+/// reusing the same tap. `Err` as in [`open_with_held_passphrase`].
 fn open_with_held_passphrase_and_key(
     path: &std::path::Path,
     hmac_secret: &[u8; 32],
@@ -3792,7 +3669,7 @@ fn open_with_held_passphrase_and_key(
         let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_ref().ok_or("Vault is locked")?;
         session.passphrase.clone()
-    }; // ← lock released before the Argon2id derivation below
+    }; // <- lock released before the Argon2id derivation below
     let sealed = crate::vault::io::read_vault(path)?;
     let plaintext = match crate::crypto::vault_crypto::open_vault_with_key_record(
         &passphrase,
@@ -3808,7 +3685,7 @@ fn open_with_held_passphrase_and_key(
 
 /// Granular sync of a key-protected `path` using the session's own passphrase
 /// and a tap's hmac output. `Ok(None)` when that combination does not open the
-/// file — see [`open_with_held_passphrase_and_key`].
+/// file - see [`open_with_held_passphrase_and_key`].
 pub fn session_merge_vault_from_file_with_key_held(
     path: &std::path::Path,
     hmac_secret: &[u8; 32],
@@ -3860,18 +3737,14 @@ pub fn session_merge_vault_from_body(incoming: VaultBody) -> Result<MergeSummary
             yubikey,
             summary,
         )
-    }; // ← lock released here
+    }; // <- lock released here
     do_save(&body, &passphrase, &path, yubikey)?;
     Ok(summary)
 }
 
-/// Fast auto-merge: like [`do_merge`], but every surfaced decision is resolved
-/// automatically in favour of the incoming vault (KeePassXC-style whole-incoming
-/// wins), so the outcome is deterministic. Field collisions take the incoming
-/// value (the losing local value kept in history); folder conflicts take the
-/// incoming folder; tombstoned deletes (whole-entry and per-item) are applied;
-/// and brought-over edits keep the replaced local value in history. Nothing is
-/// lost — every replaced value lives in the entry's unified history.
+/// [`do_merge`] with every decision resolved for the incoming side (KeePassXC
+/// style), so the outcome is deterministic. Nothing is lost: every replaced
+/// local value goes to the entry's history.
 fn do_fast_merge(session: &mut VaultSession, incoming: VaultBody) -> MergeSummary {
     let summary = do_merge(session, incoming);
     let now = crate::api::vault::chrono_now();
@@ -3951,17 +3824,13 @@ pub fn session_fast_merge_from_body(incoming: VaultBody) -> Result<MergeSummary,
             yubikey,
             summary,
         )
-    }; // ← lock released here
+    }; // <- lock released here
     do_save(&body, &passphrase, &path, yubikey)?;
     Ok(summary)
 }
 
-/// Apply a batch of granular-sync review decisions to the session in memory.
-/// Mirrors the per-decision `session_*` mutations exactly but performs no save,
-/// so the public wrapper can re-seal the vault once for the whole review.
-/// Application order matches Flutter's apply loop: field resolutions, history
-/// replacements, item deletes, folder assignments, then whole-entry deletes.
-/// One timestamp stamps the whole batch (deterministic within one review).
+/// No save here, so the wrapper re-seals once per review. Order matches
+/// Flutter's apply loop; one timestamp stamps the whole batch.
 fn do_apply_sync_decisions(
     session: &mut VaultSession,
     field_resolutions: &[crate::api::vault::SyncFieldResolutionInput],
@@ -4076,7 +3945,7 @@ pub fn session_apply_sync_decisions(
             session.path.clone(),
             yubikey,
         )
-    }; // ← lock released here
+    }; // <- lock released here
     do_save(&body, &passphrase, &path, yubikey)?;
     Ok(())
 }
@@ -4105,7 +3974,7 @@ pub fn session_cancel_sync() -> Result<(), String> {
             session.path.clone(),
             yubikey,
         )
-    }; // ← lock released here
+    }; // <- lock released here
     let (body, passphrase, path, yubikey) = saved;
     do_save(&body, &passphrase, &path, yubikey)?;
     Ok(())
@@ -4423,7 +4292,7 @@ mod folder_tests {
         });
         session_add_entry_no_save(entry).unwrap();
 
-        // Delete "Work", no reassign — entry folder should become ""
+        // Delete "Work", no reassign - entry folder should become ""
         session_delete_folder(String::from("Work"), None).unwrap();
 
         let folders = session_list_folders().unwrap();
@@ -4751,7 +4620,7 @@ mod autofill_tests {
         teardown(&path);
     }
 
-    // Pure JSON formatter for the autofill summary list — no session needed, so
+    // Pure JSON formatter for the autofill summary list - no session needed, so
     // it runs in the fast lane (the session-backed test above does Argon2).
     #[test]
     fn login_summaries_json_includes_app_id_and_escapes() {
@@ -4822,7 +4691,7 @@ mod tests {
     use serial_test::serial;
     use std::env::temp_dir;
 
-    /// Helper — creates a minimal vault file on disk and returns its path.
+    /// Helper - creates a minimal vault file on disk and returns its path.
     fn setup_vault(passphrase: &[u8]) -> PathBuf {
         let mut path = temp_dir();
         path.push("gabbro_session_test.gabbro");
@@ -4853,7 +4722,7 @@ mod tests {
         path
     }
 
-    /// Helper — ensures the session is locked and vault file is cleaned up.
+    /// Helper - ensures the session is locked and vault file is cleaned up.
     fn teardown(path: &PathBuf) {
         let _ = lock_vault();
         let _ = std::fs::remove_file(path);
@@ -4955,7 +4824,7 @@ mod tests {
     }
 
     // Net (attachments task): nothing else ever round-trips attachment BYTES
-    // through the encrypted file — imports fill them, merge tests use names.
+    // through the encrypted file - imports fill them, merge tests use names.
     #[test]
     #[serial]
     fn attachment_bytes_survive_a_disk_round_trip() {
@@ -5011,11 +4880,11 @@ mod tests {
         let path = setup_vault(pass);
 
         unlock_vault(pass, path.clone()).unwrap();
-        // Vault is unlocked — summaries should be accessible
+        // Vault is unlocked - summaries should be accessible
         assert!(list_entry_summaries().is_ok());
 
         lock_vault().unwrap();
-        // After lock, session must be cleared — all access must fail
+        // After lock, session must be cleared - all access must fail
         assert!(list_entry_summaries().is_err());
         assert!(get_entry("id-001").is_err());
 
@@ -5039,10 +4908,7 @@ mod tests {
         teardown(&path);
     }
 
-    // R-03 P1: a CRUD save syncs the .bak to the CURRENT vault, so a restore
-    // after corruption returns the user's latest state — including the edit
-    // that just triggered this save. (The pre-P1 behaviour trailed by one save
-    // and lost the most recent edit on restore; hardware-found 2026-06-11.)
+    // R-03 P1: a `.bak` one save behind loses the latest edit on restore.
     #[test]
     #[serial]
     fn bak_after_crud_save_matches_current_vault() {
@@ -5510,8 +5376,6 @@ mod yubikey_session_tests {
         let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
-    // ── VERSION 4 multi-key passphrase change ─────────────────────────────────
-
     fn setup_multi_key_vault(passphrase: &[u8]) -> std::path::PathBuf {
         let mut path = temp_dir();
         path.push("gabbro_v4_change_pass_test.gabbro");
@@ -5556,7 +5420,7 @@ mod yubikey_session_tests {
         let new_pass = b"new-multi-key-pass";
         let path = setup_multi_key_vault(old_pass);
 
-        // Unlock with key 0 → vault_key_master cached → VERSION 4 path
+        // Unlock with key 0 -> vault_key_master cached -> VERSION 4 path
         unlock_vault_with_key_record(old_pass, &[0x11u8; 32], vec![0x01u8; 64], path.clone())
             .unwrap();
         session_change_passphrase(old_pass, new_pass).unwrap();
@@ -5604,7 +5468,7 @@ mod yubikey_session_tests {
         let pass = b"multi-key downgrade pass";
         let path = setup_multi_key_vault(pass);
 
-        // Unlock with a registered key — proves the vault is key-protected and the
+        // Unlock with a registered key - proves the vault is key-protected and the
         // session is hardware-authenticated (the implicit downgrade authorization).
         unlock_vault_with_key_record(pass, &[0x11u8; 32], vec![0x01u8; 64], path.clone()).unwrap();
 
@@ -5612,12 +5476,12 @@ mod yubikey_session_tests {
         export_path.push("gabbro_downgrade_passonly_out.gabbro");
         session_export_vault_passphrase_only(export_path.clone()).unwrap();
 
-        // The downgraded artifact opens with the passphrase ALONE — no YubiKey.
+        // The downgraded artifact opens with the passphrase ALONE - no YubiKey.
         let body = load_vault(pass, &export_path)
             .expect("passphrase-only downgrade artifact must open with the passphrase alone");
         assert_eq!(body.entries.len(), 1);
 
-        // The ORIGINAL vault is untouched — still key-protected.
+        // The ORIGINAL vault is untouched - still key-protected.
         assert!(
             load_vault(pass, &path).is_err(),
             "original key-protected vault must stay key-protected after a downgrade export"
@@ -5629,8 +5493,8 @@ mod yubikey_session_tests {
     }
 
     // Pin for the held-merge sync, keyed half: `do_save` sends a key-protected
-    // session down the body-only re-seal branch, so the header — and with it the
-    // random per-vault master key — survives every CRUD save. That is what lets a
+    // session down the body-only re-seal branch, so the header - and with it the
+    // random per-vault master key - survives every CRUD save. That is what lets a
     // vault synced from another device open under the master already in the
     // session.
     #[test]
@@ -5745,8 +5609,6 @@ mod yubikey_mgmt_tests {
         let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
-    // ── session_add_yubikey ───────────────────────────────────────────────────
-
     #[test]
     #[serial]
     fn add_yubikey_succeeds_on_v4_vault() {
@@ -5764,7 +5626,7 @@ mod yubikey_mgmt_tests {
         teardown(&path);
     }
 
-    // R-03: adding a key is a credential change — .bak refreshes to the
+    // R-03: adding a key is a credential change - .bak refreshes to the
     // post-change vault instead of rotating to the pre-change one
     #[test]
     #[serial]
@@ -5789,7 +5651,7 @@ mod yubikey_mgmt_tests {
         );
     }
 
-    // R-03: removing a key is a credential change — .bak must match the
+    // R-03: removing a key is a credential change - .bak must match the
     // post-removal vault (a rotated .bak would still trust the removed key)
     #[test]
     #[serial]
@@ -5813,8 +5675,6 @@ mod yubikey_mgmt_tests {
             "removing a YubiKey must refresh .bak to the post-change vault"
         );
     }
-
-    // ── session_remove_yubikey ────────────────────────────────────────────────
 
     #[test]
     #[serial]
@@ -5846,7 +5706,7 @@ mod yubikey_mgmt_tests {
 
         unlock_vault_with_key_record(pass, &[0x11u8; 32], vec![0x01u8; 64], path.clone()).unwrap();
 
-        // Remove the second key — leaves one key on disk
+        // Remove the second key - leaves one key on disk
         session_remove_yubikey(vec![0x02u8; 48]).unwrap();
 
         // Removing the last remaining key must fail
@@ -5855,8 +5715,6 @@ mod yubikey_mgmt_tests {
 
         teardown(&path);
     }
-
-    // ── session_set_yubikey_alias / session_list_yubikey_aliases ─────────────
 
     #[test]
     #[serial]
@@ -6047,8 +5905,6 @@ mod json_export_tests {
 
         teardown(&vault_path, &json_path);
     }
-
-    // ── search_blob unit tests (no vault session needed) ──────────────────────
 
     #[test]
     fn search_blob_for_login_includes_username_and_url() {
@@ -6315,9 +6171,8 @@ mod json_export_tests {
 
     #[test]
     fn search_blob_excludes_empty_labelled_fields_enpass_regression() {
-        // Enpass templates carry typed fields (Email, Phone, ...) that import as
-        // empty-valued custom fields. Their labels must not make a full-text
-        // search for the label word match the entry. (2026-06-24 regression.)
+        // Enpass templates import typed fields (Email, Phone) as empty custom
+        // fields; their labels must not match a search for the label word.
         use crate::vault::entry::{CustomField, EntryMeta, LoginEntry, VaultEntry};
         let entry = VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
@@ -6560,12 +6415,8 @@ mod merge_tests {
         }
     }
 
-    // Runs the README hardware walk entirely in code (no UI): import A, sync B
-    // keeping all defaults, sync C applying the dictated picks through the single
-    // batched `session_apply_sync_decisions` call, and assert the same end-state
-    // the JSON checker verifies. Proves the walk's expected result is exactly what
-    // the engine produces — so a failing hardware checker means a mis-click, not a
-    // code bug.
+    // The README hardware walk in code, so a failing hardware checker means a
+    // mis-click, not a code bug.
     #[test]
     #[serial]
     #[ignore = "production-Argon saves; run in release via the gate"]
@@ -6647,7 +6498,7 @@ mod merge_tests {
     }
 
     // A never-edited entry must survive a sync. `create_login_entry` starts every entry
-    // with empty `field_times` (api/vault.rs) — only `update_entry` fills them in — so an
+    // with empty `field_times` (api/vault.rs) - only `update_entry` fills them in - so an
     // entry created and synced before it is ever edited arrives carrying none. Merging it
     // must not lose data: it is added, and the local entry survives.
     #[test]
@@ -6828,8 +6679,6 @@ mod merge_tests {
         teardown(&path);
     }
 
-    // ── sync using the passphrase the session already holds ───────────────────
-
     // Writes a second vault sealed with `pass`, for the session to open unaided.
     fn source_file(pass: &[u8], suffix: &str, entries: Vec<VaultEntry>) -> std::path::PathBuf {
         let mut path = temp_dir();
@@ -6972,8 +6821,6 @@ mod merge_tests {
         assert_eq!(before, after, "the incoming file must be byte-identical");
     }
 
-    // ── keyed sync using the passphrase the session already holds ─────────────
-
     // A key-protected second vault sealed with `pass` and two fabricated keys,
     // for the session to open with its own passphrase plus a tap's hmac output.
     fn keyed_source_file(
@@ -7011,7 +6858,7 @@ mod merge_tests {
     }
 
     // The keyed file was sealed with the passphrase the session holds, so with
-    // the tap done only the PIN was typed — no passphrase.
+    // the tap done only the PIN was typed - no passphrase.
     #[test]
     #[serial]
     fn keyed_held_merges_a_file_sealed_with_the_held_passphrase() {
@@ -7190,12 +7037,8 @@ mod merge_tests {
         assert!(ids.contains(&String::from("shared")), "kept: {ids:?}");
     }
 
-    // Fast auto-merge walk: load A, then fast-merge the other two (no prompts,
-    // incoming always wins). Proves (1) every A-vs-C clash resolves to C's value
-    // regardless of B/C order, and (2) order still matters via the delete/re-add
-    // path: C tombstones `delme`, so A->B->C drops it, but A->C->B re-adds it from
-    // B (additive rule: an incoming entry is re-added even past a tombstone).
-    // Equivalent of `check_sync_walk_export`, for the fast path.
+    // Order still matters on the fast path via delete/re-add: C tombstones
+    // `delme`, so A->B->C drops it but A->C->B re-adds it from B.
     #[test]
     #[serial]
     #[ignore = "fast-merge walk on the sync_test corpus (cheap Argon2); opt-in"]
@@ -7267,12 +7110,9 @@ mod merge_tests {
         assert!(has(&acb, "extra-b"), "extra-b kept (A->C->B)");
     }
 
-    // Hardware check for the FAST auto-merge path — the analogue of
-    // `check_sync_walk_export`. Export a vault built by: import A, then Sync B and
-    // Sync C both via "Merge automatically", to JSON at $GABBRO_FAST_WALK_JSON.
-    // This recomputes the reference fast A->B->C merge from the same corpus in
-    // process and compares by content (ignoring timestamps / field_times /
-    // history, which legitimately differ run-to-run).
+    // Hardware checker for the fast path: export the A, B, C "Merge
+    // automatically" result to $GABBRO_FAST_WALK_JSON. Timestamps, field_times
+    // and history legitimately differ per run and are ignored.
     #[test]
     #[serial]
     #[ignore = "validates a FAST-merge hardware export; set GABBRO_FAST_WALK_JSON to the .json path"]
@@ -7357,8 +7197,6 @@ mod merge_tests {
         let _ = std::fs::remove_file(path);
         let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
-
-    // ── recovery history: replace -> read -> restore ──────────────────────────
 
     #[test]
     #[serial]
@@ -7479,8 +7317,6 @@ mod merge_tests {
         teardown(&path);
     }
 
-    // ── tombstone recorded on single delete ───────────────────────────────────
-
     #[test]
     #[serial]
     fn delete_entry_records_tombstone() {
@@ -7507,8 +7343,6 @@ mod merge_tests {
         drop(session);
         teardown(&path);
     }
-
-    // ── tombstones recorded on bulk delete ────────────────────────────────────
 
     #[test]
     #[serial]
@@ -7539,8 +7373,6 @@ mod merge_tests {
         drop(session);
         teardown(&path);
     }
-
-    // ── merge: addition (entry only in incoming) ──────────────────────────────
 
     #[test]
     #[serial]
@@ -7579,8 +7411,6 @@ mod merge_tests {
 
         teardown(&path);
     }
-
-    // ── merge: edit conflict — last-write-wins ────────────────────────────────
 
     #[test]
     #[serial]
@@ -7643,8 +7473,6 @@ mod merge_tests {
         teardown(&path);
     }
 
-    // ── merge: incoming tombstone → pending_delete (user consent required) ──────
-
     #[test]
     #[serial]
     fn merge_incoming_tombstone_becomes_pending_delete() {
@@ -7655,7 +7483,7 @@ mod merge_tests {
             vec![note("victim", "Deleted remotely", "2026-01-01T00:00:00Z")],
         );
 
-        // Incoming deleted "victim" — requires user consent, not silent delete.
+        // Incoming deleted "victim" - requires user consent, not silent delete.
         let incoming = VaultBody {
             entries: vec![],
             deleted_ids: vec![tombstone("victim", "2026-01-02T00:00:00Z")],
@@ -7668,7 +7496,7 @@ mod merge_tests {
         assert_eq!(summary.pending_deletes.len(), 1);
         assert_eq!(summary.pending_deletes[0].id, "victim");
         assert_eq!(summary.pending_deletes[0].title, "Deleted remotely");
-        // Entry must still be present — not deleted without user consent.
+        // Entry must still be present - not deleted without user consent.
         assert_eq!(list_entry_summaries().unwrap().len(), 1);
 
         teardown(&path);
@@ -7690,7 +7518,7 @@ mod merge_tests {
         save_vault(&body_with_tombstone, pass, &path).unwrap();
         unlock_vault(pass, path.clone()).unwrap();
 
-        // Incoming has the entry — UNION means it is always added.
+        // Incoming has the entry - UNION means it is always added.
         let incoming = VaultBody {
             entries: vec![note("victim", "Added remotely", "2026-01-01T00:00:00Z")],
             deleted_ids: vec![],
@@ -7706,7 +7534,7 @@ mod merge_tests {
         teardown(&path);
     }
 
-    // ── merge: incoming tombstone + local entry → pending_delete regardless of timestamp
+    // merge: incoming tombstone + local entry -> pending_delete regardless of timestamp
 
     #[test]
     #[serial]
@@ -7728,7 +7556,7 @@ mod merge_tests {
         unlock_vault(pass, path.clone()).unwrap();
         let summary = session_merge_vault_from_body(incoming).unwrap();
 
-        // Regardless of timestamps, incoming tombstone → pending_delete (user consent).
+        // Regardless of timestamps, incoming tombstone -> pending_delete (user consent).
         assert_eq!(summary.pending_deletes.len(), 1);
         assert_eq!(summary.pending_deletes[0].title, "Edited locally");
         // Entry must still be present.
@@ -7769,8 +7597,6 @@ mod merge_tests {
         teardown(&path);
     }
 
-    // ── merge: folder union ───────────────────────────────────────────────────
-
     #[test]
     #[serial]
     fn merge_unions_folders() {
@@ -7810,8 +7636,6 @@ mod merge_tests {
         teardown(&path);
     }
 
-    // ── merge: identical vaults → zero-change summary ─────────────────────────
-
     #[test]
     #[serial]
     fn merge_identical_vaults_returns_zero_summary() {
@@ -7838,8 +7662,6 @@ mod merge_tests {
 
         teardown(&path);
     }
-
-    // ── merge: tombstone union (dedup, keep newer) ────────────────────────────
 
     #[test]
     #[serial]
@@ -7892,8 +7714,6 @@ mod merge_tests {
         drop(session);
         teardown(&path);
     }
-
-    // ── merge: folder assignment conflict ─────────────────────────────────────
 
     #[test]
     #[serial]
@@ -7973,8 +7793,6 @@ mod merge_tests {
 
         teardown(&path);
     }
-
-    // ── vault_updated_at is stamped on every save ─────────────────────────────
 
     #[test]
     #[serial]
@@ -8058,8 +7876,6 @@ mod export_sync_tests {
         }
     }
 
-    // ── test 1: deleted_ids round-trips through export ────────────────────────
-
     #[test]
     #[serial]
     fn export_roundtrips_deleted_ids() {
@@ -8092,8 +7908,6 @@ mod export_sync_tests {
 
         teardown(&[vault_path, export_path]);
     }
-
-    // ── test 2: folder names round-trip through export and merge ─────────────
 
     #[test]
     #[serial]
@@ -8144,8 +7958,6 @@ mod export_sync_tests {
         teardown(&[vault_a, vault_b, export_path]);
     }
 
-    // ── test 3: tombstone in export causes deletion on receiving vault ────────
-
     #[test]
     #[serial]
     fn export_tombstone_causes_delete_on_receiving_vault() {
@@ -8195,7 +8007,7 @@ mod export_sync_tests {
             "tombstone must create a pending_delete requiring user consent"
         );
         assert_eq!(summary.pending_deletes[0].id, "n1");
-        // Entry must still be present — not deleted without explicit user consent.
+        // Entry must still be present - not deleted without explicit user consent.
         let ids: Vec<String> = list_entry_summaries()
             .unwrap()
             .into_iter()
@@ -8210,19 +8022,11 @@ mod export_sync_tests {
     }
 }
 
-// ── Multi-device sync fuzz proof (granular sync, v9) ──────────────────────────
-//
-// Deterministic fuzzer for the field-level merge. Each pass starts from a fixed
-// 14-entry base (all 7 types), forks 3 device copies, and applies random divergent
-// edits/adds/deletes with globally-unique timestamps across EVERY mergeable field:
-// scalars (title, password, notes, card fields, ...), custom k:v pairs, AND
-// attachments. The copies are then converged in two random orders. Invariants:
-//   * no loss / correct LWW: converged values equal an INDEPENDENT oracle
-//     (newest value per field, computed directly from device states, not via merge);
-//   * order-independent: both convergence orders give the same result;
-//   * convergence: re-merging the converged set with any device is stable.
-// Field keys match exactly what `merge_entry_pair` reads, so this exercises the
-// real per-field decisions. Runs in the normal (fast) suite — no crypto.
+// Field-level merge fuzzer: three device copies diverge with unique timestamps
+// across every mergeable field, then converge in two random orders. Checked
+// against an independent oracle (newest value per field from the device
+// states, not via merge), for order independence, and for stability on
+// re-merge. No crypto, so it runs in the normal suite.
 #[cfg(test)]
 mod sync_fuzz {
     use super::*;
@@ -8232,7 +8036,7 @@ mod sync_fuzz {
     };
     use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
-    // SplitMix64 — deterministic, dependency-free.
+    // SplitMix64 - deterministic, dependency-free.
     struct Rng(u64);
     impl Rng {
         fn next(&mut self) -> u64 {
@@ -8265,7 +8069,7 @@ mod sync_fuzz {
         }
     }
 
-    // Scalar field names per type — identical to the keys merge_entry_pair uses.
+    // Scalar field names per type - identical to the keys merge_entry_pair uses.
     fn scalar_keys(e: &VaultEntry) -> &'static [&'static str] {
         match e {
             VaultEntry::Login(_) => &[
@@ -9320,7 +9124,7 @@ mod passkey_tests {
         assert_eq!(s.title, "example.com");
         assert!(s.search_blob.contains("user@example.com"));
         assert!(s.search_blob.contains("a note"));
-        // 32 bytes of 0x07 would render as repeated "\u{7}" — the blob must
+        // 32 bytes of 0x07 would render as repeated "\u{7}" - the blob must
         // carry no trace of key bytes in any encoding it could plausibly take.
         assert!(!s.search_blob.contains('\u{7}'));
     }
@@ -9333,10 +9137,8 @@ mod passkey_tests {
         e
     }
 
-    // Maintainer ruling 2026-08-20: passkeys use the standard granular sync,
-    // zero irregularities. Text fields merge per-field with edit-stamps and
-    // conflicts; the key-material block ("credential") moves atomically, like
-    // File `data`, because half a credential signs for nobody.
+    // Passkeys use the standard granular sync; only the "credential" block moves
+    // atomically, like File `data`, because half a credential signs for nobody.
 
     #[test]
     fn passkey_merges_fields_independently_like_any_entry() {
@@ -9388,7 +9190,7 @@ mod passkey_tests {
     #[test]
     fn passkey_credential_block_moves_atomically() {
         // Incoming re-registered the credential (all key material differs,
-        // stamped); the merged entry must carry the incoming block whole —
+        // stamped); the merged entry must carry the incoming block whole -
         // never a mix of old and new bytes.
         let local = passkey("2026-01-02T00:00:00Z", None, 7);
         let incoming = stamped(

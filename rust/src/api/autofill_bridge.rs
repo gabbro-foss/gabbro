@@ -1,11 +1,6 @@
-/// JNI bridge functions for GabbroAutofillService.
-///
-/// These are called directly from Kotlin (not via flutter_rust_bridge) because
-/// the autofill service runs outside Flutter but inside the same process.
-/// The VAULT_SESSION global is shared — no new session state needed.
-///
-/// Naming rule: Java_<package_dots_as_underscores>_<Class>_<method>
-/// Package: app.gabbro.gabbro  →  app_gabbro_gabbro
+/// JNI, not flutter_rust_bridge: the autofill service runs outside Flutter in
+/// the same process, sharing VAULT_SESSION. Symbol names follow
+/// Java_<package_with_underscores>_<Class>_<method>.
 #[cfg(target_os = "android")]
 pub mod jni {
     use crate::vault::session::is_vault_unlocked;
@@ -14,7 +9,7 @@ pub mod jni {
     use jni::JNIEnv;
 
     /// Returns JNI_TRUE if the vault session is currently unlocked.
-    /// Delegates to is_vault_unlocked() — a public function that encapsulates
+    /// Delegates to is_vault_unlocked() - a public function that encapsulates
     /// the VAULT_SESSION mutex access.
     #[no_mangle]
     pub extern "system" fn Java_app_gabbro_gabbro_RustBridge_isVaultUnlocked(
@@ -24,12 +19,7 @@ pub mod jni {
         u8::from(is_vault_unlocked())
     }
 
-    /// Returns a JSON string encoding id, username, and password for a single
-    /// Login entry looked up by UUID.
-    ///
-    /// Shape: `{"id":"...","username":"...","password":"..."}`
-    /// Returns `"{}"` if the vault is locked, the id is not found, or the
-    /// entry is not a Login entry.
+    /// `{"id","username","password"}`; `"{}"` when locked, unknown, or not a Login.
     #[no_mangle]
     pub extern "system" fn Java_app_gabbro_gabbro_RustBridge_getEntry<'local>(
         mut env: JNIEnv<'local>,
@@ -56,12 +46,7 @@ pub mod jni {
         })
     }
 
-    /// Returns a JSON string encoding all Login entry summaries in the session.
-    ///
-    /// Shape: `[{"id":"...","username":"...","url":"...","app_id":"..."}]`
-    /// (`app_id` is the empty string when unset). See `login_summaries_json`.
-    /// Returns an empty array `[]` if the vault is locked or the session is empty.
-    /// Kotlin parses this with org.json.JSONArray — no new Android dependency needed.
+    /// See `login_summaries_json`; `[]` when locked.
     #[no_mangle]
     pub extern "system" fn Java_app_gabbro_gabbro_RustBridge_listLoginSummaries<'local>(
         env: JNIEnv<'local>,

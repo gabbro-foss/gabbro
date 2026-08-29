@@ -1,14 +1,7 @@
-//! Import-parser fuzzer (S-08) — proves every untrusted-import parser handles
-//! garbage and byte-mutated samples with an `Err`, never a panic.
-//!
-//! The five import parsers consume attacker-suppliable export files (a victim can
-//! be sent a malicious `.json` / `.csv`). Their bounds-checks *looked* panic-free
-//! by inspection, but S-01 (a non-char-boundary slice in the Enpass expiry parser)
-//! proved inspection is not enough. This is the permanent negative guard.
-//!
-//! Deterministic (fixed seed) and cheap (no Argon2/crypto), so it runs in the
-//! routine `cargo test`, not as an opt-in. It is the systemic guard; the targeted
-//! red tests in each parser pin the specific known cases (e.g. S-01's expiry).
+//! S-08: every import parser takes attacker-suppliable files and must answer
+//! garbage and byte mutations with `Err`, never a panic; S-01 (a
+//! non-char-boundary slice in the Enpass expiry parser) proved inspection is
+//! not enough. Fixed seed, no crypto, so it runs in the routine suite.
 
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
@@ -27,7 +20,7 @@ const DASHLANE_SAMPLE: &[u8] =
 const GOOGLE_SAMPLE: &[u8] = b"name,url,username,password,note\nt,https://example.com,u,p,n\n";
 
 /// Feed `parser` random garbage and byte-mutations of `base`. Any return value is
-/// fine; the assertion is implicit — reaching the end means it never panicked.
+/// fine; the assertion is implicit - reaching the end means it never panicked.
 fn fuzz_bytes(seed_salt: u64, base: &[u8], parser: impl Fn(&[u8])) {
     let mut rng = StdRng::seed_from_u64(FIXED_SEED ^ seed_salt);
     // Random garbage of assorted lengths.

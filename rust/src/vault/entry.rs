@@ -1,7 +1,7 @@
-//! Vault entry types — the core domain model for Gabbro.
+//! Vault entry types - the core domain model for Gabbro.
 //!
 //! All sensitive data lives in Rust. Flutter never constructs
-//! these types directly — it calls API functions that build them.
+//! these types directly - it calls API functions that build them.
 
 use indexmap::IndexMap;
 use rand::rngs::OsRng;
@@ -10,12 +10,9 @@ use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
-/// Mint a fresh entry id: a random UUID v4, drawn from `OsRng`.
-///
-/// Every entry id in the vault comes from here. Built on `Builder::from_random_bytes`
-/// (which sets the version and variant bits) rather than `Uuid::new_v4`, so the crate
-/// does not need uuid's `v4` feature — the only edge pulling a second major version of
-/// `getrandom` into the tree. Same entropy source either way.
+/// `Builder::from_random_bytes` rather than `Uuid::new_v4`: the `v4` feature
+/// would pull a second major version of `getrandom` into the tree. Same
+/// entropy either way.
 pub(crate) fn new_entry_id() -> String {
     let mut bytes = [0u8; 16];
     OsRng.fill_bytes(&mut bytes);
@@ -38,13 +35,11 @@ pub struct EntryMeta {
     /// Per-field last-change times for granular sync (v9+): field key -> ms since
     /// the Unix epoch. Scalar fields are keyed by their serde name (e.g. "password");
     /// custom pairs by "custom_fields:<label>"; attachments by "attachments:<uuid>".
-    /// Empty on pre-v9 vaults — an absent key counts as "oldest", so merge falls back
+    /// Empty on pre-v9 vaults - an absent key counts as "oldest", so merge falls back
     /// to the whole-entry `updated_at` (today's behaviour).
     #[serde(default)]
     pub field_times: BTreeMap<String, u64>,
-    /// Values replaced during sync resolution, kept so the user can recover them
-    /// (the sync model's fallback property). Each record names the field key the
-    /// value belonged to. Empty on vaults written before this was added.
+    /// Values replaced during sync resolution, kept so the user can recover them.
     #[serde(default)]
     pub history: Vec<HistoryRecord>,
 }
@@ -55,7 +50,7 @@ pub struct EntryMeta {
 pub struct HistoryRecord {
     /// Field key the value belonged to ("password", "custom_fields:Tag", ...).
     pub field: String,
-    /// The replaced value (may be a secret — treat accordingly).
+    /// The replaced value (may be a secret - treat accordingly).
     pub value: String,
     /// ISO 8601 timestamp: when the current value replaced this one.
     pub saved_at: String,
@@ -87,7 +82,7 @@ impl ZeroizeOnDrop for EntryMeta {}
 impl EntryMeta {
     /// Record `value` as the previous value of `field`, keeping at most one
     /// history record per field: an existing record for the same field is
-    /// overwritten. This is the unified history model — one previous value per
+    /// overwritten. This is the unified history model - one previous value per
     /// field, shared by the sync path and the on-save secret-field capture.
     pub fn record_previous(
         &mut self,
@@ -118,7 +113,7 @@ pub struct EntryAttachment {
     pub name: String,
     /// MIME type (e.g. "image/png", "application/pdf").
     pub kind: String,
-    /// Raw binary data — decoded from base64 on import.
+    /// Raw binary data - decoded from base64 on import.
     pub data: Vec<u8>,
 }
 
@@ -129,7 +124,7 @@ pub struct LoginEntry {
     /// Shared metadata (id, timestamp, folder).
     pub meta: EntryMeta,
     /// Human-readable item title (e.g. "Example", "Sample").
-    /// Distinct from the URL — used as the primary display label in list views.
+    /// Distinct from the URL - used as the primary display label in list views.
     pub title: String,
     /// The URL this login belongs to (e.g. "https://example.com").
     pub url: String,
@@ -193,7 +188,7 @@ pub struct IdentityEntry {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct CardEntry {
     pub meta: EntryMeta,
-    /// User's own label for this card (e.g. "Visa Platinum"). Optional —
+    /// User's own label for this card (e.g. "Visa Platinum"). Optional -
     /// Flutter falls back to payment network or cardholder name if absent.
     pub card_name: Option<String>,
     /// Card status: "active", "lapsed", or "inactive".
@@ -208,7 +203,7 @@ pub struct CardEntry {
     /// Bank account number associated with this card.
     pub card_account_number: Option<String>,
     /// Payment network (e.g. "Visa", "Mastercard", "Amex").
-    /// Flutter maps this to a logo asset — no binary data stored here.
+    /// Flutter maps this to a logo asset - no binary data stored here.
     pub payment_network: Option<String>,
     /// Card PIN.
     pub pin: Option<String>,
@@ -217,7 +212,7 @@ pub struct CardEntry {
     /// Transaction password (used by some banks for online payments).
     pub transaction_password: Option<String>,
     pub notes: Option<String>,
-    /// User-defined extra fields — overflow from import (e.g. portal username/password).
+    /// User-defined extra fields - overflow from import (e.g. portal username/password).
     #[serde(default)]
     pub custom_fields: Vec<CustomField>,
     pub attachments: Vec<EntryAttachment>,
@@ -311,7 +306,7 @@ impl Zeroize for CustomEntry {
     fn zeroize(&mut self) {
         self.meta.zeroize();
         self.title.zeroize();
-        // HashMap has no zeroize impl — clear() drops all keys and values promptly.
+        // HashMap has no zeroize impl - clear() drops all keys and values promptly.
         // Each CustomField value is ZeroizeOnDrop so memory is cleared on drop.
         self.fields.clear();
     }
@@ -319,7 +314,7 @@ impl Zeroize for CustomEntry {
 
 impl ZeroizeOnDrop for CustomEntry {}
 
-/// A website passkey — a WebAuthn discoverable credential (ADR-009).
+/// A website passkey - a WebAuthn discoverable credential (ADR-009).
 ///
 /// The ES256 private key lives in the vault body, encrypted at rest like every
 /// other secret; relying parties only ever receive signatures, never the key.
@@ -328,7 +323,7 @@ pub struct PasskeyEntry {
     pub meta: EntryMeta,
     /// Relying-party id the credential is bound to (e.g. "example.com").
     pub rp_id: String,
-    /// WebAuthn user.name — the account identifier the site shows (e.g. email).
+    /// WebAuthn user.name - the account identifier the site shows (e.g. email).
     pub user_name: String,
     /// WebAuthn user.displayName.
     pub user_display_name: String,
@@ -349,7 +344,7 @@ pub struct PasskeyEntry {
 }
 
 impl PasskeyEntry {
-    /// The immutable key-material block as one byte string — the sync merge's
+    /// The immutable key-material block as one byte string - the sync merge's
     /// atomic "credential" field (rides the resolution path as base64, like
     /// File `data`). Half a credential signs for nobody, so it never splits.
     /// Length-prefixed so no two field splits produce the same bytes.
@@ -406,7 +401,7 @@ impl PasskeyEntry {
     }
 }
 
-/// A single vault entry — wraps all seven entry types into one enum.
+/// A single vault entry - wraps all seven entry types into one enum.
 ///
 /// This is the type that gets serialized to JSON and encrypted into
 /// the vault body. A `Vec<VaultEntry>` represents the full vault contents.
@@ -447,8 +442,6 @@ mod tests {
             ..Default::default()
         }
     }
-
-    // ── per-field change-times for granular sync (v9) ─────────────────────────
 
     #[test]
     fn field_times_defaults_empty_when_absent_from_json() {
@@ -929,7 +922,7 @@ mod tests {
             None,
             String::from("active"),
             String::from("Alex Smith"),
-            String::from("123456"), // 6 digits — minimum for debit cards
+            String::from("123456"), // 6 digits - minimum for debit cards
             String::from("12/28"),
             String::from("123"),
             None,
@@ -1010,7 +1003,7 @@ mod tests {
             String::from("Alex Smith"),
             String::from("4111111111111111"),
             String::from("12/28"),
-            String::from(""), // empty CVV — should be accepted for debit cards
+            String::from(""), // empty CVV - should be accepted for debit cards
             None,
             None,
             None,

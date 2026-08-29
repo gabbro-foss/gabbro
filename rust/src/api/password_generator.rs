@@ -34,13 +34,13 @@ pub fn generate_password(config: PasswordConfig) -> Result<String, String> {
 
     match config.language {
         // CJK combined pools: uppercase/lowercase both map to a single unified pool.
-        // Korean: 2350 Hangul syllables U+AC00–U+B52D.
+        // Korean: 2350 Hangul syllables U+AC00-U+B52D.
         Language::Korean => {
             if config.use_uppercase || config.use_lowercase {
                 pool.extend((0u32..2350).filter_map(|i| char::from_u32(0xAC00 + i)));
             }
         }
-        // Chinese Simplified + Traditional share GB2312 Level 1: 3755 CJK chars U+4E00–U+5CAA.
+        // Chinese Simplified + Traditional share GB2312 Level 1: 3755 CJK chars U+4E00-U+5CAA.
         Language::ChineseSimplified | Language::ChineseTraditional => {
             if config.use_uppercase || config.use_lowercase {
                 pool.extend((0u32..3755).filter_map(|i| char::from_u32(0x4E00 + i)));
@@ -117,7 +117,7 @@ pub fn generate_password(config: PasswordConfig) -> Result<String, String> {
 }
 
 /// Calculate entropy in bits for a password of given length drawn from a pool of given size.
-/// Formula: entropy = length × log₂(pool_size)
+/// Formula: entropy = length x log2(pool_size)
 #[flutter_rust_bridge::frb(sync)]
 pub fn entropy_bits(pool_size: u32, length: u32) -> f64 {
     if pool_size == 0 || length == 0 {
@@ -197,7 +197,7 @@ mod tests {
 
     #[test]
     fn test_entropy_bits_reasonable() {
-        // 16 chars from pool of 62 (a-z, A-Z, 0-9) ≈ 95 bits
+        // 16 chars from pool of 62 (a-z, A-Z, 0-9) ~ 95 bits
         let e = entropy_bits(62, 16);
         assert!(e > 90.0 && e < 100.0, "Entropy was {}", e);
     }

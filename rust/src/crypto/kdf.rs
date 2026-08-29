@@ -28,16 +28,9 @@ impl Argon2idParams {
     }
 }
 
-/// Derives 96 bytes of key material from a passphrase and salt.
-///
-/// All 96 bytes are consumed whole, as the HKDF input keying material that yields
-/// the vault key (`hkdf::derive_vault_key_v11`, ADR-018). The caller does not split
-/// them: the v2–v10 formats fed the three 32-byte ranges to an X25519 + ML-KEM
-/// hybrid layer, but RT-3 deleted that layer, and the length stays 96 because
+/// The output stays 96 bytes (a leftover of the removed hybrid layer) because
 /// changing it would change every derived key and brick every v11 vault.
-///
-/// The salt must be exactly 32 bytes. Use a cryptographically random
-/// salt generated fresh for each new vault.
+/// The salt must be exactly 32 bytes.
 pub fn derive_key(
     passphrase: &[u8],
     salt: &[u8; 32],
