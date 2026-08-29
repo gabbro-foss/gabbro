@@ -149,28 +149,11 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**Shorten comments and user-facing messages.** Two sub-tasks, in sequence:
-
-1. **Code comments.** Scope: `*.rs` (62, `frb_generated.rs` excluded),
-   `*.dart` (279, tests included, `lib/src/rust/` and `lib/l10n/app_localizations*.dart`
-   excluded - both generated), `*.kt` (34; `.kts` build scripts excluded).
-   Zero test impact - doc-comment fences are all `text`, no doctests compile.
-   Order: kt -> rs -> dart, a survey per layer, reviewed before edits.
-
-   **Rules.** Code states the what and the how; a comment states only the
-   why, never the when (no dates, no "was added in", no session history -
-   git holds that). No comment by default: add one only where the why is
-   not evident from the code. ASCII only, no emojis, no em-dashes or
-   arrows. Plain wording, no stock LLM phrases. Language-mandated forms
-   stay: Rust `//!`/`///` doc comments per rustdoc, Dart `///` per
-   Effective Dart, Kotlin KDoc - each used only when there is a why to say.
-
-   **Done (gate green):** 11474 -> 8293 comment lines, 107794 -> 104317 LOC
-   across kt/rs/dart; comment-stripped sources identical before and after.
-
-2. **User-facing strings**: terse UI strings. Not free - each change touches
-   `lib/l10n/app_*.arb` (all locales) and the tests quoting the literal
-   (~1.6k `find.text` assertions). Scope and weigh before starting.
+**Shorten user-facing strings.** Terse UI strings. Not free: each change
+touches `lib/l10n/app_*.arb` (all locales) and the tests quoting the literal
+(~1.6k `find.text` assertions). Scope and weigh before starting. Comment
+rules from the finished code-comment sweep carry over: ASCII only, no
+emojis, plain wording.
 
 ---
 
