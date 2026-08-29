@@ -172,21 +172,11 @@ resolved but never applied — inert, emits no warning.
    only in wordlist data; comment-stripped sources identical before and after;
    clippy clean.
 
-   **Dart survey (2026-08-29, against the rules):** 5987 comment lines in
-   262 files (generated bridge and `app_localizations*.dart` excluded):
-   lib ~2700, tests ~3200. Top: `vault_list_screen.dart` 445/3086,
-   `unlock_screen.dart` 243, `main.dart` 242, `test/unlock_screen_test.dart`
-   201, `tablet_vault_layout.dart` 134/575. Violations: 975 non-ASCII lines
-   (mostly `// -- Section ----` rules, ~230 of them; em-dashes; the Cyrillic
-   and CJK hits are test data, allowed), 431 ASCII banner lines
-   (`// -----` boxes), 21 dated lines, 31 history lines, 30 hardware
-   anecdotes. Cut: banner boxes to a plain one-line heading or nothing,
-   integration-test preambles of 18-22 lines, the five near-identical "Set
-   by the active vault list so the GLOBAL Ctrl+X handler" blocks in
-   `vault_list_screen.dart` (say it once), test preambles restating group
-   names, anecdotes reduced to the failure mode (no dates, no quotes). Keep
-   the why: ADR refs, the `// ignore:` lint lines (70, directives not
-   comments). Target ~4500.
+   **Dart: done.** 5987 -> 4676 comment lines, 64290 -> 62841 LOC (211 files;
+   vendored `rust_builder/cargokit` excluded); non-ASCII only in script test
+   data; comment-stripped sources identical before and after; `flutter
+   analyze` output identical before and after.
+
 2. **User-facing strings**: terse UI strings. Not free - each change touches
    `lib/l10n/app_*.arb` (all locales) and the tests quoting the literal
    (~1.6k `find.text` assertions). Scope and weigh before starting.
