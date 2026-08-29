@@ -165,18 +165,8 @@ resolved but never applied — inert, emits no warning.
    stay: Rust `//!`/`///` doc comments per rustdoc, Dart `///` per
    Effective Dart, Kotlin KDoc - each used only when there is a why to say.
 
-   **Kotlin survey (2026-08-29, against the rules):** 1075 comment lines;
-   top 5 files hold 52% (`GabbroAutofillService.kt` 261/992, its two test
-   files 89 + 66, `RustBridge.kt` 54/78, `PasskeyProvider.kt` 54/203).
-   Violations: 180 non-ASCII lines (`// -- Section ----` box-drawing rules
-   and em-dashes), 5 history lines ("same session as this file"), 0 dates.
-   Cut: class headers restating the name, doc comments paraphrasing the
-   signature, inline narration mirroring the next line, lifecycle headers
-   (Autofill 14, UnlockActivity 22, SaveActivity 19 lines) beyond the
-   OS-driven control flow that the code cannot show. Keep the why:
-   Ctap2Session over Ctap2Client, SAF EPERM, NDEF skip, privileged-browser
-   fallback, "metadata only, never field values", debug compile-out. Target
-   ~500 lines.
+   **Kotlin: done.** 1075 -> 420 comment lines, 6148 -> 5449 LOC, 0 non-ASCII;
+   comment-stripped sources identical before and after.
 
    **Rust survey (2026-08-29, against the rules):** 4412 comment lines in
    61 files. Top: `vault/session.rs` 785/9411, `api/vault_bridge.rs` 434,
