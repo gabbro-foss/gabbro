@@ -165,17 +165,8 @@ resolved but never applied — inert, emits no warning.
    stay: Rust `//!`/`///` doc comments per rustdoc, Dart `///` per
    Effective Dart, Kotlin KDoc - each used only when there is a why to say.
 
-   **Kotlin: done.** 1075 -> 420 comment lines, 6148 -> 5449 LOC, 0 non-ASCII;
-   comment-stripped sources identical before and after.
-
-   **Rust: done.** 4412 -> 3197 comment lines, 37356 -> 36027 LOC, non-ASCII
-   only in wordlist data; comment-stripped sources identical before and after;
-   clippy clean.
-
-   **Dart: done.** 5987 -> 4676 comment lines, 64290 -> 62841 LOC (211 files;
-   vendored `rust_builder/cargokit` excluded); non-ASCII only in script test
-   data; comment-stripped sources identical before and after; `flutter
-   analyze` output identical before and after.
+   **Done (gate green):** 11474 -> 8293 comment lines, 107794 -> 104317 LOC
+   across kt/rs/dart; comment-stripped sources identical before and after.
 
 2. **User-facing strings**: terse UI strings. Not free - each change touches
    `lib/l10n/app_*.arb` (all locales) and the tests quoting the literal
