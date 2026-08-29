@@ -12,8 +12,6 @@ import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/widgets/yubikey_tap.dart';
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 MergeSummary _summary({
   int added = 0,
   int updated = 0,
@@ -107,13 +105,8 @@ Future<void> _openMenu(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
-// Open the menu, start a file sync, and let the merge land (and the review dialog
-// open, if any).
-//
-// Order matters: the apply choice comes first, then the passphrase. A
-// passphrase-only file is merged with the passphrase the session already holds,
-// so the box only appears when that fails — which is what these tests exercise,
-// because `_buildScreen` defaults the held merge to "does not open it".
+// The passphrase box only appears when the held-passphrase merge fails, which
+// `_buildScreen` defaults to.
 Future<void> _startSync(WidgetTester tester) async {
   await _openMenu(tester);
   await tester.tap(find.text('Sync from vault'));
@@ -147,8 +140,6 @@ Future<void> _settle(WidgetTester tester) async {
   await tester.pump(const Duration(milliseconds: 350));
   await tester.pump(const Duration(milliseconds: 350));
 }
-
-// ── Tests ─────────────────────────────────────────────────────────────────────
 
 void main() {
   group('VaultListScreen sync flow', () {
@@ -1106,7 +1097,7 @@ void main() {
     });
 
     // Scenario 9 (attachments task): the keep/delete prompt must name the
-    // file — a bare uuid gives the user nothing to decide on.
+    // file - a bare uuid gives the user nothing to decide on.
     testWidgets('an attachment item-delete prompt names the file', (
       tester,
     ) async {
@@ -1191,7 +1182,7 @@ void main() {
       await tester.tap(find.text('Continue'));
       await _settle(tester);
 
-      // Step 2: the clash. Nothing left to satisfy — the incoming value leads,
+      // Step 2: the clash. Nothing left to satisfy - the incoming value leads,
       // so OK is live straight away and finishing applies it.
       expect(find.textContaining('Second'), findsOneWidget);
       TextButton okButton() => tester.widget<TextButton>(
@@ -1241,7 +1232,6 @@ void main() {
     });
   });
 
-  // ── ADR-013: key-protected source sync ──────────────────────────────────────
   group('VaultListScreen key-protected sync flow', () {
     final sourceRecords = [
       YubikeyRecordData(
@@ -1353,7 +1343,7 @@ void main() {
     });
 
     // The records come from the incoming file's header, so the key to tap is
-    // one registered in that file — which may differ from this vault's keys.
+    // one registered in that file - which may differ from this vault's keys.
     testWidgets('keyed dialog says to use the incoming vault key', (
       tester,
     ) async {
@@ -1370,7 +1360,7 @@ void main() {
     });
 
     // Keyed silent path: with the tap done, the held passphrase merges the file
-    // — no passphrase is ever typed and the full-credentials merge never runs.
+    // - no passphrase is ever typed and the full-credentials merge never runs.
     testWidgets('keyed held merge runs on the tap alone', (tester) async {
       List<int>? heldHmac;
       List<int>? heldCred;
@@ -1409,7 +1399,7 @@ void main() {
     });
 
     // ADR-016 reveal-eye: the keyed sync dialog's PIN eye scales (capped) at
-    // large text and the dialog does not overflow. (PIN only — the held
+    // large text and the dialog does not overflow. (PIN only - the held
     // passphrase is tried first, so the keyed dialog has no passphrase field.)
     testWidgets('sync dialog eyes scale (capped) at large text', (
       tester,
@@ -1476,7 +1466,7 @@ void main() {
     });
 
     // Fallback: the held passphrase does not open the keyed file, so a typed
-    // passphrase is asked for — reusing the tap already done (no second tap).
+    // passphrase is asked for - reusing the tap already done (no second tap).
     testWidgets('keyed fallback reuses the tap with a typed passphrase', (
       tester,
     ) async {
@@ -1532,7 +1522,7 @@ void main() {
     });
 
     // A keyed file that is not the same vault fails to decrypt outright, so
-    // the same-passphrase warning would be noise here — pin its absence.
+    // the same-passphrase warning would be noise here - pin its absence.
     testWidgets('keyed apply choice carries no same-passphrase warning', (
       tester,
     ) async {
@@ -1659,7 +1649,6 @@ void main() {
     );
   });
 
-  // ── Net (S8): the sync flow is one code path on both platforms ─────────────
   // The vault-list screen has a single `isAndroid` branch (picker/transport);
   // the chooser, automatic path, review and fallback must read the same on
   // Android as on Linux. Pinned before the one-click-sync change.
@@ -1793,7 +1782,6 @@ void main() {
     });
   });
 
-  // ── Net (S2): today's labels, re-pinned when they change ──────────────────
   group('sync labels', () {
     testWidgets('the menu item and the passphrase dialog both say Sync from vault', (
       tester,
@@ -1821,7 +1809,6 @@ void main() {
     });
   });
 
-  // ── S6/S7: one-click sync ─────────────────────────────────────────────────
   // A remembered folder replaces the picker; auto-merge replaces the chooser.
   group('VaultListScreen one-click sync', () {
     testWidgets('a remembered folder resolves this vault\'s file, no picker', (
@@ -1989,7 +1976,6 @@ void main() {
     });
   });
 
-  // ── S6/S7 with a key-protected source ──────────────────────────────────────
   // Auto-merge removes the how-to-apply question, never the tap: the source's
   // YubiKey is still asked for, and a rotated passphrase still falls back.
   group('VaultListScreen one-click sync, key-protected source', () {

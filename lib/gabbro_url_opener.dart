@@ -12,7 +12,7 @@ enum UrlOpenResult { opened, notAWebLink, failed }
 /// The one way Gabbro opens a link.
 ///
 /// Linux hands it to `xdg-open`; Android to our own channel. Both open the
-/// user's own browser — never a webview inside Gabbro, where the vault is
+/// user's own browser - never a webview inside Gabbro, where the vault is
 /// open. All fields are test seams.
 class GabbroUrlOpener {
   GabbroUrlOpener._();

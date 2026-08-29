@@ -4,8 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/app_paths.dart';
 import 'package:gabbro/vault_registry.dart';
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 VaultRecord _record({
   String path = '/tmp/vault.gabbro',
   String alias = 'Test',
@@ -16,11 +14,7 @@ VaultRecord _record({
   lastUsedAt: lastUsedAt ?? DateTime.fromMillisecondsSinceEpoch(0),
 );
 
-// ── Tests ─────────────────────────────────────────────────────────────────────
-
 void main() {
-  // ── VaultRecord.fromJson ────────────────────────────────────────────────────
-
   group('VaultRecord.fromJson', () {
     test('parses all fields', () {
       final r = VaultRecord.fromJson({
@@ -45,8 +39,6 @@ void main() {
 
   });
 
-  // ── VaultRecord.toJson ──────────────────────────────────────────────────────
-
   group('VaultRecord.toJson', () {
     test('serialises all fields', () {
       final r = _record(path: '/tmp/b.gabbro', alias: 'Beta');
@@ -68,8 +60,6 @@ void main() {
       expect(restored.lastUsedAt, original.lastUsedAt);
     });
   });
-
-  // ── VaultRecord.copyWith ────────────────────────────────────────────────────
 
   group('VaultRecord.copyWith', () {
     test('overrides only path', () {
@@ -94,8 +84,6 @@ void main() {
     });
   });
 
-  // ── VaultRegistry construction ──────────────────────────────────────────────
-
   group('VaultRegistry', () {
     test('empty registry has zero records', () {
       final reg = VaultRegistry([]);
@@ -114,8 +102,6 @@ void main() {
       expect(() => reg.records.add(_record()), throwsUnsupportedError);
     });
   });
-
-  // ── VaultRegistry.lastUsed ──────────────────────────────────────────────────
 
   group('VaultRegistry.lastUsed', () {
     test('returns null for empty registry', () {
@@ -155,8 +141,6 @@ void main() {
     });
   });
 
-  // ── VaultRegistry.add ──────────────────────────────────────────────────────
-
   group('VaultRegistry.add', () {
     test('adds a record', () {
       final reg = VaultRegistry([]).add(_record(path: '/a'));
@@ -171,8 +155,6 @@ void main() {
       expect(updated.records.length, 1);
     });
   });
-
-  // ── VaultRegistry.remove ────────────────────────────────────────────────────
 
   group('VaultRegistry.remove', () {
     test('removes by path', () {
@@ -194,8 +176,6 @@ void main() {
       expect(original.records.length, 1);
     });
   });
-
-  // ── VaultRegistry.updateAlias ───────────────────────────────────────────────
 
   group('VaultRegistry.updateAlias', () {
     test('updates alias for matching path', () {
@@ -220,8 +200,6 @@ void main() {
     });
   });
 
-  // ── VaultRegistry.touchLastUsed ─────────────────────────────────────────────
-
   group('VaultRegistry.touchLastUsed', () {
     test('updates lastUsedAt for matching path', () {
       final before = DateTime.parse('2020-01-01T00:00:00.000');
@@ -244,7 +222,6 @@ void main() {
     });
   });
 
-  // ── R4: the registry accepts duplicates ─────────────────────────────────────
   //
   // `add` is the single choke point for registering a vault (`main.dart:946`,
   // reached from all four creation sites) and it appends blind. Adoption will
@@ -321,8 +298,6 @@ void main() {
     });
   });
 
-  // ── VaultRegistry serialisation ─────────────────────────────────────────────
-
   group('VaultRegistry serialisation', () {
     test('empty registry round-trips', () {
       final reg = VaultRegistry([]);
@@ -353,9 +328,7 @@ void main() {
     });
   });
 
-  // ── VaultRegistry migration ─────────────────────────────────────────────────
-
-  // R-03: deleting a vault must also delete its .bak safety copy — on Android
+  // R-03: deleting a vault must also delete its .bak safety copy - on Android
   // the user has no file manager access to clean it up themselves.
   group('deleteVaultFiles', () {
     test('deletes the vault file and its .bak sibling', () async {
@@ -388,7 +361,6 @@ void main() {
     });
   });
 
-  // ── The legacy "type" key ───────────────────────────────────────────────────
   //
   // `VaultRecord.type` recorded whether a vault needed a YubiKey. Nothing ever
   // read it, and a plaintext registry naming the passphrase-only vaults just

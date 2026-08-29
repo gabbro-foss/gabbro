@@ -45,7 +45,7 @@ void main() {
   });
 
   // Pure-function invariants on the picker's label/sort helpers. These guard the
-  // picker against silent breakage as languages and locales are added — a blank
+  // picker against silent breakage as languages and locales are added - a blank
   // or duplicated label means an ambiguous/unusable row, and a sort that drops a
   // choice means a language the user can never select. Auto-covers future
   // LanguageChoice values; replaces the old `values.length == 35` magic number.

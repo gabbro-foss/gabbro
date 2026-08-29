@@ -7,7 +7,7 @@ import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
 // Scenario 6 (attachments task): the create/edit screen must show an entry's
-// attachments and let the user add and remove them — otherwise an imported
+// attachments and let the user add and remove them - otherwise an imported
 // attachment stays invisible and nothing can ever be attached in-app.
 
 NoteEntryData _noteWith(List<AttachmentMetaData> attachments) => NoteEntryData(
@@ -209,7 +209,7 @@ void main() {
     tester,
   ) async {
     final calls = <String>[];
-    // 25 MB cap; a 1-byte overflow must be refused BEFORE the bridge —
+    // 25 MB cap; a 1-byte overflow must be refused BEFORE the bridge -
     // matching the Rust-side cap that keeps a vault loadable on a phone.
     final oversized = Uint8List(25 * 1024 * 1024 + 1);
     await tester.pumpWidget(

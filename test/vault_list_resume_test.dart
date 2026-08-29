@@ -20,7 +20,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    // The session starts empty; then an entry appears — as if the autofill
+    // The session starts empty; then an entry appears - as if the autofill
     // SaveActivity wrote one into the shared session while we were backgrounded.
     var entries = <EntrySummaryData>[];
     await tester.pumpWidget(testApp(VaultListScreen(

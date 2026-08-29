@@ -9,8 +9,8 @@ import 'package:gabbro/text_scale.dart';
 
 // Regression coverage for the "BOTTOM OVERFLOWED" the keyboard caused on the
 // vault list. Each case opens the keyboard (a large bottom view inset) across
-// the layout permutations — phone (alphabet bar left/right, with the FAB),
-// tablet portrait/landscape, and a dragged list-pane width — and asserts the
+// the layout permutations - phone (alphabet bar left/right, with the FAB),
+// tablet portrait/landscape, and a dragged list-pane width - and asserts the
 // frame renders without a RenderFlex overflow.
 
 List<EntrySummaryData> _entries() => [
@@ -59,15 +59,8 @@ Future<void> _pumpWithKeyboard(
   await tester.pumpAndSettle();
 }
 
-/// Pumps the vault list at [w]x[h] logical px at [textScale], no keyboard.
-///
-/// Large text is where the two-pane layout is most fragile. In a Row, changing
-/// any child's width changes every sibling's height: a narrower left-hand
-/// column gives the detail pane more room, its placeholder wraps onto fewer
-/// lines, and the vertical extent changes throughout. That is what made a
-/// previous overflow look like the nav rail's fault when it was not — a layout
-/// fix that "works" can be pure correlation — so any
-/// change to the row's children needs this pinned before and after.
+/// In a Row, changing any child's width changes every sibling's height, so a
+/// layout fix that "works" can be pure correlation; pin before and after.
 Future<void> _pumpAtTextScale(
   WidgetTester tester, {
   required double w,
@@ -92,7 +85,7 @@ Future<void> _pumpAtTextScale(
 }
 
 /// Height of the entry list itself. Zero means the header ate the screen and
-/// the user can see no entries at all — the failure this file guards.
+/// the user can see no entries at all - the failure this file guards.
 double _listHeight(WidgetTester tester) =>
     tester.getSize(find.byType(ScrollablePositionedList).first).height;
 

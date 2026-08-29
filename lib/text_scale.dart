@@ -8,19 +8,15 @@ import 'dart:math' as math;
 /// Lowest selectable text scale (also the storage floor in [AppSettings]).
 const double kMinTextScale = 0.8;
 
-/// Device-tier maximum text scales. Phones have less screen room than tablets,
-/// so they cap lower. Reused 600dp breakpoint (same as the two-pane layout).
-/// Calibrated on hardware (S23 / GrapheneOS / Idea Tab Pro, 2026-07-03): the
-/// original 6x/8x left too little content on screen; trimmed in stages
-/// (6x/8x -> 4x/6x -> 3.5x/5x -> 3.0x/5x -> 2x/4x) as each hardware pass showed
-/// the top of the range unusable / still clipping. Final: phone caps at the 2x
-/// WCAG resize bar (severe low-vision belongs on a tablet), tablet at 3x.
+/// Calibrated on hardware: higher caps left too little content on screen.
+/// Phone stops at the 2x WCAG resize bar (severe low vision belongs on a
+/// tablet), tablet at 3x. Same 600dp breakpoint as the two-pane layout.
 const double kPhoneMaxScale = 2.0;
 const double kTabletMaxScale = 3.0;
 const double kTabletBreakpointDp = 600.0;
 
 /// Controls/targets grow to at most this multiple at the device's max text
-/// scale — big enough to hit, never large enough to consume the screen.
+/// scale - big enough to hit, never large enough to consume the screen.
 const double kMaxTargetScale = 2.0;
 
 /// The largest text scale this device can carry, from its shortest side (dp).
@@ -38,7 +34,7 @@ double posForScale(double scale, double deviceMax) =>
     math.log(scale / kMinTextScale) / math.log(deviceMax / kMinTextScale);
 
 /// Control/target size multiplier for a given text scale: lerp 1.0 -> 2.0
-/// across the device's text range, clamped. Targets grow, never shrink — a
+/// across the device's text range, clamped. Targets grow, never shrink - a
 /// below-normal text scale still yields 1.0.
 double targetScaleFor(double textScale, double deviceMax) {
   final t = ((textScale - 1.0) / (deviceMax - 1.0)).clamp(0.0, 1.0);

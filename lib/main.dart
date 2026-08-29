@@ -42,14 +42,8 @@ import 'package:gabbro/src/rust/frb_generated.dart';
 import 'package:gabbro/text_scale.dart';
 import 'package:gabbro/vault_registry.dart';
 
-/// Maps a non-system [LanguageChoice] to the correct [Locale].
-///
-/// Most locales use a single BCP-47 language tag that matches the enum name.
-/// The five complex locales (pt_PT, pt_BR, sr_Latn, zh_CN, zh_TW) need a
-/// country or script subtag and are handled explicitly.
-///
-/// Public only as a test seam: `test/locale_resolution_test.dart` asserts every
-/// mapping lands on a locale in [AppLocalizations.supportedLocales].
+/// Public only so `test/locale_resolution_test.dart` can assert every mapping
+/// lands on a supported locale.
 @visibleForTesting
 Locale localeFor(LanguageChoice choice) {
   assert(choice != LanguageChoice.system);
@@ -149,7 +143,7 @@ Future<void> autofillUnlockMain() async {
 
 /// The autofill unlock app. Mirrors [main]'s MaterialApp shell (localization
 /// delegates / locale / theme / text scale) and reuses [UnlockScreen] so the
-/// autofill prompt offers the full unlock flow — vault picker, passphrase,
+/// autofill prompt offers the full unlock flow - vault picker, passphrase,
 /// YubiKey, biometric. After the shared vault session unlocks, [onUnlocked]
 /// signals the native side (the `unlock` method) to build the fill response.
 Widget buildAutofillUnlockApp({
@@ -251,7 +245,7 @@ class _AutofillUnlockAppState extends State<_AutofillUnlockApp> {
     if (matched == true) {
       // RT-5: this activity runs only because the vault was locked, so the
       // session is ours. It finishes here and its Dart isolate dies with it,
-      // leaving nothing to close that session — so lock first, THEN finish.
+      // leaving nothing to close that session - so lock first, THEN finish.
       // `unlock` deliberately no longer finishes: locking after it would race
       // the engine teardown.
       widget.onLock();
@@ -339,15 +333,10 @@ Future<void> passkeyUnlockMain() async {
   ));
 }
 
-/// The passkey consent app. Locked -> UnlockScreen first (this flow then owns
-/// the session and locks it again before finishing, like the autofill unlock —
-/// RT-5); unlocked -> straight to consent.
-///
-/// [isUnlockOnly]: the picker's "Unlock Gabbro" action. Unlock, approve (Kotlin
-/// rebuilds the picker rows), finish — no consent, and the session stays open
-/// so the follow-up row tap needs no second unlock. [relockAfter]: that row tap
-/// (stamped by Kotlin); the flow locks on the way out even though it did not
-/// open the session, so Gabbro ends locked as the user left it.
+/// A flow that unlocked the session locks it again before finishing (RT-5).
+/// [isUnlockOnly] leaves it open so the follow-up row tap needs no second
+/// unlock; [relockAfter] marks that tap, which locks on the way out even
+/// though it did not open the session.
 Widget buildPasskeyApp({
   required AppSettings settings,
   required VaultRegistry registry,
@@ -650,7 +639,7 @@ class _AutofillSaveAppState extends State<_AutofillSaveApp> {
   }
 
   /// RT-5: a vault THIS flow unlocked is ours to close, and the activity's Dart
-  /// isolate dies when it finishes — so lock on the way out, before telling
+  /// isolate dies when it finishes - so lock on the way out, before telling
   /// Kotlin to finish. A session the main app already had open is left alone:
   /// closing it would lock the user out of the app they are using.
   Future<void> _finish(String method) async {
@@ -693,7 +682,7 @@ Future<void> main() async {
 /// Start the Linux auto-type trigger listener (ADR-017). The socket path and
 /// token come from Rust so nothing is duplicated. Best-effort: a failure (or
 /// another instance already owning the socket) just leaves auto-type inactive
-/// in this instance — it never blocks launch.
+/// in this instance - it never blocks launch.
 Future<void> _startAutotypeListener() async {
   try {
     final listener = AutotypeListener(
@@ -727,23 +716,18 @@ Future<void> _onAutotypeTrigger() async {
 
 /// The mounted GabbroApp's navigator, so the passkey daemon (started before
 /// the app mounts) can show its consent dialog over whatever screen is up.
-/// Null when no app is mounted — consent then no-ops as a cancel. Set by the
+/// Null when no app is mounted - consent then no-ops as a cancel. Set by the
 /// app's State (per-instance key: a shared one silently broke the second
 /// GabbroApp pumped in a test, blinding the theme a11y net).
 GlobalKey<NavigatorState>? rootNavigatorKey;
 
-/// Start the Linux passkey provider (ADR-009). Rust owns the uhid device and
-/// streams each request; consent shows as an in-app dialog when the user is
-/// focused on Gabbro (no forced window raise — see docs). Best-effort: a
-/// failure (missing uhid module / udev rule, second instance) never blocks
-/// launch — it lands in [reportPasskeyFailure], which the vault-list banner
-/// reads to tell the user why passkeys are inactive (F2). The process owns
-/// the device for its whole life; quitting closes the fd and the kernel
-/// unplugs it.
+/// Best-effort: a failure (missing uhid module or udev rule, second instance)
+/// never blocks launch; it lands in [reportPasskeyFailure] for the vault-list
+/// banner (F2). Quitting closes the fd and the kernel unplugs the device.
 Future<void> _startPasskeyDaemon() async {
   try {
     // The fallible half (flock, /dev/uhid, device create) is awaited here so
-    // its error is catchable; the stream fn below only attaches the pump —
+    // its error is catchable; the stream fn below only attaches the pump -
     // its Err would be lost on an unawaited FRB future.
     await passkeyDaemonOpen();
     final device = UhidPasskeyDevice();
@@ -767,7 +751,7 @@ Future<void> _startPasskeyDaemon() async {
 enum PostDeleteRoute { stayOnManageVaults, onboarding, remainingVault }
 
 /// Pure routing decision for [GabbroAppState.deleteVaultFromManager]. Active-vault
-/// deletion leaves the screen — to the remaining last-used vault's unlock screen,
+/// deletion leaves the screen - to the remaining last-used vault's unlock screen,
 /// or onboarding when none remain; non-active deletion stays put. Kept pure (no
 /// FFI/widgets) so it is unit-testable; the navigation itself stays in the State.
 PostDeleteRoute postDeleteRoute({
@@ -803,7 +787,7 @@ abstract class GabbroAppState {
   /// When [deleteFiles] is true the vault file and its `.bak` are deleted from
   /// disk; otherwise only the registry entry is removed (the bytes stay so the
   /// user can recover them). Routes to the next vault, or onboarding if none
-  /// remain — so a single corrupt vault never strands the user.
+  /// remain - so a single corrupt vault never strands the user.
   Future<void> removeVault(String path, {required bool deleteFiles});
   /// ADR-014: delete [path] from Manage Vaults (its file + `.bak` are removed).
   /// If it was the active vault, route to the remaining last-used vault's unlock
@@ -909,7 +893,7 @@ ThemeData gabbroDarkTheme({required bool highContrast}) {
 
 /// True when [event] is a key-down of the physical [key] with Ctrl held. Matches
 /// the PHYSICAL key (not the logical one) so Ctrl+L / Ctrl+F work on any keyboard
-/// layout — on a Cyrillic/Greek layout the physical L/F position emits a non-Latin
+/// layout - on a Cyrillic/Greek layout the physical L/F position emits a non-Latin
 /// letter, which a logical match would silently miss.
 bool isCtrlShortcut(KeyEvent event, PhysicalKeyboardKey key) =>
     event is KeyDownEvent &&
@@ -924,17 +908,12 @@ class _EscapeFallbackIntent extends Intent {
   const _EscapeFallbackIntent();
 }
 
-/// Owns Tab -> Next/PreviousFocusIntent traversal app-wide. While the vault list
-/// owns Tab ([vaultRegionActive] true — desktop + vault list is the current
-/// route) it ABSORBS the intent (the global HardwareKeyboard handler drives the
-/// region cycle instead; that handler does NOT stop the focus/shortcuts path, so
-/// without this the two fight and focus lands one control too far). Everywhere
-/// else it performs the NORMAL traversal, so Tab is unchanged on other screens
-/// and inside dialogs. It must stay ALWAYS-enabled: a disabled action still
-/// shadows WidgetsApp's default in the Actions lookup, which would kill traversal
-/// outright. Registered via MaterialApp.builder — below WidgetsApp's default
-/// shortcuts, above every route's ModalScope — so it also covers the cold-start
-/// case, where the key dispatches from the route scope with nothing focused.
+/// While the vault list owns Tab this absorbs the traversal intent: the global
+/// key handler drives the region cycle but does not stop the shortcuts path,
+/// so without this the two fight and focus lands one control too far. Must
+/// stay always-enabled (a disabled action still shadows WidgetsApp's default
+/// and kills traversal) and registered via MaterialApp.builder, below the
+/// default shortcuts, to cover cold start with nothing focused.
 class _RegionTraversalAction<T extends Intent> extends Action<T> {
   _RegionTraversalAction({required this.forward});
   final bool forward;
@@ -956,7 +935,7 @@ class GabbroApp extends StatefulWidget {
   final VaultRegistry registry;
 
   /// Last-used vault path from the registry. Null when registry is empty
-  /// (first-time user — routes to OnboardingScreen).
+  /// (first-time user - routes to OnboardingScreen).
   final String? vaultPath;
 
   final AppSettings settings;
@@ -1038,7 +1017,7 @@ class _GabbroAppState extends State<GabbroApp>
     if (event is KeyDownEvent) {
       _resetForegroundTimer();
       // Ctrl+L locks the vault from anywhere. (No Ctrl+C binding: copying a
-      // secret stays a deliberate, auto-clearing action — see
+      // secret stays a deliberate, auto-clearing action - see
       // keyboard_shortcuts_list_screen.)
       if (isCtrlShortcut(event, PhysicalKeyboardKey.keyL)) {
         _lock();
@@ -1066,7 +1045,7 @@ class _GabbroAppState extends State<GabbroApp>
         openVaultMenu!();
         return true;
       }
-      // Ctrl+Q asks to lock and quit — it raises the menu item's own confirm
+      // Ctrl+Q asks to lock and quit - it raises the menu item's own confirm
       // dialog rather than exiting, so a mistyped key costs a live session
       // nothing. Same gating as Ctrl+N / Ctrl+M.
       if (isCtrlShortcut(event, PhysicalKeyboardKey.keyQ) && quitVault != null) {
@@ -1075,7 +1054,7 @@ class _GabbroAppState extends State<GabbroApp>
       }
       // Tab / Shift+Tab drives the vault-list region cycle when a vault list has
       // registered a handler. Global like Ctrl+L/F so it fires wherever focus is
-      // — a body-scoped Actions override silently failed on real hardware (round
+      // - a body-scoped Actions override silently failed on real hardware (round
       // 10). The handler self-gates (Linux desktop only, current route only) and
       // returns false to let Tab fall through to default traversal.
       if (event.logicalKey == LogicalKeyboardKey.tab &&
@@ -1085,12 +1064,12 @@ class _GabbroAppState extends State<GabbroApp>
       }
       // Esc blurs a focused text field on a SCREEN before anything else (D4:
       // unfocus first, then a 2nd Esc goes back via the app-root fallback).
-      // Handled here — ahead of focus dispatch — because a focused text field
+      // Handled here - ahead of focus dispatch - because a focused text field
       // otherwise swallows Escape. A field inside a dialog is left alone so the
       // app-root fallback closes the whole dialog instead of just blurring.
       if (event.logicalKey == LogicalKeyboardKey.escape) {
         // The vault-list region cycle owns Esc while focus is inside it: Esc is
-        // the only exit back to Unfocused, from ANY region — not only the
+        // the only exit back to Unfocused, from ANY region - not only the
         // search field, which was the one region the blur below could reach.
         // The hook self-gates (desktop, current route, focus inside a region),
         // so Esc still pops screens and closes dialogs everywhere else.
@@ -1108,8 +1087,6 @@ class _GabbroAppState extends State<GabbroApp>
     }
     return false;
   }
-
-  // ── Foreground inactivity timer ───────────────────────────────────────────
 
   Duration? get _foregroundDuration => switch (_settings.foregroundLockTimeout) {
     ForegroundLockTimeout.thirtySeconds => const Duration(seconds: 30),
@@ -1140,7 +1117,6 @@ class _GabbroAppState extends State<GabbroApp>
     _resetForegroundTimer();
   }
 
-  // ── Background lock ───────────────────────────────────────────────────────
   //
   // Rather than a timer that must fire while the OS may have suspended the
   // Dart isolate, we record a timestamp when the app backgrounds and compare
@@ -1169,7 +1145,7 @@ class _GabbroAppState extends State<GabbroApp>
     switch (state) {
       case AppLifecycleState.inactive:
         // On Linux/macOS/Windows, switching workspaces or losing window focus
-        // fires inactive — hidden/paused are not sent. Record the backgrounding
+        // fires inactive - hidden/paused are not sent. Record the backgrounding
         // timestamp so the elapsed check on resumed works.
         // On Android/iOS, inactive is a brief transition state (task switcher,
         // incoming call) that must NOT trigger background-lock timing.
@@ -1208,14 +1184,9 @@ class _GabbroAppState extends State<GabbroApp>
     return false;
   }
 
-  // ── Lock ──────────────────────────────────────────────────────────────────
-
-  /// [automatic] marks a lock the user did not ask for — a timeout expiring,
-  /// meaning they walked away. Those take the clipboard with them (RT-4). A
-  /// deliberate lock (Ctrl+L, the menu item) leaves a pending wipe to run out
-  /// its configured delay: the user is right there and may be about to paste.
-  /// `detached` is the process dying, so it counts as deliberate — nothing is
-  /// left running to honour a wipe either way.
+  /// [automatic] means the user walked away, so the clipboard goes too (RT-4);
+  /// a deliberate lock leaves the pending wipe, since they may be about to
+  /// paste. `detached` counts as deliberate: nothing is left to honour a wipe.
   void _lock({bool automatic = false}) {
     _foregroundTimer?.cancel();
     _backgroundTimer?.cancel();
@@ -1234,8 +1205,6 @@ class _GabbroAppState extends State<GabbroApp>
       (_) => false,
     );
   }
-
-  // ── Registry helpers ───────────────────────────────────────────────────────
 
   Future<void> _onVaultCreated(String path, String alias) async {
     final updated = _registry.add(VaultRecord(
@@ -1294,7 +1263,7 @@ class _GabbroAppState extends State<GabbroApp>
   @override
   void switchToVault(String path, String alias) {
     // pushAndRemoveUntil (not pushReplacement) so the whole back stack is
-    // cleared — a back-press after switching vaults must never reveal a prior
+    // cleared - a back-press after switching vaults must never reveal a prior
     // (possibly still-unlocked) vault's screen. Mirrors auto-lock (_lock).
     _navigatorKey.currentState?.pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => _buildUnlockScreen(path, alias)),
@@ -1317,7 +1286,7 @@ class _GabbroAppState extends State<GabbroApp>
           registry: _registry,
           onRegistered: (path, alias) async {
             // Same registration the create flow uses (type auto-detect), then
-            // the unlock screen with a cleared back stack — adopting grants
+            // the unlock screen with a cleared back stack - adopting grants
             // no access.
             await _onVaultCreated(path, alias);
             switchToVault(path, alias);
@@ -1337,7 +1306,7 @@ class _GabbroAppState extends State<GabbroApp>
     }
     final updated = _registry.remove(path);
     await updated.save();
-    // Direct field mutation (no setState) to avoid racing pushAndRemoveUntil —
+    // Direct field mutation (no setState) to avoid racing pushAndRemoveUntil -
     // mirrors onDelete for the active vault.
     _registry = updated;
     try {
@@ -1514,7 +1483,7 @@ class _GabbroAppState extends State<GabbroApp>
   }
 
   /// Escape fallback: close the top dialog, or pop the current screen (its back
-  /// arrow). Fires only when nothing deeper handled Escape — a focused search
+  /// arrow). Fires only when nothing deeper handled Escape - a focused search
   /// field blurs itself (vault_list), and a dialog with its own Esc (sync review)
   /// cancels with rollback, both winning over this.
   void _handleEscape() => _navigatorKey.currentState?.maybePop();

@@ -1,11 +1,7 @@
 import 'dart:io';
 
-/// Opens a link on Linux by handing it to the desktop's own handler,
-/// `xdg-open` — the same thing `url_launcher` did, without the plugin.
-///
-/// The URL comes from vault data, so it is passed as a single argument to the
-/// program: no shell is involved, and its punctuation can never be read as
-/// commands.
+/// `xdg-open` with the URL as a single argument: it comes from vault data and
+/// no shell must ever read its punctuation as commands.
 class LinuxUrlOpener {
   LinuxUrlOpener({
     Future<ProcessResult> Function(String, List<String>)? runProcess,

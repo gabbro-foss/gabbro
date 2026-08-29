@@ -7,8 +7,6 @@ import 'package:gabbro/screens/review_changes_screen.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
-// ── Fake data helpers ─────────────────────────────────────────────────────────
-
 CardEntryData _originalCard() => CardEntryData(
       id: 'card-id-1',
       cardName: 'Granite Visa',
@@ -186,8 +184,6 @@ LoginEntryData _appIdLogin({String? appId, String? email}) => LoginEntryData(
       email: email,
     );
 
-// ── Widget helper ─────────────────────────────────────────────────────────────
-
 Widget _buildReviewScreen({
   required VaultEntryData original,
   required VaultEntryData updated,
@@ -201,8 +197,6 @@ Widget _buildReviewScreen({
     ));
 
 Future<void> _noOpSave(VaultEntryData entry, int? days) async {}
-
-// ── Tests ─────────────────────────────────────────────────────────────────────
 
 void main() {
   // ADR-016 reveal-eye: the sensitive-values show/hide toggle (base 18, action
@@ -278,7 +272,7 @@ void main() {
       updated: VaultEntryData.login(_updatedUrlOnly()),
     ));
 
-    // Title and username unchanged — must not appear in diff grid
+    // Title and username unchanged - must not appear in diff grid
     expect(find.text('Title'), findsNothing);
     expect(find.text('Username'), findsNothing);
   });
@@ -318,7 +312,7 @@ void main() {
     ));
 
     expect(find.text('CVV changed'), findsOneWidget);
-    // Eye icon present — toggle is wired, not a no-op
+    // Eye icon present - toggle is wired, not a no-op
     expect(find.byIcon(Icons.visibility_off), findsWidgets);
     // Tap to reveal CVV new value
     final cvvRow = find.ancestor(
@@ -367,7 +361,7 @@ void main() {
   });
 
   testWidgets('Custom diff shows new field added (empty -> value)', (tester) async {
-    // original has no fields; updated adds one — the new field must appear in diff
+    // original has no fields; updated adds one - the new field must appear in diff
     final original = CustomEntryData(
       id: 'custom-id-2',
       title: 'Wifi',
@@ -410,8 +404,6 @@ void main() {
     expect(find.text('10.0.0.1'), findsOneWidget);
     expect(find.text('10.0.0.2'), findsOneWidget);
   });
-
-  // ── Card optional-field diff regression ──────────────────────────────────────
 
   testWidgets('card number change appears in diff', (tester) async {
     final updated = CardEntryData(
@@ -508,8 +500,6 @@ void main() {
     expect(find.text('(empty)'), findsOneWidget);
     expect(find.text('Primary travel card'), findsOneWidget);
   });
-
-  // ── Note / File / Login / Card custom field and new-field diffs ──────────────
 
   testWidgets('Note diff shows changed custom field', (tester) async {
     final original = NoteEntryData(
@@ -781,8 +771,6 @@ void main() {
     expect(find.text('Gold'), findsOneWidget);
     expect(find.text('Platinum'), findsOneWidget);
   });
-
-  // ── End custom field diff tests ───────────────────────────────────────────
 
   testWidgets('folder change appears in diff for Login entry', (tester) async {
     final original = LoginEntryData(

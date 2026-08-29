@@ -9,7 +9,7 @@ import 'package:gabbro/widgets/url_link.dart';
 
 import 'test_helpers.dart';
 
-// Net for the url_launcher replacement: pins what a link tap actually does —
+// Net for the url_launcher replacement: pins what a link tap actually does -
 // the URL the user was shown is the URL handed to the browser, and a launch
 // that fails says so instead of appearing to work.
 
@@ -112,7 +112,7 @@ void main() {
   });
 
   // 7d: on Linux a screen reader never reads a SnackBar, so the message is
-  // announced too — otherwise a blind user gets silence either way.
+  // announced too - otherwise a blind user gets silence either way.
   testWidgets('7d: the message is announced, not only shown', (tester) async {
     final announcements = <String>[];
     tester.binding.defaultBinaryMessenger.setMockDecodedMessageHandler<dynamic>(

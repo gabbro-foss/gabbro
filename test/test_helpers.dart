@@ -13,8 +13,8 @@ Widget testApp(Widget home, {ThemeData? theme}) => MaterialApp(
   home: home,
 );
 
-/// Finds every reveal-eye (show/hide) [IconButton] on screen — those whose icon
-/// is `Icons.visibility` or `Icons.visibility_off` — regardless of the current
+/// Finds every reveal-eye (show/hide) [IconButton] on screen - those whose icon
+/// is `Icons.visibility` or `Icons.visibility_off` - regardless of the current
 /// obscured/revealed state. Used by the ADR-016 large-text scaling tests to
 /// assert each toggle's `iconSize` grows with the text.
 Finder revealEyeButtons() => find.byWidgetPredicate(
@@ -46,7 +46,7 @@ List<SemanticsNode> allSemanticsNodes(WidgetTester t) {
   return out;
 }
 
-/// The label of every node currently marked as a live region — what a screen
+/// The label of every node currently marked as a live region - what a screen
 /// reader announces on its own, without the user moving to it.
 List<String> liveRegionLabels(WidgetTester t) => allSemanticsNodes(t)
     .map((n) => n.getSemanticsData())
@@ -71,7 +71,7 @@ int occurrencesOf(String haystack, String needle) => needle.isEmpty
     : RegExp(RegExp.escape(needle)).allMatches(haystack).length;
 
 /// The label of every semantics node that has a name of its own AND children
-/// beneath it — a "named container". This is what actually reaches Orca when
+/// beneath it - a "named container". This is what actually reaches Orca when
 /// focus lands on a control inside it: the Linux embedder reads only names, so
 /// a region is audible because it is a named ancestor, not because it is a
 /// live region (which Linux ignores entirely).
@@ -81,7 +81,7 @@ List<String> namedContainerLabels(WidgetTester t) => allSemanticsNodes(t)
     .where((l) => l.isNotEmpty)
     .toList();
 
-/// The first line of every named container's label — what a screen reader is
+/// The first line of every named container's label - what a screen reader is
 /// given first when focus lands inside it. Two of the vault list's regions have
 /// a child's own name merged onto the end of theirs (the search box's
 /// placeholder, the chips row's page chevron), so an exact match would miss
@@ -107,7 +107,7 @@ List<String> subtreeLabels(WidgetTester t, Finder finder) {
   return out;
 }
 
-/// Captures every `SemanticsService.announce()` the app makes, in order — the
+/// Captures every `SemanticsService.announce()` the app makes, in order - the
 /// only channel that speaks on Linux for something that is an EVENT rather
 /// than a place (a shortcut firing, a sheet opening). Returns a growing list.
 List<String> recordAnnouncements(WidgetTester t) {
@@ -130,7 +130,7 @@ List<String> recordAnnouncements(WidgetTester t) {
 }
 
 /// Installs a mock for the `Clipboard` platform channel and returns a growing
-/// list of every text written via `Clipboard.setData` — a copy writes the
+/// list of every text written via `Clipboard.setData` - a copy writes the
 /// secret, the auto-clear writes an empty string. Used by the clipboard-clear
 /// pins across entry-detail, the generator, and the shared mixin.
 List<String> recordClipboardWrites(WidgetTester tester) {

@@ -7,7 +7,7 @@ import 'test_helpers.dart';
 
 /// The net under the "incoming choice always first, always the default" change:
 /// every tap must keep mapping to the same vault side after the two options are
-/// reordered. Pins the decisions each tap produces, never the on-screen order —
+/// reordered. Pins the decisions each tap produces, never the on-screen order -
 /// the order itself is pinned separately, red-first.
 
 /// Open a one-step review for [summary]; [onResult] receives the decisions when
@@ -108,13 +108,9 @@ Future<void> _tapThenOk(WidgetTester tester, Finder choice) async {
   await tester.pumpAndSettle();
 }
 
-/// Position of the first rendered `Text` containing [needle], in widget-tree
-/// order. Layout-agnostic: a choice pair renders as a `Wrap` of chips at normal
-/// text and a `Column` of rows at large text, so comparing coordinates would
-/// pin the layout rather than the order.
-/// Set [exact] for a bare label (Keep / Delete / Skip): the step's own body text
-/// says "Delete it here too, or keep it?", so a substring match would find that
-/// sentence instead of the choice and pass for the wrong widget.
+/// Widget-tree order, not coordinates: the pair is a Wrap at normal text and
+/// a Column at large text. [exact] for a bare label, or the body sentence
+/// "Delete it here too, or keep it?" matches first.
 int _order(WidgetTester tester, String needle, {bool exact = false}) {
   final labels = tester
       .widgetList<Text>(find.byType(Text))

@@ -2,12 +2,9 @@ import 'package:flutter/services.dart';
 
 const _yubikeyChannel = MethodChannel('app.gabbro.gabbro/yubikey');
 
-/// Whether this device has NFC hardware. Detected once at startup by
-/// [initNfcCapability] and read synchronously by the USB/NFC transport selectors
-/// so they only offer NFC where the device supports it. Defaults to false
-/// (USB-only) until detected, and stays false on Linux (libfido2 is USB-only,
-/// so the `has_nfc` channel has no handler). Tests set this directly and must
-/// reset it in tearDown.
+/// Detected once at startup so the transport selectors can read it
+/// synchronously. Stays false on Linux (libfido2 is USB-only). Tests that set
+/// it must reset it in tearDown.
 bool nfcAvailable = false;
 
 /// Query the platform for NFC hardware and cache the result in [nfcAvailable].

@@ -259,7 +259,6 @@ class _SecurityScreenState extends State<SecurityScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // ── Foreground lock ────────────────────────────────────────
               SectionHeader(label: l.sectionForegroundLock),
               const SizedBox(height: 4),
               Text(
@@ -281,7 +280,6 @@ class _SecurityScreenState extends State<SecurityScreen> {
               ),
               const SizedBox(height: 32),
 
-              // ── Background lock ────────────────────────────────────────
               SectionHeader(label: l.sectionBackgroundLock),
               const SizedBox(height: 4),
               Text(
@@ -303,7 +301,6 @@ class _SecurityScreenState extends State<SecurityScreen> {
               ),
               const SizedBox(height: 32),
 
-              // ── Password history ───────────────────────────────────────
               SectionHeader(label: l.sectionPasswordHistory),
               const SizedBox(height: 4),
               Text(
@@ -325,7 +322,6 @@ class _SecurityScreenState extends State<SecurityScreen> {
               ),
               const SizedBox(height: 32),
 
-              // ── Passphrase copy/paste ──────────────────────────────────
               SectionHeader(label: l.sectionPassphraseCopyPaste),
               const SizedBox(height: 4),
               Text(
@@ -347,7 +343,6 @@ class _SecurityScreenState extends State<SecurityScreen> {
               ),
               const SizedBox(height: 32),
 
-              // ── Biometric unlock (Android only) ───────────────────────
               if (widget.isAndroid) ...[
                 SectionHeader(label: l.sectionBiometricUnlock),
                 const SizedBox(height: 4),
@@ -370,7 +365,6 @@ class _SecurityScreenState extends State<SecurityScreen> {
                 const SizedBox(height: 32),
               ],
 
-              // ── App passkeys (Android only, F1) ───────────────────────
               // Android grants INTERNET silently at install, so this toggle
               // is the only informed opt-in the user ever gets.
               if (widget.isAndroid) ...[
@@ -396,7 +390,6 @@ class _SecurityScreenState extends State<SecurityScreen> {
                 const SizedBox(height: 32),
               ],
 
-              // ── Clipboard clear ────────────────────────────────────────
               SectionHeader(label: l.sectionClipboardClear),
               const SizedBox(height: 4),
               Text(

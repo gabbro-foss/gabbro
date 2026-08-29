@@ -1,13 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 
-/// Listens on a unix-domain socket for the `gabbro-autotype` trigger and fires
-/// [onTrigger] when the exact token arrives (ADR-017, Linux desktop auto-type).
-///
-/// The path and token come from the Rust bridge (so they never duplicate the
-/// canonical constants); they are passed in here so the listener is testable
-/// without the native library. There is no multi-instance support: if another
-/// instance already holds the socket, [start] declines rather than clobber it.
+/// ADR-017. Path and token are passed in (from the Rust bridge) so this is
+/// testable without the native library. If another instance holds the socket,
+/// [start] declines rather than clobber it.
 class AutotypeListener {
   AutotypeListener({
     required this.socketPath,

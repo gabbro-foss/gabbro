@@ -118,8 +118,8 @@ void main() {
     expect(icon.size, greaterThan(24));
   });
 
-  // ADR-016 Phase 3: the two icons inside the search box — the search-mode
-  // toggle (title-only vs all-fields) and the clear button — were the last
+  // ADR-016 Phase 3: the two icons inside the search box - the search-mode
+  // toggle (title-only vs all-fields) and the clear button - were the last
   // fixed-24 icons on this screen. A low-vision user reading 3x text still got
   // 24px glyphs there while every other icon around them grew.
   testWidgets('search box icons are base 24 at normal text', (tester) async {
@@ -152,7 +152,7 @@ void main() {
   });
 
   // ADR-016 Phase 3: the app-bar popup-menu item icons are a fixed size 20 and
-  // don't grow with the text scale — scale them (base 20 kept for menu density)
+  // don't grow with the text scale - scale them (base 20 kept for menu density)
   // so a low-vision user gets proportionally larger menu glyphs.
   testWidgets('popup-menu item icons keep base 20 at normal text',
       (tester) async {
@@ -190,7 +190,7 @@ void main() {
   });
 
   // ADR-016 Phase 3: the add-entry type-picker rows use a default-size (24)
-  // leading icon that doesn't scale — scale it with the text.
+  // leading icon that doesn't scale - scale it with the text.
   testWidgets('type-picker leading icons are base 24 at normal text',
       (tester) async {
     await tester.pumpWidget(_buildScreen());
@@ -233,7 +233,7 @@ void main() {
     }
   });
 
-  // ADR-016 Phase 3: the per-entry list-row type icon is a fixed size 20 —
+  // ADR-016 Phase 3: the per-entry list-row type icon is a fixed size 20 -
   // scale it with the text so it stays legible alongside the enlarged title.
   testWidgets('phone list-row entry icon is base 20 at normal text',
       (tester) async {
@@ -282,7 +282,7 @@ void main() {
       expect(find.text('Manage folders'), findsOneWidget);
       expect(find.text('Keyboard shortcuts'), findsOneWidget);
       expect(find.text('Quit'), findsOneWidget);
-      // Net (2026-07-21): pin the exact count so a silently added or removed item
+      // Pin the exact count so a silently added or removed item
       // is caught. Bump this when the menu gains an item.
       expect(find.byType(PopupMenuItem<String>), findsNWidgets(16));
     });
@@ -399,7 +399,7 @@ void main() {
       await tester.tap(find.byIcon(Icons.menu));
       await tester.pumpAndSettle();
 
-      // Every PopupMenuItem child is a Row — each must contain at least one Icon.
+      // Every PopupMenuItem child is a Row - each must contain at least one Icon.
       final rows = find.descendant(
         of: find.byType(PopupMenuItem<String>),
         matching: find.byType(Row),
@@ -425,8 +425,6 @@ void main() {
       expect(find.text('Delete vault'), findsNothing);
     });
   });
-
-  // ── Menu navigation ───────────────────────────────────────────────────────
 
   testWidgets('tapping Password generator pushes GeneratorScreen', (tester) async {
     await tester.pumpWidget(_buildScreen());
@@ -470,7 +468,7 @@ void main() {
   });
 
   testWidgets('tapping Manage vaults is null-safe when no GabbroApp', (tester) async {
-    // GabbroApp.maybeOf returns null here — must not throw.
+    // GabbroApp.maybeOf returns null here - must not throw.
     await tester.pumpWidget(_buildScreen());
     await _setNarrow(tester);
     await tester.pumpAndSettle();
@@ -480,12 +478,12 @@ void main() {
     await tester.tap(find.text('Manage vaults'));
     await tester.pumpAndSettle();
 
-    // No crash — screen is still rendered.
+    // No crash - screen is still rendered.
     expect(find.byType(Scaffold), findsAtLeastNWidgets(1));
   });
 
   // Security regression guard: if listEntries throws (the vault is locked), the
-  // screen must NOT render the entry list / its chrome — no decrypted data may
+  // screen must NOT render the entry list / its chrome - no decrypted data may
   // surface. Pins the _error render-gate against future regression.
   testWidgets('locked vault (listEntries throws) renders no entry-list chrome',
       (tester) async {
@@ -496,7 +494,7 @@ void main() {
     await _setNarrow(tester);
     await tester.pumpAndSettle();
 
-    // The error screen replaces the whole list view — no menu, no search field.
+    // The error screen replaces the whole list view - no menu, no search field.
     expect(find.byType(PopupMenuButton<String>), findsNothing,
         reason: 'a locked load must not render the vault-list AppBar/menu');
     expect(find.byIcon(Icons.lock_outline), findsNothing,

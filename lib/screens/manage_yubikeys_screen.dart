@@ -23,8 +23,6 @@ Uint8List _fromHex(String hex) {
   return Uint8List.fromList(result);
 }
 
-// ── Default bridge implementations ───────────────────────────────────────────
-
 List<YubikeyRecordData> _defaultListKeys(String path) =>
     listVaultYubikeyRecords(path: path);
 
@@ -61,8 +59,6 @@ Future<void> _defaultAddYubikey({
   newSalt: newSalt,
 );
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 class ManageYubiKeysScreen extends StatefulWidget {
   final String vaultPath;
   final String transport;
@@ -70,7 +66,6 @@ class ManageYubiKeysScreen extends StatefulWidget {
   // null = use Platform.isAndroid at runtime; set to true/false in tests.
   final bool? isAndroid;
 
-  // ── Injected bridge callbacks (default to real bridge; swap in tests) ──────
   final List<YubikeyRecordData> Function(String path) onListKeys;
   final List<YubikeyAliasData> Function() onListAliases;
   final Future<void> Function(String hex, String alias) onSetAlias;
@@ -82,7 +77,6 @@ class ManageYubiKeysScreen extends StatefulWidget {
   })
   onAddYubikey;
 
-  // ── Linux FIDO callbacks ──────────────────────────────────────────────────
   final List<String> Function() onFidoListDevices;
   final Future<FidoCredentialData> Function({
     required String devicePath,
@@ -421,7 +415,7 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
     ).then((_) => _progressShown = false);
 
     try {
-      // Step 1: register — obtain credentialId.
+      // Step 1: register - obtain credentialId.
       final cred = await _yubikeyChannel.invokeMethod<String>('register', {
         'pin': pin,
         'transport': transport,
@@ -433,7 +427,7 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
 
       if (!mounted) return;
 
-      // Step 2: get_hmac_secret — obtain HMAC secret using the new credential.
+      // Step 2: get_hmac_secret - obtain HMAC secret using the new credential.
       final hmacHex = await _yubikeyChannel
           .invokeMethod<String>('get_hmac_secret', {
             'credentialId': credIdHex,

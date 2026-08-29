@@ -14,8 +14,6 @@ import 'package:gabbro/widgets/path_field.dart';
 
 import 'test_helpers.dart';
 
-// ── Widget helper ─────────────────────────────────────────────────────────────
-
 Widget _buildScreen({
   Future<String?> Function()? onPickFile,
   Future<VaultHeaderData> Function(String path)? onReadHeader,
@@ -71,14 +69,14 @@ void main() {
       await _tapBrowse(tester);
       await tester.pumpAndSettle();
 
-      // Alias prefilled from the vault file's header…
+      // Alias prefilled from the vault file's header...
       final aliasField = find.byKey(const Key('adopt_alias_field'));
       expect(aliasField, findsOneWidget);
       expect(
         tester.widget<TextField>(aliasField).controller?.text,
         'Personal',
       );
-      // …and editable.
+      // ...and editable.
       await tester.enterText(aliasField, 'Work');
       expect(tester.widget<TextField>(aliasField).controller?.text, 'Work');
     });
@@ -326,7 +324,7 @@ void main() {
     });
   });
 
-  // N5 (Linux desktop): the whole flow must complete without a pointer —
+  // N5 (Linux desktop): the whole flow must complete without a pointer -
   // typed path, Enter to triage, Tab to the Add button, Enter to adopt.
   group('N5: keyboard only', () {
     testWidgets('typed path -> Enter -> Tab -> Enter adopts', (tester) async {
@@ -375,7 +373,7 @@ void main() {
   });
 
   // N4: an error card appearing moves no focus, so on Linux the reader would
-  // say nothing — announce it. Android is gated off (deprecated events;
+  // say nothing - announce it. Android is gated off (deprecated events;
   // TalkBack reads the widgets themselves).
   group('N4: errors are announced on Linux', () {
     testWidgets('triage error is spoken', (tester) async {
@@ -429,7 +427,7 @@ void main() {
   });
 
   // N2: longest strings x largest text x narrowest phone, together, through
-  // every state of the flow — the catalog probe only sweeps the initial state
+  // every state of the flow - the catalog probe only sweeps the initial state
   // at 2x.
   group('N2: every locale at 2x on a 360dp phone', () {
     testWidgets('all five states render without overflow', (tester) async {
@@ -475,7 +473,7 @@ void main() {
         await tester.pumpAndSettle();
         final l = lookupAppLocalizations(locale);
 
-        // The screen's own list, not a TextField's inner scrollable — at 2x a
+        // The screen's own list, not a TextField's inner scrollable - at 2x a
         // huge field can own the list's centre, so centre-drags are unsafe.
         final list = find
             .descendant(
@@ -506,7 +504,7 @@ void main() {
 
         // 2. confirm with the colliding alias -> collision error. Invoked
         // directly: at 2x the button can be taller than the viewport, so a
-        // centre-tap misses — a harness artifact. Tappability is pinned at
+        // centre-tap misses - a harness artifact. Tappability is pinned at
         // 1x by F3; this sweep asserts layout.
         await show(find.byKey(const Key('adopt_confirm_button')), 400);
         tester
@@ -516,7 +514,7 @@ void main() {
         expect(tester.takeException(), isNull,
             reason: 'collision error must scroll at 2x in $locale');
         // The zero-size collision marker can sit outside the lazy list's
-        // build range at 2x — assert the user-visible signal instead: the
+        // build range at 2x - assert the user-visible signal instead: the
         // localized collision message on the alias field.
         await show(find.byKey(const Key('adopt_alias_field')), -400);
         expect(

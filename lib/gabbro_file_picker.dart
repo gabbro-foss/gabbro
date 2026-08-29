@@ -61,7 +61,7 @@ class GabbroFilePicker {
 
   /// Save-as dialog; returns the chosen path or null on cancel. Linux only:
   /// Android picks a folder instead and never shows one, so reaching this
-  /// anywhere else is a wiring bug — it must fail loudly, not silently.
+  /// anywhere else is a wiring bug - it must fail loudly, not silently.
   static Future<String?> savePath(
       {String? fileName,
       List<String>? allowedExtensions,
@@ -98,8 +98,6 @@ class GabbroFilePicker {
 
   /// Android folder leg (SAF trees); export reaches it directly.
   static Future<String?> Function() androidPickDirectory = _androidPickDirectory;
-
-  // ── Android legs: our own picker channel ──────────────────────────────────
 
   static Future<String?> _androidPickPath({List<String>? allowedExtensions}) =>
       androidPicker.openFile(allowedExtensions: allowedExtensions);

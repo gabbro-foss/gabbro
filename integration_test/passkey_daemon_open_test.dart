@@ -1,12 +1,7 @@
-// Red-first for the daemon-failure status (F2, Current Focus item 5).
-//
-// `passkeyDaemonOpen()` must surface a device/lock failure as a catchable
-// Dart error. The old shape (one stream fn doing flock + open + pump) lost
-// its Err on an unawaited FRB future, so the app could never learn why the
-// passkey provider was inactive and the vault-list banner stayed dead.
-//
-// Real seam: the compiled cdylib, the real flock path, an outside flock(1)
-// holding the lock exactly as a second Gabbro instance would.
+// F2: `passkeyDaemonOpen()` must surface a device or lock failure as a
+// catchable Dart error, or the vault-list banner can never say why passkeys
+// are inactive. Real seam: an outside flock(1) holds the lock exactly as a
+// second Gabbro instance would.
 
 import 'dart:convert';
 import 'dart:io';

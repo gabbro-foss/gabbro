@@ -18,8 +18,6 @@ import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/text_scale.dart';
 
-// ── Fake data helpers ─────────────────────────────────────────────────────────
-
 LoginEntryData _loginEntry() => LoginEntryData(
       id: 'test-id-1',
       title: 'Gneiss Bank',
@@ -69,8 +67,6 @@ CustomEntryData _customEntry() => CustomEntryData(
       attachments: const [],
     );
 
-// ── Widget helper ─────────────────────────────────────────────────────────────
-
 Widget _buildScreen(
   VaultEntryData entry, {
   Future<void> Function(String id)? onDeleteEntry,
@@ -90,8 +86,6 @@ Widget _buildScreen(
       exportFilePicker: exportFilePicker ?? (_) async => null,
       onFetchHistory: onFetchHistory ?? (_) async => const [],
     ));
-
-// ── Tests ─────────────────────────────────────────────────────────────────────
 
 void main() {
   passkeyTests();
@@ -247,7 +241,7 @@ void main() {
     clipboardWiper.cancelPending(); // this test is about the snackbar, not the wipe
   });
 
-  // Round 26 (Orca): copying from the detail pane said nothing — the snackbar
+  // Copying from the detail pane said nothing - the snackbar
   // that confirms it is invisible to a Linux screen reader, which reads only a
   // node's name and never sees a snackbar appear. Copying moves no focus, so an
   // announcement of the same text has nothing competing with it.
@@ -332,7 +326,6 @@ void main() {
     expect(find.textContaining('never'), findsOneWidget);
   });
 
-  // ── Clipboard auto-clear (net-first pin, ADR-017 Phase 3.1) ───────────────
   // These pin the *actual* clear (existing tests only checked the snackbar
   // label). The copy goes through the injected stub, so the only writes that
   // reach the platform channel are the auto-clear's empty writes.
@@ -494,12 +487,8 @@ void main() {
     expect(popped, isTrue);
   });
 
-  // Round 19 proved the two-pane delete fault: the layout drops the detail
-  // pane the moment the entry leaves the filtered list, so by the time the
-  // vault delete returns this screen is gone and the parent is never told —
-  // the row sits in the list until something else forces a reload. The parent
-  // callback must not depend on this screen surviving; only the Navigator use
-  // below does.
+  // The two-pane layout drops the detail pane the moment the entry leaves the
+  // list, so the parent callback must not depend on this screen surviving.
   testWidgets('the parent is still told when the detail pane is torn down '
       'mid-delete', (tester) async {
     final deleteRunning = Completer<void>();
@@ -864,8 +853,6 @@ void main() {
     expect(find.text('AB123456'), findsOneWidget);
   });
 
-  // ── Card entry ───────────────────────────────────────────────────────────────
-
   testWidgets('card entry renders cardholder and obscures card number and CVV',
       (tester) async {
     await tester.pumpWidget(
@@ -877,7 +864,7 @@ void main() {
     expect(find.text('••••••••'), findsNWidgets(2));
     expect(find.text('4111111111111111'), findsNothing);
     expect(find.text('123'), findsNothing);
-    // Two visibility_off icons — one per toggle field.
+    // Two visibility_off icons - one per toggle field.
     expect(find.byIcon(Icons.visibility_off), findsNWidgets(2));
   });
 
@@ -911,8 +898,6 @@ void main() {
     expect(find.text('4111111111111111'), findsNothing);
   });
 
-  // ── Custom entry ─────────────────────────────────────────────────────────────
-
   testWidgets('custom entry renders title', (tester) async {
     await tester.pumpWidget(
       _buildScreen(VaultEntryData.custom(_customEntry())),
@@ -921,8 +906,6 @@ void main() {
     // Title appears in AppBar and as a body field value.
     expect(find.text('My Custom Secret'), findsWidgets);
   });
-
-  // ── Delete dialog cancel path ─────────────────────────────────────────────────
 
   testWidgets('cancel delete dialog does not call onDeleteEntry',
       (tester) async {
@@ -947,8 +930,6 @@ void main() {
     expect(find.byType(EntryDetailScreen), findsOneWidget);
   });
 
-  // ── Empty URL ────────────────────────────────────────────────────────────────
-
   testWidgets('login with empty URL shows no browser launch icon',
       (tester) async {
     final entry = LoginEntryData(
@@ -970,8 +951,6 @@ void main() {
 
     expect(find.byIcon(Icons.open_in_browser_outlined), findsNothing);
   });
-
-  // ── Note hidden custom field ──────────────────────────────────────────────────
 
   testWidgets('note hidden custom field toggles visible', (tester) async {
     final entry = NoteEntryData(
@@ -1088,7 +1067,7 @@ void main() {
   });
 
   // ADR-016 reveal-eye: the show/hide password toggle (an action-row button,
-  // base 18) grows with the text scale — full control-scale, not the suffix cap.
+  // base 18) grows with the text scale - full control-scale, not the suffix cap.
   testWidgets('reveal-eye toggle scales up at large text', (tester) async {
     tester.platformDispatcher.textScaleFactorTestValue = 2.0;
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
@@ -1125,7 +1104,6 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  // ── Bottom reserve (tablet FAB clearance) ─────────────────────────────────
   // The shared screen is used both as the phone full-screen route (no FAB) and
   // as the tablet detail pane (a Scaffold-level FAB floats over its bottom).
   // A tablet-only bottomReserve keeps content clear of the FAB without leaking
@@ -1273,8 +1251,6 @@ EdgeInsets bodyScrollPadding(WidgetTester tester) {
   );
   return scroll.padding as EdgeInsets;
 }
-// ── Passkey entries ───────────────────────────────────────────────────────────
-
 PasskeyEntryData _passkeyEntry({String? notes}) => PasskeyEntryData(
       id: 'pk-id-1',
       createdAt: '2026-01-01T00:00:00Z',

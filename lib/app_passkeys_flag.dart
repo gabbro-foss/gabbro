@@ -11,7 +11,7 @@ bool? debugAppPasskeysIsAndroid;
 const _channel = MethodChannel('app.gabbro.gabbro/app_passkeys');
 
 /// Mirror the app-passkeys opt-in (F1) into Android SharedPreferences, where
-/// the credential-provider service — which runs without Flutter — reads it.
+/// the credential-provider service - which runs without Flutter - reads it.
 /// Best-effort: a channel failure leaves the provider on its stored value
 /// (absent = off), so a native app is refused rather than allowed.
 Future<void> pushAppPasskeysFlag(bool enabled) async {

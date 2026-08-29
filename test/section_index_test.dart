@@ -55,8 +55,6 @@ void main() {
     });
   });
 
-  // ── Cycle 1: Cyrillic ──────────────────────────────────────────────────────
-
   group('sectionBucket - Cyrillic', () {
     test('Latin preserved with explicit locale', () {
       expect(sectionBucket('Quartz', _en), 'Q');
@@ -101,8 +99,6 @@ void main() {
     });
   });
 
-  // ── Cycle 2: Greek (accent-folding) ────────────────────────────────────────
-
   group('sectionBucket - Greek', () {
     test('accented capital folds to base', () {
       expect(sectionBucket('Άλφα', _el), 'Α');
@@ -130,8 +126,6 @@ void main() {
     });
   });
 
-  // ── Cycle 3: Korean (jamo decomposition) ───────────────────────────────────
-
   group('sectionBucket - Korean', () {
     test('syllable buckets under its leading consonant', () {
       expect(sectionBucket('김치', _ko), 'ㄱ');
@@ -151,8 +145,6 @@ void main() {
       expect(sectionBucket('김치', _en), '#');
     });
   });
-
-  // ── Cycle 4: CJK no-bar locales ─────────────────────────────────────────────
 
   group('isIndexableLocale', () {
     test('ja and zh have no index bar', () {

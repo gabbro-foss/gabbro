@@ -170,7 +170,7 @@ void main() {
 
   // NET (green before the region-Esc change, must stay green): Esc still GOES
   // BACK from a pushed screen when a non-text control holds focus. The region
-  // cycle needs Esc to drop focus out of a region instead of popping — that
+  // cycle needs Esc to drop focus out of a region instead of popping - that
   // must not leak onto other screens, where a focused button means "pop", not
   // "blur".
   testWidgets('Esc pops a pushed sub-screen when a non-text control is focused',
@@ -215,7 +215,7 @@ void main() {
         reason: 'a focused non-text control must not turn Esc into a blur');
   });
 
-  // NET: the same guard for a dialog — Esc closes it whole, even when a button
+  // NET: the same guard for a dialog - Esc closes it whole, even when a button
   // inside it holds focus.
   testWidgets('Esc closes a dialog when a non-text control inside it is focused',
       (tester) async {

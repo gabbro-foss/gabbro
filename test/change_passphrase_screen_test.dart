@@ -6,8 +6,6 @@ import 'package:gabbro/screens/change_passphrase_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
-// ── Fake entropy ──────────────────────────────────────────────────────────────
-
 EntropyResult _fakeStrongEntropy(String ignored) => EntropyResult(
       bits: 100,
       tier: StrengthTier.veryStrong,
@@ -22,14 +20,10 @@ EntropyResult _fakeWeakEntropy(String ignored) =>
 EntropyResult _fakeTerribleEntropy(String ignored) =>
     EntropyResult(bits: 5, tier: StrengthTier.terrible);
 
-// ── Fake YubiKey record ───────────────────────────────────────────────────────
-
 YubikeyRecordData _fakeRecord() => YubikeyRecordData(
       credentialId: Uint8List.fromList([1, 2, 3, 4]),
       salt: Uint8List(32),
     );
-
-// ── Widget helper ─────────────────────────────────────────────────────────────
 
 ChangePassphraseScreen _screen({
   Future<void> Function(List<int>, List<int>)? onChangePassphrase,
@@ -75,7 +69,7 @@ Widget _buildScreen({
     ));
 
 // testApp uses home: (a root route) which the success path's Navigator.pop can't
-// pop cleanly — and popping disposes the screen's Scaffold + its SnackBar. Push
+// pop cleanly - and popping disposes the screen's Scaffold + its SnackBar. Push
 // the screen above a host Scaffold so pop returns there and the ScaffoldMessenger
 // SnackBar survives. Use for tests that exercise a successful change.
 Future<void> _pumpPushed(WidgetTester tester, ChangePassphraseScreen screen) async {
@@ -108,10 +102,7 @@ Future<void> _fillAndSubmit(WidgetTester tester, {String? yubikeyPin}) async {
   await tester.pumpAndSettle();
 }
 
-// ── Tests ─────────────────────────────────────────────────────────────────────
-
 void main() {
-  // ── ADR-016 reveal-eye: suffix-icon toggles grow with text but are capped ───
   group('reveal-eye toggles scale (capped) at large text', () {
     void setPhone(WidgetTester tester) {
       tester.view.physicalSize = const Size(400, 800);
@@ -147,7 +138,6 @@ void main() {
     });
   });
 
-  // ── Enter-submit / focus chain ──────────────────────────────────────────────
   group('Enter-submit chain', () {
     bool focused(WidgetTester tester, String label) => tester
         .widget<TextField>(find.widgetWithText(TextField, label))
@@ -203,10 +193,10 @@ void main() {
   });
 
   // fields[0] = old passphrase, fields[1] = new passphrase, fields[2] = confirm
-  // Old passphrase: interactive selection allowed (paste permitted — policy decision).
+  // Old passphrase: interactive selection allowed (paste permitted - policy decision).
   // New + confirm: interactive selection blocked.
   // Copy blocking on old passphrase field is enforced via contextMenuBuilder
-  // (paste-only menu) — verified manually on device, not via automated test.
+  // (paste-only menu) - verified manually on device, not via automated test.
 
   testWidgets('all fields block selection when blockPassphraseCopyPaste is true', (tester) async {
     await tester.pumpWidget(_buildScreen(blockPassphraseCopyPaste: true));
@@ -225,8 +215,6 @@ void main() {
     expect(fields[1].enableInteractiveSelection, isNot(isFalse));
     expect(fields[2].enableInteractiveSelection, isNot(isFalse));
   });
-
-  // ── YubiKey mode ─────────────────────────────────────────────────────────────
 
   testWidgets('yubikey mode shows YubiKey info banner', (tester) async {
     await tester.pumpWidget(_buildScreen(yubikeyRecords: [_fakeRecord()]));
@@ -254,7 +242,7 @@ void main() {
     await tester.pumpWidget(_buildScreen(
       yubikeyRecords: [_fakeRecord()],
       onConfirmYubikey: (_, _, _, _) async => confirmCalled = true,
-      // Throw so the screen does not navigate away — we only need to check
+      // Throw so the screen does not navigate away - we only need to check
       // that onConfirmYubikey was called first.
       onChangePassphrase: (_, _) async => throw Exception('stop'),
     ));
@@ -327,8 +315,6 @@ void main() {
     expect(confirmAnyCalled, isTrue);
     expect(find.textContaining('stop'), findsOneWidget);
   });
-
-  // ── Approach B: disable biometric on a successful passphrase change ───────────
 
   testWidgets(
       'N1: passphrase-only success with biometric off shows success, does not disable biometric',
@@ -412,8 +398,6 @@ void main() {
     );
   });
 
-  // ── Strength gate: align with onboarding (Fair-and-above) ─────────────────────
-
   testWidgets('R5: a Fair passphrase is accepted (matches onboarding)',
       (tester) async {
     var changeCalled = false;
@@ -457,7 +441,6 @@ void main() {
     expect(find.text('Passphrase is too weak'), findsOneWidget);
   });
 
-  // ── Visibility toggles (net-first: pin current flip behaviour) ──────────────
   // Pins the show/hide eye toggles so the later a11y label work cannot regress
   // the flip. Passphrase-only mode has 3 toggles (old/new/confirm); YubiKey mode
   // adds a 4th (PIN).

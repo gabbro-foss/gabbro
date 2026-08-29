@@ -85,7 +85,7 @@ void main() {
   });
 
   // Scenario 9 (attachments task): an attachment history row is titled by its
-  // FILENAME (the record's value) — never the uuid or the raw key.
+  // FILENAME (the record's value) - never the uuid or the raw key.
   testWidgets('an attachment history row is titled by filename', (
     tester,
   ) async {

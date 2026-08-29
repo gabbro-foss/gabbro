@@ -1,13 +1,6 @@
-// Tests for foreground and background lock behaviour in GabbroApp.
-//
-// Background lock uses a timestamp-on-background / check-on-resume strategy
-// rather than a timer, so tests advance a fake clock injected via
-// GabbroApp.clock rather than pumping time while the app is in background.
-//
-// Frames caveat: hidden/paused/detached call Flutter's _setFramesEnabled(false).
-// Tests that assert on the widget tree after a background-triggered lock must
-// send AppLifecycleState.resumed first (re-enables frames), then call
-// pump() to consume hasScheduledFrame before pump(duration) runs the animation.
+// Background lock is timestamp-on-background, check-on-resume, so tests
+// advance the injected clock. hidden/paused/detached disable frames: send
+// resumed first, then pump() before pump(duration).
 
 import 'dart:io';
 
@@ -152,12 +145,12 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.keyA);
       await tester.pump();
 
-      // 10 s since the key press — must NOT lock.
+      // 10 s since the key press - must NOT lock.
       await tester.pump(const Duration(seconds: 10));
       await tester.pump();
       expect(find.text('InitialScreen'), findsOneWidget);
 
-      // 25 more seconds (35 s since key press) — MUST lock.
+      // 25 more seconds (35 s since key press) - MUST lock.
       await tester.pump(const Duration(seconds: 25));
       await tester.pump(const Duration(milliseconds: 500));
       expect(find.text('InitialScreen'), findsNothing);
@@ -177,7 +170,7 @@ void main() {
       await tester.tap(find.text('InitialScreen'));
       await tester.pump();
 
-      // 10 s since tap — must NOT lock.
+      // 10 s since tap - must NOT lock.
       await tester.pump(const Duration(seconds: 10));
       await tester.pump();
       expect(find.text('InitialScreen'), findsOneWidget);
@@ -304,7 +297,7 @@ void main() {
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
       await tester.pump();
 
-      // Only 30 s — under the threshold.
+      // Only 30 s - under the threshold.
       advance(const Duration(seconds: 30));
 
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
@@ -325,7 +318,7 @@ void main() {
       );
       await tester.pumpWidget(app);
 
-      // First background session — 30 s (under threshold).
+      // First background session - 30 s (under threshold).
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
       await tester.pump();
       advance(const Duration(seconds: 30));
@@ -333,7 +326,7 @@ void main() {
       await tester.pump();
       expect(find.text('InitialScreen'), findsOneWidget); // no lock
 
-      // Second background session — also 30 s (not cumulative).
+      // Second background session - also 30 s (not cumulative).
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
       await tester.pump();
       advance(const Duration(seconds: 30));
@@ -378,7 +371,7 @@ void main() {
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
       await tester.pump();
 
-      // Only 30 s away — under the 1-minute threshold.
+      // Only 30 s away - under the 1-minute threshold.
       advance(const Duration(seconds: 30));
 
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
@@ -411,7 +404,7 @@ void main() {
       await tester.pump(const Duration(minutes: 1, seconds: 1));
 
       // resumed re-enables frames; _backgroundedAt was cleared by _lock() so no
-      // double-lock — just renders the already-queued navigation.
+      // double-lock - just renders the already-queued navigation.
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 500));
@@ -433,7 +426,7 @@ void main() {
       ));
       expect(find.text('InitialScreen'), findsOneWidget);
 
-      // Focus lost; app still visible — no resumed follows during background.
+      // Focus lost; app still visible - no resumed follows during background.
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
       await tester.pump();
 
@@ -491,17 +484,17 @@ void main() {
         ),
       ));
 
-      // Go to background and immediately come back (under threshold — no lock).
+      // Go to background and immediately come back (under threshold - no lock).
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
       await tester.pump();
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
       await tester.pump();
 
-      // 25 s since resume — must NOT lock (30 s threshold).
+      // 25 s since resume - must NOT lock (30 s threshold).
       await tester.pump(const Duration(seconds: 25));
       expect(find.text('InitialScreen'), findsOneWidget);
 
-      // 6 s more (31 s since resume) — MUST lock.
+      // 6 s more (31 s since resume) - MUST lock.
       await tester.pump(const Duration(seconds: 6));
       await tester.pump(const Duration(milliseconds: 500));
 
@@ -550,18 +543,18 @@ void main() {
           GabbroApp.maybeOf(tester.element(find.text('InitialScreen')));
       appState!.suspendForegroundLock();
 
-      // Well past the normal threshold — still suspended.
+      // Well past the normal threshold - still suspended.
       await tester.pump(const Duration(minutes: 1));
       expect(find.text('InitialScreen'), findsOneWidget);
 
       appState.resumeForegroundLock();
       await tester.pump();
 
-      // 25 s after resume — must NOT lock yet.
+      // 25 s after resume - must NOT lock yet.
       await tester.pump(const Duration(seconds: 25));
       expect(find.text('InitialScreen'), findsOneWidget);
 
-      // 6 s more (31 s after resume) — MUST lock.
+      // 6 s more (31 s after resume) - MUST lock.
       await tester.pump(const Duration(seconds: 6));
       await tester.pump(const Duration(milliseconds: 500));
 

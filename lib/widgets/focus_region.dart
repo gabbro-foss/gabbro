@@ -25,7 +25,7 @@ class FocusFrameStyle {
 }
 
 /// The frame a focused region should draw: none when unfocused; a solid border
-/// in normal modes; a dashed, thicker border in high-contrast — a non-colour cue
+/// in normal modes; a dashed, thicker border in high-contrast - a non-colour cue
 /// (texture) for users who need more than colour and width alone.
 FocusFrameStyle? focusFrameStyle({
   required bool focused,
@@ -40,7 +40,7 @@ FocusFrameStyle? focusFrameStyle({
   );
 }
 
-/// Strokes a rounded-rect border for [style] — solid, or dashed when
+/// Strokes a rounded-rect border for [style] - solid, or dashed when
 /// [FocusFrameStyle.dashed] is set (high-contrast).
 class FocusFramePainter extends CustomPainter {
   final FocusFrameStyle style;
@@ -80,7 +80,7 @@ class FocusFramePainter extends CustomPainter {
       old.style != style || old.radius != radius;
 }
 
-/// An [OutlineInputBorder] drawn with dashes — Flutter can't dash an input
+/// An [OutlineInputBorder] drawn with dashes - Flutter can't dash an input
 /// border out of the box. Used for the search field's focus border in
 /// high-contrast, so its own outline "lights up" dashed (matching the
 /// [FocusRegion] frame) with no second line.
@@ -131,29 +131,14 @@ class DashedOutlineInputBorder extends OutlineInputBorder {
   }
 }
 
-/// Wraps a traversal "region" (search box, a list, the chips row, the detail
-/// pane) and draws a focus frame around it while any control inside it holds
-/// focus. The frame is the qtile-style "which area am I in" cue; individual
-/// items keep their own selection highlight. Colour is the theme primary; the
-/// high-contrast variant is dashed and thicker (see [focusFrameStyle]).
-/// [label] names the region to a screen reader and is read when focus enters
-/// it — the audible counterpart of the frame, so a user who cannot see the
-/// frame still knows which region Tab moved them to. Null means the region
-/// stays silent.
-///
-/// It is a NAME on a Semantics container, not a `SemanticsService` announcement.
-/// Round 22 tried the announcement and it was inaudible wherever it mattered:
-/// the Linux embedder sends announcements as ATK "polite", and Orca discards a
-/// polite notification while it is already speaking — which it always is when
-/// focus has just landed on a row or a button. The named container is read as
-/// an `ATK_ROLE_PANEL` ancestor and cannot be discarded that way (round 16).
-///
-/// Known cost, accepted by the maintainer: because the panel is an ancestor of
-/// every row, Orca reads the region name again on each arrow press inside the
-/// entry list. An audible repeat beats inaudible silence.
-///
-/// [showFrame] is false for the search box, which lights up its OWN outline
-/// instead (an overlay frame there gave a double border) but is still named.
+/// Draws a "which area am I in" frame around a Tab region while a control
+/// inside holds focus, and names the region to a screen reader. [label] is a
+/// name on a Semantics container, not a `SemanticsService` announcement: the
+/// Linux embedder sends announcements as ATK "polite" and Orca discards those
+/// while speaking, which it always is right after a focus change; a named
+/// panel ancestor cannot be discarded. Accepted cost: Orca repeats the region
+/// name on each arrow press inside the list. [showFrame] is false for the
+/// search box, which lights its own outline.
 class FocusRegion extends StatefulWidget {
   final Widget child;
   final double radius;

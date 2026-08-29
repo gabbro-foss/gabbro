@@ -19,8 +19,6 @@ import 'package:gabbro/widgets/path_field.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
 import 'package:gabbro/widgets/text_size_slider.dart';
 
-// ── Hex helpers ───────────────────────────────────────────────────────────────
-
 String _toHex(List<int> bytes) =>
     bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
 
@@ -31,8 +29,6 @@ Uint8List _fromHex(String hex) {
   }
   return Uint8List.fromList(result);
 }
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
 
 /// Turns a user-entered vault alias into a safe filename stem for the default
 /// vault path. Lowercases, spaces -> `_`, and strips everything outside
@@ -45,8 +41,6 @@ String sanitiseVaultAlias(String alias) {
   final cleaned = s.replaceAll(RegExp(r'[^a-z0-9_\-]'), '');
   return cleaned.isEmpty ? 'vault' : cleaned;
 }
-
-// ── Bridge defaults ───────────────────────────────────────────────────────────
 
 Future<void> _defaultInitVault(
   List<int> passphrase,
@@ -187,7 +181,7 @@ Future<void> _defaultInitVaultWithYubikey(
   // Wait for user to swap to a different physical key before backup registration
   await onAwaitBackupKey();
 
-  // Tap 3: register backup key (fresh discovery — accepts the backup key now presented)
+  // Tap 3: register backup key (fresh discovery - accepts the backup key now presented)
   final credId2Hex = await _yubikeyChannel.invokeMethod<String>('register', {
     'pin': pins[1],
     'transport': transports[1],
@@ -232,8 +226,6 @@ Future<void> _defaultInitVaultWithYubikey(
   );
 }
 
-// ── Widget ────────────────────────────────────────────────────────────────────
-
 class OnboardingScreen extends StatefulWidget {
   final String? initialPath;
   final String? postDeletionMessage;
@@ -246,7 +238,7 @@ class OnboardingScreen extends StatefulWidget {
   /// Tests can pass `showYubikey: true` to exercise the YubiKey UI.
   final bool showYubikey;
 
-  /// True only on Android — controls NFC transport selector visibility.
+  /// True only on Android - controls NFC transport selector visibility.
   /// Tests simulating Android can pass `isAndroid: true`.
   final bool isAndroid;
 
@@ -277,13 +269,13 @@ class OnboardingScreen extends StatefulWidget {
   /// `~/.local/share`). On failure the path field is left empty and editable.
   final Future<String> Function() resolveDataDir;
 
-  /// Quit the app from first-run onboarding — a tiling-WM user has no title-bar
-  /// close, and first-run has no other way out. Null → the button renders
+  /// Quit the app from first-run onboarding - a tiling-WM user has no title-bar
+  /// close, and first-run has no other way out. Null -> the button renders
   /// disabled (tests that don't drive Quit); production wires it to exit.
   final VoidCallback? onQuit;
 
   /// Adopt an existing `.gabbro` file instead of creating a vault (someone
-  /// setting up their second device). Null → the button is absent.
+  /// setting up their second device). Null -> the button is absent.
   final VoidCallback? onAdoptRequested;
 
   OnboardingScreen({
@@ -317,7 +309,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final _aliasController = TextEditingController();
   final _passphraseController = TextEditingController();
   final _confirmController = TextEditingController();
-  // One controller per key (index 0 = primary, 1 = backup, …)
+  // One controller per key (index 0 = primary, 1 = backup, ...)
   final List<TextEditingController> _pinControllers = [
     TextEditingController(),
     TextEditingController(),
@@ -770,7 +762,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // ── Top row: cancel (left, if nested) + accessibility (right) ──
+            // Top row: cancel (left, if nested) + accessibility (right)
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
               child: Row(
@@ -820,7 +812,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       child: Padding(
                         padding: const EdgeInsets.only(right: 8.0),
                         // This button *controls* the text size, so keep it a
-                        // fixed size (like the icon buttons beside it) — it must
+                        // fixed size (like the icon buttons beside it) - it must
                         // not balloon when large text is on (ADR-016 Phase 3).
                         child: MediaQuery(
                           data: MediaQuery.of(
@@ -854,7 +846,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ],
               ),
             ),
-            // ── Main content ────────────────────────────────────────────
             Expanded(
               child: Center(
                 child: ConstrainedBox(
@@ -880,7 +871,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 MediaQuery.of(context).size.shortestSide,
                               ),
                               // Onboarding preview is just the brand word (a
-                              // proper noun, same in every locale) — the full
+                              // proper noun, same in every locale) - the full
                               // sample sentence lives on the appearance screen.
                               previewText: 'Gabbro',
                               semanticLabel: l.sectionTextSize,
@@ -1145,7 +1136,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               ),
                             ),
                           ],
-                          // ── YubiKey opt-in (Android and Linux) ─────────────
                           if (widget.showYubikey) ...[
                             const SizedBox(height: 16),
                             const Divider(),

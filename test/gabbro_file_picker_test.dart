@@ -262,8 +262,6 @@ void main() {
 
 }
 
-// ── Step 3: remembered folders ────────────────────────────────────────────────
-
 /// Records the start folder each dialog was asked to open in.
 class _StartFolderLinuxPicker extends LinuxFilePicker {
   String? openedIn;

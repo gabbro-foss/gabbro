@@ -6,16 +6,12 @@ import 'package:gabbro/src/rust/api/import.dart';
 import 'package:gabbro/text_scale.dart';
 import 'test_helpers.dart';
 
-// ── Factories ─────────────────────────────────────────────────────────────────
-
 CsvPreviewData _preview(List<String> headers) =>
     CsvPreviewData(headers: headers, rows: const []);
 
 ImportResult _ok(int count) =>
     ImportResult(imported: BigInt.from(count), failures: []);
 
-
-// ── Screen builder ────────────────────────────────────────────────────────────
 
 Widget _buildScreen({
   required CsvPreviewData preview,
@@ -76,7 +72,6 @@ Future<void> _tapImport(WidgetTester tester) async {
 }
 
 void main() {
-  // ── Large-text preview table (ADR-016) ────────────────────────────────────
   // On hardware the preview heading row ([name, url, username]) clipped
   // mid-height at large tablet scale (default 56px row, seen during the
   // ADR-016 trimming passes); it must grow with the scale.
@@ -99,8 +94,6 @@ void main() {
     ));
     expect(_previewTable(tester).headingRowHeight, isNull);
   });
-
-  // ── Column auto-detection ─────────────────────────────────────────────────
 
   testWidgets('standard column names are all pre-selected on open',
       (tester) async {
@@ -181,8 +174,6 @@ void main() {
     expect(capturedConfig?.usernameCol, 'email_username');
   });
 
-  // ── Validation ────────────────────────────────────────────────────────────
-
   testWidgets('tapping Import with no recognisable columns shows error',
       (tester) async {
     bool importCalled = false;
@@ -234,8 +225,6 @@ void main() {
 
     expect(importCalled, isTrue);
   });
-
-  // ── Import flow ───────────────────────────────────────────────────────────
 
   testWidgets('successful import pops with the imported entry count',
       (tester) async {
@@ -335,8 +324,6 @@ void main() {
     final button = tester.widget<FilledButton>(find.byType(FilledButton));
     expect(button.onPressed, isNotNull);
   });
-
-  // ── Config assembly ───────────────────────────────────────────────────────
 
   testWidgets('csvContent string is forwarded to onImport unchanged',
       (tester) async {

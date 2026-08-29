@@ -70,7 +70,7 @@ void main() {
   });
 
   // N3: the save prompt offers the vault list, and choosing another vault
-  // retargets the unlock — the login is saved into the vault you picked.
+  // retargets the unlock - the login is saved into the vault you picked.
   testWidgets('locked: choosing another vault switches the unlock target',
       (tester) async {
     await tester.pumpWidget(buildAutofillSaveApp(
@@ -95,7 +95,7 @@ void main() {
     );
   });
 
-  // 2: same as the fill prompt — nothing here can open the pick-a-vault-file
+  // 2: same as the fill prompt - nothing here can open the pick-a-vault-file
   // screen, so the entry is not offered.
   testWidgets('locked: the vault list does not offer the adopt entry',
       (tester) async {
@@ -130,13 +130,8 @@ void main() {
     expect(find.byType(DropdownButton<String>), findsNothing);
   });
 
-  // RT-5: a vault this flow unlocked is its own, and the activity's isolate dies
-  // when it finishes — so it closes the session on the way out, before telling
-  // Kotlin to finish.
-  //
-  // Driven through Cancel, not Save: both routes share `_finish` and differ only
-  // in the method name, and Save writes the entry through real FFI first, which
-  // a widget test cannot run. The Save route is covered on device.
+  // RT-5. Driven through Cancel: Save shares `_finish` but writes through real
+  // FFI first, which a widget test cannot run.
   testWidgets('save: a vault this flow unlocked is locked again on the way out',
       (tester) async {
     final events = <String>[];
@@ -176,7 +171,7 @@ void main() {
   });
 
   // The main app already had this vault open, so the session is not ours to
-  // close — its own auto-lock owns it.
+  // close - its own auto-lock owns it.
   testWidgets('save: a session the main app owns is left alone',
       (tester) async {
     var locks = 0;

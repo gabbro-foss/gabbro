@@ -23,7 +23,7 @@ Future<void> openMenu(WidgetTester tester) async {
 void main() {
   testWidgets('lists every documented shortcut with its description',
       (tester) async {
-    // Tall viewport so the whole (lazy) list renders — the no-copy note sits at
+    // Tall viewport so the whole (lazy) list renders - the no-copy note sits at
     // the very bottom and would otherwise not be built.
     tester.view.physicalSize = const Size(1200, 3000);
     tester.view.devicePixelRatio = 1.0;

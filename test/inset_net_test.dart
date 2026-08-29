@@ -5,16 +5,10 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'screen_catalog.dart';
 
-// Edge-to-edge inset net (2026-08-25). On Android 15+ with targetSdk 35+ the
-// app draws under the system bars; the nav bar's band reaches a screen only as
-// MediaQuery.padding, and a Scaffold strips that padding from its body and
-// snackbar whenever bottomNavigationBar != null (scaffold.dart). Nothing the
-// overflow probe checks can see that, so this net renders every catalogued
-// screen with a faked system inset, scrolls each list to its end, and asserts
-// that no text, icon, snackbar or FAB reaches into the inset band.
-//
-// Cases: 3-button nav (~48dp bottom), gesture nav (~20dp bottom), landscape
-// (the bar moves to a side), phone and tablet, and no inset (Linux).
+// On Android 15+ the app draws under the system bars, and a Scaffold strips
+// the nav-bar padding from its body whenever bottomNavigationBar != null.
+// The overflow probe cannot see that, so this renders every screen with a
+// faked inset and asserts nothing reaches into the band.
 
 /// One inset scenario: where the system bar sits and how thick it is (dp).
 class Inset {

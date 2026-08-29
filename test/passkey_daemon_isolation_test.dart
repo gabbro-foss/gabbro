@@ -2,13 +2,9 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
-// Net for the Linux passkey daemon (ADR-009): auto-type
-// and the daemon stay strangers, and daemon code never reaches an Android
-// build. If either breaks, a Linux passkey change ships inside auto-type or
-// inside the Android .so.
-//
-// Daemon sources are the ones the plan names: uhid transport + CTAPHID
-// framing. The sweeps arm themselves the moment such a file or module lands.
+// Auto-type and the passkey daemon stay strangers, and daemon code never
+// reaches an Android build; otherwise a Linux passkey change ships inside
+// auto-type or the Android .so.
 
 final RegExp _daemonPattern = RegExp('uhid|ctaphid|ctap2', caseSensitive: false);
 

@@ -18,21 +18,15 @@ import 'package:gabbro/text_scale.dart';
 import 'package:gabbro/vault_registry.dart';
 import 'package:gabbro/widgets/gabbro_logo.dart';
 
-// ── Fake entropy ──────────────────────────────────────────────────────────────
-
 EntropyResult _fakeEntropy(String ignored) => EntropyResult(
       bits: 0,
       tier: StrengthTier.terrible,
     );
 
-// ── Fake YubiKey record ───────────────────────────────────────────────────────
-
 YubikeyRecordData _fakeRecord() => YubikeyRecordData(
       credentialId: Uint8List.fromList([1, 2, 3, 4]),
       salt: Uint8List(32),
     );
-
-// ── Registry helpers ──────────────────────────────────────────────────────────
 
 VaultRecord _vaultRecord({
   required String path,
@@ -43,8 +37,6 @@ VaultRecord _vaultRecord({
       alias: alias,
       lastUsedAt: DateTime.fromMillisecondsSinceEpoch(0),
     );
-
-// ── Widget helper ─────────────────────────────────────────────────────────────
 
 Widget _buildScreen({
   String vaultPath = '/tmp/test.gabbro',
@@ -108,7 +100,7 @@ Widget _buildScreen({
 
 /// The same screen under the real app shell, as the main app builds it
 /// (`main.dart:_buildUnlockScreen`): no adopt callback, the shell above it.
-/// `testApp` alone renders it bare, which no user ever meets — and the offer to
+/// `testApp` alone renders it bare, which no user ever meets - and the offer to
 /// open another vault file depends on that shell being there.
 Widget _buildScreenInApp({
   String vaultPath = '/tmp/a.gabbro',
@@ -135,9 +127,8 @@ Widget _buildScreenInApp({
       ),
     );
 
-// ── Net B appearance shell (top-level per test-helper convention) ──────────────
 // Mirrors main.dart's MaterialApp wiring so the screen is exercised under the
-// user's real theme / high-contrast / text size / locale — not the test default.
+// user's real theme / high-contrast / text size / locale - not the test default.
 
 Widget _appShell(
   Widget home, {
@@ -149,7 +140,7 @@ Widget _appShell(
     MaterialApp(
       // Production's delegates, not AppLocalizations' bare list: they ship the
       // nn and yo fallbacks, so no sweep below has to tolerate a warning no user
-      // ever meets — and a tolerance cannot swallow a real overflow raised in
+      // ever meets - and a tolerance cannot swallow a real overflow raised in
       // the same frame.
       localizationsDelegates: gabbroLocalizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
@@ -182,7 +173,7 @@ UnlockScreen _bareUnlock({
 
 // RT-3: a bare UnlockScreen showing the pre-v11 format banner. The Net A/B/C
 // sweeps below use this so the banner is exercised for overflow, contrast, tap
-// targets and long-string locales — _bareUnlock has a readable vault, so it
+// targets and long-string locales - _bareUnlock has a readable vault, so it
 // never renders the banner at all.
 Widget _bareFormatTooOld() => UnlockScreen(
       vaultPath: '/tmp/test.gabbro',
@@ -218,7 +209,7 @@ Widget _biometricAtScale(
 
 // The unlock screen as the vault-switch route builds it: a second route on the
 // stack, so Navigator.canPop is true and the vault below is still unlocked.
-// Only that route can be cancelled — every other way in clears the stack on
+// Only that route can be cancelled - every other way in clears the stack on
 // purpose, which _bareUnlock (a lone route) stands for.
 Widget _nestedUnlock({
   VoidCallback? onQuit,
@@ -226,7 +217,7 @@ Widget _nestedUnlock({
   TextScaler textScaler = TextScaler.noScaling,
 }) =>
     MaterialApp(
-      // Production's delegates, not AppLocalizations' — they ship the nn and yo
+      // Production's delegates, not AppLocalizations' - they ship the nn and yo
       // fallbacks, so the locale sweep below can demand a clean render instead
       // of tolerating a warning that no user ever meets.
       localizationsDelegates: gabbroLocalizationsDelegates,
@@ -249,8 +240,6 @@ Widget _nestedUnlock({
       ),
     );
 
-// ── Tests ─────────────────────────────────────────────────────────────────────
-
 void main() {
   testWidgets('unlock screen renders key elements', (tester) async {
     await tester.pumpWidget(_buildScreen());
@@ -260,7 +249,7 @@ void main() {
     expect(find.byType(TextField), findsOneWidget);
   });
 
-  // Quit (2026-07-21, canon-TDD #1): a tiling-WM user with no title-bar close
+  // Quit: a tiling-WM user with no title-bar close
   // needs a way out of the locked screen. First scenario: the button exists.
   testWidgets('shows a Quit button (power icon) on the locked screen',
       (tester) async {
@@ -289,7 +278,7 @@ void main() {
   });
 
   // Quit (canon-TDD #3): the locked screen holds no secrets, so Quit exits at
-  // once — it fires onQuit and never raises a confirm dialog (that beat is only
+  // once - it fires onQuit and never raises a confirm dialog (that beat is only
   // for the unlocked vault, where an accidental quit costs a re-unlock).
   testWidgets('tapping Quit on the locked screen fires onQuit, no confirm',
       (tester) async {
@@ -303,7 +292,6 @@ void main() {
     expect(find.byType(AlertDialog), findsNothing);
   });
 
-  // ── Cancel (canon-TDD) ────────────────────────────────────────────────────
   // Reached from Manage vaults -> switch, the vault you came from is still open
   // behind this screen, but nothing on screen says how to get back to it. Esc
   // does it in two presses and says so nowhere.
@@ -335,7 +323,7 @@ void main() {
     expect(find.byTooltip('Cancel'), findsNothing);
   });
 
-  // R4: a tooltip is not an accessible name — on Linux a screen reader reads
+  // R4: a tooltip is not an accessible name - on Linux a screen reader reads
   // only the name, so the icon carries a semanticLabel too.
   testWidgets('Cancel carries a localized accessible name', (tester) async {
     final handle = tester.ensureSemantics();
@@ -350,7 +338,7 @@ void main() {
 
   // R5: the label is longer in most languages than in English, and the worst
   // case is the longest translation at the largest scale on the narrowest
-  // screen — all three together (ADR-016).
+  // screen - all three together (ADR-016).
   testWidgets('Cancel survives every locale at 2x text on a 360dp phone',
       (tester) async {
     tester.view.physicalSize = const Size(360, 800);
@@ -418,7 +406,6 @@ void main() {
     expect(called, isTrue);
   });
 
-  // ── Net A regression pins ───────────────────────────────────────────────────
   // Lock the *current* unlock-flow behaviour before the autofill `onUnlocked`
   // hook is introduced, so any regression from the reuse/extraction is caught.
 
@@ -683,8 +670,6 @@ void main() {
     }
   });
 
-  // ── Net B: appearance + language ────────────────────────────────────────────
-
   group('Net B appearance + language', () {
     testWidgets('renders under light/dark themes, plain and high-contrast',
         (tester) async {
@@ -765,7 +750,7 @@ void main() {
 
         // No tolerance: _appShell now uses production's delegates, so nn and yo
         // render as cleanly as every other locale. A tolerance here could not
-        // tell a delegate warning from an overflow raised in the same frame —
+        // tell a delegate warning from an overflow raised in the same frame -
         // Flutter folds both into one opaque "Multiple exceptions" wrapper, and
         // a `contains` check on it passes either way.
         expect(tester.takeException(), isNull,
@@ -806,8 +791,6 @@ void main() {
           reason: 'the long-string locale must not overflow the banner');
     });
   });
-
-  // ── Net C: accessibility (broad sweep) ──────────────────────────────────────
 
   group('Net C accessibility (broad sweep)', () {
     testWidgets('meets Android tap-target guideline (passphrase + yubikey modes)',
@@ -859,7 +842,7 @@ void main() {
     });
 
     // RT-3 banner: it is what the user sees INSTEAD of the unlock controls, so
-    // it must clear the same bars — the upgrade link must be reachable and
+    // it must clear the same bars - the upgrade link must be reachable and
     // announced, not a bare unlabelled button.
     testWidgets('format-too-old banner meets tap-target, label and contrast '
         'guidelines', (tester) async {
@@ -891,15 +874,11 @@ void main() {
     });
   });
 
-  // ── Safe area ─────────────────────────────────────────────────────────────
-
   testWidgets('body uses SafeArea to avoid system navigation bar overlap',
       (tester) async {
     await tester.pumpWidget(_buildScreen(yubikeyRecords: [_fakeRecord()]));
     expect(find.byType(SafeArea), findsOneWidget);
   });
-
-  // ── YubiKey mode ──────────────────────────────────────────────────────────
 
   testWidgets('passphrase-only mode when yubikey records are empty', (tester) async {
     await tester.pumpWidget(_buildScreen(yubikeyRecords: []));
@@ -960,8 +939,6 @@ void main() {
     expect(find.textContaining('Could not unlock vault'), findsOneWidget);
   });
 
-  // ── Vault alias ───────────────────────────────────────────────────────────
-
   testWidgets('shows vault alias below title when provided', (tester) async {
     await tester.pumpWidget(_buildScreen(vaultAlias: 'Work'));
     expect(find.text('Work'), findsOneWidget);
@@ -972,14 +949,10 @@ void main() {
     expect(find.text('Work'), findsNothing);
   });
 
-  // ── No switch icon ────────────────────────────────────────────────────────
-
   testWidgets('no switch icon shown (switch icon removed in new design)', (tester) async {
     await tester.pumpWidget(_buildScreen());
     expect(find.byIcon(Icons.swap_horiz), findsNothing);
   });
-
-  // ── Multi-key vault ───────────────────────────────────────────────────────
 
   testWidgets('multi-key vault calls onUnlockWithAnyYubikey not onUnlockWithYubikey',
       (tester) async {
@@ -1001,8 +974,6 @@ void main() {
     expect(anyCalled, isTrue);
     expect(singleCalled, isFalse);
   });
-
-  // ── biometric button ──────────────────────────────────────────────────────
 
   group('biometric button', () {
     testWidgets('not shown when this vault is not enrolled', (tester) async {
@@ -1042,7 +1013,6 @@ void main() {
       expect(called, isTrue);
     });
 
-    // ── large text (ADR-016): icon-only past 1.5x ────────────────────────────
     testWidgets('keeps the labelled button at normal text scale', (tester) async {
       await tester.pumpWidget(_biometricAtScale(1.0));
       await tester.pump();
@@ -1144,13 +1114,10 @@ void main() {
     });
   });
 
-  // ── H1: an externally swapped vault file makes the stored passphrase stale ──
-  //
-  // Error contract (pinned here, used by the H1 fix): tap-stage failures —
-  // wrong PIN (HMAC_FAILED / HMAC_MULTI_FAILED), timeout, transport — are
-  // PlatformExceptions thrown by the tap call, before the passphrase is ever
-  // tried. A wrong passphrase is a plain exception from the Rust decrypt call.
-  // Only the decrypt stage may ever conclude "stored passphrase is stale".
+  // H1 error contract: tap-stage failures are PlatformExceptions before the
+  // passphrase is tried; a wrong passphrase is a plain exception from the
+  // decrypt call. Only the decrypt stage may conclude the stored passphrase
+  // is stale.
   group('H1: external vault swap vs biometric', () {
     testWidgets('N1: a typed wrong passphrase never touches biometric enrolment',
         (tester) async {
@@ -1365,8 +1332,8 @@ void main() {
       expect(find.byType(DropdownButton<String>), findsOneWidget);
     });
 
-    // E2 (adopt): a single registered vault still gets the dropdown — it now
-    // carries the "Open a vault file…" entry, the unlock screen's route to
+    // E2 (adopt): a single registered vault still gets the dropdown - it now
+    // carries the "Open a vault file..." entry, the unlock screen's route to
     // adopting a second device's export. Flips the pre-adopt one-vault pin.
     testWidgets('shows dropdown with one vault (it carries the adopt entry)',
         (tester) async {
@@ -1462,7 +1429,6 @@ void main() {
     });
   });
 
-  // ── ADR-016 reveal-eye: suffix toggles scale (capped) at large text ────────
   group('reveal-eye toggles scale (capped) at large text', () {
     void setPhone(WidgetTester tester) {
       tester.view.physicalSize = const Size(400, 800);
@@ -1498,8 +1464,6 @@ void main() {
     });
   });
 
-  // ── Passphrase visibility toggle ───────────────────────────────────────────
-
   testWidgets('passphrase visibility toggle switches icon', (tester) async {
     await tester.pumpWidget(_buildScreen()); // passphrase-only mode
 
@@ -1512,8 +1476,6 @@ void main() {
     expect(find.byIcon(Icons.visibility), findsOneWidget);
     expect(find.byIcon(Icons.visibility_off), findsNothing);
   });
-
-  // ── PIN visibility toggle in YubiKey mode ─────────────────────────────────
 
   testWidgets('PIN visibility toggle in yubikey mode switches icon',
       (tester) async {
@@ -1530,8 +1492,6 @@ void main() {
     expect(find.byIcon(Icons.visibility_off), findsOneWidget);
     expect(find.byIcon(Icons.visibility), findsOneWidget);
   });
-
-  // ── PlatformException error codes ─────────────────────────────────────────
 
   testWidgets('TRANSPORT_ERROR exception shows transport error message',
       (tester) async {
@@ -1569,8 +1529,6 @@ void main() {
     expect(find.text('No FIDO2 device found'), findsOneWidget);
   });
 
-  // ── Entropy indicator ─────────────────────────────────────────────────────
-
   testWidgets('typing in passphrase field shows entropy strength indicator',
       (tester) async {
     await tester.pumpWidget(_buildScreen());
@@ -1582,8 +1540,6 @@ void main() {
 
     expect(find.byType(LinearProgressIndicator), findsOneWidget);
   });
-
-  // ── Stalled-tap Cancel (Android) ──────────────────────────────────────────
 
   testWidgets('yubikey unlock shows a Cancel button on Android while tapping',
       (tester) async {
@@ -1676,8 +1632,6 @@ void main() {
     expect(find.textContaining('Check your passphrase'), findsNothing);
   });
 
-  // ── R-03: vault-corruption restore flow ────────────────────────────────────
-
   testWidgets('corrupt vault with a backup offers the restore option',
       (tester) async {
     await tester.pumpWidget(_buildScreen(
@@ -1710,13 +1664,8 @@ void main() {
     expect(find.text('Delete file'), findsOneWidget);
   });
 
-  // ── RT-3: a pre-v11 vault is refused, NOT reported as corrupt ──────────────
-  //
-  // The floor moved to v11, so an older vault no longer parses. Without these,
-  // the parse probe reports it unreadable and the user is told their vault is
-  // corrupt and invited to delete it — the file is fine, it just needs
-  // migrating with alpha.14 first. Refuse, explain, and offer no destructive
-  // action.
+  // A pre-floor vault does not parse; without these the user is told it is
+  // corrupt and invited to delete a file that only needs migrating.
 
   const oldFormatMessage =
       'This vault uses an older format that this version of Gabbro cannot '
@@ -1885,7 +1834,7 @@ void main() {
     final failures = <Object>[
       // The real wrong-PIN code (GabbroUnlockHostActivity registers HMAC_FAILED
       // for the single-key tap); an invented CTAP_ERROR passed here for the
-      // same reason any unknown code does — keep the pin on the real contract.
+      // same reason any unknown code does - keep the pin on the real contract.
       PlatformException(code: 'HMAC_FAILED', message: 'Wrong PIN'),
       Exception('decryption failed'),
       PlatformException(code: 'TAP_TIMEOUT'),
@@ -2179,7 +2128,6 @@ void main() {
     expect(find.textContaining("app's private storage"), findsNothing);
   });
 
-  // ── R6: the unlock screen never adopts a vault ─────────────────────────────
   //
   // Picking a `.gabbro` here is a repair for a vault that cannot be read, not a
   // way to add one: it replaces the bytes at the path already in the list.
@@ -2220,7 +2168,6 @@ void main() {
         reason: 'the picked file is never registered as a second vault');
   });
 
-  // ── H2 F8-F11: confirm before restore-from-file writes anything ─────────────
   //
   // One mis-pick here overwrites the vault AND refreshes its .bak, so this
   // dialog is the user's last chance to stop it. The Rust side keeps the old
@@ -2317,14 +2264,9 @@ void main() {
         reason: 'the vault stays corrupt');
   });
 
-  // ── H1: a restored file makes the stored fingerprint passphrase stale ──────
-  //
-  // Biometric keeps a copy of the passphrase of whatever vault sat at this path
-  // (`BiometricStore.kt:21`). Restoring a different file leaves that copy
-  // behind, so the fingerprint hands the vault a passphrase it no longer
-  // accepts and unlock fails with nothing to explain it. A passphrase change
-  // already unenrols for exactly this reason; so does a device fingerprint
-  // change. Restoring is the third case.
+  // Biometric keeps the passphrase of whatever vault sat at this path;
+  // restoring a different file would hand it a stale one with nothing to
+  // explain the failure. A passphrase change unenrols for the same reason.
 
   /// Drives a corrupt vault through restore-from-file and reports whether the
   /// biometric enrolment was dropped.
@@ -2471,7 +2413,7 @@ void main() {
 
   // A new string is not done until the longest translation survives the largest
   // text on the narrowest phone. Testing scale and locale apart never meets that
-  // case — the sync chooser overflowed in 32 of 37 languages while its English
+  // case - the sync chooser overflowed in 32 of 37 languages while its English
   // check passed.
   testWidgets('the biometric notice survives every locale at 2x on a 360dp phone',
       (tester) async {
@@ -2482,7 +2424,7 @@ void main() {
     for (final locale in AppLocalizations.supportedLocales) {
       // Tear the previous tree down first. Without this the UnlockScreen State
       // is reused across iterations, so the second locale opens on a screen
-      // already restored — no corrupt block, no button, and nothing swept.
+      // already restored - no corrupt block, no button, and nothing swept.
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pumpAndSettle();
 
@@ -2490,7 +2432,7 @@ void main() {
         locale: locale,
         // Production's delegate list, which ships fallbacks for nn and yo. The
         // shared _appShell uses the bare AppLocalizations list, whose missing
-        // Material/Cupertino delegates warn for those two — a test-helper
+        // Material/Cupertino delegates warn for those two - a test-helper
         // artefact users never meet.
         localizationsDelegates: gabbroLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
@@ -2507,8 +2449,8 @@ void main() {
           onBiometricIsEnrolled: (_) async => true,
           onVaultIsReadable: (_) async => false,
           // Stubbed like _buildScreen does: left at their defaults these call
-          // the real bridge, the probe never settles and the corrupt block —
-          // which holds the restore button — never renders.
+          // the real bridge, the probe never settles and the corrupt block -
+          // which holds the restore button - never renders.
           onVaultFormatTooOld: (_) async => false,
           onVaultFormatTooNew: (_) async => false,
           onBackupUsable: (_) async => false,

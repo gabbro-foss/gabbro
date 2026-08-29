@@ -48,7 +48,7 @@ void main() {
       expect(find.byIcon(Icons.chevron_right), findsOneWidget);
       expect(find.byIcon(Icons.chevron_left), findsNothing);
 
-      // Tapping it scrolls right, which reveals the left chevron — proves the
+      // Tapping it scrolls right, which reveals the left chevron - proves the
       // onTap wiring still reaches _scrollChips end to end.
       await tester.tap(find.byIcon(Icons.chevron_right));
       await tester.pumpAndSettle();

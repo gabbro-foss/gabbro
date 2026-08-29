@@ -2,12 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:gabbro/app_paths.dart';
 
-/// R-03: delete a vault file together with its `.bak` safety copy.
-///
-/// The Rust save path keeps a `.bak` sibling next to every vault; deleting a
-/// vault must remove both, or a copy of the deleted vault survives — and on
-/// Android the user has no file-manager access to app-private storage to
-/// clean it up themselves.
+/// R-03: the `.bak` goes too, or a copy of the deleted vault survives where an
+/// Android user cannot reach it.
 Future<void> deleteVaultFiles(String path) async {
   final vault = File(path);
   if (vault.existsSync()) await vault.delete();
@@ -80,16 +76,12 @@ class VaultRegistry {
         .toList(),
   );
 
-  // ── Serialisation ───────────────────────────────────────────────────────────
-
   List<Map<String, dynamic>> toJson() =>
       _records.map((r) => r.toJson()).toList();
 
   factory VaultRegistry.fromJson(List<dynamic> json) => VaultRegistry(
     json.map((e) => VaultRecord.fromJson(e as Map<String, dynamic>)).toList(),
   );
-
-  // ── File I/O ─────────────────────────────────────────────────────────────────
 
   static Future<File> _registryFile() async {
     final dirPath = await GabbroPaths.configDir();
@@ -138,8 +130,6 @@ class VaultRegistry {
     const encoder = JsonEncoder.withIndent('  ');
     return '// Gabbro vault registry\n${encoder.convert(toJson())}\n';
   }
-
-  // ── JSONC parser ─────────────────────────────────────────────────────────────
 
   static String _stripComments(String input) {
     return input

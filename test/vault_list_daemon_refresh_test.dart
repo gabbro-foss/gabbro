@@ -9,7 +9,7 @@ import 'package:gabbro/src/rust/api/passkey_daemon_bridge.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
 // TDD list "entry-list refresh on daemon store" (ARCHITECTURE.md): the vault
-// list must show a passkey the moment the daemon stores it — the user is
+// list must show a passkey the moment the daemon stores it - the user is
 // watching the list and otherwise concludes the create failed. Real
 // VaultListScreen + real PasskeyDaemon; only I/O and the bridge are faked, so
 // whatever production mechanism connects them is what is under test.

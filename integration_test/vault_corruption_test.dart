@@ -1,25 +1,8 @@
-// Phase 1 - Linux desktop, no hardware. R-03 P0 diagnostic.
-//
-// Run with:
-//   cd rust && cargo build --release --lib && cd ..
-//   dart test integration_test/ -j 1
-//
-// Plain `dart test` against the release cdylib, for the same reasons as
-// vault_session_test.dart: real FFI needs the native lib, and release matters
-// because debug Argon2id is too slow. See that file's header.
-//
-// Why this file exists: on real hardware (2026-06-11) a YubiKey vault, after its
-// main AND .bak files were overwritten with `printf rubbish`, unlocked with no
-// error to an EMPTY vault. That is impossible at the crypto layer — garbage cannot
-// pass the AES-GCM auth tag, and there is no auto-create fallback on the load path
-// (load_vault / load_vault_with_yubikey both go through SealedVault::from_bytes).
-// This suite scripts the maintainer's exact sequence end-to-end through real FFI on the
-// passphrase path and pins the invariant: garbage on disk -> unlock FAILS, and no
-// empty session is left behind. If this stays green while the device failed, the
-// device failure was environmental (a stale build, or the file `ls`/`printf`
-// touched was not the path the app reads) — not a Gabbro code bug. The YubiKey
-// crypto gate is pinned separately by the pure-Rust
-// `garbaged_yubikey_vault_does_not_open` test (no hardware needed there either).
+// R-03 P0: garbage on disk must fail unlock and leave no empty session
+// behind. Garbage cannot pass the AES-GCM tag and there is no auto-create on
+// the load path, so if this stays green while a device shows an empty vault,
+// the device failure is environmental, not a code bug. See rust_lib_setup.dart
+// for how to run.
 
 import 'dart:convert';
 import 'dart:io';
@@ -90,7 +73,7 @@ void main() {
 
     // Path instrumentation: the file the app reads/writes IS vaultPath, and the
     // .bak sits beside it. On the device, confirm the file you garbage is THIS
-    // path (registry path == on-disk file) — a mismatch there is the leading
+    // path (registry path == on-disk file) - a mismatch there is the leading
     // suspect for the empty-vault report.
     final bakPath = '$vaultPath.bak';
     expect(File(vaultPath).existsSync(), isTrue,
@@ -116,7 +99,7 @@ void main() {
 
   test('garbaging only the main file (with a good .bak) also fails unlock',
       () async {
-    // The .bak being intact must not let a garbaged main file open — restore is
+    // The .bak being intact must not let a garbaged main file open - restore is
     // an explicit, separate user action, never an automatic fallback on unlock.
     await initVault(passphrase: passphrase, path: vaultPath, alias: 'IT');
     final login = await createLoginEntry(
@@ -162,8 +145,8 @@ void main() {
 
   test('P1 acceptance: restore after corrupt-main returns the LAST edit, '
       'not the save before it', () async {
-    // Reproduces the 2026-06-11 hardware failure: edit an entry twice, garbage
-    // the main file, restore from .bak. Pre-P1 the .bak trailed by one save, so
+    // Edit an entry twice, garbage
+    // the main file, restore from .bak. If the .bak trails by one save, so
     // the restored vault was missing the second edit. With ".bak == last
     // verified save", the second edit must be present after restore + unlock.
     await initVault(passphrase: passphrase, path: vaultPath, alias: 'IT');
@@ -195,7 +178,7 @@ void main() {
       );
     }
 
-    // First edit, then a SECOND edit — the one the old rotation lost on restore.
+    // First edit, then a SECOND edit - the one the old rotation lost on restore.
     await updateEntry(entry: VaultEntryData_Login(edited('second-pass')), expiryDays: null);
     await updateEntry(entry: VaultEntryData_Login(edited('third-pass')), expiryDays: null);
     lockVault();
@@ -206,7 +189,7 @@ void main() {
         unlockVault(passphrase: passphrase, path: vaultPath), throwsA(anything),
         reason: 'precondition: the garbaged main file must not open');
 
-    // Explicit restore, then unlock — the second edit must be there.
+    // Explicit restore, then unlock - the second edit must be there.
     await restoreVaultBackup(path: vaultPath);
     await unlockVault(passphrase: passphrase, path: vaultPath);
     final reopened = (getEntry(id: id) as VaultEntryData_Login).field0;
@@ -240,7 +223,7 @@ void main() {
         unlockVault(passphrase: passphrase, path: vaultPath), throwsA(anything),
         reason: 'precondition: the corrupt vault must not open');
 
-    // Restore from the picked backup file, then unlock — entries are back.
+    // Restore from the picked backup file, then unlock - entries are back.
     await restoreVaultFromFile(path: vaultPath, source: backupPath);
     await unlockVault(passphrase: passphrase, path: vaultPath);
     final reopened = (getEntry(id: id) as VaultEntryData_Login).field0;

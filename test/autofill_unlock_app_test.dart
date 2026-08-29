@@ -112,7 +112,7 @@ void main() {
   });
 
   // 1: nothing here can open the pick-a-vault-file screen, so the entry must
-  // not be offered — tapping it did nothing at all.
+  // not be offered - tapping it did nothing at all.
   testWidgets('the vault list does not offer the adopt entry', (tester) async {
     await tester.pumpWidget(buildAutofillUnlockApp(
       settings: const AppSettings(),
@@ -174,7 +174,7 @@ void main() {
     expect(calls, contains('cancel'));
   });
 
-  // D1: the *real* path — unlocking with no match must show the localized
+  // D1: the *real* path - unlocking with no match must show the localized
   // no-match dialog (not silently fail / not a false auth error). Regression
   // for the dialog being shown from a context above the MaterialApp's Navigator.
   testWidgets(
@@ -220,7 +220,7 @@ void main() {
 
   // RT-5: this activity exists only because the vault was locked, so the
   // session it opens is its own. It finishes right after the fill and its Dart
-  // isolate dies with it, leaving nothing running to close that session — so it
+  // isolate dies with it, leaving nothing running to close that session - so it
   // must lock on the way out. The ORDER matters: locking after `finish` would
   // race the engine teardown, which is why `unlock` no longer finishes.
   testWidgets('a successful fill locks the vault, then finishes', (tester) async {

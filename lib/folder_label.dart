@@ -1,10 +1,5 @@
-/// Human-readable label for a remembered folder.
-///
-/// A Linux path is shown as is. An Android SAF tree URI
-/// (`content://…/tree/primary%3ADownload%2FGabbroSync`) is shown as
-/// `primary:Download/GabbroSync`, since the raw URI means nothing to a user.
-/// A document URI (the import screen remembers the picked file's location)
-/// is shown as the file's folder, the file name dropped.
+/// A raw SAF URI means nothing to a user: `content://.../tree/primary%3A...`
+/// shows as `primary:Download/...`, a document URI as its folder.
 String folderDisplayLabel(String folder) {
   const tree = '/tree/';
   const document = '/document/';

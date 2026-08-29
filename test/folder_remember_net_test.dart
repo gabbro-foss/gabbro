@@ -1,12 +1,5 @@
-// Net for step 3 (remember export/import folders, read-only view in Sync
-// settings). Pins today's picker -> field -> action wiring on the export and
-// import screens, the Android export folder memory, and the absence of folder
-// all green before any change. (N5, the absence of folder rows in Sync
-// settings, was retired when R9 added them.)
-//
-// N6 (vault list opens the export screen with the remembered URI) has a single
-// code path: one PopupMenuButton, one `_openExportScreen`; nothing to pin.
-// N8 (today's strings in all 37 locales) is pinned by l10n_test's key-set check.
+// Pins the picker -> field -> action wiring on the export and import screens
+// and the Android export folder memory.
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';

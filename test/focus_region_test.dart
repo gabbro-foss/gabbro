@@ -60,7 +60,7 @@ void main() {
     expect(p!.style.dashed, isFalse, reason: 'normal mode is solid');
   });
 
-  // Regression pin (hardware rounds 5-8): the search box drew TWO lines — its
+  // Regression pin (hardware rounds 5-8): the search box drew TWO lines - its
   // own outline PLUS an overlay FocusRegion frame (and a fade-double on Tab-in).
   // The field's OWN outline is now the single indicator; no overlay frame.
   testWidgets('search box: its own outline is the single focus indicator',

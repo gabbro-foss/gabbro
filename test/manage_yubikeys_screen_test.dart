@@ -31,8 +31,6 @@ Future<void> _fillAndRegister(WidgetTester tester, {String pin = '123456'}) asyn
   await tester.pumpAndSettle();
 }
 
-// ── Factories ─────────────────────────────────────────────────────────────────
-
 YubikeyRecordData _record(String hexPrefix) => YubikeyRecordData(
       credentialId: Uint8List.fromList(
           List.generate(16, (i) => int.parse(hexPrefix.padRight(2, '0'), radix: 16) + i)),
@@ -46,8 +44,6 @@ FidoCredentialData _fakeCredential() => FidoCredentialData(
       credentialId: Uint8List.fromList(List.filled(16, 0xAB)),
       salt: Uint8List(32),
     );
-
-// ── Screen builder ────────────────────────────────────────────────────────────
 
 Widget _buildScreen({
   List<YubikeyRecordData> records = const [],
@@ -94,8 +90,6 @@ Widget _buildScreen({
     ));
 
 void main() {
-  // ── Loading and list states ───────────────────────────────────────────────
-
   testWidgets('credential hint is shown in subtitle for each key', (tester) async {
     // _credHint truncates long credential IDs to 16 hex chars + ellipsis.
     await tester
@@ -164,8 +158,6 @@ void main() {
     expect(find.textContaining('disk read error'), findsOneWidget);
   });
 
-  // ── Delete button rules ───────────────────────────────────────────────────
-
   testWidgets('delete button is disabled when only one key exists',
       (tester) async {
     await tester.pumpWidget(_buildScreen(records: [_record('11')]));
@@ -186,8 +178,6 @@ void main() {
         find.widgetWithIcon(IconButton, Icons.delete_outline));
     expect(deleteBtns.every((b) => b.onPressed != null), isTrue);
   });
-
-  // ── FAB visibility ────────────────────────────────────────────────────────
 
   testWidgets('add-key FAB is shown when fewer than four keys registered',
       (tester) async {
@@ -210,8 +200,6 @@ void main() {
 
     expect(find.byType(FloatingActionButton), findsNothing);
   });
-
-  // ── Remove key flow ───────────────────────────────────────────────────────
 
   testWidgets('remove key: confirmation dialog appears on tap', (tester) async {
     await tester
@@ -271,8 +259,6 @@ void main() {
     expect(find.textContaining('Security warning'), findsOneWidget);
   });
 
-  // ── Edit alias flow ───────────────────────────────────────────────────────
-
   testWidgets('edit alias: dialog opens when edit button tapped',
       (tester) async {
     await tester
@@ -322,8 +308,6 @@ void main() {
 
     expect(savedAlias, 'Work YubiKey');
   });
-
-  // ── Linux FIDO add-key flow ───────────────────────────────────────────────
 
   testWidgets('add key Linux: shows snackbar when no FIDO device found',
       (tester) async {
@@ -446,7 +430,7 @@ void main() {
 
     await tester.enterText(find.byType(TextField), '123456');
     await tester.tap(find.text('OK'));
-    await tester.pumpAndSettle(); // Register → hmac → addYubikey → load → snackbar
+    await tester.pumpAndSettle(); // Register -> hmac -> addYubikey -> load -> snackbar
 
     expect(addedKey, isTrue);
     expect(find.textContaining('YubiKey added'), findsOneWidget);
@@ -493,8 +477,6 @@ void main() {
 
     expect(find.textContaining('Failed to add key'), findsOneWidget);
   });
-
-  // ── Error and success snackbars ───────────────────────────────────────────
 
   testWidgets('edit alias: error snackbar shown when onSetAlias throws',
       (tester) async {
@@ -548,7 +530,7 @@ void main() {
 
   testWidgets('remove key: standard dialog shown when not the second-to-last key',
       (tester) async {
-    // Three keys → removing one is not the second-to-last scenario.
+    // Three keys -> removing one is not the second-to-last scenario.
     await tester.pumpWidget(_buildScreen(
         records: [_record('50'), _record('51'), _record('52')]));
     await tester.pumpAndSettle();
@@ -561,8 +543,6 @@ void main() {
     expect(find.textContaining('Remove YubiKey'), findsOneWidget);
     expect(find.textContaining('Security warning'), findsNothing);
   });
-
-  // ── Android FIDO add-key flow (MethodChannel mocked) ─────────────────────
 
   testWidgets('add key Android: PIN cancel aborts the flow', (tester) async {
     bool addCalled = false;

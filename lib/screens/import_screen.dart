@@ -14,7 +14,7 @@ import 'package:gabbro/widgets/path_field.dart';
 import 'package:gabbro/widgets/url_link.dart';
 import 'package:gabbro/widgets/yubikey_tap.dart';
 
-/// Import size caps, mirrored from `rust/src/import/mod.rs` — keep in sync. A
+/// Import size caps, mirrored from `rust/src/import/mod.rs` - keep in sync. A
 /// malicious export file could otherwise exhaust memory while being read, before
 /// the Rust parser's own cap is reached, so we reject oversized files here too
 /// (before reading them) and announce the limits on screen (S-02).
@@ -57,7 +57,7 @@ Future<GabbroImportResult> _defaultImportGabbroWithKey(
 );
 
 /// Reads the source vault's YubiKey records to decide whether a key is required.
-/// Non-empty ⇒ key-protected. Sync — header read only.
+/// Non-empty means key-protected. Header read only.
 List<YubikeyRecordData> _defaultDetectSourceRecords(String path) =>
     listVaultYubikeyRecords(path: path);
 
@@ -125,7 +125,7 @@ class ImportScreen extends StatefulWidget {
 
   /// Whether the chosen `.gabbro` source is intact but predates the readable
   /// floor. Asked only after an import fails, to tell "too old" apart from a
-  /// wrong passphrase or a damaged file — an old vault is undamaged and needs
+  /// wrong passphrase or a damaged file - an old vault is undamaged and needs
   /// explaining, never a raw error string. Mirrors the unlock screen's
   /// `onVaultFormatTooOld` so both refusals behave the same.
   final Future<bool> Function(String path) onSourceFormatTooOld;
@@ -224,8 +224,6 @@ class _ImportScreenState extends State<ImportScreen> {
     _yubikeyPinFocus.dispose();
     super.dispose();
   }
-
-  // ── Type ─────────────────────────────────────────────────────────────────
 
   /// Extensions differ per type, so a path chosen for one type would arm the
   /// button on a file the new type cannot parse: the path goes with the type.
@@ -343,8 +341,6 @@ class _ImportScreenState extends State<ImportScreen> {
     return file;
   }
 
-  // ── Google / Dashlane / Enpass / Bitwarden ───────────────────────────────
-
   Future<void> _importJsonOrCsv(
     Future<ImportResult> Function(List<int> data) importer,
   ) async {
@@ -374,8 +370,6 @@ class _ImportScreenState extends State<ImportScreen> {
       if (mounted) setState(() => _isImporting = false);
     }
   }
-
-  // ── Gabbro vault ─────────────────────────────────────────────────────────
 
   Future<void> _importGabbro() async {
     final l = AppLocalizations.of(context);
@@ -438,8 +432,6 @@ class _ImportScreenState extends State<ImportScreen> {
     }
   }
 
-  // ── CSV ──────────────────────────────────────────────────────────────────
-
   Future<void> _sniffAndPushCsvMapping() async {
     final file = _checkedFile(AppLocalizations.of(context));
     if (file == null) return;
@@ -468,8 +460,6 @@ class _ImportScreenState extends State<ImportScreen> {
       if (mounted) setState(() => _isImporting = false);
     }
   }
-
-  // ── Warning banner ───────────────────────────────────────────────────────
 
   Widget _duplicateWarningBanner(BuildContext context) {
     final l = AppLocalizations.of(context);
@@ -500,8 +490,6 @@ class _ImportScreenState extends State<ImportScreen> {
       ),
     );
   }
-
-  // ── Build ────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -566,7 +554,7 @@ class _ImportScreenState extends State<ImportScreen> {
               // While syncing a key-protected source we are blocked on a
               // hardware tap. Surface the "tap now" prompt (matching the
               // change-passphrase / manage-vaults screens) so the spinner is
-              // never silent — on Android the tap call blocks until a key is
+              // never silent - on Android the tap call blocks until a key is
               // presented; the user can also back out to cancel.
               if (_type == ImportType.gabbro &&
                   _isImporting &&
@@ -731,7 +719,7 @@ class _ImportScreenState extends State<ImportScreen> {
 
   // The source is intact, just too old: same words and link as the unlock
   // screen, so one refusal is not two different experiences. Error-red is
-  // right — the import did fail — but the text carries the meaning on its
+  // right - the import did fail - but the text carries the meaning on its
   // own (ADR-003), and names no format version (meaningless to the user).
   // Same shape for a source from a newer build: explain "update Gabbro".
   List<Widget> _gabbroFormatNotes(AppLocalizations l) => [

@@ -6,7 +6,7 @@ import 'screen_catalog.dart';
 
 // NET-FIRST floor for Phase 3 (region Tab-cycle + within-region arrows). Pins
 // that today's keyboard-reachable vault-list controls STAY reachable. Phase 3
-// changes the reach PATH (Tab lands on a region, arrows move within it) — when a
+// changes the reach PATH (Tab lands on a region, arrows move within it) - when a
 // pin's path changes, update it deliberately. A control going PERMANENTLY
 // unreachable must fail here, not slip through.
 
@@ -48,12 +48,7 @@ void main() {
         reason: 'a filter chip must stay keyboard-reachable');
   });
 
-  // Phase 3 excluded the two-pane nav rail from the region Tab-cycle, and the
-  // rail has since been removed outright, so the old "Tab reaches the navigation
-  // rail" pin is doubly gone. The floor that DOES hold: the wide layout's content
-  // stays keyboard-reachable — Tab still reaches the search field. Full wide
-  // reachability (search/folder/chips/list/detail) is pinned in
-  // keyboard_region_cycle_test.dart.
+  // Full wide reachability is pinned in keyboard_region_cycle_test.dart.
   testWidgets('BASELINE: Tab reaches the search field (wide two-pane)',
       (tester) async {
     await pumpVaultList(tester, tablet);

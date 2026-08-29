@@ -7,7 +7,7 @@ import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
 // The save-confirm screen resolves the user's choice (update / save-new /
-// pick-another / cancel) and writes through injected seams — never a silent
+// pick-another / cancel) and writes through injected seams - never a silent
 // overwrite. Real bridge calls are replaced by fakes here.
 
 VaultEntryData _login(String id, {String password = 'old', String username = 'alice'}) =>

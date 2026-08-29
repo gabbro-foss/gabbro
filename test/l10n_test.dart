@@ -26,8 +26,8 @@ Map<String, String> _readArb(File f) {
   };
 }
 
-/// A key names a language endonym: `langFrench`, `langDutch`, … but not
-/// `langSystem` (which IS localised — "System default" / "Système par défaut").
+/// A key names a language endonym: `langFrench`, `langDutch`, ... but not
+/// `langSystem` (which IS localised - "System default" / "Système par défaut").
 bool _isEndonymKey(String key) =>
     key.startsWith('lang') &&
     key.length > 4 &&
@@ -82,17 +82,8 @@ void main() {
     });
   });
 
-  // ── Language-label endonym convention ──────────────────────────────────────
-  //
-  // Language names shown in the language picker are ENDONYMS (the language's own
-  // name) and must be identical in every locale's ARB — e.g. langGerman is
-  // "Deutsch" and langDutch is "Nederlands" everywhere, never translated into the
-  // UI locale's exonym (no "Holland"/"Hollandi"/"Nederländska"). This guards the
-  // alpha.6 langDutch fix and catches the same mistake for any future language.
-  //
-  // The endonym keys match `lang<UpperCase>...`. langSystem ("System default") is
-  // a normal translatable string, not an endonym, so it is excluded. languageHeader
-  // and languageNote start with lowercase "langu" and never match `lang[A-Z]`.
+  // Language names are endonyms and must be identical in every ARB, never the
+  // UI locale's exonym. langSystem is a normal translatable string, excluded.
 
   group('language-label endonym convention', () {
     final base = _readArb(File('lib/l10n/app_en.arb'));
@@ -111,7 +102,7 @@ void main() {
       test('$name uses endonyms for all language labels', () {
         final values = _readArb(f);
         for (final key in endonymKeys) {
-          // A locale may omit an endonym key entirely — gen-l10n then falls back
+          // A locale may omit an endonym key entirely - gen-l10n then falls back
           // to the (correct) English endonym. Only a present value can be wrong.
           if (!values.containsKey(key)) continue;
           expect(
@@ -128,7 +119,7 @@ void main() {
   group('ARB completeness across locales', () {
     // Behaviour 1: a key missing from one locale means that user silently reads
     // English for that string. Behaviour 2: a key whose message renames or drops
-    // a placeholder renders broken. Neither is caught by rendering — these read
+    // a placeholder renders broken. Neither is caught by rendering - these read
     // the ARB files directly.
     final base = _readArb(File('lib/l10n/app_en.arb'));
     final files = _arbFiles();
@@ -144,7 +135,7 @@ void main() {
     test('the ARB listing is complete, so the checks are not vacuous', () {
       // A wrong path would return an empty list and pass every per-file loop
       // below while checking nothing (the probe had this exact hole). Adding or
-      // removing a language fails HERE first — update the count deliberately.
+      // removing a language fails HERE first - update the count deliberately.
       expect(
         files.length,
         37,
@@ -187,13 +178,13 @@ void main() {
   });
 
   // A Cyrillic reader met one Latin sentence among their Cyrillic ones
-  // (`vaultRestoredBiometricDisabled` in sr, 2026-07-31): the sr_Latn value had
+  // (`vaultRestoredBiometricDisabled` in sr): the sr_Latn value had
   // been copied into sr. Nothing checked script, so nothing caught it.
   group('Cyrillic locales are written in Cyrillic', () {
     // sr_Latn is deliberately Latin; it is not in this list.
     const cyrillic = ['bg', 'kk', 'ru', 'sr', 'uk'];
     // Product and format names stay Latin in every locale, so a value built only
-    // from them ("Gabbro — {alias}", "YubiKey PIN") has nothing to transliterate.
+    // from them ("Gabbro - {alias}", "YubiKey PIN") has nothing to transliterate.
     const properNouns = [
       'Gabbro', 'YubiKey', 'Bitwarden', 'Dashlane', 'Enpass', 'Google',
       'Android', 'FIDO2', 'JSON', 'CSV', 'CVV', 'PIN', 'URL', 'USB', 'UUID',
@@ -212,12 +203,12 @@ void main() {
           // Endonyms are Latin by design and enforced identical everywhere.
           if (_isEndonymKey(e.key)) continue;
           // A value left identical to English is a separate problem
-          // (untranslated strings, Bikeshed) — not a script error.
+          // (untranslated strings, Bikeshed) - not a script error.
           if (base[e.key] == e.value) continue;
           if (cyrillicChar.hasMatch(e.value)) continue;
 
           // No Cyrillic: fine only if nothing here was translatable to begin
-          // with — strip placeholders and product names and see what is left.
+          // with - strip placeholders and product names and see what is left.
           var rest = e.value.replaceAll(RegExp(r'\{[^}]*\}'), '');
           for (final noun in properNouns) {
             rest = rest.replaceAll(noun, '');
@@ -232,8 +223,8 @@ void main() {
   });
 
   // `l10n_test` enforced the key SET, not that a value was ever translated, so a
-  // string could ship English in all 37 locales unnoticed (three did, found
-  // 2026-07-29). A value identical to English is only legitimate when there was
+  // string could ship English in all 37 locales unnoticed
+  // A value identical to English is only legitimate when there was
   // nothing to translate: an endonym, a product name, an acronym, or a format
   // string that is all placeholder.
   group('no value ships untranslated', () {
@@ -262,7 +253,7 @@ void main() {
         if (_isEndonymKey(e.key)) continue;
         if (!others.every((o) => o[e.key] == e.value)) continue;
 
-        // Identical everywhere — fine only if nothing here was translatable.
+        // Identical everywhere - fine only if nothing here was translatable.
         var rest = e.value.replaceAll(RegExp(r'\{[^}]*\}'), '');
         for (final token in untranslatable) {
           rest = rest.replaceAll(token, '');
@@ -308,7 +299,6 @@ void main() {
     }
   });
 
-  // ── localeFor complex locale branches ──────────────────────────────────────
   //
   // These 5 locales have explicit switch arms in localeFor (they need a country
   // or script subtag). The other LanguageChoices hit the wildcard arm already
@@ -328,13 +318,12 @@ void main() {
         );
         await tester.pump();
         // If localeFor returns the wrong Locale the app would fail to resolve
-        // AppLocalizations and throw — reaching this line proves the mapping works.
+        // AppLocalizations and throw - reaching this line proves the mapping works.
         expect(find.byType(AppearanceScreen), findsOneWidget);
       });
     }
   });
 
-  // ── _FallbackMaterialLocalizationsDelegate fallback branch ─────────────────
   //
   // Norwegian Nynorsk (nn) and Yoruba (yo) are in LanguageChoice but not in
   // GlobalMaterialLocalizations, so _FallbackMaterialLocalizationsDelegate.load()
@@ -350,8 +339,6 @@ void main() {
     // No crash = fallback loaded English MaterialLocalizations successfully.
     expect(find.byType(AppearanceScreen), findsOneWidget);
   });
-
-  // ── textScale applied to MediaQuery (ADR-016) ──────────────────────────────
 
   group('textScale applied to MediaQuery', () {
     Widget buildWithScale(double scale) => GabbroApp(
@@ -395,7 +382,6 @@ void main() {
     });
   });
 
-  // ── Import strings must not describe the retired UUID mechanism ─────────────
   //
   // Import dedups on a content hash, not on the source file's id. A string that
   // still promises UUID matching tells the user their edited entry will be
@@ -418,7 +404,6 @@ void main() {
     }
   });
 
-  // ── The .gabbro extension is a filename, never prose ───────────────────────
   //
   // app_sr.arb once transliterated it to ".габбро", sending a Serbian user to
   // look for a file that cannot exist. Every key whose English text names the

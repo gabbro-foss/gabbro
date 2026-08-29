@@ -100,7 +100,7 @@ class EntryDetailScreen extends StatefulWidget {
   final Future<String?> Function(String filename)? exportFilePicker;
 
   /// Test seam: fetch an attachment's bytes for saving to disk. Bytes cross
-  /// the bridge only on demand — the entry DTO carries metadata alone.
+  /// the bridge only on demand - the entry DTO carries metadata alone.
   final Future<Uint8List> Function(String entryId, String uuid)
   onExtractAttachment;
 
@@ -159,7 +159,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     super.initState();
     _entry = widget.entry;
     // Designate this Login as the Linux auto-type target while it is open
-    // (ADR-017). Harmless on other platforms — only the Linux listener reads it.
+    // (ADR-017). Harmless on other platforms - only the Linux listener reads it.
     if (_entry is VaultEntryData_Login) autotypeTarget.setLogin(_entryId());
     _loadHistory();
   }
@@ -177,7 +177,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
   void dispose() {
     // Stop targeting this Login once its screen closes, unless a newer screen
     // has already claimed the target (clearIf guards that). A pending clipboard
-    // wipe deliberately survives this screen (RT-4) — clipboardWiper owns it.
+    // wipe deliberately survives this screen (RT-4) - clipboardWiper owns it.
     if (_entry is VaultEntryData_Login) autotypeTarget.clearIf(_entryId());
     super.dispose();
   }
@@ -219,8 +219,8 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     if (confirmed != true) return;
     // Captured before the await: the two-pane layout drops this screen as soon
     // as the entry leaves the filtered list, and the parent must still be told
-    // to reload — otherwise the deleted row sits in the list until something
-    // else forces a refresh (round 19). Only the Navigator use below needs a
+    // to reload - otherwise the deleted row sits in the list until something
+    // else forces a refresh. Only the Navigator use below needs a
     // live context, so only it is guarded.
     final onDeleted = widget.onDeleted;
     await widget.onDeleteEntry(_entryId());
@@ -345,7 +345,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       appBar: AppBar(
         title: Text(_title(l)),
         actions: [
-          // File export button — only shown for File entries
+          // File export button - only shown for File entries
           if (_entry case VaultEntryData_File(:final field0))
             IconButton(
               icon: const Icon(Icons.download_outlined),
@@ -378,7 +378,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                 widget.onEdited?.call();
               } else if (mounted) {
                 // No review-save, but edit-mode attachment adds/removes have
-                // already persisted — re-read or they stay invisible here.
+                // already persisted - re-read or they stay invisible here.
                 try {
                   final fresh = (widget.onGetEntry ?? _defaultGetEntry)(
                     _entryId(),
@@ -434,8 +434,6 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     VaultEntryData_Custom(:final field0) => _customView(field0, l),
     VaultEntryData_Passkey(:final field0) => _passkeyView(field0, l),
   };
-
-  // ── Entry type views ─────────────────────────────────────────────────────────
 
   /// Attachment rows for the five attachment-bearing types (a File entry is
   /// its own payload and uses the export button in the app bar instead).
@@ -781,8 +779,6 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     );
   }
 
-  // ── Shared helpers ───────────────────────────────────────────────────────────
-
   Future<void> _launchUrl(BuildContext context, String url) async {
     final uri = Uri.tryParse(url);
     if (uri == null || url.isEmpty) return;
@@ -860,7 +856,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       );
       // A Linux screen reader never sees the snackbar: it reads a node's name
       // and is not told one appeared, so copying was completely silent
-      // (round 26). The copy moves no focus, so this has nothing competing
+      //. The copy moves no focus, so this has nothing competing
       // with it. Same text, so no new translations.
       if (!widget.isAndroid) {
         SemanticsService.sendAnnouncement(
@@ -950,7 +946,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                   ),
                 ),
               ),
-              // Breakdown — only for fields wired with a breakdown (the
+              // Breakdown - only for fields wired with a breakdown (the
               // password) and only while revealed. onLongPress carries the
               // same action, so a tap here mirrors the long-press.
               if (onLongPress != null && !obscured)

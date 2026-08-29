@@ -2,22 +2,10 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
-// Error-localization net (item 4). Governs: a Rust error must not reach the user
-// in English. The rule (see memory project_error_l10n_by_log_level): the
-// localized part must carry the actionable MEANING; raw English is allowed only
-// as a trailing technical detail, never as the whole message or the only
-// meaningful words.
-//
-// This is a source scan, not a behavioural test: it finds every site that feeds
-// a caught error's `.toString()` into user-visible text and classifies it. A
-// site is OK only when the `e.toString()` is an argument to an approved,
-// meaning-carrying localized template; otherwise it is a raw leak and must be
-// listed in `_todoRawErrors` until fixed. A new, unlisted leak fails the test.
-//
-// The already-correct too-old-vault path (vaultFormatTooOld shown, not raw) is
-// pinned behaviourally in test/unlock_screen_test.dart. Regressions elsewhere —
-// e.g. reverting a mapped onboarding FIDO code to raw `e.toString()` — reappear
-// as a scan site here, so they cannot slip through silently.
+// A Rust error must not reach the user in English: raw text may only be a
+// trailing detail inside a localized template that carries the meaning. A
+// source scan: every `e.toString()` fed into user-visible text is classified,
+// and a new unlisted leak fails.
 
 // Localized templates whose sentence states what happened; the interpolated
 // error is trailing detail only. Adding a site wrapped in one of these is fine.
@@ -40,11 +28,11 @@ const Set<String> _approvedTemplates = {
   'restoreBackupFailed',
 };
 
-// `e.toString()` / `err.toString()` — a caught error rendered to a string. `\b`
+// `e.toString()` / `err.toString()` - a caught error rendered to a string. `\b`
 // keeps `locale.toString()` / `buffer.toString()` from matching.
 final RegExp _rawErrorToString = RegExp(r'\b(?:e|err)\.toString\(\)');
 
-/// The statement text around [index] in [src] — from the previous `;`/`{`/`}` to
+/// The statement text around [index] in [src] - from the previous `;`/`{`/`}` to
 /// the next. So a template call and its `e.toString()` argument are seen together
 /// even when a formatter wraps them onto separate lines.
 String _enclosingStatement(String src, int index) {
@@ -107,14 +95,9 @@ const Map<String, int> _todoRawErrors = <String, int>{
   // meaning-carrying localized template. New leaks fail the test below.
 };
 
-// Sites where `e.toString()` appears but does NOT reach the user as a raw
-// message — so they are resolved, not leaks, and kept out of the backlog above.
-// Each is a reviewed claim. Two reasons occur:
-//   - control flow only: the string feeds a `contains(...)` branch, never shown.
-//   - field wrapped at render: the raw detail is stored in a field that a
-//     meaning-carrying template wraps at the build site (the assignment can't
-//     wrap inline because its method runs in initState, before AppLocalizations
-//     is available).
+// Reviewed non-leaks: the string feeds a `contains` branch only, or a field
+// that a template wraps at build time (initState runs before
+// AppLocalizations is available).
 const Map<String, int> _notADisplayLeak = {
   // vault_list: 408 `_error` set in _loadEntries (initState) is shown via
   // `vaultLoadFailed(_error!)` at build; 994 `msg` feeds a
@@ -146,7 +129,7 @@ void main() {
   });
 
   // Enumerate + freeze. Every raw `e.toString()` in source must be accounted
-  // for — either in the leak backlog or as a reviewed non-leak. No new
+  // for - either in the leak backlog or as a reviewed non-leak. No new
   // untranslated leak, no stale entry.
   test('every raw-error site is accounted for', () {
     final sites = _scanRawErrorSites();

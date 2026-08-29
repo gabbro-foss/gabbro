@@ -5,12 +5,9 @@ import 'package:gabbro/main.dart' show gabbroLocalizationsDelegates;
 import 'package:gabbro/screens/recovery_history_screen.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 
-// The recovery-history row put its Revert / Delete / eye controls in the
-// ListTile `trailing` slot. `trailing` is intrinsically sized, so at larger
-// text the controls ran off the right edge and could not be tapped: the user
-// could no longer restore or discard a value sync had replaced. Visible in 24
-// of 34 locales at 2.0x on a 360dp phone -- en, ja, ko, zh*, da, et, hr, sl and
-// sr* have short enough words to fit, which is why it went unseen.
+// A ListTile `trailing` slot is intrinsically sized: at large text the
+// Revert / Delete controls ran off the edge and a replaced value could not be
+// restored. Short-worded locales fit, which is why it went unseen.
 
 HistoryRecordData _rec(String field, String value) => HistoryRecordData(
   field: field,

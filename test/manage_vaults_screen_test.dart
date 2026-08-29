@@ -6,8 +6,6 @@ import 'package:gabbro/screens/manage_vaults_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/vault_registry.dart';
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 VaultRecord _record({
   String path = '/tmp/test.gabbro',
   String alias = 'Test',
@@ -44,15 +42,11 @@ Widget _buildScreen({
       listYubikeyRecords: listYubikeyRecords ?? (_) => [],
     ));
 
-// ── Tests ─────────────────────────────────────────────────────────────────────
-
 void main() {
   final registry = VaultRegistry([
     _record(path: '/tmp/a.gabbro', alias: 'Alpha'),
     _record(path: '/tmp/b.gabbro', alias: 'Beta'),
   ]);
-
-  // ── Vault list display ────────────────────────────────────────────────────
 
   group('vault list display', () {
     testWidgets('shows all vault aliases', (tester) async {
@@ -78,8 +72,6 @@ void main() {
     });
   });
 
-  // ── Switch to vault ───────────────────────────────────────────────────────
-
   testWidgets('tapping vault row calls onSwitchToVault with path and alias',
       (tester) async {
     String? selectedPath;
@@ -97,8 +89,6 @@ void main() {
     expect(selectedAlias, 'Alpha');
   });
 
-  // ── Add vault ─────────────────────────────────────────────────────────────
-
   testWidgets('shows Add vault button', (tester) async {
     await tester.pumpWidget(_buildScreen(registry: registry));
     expect(find.text('Add vault'), findsOneWidget);
@@ -114,8 +104,6 @@ void main() {
     await tester.pumpAndSettle();
     expect(called, isTrue);
   });
-
-  // ── Rename dialog ─────────────────────────────────────────────────────────
 
   group('rename dialog', () {
     testWidgets('edit icon opens rename dialog', (tester) async {
@@ -212,8 +200,6 @@ void main() {
       expect(find.text('Alpha'), findsNothing);
     });
   });
-
-  // ── Delete dialog (2-step) ────────────────────────────────────────────────
 
   group('delete dialog', () {
     testWidgets('delete icon present for each vault', (tester) async {
@@ -339,8 +325,6 @@ void main() {
       expect(find.text('Beta'), findsOneWidget);
     });
   });
-
-  // ── YubiKey delete flow ───────────────────────────────────────────────────
 
   // At large text these dialogs are taller than the screen, so their controls
   // sit below the fold and scroll into reach (see gabbro_dialog_test.dart).
@@ -568,13 +552,7 @@ void main() {
     });
   });
 
-  // ── Active-vault delete no longer blocked (ADR-014) ───────────────────────
-  //
-  // ADR-014 removes the show_vault_list privacy toggle and, with it, the block
-  // on deleting the active vault while siblings exist. Any vault's delete now
-  // opens the confirmation flow; routing after deletion is handled in main.dart
-  // (active -> remaining-or-onboarding; non-active -> stay), covered in
-  // main_navigation_test.dart.
+  // ADR-014: routing after deletion is covered in main_navigation_test.dart.
   group('active-vault delete no longer blocked (ADR-014)', () {
     final twoVaults = VaultRegistry([
       _record(path: '/tmp/a.gabbro', alias: 'Alpha'),
@@ -606,7 +584,6 @@ void main() {
     });
   });
 
-  // ── Backup + emergency-wipe info (ADR-012) ────────────────────────────────
   group('backup & emergency-wipe info', () {
     testWidgets('info icon opens the backup + emergency-wipe dialog', (tester) async {
       await tester.pumpWidget(_buildScreen(registry: registry));

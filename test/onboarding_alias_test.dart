@@ -1,9 +1,5 @@
-// Unit tests for sanitiseVaultAlias - the function the onboarding alias-path
-// auto-sync feeds straight into `<dataDir>/<stem>_gabbro.gabbro`. The security
-// property under test: a user-entered alias can never inject a path separator or
-// `..` traversal into the generated vault path. (The UI wiring that calls it on
-// each alias keystroke - listener -> setState -> PathField initialPath update -
-// is trivial glue; the real flaw surface is the sanitisation itself.)
+// A user-entered alias feeds the generated vault path and must never inject a
+// separator or `..` traversal.
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';

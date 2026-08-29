@@ -44,7 +44,6 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // ── Theme ──────────────────────────────────────────────────
               SectionHeader(label: l.sectionTheme),
               const SizedBox(height: 8),
               SegmentedRow<ThemeChoice>(
@@ -59,7 +58,6 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
               ),
               const SizedBox(height: 32),
 
-              // ── Text size ──────────────────────────────────────────────
               SectionHeader(label: l.sectionTextSize),
               const SizedBox(height: 8),
               TextSizeSlider(
@@ -76,7 +74,6 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
               ),
               const SizedBox(height: 32),
 
-              // ── Alphabet bar position ──────────────────────────────────
               SectionHeader(label: l.sectionAlphabetBar),
               const SizedBox(height: 4),
               Text(
@@ -98,7 +95,6 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
               ),
               const SizedBox(height: 32),
 
-              // ── High contrast ──────────────────────────────────────────
               SectionHeader(label: l.sectionAccessibility),
               const SizedBox(height: 8),
               // SwitchListTile (not ListTile + trailing Switch) so the toggle

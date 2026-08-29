@@ -7,17 +7,13 @@ import 'package:gabbro/text_scale.dart';
 import 'package:gabbro/widgets/sync_method_dialog.dart';
 
 // The sync-method chooser is the last thing between a user and a merge they
-// cannot undo, so every choice — including backing out — has to stay reachable
+// cannot undo, so every choice - including backing out - has to stay reachable
 // in the worst case the app supports: longest translation, largest text,
 // narrowest phone, together.
 
-/// Renders the chooser at [locale] and [scale] and returns the layout
-/// exception, if any. Tears the previous tree down first so a pending overflow
-/// from the last locale is not blamed on this one.
-///
-/// Pushed through `showDialog`, as production does — an AlertDialog dropped
-/// into a page body is laid out under different constraints and would report
-/// overflows the real dialog route never has.
+/// Tears the previous tree down first so a pending overflow is not blamed on
+/// this locale. Pushed through `showDialog` as production does: a dialog in
+/// a page body gets different constraints.
 Future<Object?> _overflowFor(
   WidgetTester tester,
   Locale locale,
@@ -128,7 +124,7 @@ void main() {
       // A wrapped label can extend below the screen, putting its centre (what
       // tester.tap aims at) off the bottom while the control itself is
       // perfectly reachable. Tap a point inside its visible part, as a finger
-      // would — that is the real question: can the user hit this choice?
+      // would - that is the real question: can the user hit this choice?
       final rect = tester.getRect(target);
       final y = (rect.top < 0 ? 0.0 : rect.top) + 20;
       expect(

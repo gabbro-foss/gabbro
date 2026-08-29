@@ -4,22 +4,11 @@ import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart' show gabbroLocalizationsDelegates;
 import 'package:gabbro/text_scale.dart';
 
-// A failure SnackBar is the only explanation the user gets. It has to survive
-// the worst case the app supports - longest translation, largest reachable
-// text, narrowest phone, together - or that explanation is unreadable.
-//
-// GATE: every message the app still shows in a SnackBar must be reachable at
-// the 2x phone ceiling (the largest scale a 360dp phone ever renders,
-// clampToDevice) in every locale. The three messages that could not meet this
-// (biometricEnrollFailed, exportFailed, recoveryActionFailed) were moved to a
-// scrolling dialog (showFailureMessage, ADR-016) and are gated in their own
-// screen tests - not here, where a synthetic SnackBar would wrongly fail
-// them. The scale is applied via platformDispatcher, which bypasses
-// clampToDevice - only values at or below the surface's ceiling may be used.
-//
-// Judge by the message's rectangle, never by a layout exception: a SnackBar
-// sits in an overlay and clips its content instead of overflowing, so it
-// throws nothing however long the message gets (see url_link_overflow_test).
+// A failure SnackBar is the only explanation the user gets, so every message
+// still shown in one must be reachable at the 2x phone ceiling in every
+// locale; messages that could not are in a scrolling dialog and gated in
+// their own tests. Judge by the message's rectangle: a SnackBar clips
+// instead of overflowing, so it never throws.
 
 /// A 360dp-wide phone surface, restored after the test.
 void phoneSurface(WidgetTester tester) {

@@ -31,7 +31,7 @@ const int kAttachmentMaxBytes = 25 * 1024 * 1024;
 
 /// Mirrors the Rust-side count cap (`ENTRY_ATTACHMENT_MAX_COUNT`): the Add
 /// button hides at the cap. Import/merge can exceed it; those entries still
-/// list and extract everything — only adding more is off.
+/// list and extract everything - only adding more is off.
 const int kAttachmentMaxCount = 3;
 
 Future<String> _defaultAddAttachment(
@@ -49,10 +49,10 @@ class CreateEntryScreen extends StatefulWidget {
   final VaultEntryData? existing;
   /// Raw field values from a failed import, keyed by Gabbro canonical names
   /// (e.g. `"card_number"`, `"cardholder_name"`, `"expiry"`, `"cvv"`).
-  /// Distinct from [existing] — carries unvalidated data that never made it
+  /// Distinct from [existing] - carries unvalidated data that never made it
   /// into the vault. Used by the import failures review flow.
   final Map<String, String>? prefill;
-  /// Creates the entry and returns its new id — needed so attachments picked
+  /// Creates the entry and returns its new id - needed so attachments picked
   /// during creation can be persisted against it right after.
   final Future<String> Function(VaultEntryData entry) onCreateEntry;
   final VaultEntryData Function(String id) onGetEntry;
@@ -63,7 +63,7 @@ class CreateEntryScreen extends StatefulWidget {
   final Future<PickedFile?> Function() pickFile;
 
   /// Test seams for the attachment bridge calls (edit mode applies them
-  /// immediately, like YubiKey management — independent of the field Save).
+  /// immediately, like YubiKey management - independent of the field Save).
   final Future<String> Function(
     String entryId,
     String name,
@@ -97,7 +97,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   late String _selectedFolder;
   List<String> _folders = [];
 
-  // ── Login fields ────────────────────────────────────────────────────────────
   late final TextEditingController _loginTitleController;
   late final TextEditingController _urlController;
   late final TextEditingController _usernameController;
@@ -116,14 +115,12 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   final FocusNode _passwordFocus = FocusNode();
   final FocusNode _loginNotesFocus = FocusNode();
 
-  // ── Note fields ─────────────────────────────────────────────────────────────
   late final TextEditingController _titleController;
   late final TextEditingController _contentController;
   final List<_CustomFieldState> _noteCustomFields = [];
   final FocusNode _noteTitleFocus = FocusNode();
   final FocusNode _noteContentFocus = FocusNode();
 
-  // ── Identity fields ─────────────────────────────────────────────────────────
   late final TextEditingController _firstNameController;
   late final TextEditingController _lastNameController;
   late final TextEditingController _emailController;
@@ -136,7 +133,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   final FocusNode _phoneFocus = FocusNode();
   final FocusNode _addressFocus = FocusNode();
 
-  // ── Card fields ─────────────────────────────────────────────────────────────
   final List<_CustomFieldState> _cardCustomFields = [];
   late final TextEditingController _cardNameController;
   late final TextEditingController _cardStatusController;
@@ -160,25 +156,22 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   final FocusNode _creditLimitFocus = FocusNode();
   final FocusNode _cardAccountNumberFocus = FocusNode();
 
-  // ── File fields ─────────────────────────────────────────────────────────────
   String? _pickedFilename;
   Uint8List? _pickedFileBytes;
 
-  // ── Attachments (all types except File — a File entry IS its payload) ───────
   /// Stored attachments of the entry being edited (metadata only; bytes stay
   /// behind the bridge). Empty in create mode.
   final List<AttachmentMetaData> _attachments = [];
-  /// Files picked while creating — persisted right after the entry exists.
+  /// Files picked while creating - persisted right after the entry exists.
   final List<PickedFile> _pendingAttachments = [];
 
   /// True once an edit-mode add/remove persisted. Review-with-no-field-changes
-  /// then returns silently — "No changes to save." would read as the
+  /// then returns silently - "No changes to save." would read as the
   /// attachment change having failed.
   bool _attachmentsChanged = false;
   late final TextEditingController _fileNotesController;
   final List<_CustomFieldState> _fileCustomFields = [];
 
-  // ── Custom entry fields ─────────────────────────────────────────────────────
   late final TextEditingController _customTitleController;
   final List<_CustomFieldState> _customFields = [];
   final FocusNode _customTitleFocus = FocusNode();
@@ -226,7 +219,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   void _initControllers() {
     final e = widget.existing;
 
-    // ── Login ──────────────────────────────────────────────────────────────
     if (e case VaultEntryData_Login(:final field0)) {
       _loginTitleController = TextEditingController(text: field0.title);
       _urlController = TextEditingController(text: field0.url);
@@ -254,12 +246,10 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       _appIdController = TextEditingController();
     }
 
-    // ── Passkey ────────────────────────────────────────────────────────────
     if (e case VaultEntryData_Passkey(:final field0)) {
       _passkeyNotesController.text = field0.notes ?? '';
     }
 
-    // ── Note ───────────────────────────────────────────────────────────────
     if (e case VaultEntryData_Note(:final field0)) {
       _titleController = TextEditingController(text: field0.title);
       _contentController = TextEditingController(text: field0.content);
@@ -277,7 +267,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       _contentController = TextEditingController();
     }
 
-    // ── Identity ───────────────────────────────────────────────────────────
     if (e case VaultEntryData_Identity(:final field0)) {
       _firstNameController = TextEditingController(text: field0.firstName);
       _lastNameController = TextEditingController(text: field0.lastName);
@@ -301,7 +290,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       _addressController = TextEditingController();
     }
 
-    // ── Card ───────────────────────────────────────────────────────────────
     if (e case VaultEntryData_Card(:final field0)) {
       _cardNameController = TextEditingController(text: field0.cardName ?? '');
       _cardStatusController = TextEditingController(text: field0.status);
@@ -358,7 +346,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       _cardNotesController = TextEditingController();
     }
 
-    // ── File ───────────────────────────────────────────────────────────────
     if (e case VaultEntryData_File(:final field0)) {
       _pickedFilename = field0.filename;
       _pickedFileBytes = Uint8List.fromList(field0.data);
@@ -376,7 +363,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       _fileNotesController = TextEditingController();
     }
 
-    // ── Custom ─────────────────────────────────────────────────────────────
     if (e case VaultEntryData_Custom(:final field0)) {
       _customTitleController = TextEditingController(text: field0.title);
       for (final f in field0.fields) {
@@ -463,8 +449,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     }
     super.dispose();
   }
-
-  // ── Save orchestration ───────────────────────────────────────────────────────
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
@@ -615,7 +599,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     }
   }
 
-  /// The trimmed app-id field value, or null when blank — an unset app id
+  /// The trimmed app-id field value, or null when blank - an unset app id
   /// matches no native app (zero false positives).
   String? _appIdOrNull() {
     final v = _appIdController.text.trim();
@@ -1015,8 +999,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     }
   }
 
-  // ── Build ────────────────────────────────────────────────────────────────────
-
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
@@ -1095,8 +1077,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     };
   }
 
-  // ── Passkey fields (edit-only: registered by the provider flow) ──────────────
-
   List<Widget> _passkeyFields(AppLocalizations l) {
     final existing = widget.existing;
     if (existing is! VaultEntryData_Passkey) {
@@ -1106,7 +1086,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     return [
       _folderPicker(),
       const SizedBox(height: 12),
-      // Read-only identity fields: plain labels, no "(optional)" — that
+      // Read-only identity fields: plain labels, no "(optional)" - that
       // invites input these fields refuse.
       TextFormField(
         initialValue: e.rpId,
@@ -1127,8 +1107,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       ),
     ];
   }
-
-  // ── Login fields ─────────────────────────────────────────────────────────────
 
   List<Widget> _loginFields(AppLocalizations l) => [
     _folderPicker(),
@@ -1256,8 +1234,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     _attachmentsSection(l),
   ];
 
-  // ── Note fields ──────────────────────────────────────────────────────────────
-
   List<Widget> _noteFields(AppLocalizations l) => [
     _folderPicker(),
     const SizedBox(height: 12),
@@ -1300,8 +1276,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     const SizedBox(height: 8),
     _attachmentsSection(l),
   ];
-
-  // ── Identity fields ──────────────────────────────────────────────────────────
 
   List<Widget> _identityFields(AppLocalizations l) => [
     _folderPicker(),
@@ -1381,8 +1355,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     const SizedBox(height: 8),
     _attachmentsSection(l),
   ];
-
-  // ── Card fields ──────────────────────────────────────────────────────────────
 
   List<Widget> _cardFields(AppLocalizations l) => [
     _folderPicker(),
@@ -1609,8 +1581,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     _attachmentsSection(l),
   ];
 
-  // ── File fields ──────────────────────────────────────────────────────────────
-
   List<Widget> _fileFields(AppLocalizations l) => [
     _folderPicker(),
     const SizedBox(height: 12),
@@ -1676,8 +1646,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       _pickedFileBytes = f.bytes;
     });
   }
-
-  // ── Attachments (all entry types except File) ───────────────────────────────
 
   List<AttachmentMetaData> _existingAttachments() => switch (widget.existing) {
     VaultEntryData_Login(:final field0) => field0.attachments,
@@ -1859,8 +1827,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     );
   }
 
-  // ── Custom entry fields ──────────────────────────────────────────────────────
-
   List<Widget> _customEntryFields(AppLocalizations l) => [
     _folderPicker(),
     const SizedBox(height: 12),
@@ -1889,8 +1855,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     const SizedBox(height: 8),
     _attachmentsSection(l),
   ];
-
-  // ── Shared custom fields section ─────────────────────────────────────────────
 
   Widget _customFieldsSection({
     required List<_CustomFieldState> fields,
@@ -1971,8 +1935,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     );
   }
 
-  // ── Field helpers ────────────────────────────────────────────────────────────
-
   Widget _folderPicker() {
     final l = AppLocalizations.of(context);
     // Build a deduplicated items list that always contains the current value.
@@ -2051,16 +2013,12 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   }
 }
 
-// ── Card status localization ─────────────────────────────────────────────────
-
 String _localizeCardStatus(String status, AppLocalizations l) => switch (status) {
   'active' => l.cardStatusActive,
   'lapsed' => l.cardStatusLapsed,
   'inactive' => l.cardStatusInactive,
   _ => status,
 };
-
-// ── Custom field state helper ────────────────────────────────────────────────
 
 class _CustomFieldState {
   final TextEditingController labelController;
@@ -2083,8 +2041,6 @@ class _CustomFieldState {
     valueController.dispose();
   }
 }
-
-// ── Expiry input formatter ───────────────────────────────────────────────────
 
 class _ExpiryInputFormatter extends TextInputFormatter {
   @override

@@ -3,19 +3,9 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-/// Single source of truth for the app's on-disk directories.
-///
-/// Two roots:
-/// - **config** — user settings (`settings.jsonc`) and the vault registry
-///   (`vaults.jsonc`). Linux/macOS: `$HOME/.config/gabbro` (resp. Application
-///   Support); elsewhere the platform app-support dir.
-/// - **data** — the default location for new vault files. The platform
-///   app-support dir on every platform.
-///
-/// [sandboxRoot] is a test-only override. When set, BOTH roots resolve under it
-/// (`<root>/config`, `<root>/data`) and the real folders are never touched. The
-/// global net in `test/flutter_test_config.dart` sets it for the whole test run,
-/// so no test can reach the user's real settings or vaults even if it forgets to.
+/// Every config and data path resolves through here so that [sandboxRoot],
+/// set for the whole run by `test/flutter_test_config.dart`, keeps every test
+/// away from the user's real settings and vaults even if it forgets to.
 class GabbroPaths {
   GabbroPaths._();
 
@@ -45,7 +35,7 @@ class GabbroPaths {
   /// [linuxDataDirFallback] resolves the data dir under this name.
   static const String _linuxApplicationId = 'app.gabbro.gabbro';
 
-  // Real-folder resolution — must match the historical per-call-site logic so
+  // Real-folder resolution - must match the historical per-call-site logic so
   // production behaviour is unchanged when sandboxRoot is null.
   static Future<String> _realConfigDir() async {
     if (Platform.isLinux) {
@@ -78,7 +68,7 @@ class GabbroPaths {
   }
 
   /// Android app-support dir from our own Kotlin channel; the handler returns
-  /// `filesDir.path` — exactly what path_provider_android returned, so no
+  /// `filesDir.path` - exactly what path_provider_android returned, so no
   /// existing install moves. Throws when the channel yields nothing, so the
   /// caller can surface it rather than write somewhere wrong.
   @visibleForTesting

@@ -63,7 +63,7 @@ Future<MergeSummary> _defaultMergeVaultWithKey(
   credentialId: credentialId,
 );
 
-/// Fast auto-merge (incoming wins, no prompts) — the "Merge automatically" path.
+/// Fast auto-merge (incoming wins, no prompts) - the "Merge automatically" path.
 Future<MergeSummary> _defaultFastMergeVault(
   String path,
   List<int> passphrase,
@@ -113,7 +113,7 @@ Future<MergeSummary?> _defaultFastMergeVaultWithKeyHeld(
 /// Cancel an in-progress granular sync: roll the vault back to its pre-sync state.
 Future<void> _defaultCancelSync() => cancelSync();
 
-/// Run the import flow. Returns the number of entries added — 0 when every
+/// Run the import flow. Returns the number of entries added - 0 when every
 /// entry in the file was already in the vault, `null` when the user backed out
 /// without importing.
 Future<int?> _defaultOpenImport(BuildContext context) =>
@@ -154,7 +154,7 @@ Future<void> _defaultApplySyncDecisions({
 );
 
 /// Reads the source vault's YubiKey records to decide whether a key is required.
-/// Non-empty means key-protected. Sync — header read only.
+/// Non-empty means key-protected. Sync - header read only.
 List<YubikeyRecordData> _defaultDetectSyncSourceRecords(String path) =>
     listVaultYubikeyRecords(path: path);
 
@@ -241,57 +241,37 @@ Future<void> confirmAnyYubikey(
   );
 }
 
-/// Set by the active vault list so the GLOBAL Tab / Shift+Tab handler in
-/// main.dart can drive the region cycle regardless of where focus currently is.
-/// Returns true when it consumed the key (focus moved to the next/previous
-/// region stop), false to let Tab fall through to default traversal. Null when
-/// no vault list is mounted. Mirrors [focusVaultSearch]; same reason — a
-/// screen-local `Actions` override died on real hardware (round 10).
+// Global hooks the mounted vault list sets and its dispose clears; null when
+// none is mounted. The desktop shortcuts and Tab cycle are handled in
+// main.dart's global key handler because a screen-local shortcut dies once
+// focus leaves the screen subtree.
+
+/// Returns true when it consumed the key, false to let Tab fall through.
 bool Function({required bool forward})? vaultRegionTab;
 
-/// Set by the active vault list so the GLOBAL Esc handler (main.dart) can drop
-/// focus out of the region cycle from ANY region, not just the search field —
-/// Esc is the only exit back to the Unfocused state (KEYBOARD_NAV). Returns
-/// true when it consumed the key. Null when no vault list is mounted.
+/// Esc is the only exit from the region cycle back to the unfocused state.
 bool Function()? vaultRegionEscape;
 
-/// Set by the active vault list so main.dart's app-root traversal absorber knows
-/// when to swallow Flutter's default Tab -> Next/PreviousFocusIntent traversal
-/// (the [vaultRegionTab] driver moves focus instead). Returns true only on
-/// desktop while the vault list is the current route; false elsewhere so Tab
-/// stays normal on other screens and inside dialogs. Null when no vault list is
-/// mounted. The absorber must sit BELOW WidgetsApp's default shortcuts (i.e.
-/// MaterialApp.builder) or the default traversal fires first.
+/// Tells main.dart's traversal absorber when to swallow Flutter's own Tab
+/// traversal: only on desktop while the vault list is the current route, so
+/// Tab stays normal on other screens and in dialogs.
 bool Function()? vaultRegionActive;
 
-/// Set by the active vault list so the GLOBAL Ctrl+F / Ctrl+Shift+F handler in
-/// main.dart can focus its search field regardless of where focus currently is.
-/// A screen-local shortcut dies once focus leaves the screen subtree (hardware:
-/// "Ctrl+F worked once then not"), so search focus rides the same global key
-/// handler as Ctrl+L. `allFields` picks normal (false) vs all-fields (true) mode.
 void Function({required bool allFields})? focusVaultSearch;
 
-/// Set by the active vault list so the passkey daemon can reload it after
-/// storing an entry — the user is watching the list during a create and
-/// otherwise concludes it failed. Null when no vault list is mounted (the
-/// next mount loads fresh anyway).
+/// The passkey daemon reloads the list after storing an entry; the user is
+/// watching it and otherwise concludes the create failed.
 void Function()? reloadVaultList;
 
-/// Set by the active vault list so the GLOBAL Ctrl+N handler (main.dart) can open
-/// the new-entry type picker from anywhere. The region Tab-cycle excludes the
-/// FAB, so this is the keyboard path to create an entry. No-op when null.
+/// The Tab cycle excludes the FAB, so Ctrl+N is the keyboard path to it.
 void Function()? openNewEntry;
 
-/// Set by the active vault list so the GLOBAL Ctrl+M handler (main.dart) can open
-/// the overflow menu from anywhere. The region Tab-cycle excludes the menu
-/// button, so this is the keyboard path to it. No-op when null.
+/// The Tab cycle excludes the menu button, so Ctrl+M is the keyboard path.
 void Function()? openVaultMenu;
 
-/// Set by the active vault list so the GLOBAL Ctrl+Q handler (main.dart) can
-/// lock and quit from anywhere on that screen. It raises the SAME confirm dialog
-/// as the menu's Quit item — an accidental keystroke must not end a live session.
-/// Null when no vault list is mounted, or when quitting isn't offered (`onQuit`
-/// is null off Linux), so the key is inert exactly where the menu item is absent.
+/// Raises the same confirm dialog as the menu's Quit item: an accidental
+/// keystroke must not end a live session. Null where quitting is not offered,
+/// so the key is inert exactly where the menu item is absent.
 void Function()? quitVault;
 
 class VaultListScreen extends StatefulWidget {
@@ -329,7 +309,7 @@ class VaultListScreen extends StatefulWidget {
   final Future<MergeSummary?> Function(String path) mergeVaultHeld;
   final Future<MergeSummary?> Function(String path) fastMergeVaultHeld;
 
-  /// Keyed sync with the held passphrase plus the tap's hmac — only the PIN is
+  /// Keyed sync with the held passphrase plus the tap's hmac - only the PIN is
   /// typed. `null` = held passphrase does not open the file; the flow falls
   /// back to a typed passphrase, reusing the same tap.
   final Future<MergeSummary?> Function(
@@ -396,8 +376,8 @@ class VaultListScreen extends StatefulWidget {
   /// construction time. Pass `[]` to force passphrase-only mode (tests).
   final List<YubikeyRecordData>? yubikeyRecords;
 
-  /// Quit the app from the menu — the item confirms first, then locks (wipes
-  /// keys) and exits. Null → the confirm's Quit action does nothing (tests that
+  /// Quit the app from the menu - the item confirms first, then locks (wipes
+  /// keys) and exits. Null -> the confirm's Quit action does nothing (tests that
   /// don't drive Quit); production wires it to exit after the lock.
   final VoidCallback? onQuit;
 
@@ -493,32 +473,24 @@ class _VaultListScreenState extends State<VaultListScreen>
   // handled globally for every text field (main.dart _onKeyEvent).
   final FocusNode _searchFocus = FocusNode();
 
-  // Phase 3: one FocusScope per Tab region, each labelled 'region:<name>'. Tab
-  // (intercepted globally in main.dart, routed here via _handleRegionTab) steps
-  // a fixed cycle of regions; arrows stay within a region (Flutter's default
-  // directional focus). Order: search -> folder -> chips -> entry list (the
-  // tablet layout adds its detail pane — handled there). The search-mode toggle
-  // icon is NOT a stop: Ctrl+F / Ctrl+Shift+F reach and set it directly (DRY).
+  // One FocusScope per Tab region; arrows stay inside a region. The
+  // search-mode toggle is not a stop: Ctrl+F / Ctrl+Shift+F set it directly.
   final _searchScope = FocusScopeNode(debugLabel: 'region:search');
   final _folderScope = FocusScopeNode(debugLabel: 'region:folder');
   final _chipsScope = FocusScopeNode(debugLabel: 'region:chips');
   final _listScope = FocusScopeNode(debugLabel: 'region:list');
   // The two-pane detail pane's region. Owned here so the cycle can reach it, but
-  // mounted by TabletVaultLayout ONLY when an entry is selected — so its being
+  // mounted by TabletVaultLayout ONLY when an entry is selected - so its being
   // non-empty is exactly "detail is a stop" (see _stopOrder). Never mounted in
   // the single-pane layout.
   final _detailScope = FocusScopeNode(debugLabel: 'region:detail');
   // The folder dropdown's own node, so the 'folder' stop lands on it directly.
   final FocusNode _folderFocus = FocusNode(debugLabel: 'folder');
 
-  /// Wrap a Tab region in its FocusScope plus the focus frame on desktop; pass
-  /// the child through UNCHANGED on Android. Keyboard navigation is
-  /// Linux-desktop only and must not alter the Android widget tree at all — so
-  /// scope and frame leave together, never one without the other.
-  /// [frame] is false for the search box, which lights up its OWN outline
-  /// instead (an overlay frame there gave a double border).
-  /// [label] names the region aloud (Linux only — it rides the same gate, so
-  /// Android gains no announcement, per D5).
+  /// Keyboard navigation is Linux-desktop only and must not alter the Android
+  /// widget tree at all, so scope and frame leave together. [frame] is false
+  /// for the search box, which lights its own outline (an overlay frame gave
+  /// a double border).
   Widget _region(
     FocusScopeNode scope,
     Widget child, {
@@ -532,15 +504,10 @@ class _VaultListScreenState extends State<VaultListScreen>
     );
   }
 
-  /// Says something that has no node for a reader to land on — a shortcut
-  /// firing, a sheet opening, focus arriving in a region. On Linux the reader
-  /// is handed a node's NAME and nothing else, so an event that changes no
-  /// name is otherwise completely silent (round 16: Orca said nothing for any
-  /// shortcut).
-  ///
-  /// Linux only, on the same D5 gate as the regions: Android has deprecated
-  /// announcement events (they force TalkBack to drop its speech queue), and
-  /// TalkBack already reads these flows from the widgets themselves.
+  /// For events with no node to land on (a shortcut, a sheet opening): on
+  /// Linux the reader gets only node names, so these are otherwise silent.
+  /// Linux only: Android has deprecated announcement events and TalkBack
+  /// already reads these flows from the widgets.
   void _announce(String message) {
     if (widget.isAndroid || !mounted) return;
     SemanticsService.sendAnnouncement(
@@ -550,20 +517,11 @@ class _VaultListScreenState extends State<VaultListScreen>
     );
   }
 
-  /// Makes a control say what it DOES, not just what it is.
-  ///
-  /// A Linux screen reader is given only a node's NAME — the embedder never
-  /// reads a semantics hint at all, which is why Orca spoke
-  /// none of these in round 16. So on Linux the outcome goes inside the name,
-  /// after the control's own name. Android does read hints and TalkBack
-  /// already passes, so there the hint is left exactly as it was.
-  ///
-  /// [outcome] null means the control has nothing to promise right now (a row
-  /// in selection mode ticks rather than opens), so nothing is added at all.
-  ///
-  /// `isAndroid` is fixed for the life of the app, so this branch never
-  /// reshapes the tree at runtime — unlike the decoration flip that once cost
-  /// a row its focus node.
+  /// The Linux embedder never reads a semantics hint, so the outcome goes
+  /// inside the name there; Android reads hints and keeps its own. [outcome]
+  /// null (a row in selection mode ticks rather than opens) adds nothing.
+  /// `isAndroid` is fixed for the app's life, so the branch never reshapes
+  /// the tree at runtime.
   Widget _saysWhatItDoes(
     Widget child, {
     required String name,
@@ -571,7 +529,7 @@ class _VaultListScreenState extends State<VaultListScreen>
   }) {
     if (outcome == null) return child;
     if (widget.isAndroid) return Semantics(hint: outcome, child: child);
-    // An empty [name] means the control has nothing to add before the outcome —
+    // An empty [name] means the control has nothing to add before the outcome -
     // the search box, whose region already says "Search" and whose placeholder
     // would just repeat it. Compose only when there is a name, or the label
     // starts with a stray ". ".
@@ -581,18 +539,15 @@ class _VaultListScreenState extends State<VaultListScreen>
     );
   }
 
-  /// The `semanticsLabel` for the Text that shows a control's own name: blank
-  /// where [_saysWhatItDoes] has already composed that name into the label, so
-  /// it is not spoken twice; null (unchanged) otherwise.
-  ///
-  /// A blanked VALUE, not a wrapper widget: wrapping would change the widget
-  /// tree's shape, which is what disposed a row's focus node once before.
+  /// Blank where [_saysWhatItDoes] already composed the name, so it is not
+  /// spoken twice. A blanked value, not a wrapper: wrapping changes the tree
+  /// shape, which disposes a row's focus node.
   String? _ownNameLabel({String? outcome}) =>
       outcome != null && !widget.isAndroid ? '' : null;
 
   /// The Tab stops in cycle order for the current state. Folder appears only
   /// when there are folders. Detail appears only when the two-pane layout has
-  /// mounted its region (i.e. wide AND an entry is selected) — its scope carries
+  /// mounted its region (i.e. wide AND an entry is selected) - its scope carries
   /// focusable descendants exactly then; empty (never a stop) single-pane.
   List<String> _stopOrder() => [
     'search',
@@ -604,7 +559,7 @@ class _VaultListScreenState extends State<VaultListScreen>
 
   /// The scope backing each cycle stop. Regions are matched by node IDENTITY,
   /// never by debugLabel: Flutter only assigns debugLabel inside an assert, so
-  /// it is null in every release build — a label lookup passes in `flutter test`
+  /// it is null in every release build - a label lookup passes in `flutter test`
   /// (debug) and silently matches nothing on the user's machine. That was the
   /// round-11 hardware failure: every Tab re-entered the cycle at stop 0.
   Map<String, FocusScopeNode> get _scopeOfStop => {
@@ -672,13 +627,13 @@ class _VaultListScreenState extends State<VaultListScreen>
     return route == null || route.isCurrent;
   }
 
-  // Ctrl+N (global): open the new-entry type picker — the keyboard path to the
+  // Ctrl+N (global): open the new-entry type picker - the keyboard path to the
   // FAB, which the region Tab-cycle excludes.
   void _handleNewEntryShortcut() {
     if (mounted && _actionShortcutActive()) _showTypePicker();
   }
 
-  // Ctrl+M (global): open the overflow menu — the keyboard path to the menu
+  // Ctrl+M (global): open the overflow menu - the keyboard path to the menu
   // button, which the region Tab-cycle excludes.
   void _handleMenuShortcut() {
     if (mounted && _actionShortcutActive()) {
@@ -694,14 +649,9 @@ class _VaultListScreenState extends State<VaultListScreen>
     }
   }
 
-  /// Esc handler (registered as the global [vaultRegionEscape] hook): drop focus
-  /// out of the cycle, back to Unfocused. Returns true when it consumed the key.
-  ///
-  /// It unfocuses the REGION SCOPE, not the focused control: unfocusing a
-  /// control only parks focus on its enclosing scope, which is still inside the
-  /// region — the frame would stay lit and the next Tab would resume mid-cycle.
-  /// Unfocusing the scope hands focus to the route scope above the cycle, while
-  /// the region keeps its own memory of the control that was focused, so
+  /// Unfocuses the region scope, not the control: unfocusing a control parks
+  /// focus on its scope, still inside the region, so the frame stays lit and
+  /// the next Tab resumes mid-cycle. The region remembers its control, so
   /// Tabbing back in returns there.
   bool _handleRegionEscape() {
     if (!_regionCycleActive()) return false;
@@ -841,8 +791,8 @@ class _VaultListScreenState extends State<VaultListScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    // Reload on resume so changes made while backgrounded — e.g. a login saved by
-    // the autofill SaveActivity into the shared session — appear without a manual
+    // Reload on resume so changes made while backgrounded - e.g. a login saved by
+    // the autofill SaveActivity into the shared session - appear without a manual
     // refresh or a lock/unlock cycle.
     if (state == AppLifecycleState.resumed) _loadEntries();
   }
@@ -914,7 +864,7 @@ class _VaultListScreenState extends State<VaultListScreen>
       try {
         folders = (widget.listFolders ?? _defaultListFolders)();
       } catch (_) {
-        // folders unavailable (e.g. vault locked) — degrade gracefully
+        // folders unavailable (e.g. vault locked) - degrade gracefully
       }
       setState(() {
         _entries = entries;
@@ -962,7 +912,7 @@ class _VaultListScreenState extends State<VaultListScreen>
         _ => entryType,
       };
 
-  // Used internally for sort/group/search — English fallbacks are fine here.
+  // Used internally for sort/group/search - English fallbacks are fine here.
   String _displayTitle(EntrySummaryData entry) {
     return switch (entry.entryType) {
       'Login' => entry.title.isNotEmpty ? entry.title : '(no URL)',
@@ -971,7 +921,7 @@ class _VaultListScreenState extends State<VaultListScreen>
     };
   }
 
-  // Used for display in build() — returns localized fallbacks.
+  // Used for display in build() - returns localized fallbacks.
   String _localizedDisplayTitle(EntrySummaryData entry, AppLocalizations l) =>
       switch (entry.entryType) {
         'Login' => entry.title.isNotEmpty ? entry.title : l.noUrlFallback,
@@ -1043,7 +993,7 @@ class _VaultListScreenState extends State<VaultListScreen>
       });
 
     // Non-indexable locales (ja/zh) get a flat title-sorted list with no
-    // section headers — there is no human-orderable bucket to label.
+    // section headers - there is no human-orderable bucket to label.
     if (!isIndexableLocale(_locale)) return sorted;
 
     final result = <dynamic>[];
@@ -1157,7 +1107,7 @@ class _VaultListScreenState extends State<VaultListScreen>
     final count = await widget.openImport(context);
     if (mounted) {
       setState(() => _isImporting = false);
-      // `null` means the user backed out — say nothing. Any number, 0 included,
+      // `null` means the user backed out - say nothing. Any number, 0 included,
       // means an import ran: report it and re-read, or a run where every entry
       // was already present leaves the screen looking like a dead button.
       if (count != null) {
@@ -1312,7 +1262,7 @@ class _VaultListScreenState extends State<VaultListScreen>
     final path = picked;
 
     // ADR-013: a key-protected source (passphrase + YubiKey) cannot be opened
-    // with the passphrase alone — the crypto refuses it. Detect that up front so
+    // with the passphrase alone - the crypto refuses it. Detect that up front so
     // the sync flow can ask for the key, mirroring the import-entries path. A
     // header-read failure (unreadable / not a gabbro file) falls through to the
     // passphrase-only path; mergeVault then surfaces the real error.
@@ -1327,7 +1277,7 @@ class _VaultListScreenState extends State<VaultListScreen>
     // SyncPassphraseDialog owns the controllers; returns the credentials, or
     // null on cancel. A key-protected source needs PIN + tap up front (they
     // cannot be guessed) but no passphrase: the one the session already holds
-    // is tried first, same as the passphrase-only path — a typed passphrase is
+    // is tried first, same as the passphrase-only path - a typed passphrase is
     // only ever asked for after that fails.
     SyncCredentials? creds;
     if (isKeyProtected) {
@@ -1351,8 +1301,8 @@ class _VaultListScreenState extends State<VaultListScreen>
     setState(() => _isSyncing = true);
     try {
       // Silent sync: merge with the session's own passphrase, so nothing is
-      // typed. `null` means it does not open this file — the passphrase was
-      // changed on the other device, or this is not that vault — so fall back
+      // typed. `null` means it does not open this file - the passphrase was
+      // changed on the other device, or this is not that vault - so fall back
       // to asking for one, keeping the apply choice already made. The keyed
       // path adds the tap's hmac and, on fallback, reuses it: one tap total.
       MergeSummary? held;
@@ -1514,7 +1464,7 @@ class _VaultListScreenState extends State<VaultListScreen>
         if (decisions != null) {
           // Apply the whole review in one call: one vault re-seal (Argon2id) for
           // all decisions, instead of one per decision. An interrupted review
-          // therefore applies all-or-nothing — re-syncing re-surfaces the same
+          // therefore applies all-or-nothing - re-syncing re-surfaces the same
           // choices with nothing lost.
           await widget.applySyncDecisions(
             fieldResolutions: [
@@ -1789,7 +1739,7 @@ class _VaultListScreenState extends State<VaultListScreen>
       context: context,
       builder: (ctx) => AlertDialog(
         // Flutter only supplies a default dialog name on Android, so on Linux
-        // Orca announced "alert" and then the focused Cancel button — the
+        // Orca announced "alert" and then the focused Cancel button - the
         // question itself was never read, leaving a screen-reader user
         // confirming something they were never told.
         semanticLabel: l.quitConfirmTitle,
@@ -1817,7 +1767,7 @@ class _VaultListScreenState extends State<VaultListScreen>
     final appState = GabbroApp.of(context);
     final settings = appState.settings;
     // pushAndRemoveUntil (not pushReplacement) so the entire back stack is
-    // cleared on lock — no prior route (e.g. this now-locked vault's list) can
+    // cleared on lock - no prior route (e.g. this now-locked vault's list) can
     // survive underneath to be revealed by a back-press. Mirrors auto-lock.
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
@@ -1833,17 +1783,10 @@ class _VaultListScreenState extends State<VaultListScreen>
     );
   }
 
-  /// The one place an entry is ticked or unticked. Both layouts and both ways
-  /// of ticking (the row, the checkbox) come through here, so no one of them
-  /// can be left silent — the logic used to be written out three times over.
-  ///
-  /// Ticking moves no focus, and a reader announces a state change only on the
-  /// object it is already sitting on. The tick is not on that object: the state
-  /// lives on the checkbox node beneath the row, so hardware round 29 heard
-  /// nothing at all (the "space" Orca said was its echo of the key). It
-  /// therefore speaks the selection count the app bar is already showing —
-  /// nothing takes focus afterwards, which is the condition an announcement
-  /// has to meet to be heard on Linux at all.
+  /// The one place an entry is ticked, so no path can be left silent. The
+  /// tick state lives on the checkbox node beneath the row, not on the focused
+  /// row, so a reader hears nothing; speaking the selection count works
+  /// because nothing takes focus afterwards.
   void _toggleSelection(String id) {
     setState(() {
       if (_selectedIds.contains(id)) {
@@ -1889,12 +1832,9 @@ class _VaultListScreenState extends State<VaultListScreen>
         OutlineInputBorder(borderSide: BorderSide(color: theme.colorScheme.outline));
     final placeholder =
         _fullTextSearch ? l.searchAllFieldsHint : l.searchEntriesHint;
-    // One thing, not five. This used to name the box, say what typing does and
-    // then recite both shortcuts, which on hardware was too long to sit through
-    // (round 23) — and "Ctrl+F: focus search" is useless once you are already
-    // in the box. The region above already says "Search", so the placeholder
-    // would be a repeat too; both shortcuts stay on the Keyboard shortcuts
-    // screen, which is where a user goes looking for them.
+    // One thing only: the region already says "Search", the shortcuts are
+    // useless once you are in the box, and a five-part name is too long to
+    // sit through.
     final searchOutcome = l.hintSearch;
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
@@ -1903,11 +1843,9 @@ class _VaultListScreenState extends State<VaultListScreen>
         controller: _searchController,
         focusNode: _searchFocus,
         decoration: InputDecoration(
-          // Android keeps Flutter's own placeholder, styling and all. Linux
-          // has to supply it as a WIDGET so its own name can be excluded from
-          // the semantics and composed into the label first instead — and
-          // Flutter does not style a placeholder it did not build, so the
-          // grey is restated here. Pinned against Android in
+          // Linux supplies the placeholder as a widget so its name can be
+          // composed into the label; Flutter does not style a placeholder it
+          // did not build, so the grey is restated. Pinned against Android in
           // a11y_region_net_test.dart.
           hintText: widget.isAndroid ? placeholder : null,
           // One line, both branches. Left to wrap, the placeholder grew the
@@ -1953,7 +1891,7 @@ class _VaultListScreenState extends State<VaultListScreen>
           border: const OutlineInputBorder(),
           // The field's OWN outline is the focus indicator: it lights up solid
           // (normal) or dashed + thicker (high-contrast). One line that changes
-          // — no overlay frame, so no fade-double on Tab-in. Android pins both
+          // - no overlay frame, so no fade-double on Tab-in. Android pins both
           // states to the same flat outline: nothing lights up.
           enabledBorder: widget.isAndroid ? flat : null,
           focusedBorder: widget.isAndroid
@@ -2050,7 +1988,7 @@ class _VaultListScreenState extends State<VaultListScreen>
       return Scaffold(body: Center(child: Text(l.vaultLoadFailed(_error!))));
     }
 
-    // Ctrl+F / Ctrl+Shift+F focus search via the global handler (main.dart) — see
+    // Ctrl+F / Ctrl+Shift+F focus search via the global handler (main.dart) - see
     // focusVaultSearch above; no screen-local shortcut wrapper (it died once
     // focus left the screen).
     return Scaffold(
@@ -2061,7 +1999,7 @@ class _VaultListScreenState extends State<VaultListScreen>
       // Null when hidden, never an empty box: a Scaffold strips the system
       // bar inset from its body and snackbar whenever this slot is filled, so
       // an empty box here put the list and the sync snackbar under Android's
-      // nav bar (edge-to-edge, 2026-08-25). The notifier listener rebuilds.
+      // nav bar (edge-to-edge). The notifier listener rebuilds.
       bottomNavigationBar: _passkeyBanner(),
       appBar: AppBar(
         title: Text(
@@ -2454,7 +2392,7 @@ class _VaultListScreenState extends State<VaultListScreen>
               clipboardClearTimeout:
                   GabbroApp.maybeOf(context)?.settings.clipboardClearTimeout ??
                   ClipboardClearTimeout.sixtySeconds,
-              // The list + detail Tab regions (desktop only — null on Android so
+              // The list + detail Tab regions (desktop only - null on Android so
               // the widget tree is unchanged there). Detail is wrapped by the
               // layout only when an entry is selected, which is how the cycle
               // knows to include it (see _stopOrder).
@@ -2541,7 +2479,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                       : Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Index bar — fixed width column. Position (left or
+                            // Index bar - fixed width column. Position (left or
                             // right) is read from settings or the test override.
                             if (_searchQuery.isEmpty &&
                                 isIndexableLocale(_locale) &&
@@ -2659,7 +2597,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                                                         entry.id,
                                                       ),
                                                   // Honour the injected delete
-                                                  // too — same reason as the
+                                                  // too - same reason as the
                                                   // fetch above: calling the
                                                   // FFI directly left deleting
                                                   // from here untestable.
@@ -2715,7 +2653,7 @@ class _VaultListScreenState extends State<VaultListScreen>
             ),
           );
           // Tab traversal is driven globally (main.dart -> _handleRegionTab);
-          // no body-scoped Actions override (it failed on hardware, round 10).
+          // no body-scoped Actions override.
           return body;
         },
         ),
@@ -2724,19 +2662,13 @@ class _VaultListScreenState extends State<VaultListScreen>
   }
 }
 
-/// Passphrase dialog for "Sync from vault".
-///
-/// Owns its TextEditingController so Flutter can dispose it safely during the
-/// dialog exit animation via State.dispose(), avoiding use-after-dispose errors.
-/// Returns the entered passphrase text on confirm, or null on cancel.
-/// Credentials gathered by [SyncPassphraseDialog]. `pin` and `transport` are
-/// only meaningful when the source is key-protected (ADR-013).
+/// `pin` and `transport` only mean anything for a key-protected source (ADR-013).
 @visibleForTesting
 class SyncCredentials {
   final String passphrase;
   final String pin;
   final String transport;
-  // Tapped key material — non-null only for a key-protected source, where the
+  // Tapped key material - non-null only for a key-protected source, where the
   // dialog runs the YubiKey tap itself (so it can show the inline tap note).
   final List<int>? hmac;
   final List<int>? credentialId;
@@ -2925,7 +2857,7 @@ class SyncPassphraseDialogState extends State<SyncPassphraseDialog> {
             ),
             const SizedBox(height: 12),
             // The records come from the incoming file's header, so the key to
-            // tap is one registered in that file — this vault's own keys may
+            // tap is one registered in that file - this vault's own keys may
             // not be.
             Text(
               l.syncUseIncomingYubikey,
@@ -3039,7 +2971,7 @@ class _ChipRowFadeEdge extends StatelessWidget {
   Widget build(BuildContext context) {
     final isRight = alignment == Alignment.centerRight;
     final color = Theme.of(context).scaffoldBackgroundColor;
-    // Grow the chevron with the text scale (capped 1.5x — it lives in a fixed
+    // Grow the chevron with the text scale (capped 1.5x - it lives in a fixed
     // 48px edge), matching the alphabet bar and breakdown sheet.
     final s = controlScaleFor(context).clamp(1.0, 1.5).toDouble();
     // Button semantics + a desktop hover tooltip, matching the alphabet index

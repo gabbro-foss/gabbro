@@ -5,15 +5,10 @@ import 'package:flutter/material.dart';
 import 'l10n/app_localizations.dart';
 import 'src/rust/api/simple.dart';
 
-/// A thin, tested seam around `file_picker`'s native dialogs.
-///
-/// On Linux `file_picker` reaches the system file dialog *only* through the XDG
-/// Desktop Portal over the DBus session bus. Inside a sandbox (e.g. a Wayland
-/// bubblewrap launch) where that bus socket isn't bound in, the underlying
-/// `DBusClient` throws a `SocketException` that otherwise propagates unhandled
-/// and crashes the isolate. `runPicker` converts any such failure into a typed
-/// [FilePickerUnavailable] so callers can degrade gracefully — the editable
-/// path fields are the manual fallback.
+/// Inside a sandbox with no session bus the portal client throws a
+/// `SocketException` that would crash the isolate; `runPicker` turns any such
+/// failure into [FilePickerUnavailable] so the editable path fields remain as
+/// the fallback.
 
 /// Thrown when the native file dialog could not be reached (typically the XDG
 /// portal / DBus session bus is unavailable in a sandbox). Carries the
@@ -27,13 +22,9 @@ class FilePickerUnavailable implements Exception {
   String toString() => 'FilePickerUnavailable: $cause';
 }
 
-/// Raises (`true`) or lowers (`false`) the process `PR_SET_DUMPABLE` flag while
-/// a native file dialog is open. R-04 keeps the process non-dumpable so a
-/// same-uid peer cannot ptrace it or read `/proc/<pid>/mem`; but a non-dumpable
-/// process also forbids `xdg-desktop-portal` (a same-uid peer) from reading
-/// `/proc/<pid>/{root,cwd,exe}` to service a FileChooser request, so no file
-/// dialog can open. We therefore raise the flag only for the picker window. The
-/// `RLIMIT_CORE=0` no-core-dump guarantee is independent and stays in force.
+/// R-04 keeps the process non-dumpable, but then `xdg-desktop-portal` cannot
+/// read `/proc/<pid>` to service a FileChooser, so the flag is raised only
+/// while a dialog is open. See `hardening.rs`.
 typedef DumpableToggle = Future<void> Function(bool dumpable);
 
 Future<void> _defaultSetDumpable(bool dumpable) async {

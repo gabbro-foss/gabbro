@@ -5,7 +5,7 @@ import 'package:gabbro/settings.dart';
 
 /// Returns the display label for [v] in the current UI language.
 ///
-/// Single source of truth for language names — update here when adding new
+/// Single source of truth for language names - update here when adding new
 /// [LanguageChoice] values and both the settings screen and onboarding picker
 /// pick up the change automatically.
 String languageChoiceLabel(LanguageChoice v, AppLocalizations l) => switch (v) {

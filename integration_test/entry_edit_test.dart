@@ -1,21 +1,6 @@
-// Phase 1 - Linux desktop, no hardware.
-//
-// Run with:
-//   cd rust && cargo build --release --lib && cd ..
-//   dart test integration_test/ -j 1
-//
-// Plain `dart test` against the release cdylib, for the same reasons as
-// vault_session_test.dart: real FFI needs the native lib, and release matters
-// because debug Argon2id is too slow. See that file's header.
-//
-// These tests cover the un-injectable real-bridge calls embedded in the edit/detail
-// screens that `flutter test` widget tests mock past:
-//   - create_entry_screen.dart `_defaultGetEntry` / `_defaultCreate` / `updateEntry`,
-//   - entry_detail_screen.dart:355 (getEntry refresh after clearing history),
-//   - entry_detail_screen.dart:374 (getEntry refresh after reverting password).
-// The widget glue around these is already covered by `flutter test` with mocked
-// callbacks; the value here is the real FFI -> crypto -> disk path for the edit,
-// password-history, and revert flows. Passphrase-only (no YubiKey).
+// The un-injectable bridge calls inside the edit and detail screens that
+// widget tests mock past: edit, password history and revert through real FFI.
+// See rust_lib_setup.dart for how to run.
 
 import 'dart:convert';
 import 'dart:io';

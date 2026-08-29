@@ -1,17 +1,6 @@
-// Net for the vault-switch route stack (unlocked vault -> Manage vaults ->
-// another vault).
-//
-// The rule the switch flow has to satisfy, in the user's terms:
-//   - Cancel (Esc) BEFORE the new vault opens -> fall back to the vault that is
-//     still unlocked. Cancelling must cost you your session.
-//   - A SUCCESSFUL unlock of the new vault -> the previous vault is closed and
-//     unreachable. Rust drops and zeroizes its keys (session.rs:105); the UI
-//     must not keep a screen that still renders its entries.
-//
-// This file pins the first half green against the current code. The second half
-// is red-first in the tests that follow it.
-//
-// All file I/O is sandboxed globally by test/flutter_test_config.dart.
+// Vault switch: cancelling before the new vault opens falls back to the
+// still-unlocked one; a successful unlock closes the previous vault, and the
+// UI must not keep a screen that still renders its entries.
 
 import 'dart:async';
 import 'dart:io';
@@ -84,7 +73,7 @@ Future<void> pressCtrlF(WidgetTester t) async {
   await t.pump();
 }
 
-/// Puts Beta's unlock screen over Alpha's list — the stack the Manage-vaults
+/// Puts Beta's unlock screen over Alpha's list - the stack the Manage-vaults
 /// tap builds, pinned by the first net test. Only the crypto call is stubbed,
 /// so the real post-unlock routing runs.
 Future<void> pushBetaUnlock(WidgetTester tester) async {
@@ -186,7 +175,7 @@ void main() {
   });
 
   // The top-left corner on this route: Cancel, not Quit. Was the reverse until
-  // the Cancel control landed — the net that pinned the old corner lives in the
+  // the Cancel control landed - the net that pinned the old corner lives in the
   // git history, and this is the same assertion inverted.
   testWidgets('the switch unlock screen shows Cancel and no Quit',
       (tester) async {
@@ -218,8 +207,6 @@ void main() {
         reason: 'Alpha was never locked, so cancelling lands back in it');
   });
 
-  // ── Red: the previous vault must be gone once the new one is open ────────
-
   testWidgets('a successful switch closes the previous vault screen',
       (tester) async {
     setDesktop(tester);
@@ -238,13 +225,10 @@ void main() {
         reason: 'Esc must not reveal the vault that was just closed');
   });
 
-  // The shortcut hooks are single global slots (vault_list_screen.dart:701):
-  // the last vault list to mount owns them, and its dispose() clears them. If
-  // Esc pops the newly opened vault back to a stranded one, the screen the user
-  // is looking at owns no shortcuts at all — Tab and Ctrl+F do nothing.
-  // (Asserted on the hooks, not on a focused search field: the vault list built
-  // by production here loads through real FFI, so it renders its error state
-  // and has no search field to focus.)
+  // The shortcut hooks are single global slots owned by the last vault list
+  // to mount; a stranded list would own none, so Tab and Ctrl+F do nothing.
+  // Asserted on the hooks: the production list loads through real FFI here
+  // and renders its error state, with no search field to focus.
   testWidgets('Esc after a successful switch leaves a live vault list owning the shortcuts',
       (tester) async {
     setDesktop(tester);

@@ -16,8 +16,6 @@ import 'package:gabbro/vault_registry.dart';
 import 'package:gabbro/widgets/gabbro_logo.dart';
 import 'package:gabbro/widgets/text_size_slider.dart';
 
-// ── Fake entropy ──────────────────────────────────────────────────────────────
-
 // Returns a fixed strong result so passphrase-dependent UI
 // (match indicator) works without the Rust bridge.
 EntropyResult _fakeStrongEntropy(String ignored) => EntropyResult(
@@ -34,8 +32,6 @@ EntropyResult _fakeWeakEntropy(String ignored) => EntropyResult(
       bits: 30,
       tier: StrengthTier.weak,
     );
-
-// ── Widget helper ─────────────────────────────────────────────────────────────
 
 Widget _buildScreen({
   Future<void> Function(List<int>, String, String?)? onInitVault,
@@ -87,8 +83,6 @@ Widget _buildInApp({AppSettings settings = const AppSettings()}) => GabbroApp(
 AppSettings _settingsOf(WidgetTester tester) =>
     GabbroApp.of(tester.element(find.byType(OnboardingScreen))).settings;
 
-// ── Tests ─────────────────────────────────────────────────────────────────────
-
 void main() {
   testWidgets('onboarding screen renders key elements', (tester) async {
     await tester.pumpWidget(_buildScreen());
@@ -97,7 +91,6 @@ void main() {
     expect(find.text('Create vault'), findsOneWidget);
   });
 
-  // ── E1: adopt entry point ───────────────────────────────────────────────────
   group('adopt entry point', () {
     testWidgets('shows the open-existing button and fires the callback', (
       tester,
@@ -119,7 +112,7 @@ void main() {
     });
   });
 
-  // ── Accessibility toggle: text scale + slider reveal + logo hide (ADR-016) ──
+  // Accessibility toggle: text scale + slider reveal + logo hide (ADR-016)
   group('accessibility toggle', () {
     testWidgets('E1 default: logo shown, no slider', (tester) async {
       await tester.pumpWidget(_buildInApp());
@@ -192,7 +185,6 @@ void main() {
     });
   });
 
-  // ── Enter-submit / focus chain ──────────────────────────────────────────────
   group('Enter-submit chain', () {
     const passphrase = 'correct horse battery staple one two three four';
 
@@ -303,12 +295,10 @@ void main() {
     });
   });
 
-  // ── Language button ────────────────────────────────────────────────────────
-
   testWidgets('language button shown on first launch (cannot pop)', (tester) async {
     await tester.pumpWidget(_buildScreen());
     expect(find.byIcon(Icons.language), findsOneWidget);
-    // Net (2026-07-21): the first-run top row is language (left) + accessibility
+    // The first-run top row is language (left) + accessibility
     // (right). Pin both, so a later change to the row (e.g. adding Quit) is a
     // deliberate, caught edit rather than a silent shift.
     expect(find.byIcon(Icons.accessibility_new), findsOneWidget);
@@ -418,12 +408,7 @@ void main() {
     );
     await tester.pump();
 
-    // Tap Create vault — button is disabled until passphrase is strong,
-    // so trigger form validation directly via the form key by tapping
-    // the button after entering a weak passphrase to enable it briefly.
-    // Easier: just assert the validators exist by checking field presence.
-    // The validators are tested individually below.
-    // Fields: alias, path (PathField), passphrase, confirm = 4
+    // alias, path, passphrase, confirm; validators are tested individually below.
     expect(find.byType(TextFormField), findsNWidgets(4));
   });
 
@@ -501,8 +486,6 @@ void main() {
 
     expect(find.text('✓ Passphrases match'), findsOneWidget);
   });
-
-  // ── YubiKey opt-in ────────────────────────────────────────────────────────────
 
   testWidgets('yubikey section hidden when isAndroid is false', (tester) async {
     await tester.pumpWidget(_buildScreen(isAndroid: false));
@@ -586,8 +569,6 @@ void main() {
     expect(capturedPins![0], 'pin-primary');
     expect(capturedPins![1], 'pin-backup');
   });
-
-  // ── Per-key transport (Android + NFC) ─────────────────────────────────────────
 
   // Drives the full YubiKey onboarding form and taps Create, returning the
   // transports passed to the init callback. [tapBackupNfc] selects NFC on the
@@ -717,7 +698,7 @@ void main() {
 
     await tester.ensureVisible(find.text('Create vault'));
     // tester.runAsync lets real async I/O (file.parent.create) complete while
-    // the framework processes events — needed because pump() alone does not
+    // the framework processes events - needed because pump() alone does not
     // drive platform I/O completions.
     await tester.runAsync(() async {
       await tester.tap(find.text('Create vault'));
@@ -727,8 +708,6 @@ void main() {
 
     expect(called, isTrue);
   });
-
-  // ── Step indicator ────────────────────────────────────────────────────────────
 
   Future<void> fillAndSubmitYubikey(
     WidgetTester tester,
@@ -785,7 +764,7 @@ void main() {
     expect(find.text('Register primary key'), findsOneWidget);
     expect(find.text('Touch your YubiKey now'), findsOneWidget);
     expect(find.text('Activate primary key'), findsOneWidget);
-    // Steps 2–4 hints not shown yet — waiting for tap 1
+    // Steps 2-4 hints not shown yet - waiting for tap 1
     expect(find.text('Touch your YubiKey again'), findsNothing);
   });
 
@@ -806,7 +785,7 @@ void main() {
 
     expect(find.text('Activate primary key'), findsOneWidget);
     expect(find.text('Touch your YubiKey again'), findsOneWidget);
-    // Step 1 hint gone — step 1 is done
+    // Step 1 hint gone - step 1 is done
     expect(find.text('Touch your YubiKey now'), findsNothing);
   });
 
@@ -827,7 +806,7 @@ void main() {
 
     expect(find.text('Swap to backup key'), findsOneWidget);
     expect(find.text('Continue'), findsOneWidget);
-    // Backup key steps not yet active — no hints shown
+    // Backup key steps not yet active - no hints shown
     expect(find.text('Touch your backup YubiKey'), findsNothing);
   });
 
@@ -851,7 +830,7 @@ void main() {
 
     expect(find.text('Continue'), findsOneWidget);
 
-    // Tap outside runAsync — _onContinueWithBackupKey runs synchronously and
+    // Tap outside runAsync - _onContinueWithBackupKey runs synchronously and
     // calls c.complete(), which schedules the mock continuation as a microtask.
     await tester.tap(find.text('Continue'));
     // Give the event loop a turn so the microtask (backupGateReached = true) runs.
@@ -862,8 +841,6 @@ void main() {
     expect(find.text('Continue'), findsNothing);
     expect(find.text('Touch your backup YubiKey'), findsOneWidget);
   });
-
-  // ── Alias field ───────────────────────────────────────────────────────────
 
   testWidgets('alias text field is present', (tester) async {
     await tester.pumpWidget(_buildScreen());
@@ -881,15 +858,13 @@ void main() {
       find.widgetWithText(TextFormField, 'Confirm passphrase'), passphrase);
     await tester.pump();
 
-    // Leave alias empty — tap Create vault to trigger validation
+    // Leave alias empty - tap Create vault to trigger validation
     await tester.ensureVisible(find.text('Create vault'));
     await tester.tap(find.text('Create vault'));
     await tester.pumpAndSettle();
 
     expect(find.text('Alias is required'), findsOneWidget);
   });
-
-  // ── Duplicate alias ───────────────────────────────────────────────────────
 
   testWidgets('alias already in use shows validation error on create',
       (tester) async {
@@ -920,8 +895,6 @@ void main() {
 
     expect(find.text('A vault named "Taken Vault" already exists.'), findsOneWidget);
   });
-
-  // ── Cancel button ─────────────────────────────────────────────────────────
 
   group('cancel button', () {
     testWidgets('no cancel button shown as root screen', (tester) async {
@@ -955,8 +928,8 @@ void main() {
       expect(find.byIcon(Icons.close), findsOneWidget);
     });
 
-    // Nested onboarding (creating an extra vault) is not a trap — cancel pops
-    // back to the unlocked app — so Quit belongs only on the first-run root.
+    // Nested onboarding (creating an extra vault) is not a trap - cancel pops
+    // back to the unlocked app - so Quit belongs only on the first-run root.
     testWidgets('no Quit button shown when pushed onto a navigation stack',
         (tester) async {
       await tester.pumpWidget(
@@ -1044,8 +1017,6 @@ void main() {
     expect(createdPath, '/tmp/test.gabbro');
   });
 
-  // ── Post-deletion message ──────────────────────────────────────────────────
-
   testWidgets('postDeletionMessage shows info banner', (tester) async {
     await tester.pumpWidget(testApp(OnboardingScreen(
       initialPath: '/tmp/test.gabbro',
@@ -1059,8 +1030,6 @@ void main() {
     expect(find.text('Your vault has been deleted.'), findsOneWidget);
     expect(find.byIcon(Icons.info_outline), findsOneWidget);
   });
-
-  // ── Error display ──────────────────────────────────────────────────────────
 
   testWidgets('generic exception from onInitVault shows error message',
       (tester) async {
@@ -1087,7 +1056,7 @@ void main() {
     });
     await tester.pump();
 
-    // Localized frame ("Setup failed: …") carries the meaning; the raw detail
+    // Localized frame ("Setup failed: ...") carries the meaning; the raw detail
     // ("disk full") is appended rather than shown alone.
     expect(find.textContaining('Setup failed:'), findsOneWidget);
     expect(find.textContaining('disk full'), findsOneWidget);
@@ -1095,7 +1064,7 @@ void main() {
 
   // H3: the Rust guard refuses an occupied path, but its message is English and
   // reaches the user wrapped in "Setup failed:". Someone pointing Create at their
-  // existing vault — the mistake this guard exists for — deserves their own
+  // existing vault - the mistake this guard exists for - deserves their own
   // language and no talk of failure.
   testWidgets('an existing file at the chosen path is refused in the users language',
       (tester) async {
@@ -1163,8 +1132,6 @@ void main() {
     expect(find.text('Key tap timeout'), findsOneWidget);
   });
 
-  // ── Create vault button state ──────────────────────────────────────────────
-
   testWidgets('create vault button is disabled before passphrase is entered',
       (tester) async {
     await tester.pumpWidget(_buildScreen());
@@ -1176,15 +1143,13 @@ void main() {
         reason: '_strongEnough is false when _entropy is null');
   });
 
-  // ── Passphrase visibility toggles ─────────────────────────────────────────
-
   testWidgets('passphrase visibility toggle switches icon', (tester) async {
     await tester.pumpWidget(_buildScreen());
 
     // Two visibility_off icons: passphrase + confirm fields.
     expect(find.byIcon(Icons.visibility_off), findsNWidgets(2));
 
-    // Tap the passphrase field's eye (first one) — scroll it into view first.
+    // Tap the passphrase field's eye (first one) - scroll it into view first.
     await tester.ensureVisible(find.byIcon(Icons.visibility_off).first);
     await tester.tap(find.byIcon(Icons.visibility_off).first);
     await tester.pump();
@@ -1206,7 +1171,6 @@ void main() {
     expect(find.byIcon(Icons.visibility_off), findsOneWidget);
   });
 
-  // ── ADR-016 reveal-eye: suffix toggles scale (capped) at large text ────────
   group('reveal-eye toggles scale (capped) at large text', () {
     void setPhone(WidgetTester tester) {
       tester.view.physicalSize = const Size(400, 800);
@@ -1245,8 +1209,6 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   });
-
-  // ── YubiKey PIN visibility toggles ─────────────────────────────────────────
 
   testWidgets('primary PIN visibility toggle in yubikey mode switches icon',
       (tester) async {
@@ -1297,8 +1259,6 @@ void main() {
     await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
     handle.dispose();
   });
-
-  // ── Passphrase strength gate (Fair-and-above allows creation) ──────────────
 
   group('passphrase strength gate', () {
     Finder createButton() => find.widgetWithText(FilledButton, 'Create vault');

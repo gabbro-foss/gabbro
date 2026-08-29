@@ -27,13 +27,8 @@ List<int> _fromHex(String hex) {
   return out;
 }
 
-/// Prompt the user to tap any of the vault's registered YubiKeys and return the
-/// resulting hmac-secret output plus the matched credential id.
-///
-/// Mirrors the unlock screen's multi-key tap (`fidoGetHmacSecretAny` on Linux, the
-/// `get_hmac_secret_multi` MethodChannel on Android) but returns the match instead
-/// of unlocking — used by the import/sync flow to open a key-protected source
-/// (ADR-013). Throws `PlatformException` if no device is present or the tap fails.
+/// The unlock screen's multi-key tap, returning the match instead of
+/// unlocking, for opening a key-protected sync source (ADR-013).
 Future<YubikeyHmacMatch> getAnyYubikeyHmacSecret({
   required List<YubikeyRecordData> records,
   required String pin,
@@ -70,13 +65,7 @@ Future<YubikeyHmacMatch> getAnyYubikeyHmacSecret({
   );
 }
 
-/// Prompt the user to tap one specific registered YubiKey and return the
-/// resulting hmac-secret output.
-///
-/// Single-credential variant of [getAnyYubikeyHmacSecret] (`fidoGetHmacSecret`
-/// on Linux, the `get_hmac_secret` MethodChannel on Android). Used by the unlock
-/// screen when the vault has a single registered key. Throws `PlatformException`
-/// if no device is present or the tap fails.
+/// Single-credential variant of [getAnyYubikeyHmacSecret].
 Future<List<int>> getYubikeyHmacSecret({
   required List<int> credentialId,
   required List<int> salt,
@@ -109,10 +98,6 @@ Future<List<int>> getYubikeyHmacSecret({
   return _fromHex(hmacHex!);
 }
 
-/// Abort an in-flight Android YubiKey tap (the user pressed Cancel). The native
-/// side stops discovery and completes the pending tap with a `TAP_CANCELLED`
-/// error, so the awaiting unlock/register future rejects and the spinner clears.
-///
 /// No-op on Linux, where the tap is a blocking FFI call that cannot be
 /// interrupted from here.
 Future<void> cancelYubikeyTap() async {

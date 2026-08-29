@@ -6,8 +6,6 @@ import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
-// ── Fake data helpers ─────────────────────────────────────────────────────────
-
 EntrySummaryData _entry(String id, String title, String type,
         {String folder = 'Personal', String searchBlob = ''}) =>
     EntrySummaryData(
@@ -40,7 +38,6 @@ List<EntrySummaryData> _blobEntries() => [
       searchBlob: 'alice smith alice@example.com'),
 ];
 
-// ── Widget helper ─────────────────────────────────────────────────────────────
 //
 // Forces a narrow (phone) surface so LayoutBuilder picks the phone layout.
 // The tablet layout has a different widget tree that would break these tests.
@@ -76,8 +73,6 @@ void _setNarrow(WidgetTester tester) {
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
 }
-
-// ── Tests ─────────────────────────────────────────────────────────────────────
 
 void main() {
   testWidgets('the chip row offers every entry type in the agreed order',
@@ -194,7 +189,7 @@ void main() {
       (tester) async {
     // On the phone layout, checkboxes only appear after entering selection mode
     // via the checklist icon. The old isWide behaviour (always-visible checkboxes)
-    // has been removed — phone layout is now checkbox-on-select only.
+    // has been removed - phone layout is now checkbox-on-select only.
     _setNarrow(tester);
     await tester.pumpWidget(_buildScreen(_threeEntries));
 
@@ -334,7 +329,7 @@ void main() {
     await tester.tap(find.text('Work').last);
     await tester.pumpAndSettle();
 
-    // Also filter by Note type — Work has no notes
+    // Also filter by Note type - Work has no notes
     await _tapChip(tester, 'Note');
     await tester.pump();
 
@@ -368,8 +363,6 @@ void main() {
 
     expect(find.descendant(of: find.byType(ListTile), matching: find.text('Muscovite')), findsOneWidget);
   });
-
-  // ── Full-text search toggle tests ─────────────────────────────────────────
 
   testWidgets('full-text search toggle icon is present in search bar',
       (tester) async {
@@ -420,7 +413,7 @@ void main() {
     await tester.enterText(find.byType(TextField), 'savings account');
     await tester.pump();
 
-    // 'savings account' is not in any title — no results
+    // 'savings account' is not in any title - no results
     expect(find.text('No entries match your search.'), findsOneWidget);
   });
 
@@ -444,7 +437,6 @@ void main() {
     expect(find.text('No entries match your search.'), findsOneWidget);
   });
 
-  // ── A11y: search clear button carries a tooltip ───────────────────────────
   // The bare clear (x) IconButton announced only "button"; it now has a
   // localized tooltip on both phone and tablet layouts.
 

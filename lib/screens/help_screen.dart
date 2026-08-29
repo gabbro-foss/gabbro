@@ -131,14 +131,11 @@ class _HelpScreenState extends State<HelpScreen> {
                               constraints: BoxConstraints(
                                 maxHeight: constraints.maxHeight * 0.5,
                               ),
-                              // The screenshot is a PNG: textScaler can't grow
-                              // it and FLAG_SECURE blocks an external magnifier,
-                              // so tap to open a full-screen pinch-zoom viewer
-                              // (ADR-016 Phase 2b).
-                              // Merged so the image's semanticLabel lands on
-                              // the same node as the tap action: a Linux screen
-                              // reader reads only a node's name, and the
-                              // Tooltip's message never reaches it.
+                              // textScaler cannot grow a PNG and FLAG_SECURE
+                              // blocks an external magnifier, so tap opens a
+                              // pinch-zoom viewer. Merged so the label lands
+                              // on the tap node: a Linux reader never reads
+                              // the Tooltip.
                               child: MergeSemantics(
                                 child: Tooltip(
                                 message: l.helpEnlargeImage,
@@ -192,7 +189,6 @@ class _HelpScreenState extends State<HelpScreen> {
                 ),
               ),
             ),
-            // ── Navigation row ──────────────────────────────────────────────
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
               child: Row(
@@ -207,7 +203,6 @@ class _HelpScreenState extends State<HelpScreen> {
                     tooltip: l.tooltipPreviousPage,
                     onPressed: _currentPage > 0 ? () => _goTo(_currentPage - 1) : null,
                   ),
-                  // ── Dot indicators ────────────────────────────────────────
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: List.generate(count, (i) {

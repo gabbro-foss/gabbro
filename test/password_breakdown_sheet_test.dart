@@ -212,8 +212,8 @@ void main() {
 
     testWidgets('classifies CJK characters as letter, not symbol',
         (tester) async {
-      // 字 (U+5B57) is Unicode category Lo — has no case.
-      // Before the fix it falls through to symbol (■); after it should be letter (◆).
+      // 字 (U+5B57) is Unicode category Lo - has no case.
+      // Before the fix it falls through to symbol (■); after it should be letter (-).
       const password = '字A1!';
 
       await tester.pumpWidget(
@@ -222,8 +222,8 @@ void main() {
         )),
       );
 
-      // ◆ appears once in the character row (字) + once in the legend = 2.
-      // If CJK were still symbol, ■ would be 4 and ◆ would be 0.
+      // - appears once in the character row (字) + once in the legend = 2.
+      // If CJK were still symbol, ■ would be 4 and - would be 0.
       expect(find.text('◆'), findsNWidgets(2));
       expect(find.text('■'), findsNWidgets(2)); // only ! + legend
     });
@@ -275,7 +275,6 @@ void main() {
       expect(controller.offset, greaterThan(before));
     });
 
-    // ── Legend shows only the character types present in the password ─────────
     testWidgets('legend omits the caseless-letter row for a Latin-only password',
         (tester) async {
       // Regression: the Letter (Lo/Lt/Lm) legend row hard-codes a CJK example

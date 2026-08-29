@@ -33,7 +33,7 @@ class AppSettings {
 
   /// Allow native Android apps to use passkeys (F1). Needs one network fetch
   /// per login (the site's own assetlinks.json); OFF by default because
-  /// Android grants INTERNET silently — this toggle is the informed opt-in.
+  /// Android grants INTERNET silently - this toggle is the informed opt-in.
   /// Android-only; ignored on Linux.
   final bool appPasskeys;
 
@@ -76,8 +76,6 @@ class AppSettings {
   });
 
   static AppSettings get defaults => const AppSettings();
-
-  // ── Serialisation ──────────────────────────────────────────────────────
 
   Map<String, dynamic> toJson() => {
     'theme': theme.name,
@@ -214,8 +212,6 @@ class AppSettings {
     syncFolder: syncFolder ?? this.syncFolder,
   );
 
-  // ── File I/O ───────────────────────────────────────────────────────────
-
   static Future<File> _settingsFile() async {
     final dirPath = await GabbroPaths.configDir();
     return File('$dirPath/settings.jsonc');
@@ -239,8 +235,6 @@ class AppSettings {
     final file = await _settingsFile();
     await file.writeAsString(_toJsonc());
   }
-
-  // ── JSONC generation ───────────────────────────────────────────────────
 
   String _toJsonc() =>
       '''// Gabbro settings
@@ -293,7 +287,7 @@ class AppSettings {
 
   // Width of the list pane in the tablet / landscape two-pane layout (dp).
   // Drag the divider in the app to resize; this value is updated automatically.
-  // Stored range: 180–900. Effective max is capped at 65% of screen width at runtime.
+  // Stored range: 180-900. Effective max is capped at 65% of screen width at runtime.
   "tablet_list_pane_width": $tabletListPaneWidth,
 
   // Hide the "passkeys are inactive" notice on the vault list ("Don't show
@@ -302,7 +296,7 @@ class AppSettings {
   "passkey_hint_dismissed": $passkeyHintDismissed,
 
   // Let native Android apps use passkeys. Each login fetches that site's own
-  // assetlinks.json to verify the app — the only network call Gabbro can make
+  // assetlinks.json to verify the app - the only network call Gabbro can make
   // (see README, "Verify no telemetry"). Android only.
   // Options: true | false
   "app_passkeys": $appPasskeys,
@@ -329,8 +323,6 @@ class AppSettings {
 }
 ''';
 
-  // ── JSONC parser ───────────────────────────────────────────────────────
-
   /// Exposed for testing only.
   static String stripCommentsForTest(String input) => _stripComments(input);
 
@@ -348,8 +340,6 @@ class AppSettings {
   }
 }
 
-// ── Enums ──────────────────────────────────────────────────────────────────
-
 enum ThemeChoice { system, light, dark }
 
 enum ForegroundLockTimeout { thirtySeconds, oneMinute, fiveMinutes, never }
@@ -364,10 +354,10 @@ enum AlphabetBarPosition { left, right }
 
 enum LanguageChoice {
   system,
-  // Simple locales — enum name equals BCP-47 language code
+  // Simple locales - enum name equals BCP-47 language code
   bg, cs, da, de, el, en, es, et, eu, fi, fr,
   hr, hu, it, ja, kk, ko, lt, lv, nb, nn,
   nl, pl, ru, sk, sl, sv, uk, yo,
-  // Complex locales — enum name differs from BCP-47 tag; see localeFor() in main.dart
+  // Complex locales - enum name differs from BCP-47 tag; see localeFor() in main.dart
   ptBr, ptPt, srLatn, zhCn, zhTw,
 }

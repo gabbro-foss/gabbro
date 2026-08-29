@@ -144,7 +144,6 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // ── Automatic merge ───────────────────────────────────────
               SectionHeader(label: l.sectionAutoMerge),
               const SizedBox(height: 4),
               Text(l.autoMergeDescription, style: small),
@@ -162,7 +161,6 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
               Text(l.autoMergeNote, style: note),
               const SizedBox(height: 32),
 
-              // ── Sync folder ───────────────────────────────────────────
               SectionHeader(label: l.sectionSyncFolder),
               const SizedBox(height: 4),
               _folderDescription(l, small),
@@ -191,7 +189,6 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
               ),
               const SizedBox(height: 32),
 
-              // ── Export and import folders, read-only (S5) ─────────────
               // One place to see every folder; each is changed on its own
               // screen, so no button and no box here.
               _folderRow(l.exportFolderLabel, _settings.exportFolder, l, note),

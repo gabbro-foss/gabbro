@@ -1,9 +1,6 @@
-// The global test sandbox (test/flutter_test_config.dart) must hold DURING
-// test execution, not just during declaration. It once did not: testMain()
-// returns at declaration time, so a teardown that nulled the root ran before
-// any test body — and a test driving a real production save overwrote the
-// user's real ~/.config/gabbro/vaults.jsonc (2026-08-01). These pins make
-// that regression impossible to miss.
+// The global sandbox must hold during execution, not just declaration:
+// testMain() returns at declaration time, so a teardown there runs before
+// any test body and a production save hits the real registry.
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -12,7 +9,7 @@ import 'package:gabbro/settings.dart';
 import 'package:gabbro/vault_registry.dart';
 
 /// The user's REAL config/data locations, resolved from the environment the
-/// same way production does when no sandbox is set. Test-only observation —
+/// same way production does when no sandbox is set. Test-only observation -
 /// nothing here may ever write them.
 String? _realHome() => Platform.environment['HOME'];
 
@@ -61,7 +58,7 @@ void main() {
   // settings) end-to-end and prove the user's real ~/.config/gabbro and
   // ~/.local/share/app.gabbro.gabbro are byte-for-byte untouched. If the
   // sandbox ever regresses, the canary restores the bytes it captured BEFORE
-  // failing — it can detect the escape without repeating the damage.
+  // failing - it can detect the escape without repeating the damage.
   testWidgets('production saves never touch the real config or vault dirs', (
     tester,
   ) async {
@@ -108,7 +105,7 @@ void main() {
     expect(_dirState(realVaultDir), equals(vaultsBefore),
         reason: 'something under the REAL vault dir changed during the test');
 
-    // And the saves must have actually happened — into the sandbox.
+    // And the saves must have actually happened - into the sandbox.
     expect(File('$sandboxConfigDir/vaults.jsonc').existsSync(), isTrue,
         reason: 'the canary save must land in the sandbox, not vanish');
   });

@@ -4,8 +4,6 @@ import 'test_helpers.dart';
 import 'package:gabbro/screens/import_failures_dialog.dart';
 import 'package:gabbro/src/rust/api/import.dart';
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 ImportFailureData _cardFailure({
   String title = 'Bad Card',
   String category = 'creditcard',
@@ -36,8 +34,6 @@ Future<void> _pumpDialog(
   await tester.tap(find.text('Show'));
   await tester.pumpAndSettle();
 }
-
-// ── Tests ─────────────────────────────────────────────────────────────────────
 
 void main() {
   testWidgets('dialog shows failure title', (tester) async {
@@ -82,7 +78,7 @@ void main() {
     await tester.tap(find.text('Skip'));
     await tester.pumpAndSettle();
 
-    // Dialog gone — only the underlying scaffold button remains
+    // Dialog gone - only the underlying scaffold button remains
     expect(find.text('Show'), findsOneWidget);
     expect(find.text('Skip'), findsNothing);
   });

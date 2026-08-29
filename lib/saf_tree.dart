@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 /// Android Storage Access Framework trees (ADR-013): the one way an app reads
 /// or overwrites a file another app (a sync client) owns under scoped
 /// storage. A tree is picked once, its grant persisted by Kotlin, and later
-/// reached by its `content://…/tree/…` URI. Export writes into one; Sync from
+/// reached by its `content://.../tree/...` URI. Export writes into one; Sync from
 /// vault reads this vault's file out of one.
 const safTreeChannel = MethodChannel('app.gabbro.gabbro/export');
 

@@ -10,8 +10,8 @@ import 'package:gabbro/text_scale.dart';
 import 'package:gabbro/widgets/url_link.dart';
 
 // The refusal message is the only thing a user gets when a stored link will not
-// open. It has to survive the worst case the app supports — longest
-// translation, largest text, narrowest phone, together — or the one explanation
+// open. It has to survive the worst case the app supports - longest
+// translation, largest text, narrowest phone, together - or the one explanation
 // available is unreadable.
 
 /// Never opens anything, so every attempt ends in the refusal message.
@@ -22,13 +22,9 @@ class _NeverOpens extends LinuxUrlOpener {
       ProcessResult(0, 1, '', '');
 }
 
-/// Shows the refusal message at [locale] and [scale], returning the layout
-/// exception if any. Any exception counts: narrowing to FlutterError would
-/// silently drop whatever else layout throws and report a false green.
-///
-/// A SnackBar alone is not enough to judge by: it sits in an overlay and clips
-/// its content instead of overflowing, so it throws nothing however long the
-/// message gets. [_messageIsReachable] is what actually catches that.
+/// Any exception counts; narrowing to FlutterError would report a false
+/// green. A SnackBar clips instead of overflowing, so [_messageIsReachable]
+/// is what actually catches a lost message.
 Future<Object?> _overflowFor(
   WidgetTester tester,
   Locale locale,
@@ -60,12 +56,8 @@ Future<Object?> _overflowFor(
   return tester.takeException();
 }
 
-/// Whether the user can actually get to the whole message.
-///
-/// At the 2x phone ceiling a long translation can wrap taller than the
-/// display, so "fits inside the screen" is the wrong thing to ask. What matters is that it can be scrolled to, which is what a
-/// dialog gives (ADR-016) and a SnackBar does not: a SnackBar clips, leaving
-/// the rest unreachable by any gesture.
+/// A long translation can wrap taller than the display, so the question is
+/// whether it can be scrolled to; a dialog can, a SnackBar clips.
 bool _messageIsReachable(WidgetTester tester, Finder message) {
   if (message.evaluate().isEmpty) return false;
   return find

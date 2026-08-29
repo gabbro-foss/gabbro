@@ -5,8 +5,6 @@ import 'package:gabbro/settings.dart';
 import 'package:gabbro/text_scale.dart';
 
 void main() {
-  // ── _stripComments ────────────────────────────────────────────────────────
-
   group('_stripComments', () {
     test('removes // lines', () {
       const input = '// a comment\n{"key": "value"}';
@@ -34,8 +32,6 @@ void main() {
     });
   });
 
-  // ── fromJson ──────────────────────────────────────────────────────────────
-
   group('AppSettings.fromJson', () {
     test('parses all fields correctly', () {
       final s = AppSettings.fromJson({
@@ -62,8 +58,6 @@ void main() {
       }
     });
   });
-
-  // ── toJson ────────────────────────────────────────────────────────────────
 
   group('AppSettings.toJson', () {
     test('serialises all fields', () {
@@ -171,8 +165,6 @@ void main() {
     });
   });
 
-  // ── copyWith ──────────────────────────────────────────────────────────────
-
   group('AppSettings.copyWith', () {
     test('overrides only the specified field', () {
       const original = AppSettings();
@@ -213,16 +205,12 @@ void main() {
     });
   });
 
-  // ── defaults ─────────────────────────────────────────────────────────────
-
   test('defaults are system theme, normal text scale, no high contrast', () {
     final d = AppSettings.defaults;
     expect(d.theme, ThemeChoice.system);
     expect(d.textScale, 1.0);
     expect(d.highContrast, isFalse);
   });
-
-  // ── ForegroundLockTimeout ─────────────────────────────────────────────────
 
   group('ForegroundLockTimeout', () {
     test('all values round-trip through fromJson', () {
@@ -255,8 +243,6 @@ void main() {
     });
   });
 
-  // ── ClipboardClearTimeout ─────────────────────────────────────────────────
-
   group('ClipboardClearTimeout', () {
     test('all values round-trip through fromJson', () {
       for (final choice in ClipboardClearTimeout.values) {
@@ -287,8 +273,6 @@ void main() {
       expect(s.toJson()['clipboard_clear_timeout'], 'thirtySeconds');
     });
   });
-
-  // ── AlphabetBarPosition ───────────────────────────────────────────────────
 
   group('AlphabetBarPosition', () {
     test('all values round-trip through fromJson', () {
@@ -321,8 +305,6 @@ void main() {
     });
   });
 
-  // ── blockPassphraseCopyPaste ──────────────────────────────────────────────
-
   group('blockPassphraseCopyPaste', () {
     test('defaults to true', () {
       final s = AppSettings.fromJson({});
@@ -352,8 +334,6 @@ void main() {
       expect(updated.foregroundLockTimeout, original.foregroundLockTimeout);
     });
   });
-
-  // ── passkeyHintDismissed ──────────────────────────────────────────────────
 
   group('passkeyHintDismissed', () {
     // "Don't show again" on the passkey banner; without persistence a
@@ -391,8 +371,6 @@ void main() {
     });
   });
 
-  // ── appPasskeys ───────────────────────────────────────────────────────────
-
   group('appPasskeys', () {
     // Informed opt-in for native-app passkeys (F1): Android grants INTERNET
     // silently, so this in-app toggle is the only ask the user ever gets.
@@ -429,8 +407,6 @@ void main() {
     });
   });
 
-  // ── show_vault_list removed (ADR-014) ─────────────────────────────────────
-
   group('show_vault_list removed (ADR-014)', () {
     test('toJson no longer emits show_vault_list', () {
       expect(
@@ -452,8 +428,6 @@ void main() {
       expect(s.toJson().containsKey('show_vault_list'), isFalse);
     });
   });
-
-  // ── LanguageChoice ────────────────────────────────────────────────────────
 
   group('LanguageChoice', () {
     test('defaults to system', () {
@@ -487,10 +461,8 @@ void main() {
     });
   });
 
-  // Biometric is per-vault + device-local (AndroidKeyStore, not settings) — no
+  // Biometric is per-vault + device-local (AndroidKeyStore, not settings) - no
   // global settings flag. See BiometricStore / unlock_screen tests.
-
-  // ── tabletListPaneWidth ───────────────────────────────────────────────────
 
   group('tabletListPaneWidth', () {
     test('defaults to 260.0', () {
@@ -531,8 +503,6 @@ void main() {
       expect(updated.foregroundLockTimeout, original.foregroundLockTimeout);
     });
   });
-
-  // ── textScale (ADR-016) ───────────────────────────────────────────────────
 
   group('textScale', () {
     test('A1 numeric text_scale round-trips through fromJson', () {
@@ -611,8 +581,6 @@ void main() {
       expect(updated.foregroundLockTimeout, original.foregroundLockTimeout);
     });
   });
-
-  // ── BackgroundLockTimeout ─────────────────────────────────────────────────
 
   group('BackgroundLockTimeout', () {
     test('all values round-trip through fromJson', () {

@@ -6,14 +6,9 @@ import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
-/// The autofill save-confirmation screen (Android). Shown by `SaveActivity` after
-/// the vault is unlocked, when the OS asked Gabbro to save a submitted login.
-///
-/// Matching and the suggested action are computed in Kotlin (the single source of
-/// truth) and handed over as a [SaveContext]; this screen resolves the user's
-/// choice — never a silent overwrite — and performs the write through the existing
-/// `create_entry`/`update_entry` bridge so the password-history retention follows
-/// the in-app `passwordHistoryExpiry` setting.
+/// Matching happens in Kotlin; this screen only resolves the user's choice
+/// (never a silent overwrite) and writes through the normal bridge so the
+/// password-history retention follows the in-app setting.
 
 /// Which action the Kotlin matcher suggests for a captured login.
 enum SaveActionKind { create, update, noop }
@@ -156,7 +151,7 @@ class _SaveConfirmScreenState extends State<SaveConfirmScreen> {
       await widget.onCreate(entry);
       widget.onDone();
     } catch (_) {
-      // Write failed — re-enable the buttons so the user can retry or cancel
+      // Write failed - re-enable the buttons so the user can retry or cancel
       // rather than being stranded on a frozen screen.
       if (mounted) setState(() => _submitting = false);
     }

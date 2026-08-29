@@ -5,7 +5,7 @@ import '../passkey_daemon.dart';
 
 /// Vault-list notice that the passkey provider is inactive (Linux): names the
 /// cause and points at the README fix, because the failure is otherwise
-/// silent — passkeys just never appear in the browser. X hides it for this
+/// silent - passkeys just never appear in the browser. X hides it for this
 /// session; "Don't show again" hides it forever (the caller persists it).
 class PasskeyHintBanner extends StatelessWidget {
   const PasskeyHintBanner({

@@ -119,8 +119,6 @@ void main() {
       expect(find.text('Select a file.'), findsOneWidget);
     });
 
-    // ── ADR-013: key-protected source sync ───────────────────────────────────
-
     YubikeyRecordData fakeRecord() => YubikeyRecordData(
           credentialId: Uint8List.fromList([1, 2]),
           salt: Uint8List.fromList([3, 4]),
@@ -323,7 +321,6 @@ void main() {
       await tester.pump();
     });
 
-    // ── R7: the Gabbro Import demands full credentials ─────────────────────────
     //
     // Four guards on one button, none of them previously tested. The last one
     // matters most: without it, pressing Sync with an empty PIN box sends that
@@ -424,7 +421,6 @@ void main() {
       expect(imported, isFalse);
     });
 
-    // ── Enter-submit / focus chain (Gabbro source) ───────────────────────────
     testWidgets('Enter on the passphrase runs the import (passphrase-only source)',
         (tester) async {
       final tmp = tempGabbroFile();
@@ -493,7 +489,6 @@ void main() {
       expect(tapPin, '1234');
     });
 
-    // ── Import failure (net pins) ────────────────────────────────────────────
     // The catch at import_screen.dart:379 had no coverage at all, which is how
     // the raw-Rust-error defect (matrix 4.2 / 4.4) shipped. These pin what the
     // failure path does TODAY, before it is changed.
@@ -568,7 +563,6 @@ void main() {
       expect(field.controller?.text, 'pw');
     });
 
-    // ── A pre-v11 source is explained, not dumped as a raw error ─────────────
     // Matrix 4.2 / 4.4. Reuses the unlock screen's strings so both refusals read
     // the same and are already translated. Neither carries a format version
     // number: "v10" means nothing to a user (Bikeshed), so the assertions below
@@ -702,10 +696,9 @@ void main() {
       expect(find.textContaining(tooOldMessage), findsNothing);
     });
 
-    // ── The too-old refusal under l10n + accessibility ───────────────────────
     // The strings are reused and already translated, but this screen's LAYOUT
     // with them is new. The worst case is the longest translation at the largest
-    // scale on the narrowest screen, together — testing them separately never
+    // scale on the narrowest screen, together - testing them separately never
     // meets it.
 
     Widget importShell({
@@ -793,8 +786,6 @@ void main() {
       handle.dispose();
     });
 
-    // ── No-file validation for each importer ─────────────────────────────────
-
     testWidgets('shows error when Enpass import attempted with no file',
         (tester) async {
       await tester.pumpWidget(buildScreen());
@@ -830,8 +821,6 @@ void main() {
       expect(find.text('Select a file.'), findsWidgets);
     });
 
-    // ── Type selection ───────────────────────────────────────────────────────
-
     for (final type in [
       'Enpass',
       'Bitwarden',
@@ -847,19 +836,17 @@ void main() {
       });
     }
 
-    // ── Passphrase field ─────────────────────────────────────────────────────
-
     testWidgets('passphrase field toggles visibility', (tester) async {
       await tester.pumpWidget(buildScreen());
       await tester.ensureVisible(find.text('Vault passphrase'));
 
-      // Initially obscured → visibility icon shown.
+      // Initially obscured -> visibility icon shown.
       final toggleBtn = find.byIcon(Icons.visibility);
       await tester.ensureVisible(toggleBtn);
       await tester.tap(toggleBtn);
       await tester.pumpAndSettle();
 
-      // After toggle, passphrase visible → visibility_off icon shown.
+      // After toggle, passphrase visible -> visibility_off icon shown.
       expect(find.byIcon(Icons.visibility_off), findsOneWidget);
     });
 

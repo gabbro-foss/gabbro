@@ -11,12 +11,8 @@ import 'package:gabbro/vault_registry.dart';
 import 'package:gabbro/widgets/path_field.dart';
 import 'package:gabbro/widgets/url_link.dart';
 
-/// Adopt: register an exported `.gabbro` file as a vault on this device,
-/// without creating an empty vault and importing into it. Adopting grants no
-/// access — the vault still asks for full credentials at unlock.
-// Production defaults: the real bridge. The format probes mirror the unlock
-// screen's defaults — a probe that cannot run must never masquerade as a
-// diagnosis, so they report false and the generic invalid message stands.
+// A probe that cannot run must never masquerade as a diagnosis, so the
+// defaults report false and the generic invalid message stands.
 Future<VaultHeaderData> _defaultReadHeader(String path) async =>
     readVaultHeader(path: path);
 
@@ -43,8 +39,8 @@ class AdoptVaultScreen extends StatefulWidget {
   final VaultRegistry registry;
 
   /// The native open dialog (PathField's `openPicker` seam): a path, null on
-  /// cancel, or throws [FilePickerUnavailable] — PathField handles the latter
-  /// two itself. Null → PathField's real file dialog.
+  /// cancel, or throws [FilePickerUnavailable] - PathField handles the latter
+  /// two itself. Null -> PathField's real file dialog.
   final Future<String?> Function()? onPickFile;
 
   /// Full-parses the picked file and returns its header (alias + YubiKey
@@ -63,14 +59,14 @@ class AdoptVaultScreen extends StatefulWidget {
   final Future<void> Function(String path, String alias) onRegistered;
 
   /// Android only: copy the picker's cache file into app storage (the Rust
-  /// `adopt_vault_file` — validates, refuses an occupied dest, creates the
+  /// `adopt_vault_file` - validates, refuses an occupied dest, creates the
   /// `.bak`). Linux registers the picked path in place and never calls this.
   final Future<void> Function(String source, String dest) onAdoptCopy;
 
   /// Android only: the app-storage directory adopted vaults are copied into.
   final Future<String> Function() onDefaultVaultDir;
 
-  /// Test seam; null → [Platform.isAndroid].
+  /// Test seam; null -> [Platform.isAndroid].
   final bool? isAndroid;
 
   const AdoptVaultScreen({
@@ -100,8 +96,8 @@ class _AdoptVaultScreenState extends State<AdoptVaultScreen> {
   /// The alias a confirm was refused for (already registered); null = none.
   String? _collisionAlias;
 
-  /// A free path in `dir` for `basename`, suffixing `-2`, `-3`, … before the
-  /// extension when the plain name is taken — the Rust copy refuses an
+  /// A free path in `dir` for `basename`, suffixing `-2`, `-3`, ... before the
+  /// extension when the plain name is taken - the Rust copy refuses an
   /// occupied destination, so the free name must be found here.
   static String _freeDestPath(String dir, String basename) {
     var candidate = '$dir/$basename';
@@ -159,7 +155,7 @@ class _AdoptVaultScreenState extends State<AdoptVaultScreen> {
         _AdoptError.alreadyRegistered => l.adoptAlreadyRegistered,
       };
 
-  // Triage a definite choice: a picker result or a submitted typed path —
+  // Triage a definite choice: a picker result or a submitted typed path -
   // never a keystroke (the header read parses the whole file).
   Future<void> _triage(String path) async {
     if (path.isEmpty || !mounted) return;
@@ -265,7 +261,7 @@ class _AdoptVaultScreenState extends State<AdoptVaultScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(l.adoptTitle)),
       // SafeArea: an explicit ListView padding disables Flutter's automatic
-      // system-bar inset (edge-to-edge Android, 2026-08-25).
+      // system-bar inset (edge-to-edge Android).
       body: SafeArea(
         child: ListView(
         padding: const EdgeInsets.all(16),

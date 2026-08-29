@@ -81,8 +81,8 @@ void main() {
     handle.dispose();
   });
 
-  // ── Phase 2b: pinch-to-zoom on help images (textScaler can't scale a PNG;
-  // FLAG_SECURE blocks an external magnifier) ──────────────────────────────────
+  // Phase 2b: pinch-to-zoom on help images (textScaler can't scale a PNG;
+  // FLAG_SECURE blocks an external magnifier)
   group('image zoom', () {
     testWidgets('help image carries an enlarge affordance and label',
         (tester) async {

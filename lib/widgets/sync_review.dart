@@ -131,8 +131,6 @@ List<SyncReviewStep> buildSyncReviewSteps(MergeSummary summary) {
   return steps;
 }
 
-// ── The user's decisions, applied by the caller via the existing FFI calls ─────
-
 /// Set a field/pair to a value: keep-mine on a clash (`keepIncoming` false), or a
 /// dropped brought-over EDIT (`keepIncoming` true with the OLD value to restore
 /// it). Mirrors `onResolveFieldConflict`.
@@ -226,7 +224,7 @@ String _fieldLabel(String field) {
   return field;
 }
 
-/// Attachment rows are labelled by filename ([name], their value) — the key
+/// Attachment rows are labelled by filename ([name], their value) - the key
 /// holds a uuid, which tells the user nothing. Other rows keep the field key.
 String _itemLabel(String field, String name) =>
     field.startsWith('attachments:') && name.isNotEmpty
@@ -238,7 +236,7 @@ const _secretFields = {'password', 'cvv', 'pin', 'transaction_password'};
 bool _isSecret(String field) => _secretFields.contains(field);
 
 /// Binary fields whose value rides the resolution path as base64 (File
-/// contents, passkey key material). They must never render their raw value —
+/// contents, passkey key material). They must never render their raw value -
 /// always `<binary>`.
 bool _isBinary(String field) => field == 'data' || field == 'credential';
 
@@ -293,19 +291,10 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
     return value.isEmpty ? l.reviewEmpty : value;
   }
 
-  /// A two-choice keep-vs-other picker (keep / delete or keep / skip), matching
-  /// the clash picker so every keep/remove decision is explicitly labelled.
-  //
-  // A ChoiceChip is locked to a single 48px line with no way to scroll it, so
-  // it silently clips a long field value (a URL, a password, a folder name) and
-  // the user picks between two values they cannot read (hardware: sync review,
-  // phone portrait). Set [showsValues] for any choice whose label interpolates
-  // user data: it then renders as a full-width row — a radio marker + the value
-  // as wrapping Text (Flutter char-wraps even an unbroken password) — at EVERY
-  // text size, because a value clips at normal text too.
-  //
-  // Bare labels (Keep / Delete / Skip) can never clip, so they stay compact
-  // chips at normal text and only become rows past 1.5x (ADR-016).
+  /// A ChoiceChip is one unscrollable 48px line and clips a long value, so
+  /// the user would pick between two values they cannot read. [showsValues]
+  /// renders wrapping rows at every text size; bare labels stay chips until
+  /// 1.5x (ADR-016).
   Widget _choiceRow(
     List<({String label, bool selected, VoidCallback onSelect})> choices, {
     bool showsValues = false,
@@ -383,7 +372,7 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
 
   /// Build and return the decisions. Every choice the user did not touch resolves
   /// in favour of the incoming vault, so finishing here and "merge the rest
-  /// automatically" are the same call — there is no separate fast path to drift.
+  /// automatically" are the same call - there is no separate fast path to drift.
   void _finish() {
     final fields = <SyncFieldResolution>[];
     final history = <SyncHistoryReplacement>[];

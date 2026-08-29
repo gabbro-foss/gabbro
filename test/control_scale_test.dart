@@ -64,8 +64,6 @@ void main() {
         closeTo(2.0, 1e-9));
   });
 
-  // ── scaledIconSize (Slice B) ───────────────────────────────────────────────
-
   group('scaledIconSize', () {
     Future<double> sizeAt(
       WidgetTester tester, {
@@ -110,7 +108,6 @@ void main() {
     });
   });
 
-  // ── scaledSuffixIconSize (reveal-eye toggles in bounded field boxes) ────────
   // Grows gently and is capped at 1.4x so a scaled eye can't clip / balloon a
   // TextField's suffix box (ADR-016; same gentle-cap idea as the selection
   // checkbox).

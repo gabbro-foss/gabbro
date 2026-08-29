@@ -5,7 +5,7 @@ import 'package:gabbro/app_paths.dart';
 
 // S1 of the path_provider replacement: on Android the app-support dir comes
 // from our own `app.gabbro.gabbro/paths` channel (Kotlin returns
-// `filesDir.path` — exactly what path_provider_android returned).
+// `filesDir.path` - exactly what path_provider_android returned).
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 

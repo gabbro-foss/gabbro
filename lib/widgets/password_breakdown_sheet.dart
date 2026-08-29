@@ -11,7 +11,7 @@ _CharType _classify(String ch) {
   if (RegExp(r'\p{Lu}', unicode: true).hasMatch(ch)) return _CharType.uppercase;
   if (RegExp(r'\p{Ll}', unicode: true).hasMatch(ch)) return _CharType.lowercase;
   if (RegExp(r'\p{Nd}', unicode: true).hasMatch(ch)) return _CharType.digit;
-  // Catches Lo/Lt/Lm: CJK ideographs, Arabic, Hebrew, etc. — letters without case.
+  // Catches Lo/Lt/Lm: CJK ideographs, Arabic, Hebrew, etc. - letters without case.
   if (RegExp(r'\p{L}', unicode: true).hasMatch(ch)) return _CharType.letter;
   return _CharType.symbol;
 }
@@ -151,7 +151,7 @@ class _PasswordBreakdownSheetState extends State<PasswordBreakdownSheet> {
     final muted = cs.onSurfaceVariant;
 
     // The legend is a key for the characters shown above it, so list only the
-    // types the password actually contains — otherwise the caseless-letter row
+    // types the password actually contains - otherwise the caseless-letter row
     // (example 字) would show even for a Latin-only password (confusing).
     final presentTypes = <_CharType>{
       for (var i = 0; i < widget.password.length; i++)

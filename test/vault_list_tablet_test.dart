@@ -12,10 +12,8 @@ import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/vault_registry.dart';
 
-// ---------------------------------------------------------------------------
-// Fake entry list — avoids hitting the Rust bridge in tests.
+// Fake entry list - avoids hitting the Rust bridge in tests.
 // Two entries so the list is non-empty and we can test selection.
-// ---------------------------------------------------------------------------
 List<EntrySummaryData> _fakeEntries() => [
   EntrySummaryData(
     id: 'id-1',
@@ -33,9 +31,7 @@ List<EntrySummaryData> _fakeEntries() => [
   ),
 ];
 
-// ---------------------------------------------------------------------------
 // Fake VaultEntryData for detail pane injection in tests.
-// ---------------------------------------------------------------------------
 VaultEntryData _fakeLoginEntry() => VaultEntryData.login(
   LoginEntryData(
     id: 'id-1',
@@ -52,12 +48,10 @@ VaultEntryData _fakeLoginEntry() => VaultEntryData.login(
   ),
 );
 
-// ---------------------------------------------------------------------------
-// Helper — builds VaultListScreen inside GabbroApp.
-// Width is controlled via tester.view.physicalSize in each test — that is
+// Helper - builds VaultListScreen inside GabbroApp.
+// Width is controlled via tester.view.physicalSize in each test - that is
 // the only reliable way to make LayoutBuilder see a specific width inside
 // MaterialApp, which otherwise expands to fill the full test surface.
-// ---------------------------------------------------------------------------
 Widget _buildScreen() => GabbroApp(
   registry: VaultRegistry([]),
   vaultPath: null,
@@ -68,7 +62,7 @@ Widget _buildScreen() => GabbroApp(
   ),
 );
 
-// Sets the test surface to [width]×900 logical pixels (devicePixelRatio=1)
+// Sets the test surface to [width]x900 logical pixels (devicePixelRatio=1)
 // and registers a teardown to reset it after the test.
 void _setWidth(WidgetTester tester, double width) {
   tester.view.physicalSize = Size(width, 900);
@@ -79,13 +73,11 @@ void _setWidth(WidgetTester tester, double width) {
 
 void main() {
   group('VaultListScreen - tablet two-pane layout', () {
-    // -----------------------------------------------------------------------
     // Test 1: no NavigationRail at any width. It offered Vault (a no-op) plus
     // Appearance / Security / About, all three of which the app-bar overflow
-    // menu already reaches — see the group at the end of this file, which pins
+    // menu already reaches - see the group at the end of this file, which pins
     // those routes. Removing it also takes the last widget that sat outside the
     // keyboard Tab-cycle.
-    // -----------------------------------------------------------------------
     testWidgets('no NavigationRail at either width', (tester) async {
       _setWidth(tester, 700);
       await tester.pumpWidget(_buildScreen());
@@ -96,18 +88,14 @@ void main() {
       expect(find.byType(NavigationRail), findsNothing);
     });
 
-    // -----------------------------------------------------------------------
-    // Test 2: NavigationBar (bottom) absent at ≥600dp
-    // -----------------------------------------------------------------------
+    // Test 2: NavigationBar (bottom) absent at >=600dp
     testWidgets('NavigationBar absent at >=600dp', (tester) async {
       _setWidth(tester, 700);
       await tester.pumpWidget(_buildScreen());
       expect(find.byType(NavigationBar), findsNothing);
     });
 
-    // -----------------------------------------------------------------------
-    // Test 4: List pane present at ≥600dp — search field is the landmark.
-    // -----------------------------------------------------------------------
+    // Test 4: List pane present at >=600dp - search field is the landmark.
     testWidgets('list pane present at >=600dp (search field visible)', (
       tester,
     ) async {
@@ -116,9 +104,7 @@ void main() {
       expect(find.widgetWithIcon(TextField, Icons.search), findsOneWidget);
     });
 
-    // -----------------------------------------------------------------------
     // Test 5: Empty state shown in detail pane when no entry is selected.
-    // -----------------------------------------------------------------------
     testWidgets('detail pane shows empty state when no entry selected', (
       tester,
     ) async {
@@ -127,12 +113,10 @@ void main() {
       expect(find.text('Select an entry'), findsOneWidget);
     });
 
-    // -----------------------------------------------------------------------
     // Test 6: Tapping the pencil on a selected entry navigates to
-    // CreateEntryScreen (edit mode uses full-screen push navigation —
+    // CreateEntryScreen (edit mode uses full-screen push navigation -
     // Option 2 from the wireframe decisions; in-place dim is not needed
     // because the two-pane layout is not visible while editing).
-    // -----------------------------------------------------------------------
     testWidgets('pencil tap on selected entry navigates to edit screen', (
       tester,
     ) async {
@@ -156,9 +140,7 @@ void main() {
       expect(find.byType(NavigationRail), findsNothing);
     });
 
-    // -----------------------------------------------------------------------
     // Test 7: Delete from detail pane returns to empty state (no crash).
-    // -----------------------------------------------------------------------
     testWidgets('delete from detail pane shows empty state', (tester) async {
       _setWidth(tester, 700);
       bool deleteEntryCalled = false;
@@ -196,13 +178,10 @@ void main() {
       expect(refreshCalled, isTrue);
     });
 
-    // -----------------------------------------------------------------------
     // Test 8: Layout switches when width crosses 600dp threshold.
-    // -----------------------------------------------------------------------
     testWidgets('layout switches across 600dp threshold', (tester) async {
       // The resizable list pane is the marker for two-pane mode; it exists only
-      // above the threshold. (The nav rail used to be the marker, but it was a
-      // second route to screens the menu already reaches and has been removed.)
+      // above the threshold.
       _setWidth(tester, 400);
       await tester.pumpWidget(_buildScreen());
       expect(find.byKey(const ValueKey('tablet-list-pane')), findsNothing);
@@ -212,15 +191,8 @@ void main() {
       expect(find.byKey(const ValueKey('tablet-list-pane')), findsOneWidget);
     });
 
-    // -----------------------------------------------------------------------
-    // Test 9: Delete all entries — detail pane shows empty state (not grey).
-    // Regression test for: bulk delete left _selectedEntryId set while
-    // filteredEntries became empty, causing the detail pane to render blank.
-    //
-    // Drives TabletVaultLayout directly: first render with one entry and
-    // tap it so _selectedEntryId is set, then rebuild with filteredEntries
-    // empty — the detail pane must show the empty state.
-    // -----------------------------------------------------------------------
+    // Bulk delete once left _selectedEntryId set with an empty list, and the
+    // detail pane rendered blank.
     testWidgets('detail pane shows empty state after delete-all', (
       tester,
     ) async {
@@ -254,7 +226,7 @@ void main() {
             ),
           ));
 
-      // First render — two entries present.
+      // First render - two entries present.
       await tester.pumpWidget(buildLayout(entries));
       await tester.pumpAndSettle();
 
@@ -263,7 +235,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Select an entry'), findsNothing);
 
-      // Rebuild with empty list — simulates parent after delete-all + refresh.
+      // Rebuild with empty list - simulates parent after delete-all + refresh.
       await tester.pumpWidget(buildLayout([]));
       await tester.pumpAndSettle();
 
@@ -271,9 +243,7 @@ void main() {
       expect(find.text('Select an entry'), findsOneWidget);
     });
 
-    // -----------------------------------------------------------------------
     // Test 11: Dragging the divider handle to the right widens the list pane.
-    // -----------------------------------------------------------------------
     testWidgets('dragging divider handle widens the list pane', (tester) async {
       _setWidth(tester, 900);
 
@@ -319,9 +289,7 @@ void main() {
       expect(after, greaterThan(before));
     });
 
-    // -----------------------------------------------------------------------
     // Test 12: Dragging beyond the dynamic max clamps the list pane width.
-    // -----------------------------------------------------------------------
     testWidgets('dragging past dynamic max clamps list pane width', (tester) async {
       _setWidth(tester, 900);
 
@@ -347,7 +315,7 @@ void main() {
       )));
       await tester.pumpAndSettle();
 
-      // Drag far beyond the screen — max for a 900dp screen = 900 - 200 = 700dp.
+      // Drag far beyond the screen - max for a 900dp screen = 900 - 200 = 700dp.
       // The reserve is 200dp (the detail pane's minimum); it was 300dp while the
       // nav rail took ~100dp of the row.
       await tester.drag(
@@ -363,14 +331,6 @@ void main() {
       expect(width, lessThanOrEqualTo(700.0));
     });
 
-    // -----------------------------------------------------------------------
-    // Test 10: Stale _selectedEntryId reset after import/vault reload.
-    //
-    // Drives TabletVaultLayout directly. Tap id-1 to set _selectedEntryId,
-    // then rebuild with a new entry list that does NOT contain id-1 —
-    // simulating a vault reload after import. Detail pane must revert to
-    // empty state rather than trying to fetch a ghost entry.
-    // -----------------------------------------------------------------------
     testWidgets('detail pane resets to empty state after vault reload removes selected entry', (
       tester,
     ) async {
@@ -379,7 +339,7 @@ void main() {
       final originalEntries = _fakeEntries(); // id-1 Alice, id-2 Bob
       final grouped = <dynamic>['A', originalEntries[0], 'B', originalEntries[1]];
 
-      // After reload: only Bob (id-2) remains — Alice (id-1) is gone.
+      // After reload: only Bob (id-2) remains - Alice (id-1) is gone.
       final reloadedEntries = [
         EntrySummaryData(
           id: 'id-2',
@@ -418,11 +378,11 @@ void main() {
             ),
           ));
 
-      // Initial render — two entries.
+      // Initial render - two entries.
       await tester.pumpWidget(buildLayout(originalEntries, grouped));
       await tester.pumpAndSettle();
 
-      // Tap Alice → _selectedEntryId = 'id-1'.
+      // Tap Alice -> _selectedEntryId = 'id-1'.
       await tester.tap(find.text('Alice'));
       await tester.pumpAndSettle();
       expect(find.text('Select an entry'), findsNothing);
@@ -431,27 +391,18 @@ void main() {
       await tester.pumpWidget(buildLayout(reloadedEntries, reloadedGrouped));
       await tester.pumpAndSettle();
 
-      // _selectedEntryId ('id-1') is no longer in filteredEntries — must reset.
+      // _selectedEntryId ('id-1') is no longer in filteredEntries - must reset.
       expect(find.text('Select an entry'), findsOneWidget);
     });
 
     // Test 13 pinned that the Security *rail destination* handed the vault path
-    // to SecurityScreen — biometric enrollment is keyed per vault, and enrolling
+    // to SecurityScreen - biometric enrollment is keyed per vault, and enrolling
     // against "" never persists. The rail is gone; the same guarantee is now
     // pinned on the menu route, at both widths, in the group below.
   });
 
-  // -------------------------------------------------------------------------
-  // Net for removing the NavigationRail. The rail offers Vault / Appearance /
-  // Security / About; "Vault" is a no-op and the other three are also in the
-  // app-bar overflow menu, which is owned by VaultListScreen and so is present
-  // at both layout widths. These pin the menu route before the rail goes, so a
-  // regression shows up as a red test rather than a target with no way in.
-  //
-  // The finders are scoped to the popup menu on purpose: the rail's own labels
-  // are the same words, so an unscoped find.text would be satisfied by the rail
-  // and would keep passing even if the menu item were broken or missing.
-  // -------------------------------------------------------------------------
+  // Finders are scoped to the popup menu: the same words appear elsewhere,
+  // so an unscoped find.text would pass with the menu item broken.
   group('settings screens reachable from the overflow menu', () {
     Future<void> openMenu(WidgetTester tester) async {
       await tester.tap(find.byIcon(Icons.menu));

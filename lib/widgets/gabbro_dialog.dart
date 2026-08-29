@@ -4,17 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 
-/// Every dialog in the app goes through here instead of calling `showDialog`
-/// directly.
-///
-/// Why: an `AlertDialog` gives its buttons a fixed strip at the bottom and lets
-/// the message shrink to fit whatever is left. On a 360dp phone at the 2x
-/// device ceiling that message is silently cut short and the buttons can be
-/// pushed off the bottom of the screen. `scrollable: true`
-/// does not help — it scrolls the title and content, never the actions.
-///
-/// So the whole dialog is put inside a scroll view instead: centred exactly as
-/// before while it fits, scrollable once it does not.
+/// Every dialog goes through here: at the 2x phone ceiling an `AlertDialog`
+/// cuts its message short and can push its buttons off screen, and
+/// `scrollable: true` never scrolls the actions. The whole dialog scrolls
+/// instead.
 Future<T?> showGabbroDialog<T>({
   required BuildContext context,
   required WidgetBuilder builder,

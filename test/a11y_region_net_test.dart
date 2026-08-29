@@ -12,17 +12,8 @@ import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'screen_catalog.dart';
 import 'test_helpers.dart';
 
-// Net-first floor for Phase 4 (the a11y layer). Every test here is GREEN against
-// the current code: it pins what Phase 4 must not break, and pins the absence of
-// what Phase 4 will add, so the red step is real and cannot be claimed by an
-// accidental match.
-//
-// The catalog-wide sweeps (contrast, tap size, labels) live in a11y_net_test.dart.
-// This file holds the targeted pins that a sweep cannot express.
-//
-// Not repeated here: the alphabet index bar's per-letter labels and its
-// exclusion of absent letters / the gap ellipsis are already pinned in
-// alphabet_index_bar_test.dart.
+// Targeted a11y pins a catalog sweep (a11y_net_test.dart) cannot express.
+// The alphabet bar's labels are pinned in alphabet_index_bar_test.dart.
 
 /// A vault list with folders and two entries, so the folder region exists and
 /// the entry rows are addressable by title.
@@ -174,7 +165,6 @@ void main() {
     handle.dispose();
   });
 
-  // ── B. What a Semantics wrapper can strip ────────────────────────────────
   // Phase 4 wraps these controls to give them labels and hints. Wrapping has
   // already cost this app a control's actions once: the text-size slider lost
   // its increase/decrease actions to a Semantics/MergeSemantics wrapper and
@@ -202,8 +192,8 @@ void main() {
       reason: 'the search box lost the name a screen reader reads',
     );
     // On Linux the name carries everything: what the box IS and what it does.
-    // A hint here would be dead text — the Linux embedder never reads one
-    // (round 16). Android's hint is pinned in section F.
+    // A hint here would be dead text - the Linux embedder never reads one
+    //. Android's hint is pinned in section F.
     expect(
       data.hint,
       isEmpty,
@@ -276,10 +266,9 @@ void main() {
     handle.dispose();
   });
 
-  // ── C. A region is silent unless it is named and focused ────────────────
   // Phase 4 gives the vault list's regions a name and announces the focused
   // one. These two pin the other side of that: an UNLABELLED region stays
-  // silent, and a labelled one announces only while it holds focus — otherwise
+  // silent, and a labelled one announces only while it holds focus - otherwise
   // a screen reader would read region names it was never meant to, or announce
   // every region at once.
 
@@ -317,7 +306,6 @@ void main() {
     handle.dispose();
   });
 
-  // ── D. The D5 platform split must survive Phase 4 ────────────────────────
   // Regions exist only on Linux, so the region announcement must never reach
   // Android. These are green now and must stay green: they are the negative
   // half of the Phase 4 work, mirroring R1/R2/R3 in keyboard_region_chips_test.
@@ -340,7 +328,7 @@ void main() {
 
   // Wrapping a region in another widget must not change the widget tree's
   // SHAPE across a rebuild: that disposes the focus node inside it and drops
-  // focus. It has happened here before — a row decoration flipped between null
+  // focus. It has happened here before - a row decoration flipped between null
   // and non-null and Enter silently moved focus to a neighbouring row.
   testWidgets('a focused region keeps focus across a rebuild', (t) async {
     final handle = await pumpVaultList(t);
@@ -361,13 +349,9 @@ void main() {
     handle.dispose();
   });
 
-  // ── E. The focus frame must be visible, not just present ─────────────────
-  // The frame is painted by a CustomPainter, so textContrastGuideline cannot
-  // see it — it only ever measures text. A keyboard user who cannot make out
-  // the frame has no idea which region they are in, in whichever theme they
-  // use. WCAG asks 3:1 for a non-text UI component boundary.
-  // Guard on the guard: the ratio maths must produce the known WCAG extremes,
-  // or a frame that is genuinely invisible could still score above 3:1.
+  // textContrastGuideline only measures text, not the CustomPainter frame;
+  // WCAG asks 3:1 for a non-text boundary. The ratio maths must hit the
+  // known WCAG extremes, or an invisible frame could still score above 3:1.
   test('the contrast ratio maths matches the known WCAG extremes', () {
     expect(contrastRatio(Colors.black, Colors.white), closeTo(21.0, 0.01));
     expect(contrastRatio(Colors.white, Colors.white), closeTo(1.0, 0.01));
@@ -399,7 +383,6 @@ void main() {
     });
   }
 
-  // ── H. An entry row must still say what TYPE it is ───────────────────────
   // The type reaches a screen reader twice today (the row icon carries it as
   // its label and the subtitle repeats it). Removing one of the two must not
   // remove both: the type is how a user tells a card from a note without
@@ -424,14 +407,10 @@ void main() {
     }
   }
 
-  // ── G. The search placeholder must look identical on both platforms ──────
-  // The grey "Search entries…" text is also the box's NAME to a screen reader.
-  // To speak that name before what the box does, Linux hands the placeholder
-  // to Flutter as a widget — and Flutter then stops styling it. So Linux has
-  // to restate the styling itself. These compare the Linux placeholder against
-  // the Android one, which still goes through Flutter's own path: green before
-  // the change (one shared path), and green after it only if the restatement
-  // matches exactly. A wrong shade fails here instead of on hardware.
+  // Linux supplies the placeholder as a widget and Flutter stops styling it,
+  // so Linux restates the styling; these compare it against the Android
+  // placeholder, which still takes Flutter's own path. A wrong shade fails
+  // here instead of on hardware.
 
   for (final (name, theme, hc) in const [
     ('light', ThemeChoice.light, false),
@@ -469,11 +448,10 @@ void main() {
     });
   }
 
-  // ── F. Android keeps its hints ───────────────────────────────────────────
-  // Round 16 (Orca) proved Linux never receives a semantics HINT at all: the
+  // Linux never receives a semantics HINT at all: the
   // Linux embedder reads only the label. The fix moves the outcome text into
   // the label ON LINUX. TalkBack passed 4/4 with the hint, so Android must be
-  // left exactly as it is — these pin that, green before the fix and after.
+  // left exactly as it is - these pin that, green before the fix and after.
   // On Linux a screen reader gets the semantics NAME, not the hint.
 
   testWidgets('Android: the search box keeps its hint', (t) async {

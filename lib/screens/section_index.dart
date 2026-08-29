@@ -1,14 +1,7 @@
-// Pure bucketing logic for the vault-list alphabet index.
-//
-// Extracted from VaultListScreen so it can be unit-tested directly and so the
-// script-aware rework has a single seam to evolve. The active UI locale picks
-// the canonical alphabet; a title buckets under its first letter iff that
-// letter is in the locale's alphabet, otherwise it collapses into '#' (which
-// always sorts last).
-//
-// Alphabets are best-effort and unreviewed by native speakers — see
-// ARCHITECTURE Current Focus. Scripts whose order can't be derived from the
-// first character without a lookup table (Japanese, Chinese) get no bar.
+// A title buckets under its first letter only if that letter is in the UI
+// locale's alphabet, else under '#'. Alphabets are best-effort, unreviewed by
+// native speakers; scripts whose order needs a lookup table (Japanese,
+// Chinese) get no bar.
 
 import 'package:flutter/widgets.dart';
 

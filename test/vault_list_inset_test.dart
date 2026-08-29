@@ -6,7 +6,7 @@ import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/widgets/passkey_hint_banner.dart';
 import 'test_helpers.dart';
 
-// Edge-to-edge (2026-08-25): with a system bar inset, the vault list's
+// Edge-to-edge: with a system bar inset, the vault list's
 // snackbar, FAB and last row must stay out of the bar's band, and the Linux
 // passkey banner must still show above it. The Scaffold strips the inset from
 // body and snackbar whenever bottomNavigationBar != null (scaffold.dart), so

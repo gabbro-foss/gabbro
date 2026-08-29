@@ -11,7 +11,7 @@ import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
 // Scenario 7 (attachments task): the detail screen must list an entry's
-// attachments and save one to disk on demand — without this an imported
+// attachments and save one to disk on demand - without this an imported
 // attachment is visible in name only and can never be recovered as a file.
 
 NoteEntryData _noteWith(List<AttachmentMetaData> attachments) => NoteEntryData(

@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/screens/alphabet_index_bar.dart';
 
-// ── Widget helpers ────────────────────────────────────────────────────────────
-
 // Pump the bar at a specific logical height by resizing the test surface.
 // This bypasses MaterialApp/Scaffold height consumption entirely.
 Future<void> pumpBar(
@@ -45,11 +43,7 @@ Future<void> pumpBar(
   await tester.pumpWidget(MaterialApp(home: bar));
 }
 
-// ── Tests ─────────────────────────────────────────────────────────────────────
-
 void main() {
-  // ── Existing tests ────────────────────────────────────────────────────────
-
   testWidgets('present letters are rendered', (tester) async {
     await pumpBar(tester, height: 756, presentLetters: {'A', 'B', 'C'});
 
@@ -88,8 +82,6 @@ void main() {
     expect(selected, isNull);
   });
 
-  // ── Greying contract ──────────────────────────────────────────────────────
-
   testWidgets('full canon is rendered even when only one letter is present',
       (tester) async {
     await pumpBar(tester, height: 756, presentLetters: {'A'});
@@ -111,8 +103,6 @@ void main() {
     // 'A' is present (full opacity); 'B' is absent (dimmed to alpha 0.25).
     expect(colorOf('A').a, greaterThan(colorOf('B').a));
   });
-
-  // ── High-contrast: never dim (hiding items defeats the mode) ──────────────
 
   testWidgets('normal mode: gap ellipsis stays dimmed', (tester) async {
     await pumpBar(
@@ -188,8 +178,6 @@ void main() {
       reason: 'high contrast must not dim a disabled chevron',
     );
   });
-
-  // ── A11y semantics ────────────────────────────────────────────────────────
 
   testWidgets('present letter slot is a button labelled with its letter',
       (tester) async {
@@ -282,8 +270,6 @@ void main() {
     handle.dispose();
   });
 
-  // ── Custom letter set (Cycle 1: locale-driven canon) ──────────────────────
-
   testWidgets('letters param drives the slot set (Cyrillic)', (tester) async {
     await pumpBar(
       tester,
@@ -296,8 +282,6 @@ void main() {
     expect(find.text('А'), findsOneWidget); // greyed, still rendered
     expect(find.text('Q'), findsNothing); // no Latin canon
   });
-
-  // ── Full mode ─────────────────────────────────────────────────────────────
 
   testWidgets('full mode: all 27 letters visible when height >= 756dp',
       (tester) async {
@@ -324,8 +308,6 @@ void main() {
 
     expect(find.text('…'), findsNothing);
   });
-
-  // ── Windowed mode ─────────────────────────────────────────────────────────
 
   testWidgets('windowed mode: chevrons rendered when height < 756dp',
       (tester) async {
@@ -447,8 +429,6 @@ void main() {
     expect(selected, isNull);
   });
 
-  // ── Drag-to-scroll ────────────────────────────────────────────────────────
-
   testWidgets('drag down shifts visible window downward', (tester) async {
     await pumpBar(
       tester,
@@ -519,7 +499,7 @@ void main() {
   });
 
   // ADR-016 Phase 3 Slice D: the letters scale with text but are CAPPED so they
-  // never bleed off the 48px strip — the bar stays usable at every text size.
+  // never bleed off the 48px strip - the bar stays usable at every text size.
   testWidgets('letter size is capped at large text (no bleed)', (tester) async {
     tester.platformDispatcher.textScaleFactorTestValue = 2.0;
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
@@ -533,7 +513,6 @@ void main() {
     expect(tester.getSize(find.text('A').first).height, lessThanOrEqualTo(22));
   });
 
-  // ── Chevron scaling (ADR-016 accessibility follow-up) ─────────────────────
   // The windowed-mode up/down chevrons grow with the text scale so a low-vision
   // user gets bigger targets, capped at 1.5x (the 48px strip). At normal text
   // the glyph stays 18 so the windowing height math is unchanged.
@@ -597,13 +576,8 @@ void main() {
     expect(find.text('М'), findsOneWidget); // window still centres on present
   });
 
-  // ── Too little height to work in ──────────────────────────────────────────
-  //
   // Windowed mode cannot go below two chevrons, two ellipsis slots and one
-  // letter. Given less than that it used to draw all of it anyway and overflow
-  // the bottom — with the list area squeezed to ~142px the bar spilled 38px
-  // over the entries. Below its minimum the bar stands down and the list
-  // keeps the space.
+  // letter; below that it stands down rather than spill over the entries.
 
   testWidgets('short but usable height: still renders, no overflow',
       (tester) async {

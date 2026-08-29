@@ -7,16 +7,9 @@ import 'package:gabbro/screens/alphabet_index_bar.dart';
 import 'screen_catalog.dart';
 import 'test_helpers.dart';
 
-// Accessibility net (item 6). Sweeps every catalog screen and dialog and asserts
-// two Flutter accessibility guidelines on a phone at natural text scale:
-//   - androidTapTargetGuideline: every tappable control is >= 48x48dp (hittable).
-//   - labeledTapTargetGuideline: every tappable node has a name a screen reader
-//     can read (no bare icon-only button).
-// These matchers were already used ad hoc on ~18 screens; the net makes them
-// systematic across the shared catalog so a new screen cannot slip through.
-//
-// Blind spot: this checks the semantics TREE, not real assistive-tech output —
-// a label can be present but wrong. Hardware VoiceOver/TalkBack still matters.
+// Sweeps the shared screen catalog so a new screen cannot slip past the tap
+// target and label guidelines. Blind spot: this checks the semantics tree,
+// not real assistive-tech output; a label can be present but wrong.
 
 // Screens/dialogs with a KNOWN unfixed control smaller than 48dp, each skipped
 // (not silently passing) with a reason. Remove the entry once fixed.
@@ -25,12 +18,9 @@ const Map<String, String> _knownTapTargetTooSmall = <String, String>{};
 // Screens/dialogs with a KNOWN unfixed unlabelled tappable node. Same rules.
 const Map<String, String> _knownUnlabelled = <String, String>{};
 
-// Screens whose icon buttons still carry their text ONLY as a tooltip, so Orca
-// says just "button" for them. Found by the sweep at the end of this file after
-// round 22; the vault list and the entry detail pane are fixed, the rest are
-// listed here so they are visible rather than silently passing. Each is the
-// same one-line change (add semanticLabel beside the tooltip). Remove the entry
-// once the screen is fixed.
+// Screens whose icon buttons carry their text only as a tooltip, so Orca says
+// just "button". Listed so they are visible rather than silently passing;
+// remove an entry once its screen is fixed.
 const Map<String, String> _knownTooltipOnly = <String, String>{};
 
 // Screens/dialogs with a KNOWN unfixed text-contrast failure, each skipped (not
@@ -66,7 +56,7 @@ Future<SemanticsHandle> _pump(
 }
 
 /// The surface a catalog screen is swept on. Entries that only exist above a
-/// width breakpoint are rendered on the TABLET surface rather than skipped —
+/// width breakpoint are rendered on the TABLET surface rather than skipped -
 /// skipping left the whole two-pane layout (its list and detail regions) with no
 /// accessibility coverage at all. Mirrors what the overflow probe already does.
 Surface _surfaceFor(String key) =>
@@ -89,7 +79,7 @@ void main() {
   // guideline, and an unlabelled one must FAIL the label guideline. Otherwise a
   // green sweep proves nothing.
   // meetsGuideline is an async matcher, so a bad widget is proven by catching
-  // the TestFailure it throws — `isNot(meetsGuideline(...))` would never resolve.
+  // the TestFailure it throws - `isNot(meetsGuideline(...))` would never resolve.
   Future<bool> failsGuideline(WidgetTester tester, Matcher guideline) async {
     try {
       await expectLater(tester, guideline);
@@ -142,7 +132,7 @@ void main() {
   });
 
   // Sliders must keep the increase/decrease actions a screen reader uses to
-  // adjust them — a Semantics/MergeSemantics label wrapper must not strip them
+  // adjust them - a Semantics/MergeSemantics label wrapper must not strip them
   // (hardware found the text-size slider unadjustable under TalkBack).
   testWidgets('the text-size slider stays screen-reader adjustable', (
     tester,
@@ -163,7 +153,7 @@ void main() {
 
   // Guard on the contrast guard: low-contrast text must FAIL and clear-contrast
   // text must PASS textContrastGuideline, or a green sweep proves nothing. Same
-  // async-matcher rule as above — a failure is proven by catching TestFailure.
+  // async-matcher rule as above - a failure is proven by catching TestFailure.
   testWidgets('the net flags low-contrast text', (tester) async {
     final handle = await _pump(
       tester,
@@ -171,7 +161,7 @@ void main() {
         home: Scaffold(
           backgroundColor: Colors.white,
           body: Center(
-            // ~1.1:1 on white — well under the 4.5:1 the guideline demands.
+            // ~1.1:1 on white - well under the 4.5:1 the guideline demands.
             child: Text('barely visible', style: TextStyle(color: Color(0xFFEDEDED))),
           ),
         ),
@@ -273,7 +263,7 @@ void main() {
 
   // Plumbing: the high-contrast setting must actually reach the alphabet bar
   // in the vault list. The bar's dim absent-letters / ellipsis are excluded
-  // from semantics, so the contrast sweep can't see them — this asserts the
+  // from semantics, so the contrast sweep can't see them - this asserts the
   // setting flows through the screen to the widget that acts on it.
   testWidgets('high-contrast setting reaches the vault-list alphabet bar', (
     tester,
@@ -338,7 +328,6 @@ void main() {
     }
   }
 
-  // --- Tap-target size: every control is >= 48dp ---------------------------
   for (final entry in screens.entries) {
     testWidgets(
       '${entry.key}: tap targets >= 48dp',
@@ -372,7 +361,6 @@ void main() {
     );
   }
 
-  // --- Screen-reader labels: every tappable node is named ------------------
   for (final entry in screens.entries) {
     testWidgets(
       '${entry.key}: tap targets labelled',
@@ -406,14 +394,9 @@ void main() {
     );
   }
 
-  // --- A tooltip is not a name on Linux ------------------------------------
-  // labeledTapTargetGuideline above accepts a tooltip as a label, so every
-  // icon-only button in the app passed it while Orca said just "button" for
-  // all of them (round 22). The Linux embedder copies a node's label and
-  // ignores its tooltip entirely, so an icon button whose text
-  // lives only in the tooltip has no name a screen reader can reach: a user
-  // cannot tell Copy from Delete entry. The tooltip stays — it is what a mouse
-  // user sees — the name is added beside it.
+  // labeledTapTargetGuideline accepts a tooltip as a label, but the Linux
+  // embedder ignores tooltips, so a tooltip-only icon button has no name a
+  // reader can reach: the user cannot tell Copy from Delete entry.
   for (final entry in screens.entries) {
     testWidgets(
       '${entry.key}: icon buttons are named, not just tooltipped',

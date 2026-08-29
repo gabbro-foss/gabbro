@@ -7,7 +7,7 @@ import 'package:gabbro/widgets/gabbro_dialog.dart';
 
 // A dialog's buttons live in a fixed strip that never scrolls, and its message
 // shrinks to whatever is left over. Measured on a 360dp phone at the 2x device
-// ceiling: the message is silently cut short — the user cannot read the whole
+// ceiling: the message is silently cut short - the user cannot read the whole
 // question. showGabbroDialog puts the whole dialog in a scroll view to fix
 // that, and must leave normal text exactly as it was.
 

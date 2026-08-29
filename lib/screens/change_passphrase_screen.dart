@@ -112,7 +112,7 @@ class ChangePassphraseScreen extends StatefulWidget {
       onConfirmYubikey;
 
   /// Called in multi-key YubiKey mode (2+ keys) before changing the passphrase.
-  /// Sends all records in one FIDO2 assertion — one tap regardless of which key is inserted.
+  /// Sends all records in one FIDO2 assertion - one tap regardless of which key is inserted.
   final Future<void> Function(List<YubikeyRecordData> records, String pin, String transport)
       onConfirmAnyYubikey;
 
@@ -309,7 +309,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(l.changePassphraseTitle)),
       // SafeArea: keeps the form out of the system bars (edge-to-edge
-      // Android, 2026-08-25).
+      // Android).
       body: SafeArea(
         child: Center(
         child: ConstrainedBox(

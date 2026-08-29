@@ -253,7 +253,6 @@ void main() {
       expect(renamedTo, 'Career');
     });
 
-    // ── Net (pin currently-untested guards; green against current code) ──────────
     testWidgets('N1: rename with empty/whitespace name does not call renameFolder',
         (tester) async {
       var called = false;
@@ -289,7 +288,6 @@ void main() {
       expect(called, isFalse);
     });
 
-    // ── New behaviour (red against current code) ─────────────────────────────────
     testWidgets('R1: a failing rename shows a SnackBar and is handled (no throw)',
         (tester) async {
       await tester.pumpWidget(_buildScreen(

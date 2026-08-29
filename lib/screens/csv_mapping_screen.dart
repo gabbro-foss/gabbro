@@ -113,7 +113,6 @@ class _CsvMappingScreenState extends State<CsvMappingScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // ── Preview table ─────────────────────────────────────────────
               Text(
                 l.csvPreviewLabel,
                 style: Theme.of(context).textTheme.titleSmall,
@@ -156,7 +155,6 @@ class _CsvMappingScreenState extends State<CsvMappingScreen> {
               ),
               const SizedBox(height: 24),
 
-              // ── Warning ───────────────────────────────────────────────────
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -170,7 +168,6 @@ class _CsvMappingScreenState extends State<CsvMappingScreen> {
               ),
               const SizedBox(height: 24),
 
-              // ── Column mapping dropdowns ──────────────────────────────────
               Text(
                 'Column mapping',
                 style: Theme.of(context).textTheme.titleSmall,

@@ -74,7 +74,7 @@ class _RecoveryHistoryScreenState extends State<RecoveryHistoryScreen> {
           final binary = _isBinary(r.field);
           final revealed = _revealed.contains(index);
           // An attachment row is titled by its filename (the record's value);
-          // a uuid tells the user nothing. The value line is dropped — it
+          // a uuid tells the user nothing. The value line is dropped - it
           // would repeat the title.
           final isAttachment = r.field.startsWith('attachments:');
           final title = isAttachment && r.value.isNotEmpty

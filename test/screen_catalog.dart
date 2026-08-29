@@ -73,7 +73,7 @@ const tablet = Surface('tablet 866dp->3x', Size(1732, 2400), 2.0);
 
 /// The real app shell around [screen]. The default [textScale] is the tablet
 /// ceiling, which `clampToDevice` trims to each surface's own max (2x phone,
-/// 3x tablet — overflow probe); pass 1.0 for a natural render (accessibility
+/// 3x tablet - overflow probe); pass 1.0 for a natural render (accessibility
 /// net). [localizationsDelegates] defaults to production; the overflow probe's
 /// padded axis swaps it.
 Widget appShell(
@@ -241,7 +241,7 @@ final Map<String, Widget Function()> screens = {
       'A rather long folder name to stress the field',
     ],
   ),
-  // lib/widgets/ — nothing enumerated these before, which is how the
+  // lib/widgets/ - nothing enumerated these before, which is how the
   // sync_review clipped-value bug reached a release. Each is wrapped in a
   // Scaffold because they are page fragments, not screens.
   'focus_region': () => Scaffold(
@@ -331,12 +331,8 @@ final Map<String, Widget Function()> screens = {
   // never reached; leaving initialGabbroPath null keeps source detection (an
   // FFI call) out of the constructor.
   'import': () => ImportScreen(isAndroid: false),
-  // The two-pane tablet layout. Probed on both surfaces even though it only
-  // ships on the tablet path, so a phone-width regression cannot hide.
-  // Wrapped in a Scaffold: in production it is the BODY of VaultListScreen's
-  // Scaffold, so it inherits that Material's text style. Rendered bare it picks
-  // up WidgetsApp's red error text style instead, which reads as a contrast
-  // failure the user can never meet.
+  // Wrapped in a Scaffold as in production; rendered bare it picks up
+  // WidgetsApp's red error text style and reads as a contrast failure.
   'tablet_vault_layout': () => Scaffold(
     body: TabletVaultLayout(
       groupedEntries: const ['A', probeEntry],
@@ -556,7 +552,7 @@ final Map<String, Future<void> Function(BuildContext)> dialogs = {
 };
 
 // Entries that only exist above a width breakpoint. Probing them narrower than
-// the app ever builds them reports a failure the user can never meet — a harness
+// the app ever builds them reports a failure the user can never meet - a harness
 // artifact. vault_list_screen.dart gates the two-pane layout at >= 600dp.
 const Map<String, String> tabletOnly = {
   'tablet_vault_layout': 'built only at width >= 600dp',
@@ -613,7 +609,7 @@ const Map<String, String> covers = {
 };
 
 /// Files deliberately left out of the sweep, each with the reason. A waiver is a
-/// claim that the file cannot render — not that it is "covered elsewhere", which
+/// claim that the file cannot render - not that it is "covered elsewhere", which
 /// has previously overstated real coverage.
 const Map<String, String> waived = <String, String>{
   'yubikey_tap': 'no widget class — platform-channel calls only, nothing renders',

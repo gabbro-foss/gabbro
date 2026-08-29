@@ -6,8 +6,6 @@ import 'test_helpers.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
-// ── Fake data helpers ─────────────────────────────────────────────────────────
-
 EntrySummaryData _entry(String id, String title, String type) =>
     EntrySummaryData(
       id: id,
@@ -22,9 +20,8 @@ List<EntrySummaryData> _twoEntries() => [
   _entry('2', 'Basalt', 'Note'),
 ];
 
-// ── Widget helpers ────────────────────────────────────────────────────────────
 //
-// Both helpers use MaterialApp (no GabbroApp needed — these tests don't
+// Both helpers use MaterialApp (no GabbroApp needed - these tests don't
 // exercise clipboard timeout or settings). Width is controlled via
 // tester.view.physicalSize so LayoutBuilder sees the correct constraint.
 
@@ -59,8 +56,6 @@ void _setWide(WidgetTester tester) {
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
 }
-
-// ── Tests ─────────────────────────────────────────────────────────────────────
 
 void main() {
   testWidgets(
@@ -112,7 +107,7 @@ void main() {
   );
 
   // ADR-016 Phase 3 (Slice A): selection checkboxes must NOT force
-  // VisualDensity.compact — compact shrinks the tap target below the standard
+  // VisualDensity.compact - compact shrinks the tap target below the standard
   // 48dp, the opposite of the accessibility goal.
   testWidgets('narrow: selection checkbox does not force compact density',
       (tester) async {
@@ -153,7 +148,7 @@ void main() {
   // A11y: the selection-mode app-bar actions (delete, close) carry semantic
   // labels (tooltips). A full labelledTapTargetGuideline assertion is NOT made
   // here: selection mode also exposes the per-row checkboxes and the alphabet
-  // index bar as unlabelled tappables — deeper a11y debt tracked in the Bikeshed,
+  // index bar as unlabelled tappables - deeper a11y debt tracked in the Bikeshed,
   // out of scope for the show/hide-eye-toggle work.
   testWidgets('selection-mode delete and close actions carry tooltips',
       (tester) async {
@@ -267,7 +262,7 @@ void main() {
       // Assign-folder button must be visible
       expect(find.byIcon(Icons.folder_outlined), findsOneWidget);
 
-      // Tap it — dialog appears
+      // Tap it - dialog appears
       await tester.tap(find.byIcon(Icons.folder_outlined));
       await tester.pumpAndSettle();
 
@@ -291,8 +286,6 @@ void main() {
       expect(assignedIds!.length, 1);
     },
   );
-
-  // ── Delete confirmation dialog ────────────────────────────────────────────
 
   testWidgets(
     'narrow: delete button opens confirmation dialog',
@@ -342,7 +335,6 @@ void main() {
     },
   );
 
-  // ── A11y: selection checkbox carries the entry title ──────────────────────
   // Without a label a screen reader announces a bare "tick box" with no entry
   // name. The checkbox role + checked state come free from the Checkbox; we add
   // the entry title so the reader says e.g. "Gabbro, tick box, not ticked".

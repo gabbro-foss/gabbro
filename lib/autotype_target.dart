@@ -1,10 +1,6 @@
-/// Holds the Login whose secret the Linux auto-type trigger should type
-/// (ADR-017, per-entry direct-type). The user opens a Login in Gabbro, which
-/// registers it here; on trigger the listener reads it and fills that login
-/// into the focused window. No picker, so no focus is stolen.
-///
-/// [clearIf] exists so an older detail screen closing (dispose) does not wipe a
-/// target a newer screen has since registered.
+/// The Login the trigger will type (ADR-017): no picker, so no focus is
+/// stolen. [clearIf] stops an older detail screen's dispose wiping a target a
+/// newer screen registered.
 class AutotypeTarget {
   String? _loginId;
 

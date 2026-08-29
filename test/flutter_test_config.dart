@@ -1,10 +1,7 @@
-// Flutter's test framework automatically runs this file's [testExecutable] around
-// EVERY test in `test/`. We use it to root all of GabbroPaths' config/data I/O in a
-// throwaway temp sandbox for the whole run, so no test can ever touch the user's
-// real ~/.config/gabbro (settings + registry) or vault folders - even a test that
-// forgets to isolate itself. Individual tests may still point sandboxRoot at their
-// own temp dir for per-test isolation, as long as they restore the previous value
-// (this global one) rather than null in tearDown.
+// Runs around every test in `test/`: roots all GabbroPaths I/O in a temp
+// sandbox so even a test that forgets to isolate itself cannot reach the
+// user's real settings or vaults. Tests that override sandboxRoot must
+// restore this value, never null.
 
 import 'dart:async';
 import 'dart:io';
@@ -18,15 +15,12 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
   GabbroPaths.sandboxRoot = sandbox.path;
   // The clipboard wipe deliberately outlives the screen that scheduled it
   // (RT-4), so any test that copies a secret without advancing time ends with a
-  // pending timer — which the framework fails on. Drop it after every test.
+  // pending timer - which the framework fails on. Drop it after every test.
   // Registered here (not a `finally`) so it applies to the whole run.
   tearDown(clipboardWiper.cancelPending);
-  // NEVER reset the root or delete the dir here. `testMain()` completes when
-  // the tests are DECLARED, not when they have run — a `finally` that nulled
-  // the root here executed before the first test body did, so the "global
-  // net" protected nothing, and the first test to drive a real production
-  // save wrote the user's real ~/.config/gabbro/vaults.jsonc (2026-08-01).
-  // The dir sits in the system temp and is reclaimed by the OS; leaking it
-  // is the price of the guarantee. Pinned by test/sandbox_net_test.dart.
+  // Never reset the root or delete the dir here: `testMain()` returns when
+  // the tests are declared, not run, so a teardown would fire before the
+  // first body and a production save would hit the real registry. The OS
+  // reclaims the temp dir. Pinned by test/sandbox_net_test.dart.
   await testMain();
 }

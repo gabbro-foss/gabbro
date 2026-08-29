@@ -14,7 +14,7 @@ import 'package:gabbro/widgets/path_field.dart';
 typedef ExportFolder = ({String treeUri, String displayName});
 
 /// Sanitises a vault alias for use in a filename.
-/// Spaces → `_`; non-alphanum except `-` and `_` are stripped.
+/// Spaces -> `_`; non-alphanum except `-` and `_` are stripped.
 /// Falls back to `'vault'` if the result is empty.
 String sanitiseAlias(String? alias) {
   if (alias == null || alias.isEmpty) return 'vault';
@@ -46,7 +46,6 @@ Future<void> _defaultExportJson(String path) => exportVaultJson(path: path);
 Future<void> _defaultExportPassphraseOnly(String path) =>
     exportVaultPassphraseOnly(path: path);
 
-// ── Android SAF export (ADR-013) ──────────────────────────────────────────────
 // Raw POSIX paths can't overwrite a file another app created under scoped storage,
 // so Android `.gabbro` export writes via the Storage Access Framework: Rust builds
 // the ciphertext bytes, Kotlin writes them into the user-granted directory tree.
@@ -100,7 +99,6 @@ class ExportScreen extends StatefulWidget {
   final bool isKeyProtected;
   final bool isAndroid;
 
-  // ── Android SAF `.gabbro` export seams (ADR-013) ──────────────────────────
   /// Remembered export folder (from settings): a Linux path, whose
   /// `<folder>/<name>` pre-fills the path so Export is armed on arrival, or
   /// an Android SAF tree URI. Empty if none.
@@ -172,7 +170,7 @@ class _ExportScreenState extends State<ExportScreen> {
   // Default OFF: a repeat export overwrites the previous file (sync target).
   // On, each export lands under its own dated name.
   bool _includeDate = false;
-  // ADR-013: opt-in downgrade — export a key-protected vault as passphrase-only.
+  // ADR-013: opt-in downgrade - export a key-protected vault as passphrase-only.
   // Default OFF (the protection-preserving default); only shown for key-protected
   // vaults exporting to .gabbro.
   bool _passphraseOnly = false;
@@ -306,7 +304,7 @@ class _ExportScreenState extends State<ExportScreen> {
       if (_useSaf) {
         // Android `.gabbro`: Rust builds ciphertext bytes, Kotlin writes them into
         // the granted folder tree (overwrites a same-named file even if the sync
-        // app created it — raw paths can't under scoped storage).
+        // app created it - raw paths can't under scoped storage).
         final filename = _defaultFilename(
           widget.vaultAlias,
           false,
@@ -425,7 +423,7 @@ class _ExportScreenState extends State<ExportScreen> {
                         : l.exportPassphraseOnlyNote,
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
-                  // Opt-in passphrase-only downgrade — key-protected vaults only.
+                  // Opt-in passphrase-only downgrade - key-protected vaults only.
                   if (widget.isKeyProtected) ...[
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,

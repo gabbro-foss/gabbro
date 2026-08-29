@@ -93,12 +93,8 @@ class PasskeyDaemon {
   final PerformFn _perform;
   final DeniedFn _denied;
 
-  /// Serve requests until the device closes. One response per request: an
-  /// immediate plan (getInfo, locked, no match, malformed) is written straight
-  /// back; anything else shows consent, then performs or denies. A device
-  /// error (missing uhid module / udev rule, F2) never escapes as an
-  /// unhandled async error: it is passed to [onFailure] and run() returns,
-  /// leaving the provider inactive.
+  /// A device error (F2) never escapes as an unhandled async error: it goes
+  /// to [onFailure] and run() returns, leaving the provider inactive.
   Future<void> run() async {
     try {
       await _serve();
@@ -155,7 +151,7 @@ Future<Uint8List> _defaultDenied() => passkeyDenied();
 
 /// The real device: the Rust daemon owns `/dev/uhid` and streams complete
 /// CTAP2 requests; responses go back through the bridge. Matrix-only (needs
-/// the native library and a real uhid device), so it carries no unit test —
+/// the native library and a real uhid device), so it carries no unit test -
 /// the orchestration it feeds is covered by [PasskeyDaemon]'s tests.
 class UhidPasskeyDevice implements PasskeyDevice {
   UhidPasskeyDevice() : _requests = StreamIterator(passkeyDaemonStart());

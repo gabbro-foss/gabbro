@@ -10,23 +10,10 @@ import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'screen_catalog.dart';
 import 'test_helpers.dart';
 
-// Net-first floor for the REST of Phase 4 — the announcement work (the new-entry
-// picker's doubled labels, and the shortcuts / sheet / region entry that say
-// nothing). Every test here is GREEN against the current code.
-//
-// Two kinds of pin, both needed:
-//   * what must not regress when the change lands;
-//   * what is ABSENT or WRONG today, so the red step is real and cannot be
-//     claimed by an accidental match.
-//
-// Why this file exists at all, beyond a11y_region_net_test.dart: that file
-// proves region entry works by asserting `liveRegion`, and the Linux embedder
-// ignores liveRegion completely (proven from engine source). What
-// actually reaches Orca is the NAMED CONTAINER that FocusRegion wraps each
-// region in — and that container is also what repeats on every arrow press, so
-// it is exactly what the announcement work will remove. Nothing pinned it.
-// Without section C below, that removal would stay green here and go silent on
-// hardware, which is how round 19 was lost.
+// The Linux embedder ignores liveRegion entirely; what reaches Orca is the
+// named container FocusRegion wraps each region in. a11y_region_net_test.dart
+// asserts liveRegion, so removing the container would stay green there and
+// go silent on hardware. These pin the container.
 
 /// A vault list with folders and six entries, so every region exists and the
 /// entry list has somewhere to arrow to. [quit] wires onQuit, without which
@@ -129,7 +116,6 @@ List<String> get narrowRegionNames => [
 ];
 
 void main() {
-  // ── A. The announcement recorder ─────────────────────────────────────────
   // Everything in section B/D asserts that NOTHING is announced. If the
   // recorder never saw an announcement in the first place, all of those pass
   // forever and prove nothing. This pins that it sees one when there is one.
@@ -151,7 +137,6 @@ void main() {
     );
   });
 
-  // ── B. The new-entry type picker ─────────────────────────────────────────
   // Ctrl+N's sheet reads every type twice: the row icon carries the type as
   // its semanticLabel and the row title says it again. Only the icon sizes
   // were ever tested (vault_list_menu_test), never what a reader hears.
@@ -175,9 +160,7 @@ void main() {
         handle.dispose();
       });
 
-      // The "says it twice" defect that used to be pinned here has been fixed
-      // (the row icon's semanticLabel is gone); the exactly-once assertion now
-      // lives in a11y_semantics_test.dart, which owns the fix.
+      // The exactly-once assertion lives in a11y_semantics_test.dart.
     }
   }
 
@@ -210,16 +193,11 @@ void main() {
     handle.dispose();
   });
 
-  // ── C. The named container is the region mechanism on Linux ──────────────
-  // Orca is handed a node's NAME and nothing else. It says "Entry list" when
-  // focus lands on a row because the row sits inside a named container, read as
-  // an ATK panel — not because anything is a live region, which Linux ignores.
-  //
-  // Round 22 replaced this with SemanticsService announcements and every one
-  // that mattered was inaudible on hardware: the embedder sends announcements
-  // as ATK "polite", and Orca discards a polite notification while it is
-  // speaking, which it always is straight after a focus change. These pin the
-  // container so that swap cannot be made again without going red first.
+  // Orca says "Entry list" on a row because the row sits inside a named
+  // container read as an ATK panel. SemanticsService announcements are sent
+  // as ATK "polite" and Orca discards those while speaking, which it always
+  // is right after a focus change; these pin the container so that swap
+  // cannot be made again without going red.
 
   for (final (name, surface) in const [('narrow', phone), ('wide', tablet)]) {
     testWidgets('Linux $name: each region is a named container', (t) async {
@@ -254,7 +232,7 @@ void main() {
   });
 
   // The region name must not reach the row by any route. If it were merged down,
-  // every row would be read as "Entry list, Apple, …" on every move.
+  // every row would be read as "Entry list, Apple, ..." on every move.
   testWidgets('the region name is not merged into a row name', (t) async {
     final handle = await pumpNet(t);
     expect(
@@ -267,7 +245,7 @@ void main() {
   });
 
   // D5: regions do not exist on Android, so none of these names may appear
-  // there — before or after the change.
+  // there - before or after the change.
   for (final (name, surface) in const [('narrow', phone), ('wide', tablet)]) {
     testWidgets('Android $name: no region is a named container', (t) async {
       final handle = await pumpNet(t, surface: surface, android: true);
@@ -284,13 +262,8 @@ void main() {
     });
   }
 
-  // ── D. No shortcut says the same thing twice ─────────────────────────────
-  // What each shortcut announces is owned by a11y_semantics_test.dart. What a
-  // per-shortcut test cannot see is the OVERLAP: a shortcut that also moves
-  // focus would fire its own announcement on top of the region name the
-  // container already gives. Ctrl+F is the case that decided it — it announces
-  // nothing of its own, because it lands in the search region (named) and the
-  // field's own name already ends in "Ctrl+F: Focus search".
+  // The overlap a per-shortcut test cannot see: a shortcut that moves focus
+  // must not announce on top of the region name the container already gives.
 
   testWidgets('Ctrl+F announces nothing of its own', (t) async {
     final said = recordAnnouncements(t);
@@ -306,7 +279,7 @@ void main() {
     handle.dispose();
   });
 
-  // Hardware round 22: this is the one the maintainer heard and approved —
+  // Heard and approved on hardware:
   // "Search all fields" alone, nothing else competing with it.
   testWidgets('Ctrl+Shift+F announces the mode, once, and nothing else', (
     t,
@@ -357,23 +330,10 @@ void main() {
     handle.dispose();
   });
 
-  // ── E. Ticking an entry in selection mode ────────────────────────────────
-  // Hardware round 29, listening only: ticking a row says NOTHING about the
-  // state. Orca speaks "space" — that is its echo of the key, not the tick.
-  // The state is only heard on re-focus, where the merged row node reads the
-  // title and then the tick state.
-  //
-  // So this is the shape rounds 26-27 already solved: a change under a control
-  // that ALREADY holds focus. A name that changes under the focus is not
-  // re-read, and ticking moves no focus, so an announcement survives.
-  //
-  // What it says is the selection count the app bar is already showing, which
-  // exists in every locale and goes up or down with the tick. Section E6 pins
-  // it to the app bar's own text so the two cannot drift apart.
-  //
-  // Both layouts build their own rows and their own checkbox, and the toggle
-  // exists three times over (narrow checkbox, narrow row tap, and the wide
-  // layout's onToggleSelection callback) — so every case runs on both surfaces.
+  // A name that changes under the focused control is not re-read, and ticking
+  // moves no focus, so only an announcement is heard. It speaks the selection
+  // count the app bar shows, pinned to the app bar's own text so the two
+  // cannot drift. Every toggle path runs on both layouts.
 
   Future<void> enterSelectionMode(WidgetTester t) async {
     await t.tap(find.byTooltip(en.tooltipSelectEntries));
@@ -438,9 +398,9 @@ void main() {
       handle.dispose();
     });
 
-    // Green now and after. Outside selection mode a row tap OPENS the entry —
+    // Green now and after. Outside selection mode a row tap OPENS the entry -
     // a focus change, which is the one thing an announcement cannot survive
-    // (round 22). Speaking here would talk over what the user moved to.
+    //. Speaking here would talk over what the user moved to.
     testWidgets('Linux $name: opening an entry announces nothing', (t) async {
       final said = recordAnnouncements(t);
       final handle = await pumpNet(t, surface: surface);

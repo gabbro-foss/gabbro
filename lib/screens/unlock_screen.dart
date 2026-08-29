@@ -18,28 +18,26 @@ import 'package:gabbro/widgets/segmented_row.dart';
 import 'package:gabbro/widgets/url_link.dart';
 import 'package:gabbro/widgets/yubikey_tap.dart';
 
-// ── Bridge defaults ───────────────────────────────────────────────────────────
-
 // Public so the autofill unlock shell can reuse it as its injectable default.
 Future<void> defaultUnlock(List<int> passphrase, String path) =>
     unlockVault(passphrase: passphrase, path: path);
 
 /// Where a user whose vault predates the readable format floor is sent to
 /// recover it. Mirrors the URL the Rust refusal carries
-/// (`vault/file_format.rs`) — the vault is intact and this documents the way
+/// (`vault/file_format.rs`) - the vault is intact and this documents the way
 /// back: install alpha.14, open each vault once, then return.
 const vaultUpgradePathUrl =
     'https://github.com/gabbro-foss/gabbro/blob/master/docs/VAULT_UPGRADE_PATH.md';
 
 // R-03: probe whether the vault file parses at all. Only a parse failure may
-// surface the restore offer — authentication failures never do.
+// surface the restore offer - authentication failures never do.
 Future<bool> _defaultVaultIsReadable(String path) async {
   try {
     readVaultHeader(path: path);
     return true;
   } on StateError {
     // Bridge not initialized (widget-test context, or a startup race): we
-    // cannot probe, and "cannot probe" must never masquerade as "corrupt" —
+    // cannot probe, and "cannot probe" must never masquerade as "corrupt" -
     // report healthy so the restore banner cannot appear by accident.
     return true;
   } catch (_) {
@@ -56,7 +54,7 @@ Future<bool> _defaultVaultFormatTooOld(String path) async {
   } catch (_) {
     // Not a Gabbro vault, unreadable on disk, or the bridge is unavailable
     // (widget-test context). "Cannot tell" must never claim the file is merely
-    // old — fall through to the existing corruption handling.
+    // old - fall through to the existing corruption handling.
     return false;
   }
 }
@@ -179,8 +177,6 @@ Future<void> _defaultUnlockWithAnyYubikey(
   );
 }
 
-// ── Widget ────────────────────────────────────────────────────────────────────
-
 class UnlockScreen extends StatefulWidget {
   final String vaultPath;
   final Future<void> Function(List<int> passphrase, String path) onUnlock;
@@ -226,11 +222,11 @@ class UnlockScreen extends StatefulWidget {
   final VaultRegistry? registry;
 
   /// Called when the user selects a different vault from the dropdown.
-  /// Null → falls back to GabbroApp.maybeOf(context)?.switchToVault(…).
+  /// Null -> falls back to GabbroApp.maybeOf(context)?.switchToVault(...).
   final void Function(String path, String alias)? onVaultSwitch;
 
-  /// Called when the user picks "Open a vault file…" in the dropdown (adopt).
-  /// Null → falls back to GabbroApp.maybeOf(context)?.openAdoptVault().
+  /// Called when the user picks "Open a vault file..." in the dropdown (adopt).
+  /// Null -> falls back to GabbroApp.maybeOf(context)?.openAdoptVault().
   final VoidCallback? onAdoptRequested;
 
   /// Returns true if a biometric credential is stored for [vaultPath].
@@ -252,20 +248,20 @@ class UnlockScreen extends StatefulWidget {
   final bool? isAndroid;
 
   /// R-03: returns false when the vault file cannot be parsed (corruption).
-  /// Only this — never an authentication failure — can surface the restore
+  /// Only this - never an authentication failure - can surface the restore
   /// offer.
   final Future<bool> Function(String path) onVaultIsReadable;
 
   /// RT-3: returns true when the file is an intact Gabbro vault whose format
   /// predates the oldest this build reads. Consulted only when
   /// [onVaultIsReadable] says the file does not parse, to tell "too old" apart
-  /// from "corrupt" — an old vault is undamaged and must be explained, never
+  /// from "corrupt" - an old vault is undamaged and must be explained, never
   /// offered a restore (its `.bak` is equally old) or a delete.
   final Future<bool> Function(String path) onVaultFormatTooOld;
 
   /// Returns true when the file is an intact Gabbro vault written by a newer
   /// build than this one. Consulted, like [onVaultFormatTooOld], only when the
-  /// file does not parse — the fix is to update Gabbro, not to retry or delete.
+  /// file does not parse - the fix is to update Gabbro, not to retry or delete.
   final Future<bool> Function(String path) onVaultFormatTooNew;
 
   /// R-03 P3: whether a *usable* (present and parseable) `.bak` safety copy
@@ -291,19 +287,19 @@ class UnlockScreen extends StatefulWidget {
   /// H1: turn biometric unlock off for [vaultPath] (unenroll on the native
   /// side). Biometric stores the passphrase of whatever vault was at this path;
   /// restoring a different file makes that copy stale, exactly as a passphrase
-  /// change does. Best-effort — the restore itself has already succeeded.
+  /// change does. Best-effort - the restore itself has already succeeded.
   final Future<void> Function(String vaultPath) onDisableBiometric;
 
   /// R-03 P5: remove an unrecoverable vault from the list, leaving the bytes on
-  /// disk. Null → routes through GabbroApp.removeVault(deleteFiles: false).
+  /// disk. Null -> routes through GabbroApp.removeVault(deleteFiles: false).
   final Future<void> Function(String path)? onRemoveVaultFromList;
 
   /// R-03 P5: delete an unrecoverable vault's file and its `.bak` from disk.
-  /// Null → routes through GabbroApp.removeVault(deleteFiles: true).
+  /// Null -> routes through GabbroApp.removeVault(deleteFiles: true).
   final Future<void> Function(String path)? onDeleteVaultFile;
 
-  /// Quit the app from the locked screen — a tiling-WM user has no title-bar
-  /// close, so this is their only way out. Null → the button renders disabled
+  /// Quit the app from the locked screen - a tiling-WM user has no title-bar
+  /// close, so this is their only way out. Null -> the button renders disabled
   /// (tests that don't drive Quit); production wires it to exit the app.
   final VoidCallback? onQuit;
 
@@ -359,13 +355,13 @@ class _UnlockScreenState extends State<UnlockScreen>
 
   /// H1: set when a restore-from-file turned biometric unlock off, so the
   /// post-restore message can tell the user to switch it back on. Only for a
-  /// user who actually had it enrolled — the rest have nothing to re-enable.
+  /// user who actually had it enrolled - the rest have nothing to re-enable.
   bool _biometricDisabledByRestore = false;
   // R-03 restore flow: set only by the parse probe, never by auth failures.
   bool _vaultCorrupt = false;
   /// RT-3: the file is an intact vault in a format older than this build reads.
   /// Distinct from [_vaultCorrupt]: nothing is damaged and nothing needs
-  /// restoring — it needs migrating with an older release first.
+  /// restoring - it needs migrating with an older release first.
   bool _vaultFormatTooOld = false;
   // Intact vault from a newer build: explain "update Gabbro", never restore/delete.
   bool _vaultFormatTooNew = false;
@@ -378,13 +374,13 @@ class _UnlockScreenState extends State<UnlockScreen>
   // Where opening another vault file can actually do something: the caller
   // wired a callback, or the main app shell is above us to push the screen.
   // The autofill prompts have neither, and an entry offered there does nothing
-  // at all when tapped — so it is not offered.
+  // at all when tapped - so it is not offered.
   bool get _canAdopt =>
       widget.onAdoptRequested != null || GabbroApp.maybeOf(context) != null;
 
   // Shown only where it can change something: another vault to switch to, or
   // the offer to open a vault file. A lone vault with no such offer (the
-  // autofill prompts) gets no list — it could only reselect itself.
+  // autofill prompts) gets no list - it could only reselect itself.
   bool get _showDropdown {
     final records = widget.registry?.records;
     if (records == null || records.isEmpty) return false;
@@ -419,7 +415,7 @@ class _UnlockScreenState extends State<UnlockScreen>
   Future<void> _probeVault() async {
     final readable = await widget.onVaultIsReadable(widget.vaultPath);
     if (readable) return;
-    // RT-3: it does not parse — but an intact pre-v11 vault does not parse
+    // RT-3: it does not parse - but an intact pre-v11 vault does not parse
     // either, and it is not damaged. Say so instead of offering a restore
     // (the .bak is the same old format) or a delete.
     if (await widget.onVaultFormatTooOld(widget.vaultPath)) {
@@ -543,7 +539,7 @@ class _UnlockScreenState extends State<UnlockScreen>
     }
     if (!mounted) return;
     // H1: the file just written may be a different vault, so the passphrase
-    // biometric stored for this path is stale — drop it, exactly as a
+    // biometric stored for this path is stale - drop it, exactly as a
     // passphrase change does. Best-effort: the restore already succeeded.
     final onAndroid = widget.isAndroid ?? Platform.isAndroid;
     final wasEnrolled = _biometricEnrolled;
@@ -650,7 +646,7 @@ class _UnlockScreenState extends State<UnlockScreen>
     }
   }
 
-  /// Dropdown value for the adopt entry — NUL can never begin a real path.
+  /// Dropdown value for the adopt entry - NUL can never begin a real path.
   static const adoptDropdownValue = '\u0000adopt';
 
   void _onDropdownChanged(String? path) {
@@ -700,7 +696,7 @@ class _UnlockScreenState extends State<UnlockScreen>
       final stale = await _doUnlock(passphrase);
       if (stale) {
         // H1: this passphrase came from the store, not the keyboard, so a
-        // decrypt-stage rejection proves the stored copy is stale — the file
+        // decrypt-stage rejection proves the stored copy is stale - the file
         // at this path was swapped outside the app. Same action as a restore:
         // unenrol (best-effort) and name the cause.
         try {
@@ -717,7 +713,7 @@ class _UnlockScreenState extends State<UnlockScreen>
       if (e.code == 'BIOMETRIC_INVALIDATED') {
         // The Keystore key was invalidated (new fingerprint enrolled); the
         // native side auto-unenrolled this vault, so hide the button. No global
-        // setting to clear — enrollment is per-vault and device-local.
+        // setting to clear - enrollment is per-vault and device-local.
         setState(() {
           _biometricEnrolled = false;
           _errorMessage = l.biometricInvalidated;
@@ -730,15 +726,11 @@ class _UnlockScreenState extends State<UnlockScreen>
     }
   }
 
-  // Error contract (H1, pinned by the 'H1: external vault swap' tests):
-  // tap-stage failures — wrong PIN (HMAC_FAILED / HMAC_MULTI_FAILED), timeout,
-  // transport, cancel — arrive as PlatformExceptions from the tap call, before
-  // the passphrase is ever tried; a wrong passphrase is a plain exception from
-  // the Rust decrypt call. Returns true only for that decrypt-stage rejection
-  // with the file still readable — the one case that proves a fed-in
-  // passphrase wrong. (Only biometric feeds a non-typed passphrase, and only
-  // on Android; on Linux a fido failure is also a plain exception, but no
-  // caller acts on the return there.)
+  // H1 error contract: tap-stage failures are PlatformExceptions thrown before
+  // the passphrase is tried; a wrong passphrase is a plain exception from the
+  // decrypt call. Returns true only for that decrypt-stage rejection with the
+  // file still readable, the one case that proves a fed-in (biometric)
+  // passphrase stale.
   Future<bool> _doUnlock(List<int> passphrase) async {
     final l = AppLocalizations.of(context);
     try {
@@ -771,12 +763,9 @@ class _UnlockScreenState extends State<UnlockScreen>
       if (!mounted) return false;
       // The user cancelled the tap: just drop back to the unlock form, no error.
       if (e is PlatformException && e.code == 'TAP_CANCELLED') return false;
-      // R-03 P2: re-probe before showing a generic auth error. If the vault
-      // file itself became unreadable (e.g. corrupted while this screen was
-      // mounted), surface the corruption banner instead of "check your
-      // passphrase" — which would mislead and offer no way forward. A wrong
-      // passphrase / PIN / key leaves the file readable, so the probe returns
-      // readable and the generic error still shows (auth-failure invariant).
+      // R-03 P2: a file corrupted while this screen was mounted must show the
+      // corruption banner, not "check your passphrase". A wrong credential
+      // leaves the file readable, so the generic error still shows then.
       final stillReadable = await widget.onVaultIsReadable(widget.vaultPath);
       if (!mounted) return false;
       if (!stillReadable) {
@@ -824,7 +813,7 @@ class _UnlockScreenState extends State<UnlockScreen>
       // above). Every tap-stage failure is a PlatformException.
       return e is! PlatformException;
     }
-    // ── Unlock succeeded ── The post-success work below is NOT inside the auth
+    // Unlock succeeded The post-success work below is NOT inside the auth
     // try/catch, so a failure here can never be reported as an authentication
     // error (e.g. the autofill onUnlocked signaling failing must not read as a
     // wrong passphrase).
@@ -840,13 +829,10 @@ class _UnlockScreenState extends State<UnlockScreen>
         // Post-unlock signaling failed; nothing to surface as an auth error.
       }
     } else {
-      // pushAndRemoveUntil, not pushReplacement: unlocking THIS vault closed
-      // whichever vault was open before (session.rs replaces the session and
-      // zeroizes its keys), so no earlier screen may survive to render the
-      // closed vault's entries. Reached from a vault switch the stack still
-      // holds the previous vault's list; on a normal unlock it is already the
-      // only route, so this is identical there. Cancelling the switch never
-      // gets here — Esc pops back to the still-open vault, by design.
+      // pushAndRemoveUntil: this unlock closed whichever vault was open
+      // (Rust replaces the session), so no earlier screen may survive to
+      // render the closed vault's entries. Cancelling a switch never gets
+      // here; Esc pops back to the still-open vault.
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
           builder: (context) => VaultListScreen(
@@ -959,18 +945,9 @@ class _UnlockScreenState extends State<UnlockScreen>
                       }),
                       const SizedBox(height: 16),
                     ],
-                    // R-03: corruption banner + explicit recovery flow. Shown
-                    // only when the parse probe failed, never on auth errors.
-                    // State A: a usable .bak exists -> offer restore.
-                    // State B: no usable .bak -> the vault is unrecoverable on
-                    // this device; offer remove-from-list / delete-file so the
-                    // user is never stranded (responsive buttons that stack on
-                    // narrow Android screens rather than overflowing).
-                    // RT-3: intact vault, format older than this build reads.
-                    // Deliberately NOT the errorContainer red of the corruption
-                    // card and deliberately offering no restore/delete: nothing
-                    // is damaged, and the one destructive action available would
-                    // be the only way to actually lose the vault.
+                    // Too-old vault: not the corruption card's red and no
+                    // restore or delete offered. Nothing is damaged, and the
+                    // one destructive action would be the only way to lose it.
                     if (_vaultFormatTooOld) ...[
                       Card(
                         child: Padding(
@@ -997,7 +974,7 @@ class _UnlockScreenState extends State<UnlockScreen>
                       ),
                     ],
                     // A vault from a newer build: nothing is damaged, so no
-                    // restore/delete — the fix is to update Gabbro.
+                    // restore/delete - the fix is to update Gabbro.
                     if (_vaultFormatTooNew) ...[
                       Card(
                         child: Padding(
@@ -1082,12 +1059,9 @@ class _UnlockScreenState extends State<UnlockScreen>
                                       label: Text(l.restoreFromFileButton),
                                     ),
                                     const SizedBox(height: 8),
-                                    // Secondary "give up" actions. "Remove from
-                                    // list" keeps the file on disk — only useful
-                                    // where the user can reach it (desktop); on
-                                    // Android app-private storage it would orphan
-                                    // an unreachable file, so offer only "Delete
-                                    // file" there.
+                                    // "Remove from list" keeps the file; on
+                                    // Android that orphans an unreachable
+                                    // file, so only "Delete file" there.
                                     OverflowBar(
                                       alignment: MainAxisAlignment.center,
                                       overflowAlignment:
@@ -1145,7 +1119,7 @@ class _UnlockScreenState extends State<UnlockScreen>
                         textAlign: TextAlign.center,
                       ),
                       // H1: the fingerprint held the replaced vault's
-                      // passphrase, so it was dropped — say so, or the user is
+                      // passphrase, so it was dropped - say so, or the user is
                       // left with an unlock that silently stopped working.
                       if (_biometricDisabledByRestore) ...[
                         const SizedBox(height: 8),
@@ -1163,7 +1137,7 @@ class _UnlockScreenState extends State<UnlockScreen>
                         itemHeight: null, // menu items grow to wrapped height at large text
                         value: _selectedPath,
                         // Collapsed selection ellipsizes instead of hard-clipping (ADR-016).
-                        // Must stay as long as `items` — so the adopt entry's
+                        // Must stay as long as `items` - so the adopt entry's
                         // placeholder appears on exactly the same condition,
                         // or the closed list names the wrong vault.
                         selectedItemBuilder: (context) => [
@@ -1189,7 +1163,7 @@ class _UnlockScreenState extends State<UnlockScreen>
                       ),
                       const SizedBox(height: 16),
                     ],
-                    // R-03: the vault cannot be opened — hide the unlock
+                    // R-03: the vault cannot be opened - hide the unlock
                     // controls until it is restored. The vault dropdown above
                     // stays visible so the user can switch to another vault.
                     if (!_vaultCorrupt &&
@@ -1346,12 +1320,8 @@ class _UnlockScreenState extends State<UnlockScreen>
           ),
         ),
       ),
-      // Top-left, one button. Cancel when this screen sits over a vault that is
-      // still open (only the Manage vaults -> switch route; every other way in
-      // cleared the stack on purpose), otherwise Quit. Cancel REPLACES Quit
-      // there: you arrived mid-task from an open vault, so going back is the
-      // action, and Ctrl+Q is already inert on a non-current route
-      // (vault_list_screen.dart:602). Quit keeps its other three surfaces.
+      // Cancel replaces Quit when this screen sits over a still-open vault
+      // (the Manage vaults switch route): going back is the action there.
       if (Navigator.canPop(context))
         Align(
           alignment: Alignment.topLeft,

@@ -1,16 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gabbro/text_scale.dart';
 
-/// Continuous text-size control for the large-text accessibility initiative
-/// (ADR-016). Reused on the appearance screen and in onboarding.
-///
-/// Controlled widget: the caller owns [scale] and [deviceMax]. The slider runs
-/// on an exponential position->scale map (see text_scale.dart), bracketed by
-/// language-neutral zoom glyphs (no letters, so no "foreign A" for non-Latin
-/// scripts, and no localized words). [onChanged] fires
-/// live during a drag (drive a live preview); [onChangeEnd] fires on release
-/// (persist there to avoid writing settings every frame). A sample line
-/// previews the candidate [scale] directly via its own textScaler.
+/// ADR-016. Bracketed by zoom glyphs rather than letters, so no "foreign A"
+/// for non-Latin scripts. Persist in [onChangeEnd], not [onChanged], or
+/// settings are written every frame.
 class TextSizeSlider extends StatelessWidget {
   /// Current absolute text scale (1.0 = normal).
   final double scale;
@@ -18,10 +11,10 @@ class TextSizeSlider extends StatelessWidget {
   /// Largest scale this device can carry (from `deviceMaxScale`).
   final double deviceMax;
 
-  /// Fired continuously as the slider moves — for live preview.
+  /// Fired continuously as the slider moves - for live preview.
   final ValueChanged<double> onChanged;
 
-  /// Fired once when the drag ends — the point to persist.
+  /// Fired once when the drag ends - the point to persist.
   final ValueChanged<double>? onChangeEnd;
 
   /// Localized sample text shown scaled to [scale].
@@ -56,7 +49,7 @@ class TextSizeSlider extends StatelessWidget {
             const Icon(Icons.zoom_out),
             Expanded(
               // Name the slider ("Text size") and announce the real scale as a
-              // percentage, so a screen-reader user can find and adjust it —
+              // percentage, so a screen-reader user can find and adjust it -
               // the icons alone are silent to TalkBack.
               child: MergeSemantics(
                 child: Semantics(

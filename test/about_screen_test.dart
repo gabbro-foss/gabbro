@@ -29,7 +29,7 @@ void main() {
     // The version is injected at build time via --dart-define=APP_VERSION
     // (from pubspec, build metadata stripped); test builds pass no define, so
     // the version line falls back to "dev". Release builds show e.g.
-    // "0.1.0-alpha.10" — see BUILD_AND_RELEASE.md.
+    // "0.1.0-alpha.10" - see BUILD_AND_RELEASE.md.
     expect(find.text('Version dev'), findsOneWidget);
   });
 
@@ -64,7 +64,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Scroll to make the licence section visible. Match the licence body's own
-    // SPDX id, not a bare 'GPL' — attribution licences contain it too (LGPL),
+    // SPDX id, not a bare 'GPL' - attribution licences contain it too (LGPL),
     // and scrollUntilVisible requires the finder to resolve to exactly one.
     await tester.scrollUntilVisible(
       find.textContaining('GPL-3.0-only'),

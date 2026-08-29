@@ -8,21 +8,11 @@ import 'package:gabbro/widgets/focus_region.dart';
 
 import 'screen_catalog.dart';
 
-// Phase 3 — the region Tab-cycle (Linux-desktop only). This is the SPEC net for
-// the maintainer-approved cycle, rebuilt after round-10 hardware FAIL where the
-// old body-scoped Actions override never fired on real hardware and the sparse
-// net couldn't see it. Mechanism now: Tab/Shift+Tab is intercepted GLOBALLY
-// (main.dart _onKeyEvent, like Ctrl+L/F) and routed to the vault list's cycle.
-//
-// Cycle (narrow): search -> folder(if any) -> chips -> list -> wrap.
-// Cycle (wide): ... -> list -> detail(skip if no entry selected) -> wrap.
-// Excluded everywhere: FAB, select-entries, lock, menu, alphabet bar
-// (the bar is a touch scroll-shortcut; Up/Down in the list already covers it — DRY),
-// and the search-mode toggle icon (Ctrl+F / Ctrl+Shift+F reach + set it directly — DRY).
-//
-// The fixture is DENSE (3 folders, 7 chips, 12 lettered entries) so a real
-// region-jump and plain per-control traversal give different stop sequences —
-// the round-10 net was blind because its fixture was too thin.
+// The region Tab-cycle spec (Linux desktop). Narrow: search -> folder ->
+// chips -> list -> wrap; wide adds detail when an entry is selected. FAB,
+// menu, lock, alphabet bar and the search-mode toggle are not stops. The
+// fixture is dense so a region jump and per-control traversal give different
+// stop sequences; a thin fixture cannot tell them apart.
 
 List<EntrySummaryData> _denseEntries() {
   const titles = [
@@ -56,12 +46,9 @@ Widget _denseVaultList({
   onRefreshFn: () {},
 );
 
-/// Canonical name of the currently-focused Tab stop, read from the WIDGET the
-/// user can see holds focus — never from a FocusNode debugLabel. Labels are
-/// assigned inside an assert, so they exist in this (debug) test run and are
-/// null in the release build the maintainer hardware-tests; a label-based net
-/// agrees with label-based production code and both are blind together. That is
-/// how round 11 shipped green. See also test/no_debug_only_state_test.dart.
+/// Read from the focused widget, never a FocusNode debugLabel: labels are
+/// null in release, so a label-based net and label-based production code are
+/// blind together. See test/no_debug_only_state_test.dart.
 String _stop() {
   final n = FocusManager.instance.primaryFocus;
   if (n == null) return 'none';
@@ -124,7 +111,7 @@ Future<List<String>> _walk(
 
 Future<void> _pump(WidgetTester t, Surface surface, Widget screen) async {
   // The region cycle gates on VaultListScreen.isAndroid (false in the fixture),
-  // not TargetPlatform, so no platform override is needed — and setting one leaks
+  // not TargetPlatform, so no platform override is needed - and setting one leaks
   // past the per-test foundation-invariant check (addTearDown runs too late).
   t.view.physicalSize = surface.physical;
   t.view.devicePixelRatio = surface.dpr;
@@ -135,7 +122,7 @@ Future<void> _pump(WidgetTester t, Surface surface, Widget screen) async {
   _stripDebugLabels(t);
 }
 
-// 'rail' was here too, until the nav rail was removed — the widget is gone, so
+// 'rail' was here too, until the nav rail was removed - the widget is gone, so
 // _stop() can no longer report it and an entry for it would guard nothing.
 const _excluded = {'fab', 'appbar'};
 

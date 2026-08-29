@@ -13,10 +13,7 @@ import 'package:gabbro/src/rust/api/types.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
 import 'package:gabbro/widgets/password_breakdown_sheet.dart';
 
-// ---------------------------------------------------------------------------
-// Default generator functions — call Rust via FFI in production.
-// ---------------------------------------------------------------------------
-
+// Default generator functions - call Rust via FFI in production.
 String _defaultGeneratePassword(PasswordConfig config) =>
     generatePassword(config: config);
 
@@ -100,11 +97,11 @@ Language? _languageChoiceToLanguage(LanguageChoice choice) => switch (choice) {
 };
 
 /// Returns false for languages that have a classic character pool but no
-/// passphrase wordlist — the generator shows a "no wordlist" info message.
+/// passphrase wordlist - the generator shows a "no wordlist" info message.
 bool _hasPassphraseWordlist(Language lang) => true;
 
 /// CJK scripts (Han, Hangul, kana) have no concept of letter case, so the
-/// passphrase "capitalise words" option is meaningless for them — the Rust
+/// passphrase "capitalise words" option is meaningless for them - the Rust
 /// side's `to_uppercase()` is a no-op. The toggle is disabled and forced off
 /// for these languages.
 bool _isCjkLanguage(Language lang) =>
@@ -150,14 +147,11 @@ Language? _systemLocaleToLanguage(Locale locale) {
   };
 }
 
-// ---------------------------------------------------------------------------
 // GeneratorWidget
 //
 // Reusable password / passphrase generator.
 // - Standalone: wrap in GeneratorScreen (no onUsePassword).
 // - Inline in CreateEntryScreen: pass onUsePassword callback.
-// ---------------------------------------------------------------------------
-
 enum _GeneratorMode { classic, passphrase }
 
 class GeneratorWidget extends StatefulWidget {
@@ -169,7 +163,7 @@ class GeneratorWidget extends StatefulWidget {
   /// 60 seconds. Threaded to the shared [clipboardWiper].
   final ClipboardClearTimeout clipboardClearTimeout;
 
-  // Injectable for testing — defaults call Rust FFI.
+  // Injectable for testing - defaults call Rust FFI.
   final String Function(PasswordConfig config) generatePasswordFn;
   final Future<String> Function(PassphraseConfig config) generatePassphraseFn;
   final Future<double> Function(int wordCount, Language language)
@@ -198,15 +192,12 @@ class GeneratorWidget extends StatefulWidget {
 }
 
 class _GeneratorWidgetState extends State<GeneratorWidget> {
-  // ── Mode ─────────────────────────────────────────────────────────────────
   _GeneratorMode _mode = _GeneratorMode.classic;
 
-  // ── Generated value ───────────────────────────────────────────────────────
   String _generated = '';
   bool _obscured = true;
   double _entropyBits = 0;
 
-  // ── Classic config ────────────────────────────────────────────────────────
   double _length = 32;
   bool _useUppercase = true;
   bool _useLowercase = true;
@@ -214,7 +205,6 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
   bool _useSymbols = false;
   bool _excludeAmbiguous = false;
 
-  // ── Passphrase config ─────────────────────────────────────────────────────
   double _wordCount = 5;
   String _separator = '-';
   bool _capitalise = false;
@@ -222,7 +212,6 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
   Language _language = Language.english;
   bool _showLangFallback = false;
 
-  // ── Clipboard ─────────────────────────────────────────────────────────────
   bool _copied = false;
 
   @override
@@ -254,8 +243,6 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
       _generate(); // regenerate immediately with the resolved script/wordlist
     }
   }
-
-  // ── Generation ────────────────────────────────────────────────────────────
 
   Future<void> _generate() async {
     if (_mode == _GeneratorMode.classic) {
@@ -301,7 +288,7 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
     final config = PassphraseConfig(
       wordCount: _wordCount.round(),
       separator: _separator,
-      // Caseless CJK scripts cannot be capitalised — Rust's to_uppercase() is
+      // Caseless CJK scripts cannot be capitalised - Rust's to_uppercase() is
       // a no-op there, but send false so the config matches the disabled UI.
       capitalise: _isCjkLanguage(passphraseLanguage) ? false : _capitalise,
       appendNumber: _appendNumber,
@@ -364,15 +351,13 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
     return size;
   }
 
-  // ── Clipboard ─────────────────────────────────────────────────────────────
-
   Future<void> _copy() async {
     if (_generated.isEmpty) return;
     await clipboardWiper.copyThenClear(_generated, widget.clipboardClearTimeout);
     setState(() => _copied = true);
     // The button renames itself to "Copied", but the name changed under a
     // control that already held focus and a Linux screen reader is never told
-    // about that (round 25: the copy worked, nothing was said). Copying moves
+    // about that. Copying moves
     // no focus, so this announcement has nothing competing with it.
     if (!widget.isAndroid && mounted) {
       SemanticsService.sendAnnouncement(
@@ -385,8 +370,6 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
       if (mounted) setState(() => _copied = false);
     });
   }
-
-  // ── Build ─────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -435,7 +418,7 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
           ),
           const SizedBox(height: 20),
 
-          // Language picker — shared: drives passphrase wordlist and classic
+          // Language picker - shared: drives passphrase wordlist and classic
           // character pool (Greek / Cyrillic scripts replace Latin pool).
           SectionHeader(label: l.languageHeader),
           const SizedBox(height: 8),
@@ -512,7 +495,7 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
           if (_mode == _GeneratorMode.passphrase) ..._passphraseControls(l),
           const SizedBox(height: 24),
 
-          // Minimum length info — only meaningful for classic (character-based)
+          // Minimum length info - only meaningful for classic (character-based)
           // passwords; passphrases are word-based, so the note is hidden there.
           if (_mode == _GeneratorMode.classic)
             Padding(
@@ -586,7 +569,7 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
               ),
             ),
           ),
-          // Breakdown — only when revealed + non-empty (matches the long-press).
+          // Breakdown - only when revealed + non-empty (matches the long-press).
           if (!_obscured && _generated.isNotEmpty)
             IconButton(
               key: const Key('breakdown_button'),
@@ -622,8 +605,6 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
       ),
     );
   }
-
-  // ── Classic controls ──────────────────────────────────────────────────────
 
   List<Widget> _classicControls(AppLocalizations l) => [
     Row(
@@ -712,8 +693,6 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
     ),
   ];
 
-  // ── Passphrase controls ───────────────────────────────────────────────────
-
   List<Widget> _passphraseControls(AppLocalizations l) => [
     Row(
       children: [
@@ -777,8 +756,6 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
       },
     ),
   ];
-
-  // ── Shared helpers ────────────────────────────────────────────────────────
 
   Widget _toggleChip({
     required Key key,

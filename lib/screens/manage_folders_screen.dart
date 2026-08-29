@@ -238,7 +238,7 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
         ),
       ),
       // SafeArea: the Column has no automatic inset, so a landscape side bar
-      // covered the row ends (edge-to-edge Android, 2026-08-25).
+      // covered the row ends (edge-to-edge Android).
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : SafeArea(

@@ -4,8 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 // Repo-hygiene net: no source file under lib/ may contain a NUL byte. A stray
 // NUL makes grep treat the whole file as binary and silently return nothing
-// (this hid a real search over sync_review.dart), and — as a key/string
-// separator — is a latent "won't match a normally-typed string" trap.
+// (this hid a real search over sync_review.dart), and - as a key/string
+// separator - is a latent "won't match a normally-typed string" trap.
 List<File> _sourceFiles() => Directory('lib')
     .listSync(recursive: true)
     .whereType<File>()

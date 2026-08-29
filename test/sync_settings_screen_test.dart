@@ -216,7 +216,7 @@ void main() {
   // The XDG portal refuses a request from a process it cannot inspect, and
   // Gabbro lowers its dumpable flag (hardening). Every native dialog therefore
   // goes through runPicker, which raises the flag around the call; a bare call
-  // fails on hardware with "Unable to open /proc/<pid>/root" (2026-08-25).
+  // fails on hardware with "Unable to open /proc/<pid>/root".
   group('folder picker goes through runPicker', () {
     tearDown(resetDumpableToggle);
 

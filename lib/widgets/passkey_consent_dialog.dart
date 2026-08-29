@@ -7,7 +7,7 @@ import 'gabbro_dialog.dart';
 /// Shows the in-app passkey consent pop-up for one request and returns the
 /// chosen account index, or null if the user cancels. One account is a plain
 /// approve/cancel; several are a tap-to-choose list (Android-parity, 16c). No
-/// forced window raise — this appears over Gabbro when the user focuses it.
+/// forced window raise - this appears over Gabbro when the user focuses it.
 Future<int?> showPasskeyConsent(BuildContext context, PasskeyRequest request) {
   return showGabbroDialog<int>(
     context: context,

@@ -1,14 +1,8 @@
 import 'package:flutter/services.dart';
 
-/// Native file dialogs on Android, spoken to our own Kotlin handler
-/// (`GabbroUnlockHostActivity`) instead of the `file_picker` plugin.
-///
-/// Android hands an app a `content://` reference, not a path. The Kotlin side
-/// copies the chosen file into the app cache and returns that path, so every
-/// caller keeps working with plain paths.
-///
-/// Callers wrap invocations in `runPicker` (see `safe_file_picker.dart`),
-/// which turns any thrown error into `FilePickerUnavailable`.
+/// Android hands out `content://` references, not paths; Kotlin copies the
+/// file into the app cache so callers keep working with plain paths. Wrap
+/// calls in `runPicker`.
 class AndroidFilePicker {
   static const channel = MethodChannel('app.gabbro.gabbro/picker');
 

@@ -2,8 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/text_scale.dart';
 
 void main() {
-  // ── deviceMaxScale (B1) ────────────────────────────────────────────────────
-
   group('deviceMaxScale', () {
     test('phone tier (<600dp) maxes at 2.0', () {
       expect(deviceMaxScale(360), 2.0);
@@ -16,8 +14,6 @@ void main() {
       expect(deviceMaxScale(866), 3.0);
     });
   });
-
-  // ── scaleForPos (B2) ───────────────────────────────────────────────────────
 
   group('scaleForPos', () {
     test('pos 0 is the minimum scale 0.8', () {
@@ -45,8 +41,6 @@ void main() {
     });
   });
 
-  // ── posForScale (B3) ───────────────────────────────────────────────────────
-
   group('posForScale', () {
     test('min scale maps to pos 0, device max to pos 1', () {
       expect(posForScale(0.8, kTabletMaxScale), closeTo(0.0, 1e-9));
@@ -62,8 +56,6 @@ void main() {
       }
     });
   });
-
-  // ── targetScaleFor (B4) ────────────────────────────────────────────────────
 
   group('targetScaleFor', () {
     test('normal text scale gives normal targets (1.0)', () {
@@ -86,8 +78,6 @@ void main() {
       expect(targetScaleFor(9.0, kTabletMaxScale), closeTo(2.0, 1e-9));
     });
   });
-
-  // ── clampToDevice (B5) ─────────────────────────────────────────────────────
 
   group('clampToDevice', () {
     test('caps a tablet-set value on a phone', () {

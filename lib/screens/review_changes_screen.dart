@@ -135,8 +135,6 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
     );
   }
 
-  // ── Diff builders ────────────────────────────────────────────────────────────
-
   List<Widget> _buildSensitiveChanges(AppLocalizations l) {
     final changes = <Widget>[];
     switch ((widget.original, widget.updated)) {
@@ -334,8 +332,6 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
     diffs.add(_diffRow(label: label, before: before, after: after));
     diffs.add(const SizedBox(height: 8));
   }
-
-  // ── Shared widgets ───────────────────────────────────────────────────────────
 
   Widget _sectionHeader(String label) => Padding(
         padding: const EdgeInsets.only(bottom: 4),

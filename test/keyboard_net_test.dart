@@ -4,21 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'screen_catalog.dart';
 
-// Keyboard-accessibility net (cheap-wins phase). Sweeps the same screen_catalog
-// the overflow probe and a11y net use, so the coverage guard in
-// overflow_probe_test.dart already forces every future screen through here too —
-// one catalog, no drift.
-//
-// It pins the keyboard behaviour a desktop user relies on:
-//   - Tab traversal reaches a focusable control on every screen (a keyboard-only
-//     user who cannot reach any control is locked out of that screen).
-//   - Escape dismisses every modal dialog (a user who opened one by keyboard can
-//     close it without the mouse).
-//   - Enter/Space activate the focused control (framework guarantee, guarded).
-//
-// Blind spots: this proves a control is *reachable*, not that the whole screen
-// cycles trap-free; and it reads the focus tree, not real hardware. Physical
-// keyboard testing on Linux still matters.
+// Sweeps the shared screen catalog: Tab reaches a control on every screen,
+// Escape dismisses every dialog. Blind spot: reachable is not trap-free, and
+// this reads the focus tree, not hardware.
 
 // Screens with NO keyboard-focusable control, each skipped (not silently
 // passing) with a reason. A screen here is display-only by design; remove the
@@ -39,7 +27,7 @@ const Map<String, String> _knownNoFocusable = <String, String>{
 // Dialogs that do NOT dismiss on Escape, each skipped with a reason. Empty:
 // every catalog dialog takes Escape. The two barrierDismissible:false review
 // dialogs (sync_review, import_failures) wire Escape explicitly to a safe
-// cancel — see keyboard_shortcuts_test.dart for the result assertions.
+// cancel - see keyboard_shortcuts_test.dart for the result assertions.
 const Map<String, String> _knownEscNotHandled = <String, String>{};
 
 const _maxTabs = 40;
@@ -103,9 +91,8 @@ Future<bool> openThenEscape(
 }
 
 void main() {
-  // --- Guards on the traversal guard ---------------------------------------
   // A display-only screen must report NO reachable control, and a screen with a
-  // button must report one — otherwise the sweep below proves nothing.
+  // button must report one - otherwise the sweep below proves nothing.
   testWidgets('traversal net finds no control on a display-only screen', (
     tester,
   ) async {
@@ -134,7 +121,6 @@ void main() {
     expect(await tabToControl(tester), isNotNull);
   });
 
-  // --- Guard on the Escape guard -------------------------------------------
   // An Esc-dismissible dialog must report closed; a dialog that swallows Escape
   // must report still-open.
   testWidgets('escape guard sees a dismissible dialog close', (tester) async {
@@ -172,7 +158,6 @@ void main() {
     expect(dismissed, isFalse);
   });
 
-  // --- Enter/Space activate the focused control ----------------------------
   testWidgets('Enter and Space activate a focused button', (tester) async {
     var count = 0;
     final node = FocusNode();
@@ -201,7 +186,6 @@ void main() {
     expect(count, 2, reason: 'Space did not activate the focused button');
   });
 
-  // --- Sweep: Tab traversal reaches a control on every screen --------------
   for (final entry in screens.entries) {
     testWidgets(
       '${entry.key}: Tab reaches a focusable control',
@@ -218,7 +202,6 @@ void main() {
     );
   }
 
-  // --- Sweep: Escape dismisses every modal dialog --------------------------
   for (final entry in dialogs.entries) {
     testWidgets(
       '${entry.key}: Escape dismisses the dialog',

@@ -1,22 +1,7 @@
-// Phase 1 - Linux desktop, no hardware.
-//
-// Run with:
-//   cd rust && cargo build --release --lib && cd ..
-//   dart test integration_test/ -j 1
-//
-// Plain `dart test`: no Flutter, no window, no GL. The suite loads the compiled
-// Rust cdylib directly (see rust_lib_setup.dart), so every bridge call goes
-// through real FFI -> crypto -> disk. That is the whole point: `flutter test`
-// (host VM) cannot load the native lib, so the direct bridge calls inside the
-// screens (e.g. getEntry at entry_detail_screen.dart:355) are unreachable there.
-// Nothing here touches the UI, so nothing here needs a window - see ADR on the
-// drive-harness removal in ARCHITECTURE.md.
-//
-// Scope is the passphrase-only vault path (initVault / unlockVault), which needs
-// no YubiKey. Multi-key/YubiKey unlock, autofillUnlockMain (Android) and native
-// FilePicker flows are deliberately out of scope here: they are covered by the Rust
-// suites (yubikey_session_tests / yubikey_mgmt_tests / autofill_tests), the Kotlin
-// unit tests, the Flutter widget tests, and the hardware matrix.
+// `flutter test` cannot load the native lib, so the direct bridge calls inside
+// the screens are unreachable there; this covers the passphrase-only path
+// through real FFI. YubiKey, autofill and picker flows are covered by the
+// Rust and Kotlin suites and the hardware matrix. See rust_lib_setup.dart.
 
 import 'dart:convert';
 import 'dart:io';

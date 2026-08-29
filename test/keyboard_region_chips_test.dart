@@ -7,7 +7,7 @@ import 'package:gabbro/widgets/focus_region.dart';
 
 import 'screen_catalog.dart';
 
-// Phase 3, increment 1 — prove the region pattern on the filter chips: the row is
+// Phase 3, increment 1 - prove the region pattern on the filter chips: the row is
 // ONE Tab-stop, arrows move within it, Enter toggles, the FocusRegion frame shows.
 
 FilterChip? _focusedChip(WidgetTester t) => FocusManager
@@ -85,7 +85,7 @@ Future<void> _pumpScreen(
   await t.pump(const Duration(milliseconds: 300));
 }
 
-/// The search field's decoration — the only TextField on the vault list.
+/// The search field's decoration - the only TextField on the vault list.
 InputDecoration _searchDecoration(WidgetTester t) =>
     t.widget<TextField>(find.byType(TextField).first).decoration!;
 
@@ -121,7 +121,7 @@ void main() {
 
   // The region cycle is Linux-desktop ONLY. Android is touch-only (no keyboard
   // at all), so none of the keyboard-nav wiring may enter its widget tree. These
-  // check the region FocusScopes are present on desktop and ABSENT on Android —
+  // check the region FocusScopes are present on desktop and ABSENT on Android -
   // no synthetic key events, just the structure.
   testWidgets('desktop build wraps regions in FocusScopes', (tester) async {
     await _pump(tester); // catalog vault_list is isAndroid:false
@@ -156,7 +156,7 @@ void main() {
         reason: 'no keyboard-nav wiring may enter the Android widget tree');
   });
 
-  // D5 — the focus highlight exists to serve keyboard navigation, which is
+  // D5 - the focus highlight exists to serve keyboard navigation, which is
   // Linux-desktop only. So NOTHING of it may appear on Android: no FocusRegion
   // frame widgets, and a search field whose focused border equals its
   // unfocused one (Material's own default suppressed too). N1/N2 pin what

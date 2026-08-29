@@ -7,14 +7,10 @@ import 'package:gabbro/main.dart' show gabbroLocalizationsDelegates;
 import 'package:gabbro/widgets/gabbro_dialog.dart';
 import 'package:gabbro/widgets/sync_method_dialog.dart';
 
-// The net under the auto-merge explainer: what the chooser already promises,
-// pinned before a word of it changes. A merge cannot be undone once applied, so
-// the value each choice returns — and the warning that says "this may not be
-// your vault" — must survive any rewording.
-//
-// Pushed through showGabbroDialog, as production does (vault_list_screen.dart):
-// it wraps the dialog in the scroll-the-whole-thing layout, so a plain
-// showDialog here would pin a tree the user never sees.
+// A merge cannot be undone, so the value each choice returns and the
+// "this may not be your vault" warning must survive any rewording. Pushed
+// through showGabbroDialog as production does, or the pinned tree is one the
+// user never sees.
 
 /// Opens the chooser and hands whatever it pops to [onResult]. [warning] is the
 /// passphrase-only flag production computes as `!isKeyProtected`.

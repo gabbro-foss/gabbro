@@ -1,12 +1,5 @@
-// Phase 1 - Linux desktop, no hardware.
-//
-// Run with:
-//   cd rust && cargo build --release --lib && cd ..
-//   dart test integration_test/ -j 1
-//
-// Scenario 10 (attachments task): the attachment bridge calls the widget tests
-// mock past — addAttachment / extractAttachment / removeAttachment and the
-// metadata in getEntry — through the real FFI -> crypto -> disk path.
+// The attachment bridge calls the widget tests mock past, through real FFI.
+// See rust_lib_setup.dart for how to run.
 
 import 'dart:convert';
 import 'dart:io';

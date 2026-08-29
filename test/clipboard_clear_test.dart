@@ -86,8 +86,8 @@ void main() {
           reason: 'the reset wipe fires once its own delay elapses');
     });
 
-    // RT-4: the wipe used to die with the screen that scheduled it, so copying
-    // a password and pressing back left it on the clipboard for good.
+    // RT-4: a wipe that dies with its screen leaves a copied password on the
+    // clipboard for good.
     testWidgets('the wipe still fires after the copying screen is gone',
         (tester) async {
       final writes = recordClipboardWrites(tester);
@@ -124,7 +124,7 @@ void main() {
 
     // Auto-lock means the user walked away, so the clipboard goes with the
     // session. Manual lock does not call this (they are present, and may be
-    // about to paste) — pinned in lock_timer_test.dart.
+    // about to paste) - pinned in lock_timer_test.dart.
     testWidgets('wipeNow wipes a pending clipboard immediately',
         (tester) async {
       final writes = recordClipboardWrites(tester);

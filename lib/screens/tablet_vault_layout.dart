@@ -11,38 +11,23 @@ import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/widgets/focus_region.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-// ---------------------------------------------------------------------------
-// TabletVaultLayout
-//
-// Two-pane layout for screens ≥600dp wide.
-//
-// Structure (left → right):
-//   AlphabetIndexBar (≈28dp) | list pane | detail pane
-//
-// Appearance / Security / About, and every vault operation (export, import,
-// etc.), live in the app-bar popup menu owned by the parent VaultListScreen.
-// A NavigationRail used to offer the first three as well; it was removed as a
-// second way to the same screens.
-//
-// Interaction states:
-//   browse   — list selection active, detail shows selected entry or empty state
-//   editing  — detail pane is edit form; list pane dimmed + non-interactive
-// ---------------------------------------------------------------------------
+// Two-pane layout for screens >= 600dp. Settings and vault operations live in
+// the app-bar menu owned by the parent VaultListScreen; a NavigationRail was
+// a second way to the same screens.
 
-// Bottom padding reserved in the detail pane so its last item clears the
-// Scaffold-level add-entry FAB (56dp diameter + 16dp margin) that floats over
-// the bottom-right corner in two-pane mode. The FAB box is a fixed size — only
-// its child icon scales at large text — so a constant clearance suffices.
+// The Scaffold-level FAB (56dp + 16dp margin) floats over the detail pane's
+// bottom-right corner. Its box is a fixed size, so a constant clearance holds
+// at every text scale.
 const double _detailPaneFabClearance = 88;
 
 class TabletVaultLayout extends StatefulWidget {
   /// All entries currently loaded (filtered + grouped by the parent).
   final List<dynamic> groupedEntries;
 
-  /// The flat filtered list — needed for select-all count.
+  /// The flat filtered list - needed for select-all count.
   final List<EntrySummaryData> filteredEntries;
 
-  /// Letter → index map for the alphabet bar.
+  /// Letter -> index map for the alphabet bar.
   final Map<String, int> letterIndex;
 
   /// Canonical alphabet (locale's script) for the index bar. Null = Latin.
@@ -63,10 +48,10 @@ class TabletVaultLayout extends StatefulWidget {
   /// Icon for an entry type (delegates to parent helper).
   final IconData Function(String) entryTypeIcon;
 
-  /// Search bar widget — built by parent, passed in to avoid duplication.
+  /// Search bar widget - built by parent, passed in to avoid duplication.
   final Widget searchBar;
 
-  /// Filter chip row widget — built by parent, passed in.
+  /// Filter chip row widget - built by parent, passed in.
   final Widget filterChipRow;
 
   /// Whether the search query is non-empty (hides alphabet bar when true).
@@ -81,11 +66,11 @@ class TabletVaultLayout extends StatefulWidget {
   /// Clipboard clear timeout from settings.
   final ClipboardClearTimeout clipboardClearTimeout;
 
-  /// Optional override for fetching a full entry — used in tests to avoid
+  /// Optional override for fetching a full entry - used in tests to avoid
   /// hitting the Rust bridge.
   final VaultEntryData Function(String id)? getEntryFn;
 
-  /// Optional override for deleting an entry — used in tests.
+  /// Optional override for deleting an entry - used in tests.
   final Future<void> Function(String id)? onDeleteEntryFn;
 
   /// Whether selection mode is active (driven by parent).
@@ -99,7 +84,7 @@ class TabletVaultLayout extends StatefulWidget {
 
   /// Keyboard Tab-cycle regions for the list and detail panes (desktop only;
   /// null on Android, so the widget tree is unchanged there). The scopes are
-  /// owned by the parent VaultListScreen — the regions span both widgets (see
+  /// owned by the parent VaultListScreen - the regions span both widgets (see
   /// reference two-layout-paths). The detail scope is mounted only while an entry
   /// is selected, which is how the cycle knows detail is a reachable stop.
   final FocusScopeNode? listScope;
@@ -136,7 +121,7 @@ class TabletVaultLayout extends StatefulWidget {
 }
 
 class _TabletVaultLayoutState extends State<TabletVaultLayout> {
-  // Currently selected entry id — null means empty state in detail pane.
+  // Currently selected entry id - null means empty state in detail pane.
   String? _selectedEntryId;
 
   final ItemScrollController _itemScrollController = ItemScrollController();
@@ -166,7 +151,7 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
   Widget _buildEmptyState(BuildContext context) {
     final l = AppLocalizations.of(context);
     // At large text `selectEntry` wraps into enough lines to outgrow the detail
-    // pane, and a Column cannot shrink to fit — it overflows and the message is
+    // pane, and a Column cannot shrink to fit - it overflows and the message is
     // clipped. Scrolling keeps the whole placeholder readable (ADR-016).
     return SingleChildScrollView(
       child: Center(
@@ -189,12 +174,8 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
     if (_selectedEntryId == null || widget.filteredEntries.isEmpty) {
       return _buildEmptyState(context);
     }
-    // R-03 P6: the detail fetch runs synchronously during build. If the
-    // selected entry has vanished (deleted, or a refresh race against a
-    // locked/corrupted vault — the summary list can briefly disagree with the
-    // session), getEntry throws and crashes the whole layout build. Fall back
-    // to the empty state instead, and clear the stale selection after the frame
-    // so the list and detail pane agree again.
+    // R-03 P6: the summary list can briefly disagree with the session, and a
+    // getEntry throw here would crash the whole layout build.
     final VaultEntryData entry;
     try {
       entry = (widget.getEntryFn ?? (id) => getEntry(id: id))(_selectedEntryId!);
@@ -207,7 +188,7 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
       return _buildEmptyState(context);
     }
     // ValueKey forces Flutter to rebuild EntryDetailScreen whenever the
-    // selected id changes — this is how we refresh after an edit without
+    // selected id changes - this is how we refresh after an edit without
     // adding an onChanged callback to EntryDetailScreen.
     return EntryDetailScreen(
       key: ValueKey(_selectedEntryId),
@@ -219,17 +200,13 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
       onDeleteEntry: widget.onDeleteEntryFn ?? (id) => deleteEntry(id: id),
       onDeleted: () {
         // Reload the list FIRST. It lives in the parent's state, so it must not
-        // depend on this widget's own setState having succeeded — if that throws
+        // depend on this widget's own setState having succeeded - if that throws
         // (release builds swallow it), the deleted row would otherwise sit in
         // the list until something else forced a reload.
         widget.onRefresh();
         setState(() => _selectedEntryId = null);
-        // The pane the user was working in vanishes and the empty state takes
-        // its place. A Linux screen reader reads a node's NAME when focus
-        // arrives at it, and nothing here moves focus, so the whole thing
-        // happened in silence (round 27). Speaking the empty state's own
-        // visible text says the entry is gone and what is there instead.
-        // Linux only, on the same gate as the rest of the region layer.
+        // Nothing here moves focus, so a Linux reader would say nothing about
+        // the pane vanishing.
         if (_keyboardNav) {
           SemanticsService.sendAnnouncement(
             View.of(context),
@@ -244,13 +221,9 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
 
   Widget _buildListPane(BuildContext context) {
     final theme = Theme.of(context);
-    // At a large text scale the search box and the filter chips grow tall
-    // enough to fill the window on their own. Only the list below them could
-    // give way, so the pane ran off the bottom and the last entries could not
-    // be reached (262px over, at 4x text on a 900x700 window). Cap the header
-    // at 60% of the pane and let it scroll within that, so the list always
-    // keeps the remaining 40%. At normal text the header is far shorter than
-    // the cap, so the constraint is inert and the layout is unchanged.
+    // At large text the search box and chips can fill the pane and push the
+    // last entries out of reach; capping the header at 60% keeps the list
+    // 40%. Inert at normal text.
     return LayoutBuilder(builder: (context, constraints) => Column(
       children: [
         ConstrainedBox(
@@ -329,15 +302,11 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
                                 ? null
                                 : AppLocalizations.of(context).hintEntryRow;
                             return Container(
-                              // The decoration is ALWAYS present (transparent
-                              // border, no fill, when unselected). Flipping it
-                              // between null and non-null changes the widget
-                              // tree's SHAPE, which rebuilds the ListTile's
-                              // InkWell and disposes its focus node — so
-                              // opening an entry with Enter threw keyboard
-                              // focus onto a neighbouring row. Keeping the
-                              // border reserved also stops the row shifting
-                              // 3px sideways when it is selected.
+                              // Always present (transparent when unselected):
+                              // flipping it to null changes the tree shape,
+                              // which disposes the row's focus node and throws
+                              // keyboard focus onto a neighbour. Also stops
+                              // the 3px shift on selection.
                               decoration: BoxDecoration(
                                 border: Border(
                                   left: BorderSide(
@@ -429,7 +398,7 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
 
   /// Wrap a pane in its Tab-cycle region (FocusScope for identity + FocusRegion
   /// for the focus frame and the spoken region name). Pass-through when [scope]
-  /// is null (Android) — so the announcement rides the same gate as the frame.
+  /// is null (Android) - so the announcement rides the same gate as the frame.
   Widget _region(FocusScopeNode? scope, Widget child, {String? label}) =>
       scope == null
       ? child
@@ -439,18 +408,12 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
         );
 
   /// Whether keyboard navigation is live. The parent nulls the region scopes on
-  /// Android, where there is no keyboard — and then nothing keyboard-related,
+  /// Android, where there is no keyboard - and then nothing keyboard-related,
   /// the focus frame included, may appear anywhere in the tree.
   bool get _keyboardNav => widget.listScope != null;
 
-  /// Makes a control say what it DOES. A Linux screen reader is given only a
-  /// node's NAME — the embedder never reads a semantics hint —
-  /// so there the outcome goes inside the name, after the control's own name.
-  /// Android does read hints and keeps its own, unchanged. `_keyboardNav` is
-  /// the same Linux gate the focus frame already rides on.
-  ///
-  /// [outcome] null means the control promises nothing right now (a row in
-  /// selection mode ticks rather than opens), so nothing is added.
+  /// The Linux embedder never reads a semantics hint, so the outcome goes
+  /// inside the name there; Android reads hints and keeps its own.
   Widget _saysWhatItDoes(
     Widget child, {
     required String name,
@@ -464,12 +427,12 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
 
   /// The `semanticsLabel` for the Text showing a control's own name: blank
   /// where [_saysWhatItDoes] has already composed that name into the label,
-  /// null otherwise. A blanked VALUE, not a wrapper — a wrapper would change
+  /// null otherwise. A blanked VALUE, not a wrapper - a wrapper would change
   /// the tree's shape, which is what disposed this row's focus node once.
   String? _ownNameLabel({String? outcome}) =>
       outcome != null && _keyboardNav ? '' : null;
 
-  // Maximum list pane width: always leaves ≥200dp for the detail pane. Grows
+  // Maximum list pane width: always leaves >=200dp for the detail pane. Grows
   // naturally on wide screens. Was 300dp while the nav rail took ~100dp of the
   // row; with the rail gone that 100dp was reserved for nothing.
   double _maxListPaneWidth(BuildContext context) =>
@@ -486,13 +449,11 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
 
     return Row(
       children: [
-        // ── List pane (resizable) ──────────────────────────────────────────
         SizedBox(
           key: const ValueKey('tablet-list-pane'),
           width: effectiveWidth,
           child: _buildListPane(context),
         ),
-        // ── Drag handle ────────────────────────────────────────────────────
         // Screen-reader label + hover tooltip (ADR-015). Grip glyph grows with
         // the text scale, gently capped at 1.5x, as it lives in the fixed 20dp
         // divider (ADR-016).
@@ -555,13 +516,9 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
             ),
           ),
         ),
-        // ── Detail pane (flex) ─────────────────────────────────────────────
-        // Always wrapped, selected or not. The cycle decides whether detail is
-        // a Tab stop from the scope's FOCUSABLE DESCENDANTS, and the empty
-        // pane has none (an icon and a line of text), so it is still never a
-        // stop. Mounting the wrapper conditionally instead changed the widget
-        // tree's SHAPE every time the selection cleared, which tore down and
-        // rebuilt the whole detail subtree — see the round-17 delete bug.
+        // Always wrapped: the empty pane has no focusable descendants so it
+        // is never a stop anyway, and a conditional wrapper changed the tree
+        // shape on every selection clear, tearing down the detail subtree.
         Expanded(
           child: _region(
             widget.detailScope,

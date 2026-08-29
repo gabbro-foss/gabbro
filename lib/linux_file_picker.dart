@@ -2,12 +2,8 @@ import 'dart:convert';
 
 import 'package:dbus/dbus.dart';
 
-/// Native file dialogs on Linux, spoken directly to the XDG Desktop Portal
-/// (`org.freedesktop.portal.FileChooser`) over the DBus session bus — the
-/// same conversation `file_picker` holds today, without the plugin.
-///
-/// Callers wrap invocations in `runPicker` (see `safe_file_picker.dart`),
-/// which turns any thrown error (no bus, no portal) into
+/// XDG Desktop Portal FileChooser over the DBus session bus. Wrap calls in
+/// `runPicker`, which turns a missing bus or portal into
 /// `FilePickerUnavailable`.
 class LinuxFilePicker {
   LinuxFilePicker({DBusClient Function()? clientFactory})

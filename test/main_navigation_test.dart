@@ -1,16 +1,5 @@
-// Widget tests for GabbroApp's navigation methods (the GabbroAppState interface).
-// These are navigation + in-memory registry methods, not real-FFI paths, so they
-// belong in `flutter test`: the app shell mounts via injectable constructor args
-// and the target screens build without the native lib.
-//
-// Vault-deletion routing (`deleteVaultFromManager`, ADR-014) is NOT covered here:
-// its post-delete navigation builds real FFI-backed screens (UnlockScreen's
-// readability probe, etc.) which cannot run under `flutter test` (no Rust
-// isolate). Its routing decision is unit-tested as a pure function
-// (`postDeleteRoute`, see 5c49c19).
-//
-// All file I/O is sandboxed globally by test/flutter_test_config.dart, so nothing
-// here can reach the user's real settings or vault folders.
+// Vault-deletion routing (ADR-014) is not here: its post-delete navigation
+// builds FFI-backed screens. Its decision is unit-tested as `postDeleteRoute`.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -104,7 +93,7 @@ void main() {
   });
 
   // F9: registering an adopted vault must land on its unlock screen, locked,
-  // with the back stack cleared — adopting grants no access.
+  // with the back stack cleared - adopting grants no access.
   testWidgets('F9: adopt registration lands on the unlock screen for the vault',
       (tester) async {
     await tester.pumpWidget(_app(_registryWith(['Alpha'])));

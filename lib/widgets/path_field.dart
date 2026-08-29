@@ -18,7 +18,7 @@ class PathField extends StatefulWidget {
   final String? Function(String?)? validator;
   final bool readOnly;
 
-  /// Fires only when the native picker returns a path — never while typing.
+  /// Fires only when the native picker returns a path - never while typing.
   /// Lets a caller act on a definite choice (adopt triages the file here)
   /// without reacting to every keystroke.
   final void Function(String path)? onPathPicked;

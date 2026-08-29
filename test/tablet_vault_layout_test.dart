@@ -90,7 +90,7 @@ void main() {
   // rail. ADR-016 Phase 3 stays covered by the list-row icon tests below, which
   // pin the same helper on a widget that survives.
 
-  // ADR-016 Phase 3: the tablet list-row type icon is a fixed size 20 — scale
+  // ADR-016 Phase 3: the tablet list-row type icon is a fixed size 20 - scale
   // it with the text.
   testWidgets('tablet list-row entry icon is base 20 at normal text',
       (tester) async {
@@ -122,8 +122,6 @@ void main() {
     expect(icon.size, isNotNull);
     expect(icon.size, greaterThan(20));
   });
-
-  // ── Resize handle: accessibility (screen-reader label + icon scaling) ──────
 
   // Net-first: the drag handle renders at tablet width (pins current wiring).
   testWidgets('resize handle divider is present at tablet width',
@@ -226,8 +224,7 @@ void main() {
 
   // Net for the delete flow at this level: confirming a delete in the detail
   // pane must tell the parent to reload the list AND clear the pane. Nothing
-  // pinned this here — the two-pane break found in round 17 was only visible
-  // on hardware.
+  // pinned this here before; the two-pane break was only visible on hardware.
   testWidgets('deleting the selected entry reloads the list and clears the '
       'detail pane', (tester) async {
     _setTablet(tester);
@@ -254,9 +251,9 @@ void main() {
         reason: 'the detail pane must return to the empty state');
   });
 
-  // Round 27 (Orca): deleting the open entry was completely silent. The pane it
+  // Deleting the open entry was completely silent. The pane it
   // was in disappears and is replaced by the empty state, and a Linux screen
-  // reader is told none of that — it reads a node's name when focus moves to
+  // reader is told none of that - it reads a node's name when focus moves to
   // it, and nothing moved. Speaking the empty state's own visible text says
   // both that the entry is gone and what is there now, with no new strings.
   Future<List<String>> deleteAndListen(

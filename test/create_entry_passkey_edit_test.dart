@@ -7,8 +7,8 @@ import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
 // Net for the passkey edit form (edit-only; entries are registered by the
 // provider flow): site and account are identity, locked read-only; notes are
-// the one free-text field. Labels must say so — a field inviting input that
-// refuses it reads as broken (hardware find 2026-08-22).
+// the one free-text field. Labels must say so - a field inviting input that
+// refuses it reads as broken.
 
 PasskeyEntryData _passkeyEntry() => PasskeyEntryData(
       id: 'pk-id-1',

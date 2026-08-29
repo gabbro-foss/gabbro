@@ -317,7 +317,7 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
     final chevronHeight = _kChevronHeight * chevronScale;
 
     // The bar is a fixed 48px strip: let the letters grow with text for
-    // readability but CAP the scale so they never bleed off it — the bar stays
+    // readability but CAP the scale so they never bleed off it - the bar stays
     // usable at every text size instead of being hidden (ADR-016 Phase 3 D).
     final cappedScaler = TextScaler.linear(
       MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 1.5),
@@ -328,9 +328,8 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
         builder: (context, constraints) {
           final availableHeight = constraints.maxHeight;
 
-          // ── Full mode ──────────────────────────────────────────────────────────
           // Enough room to show every slot: distribute available height evenly
-          // across all of them so children exactly fill the box — no overflow.
+          // across all of them so children exactly fill the box - no overflow.
           final fullModeThreshold = widget.letters.length * _kMinSlotHeight;
           if (availableHeight >= fullModeThreshold) {
             final slotHeight = availableHeight / widget.letters.length;
@@ -349,16 +348,13 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
             );
           }
 
-          // ── Too small to work in ───────────────────────────────────────────────
-          // Windowed mode's floor: two chevrons, two reserved ellipsis slots and
-          // one letter. Below that the bar used to draw all of it anyway and
-          // spill over the entry list (360dp phone at large text). Stand down
-          // instead — the list scrolls perfectly well without the bar.
+          // Windowed mode's floor is two chevrons, two ellipsis slots and one
+          // letter; below that it would spill over the entry list, so it stands
+          // down. The list scrolls fine without the bar.
           if (availableHeight < 2 * chevronHeight + 3 * _kMinSlotHeight) {
             return const SizedBox.shrink();
           }
 
-          // ── Windowed mode ──────────────────────────────────────────────────────
           final winSize = _windowSize(availableHeight, chevronHeight);
 
           // Initialise window position once we have a real winSize from layout.

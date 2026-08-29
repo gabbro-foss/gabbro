@@ -5,8 +5,6 @@ import 'package:gabbro/screens/create_entry_screen.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 LoginEntryData _loginEntry() => LoginEntryData(
       id: 'test-id-1',
       title: 'Test',
@@ -27,8 +25,6 @@ Widget _buildCardScreenWithPrefill(Map<String, String> prefill) => testApp(Creat
       onCreateEntry: (_) async => '',
       onGetEntry: (_) => VaultEntryData.login(_loginEntry()),
     ));
-
-// ── Tests ─────────────────────────────────────────────────────────────────────
 
 void main() {
   testWidgets('card prefill populates card number field', (tester) async {
@@ -97,7 +93,7 @@ void main() {
   });
 
   testWidgets('prefill does not affect existing edit mode', (tester) async {
-    // existing takes precedence over prefill — both should not be set
+    // existing takes precedence over prefill - both should not be set
     // simultaneously in production, but if they are, existing wins because
     // _initControllers checks existing first.
     final card = CardEntryData(

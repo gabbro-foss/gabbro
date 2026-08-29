@@ -9,26 +9,15 @@ import 'package:gabbro/main.dart';
 
 import 'screen_catalog.dart';
 
-// ADR-016 Phase 2 headless overflow probe. Renders each catalog screen at the
-// device's MAX text scale on a phone and a tablet surface and asserts no
-// RenderFlex / layout overflow (an overflow reports a FlutterError ->
-// takeException()). The screens/dialogs themselves live in screen_catalog.dart,
-// shared with the accessibility net.
-//
-// Blind spot: a child clipped inside a FIXED width/height throws nothing, so
-// this probe cannot see it. Both defects found in the l10n/a11y sweep so far
-// (recovery-history actions, sync_review chip values) were of exactly that kind
-// and came from hardware use, not from here.
+// ADR-016: every catalog screen at the device max text scale, asserting no
+// layout overflow. Blind spot: a child clipped inside a fixed box throws
+// nothing, and both real defects so far were of that kind.
 
 Widget _app(Widget screen) => appShell(screen);
 
-// --- Longer-language (padded) axis (ADR-016 item 3) -----------------------
-// A layout overflows on rendered width, and width does not care which language
-// produced it: "le renard..." and "the fox..." stress the same box. So instead
-// of rendering all 37 real locales, render each screen ONCE under a synthetic
-// locale whose every ARB label is ~2x its English length. One pass catches what
-// any real language could; it may over-report (the safe direction). See
-// ARCHITECTURE.md Current Focus.
+// Width does not care which language produced it, so one synthetic locale
+// with every label at ~2x English length replaces 37 real ones. It may
+// over-report, the safe direction.
 
 // The real English strings, read from the template ARB so the padded axis tracks
 // every new UI string automatically. `@key` metadata and `@@locale` are skipped.
@@ -75,7 +64,7 @@ class _PaddingDelegate extends LocalizationsDelegate<AppLocalizations> {
 // The real delegate list with only AppLocalizations.delegate swapped for the
 // padding one, so the fallback Material/Cupertino delegates are kept verbatim
 // (no drift from production). Locale stays the default (en, supported), so the
-// padded strings reach dialogs — which are root routes an in-body
+// padded strings reach dialogs - which are root routes an in-body
 // Localizations.override could not touch.
 final List<LocalizationsDelegate<dynamic>> _paddedDelegates = [
   const _PaddingDelegate(),
@@ -235,7 +224,6 @@ void main() {
     }
   }
 
-  // --- Longer-language (padded) axis --------------------------------------
   // Guard on the guard 1: the padded delegate must actually win at MaterialApp
   // level, or every assertion below passes vacuously against real English.
   testWidgets('the padded delegate reaches the widget tree', (tester) async {

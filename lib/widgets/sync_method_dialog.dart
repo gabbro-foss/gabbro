@@ -4,13 +4,13 @@ import 'package:gabbro/l10n/app_localizations.dart';
 /// Asks how an incoming sync should be applied.
 ///
 /// Pops `true` for the automatic merge (incoming wins, no prompts), `false` for
-/// the one-by-one review, and `null` when the user backs out — which merges
+/// the one-by-one review, and `null` when the user backs out - which merges
 /// nothing.
 class SyncMethodDialog extends StatelessWidget {
   const SyncMethodDialog({super.key, this.showsPassphraseWarning = false});
 
   /// A passphrase-only save keeps nothing per-vault, so "it opened" proves
-  /// only "same passphrase" — the dialog then warns before anything applies.
+  /// only "same passphrase" - the dialog then warns before anything applies.
   /// A keyed file that is not the same vault fails to decrypt outright, so
   /// the keyed path leaves this off.
   final bool showsPassphraseWarning;
@@ -34,12 +34,9 @@ class SyncMethodDialog extends StatelessWidget {
             Text(l.syncSamePassphraseWarning),
             const SizedBox(height: 12),
           ],
-          // "Merge automatically" named an action without saying what it did,
-          // so it went unused. The paragraph is for sighted users; the
-          // semanticsLabel below carries the same meaning to a screen reader,
-          // which on Linux reads only a widget's NAME and never announces this
-          // paragraph when the dialog opens. semanticsLabel (not a Semantics
-          // wrapper) so the button keeps its own tap action and button role.
+          // A Linux reader never announces this paragraph, so the button's
+          // semanticsLabel below carries the same meaning; a label, not a
+          // Semantics wrapper, so the button keeps its role and tap action.
           Text(l.syncMethodExplainer),
           const SizedBox(height: 12),
           FilledButton(

@@ -5,7 +5,7 @@ import 'package:gabbro/main.dart';
 
 // The passkey daemon shows its consent dialog through [rootNavigatorKey]. The
 // key must target the mounted GabbroApp (consent can appear) and be null once
-// it is gone (consent no-ops as a cancel instead of crashing) — and it must be
+// it is gone (consent no-ops as a cancel instead of crashing) - and it must be
 // per-instance, or pumping a second GabbroApp in one test silently fails to
 // build (that blinded the theme/high-contrast a11y net).
 

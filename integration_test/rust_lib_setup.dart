@@ -1,12 +1,7 @@
-// Shared setup for the real-FFI suites.
-//
-// These suites run under plain `dart test` (no Flutter, no window, no GL).
-// They load the compiled Rust cdylib directly, so every bridge call goes
-// through real FFI -> crypto -> disk, exactly as it does in the app.
-//
-// The library must be built in release first:
-//   cd rust && cargo build --release --lib
-// Release matters: debug Argon2id is slow enough to blow the test timeouts.
+// The real-FFI suites run under plain `dart test` (no window needed) against
+// the release cdylib; debug Argon2id blows the timeouts:
+//   cd rust && cargo build --release --lib && cd ..
+//   dart test integration_test/ -j 1
 
 import 'dart:io';
 

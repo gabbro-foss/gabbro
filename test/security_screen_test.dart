@@ -126,12 +126,10 @@ void main() {
           foregroundLockTimeout: ForegroundLockTimeout.oneMinute,
         ),
       ));
-      // The screen receives the setting — no exception thrown, renders cleanly.
+      // The screen receives the setting - no exception thrown, renders cleanly.
       expect(find.text('1 min'), findsAtLeastNWidgets(1));
     });
   });
-
-  // ── biometricUnlock ───────────────────────────────────────────────────────
 
   group('biometricUnlock', () {
     testWidgets('biometric section hidden when isAndroid is false', (tester) async {
@@ -424,8 +422,6 @@ void main() {
       expect(enrolled, 'mypass'.codeUnits);
     });
   });
-
-  // ── Vault list section removed (ADR-014) ──────────────────────────────────
 
   group('app passkeys (F1, Android only)', () {
     testWidgets('section is hidden off Android', (tester) async {

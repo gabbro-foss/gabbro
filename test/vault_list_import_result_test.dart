@@ -1,10 +1,5 @@
-// What the vault list does with the number the import flow hands back.
-//
-// The import screen returns how many entries it added, or null when the user
-// backed out. Hardware 2026-08-17 (D2): a run that added nothing left the
-// screen completely unchanged — no message, no refresh — so a user who
-// re-imported a file they already had could not tell the button from a broken
-// one. These pin all three outcomes.
+// An import that adds nothing must still say so, or the user cannot tell the
+// button from a broken one. All three outcomes pinned.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';

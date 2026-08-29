@@ -4,7 +4,6 @@ import 'package:dbus/dbus.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/linux_file_picker.dart';
 
-// ── Fake XDG portal ───────────────────────────────────────────────────────────
 //
 // A real org.freedesktop.portal.FileChooser stand-in served on a private bus:
 // records what the client asked for, then emits the portal's Response signal
@@ -103,8 +102,6 @@ Future<
 
   return (portal: portal, clientFactory: clientFactory, close: close);
 }
-
-// ── Tests ─────────────────────────────────────────────────────────────────────
 
 void main() {
   test(
@@ -207,8 +204,6 @@ void main() {
     expect(path, '/tmp/My Vault/café.gabbro');
   });
 
-  // ── S5: folder picker (sync folder; later export/import folders) ──────────
-
   test('T7: pickDirectory sends OpenFile with directory=true, returns the path',
       () async {
     final fake = await _startFakePortal(
@@ -237,8 +232,6 @@ void main() {
   });
   _rememberedFolderTests();
 }
-
-// ── Step 3: remembered folders ────────────────────────────────────────────────
 
 /// The portal takes `current_folder` as a NUL-terminated byte string.
 List<int> _folderBytes(Map<String, DBusValue> options) =>

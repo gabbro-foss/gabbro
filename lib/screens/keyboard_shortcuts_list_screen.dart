@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 
-/// Read-only reference of the desktop keyboard shortcuts (Linux). Reached from
-/// the vault-list overflow menu; not offered on Android, which has no physical
-/// keyboard. The key combos are literal identifiers (not localised); only the
-/// descriptions are. Keep in sync with the wiring in main.dart (Ctrl+L / Ctrl+N /
-/// Ctrl+M / Ctrl+Q) and vault_list_screen.dart (Ctrl+F / Ctrl+Shift+F). Ctrl+N /
-/// Ctrl+M / Ctrl+Q reuse the existing New-entry / Menu / Quit labels (DRY).
+/// Keep in sync with the wiring in main.dart and vault_list_screen.dart. Key
+/// combos are not localised; descriptions are.
 class KeyboardShortcutsListScreen extends StatelessWidget {
   const KeyboardShortcutsListScreen({super.key});
 
@@ -18,7 +14,7 @@ class KeyboardShortcutsListScreen extends StatelessWidget {
       appBar: AppBar(title: Text(l.keyboardShortcutsTitle)),
       // SafeArea: an explicit ListView padding disables Flutter's automatic
       // system-bar inset, so edge-to-edge Android put the last rows under
-      // the nav bar (2026-08-25).
+      // the nav bar.
       body: SafeArea(
         child: ListView(
         padding: const EdgeInsets.all(16),

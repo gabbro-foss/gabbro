@@ -1,11 +1,5 @@
-// Deleting an entry from the detail view must remove it from the list there
-// and then — not on the next reload.
-//
-// This flow had no test in either layout. Round 17 found the two-pane case
-// broken on hardware: the entry was deleted, the detail pane cleared, and the
-// row sat in the list until the window was refocused. The existing tests all
-// asserted that the delete CALLBACK fired; none asserted what the user sees
-// afterwards, which is the only thing that matters here.
+// Deleting from the detail view must remove the row there and then. Asserted
+// on what the user sees, not on the callback firing.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
@@ -31,7 +25,7 @@ List<EntrySummaryData> seedEntries() => [
 ];
 
 /// A vault list backed by a mutable store, so a delete really removes the
-/// entry and the next read reflects it — as the real vault does.
+/// entry and the next read reflects it - as the real vault does.
 Future<List<EntrySummaryData>> pumpList(
   WidgetTester t, {
   required Surface surface,

@@ -11,11 +11,8 @@ import 'package:gabbro/src/rust/api/password_generator.dart';
 import 'package:gabbro/src/rust/api/passphrase_generator.dart';
 import 'package:gabbro/src/rust/api/types.dart';
 
-// ---------------------------------------------------------------------------
-// Minimal stub — GeneratorWidget is not yet implemented. All tests below
+// Minimal stub - GeneratorWidget is not yet implemented. All tests below
 // should FAIL until the widget exists.
-// ---------------------------------------------------------------------------
-
 Widget _wrap(Widget child) => testApp(Scaffold(body: child));
 
 /// Wraps [child] inside a full [GabbroApp] with [language] as the app locale.
@@ -27,7 +24,7 @@ Widget _wrapWithApp(Widget child, {required LanguageChoice language}) => GabbroA
       initialScreen: Scaffold(body: child),
     );
 
-// Stub generator functions — no Rust FFI in tests.
+// Stub generator functions - no Rust FFI in tests.
 String _stubPassword(PasswordConfig config) => 'A' * config.length;
 
 /// Script-aware stub: returns a character from the correct Unicode block so
@@ -367,11 +364,8 @@ void main() {
     });
   });
 
-  // ---------------------------------------------------------------------------
-  // Language-to-script wiring — requires GabbroApp in the widget tree so that
+  // Language-to-script wiring - requires GabbroApp in the widget tree so that
   // didChangeDependencies can resolve the app language into a Language variant.
-  // ---------------------------------------------------------------------------
-
   group('GeneratorWidget - language-to-script wiring', () {
     testWidgets(
         'Greek app language: initial classic password uses Greek script immediately',
@@ -381,7 +375,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final value = await _revealedValue(tester);
-      // α is U+03B1 — any Greek lowercase char satisfies this range
+      // α is U+03B1 - any Greek lowercase char satisfies this range
       expect(
         value.runes.any((r) => r >= 0x03B1 && r <= 0x03C9),
         isTrue,
@@ -398,7 +392,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final value = await _revealedValue(tester);
-      // а is U+0430 — any Cyrillic lowercase letter satisfies this range
+      // а is U+0430 - any Cyrillic lowercase letter satisfies this range
       expect(
         value.runes.any((r) => r >= 0x0430 && r <= 0x044F),
         isTrue,
@@ -414,7 +408,7 @@ void main() {
           _wrapWithApp(_scriptWidget(), language: LanguageChoice.el));
       await tester.pumpAndSettle();
 
-      // Toggle uppercase off — triggers _generateClassic(); language must stay Greek.
+      // Toggle uppercase off - triggers _generateClassic(); language must stay Greek.
       await tester.tap(find.byKey(const Key('toggle_uppercase')));
       await tester.pump();
 
@@ -434,7 +428,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final value = await _revealedValue(tester);
-      // あ is U+3042 — any Hiragana char satisfies this range
+      // あ is U+3042 - any Hiragana char satisfies this range
       expect(
         value.runes.any((r) => r >= 0x3041 && r <= 0x3096),
         isTrue,
@@ -451,7 +445,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final value = await _revealedValue(tester);
-      // 가 is U+AC00 — Hangul syllables start here
+      // 가 is U+AC00 - Hangul syllables start here
       expect(
         value.runes.any((r) => r >= 0xAC00 && r <= 0xB52D),
         isTrue,
@@ -468,7 +462,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final value = await _revealedValue(tester);
-      // 一 is U+4E00 — first CJK unified ideograph
+      // 一 is U+4E00 - first CJK unified ideograph
       expect(
         value.runes.any((r) => r >= 0x4E00 && r <= 0x5CAA),
         isTrue,
@@ -487,10 +481,7 @@ void main() {
   _uiToGeneratorLanguageMappingTests();
 }
 
-// ---------------------------------------------------------------------------
 // Dutch generator language tests (no app-locale LanguageChoice.nl needed)
-// ---------------------------------------------------------------------------
-
 Widget _wrappedGenerator() => testApp(Scaffold(
       body: GeneratorWidget(
         generatePasswordFn: _stubPassword,
@@ -583,13 +574,10 @@ void _kazakhTests() {
   });
 }
 
-// ---------------------------------------------------------------------------
-// LanguageChoice → Language mapping regression tests
+// LanguageChoice -> Language mapping regression tests
 //
 // These guard _languageChoiceToLanguage() in generator_widget.dart.
 // When a new LanguageChoice with a passphrase wordlist is added, add it here.
-// ---------------------------------------------------------------------------
-
 void _uiToGeneratorLanguageMappingTests() {
   // All LanguageChoice values that have a passphrase wordlist, paired with the
   // Language they must resolve to.  Both nb and nn map to norwegian; both
@@ -660,7 +648,6 @@ void _uiToGeneratorLanguageMappingTests() {
     }
   });
 
-  // ── Clipboard auto-clear (shared ClipboardClearMixin) ─────────────────────
   // The generator now copies through the mixin: the value is the generated
   // password; the auto-clear writes an empty string after the timeout, "never"
   // wipes nothing, and re-copying cancels the prior wipe.
@@ -677,8 +664,8 @@ void _uiToGeneratorLanguageMappingTests() {
       await tester.pump(const Duration(seconds: 30)); // flush pending timers
     });
 
-    // Round 25 (Orca): the copy worked and the button's name changed to
-    // "Copied", but nothing was heard — the name changed under a control that
+    // The copy worked and the button's name changed to
+    // "Copied", but nothing was heard - the name changed under a control that
     // already had focus, and a Linux screen reader is not told about that.
     // Copying moves no focus, so an announcement has nothing competing with it.
     testWidgets('copying says so out loud', (tester) async {

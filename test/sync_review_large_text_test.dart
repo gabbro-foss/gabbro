@@ -187,7 +187,7 @@ void main() {
   // Was 'choices are chips in a Wrap at normal text', pinned against a value
   // choice. That is the behaviour being removed: a value choice is now a
   // wrapping row at every text size (see the red tests below). Retargeted
-  // deliberately onto the choices that DO stay chips — bare Keep/Delete labels
+  // deliberately onto the choices that DO stay chips - bare Keep/Delete labels
   // that carry no value and so can never clip.
   testWidgets('bare keep/delete choices stay chips at normal text', (
     tester,
@@ -211,7 +211,7 @@ void main() {
   });
 
   // A chip is a single 48px line with no way to scroll it, so a long value is
-  // clipped at NORMAL text too — the user picks between two values they cannot
+  // clipped at NORMAL text too - the user picks between two values they cannot
   // read (hardware: sync review on a phone). Value choices therefore drop the
   // chip at every text size.
   testWidgets('a value choice is a wrapping row at normal text, not a chip', (

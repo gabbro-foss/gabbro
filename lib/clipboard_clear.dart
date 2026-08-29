@@ -16,21 +16,13 @@ Duration? clipboardClearDelay(ClipboardClearTimeout timeout) => switch (timeout)
       ClipboardClearTimeout.twoMinutes => const Duration(minutes: 2),
     };
 
-/// Shared "copy a secret, then wipe the clipboard" behaviour.
-///
-/// App-level, not per-widget (RT-4, 2026-08-04): the wipe used to be owned by
-/// the copying [State] and cancelled in its `dispose`, so copying a password and
-/// pressing back left it on the clipboard for good — the timeout configured in
-/// Security settings never fired in the ordinary flow. The timer now outlives
-/// the screen, the way [autotypeTarget] outlives the detail screen that set it.
-///
-/// One pending wipe app-wide: copying again cancels the prior one, wherever it
-/// came from. [ClipboardClearTimeout.never] schedules nothing. A caller's own
-/// user feedback (snackbar, checkmark, announcement) stays its own concern.
+/// App-level, not per-widget (RT-4): a wipe owned by the copying State dies in
+/// its dispose, so copying then pressing back left the secret on the clipboard
+/// for good. One pending wipe app-wide; copying again cancels the prior one.
 class ClipboardWiper {
   Timer? _timer;
 
-  /// Whether a wipe is scheduled — i.e. Gabbro put a secret on the clipboard
+  /// Whether a wipe is scheduled - i.e. Gabbro put a secret on the clipboard
   /// and has not wiped it yet. Never true for [ClipboardClearTimeout.never].
   bool get hasPendingWipe => _timer != null;
 
@@ -44,7 +36,7 @@ class ClipboardWiper {
     if (delay != null) _timer = Timer(delay, _wipe);
   }
 
-  /// Wipe now instead of waiting out the delay — auto-lock only, meaning the
+  /// Wipe now instead of waiting out the delay - auto-lock only, meaning the
   /// user walked away. A no-op unless a wipe is actually pending, so it can
   /// never clear a clipboard Gabbro did not write, and never overrides
   /// [ClipboardClearTimeout.never].
@@ -54,7 +46,7 @@ class ClipboardWiper {
     _wipe();
   }
 
-  /// Drop a pending wipe without touching the clipboard. For tests — production
+  /// Drop a pending wipe without touching the clipboard. For tests - production
   /// has no reason to forget a wipe it promised.
   @visibleForTesting
   void cancelPending() {

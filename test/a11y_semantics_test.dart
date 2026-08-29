@@ -8,20 +8,10 @@ import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'screen_catalog.dart';
 import 'test_helpers.dart';
 
-// Phase 4 — the a11y layer. A screen-reader user hears the app instead of
-// seeing it, so the focus frame can never be the only region cue.
-//
-// D5 splits this by platform:
-//   BOTH  — every region-cycle control says what Enter / the arrows do (a hint).
-//           Names are already covered: labeledTapTargetGuideline sweeps all 27
-//           screens in a11y_net_test.dart. Hints are what nothing has yet.
-//   LINUX — each region is named and announces itself when entered. Android has
-//           no regions, so nothing there may announce one; that negative is
-//           pinned in a11y_region_net_test.dart, not repeated here.
-//
-// The matching baselines (hint empty, region silent, no live region) are pinned
-// GREEN in a11y_region_net_test.dart and flip when this file goes green — that
-// is the point of them.
+// The focus frame can never be the only region cue. Both platforms: every
+// region-cycle control says what Enter and the arrows do. Linux only: each
+// region is named and announces itself when entered; Android has no regions
+// and must announce none (pinned in a11y_region_net_test.dart).
 
 List<EntrySummaryData> denseEntries() {
   const titles = ['Apple', 'Banana', 'Cherry', 'Date', 'Elder', 'Fig'];
@@ -134,23 +124,16 @@ void expectSpeaksOnLinux(
 }
 
 void main() {
-  // ── Linux: the outcome belongs in the NAME ───────────────────────────────
-  // Round 16 (Orca) heard none of these. The Linux embedder reads only a
-  // node's label — `hint` is never read at all — so on Linux "what this
+  // The Linux embedder reads only a
+  // node's label - `hint` is never read at all - so on Linux "what this
   // control does" has to be part of the name, after the control's own name.
   // Android keeps the hint instead; that half is pinned green in
   // a11y_region_net_test.dart and must not move.
 
-  // The search box says ONE thing (round 23): landing on it used to produce
-  // "Search, Search entries, Filters the entries as you type, Ctrl+F Focus
-  // search, Ctrl+Shift+F Search all fields" — five parts, too long to sit
-  // through, and the maintainer could not catch the end of it on hardware.
-  // The region above already says "Search", so the box's own placeholder was
-  // a repeat, and "Ctrl+F: Focus search" is useless once you are in the box.
-  // Both shortcuts stay documented on the Keyboard shortcuts screen.
-  // The search region's container name merges into the field's node, so what
-  // Orca actually reads is "Search" then this — two parts, which is the whole
-  // point. The placeholder must NOT be in there: it would make "Search" thrice.
+  // A five-part name is too long to sit through; the region already says
+  // "Search" and the shortcuts are useless once in the box. The container
+  // name merges into the field's node, so Orca reads "Search" then this; the
+  // placeholder must not be in there or "Search" is said three times.
   testWidgets('the search box name is just what typing does', (t) async {
     final handle = await pumpDense(t);
     final label = labelOf(t, find.byType(EditableText).first);
@@ -239,7 +222,6 @@ void main() {
     });
   }
 
-  // ── Nothing is said twice ────────────────────────────────────────────────
   // The row icon carried the entry type as its label and the subtitle said it
   // again, so a reader announced "card, amex, card, opens this entry". The
   // subtitle is the one to keep: it is visible text as well as spoken.
@@ -265,8 +247,8 @@ void main() {
 
   // The new-entry picker had the same fault as the entry row: the leading icon
   // carried the type name as its semanticLabel and the row title said it again,
-  // so a reader worked through "Password, Password, Note, Note, …" for all six.
-  // The title is the one to keep — it is visible text as well as spoken.
+  // so a reader worked through "Password, Password, Note, Note, ..." for all six.
+  // The title is the one to keep - it is visible text as well as spoken.
 
   for (final android in const [true, false]) {
     final who = android ? 'Android' : 'Linux';
@@ -302,17 +284,11 @@ void main() {
     }
   }
 
-  // ── Linux only: events have to be announced ──────────────────────────────
-  // A shortcut firing or a sheet opening is an EVENT, not a place, so there is
-  // no node for a reader to land on and read. Linux ignores liveRegion
-  // entirely, which leaves SemanticsService as the only way to
-  // say anything at all. Android is excluded throughout: it has deprecated
-  // announcement events, and TalkBack already passes.
-  //
-  // Ctrl+F deliberately announces nothing of its own — it lands in the search
-  // region, which announces itself, and the field's own name already ends in
-  // "Ctrl+F: Focus search". Ctrl+Shift+F does announce, because the all-fields
-  // mode is otherwise completely inaudible.
+  // An event has no node for a reader to land on, and Linux ignores
+  // liveRegion, so SemanticsService is the only way to say anything. Android
+  // is excluded: it deprecated announcement events and TalkBack already
+  // passes. Ctrl+F announces nothing of its own (the search region announces
+  // itself); Ctrl+Shift+F must, or all-fields mode is inaudible.
 
   testWidgets('opening the new-entry picker says what it is', (t) async {
     final said = recordAnnouncements(t);
@@ -433,20 +409,10 @@ void main() {
     handle.dispose();
   });
 
-  // ── Linux only: the regions speak ────────────────────────────────────────
-  // Tab moves between REGIONS, not controls, so a screen-reader user who Tabs
-  // hears the newly-focused control with no idea they changed region.
-  //
-  // The region's name lives on its Semantics container, which Orca reads as an
-  // ATK panel when focus lands inside it (round 16). Round 22 replaced this
-  // with SemanticsService announcements and every one that mattered was
-  // inaudible: the Linux embedder sends them as ATK "polite", and Orca discards
-  // a polite notification while it is speaking — which it always is right after
-  // a focus change. Reverted.
-  //
-  // Accepted cost: the panel is an ancestor of every row, so the name is read
-  // again on each arrow press inside the entry list. That repeat is a known,
-  // maintainer-accepted defect (see ARCHITECTURE.md), not a regression.
+  // Tab moves between regions, so a reader user needs the region named on
+  // entry. The name lives on a Semantics container (an ATK panel), not a
+  // SemanticsService announcement, which Orca discards while speaking.
+  // Accepted cost: the name repeats on each arrow press inside the list.
 
   testWidgets('each region carries its own name, in cycle order', (t) async {
     final handle = await pumpDense(t);
@@ -514,7 +480,7 @@ void main() {
   });
 
   // The container names the REGION, not the row. If its name were merged down,
-  // every row would be read as "Entry list, Apple, …".
+  // every row would be read as "Entry list, Apple, ...".
   testWidgets('the region name stays off the controls inside it', (t) async {
     final handle = await pumpDense(t);
     expect(labelOf(t, find.text('Apple')), contains('Apple'));

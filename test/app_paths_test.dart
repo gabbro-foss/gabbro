@@ -1,12 +1,5 @@
-// GabbroPaths is the single source of truth for the app's config + data
-// directories, with a test-only `sandboxRoot` override. When the override is set,
-// every settings / registry / vault-default read and write is rooted under it, so
-// no test can ever touch the user's real ~/.config/gabbro or vault folders.
-//
-// The global net lives in test/flutter_test_config.dart, which sets sandboxRoot for
-// the whole `flutter test` run. These tests point it at a per-test temp dir and
-// restore the previous (global) value in tearDown - never leaving it null, which
-// would re-expose the real folders to subsequent test files.
+// These point sandboxRoot at a per-test dir and restore the global value in
+// tearDown; leaving it null would re-expose the real folders to later files.
 
 import 'dart:io';
 
@@ -50,12 +43,8 @@ void main() {
     expect(data, startsWith(tmp.path));
   });
 
-  // Linux real-folder resolution. These are pure functions: the production
-  // _realDataDir wraps path_provider's getApplicationSupportDirectory and only
-  // falls back to linuxDataDirFallback when that throws (e.g. under a bubblewrap
-  // sandbox where ~/.local/share is absent or the GTK app-id FFI is unavailable).
-  // The fallback must mirror path_provider_linux's own precedence so it lands on
-  // the SAME directory an existing install already uses - never moving a vault.
+  // The fallback must mirror path_provider_linux's precedence so it lands on
+  // the same directory an existing install uses, never moving a vault.
   group('Linux real-folder resolution (pure)', () {
     test('linuxDataDirFallback: XDG_DATA_HOME set and the app-id dir exists '
         'returns the app-id dir under XDG_DATA_HOME', () {

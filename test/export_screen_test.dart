@@ -52,8 +52,6 @@ Widget _androidGabbroScreen(
 
 void main() {
   twoFilesNoteTests();
-  // ── sanitiseAlias unit tests ──────────────────────────────────────────────
-
   group('exportVaultFileName', () {
     test('is the sanitised alias plus .gabbro, never the on-disk name', () {
       expect(exportVaultFileName('example'), 'example.gabbro');
@@ -191,8 +189,6 @@ void main() {
       expect(cap.filename, isNull);
     });
 
-    // ── Include date toggle ──────────────────────────────────────────────────
-
     testWidgets('include date toggle is OFF by default', (tester) async {
       await tester.pumpWidget(
         testApp(ExportScreen(
@@ -219,7 +215,7 @@ void main() {
         (tester) async {
       final cap = _SafCapture();
       await tester.pumpWidget(_androidGabbroScreen(cap, vaultAlias: 'My Work'));
-      // Turn the include-date toggle on — there is exactly one SwitchListTile
+      // Turn the include-date toggle on - there is exactly one SwitchListTile
       // for a passphrase-only vault (no downgrade toggle).
       await tester.tap(find.byType(SwitchListTile));
       await tester.pump();
@@ -251,8 +247,6 @@ void main() {
       expect(cap.data, equals(Uint8List.fromList([7, 7, 7])));
       expect(cap.sha256Content, 'DD  x\n');
     });
-
-    // ── Format selector ──────────────────────────────────────────────────────
 
     testWidgets('shows format selector with Gabbro and JSON options',
         (tester) async {
@@ -348,8 +342,6 @@ void main() {
       await tester.pump();
       expect(jsonExportedPath, '/home/user/vault.json');
     });
-
-    // ── ADR-013: protection-preserving export + opt-in downgrade ─────────────
 
     const downgradeLabel = 'Export without YubiKey protection (passphrase only)';
 

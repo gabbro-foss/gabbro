@@ -47,12 +47,8 @@ void main() {
           alphabetBarPosition: AlphabetBarPosition.right,
         ),
       ));
-      // SegmentedRow renders FilledButton.tonal widgets, not SegmentedButton.
-      // The selected button has primary background colour; verify by checking
-      // that the 'Right' button exists and the 'Left' button also exists
-      // (both are always rendered — selection is conveyed by colour, not
-      // presence). The meaningful assertion is that tapping 'Left' calls
-      // onSelected — covered by the interaction test below.
+      // Selection is conveyed by colour, not presence; the interaction test
+      // below carries the meaningful assertion.
       expect(find.text('Right'), findsOneWidget);
       expect(find.text('Left'), findsOneWidget);
     });

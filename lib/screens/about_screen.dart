@@ -4,7 +4,7 @@ import 'package:gabbro/widgets/gabbro_logo.dart';
 import 'package:gabbro/widgets/url_link.dart';
 
 /// Injected at build time from `pubspec.yaml` (build metadata stripped) via
-/// `--dart-define=APP_VERSION=...` — see BUILD_AND_RELEASE.md. No dependency,
+/// `--dart-define=APP_VERSION=...` - see BUILD_AND_RELEASE.md. No dependency,
 /// no manual drift. Local/dev builds (no define) show "dev".
 const _kAppVersion = String.fromEnvironment('APP_VERSION', defaultValue: 'dev');
 
@@ -31,7 +31,6 @@ class AboutScreen extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // ── App identity ────────────────────────────────────────────
               Center(child: GabbroLogo(withText: true, width: 200)),
               const SizedBox(height: 4),
               Text(
@@ -47,7 +46,6 @@ class AboutScreen extends StatelessWidget {
               ),
               const SizedBox(height: 32),
 
-              // ── Links ────────────────────────────────────────────────────
               _SectionHeader(label: l.aboutProjectSection),
               _LinkTile(
                 icon: Icons.code,
@@ -66,7 +64,6 @@ class AboutScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
 
-              // ── Licence ──────────────────────────────────────────────────
               _SectionHeader(label: l.aboutLicenceSection),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
@@ -77,7 +74,6 @@ class AboutScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
 
-              // ── Open source components ───────────────────────────────────
               _SectionHeader(label: l.aboutOpenSourceSection),
               ..._kComponents.map(
                 (c) => _ComponentTile(
@@ -88,7 +84,6 @@ class AboutScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
 
-              // ── Attribution ──────────────────────────────────────────────
               _SectionHeader(label: l.aboutAttributionSection),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4),
@@ -116,7 +111,6 @@ class AboutScreen extends StatelessWidget {
               ),
               const SizedBox(height: 32),
 
-              // ── No telemetry notice ──────────────────────────────────────
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -149,8 +143,6 @@ class AboutScreen extends StatelessWidget {
   }
 }
 
-// ── Section header ───────────────────────────────────────────────────────────
-
 class _SectionHeader extends StatelessWidget {
   final String label;
   const _SectionHeader({required this.label});
@@ -170,7 +162,6 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-// ── Link tile — displays a URL as a tappable row ─────────────────────────────
 // Tapping shows a dialog with the URL as SelectableText (copy-friendly) and
 // an explicit "Open in browser" button. Two-step confirmation: the user sees
 // the URL before the browser opens. Goes to the system browser, never an
@@ -206,8 +197,6 @@ class _LinkTile extends StatelessWidget {
   }
 }
 
-// ── Component tile ───────────────────────────────────────────────────────────
-
 class _ComponentTile extends StatelessWidget {
   final String name;
   final String licence;
@@ -235,8 +224,6 @@ class _ComponentTile extends StatelessWidget {
     );
   }
 }
-
-// ── Component data ───────────────────────────────────────────────────────────
 
 class _Component {
   final String name;

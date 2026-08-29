@@ -13,7 +13,6 @@ import 'test_helpers.dart';
 // so in the commit).
 
 void main() {
-  // ── G1: dialog Esc mechanics our real dialogs rely on ────────────────────
   testWidgets(
     'BASELINE: a default dialog closes on Esc; barrierDismissible:false ignores it',
     (tester) async {
@@ -121,7 +120,6 @@ void main() {
     },
   );
 
-  // ── G2: search field + Esc ───────────────────────────────────────────────
   // The "Esc does not blur the search field" baseline flipped in Phase 1: Esc
   // now blurs it. That behaviour is pinned in keyboard_global_esc_test.dart.
 }

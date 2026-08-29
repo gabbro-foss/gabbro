@@ -170,7 +170,7 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
           children: [
             Text(l.backupResponsibilityBody),
             const SizedBox(height: 12),
-            // R-03: mention the automatic .bak without overselling it —
+            // R-03: mention the automatic .bak without overselling it -
             // it is same-disk corruption insurance, not a backup.
             Text(l.backupDialogSafetyCopyNote),
             const SizedBox(height: 16),
@@ -218,7 +218,7 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
     final ykRecords = widget.listYubikeyRecords(record.path);
     final isYubikey = ykRecords.isNotEmpty;
 
-    // Step 1 — warning
+    // Step 1 - warning
     final step1 = await showGabbroDialog<bool>(
       context: context,
       builder: (ctx) {
@@ -249,7 +249,7 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
     if (step1 != true) return;
     if (!mounted) return;
 
-    // Step 2 — tick the "I understand" checkbox to confirm. A checkbox, not a
+    // Step 2 - tick the "I understand" checkbox to confirm. A checkbox, not a
     // typed magic word: a word to type is either English-only (hostile to other
     // keyboards) or, if localised/the vault name, breaks on Unicode
     // normalisation and full/half-width input. A checkbox is reliable in every
@@ -292,7 +292,7 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
     if (step2 != true) return;
     if (!mounted) return;
 
-    // Step 3 — YubiKey tap authorization (YubiKey vaults only)
+    // Step 3 - YubiKey tap authorization (YubiKey vaults only)
     if (isYubikey) {
       final pinController = TextEditingController();
       bool isAuthorizing = false;

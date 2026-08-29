@@ -1,11 +1,6 @@
-// The About screen's open-source list is hand-maintained. Nothing used to check
-// it against the manifests, so a dependency could be added and shipped with no
-// attribution at all. These tests read `pubspec.yaml` and `rust/Cargo.toml` at
-// test time and fail if a direct dependency is missing from the screen, plus pin
-// the entries whose licence is easy to get wrong.
-//
-// Assets (the Public Suffix List, the wordlists) are not derivable from a
-// manifest, so those are a fixed expected set.
+// The About screen's list is hand-maintained; without this a dependency could
+// ship with no attribution. Assets are not derivable from a manifest, so
+// those are a fixed expected set.
 
 import 'dart:io';
 

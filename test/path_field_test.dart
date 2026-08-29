@@ -99,7 +99,7 @@ void main() {
     });
 
     // The adopt flow triages a file the moment the picker returns it, but a
-    // typed path only when the user submits — never per keystroke. That needs
+    // typed path only when the user submits - never per keystroke. That needs
     // the widget to tell the two apart.
     testWidgets('onPathPicked fires on a picker result, never on typing',
         (tester) async {
@@ -301,8 +301,6 @@ void main() {
     });
   });
 }
-// ── Step 3: remembered folders ────────────────────────────────────────────────
-
 /// Records the start folder the facade was asked for.
 class _StartFolderLinuxPicker extends LinuxFilePicker {
   String? openedIn;

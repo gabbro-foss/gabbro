@@ -9,8 +9,6 @@ import 'package:gabbro/screens/review_changes_screen.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
-// ── Fake data helpers ─────────────────────────────────────────────────────────
-
 CardEntryData _cardEntry({String? pin}) => CardEntryData(
       id: 'card-id-1',
       createdAt: '2025-01-01T00:00:00Z',
@@ -40,8 +38,6 @@ LoginEntryData _loginEntry() => LoginEntryData(
       folder: 'Personal',
     );
 
-// ── Widget helpers ────────────────────────────────────────────────────────────
-
 Widget _buildCreateScreen(
   String entryType, {
   Future<String> Function(VaultEntryData)? onCreateEntry,
@@ -63,10 +59,7 @@ Widget _buildEditScreen(VaultEntryData existing) => testApp(CreateEntryScreen(
       onGetEntry: (_) => existing,
     ));
 
-// ── Tests ─────────────────────────────────────────────────────────────────────
-
 void main() {
-  // ── ADR-016 reveal-eye: suffix toggles scale (capped) at large text ────────
   group('reveal-eye toggles scale (capped) at large text', () {
     void setPhone(WidgetTester tester) {
       tester.view.physicalSize = const Size(400, 800);
@@ -136,7 +129,7 @@ void main() {
 
     expect(find.text('Title is required'), findsOneWidget);
     expect(find.text('Password is required'), findsOneWidget);
-    // Username is optional now — it must NOT be required.
+    // Username is optional now - it must NOT be required.
     expect(find.text('Username is required'), findsNothing);
   });
 
@@ -179,8 +172,6 @@ void main() {
     expect(find.text('Email is required'), findsNothing);
   });
 
-  // ── Card PIN tests ────────────────────────────────────────────────────────
-
   testWidgets('card form renders PIN field', (tester) async {
     await tester.pumpWidget(_buildCreateScreen('Card'));
     expect(find.widgetWithText(TextFormField, 'PIN (optional)'), findsOneWidget);
@@ -199,7 +190,7 @@ void main() {
 
   testWidgets('card PIN show/hide toggle changes obscureText', (tester) async {
     await tester.pumpWidget(_buildCreateScreen('Card'));
-    // Initially obscured — visibility_off icon present
+    // Initially obscured - visibility_off icon present
     expect(find.byTooltip('Show PIN'), findsOneWidget);
     await tester.tap(find.byTooltip('Show PIN'));
     await tester.pump();
@@ -328,10 +319,6 @@ void main() {
     expect(card.cvv, equals(''));
   });
 
-  // ── End card PIN tests ────────────────────────────────────────────────────
-
-  // ── Login notes tests ─────────────────────────────────────────────────────
-
   testWidgets('login notes field pre-populates in edit mode', (tester) async {
     final entry = LoginEntryData(
       id: 'test-id-2',
@@ -386,7 +373,7 @@ void main() {
         onGetEntry: (_) => VaultEntryData.login(entry),
       )),
     );
-    // Edit the title — notes field should be unaffected
+    // Edit the title - notes field should be unaffected
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Gabbro Vault'),
       'Gabbro Vault Updated',
@@ -404,8 +391,8 @@ void main() {
     await tester.pumpWidget(
       _buildEditScreen(VaultEntryData.login(_loginEntry())),
     );
-    // _loginEntry() has notes: null — notes field should render empty
-    // notes field is optional — find it by label text
+    // _loginEntry() has notes: null - notes field should render empty
+    // notes field is optional - find it by label text
     final notesFieldFinder = find.widgetWithText(
       TextFormField,
       'Notes (optional)',
@@ -455,8 +442,6 @@ void main() {
     final login = (captured! as VaultEntryData_Login).field0;
     expect(login.notes, equals('created during hardware test'));
   });
-
-  // ── End login notes tests ─────────────────────────────────────────────────
 
   testWidgets('login can be saved without a URL', (tester) async {
     VaultEntryData? captured;
@@ -616,11 +601,9 @@ void main() {
       )),
     );
 
-    // _loginEntry() has folder: 'Personal' — should be pre-selected
+    // _loginEntry() has folder: 'Personal' - should be pre-selected
     expect(find.text('Personal'), findsOneWidget);
   });
-
-  // ── Card _hasChanges regression ───────────────────────────────────────────────
 
   testWidgets('editing card notes in edit mode reaches review screen',
       (tester) async {
@@ -643,8 +626,6 @@ void main() {
 
     expect(find.text('No changes to save.'), findsNothing);
   });
-
-  // ── Custom field tests ────────────────────────────────────────────────────
 
   testWidgets('note form shows Add custom field button', (tester) async {
     await tester.pumpWidget(_buildCreateScreen('Note'));
@@ -886,14 +867,12 @@ void main() {
     expect(login.customFields[0].value, equals('ABC-123'));
   });
 
-  // ── Password field visibility toggle ─────────────────────────────────────
-
   testWidgets('login password field starts obscured and toggles visible',
       (tester) async {
     await tester.pumpWidget(_buildCreateScreen('Login'));
     await tester.pumpAndSettle();
 
-    // Initially obscured → eye-off icon shown.
+    // Initially obscured -> eye-off icon shown.
     expect(find.byIcon(Icons.visibility_off), findsWidgets);
 
     await tester.tap(
@@ -927,8 +906,6 @@ void main() {
     handle.dispose();
   });
 
-  // ── Custom field deletion ─────────────────────────────────────────────────
-
   testWidgets('custom field can be removed after being added', (tester) async {
     await tester.pumpWidget(_buildCreateScreen('Note'));
     await tester.pumpAndSettle();
@@ -949,8 +926,6 @@ void main() {
     expect(find.widgetWithText(TextFormField, 'Label'), findsNothing);
   });
 
-  // ── Custom field hidden toggle ────────────────────────────────────────────
-
   testWidgets('custom field value can be toggled hidden', (tester) async {
     await tester.pumpWidget(_buildCreateScreen('Note'));
     await tester.pumpAndSettle();
@@ -969,7 +944,7 @@ void main() {
     await tester.tap(visIcon);
     await tester.pumpAndSettle();
 
-    // After toggle, value is obscured → eye-off icon shown.
+    // After toggle, value is obscured -> eye-off icon shown.
     expect(
       find.descendant(
         of: find.widgetWithText(TextFormField, 'Value'),
@@ -978,8 +953,6 @@ void main() {
       findsOneWidget,
     );
   });
-
-  // ── CVV visibility toggle (card form) ────────────────────────────────────
 
   testWidgets('card CVV field starts obscured and can be toggled', (tester) async {
     await tester.pumpWidget(_buildCreateScreen('Card'));
@@ -1004,8 +977,6 @@ void main() {
       findsOneWidget,
     );
   });
-
-  // ── Custom entry type ─────────────────────────────────────────────────────
 
   testWidgets('custom entry form renders title field', (tester) async {
     await tester.pumpWidget(_buildCreateScreen('Custom'));
@@ -1051,8 +1022,6 @@ void main() {
     expect(custom.title, 'Rock Collection');
   });
 
-  // ── Note entry validation ─────────────────────────────────────────────────
-
   testWidgets('note entry required title validation fires on empty save',
       (tester) async {
     await tester.pumpWidget(_buildCreateScreen('Note'));
@@ -1064,8 +1033,6 @@ void main() {
     expect(find.text('Title is required'), findsOneWidget);
   });
 
-  // ── Identity entry ────────────────────────────────────────────────────────
-
   testWidgets('identity form renders first and last name fields',
       (tester) async {
     await tester.pumpWidget(_buildCreateScreen('Identity'));
@@ -1075,8 +1042,6 @@ void main() {
     expect(find.widgetWithText(TextFormField, 'Last name'), findsOneWidget);
   });
 
-  // ── Edit mode: no-changes guard ───────────────────────────────────────────
-
   testWidgets('review without changes shows no-changes snackbar',
       (tester) async {
     await tester.pumpWidget(
@@ -1084,17 +1049,13 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // Tap Review → without touching any field: _hasChanges() returns false.
+    // Tap Review -> without touching any field: _hasChanges() returns false.
     await tester.ensureVisible(find.text('Review →'));
     await tester.tap(find.text('Review →'));
     await tester.pump();
 
     expect(find.byType(SnackBar), findsOneWidget);
   });
-
-  // ── End custom field tests ────────────────────────────────────────────────
-
-  // ── Android app ID (native-app autofill matching) ─────────────────────────
 
   testWidgets('login form shows the Android app ID field and helper note',
       (tester) async {
@@ -1169,12 +1130,10 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Review →'));
     await tester.pumpAndSettle();
-    // The app-id change must be detected — not dismissed as "no changes".
+    // The app-id change must be detected - not dismissed as "no changes".
     expect(find.byType(SnackBar), findsNothing);
     expect(find.byType(ReviewChangesScreen), findsOneWidget);
   });
-
-  // ── Login email field ─────────────────────────────────────────────────────
 
   testWidgets('login form shows the email field', (tester) async {
     await tester.pumpWidget(_buildCreateScreen('Login'));

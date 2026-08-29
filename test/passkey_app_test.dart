@@ -61,7 +61,7 @@ void main() {
   });
 
   // D1: the AuthenticationAction tap. The activity can only hand fresh picker
-  // rows back to the OS — never a signed credential — so Dart shows the unlock
+  // rows back to the OS - never a signed credential - so Dart shows the unlock
   // screen alone, approves (Kotlin rebuilds the rows) and finishes. The session
   // stays open: the follow-up row tap must not demand a second unlock.
   testWidgets(

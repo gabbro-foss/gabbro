@@ -17,16 +17,8 @@ import 'package:gabbro/widgets/sync_review.dart';
 
 import 'screen_catalog.dart';
 
-// Behaviour tests for the desktop keyboard shortcuts (canon-TDD phase):
-//   A. Ctrl+L locks the vault from anywhere.
-//   B. Ctrl+F focuses the vault-list search; Ctrl+Shift+F also turns on
-//      full-text ("all fields") mode. Both phone and tablet layouts.
-//   C. Escape cancels the two barrierDismissible:false review dialogs — and for
-//      sync review it must cancel SAFELY (roll back, apply nothing).
-//
-// The keyboard_net sweep proves Escape dismisses dialogs generally; these add
-// the value assertions a sweep can't: what focus/mode/result each shortcut
-// produces.
+// What each shortcut produces (focus, mode, result), which the keyboard_net
+// sweep cannot assert. Escape on the sync review must roll back, not apply.
 
 // --- Shared app harness for the global Ctrl+L shortcut (mirrors
 // lock_timer_test): a registered temp vault, foreground lock set to never so the
@@ -98,7 +90,6 @@ MergeSummary conflictSummary() => const MergeSummary(
 );
 
 void main() {
-  // ── A. Ctrl+L locks ──────────────────────────────────────────────────────
   group('Ctrl+L lock', () {
     late String vaultPath;
     late Future<void> Function() cleanup;
@@ -125,7 +116,6 @@ void main() {
     });
   });
 
-  // ── B. Ctrl+F search focus (both layouts) ────────────────────────────────
   group('Ctrl+F search focus', () {
     testWidgets('Ctrl+F focuses the search field (phone)', (tester) async {
       setSurface(tester, phone);
@@ -167,7 +157,7 @@ void main() {
           reason: 'Ctrl+F did not focus the search field on the tablet layout');
     });
 
-    // Hardware bug: Ctrl+F worked once, then not — a screen-local shortcut dies
+    // Hardware bug: Ctrl+F worked once, then not - a screen-local shortcut dies
     // once focus leaves the screen subtree. Must keep working like Ctrl+L.
     testWidgets('Ctrl+F works again after focus leaves the field', (tester) async {
       setSurface(tester, phone);
@@ -204,12 +194,11 @@ void main() {
     });
   });
 
-  // ── D. Ctrl+N new entry / Ctrl+M menu (Linux desktop) ────────────────────
   // Both mirror Ctrl+L: a global handler routed to a vault-list hook, matched on
   // the PHYSICAL key. They exist so keyboard-only users can still reach the two
   // controls the region Tab-cycle deliberately excludes (the FAB / new entry and
   // the overflow menu). Both self-gate: inert behind a dialog / pushed route and
-  // in selection mode. Layout labels are narrow / wide (two-pane) — Linux-only.
+  // in selection mode. Layout labels are narrow / wide (two-pane) - Linux-only.
   group('Ctrl+N new entry and Ctrl+M menu', () {
     Future<void> pumpVaultList(WidgetTester tester, Surface surface) async {
       setSurface(tester, surface);
@@ -221,7 +210,7 @@ void main() {
     // The type picker uses the Note type's icon; a login list entry uses the
     // lock icon, so this icon is unique to the open picker.
     final pickerOpen = find.byIcon(Icons.note_outlined);
-    // The overflow menu's Export item icon — unique to the open menu.
+    // The overflow menu's Export item icon - unique to the open menu.
     final menuOpen = find.byIcon(Icons.upload_outlined);
 
     testWidgets('Ctrl+N opens the new-entry type picker (narrow layout)',
@@ -308,10 +297,9 @@ void main() {
     });
   });
 
-  // ── E. Ctrl+Q lock and quit (Linux desktop) ──────────────────────────────
   // Same shape as Ctrl+N / Ctrl+M: a global handler routed to a vault-list hook,
   // matched on the PHYSICAL key, self-gating. It must open the SAME confirm
-  // dialog as the menu's Quit item — an accidental keystroke must not end a live
+  // dialog as the menu's Quit item - an accidental keystroke must not end a live
   // session.
   group('Ctrl+Q lock and quit', () {
     Widget quitList(
@@ -354,7 +342,7 @@ void main() {
       return calls;
     }
 
-    // The menu item's own dialog title — the same one Ctrl+Q must raise.
+    // The menu item's own dialog title - the same one Ctrl+Q must raise.
     Finder confirmDialog(WidgetTester tester) => find.text(
         AppLocalizations.of(tester.element(find.byType(VaultListScreen)))
             .quitConfirmTitle);
@@ -445,7 +433,6 @@ void main() {
     });
   });
 
-  // ── C. Escape cancels the review dialogs ─────────────────────────────────
   group('Escape cancels review dialogs', () {
     testWidgets('Escape cancels sync review SAFELY (rollback, no apply)',
         (tester) async {
