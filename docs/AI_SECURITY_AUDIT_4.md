@@ -55,6 +55,20 @@ touching autofill, passkeys, biometrics, export, auto-type.
 Drift since pass 3: `debugPrint` 0 → 7 (all non-secret, all active in release);
 Kotlin `Log.*` 15, of which the passkey activity's are ungated.
 
+**Not surveyed in this pass** (same model wrote code and surveys; these are
+its likely blind spots): the YubiKey Kotlin layer (`TapFlow`,
+`YubiKeyManager`, NFC/USB); the generated bridge (`frb_generated.rs`, most of
+the `unsafe` lines); the password/passphrase generators and the `entropy`
+module (which RNG each uses); the CSV mapping screen (attacker-controlled
+column names into the UI); the l10n pipeline (ARB placeholders). Plus a
+tree-wide grep for LLM failure patterns: duplicated logic drifting apart
+(T-02), ADR promises never built (T-35), comments describing deleted code,
+tests that mirror the implementation. Assigned to W1, W3, W6, W10.
+
+**Disclosure note.** This register is public before any fix, by the
+maintainer's choice (GPL-3 posture, alpha, small user base). Med rows are
+scheduled first for that reason.
+
 ---
 
 ## 3. Gaps in passes 1–3
