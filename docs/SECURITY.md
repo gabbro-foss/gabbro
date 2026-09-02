@@ -194,6 +194,14 @@ pattern (atomic on POSIX). Symlinks at the vault path are rejected.
 None found. Build secrets (Android keystore, `key.properties`) are git-ignored
 and verified absent from all commits.
 
+**Red-team pass found no secret-exposure path (RT-series).**
+A 2026-07/08 red-team exercise (local report, not published) attacked the
+published challenge vault, the unlock flows and the locked-vault boundary:
+challenge not cracked, no path to user secrets found. All findings closed —
+RT-3 became the hybrid-layer removal (ADR-018, v11 floor); RT-4 (clipboard wipe
+cancelled when its screen closed) and RT-5 (auto-lock ignored after an autofill
+unlock) are fixed and hardware-verified.
+
 ---
 
 ## Known limitations and open questions

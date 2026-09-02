@@ -129,7 +129,7 @@ const _excluded = {'fab', 'appbar'};
 const _cycleStops = {'search', 'folder', 'chips', 'list', 'detail'};
 
 /// True while focus is anywhere inside the region cycle. Esc must clear this
-/// (KEYBOARD_NAV: Esc is the only way back to the Unfocused state).
+/// (ADR-020: Esc is the only way back to the Unfocused state).
 bool _inCycle() => _cycleStops.contains(_stop());
 
 Future<void> _esc(WidgetTester t) async {
