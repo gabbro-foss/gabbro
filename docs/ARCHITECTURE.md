@@ -149,7 +149,7 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**Verify after flutter-bin 3.47.1 -> 3.47.2 upgrade (AUR).** A new SDK can break the build or tests silently. After upgrading: `flutter test`, then a release Linux build.
+**None set.** Pick from the Bikeshed.
 
 ---
 
