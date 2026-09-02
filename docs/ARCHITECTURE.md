@@ -174,6 +174,7 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
 
 ### Housekeeping
+- **Verify after flutter-bin 3.47.1 -> 3.47.2 upgrade (AUR).** A new SDK can break the build or tests silently. After upgrading: `flutter test`, then a release Linux build.
 - **Permanent USB product id (Linux passkeys).** 0x1209:0x0001 is pid.codes'
   shared TEST id; another dev gadget with it could confuse the YubiKey filter.
   PR requesting 0x1209:0x6ABB awaits external review (volunteer-run, can take
