@@ -149,11 +149,7 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**Shorten user-facing strings.** Terse UI strings. Not free: each change
-touches `lib/l10n/app_*.arb` (all locales) and the tests quoting the literal
-(~1.6k `find.text` assertions). Scope and weigh before starting. Comment
-rules from the finished code-comment sweep carry over: ASCII only, no
-emojis, plain wording.
+**Verify after flutter-bin 3.47.1 -> 3.47.2 upgrade (AUR).** A new SDK can break the build or tests silently. After upgrading: `flutter test`, then a release Linux build.
 
 ---
 
@@ -174,7 +170,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
 
 ### Housekeeping
-- **Verify after flutter-bin 3.47.1 -> 3.47.2 upgrade (AUR).** A new SDK can break the build or tests silently. After upgrading: `flutter test`, then a release Linux build.
 - **Permanent USB product id (Linux passkeys).** 0x1209:0x0001 is pid.codes'
   shared TEST id; another dev gadget with it could confuse the YubiKey filter.
   PR requesting 0x1209:0x6ABB awaits external review (volunteer-run, can take
@@ -186,6 +181,11 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - **Human expert cryptography review** of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) - **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
 
 ### V2+ / Defer
+- **Shorten user-facing strings.** Terse UI strings. Not free: each change
+touches `lib/l10n/app_*.arb` (all locales) and the tests quoting the literal
+(~1.6k `find.text` assertions). Scope and weigh before starting. Comment
+rules from the finished code-comment sweep carry over: ASCII only, no
+emojis, plain wording.
 - **Wayland auto-type** - blocked: Wayland breaks global input injection
   (https://gist.github.com/probonopd/9feb7c20257af5dd915e3a9f2d1f2277).
   Revisit only if Mint defaults to Wayland.
