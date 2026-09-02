@@ -322,6 +322,26 @@ as in passes 1–3. Candidates marked **[behaviour]** wait for the maintainer.
 
 ---
 
+## 9b. Avenues beyond the workstreams (external-reviewer view)
+
+What an outside reviewer landing on this repo would still ask for. Ranked by
+trust gained per hour. Only A4 changes user-visible behaviour.
+
+| # | Avenue | Why it matters | Where it lands |
+|---|--------|----------------|----------------|
+| A1 | **OpenSSF Scorecard** run and published | The first thing an automated reviewer runs; today Gabbro scores low on signed releases, branch protection, security policy, fuzzing, pinned deps — most already in T-48..T-52 | W9 |
+| A2 | **Passphrase strength estimator audit** against zxcvbn-class corpora and breach lists | SECURITY.md says passphrase-only security equals passphrase strength; a flattering estimator silently weakens every such vault | new: W1 (Rust `entropy`) + W6 (onboarding UI) |
+| A3 | **Standalone vault format spec** (`VAULT_FORMAT.md`: byte layout, version rules, AAD bytes, published test vectors) | Auditors need it; lets a stranger verify the v11 derivation independently, the way KDBX can be | W10 |
+| A4 | **Secure-by-default on Linux** **[behaviour]**: passkey daemon and auto-type listener start on every launch; the CTAP parser runs inside the key-holding process | Reviewer asks why both are on by default and why a parser bug equals the vault; answers are opt-in defaults (ADR-017 promised one) and Landlock/seccomp confinement of the daemon | W2, W4 |
+| A5 | **Continuous fuzzing** (OSS-Fuzz or ClusterFuzzLite) | Turns "fuzzed once" into "fuzzed daily"; free for Rust projects | W2, W5, W8 |
+| A6 | **Public post-mortem of the 2026-06-08 vault-brick incident** | Trust comes from how incidents were handled; this one produced the compat gate | W10 |
+| A7 | **"Audit Gabbro in one afternoon" guide** (offline build, gate, `mem_forensics.sh`, fuzzers, hardware matrix) | Lowers the bar for the volunteer reviewer the project hopes for | W10 |
+| A8 | **Sigstore/cosign signing beside GPG** | Provenance in a public transparency log; survives a lost GPG key | W9 |
+| A9 | **Move rows out of §5 quickly** | Fifty-four unconfirmed candidates left standing read as the AI slop the doc warns about; confirmed or struck rows are the proof of work | session 1 onward |
+| A10 | **A named human review**, even partial (one module, one afternoon) | Until a person signs something, the auditor monoculture (G15) stands | W10 scope |
+
+---
+
 ## 10. Tooling to add
 
 `cargo fuzz` (ctaphid, ctap2, from_bytes, merge, import), `cargo mutants`,
