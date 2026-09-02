@@ -149,7 +149,7 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**None set.** Pick from the Bikeshed.
+**Audit pass 4, session 1.** Confirm or clear T-01, T-02, T-03, T-40, T-41 with repros (plan: [AI_SECURITY_AUDIT_4.md](AI_SECURITY_AUDIT_4.md) sections 5 and 9). Findings only; remediation is a separate session.
 
 ---
 
