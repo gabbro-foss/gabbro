@@ -29,7 +29,7 @@ own site (README "Verify no telemetry"); off or network-revoked, only app
 sign-ins refuse. The daemon bridge module compiles on every platform (inert
 stubs off Linux) because FRB's generated code references it unconditionally;
 a gate leg cargo-checks the Android target to pin that. Linux: an
-in-process uhid virtual FIDO2 key (VID/PID 0x1209:0x0001, filtered out of
+in-process uhid virtual FIDO2 key (VID/PID 0x1209:0x6ABB, filtered out of
 `fido_list_devices`) exists while the app runs; browsers speak CTAP2 to it,
 consent is an in-app dialog, a locked vault answers only getInfo, and silent
 allowList pre-flights (`options.up=false`) are answered without consent.
@@ -149,11 +149,9 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**Permanent USB product id (Linux passkeys).** 0x1209:0x0001 is pid.codes'
-shared TEST id; another dev gadget with it could confuse the YubiKey filter.
-Granted 2026-09-30: 0x1209:0x6ABB is Gabbro's
-(https://github.com/pidcodes/pidcodes.github.com/pull/1265). TDD the constants in
-`rust/src/uhid.rs` + `api/fido_bridge.rs` filter, hardware-verify on Linux.
+**Build docs for Mint.** Dev box is Mint 22.3 since 2026-10-27; README
+Prerequisites and BUILD_AND_RELEASE (system Java, dpkg-deb container, makepkg)
+assume Arch. Rewrite for Mint; Arch build + AUR release must still work.
 
 ---
 
@@ -173,11 +171,13 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   placeholder SVG. Replace `assets/images/source/ic_launcher_light.svg` with the
   new logo (user supplies it) and re-run it; same render covers the Windows `.ico`
   (still the stock Flutter template).
+- **Linux passkeys: browser's own "use your security key" prompt.** Shows beside
+  Gabbro's consent dialog on register and sign-in. Chromium on Linux has no
+  built-in passkey store, so Gabbro shows up as a USB key and gets the
+  security-key prompt; no browser setting hides it (checked Brave 1.98, 2026-10-28).
+  Users find it confusing: explain it in help.
 
 ### Housekeeping
-- **Build docs still Arch-only.** Dev box is Mint 22.3 since 2026-10-27; README
-  Prerequisites and BUILD_AND_RELEASE (system Java, dpkg-deb container, makepkg)
-  assume Arch. Rewrite for Mint.
 - **Delete `purgeLegacyRecentApps` at v1.0** (`MainActivity.kt` + `LegacyPurgeTest.kt`) - the one-shot cleanup of the removed suggestion-chip store. No pre-1.0 install will still be upgrading by then.
 
 ### Security (pre-v1)

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Passkey signing dependencies updated: crypto-bigint 0.7.10 (RUSTSEC-2026-0387) and ctutils 0.4.6 (RUSTSEC-2026-0385) fix timing leaks in constant-time code; tokio 1.54.1 (RUSTSEC-2026-0386), wnaf 0.14.1 (was yanked).
 
 ### Changed
+- Linux passkeys: the virtual security key now uses Gabbro's own USB id (0x1209:0x6ABB) instead of a shared test id another device could also use.
 - Crypto stack diagrams no longer pinned to format v11: labelled v11+ with a note that later bumps (v12) change the body schema, not the key path.
 
 ## [0.1.0-alpha.23] – 2026-08-27
