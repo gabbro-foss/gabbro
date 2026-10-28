@@ -149,7 +149,11 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**Audit pass 4, session 1.** Confirm or clear T-01, T-02, T-03, T-40, T-41 with repros (plan: [AI_SECURITY_AUDIT_4.md](AI_SECURITY_AUDIT_4.md) sections 5 and 9). Findings only; remediation is a separate session.
+**Permanent USB product id (Linux passkeys).** 0x1209:0x0001 is pid.codes'
+shared TEST id; another dev gadget with it could confuse the YubiKey filter.
+Granted 2026-09-30: 0x1209:0x6ABB is Gabbro's
+(https://github.com/pidcodes/pidcodes.github.com/pull/1265). TDD the constants in
+`rust/src/uhid.rs` + `api/fido_bridge.rs` filter, hardware-verify on Linux.
 
 ---
 
@@ -165,19 +169,19 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely - the git log is the record.
 
 ### Features and UI/UX
-- **Final launcher logo (logo-blocked).** `render_icons.sh` renders a placeholder
-  SVG. When the real logo lands, replace `assets/images/source/ic_launcher_light.svg`
-  and re-run it; same render covers the Windows `.ico` (still the stock Flutter template).
+- **Final launcher logo (logo now available).** `render_icons.sh` still renders a
+  placeholder SVG. Replace `assets/images/source/ic_launcher_light.svg` with the
+  new logo (user supplies it) and re-run it; same render covers the Windows `.ico`
+  (still the stock Flutter template).
 
 ### Housekeeping
-- **Permanent USB product id (Linux passkeys).** 0x1209:0x0001 is pid.codes'
-  shared TEST id; another dev gadget with it could confuse the YubiKey filter.
-  PR requesting 0x1209:0x6ABB awaits external review (volunteer-run, can take
-  months; not release-blocking): https://github.com/pidcodes/pidcodes.github.com/pull/1265
-  On grant: TDD the constants in `rust/src/uhid.rs`, hardware-verify on Linux.
+- **Build docs still Arch-only.** Dev box is Mint 22.3 since 2026-10-27; README
+  Prerequisites and BUILD_AND_RELEASE (system Java, dpkg-deb container, makepkg)
+  assume Arch. Rewrite for Mint.
 - **Delete `purgeLegacyRecentApps` at v1.0** (`MainActivity.kt` + `LegacyPurgeTest.kt`) - the one-shot cleanup of the removed suggestion-chip store. No pre-1.0 install will still be upgrading by then.
 
 ### Security (pre-v1)
+- **Audit pass 4, session 1.** Confirm or clear T-01, T-02, T-03, T-40, T-41 with repros (plan: [AI_SECURITY_AUDIT_4.md](AI_SECURITY_AUDIT_4.md) sections 5 and 9). Findings only; remediation is a separate session.
 - **Human expert cryptography review** of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) - **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
 
 ### V2+ / Defer
