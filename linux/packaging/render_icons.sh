@@ -16,7 +16,7 @@ OUT="${1:?usage: render_icons.sh <hicolor-output-dir>}"
 SIZES="16 32 48 64 128 256 512"
 
 command -v rsvg-convert >/dev/null 2>&1 || {
-  echo "render_icons.sh: rsvg-convert not found (pacman -S librsvg)" >&2
+  echo "render_icons.sh: rsvg-convert not found (Arch: pacman -S librsvg; Mint: apt install librsvg2-bin)" >&2
   exit 1
 }
 [ -f "$SRC" ] || { echo "render_icons.sh: source SVG not found: $SRC" >&2; exit 1; }
