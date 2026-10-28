@@ -135,6 +135,8 @@ warnings are not noise.**
 | KGP via `buildscript` classpath | `url_launcher_android` | Did not reproduce 2026-08-06; re-check before acting. |
 | Flutter: AGP 8.11.1 support "will soon be dropped" (wants >= 9.0.1) | Flutter tooling, new 2026-08-21 | A future Flutter upgrade refuses to build Android until AGP is bumped. No action yet: 8.11.1 still builds; bump AGP + Kotlin together when forced. |
 | Flutter: Kotlin 2.2.20 support "will soon be dropped" (wants >= 2.3.20) | Flutter tooling, new 2026-08-21 | Same consequence and plan as the AGP row above. |
+| "Caught exception: Already watching path: .../android" | Gradle 9.3.1 file watcher (`gradle-fileevents` native lib), new on Mint 2026-10-28 | Gradle catches it; APKs build. No action. |
+| "15 packages have newer versions" (`args`, `toml`, …) | cargokit's vendored `build_tool` pins | Info only; build tool, not shipped. No action. |
 | "understands SDK XML versions up to 3 but ... version 4 was encountered" | AGP 8.11.1's SDK reader vs newer Android Studio metadata | Cosmetic; AGP still installs what it needs. Clears with the AGP bump above. |
 
 **AGP note:** every module, `rust_lib_gabbro` included, loads AGP **8.11.1**. The
@@ -149,8 +151,10 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**Smoke-test a Mint release build (no release).** Run BUILD_AND_RELEASE's Linux
-build + Verify + smoke test on Mint without tagging or publishing.
+**Final launcher logo (logo now available).** `render_icons.sh` still renders a
+placeholder SVG. Replace `assets/images/source/ic_launcher_light.svg` with the
+new logo (user supplies it) and re-run it; same render covers the Windows `.ico`
+(still the stock Flutter template).
 
 ---
 
@@ -166,10 +170,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely - the git log is the record.
 
 ### Features and UI/UX
-- **Final launcher logo (logo now available).** `render_icons.sh` still renders a
-  placeholder SVG. Replace `assets/images/source/ic_launcher_light.svg` with the
-  new logo (user supplies it) and re-run it; same render covers the Windows `.ico`
-  (still the stock Flutter template).
 - **Linux passkeys: browser's own "use your security key" prompt.** Shows beside
   Gabbro's consent dialog on register and sign-in. Chromium on Linux has no
   built-in passkey store, so Gabbro shows up as a USB key and gets the

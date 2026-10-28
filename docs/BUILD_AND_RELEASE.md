@@ -15,7 +15,7 @@ under **Installation**.
 - A build box may have **no system JDK at all** (Mint and the T430 have none), so `apksigner`
   dies with `exec: java: not found` and the release-signature check silently prints
   nothing. Prefix it: `JAVA_HOME=/opt/android-studio/jbr PATH=$JAVA_HOME/bin:$PATH`.
-- Release prerequisites beyond the gate's: `jq`, `osv-scanner`, `docker`. Without
+- Release prerequisites beyond the gate's: `jq`, `docker`, `rsvg-convert` (Arch `librsvg`, Mint `librsvg2-bin`; renders the icons). Without
   `jq`, the privileged-browser step compares two empty strings and reports
   `UNCHANGED` for a list it never read.
 - Where a system Java exists (Arch: 26.0.1) it is incompatible with the Kotlin compiler. Fix: `org.gradle.java.home=/opt/android-studio/jbr` in `android/gradle.properties` (Java 25.0.2 since the 2026-08 android-studio update). Gradle wrapper is 9.3.1: 9.1.0 is the floor for running on Java 25, 9.3.1 is the Flutter SDK's max validated (still 9.3.1 at Flutter 3.47.1; check `maxKnownAndSupportedGradleVersion` in the SDK's `gradle_utils.dart` after an SDK bump).
@@ -224,10 +224,11 @@ All three must print the same digest, matching the fingerprint in README. The ke
 gitignored.
 
 **Dependency lock**: only if any Android dependency changed (plugin or Flutter bump
-included); a stale lock fails the release build by design:
+included); a stale lock fails the release build by design. The scanner runs from its
+official Docker image, pulled fresh each run (nothing to install or update):
 
 ```bash
-(cd android && ./gradlew :app:dependencies --write-locks --configuration releaseRuntimeClasspath) && osv-scanner scan --lockfile android/app/gradle.lockfile
+(cd android && ./gradlew :app:dependencies --write-locks --configuration releaseRuntimeClasspath) && docker run --rm --pull=always -v "$PWD":/src ghcr.io/google/osv-scanner:latest scan --lockfile /src/android/app/gradle.lockfile
 ```
 
 ### Smoke test
