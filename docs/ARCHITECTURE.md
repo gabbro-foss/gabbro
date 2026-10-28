@@ -149,9 +149,8 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**Build docs for Mint.** Dev box is Mint 22.3 since 2026-10-27; README
-Prerequisites and BUILD_AND_RELEASE (system Java, dpkg-deb container, makepkg)
-assume Arch. Rewrite for Mint; Arch build + AUR release must still work.
+**Smoke-test a Mint release build (no release).** Run BUILD_AND_RELEASE's Linux
+build + Verify + smoke test on Mint without tagging or publishing.
 
 ---
 

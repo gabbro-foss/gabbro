@@ -527,6 +527,19 @@ sudo usermod -aG flutter $USER
 # log out and back in
 ```
 
+On Mint / Debian / Ubuntu, install the build libraries with apt, Rust via
+[rustup](https://rustup.rs/), and Flutter as a git clone pinned to the version
+in the latest CHANGELOG footer (e.g. `3.47.1`):
+
+```bash
+sudo apt install git jq curl unzip xz-utils zip clang cmake ninja-build pkg-config \
+  libgtk-3-dev liblzma-dev libstdc++-12-dev libfido2-dev libcbor-dev \
+  libpcsclite-dev libudev-dev xdg-desktop-portal-gtk docker.io
+git clone -b 3.47.1 --depth 1 https://github.com/flutter/flutter.git ~/development/flutter
+echo 'export PATH="$HOME/development/flutter/bin:$PATH"' >> ~/.bashrc
+sudo usermod -aG docker $USER   # release packaging only; log out and back in
+```
+
 To run the full test gate (`./gabbro_test`), also:
 
 ```bash

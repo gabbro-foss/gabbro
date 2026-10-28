@@ -10,13 +10,15 @@ under **Installation**.
 
 **Critical notes: read before Android or Kotlin sessions.**
 
-- A build box may have **no system JDK at all** (the T430 has none), so `apksigner`
+- Build boxes: Mint 22.3 (main, since 2026-10-27) or Arch. Every step below runs
+  on both; where they differ, both forms are given.
+- A build box may have **no system JDK at all** (Mint and the T430 have none), so `apksigner`
   dies with `exec: java: not found` and the release-signature check silently prints
   nothing. Prefix it: `JAVA_HOME=/opt/android-studio/jbr PATH=$JAVA_HOME/bin:$PATH`.
 - Release prerequisites beyond the gate's: `jq`, `osv-scanner`, `docker`. Without
   `jq`, the privileged-browser step compares two empty strings and reports
   `UNCHANGED` for a list it never read.
-- Where a system Java exists it is 26.0.1, incompatible with the Kotlin compiler. Fix: `org.gradle.java.home=/opt/android-studio/jbr` in `android/gradle.properties` (Java 25.0.2 since the 2026-08 android-studio update). Gradle wrapper is 9.3.1: 9.1.0 is the floor for running on Java 25, 9.3.1 is the Flutter SDK's max validated (still 9.3.1 at Flutter 3.47.1; check `maxKnownAndSupportedGradleVersion` in the SDK's `gradle_utils.dart` after an SDK bump).
+- Where a system Java exists (Arch: 26.0.1) it is incompatible with the Kotlin compiler. Fix: `org.gradle.java.home=/opt/android-studio/jbr` in `android/gradle.properties` (Java 25.0.2 since the 2026-08 android-studio update). Gradle wrapper is 9.3.1: 9.1.0 is the floor for running on Java 25, 9.3.1 is the Flutter SDK's max validated (still 9.3.1 at Flutter 3.47.1; check `maxKnownAndSupportedGradleVersion` in the SDK's `gradle_utils.dart` after an SDK bump).
 - Gradle 9 accommodations (nets: `test/android_build_config_test.dart`): cargokit's vendored `plugin.gradle` uses injected `ExecOperations` (`Project.exec` was removed, so re-patch after any flutter_rust_bridge template refresh), and `app/build.gradle.kts` pins Kotlin to JVM 21 to match `compileOptions` (unpinned, Kotlin follows the running JDK and the mismatch is a hard error).
 - AGP 8.11.1 in `android/settings.gradle.kts`. Java and Kotlin JVM target both set to 21 in `app/build.gradle.kts`.
 - `libfido2-sys` and `pub mod fido` are gated behind `cfg(not(target_os = "android"))`: libfido2 is Linux-only; Android uses yubikit-android via Kotlin.
@@ -129,13 +131,14 @@ tar -tzf "gabbro-$ver-linux-x86_64.tar.gz" | grep gabbro-autotype && gpg --verif
 Expect `bundle/gabbro-autotype`, `Good signature from "Gabbro Releases"` on key
 `369B E2CE CFD0 A528 7155 895A 4775 4EEE 7F9A ABFC`, and the version echoed back.
 
-The Arch-built bundle runs on Debian trixie / Mint (glibc <= 2.34, verified). Build in a
-`debian:trixie` container only if a future release raises that above 2.41.
+The bundle needs glibc >= 2.34 whether built on Arch or Mint (verified: Arch, and Mint
+2026-10-28), so it runs on Arch, Debian trixie and Mint. Build in a `debian:trixie`
+container only if a future release raises that above 2.41.
 
 ### Debian `.deb` + APT index
 
-One `debian:trixie` container run (Arch has no `dpkg-deb` or `apt-ftparchive`)
-repackages the signed tarball into a `.deb` (no compile) and regenerates the APT
+One `debian:trixie` container run (same output on Arch and Mint; Arch has no
+`dpkg-deb` or `apt-ftparchive`) repackages the signed tarball into a `.deb` (no compile) and regenerates the APT
 index in `../gabbro-apt/`. Optional `.deb` validation: add `apt-get install -y lintian`
 + `lintian ./*.deb` + `apt-get install -y ./*.deb` inside the container.
 Container installs cannot prove the uhid udev rule activates (no udev, shared
@@ -268,8 +271,20 @@ control file, and the signature covers content, not the filename.
 ### AUR (`gabbro-bin`)
 
 The clone is a sibling of `gabbro/`, at `../gabbro-bin-aur/`, holding exactly
-`PKGBUILD` + `gabbro-bin.install` + `.SRCINFO` before and after this procedure (in between, `makepkg` adds
+`PKGBUILD` + `gabbro-bin.install` + `.SRCINFO` before and after this procedure (in between, `mkp` adds
 `LICENSE`, the downloaded tarball and `src/`; step 5 removes them).
+
+0. Update the clone (a stale one fails the push), then define `mkp`: run only your
+   box's line (the second would override the first). On Arch it is
+   plain `makepkg`. Mint has no `makepkg`, so it runs in an `archlinux` container
+   as a non-root user (`makepkg` refuses root) and hands the files back to you
+   (verified 2026-10-28: identical `.SRCINFO`, a wrong hash fails). Run from `gabbro/`:
+
+   ```bash
+   (cd ../gabbro-bin-aur && git pull --ff-only)
+   mkp() { makepkg "$@"; }   # Arch
+   mkp() { docker run --rm -i -v "$PWD":/pkg -w /pkg -e OWNER="$(id -u):$(id -g)" archlinux:latest bash -uc 'pacman -Syu --noconfirm --needed base-devel >/dev/null 2>&1 && useradd -m builder && chown -R builder /pkg || exit 1; su builder -c "makepkg $*"; rc=$?; chown -R "$OWNER" /pkg; exit $rc' _ "$@"; }   # Mint
+   ```
 
 1. Print the tarball hash. Run from `gabbro/`:
 
@@ -281,13 +296,13 @@ The clone is a sibling of `gabbro/`, at `../gabbro-bin-aur/`, holding exactly
 3. Copy it across with the install hooks and check the published asset against the pinned sha; both source lines must say `Passed`. Run from `gabbro/`:
 
    ```bash
-   cp linux/packaging/aur/PKGBUILD linux/packaging/aur/gabbro-bin.install ../gabbro-bin-aur/ && (cd ../gabbro-bin-aur && makepkg --verifysource)
+   cp linux/packaging/aur/PKGBUILD linux/packaging/aur/gabbro-bin.install ../gabbro-bin-aur/ && (cd ../gabbro-bin-aur && mkp --verifysource)
    ```
 
 4. Regenerate `.SRCINFO` (generated, lives only in the clone) and push to the AUR:
 
    ```bash
-   cd ../gabbro-bin-aur && makepkg --printsrcinfo > .SRCINFO && git add PKGBUILD gabbro-bin.install .SRCINFO && git commit -m "Update to $ver" && git push
+   cd ../gabbro-bin-aur && mkp --printsrcinfo > .SRCINFO && git add PKGBUILD gabbro-bin.install .SRCINFO && git commit -m "Update to $ver" && git push
    ```
 
 5. Clean up, restoring the clone state: `ls -a` must show only `.`, `..`, `.git`, `PKGBUILD`, `gabbro-bin.install`, `.SRCINFO`:
