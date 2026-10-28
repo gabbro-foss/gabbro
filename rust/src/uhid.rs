@@ -4,10 +4,10 @@
 //! enumerate Gabbro exactly like a plugged-in security key. Struct layout
 //! pinned against /usr/include/linux/uhid.h (UHID_CREATE2 = 11, packed).
 
-/// Our fixed identity: pid.codes test VID/PID until a permanent PID is
-/// registered. The YubiKey-unlock scan filters exactly these (item 19).
+/// Our fixed identity: Gabbro's permanent pid.codes VID/PID (PR 1265).
+/// The YubiKey-unlock scan filters exactly these (item 19).
 pub const VENDOR_ID: u32 = 0x1209;
-pub const PRODUCT_ID: u32 = 0x0001;
+pub const PRODUCT_ID: u32 = 0x6ABB;
 
 const UHID_CREATE2: u32 = 11;
 const BUS_USB: u16 = 0x03;
@@ -97,13 +97,21 @@ pub(crate) fn test_wait_for<T>(what: &str, mut f: impl FnMut() -> Option<T>) -> 
     }
 }
 
+/// Test helper: our VID:PID as the kernel prints it in a hidraw uevent
+/// (`HID_ID=%04X:%08X:%08X` - uppercase hex).
+#[cfg(test)]
+fn test_hid_id_tag() -> String {
+    format!("{VENDOR_ID:08X}:{PRODUCT_ID:08X}")
+}
+
 /// Test helper (crate-wide): the /dev/hidraw* node carrying our VID/PID.
 #[cfg(test)]
 pub(crate) fn test_find_our_hidraw() -> Option<std::path::PathBuf> {
+    let tag = test_hid_id_tag();
     for entry in std::fs::read_dir("/sys/class/hidraw").ok()?.flatten() {
         let uevent = entry.path().join("device/uevent");
         if let Ok(s) = std::fs::read_to_string(&uevent) {
-            if s.contains("00001209:00000001") {
+            if s.contains(&tag) {
                 let mut p = std::path::PathBuf::from("/dev");
                 p.push(entry.file_name());
                 return Some(p);
@@ -138,6 +146,14 @@ mod tests {
         0x91, 0x02, // OUTPUT (Data,Var,Abs)
         0xc0, // END_COLLECTION
     ];
+
+    // The hardware tests find our hidraw node by this tag; it must match the
+    // kernel's uevent spelling exactly or they silently find nothing.
+    #[test]
+    fn hid_id_tag_matches_kernel_uevent_format() {
+        // 0x1209:0x6ABB is Gabbro's permanent pid.codes id (PR 1265).
+        assert_eq!(test_hid_id_tag(), "00001209:00006ABB");
+    }
 
     #[test]
     fn create2_event_announces_a_fido_device_under_our_identity() {
