@@ -1581,6 +1581,11 @@ class AppLocalizationsHr extends AppLocalizations {
       'Gabbro je slobodan softver otvorenog koda, licenciran pod GNU General Public License v3.0 only (GPL-3.0-only).\n\nImate slobodu koristiti, proučavati i distribuirati ovu aplikaciju prema uvjetima navedene licence.';
 
   @override
+  String aboutLogoCredit(String year, String artist) {
+    return 'Logotip © $year $artist, korišten uz dopuštenje. Sva prava pridržana.';
+  }
+
+  @override
   String get aboutOwnerRole => 'Vlasnik projekta, arhitekt i glavni programer:';
 
   @override

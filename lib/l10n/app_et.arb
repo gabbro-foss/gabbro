@@ -656,6 +656,13 @@
   "aboutReportIssue": "Teavita probleemist",
   "aboutSupportGabbro": "Toeta Gabrot",
   "aboutLicenceBody": "Gabbro on vaba ja avatud lähtekoodiga tarkvara, litsentseeritud GNU General Public License v3.0 only (GPL-3.0-only) alusel.\n\nSa võid seda tarkvara vabalt kasutada, uurida ja levitada selle litsentsi tingimuste kohaselt.",
+  "aboutLogoCredit": "Logo © {year} {artist}, kasutatud loal. Kõik õigused kaitstud.",
+  "@aboutLogoCredit": {
+    "placeholders": {
+      "year": {"type": "String"},
+      "artist": {"type": "String"}
+    }
+  },
   "aboutOwnerRole": "Projekti omanik, arhitekt ja peaaren daja:",
   "aboutAiPartner": "Tehisintellekti arenduspartner:",
   "aboutNoTelemetry": "Telemetria, analüütika, kontod ja Gabbro server puuduvad. Gabbro ei loo üldse võrguühendusi — välja arvatud siis, kui lülitad sisse rakenduste passkey-d: siis on ainus ühendus üks allalaadimine sisselogimise kohta, saidi enda rakenduste kontrollifail.",

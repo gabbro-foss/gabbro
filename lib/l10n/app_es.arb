@@ -656,6 +656,13 @@
   "aboutReportIssue": "Informar de un problema",
   "aboutSupportGabbro": "Apoyar a Gabbro",
   "aboutLicenceBody": "Gabbro es software libre y de código abierto, distribuido bajo la GNU General Public License v3.0 only (GPL-3.0-only).\n\nEres libre de usar, estudiar y redistribuir este software según los términos de dicha licencia.",
+  "aboutLogoCredit": "Logotipo © {year} {artist}, usado con permiso. Todos los derechos reservados.",
+  "@aboutLogoCredit": {
+    "placeholders": {
+      "year": {"type": "String"},
+      "artist": {"type": "String"}
+    }
+  },
   "aboutOwnerRole": "Propietario del proyecto, arquitecto y desarrollador principal:",
   "aboutAiPartner": "Socio de desarrollo IA:",
   "aboutNoTelemetry": "Sin telemetría, sin analíticas, sin cuentas, sin servidor de Gabbro. Gabbro no realiza ninguna conexión de red en absoluto — salvo que actives las passkeys de aplicaciones: entonces la única conexión es una descarga por inicio de sesión, el archivo de verificación de aplicaciones del propio sitio.",

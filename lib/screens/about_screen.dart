@@ -13,6 +13,10 @@ const _kIssuesUrl = 'https://github.com/gabbro-foss/gabbro/issues';
 const _kDonateUrl = 'https://github.com/sponsors/Zabamund';
 const _kClaudeUrl = 'https://claude.ai';
 
+// Logo artwork: all rights reserved, used with permission (LOGO_LICENSE).
+const _kLogoYear = '2026';
+const _kLogoArtist = 'Mike Manso';
+
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
 
@@ -70,6 +74,13 @@ class AboutScreen extends StatelessWidget {
                 child: Text(
                   l.aboutLicenceBody,
                   style: textTheme.bodyMedium,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text(
+                  l.aboutLogoCredit(_kLogoYear, _kLogoArtist),
+                  style: textTheme.bodySmall,
                 ),
               ),
               const SizedBox(height: 24),

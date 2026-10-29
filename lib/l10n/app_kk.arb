@@ -656,6 +656,13 @@
   "aboutReportIssue": "Мәселе туралы хабарлау",
   "aboutSupportGabbro": "Gabbroны қолдау",
   "aboutLicenceBody": "Gabbro — GNU General Public License v3.0 only (GPL-3.0-only) бойынша лицензиаланған еркін ашық бастапқы бағдарламалық жасақтама.\n\nЛицензия шарттары бойынша бұл қосымшаны пайдалануға, зерттеуге және таратуға еркіндігіңіз бар.",
+  "aboutLogoCredit": "Логотип © {year} {artist}, рұқсатпен пайдаланылады. Барлық құқықтар қорғалған.",
+  "@aboutLogoCredit": {
+    "placeholders": {
+      "year": {"type": "String"},
+      "artist": {"type": "String"}
+    }
+  },
   "aboutOwnerRole": "Жоба иесі, архитектор және бас әзірлеуші:",
   "aboutAiPartner": "AI әзірлеу серіктесі:",
   "aboutNoTelemetry": "Телеметрия, аналитика, аккаунттар және Gabbro сервері жоқ. Gabbro желіге мүлдем қосылмайды — тек қолданба passkey-лерін қоссаңыз: онда жалғыз қосылым — әр кіру сайын бір жүктеу, сайттың өз қолданба тексеру файлы.",

@@ -1584,6 +1584,11 @@ class AppLocalizationsEu extends AppLocalizations {
       'Gabbro kode irekiko software librea da, GNU General Public License v3.0 only (GPL-3.0-only) lizentziapean.\n\nLizentziaren baldintzen arabera aplikazio hau erabiltzeko, ikasteko eta banatzeko askatasuna duzu.';
 
   @override
+  String aboutLogoCredit(String year, String artist) {
+    return 'Logotipoa © $year $artist, baimenarekin erabilia. Eskubide guztiak erreserbatuta.';
+  }
+
+  @override
   String get aboutOwnerRole =>
       'Proiektu-jabea, arkitektoa eta garatzaile nagusia:';
 

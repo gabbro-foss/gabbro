@@ -1582,6 +1582,11 @@ class AppLocalizationsNn extends AppLocalizations {
       'Gabbro er fri og open kjeldekode-programvare, lisensiert under GNU General Public License v3.0 only (GPL-3.0-only).\n\nDu kan fritt bruke, studere og redistribuere denne programvara under vilkåra i den lisensen.';
 
   @override
+  String aboutLogoCredit(String year, String artist) {
+    return 'Logo © $year $artist, brukt med løyve. Alle rettar atterhaldne.';
+  }
+
+  @override
   String get aboutOwnerRole => 'Prosjekteigar, arkitekt og hovudutviklar:';
 
   @override

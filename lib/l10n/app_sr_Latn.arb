@@ -656,6 +656,13 @@
   "aboutReportIssue": "Prijavi problem",
   "aboutSupportGabbro": "Podržite Gabbro",
   "aboutLicenceBody": "Gabbro je slobodan softver otvorenog koda, licenciran pod GNU General Public License v3.0 only (GPL-3.0-only).\n\nImate slobodu da koristite, proučavate i distribuirate ovu aplikaciju prema uslovima navedene licence.",
+  "aboutLogoCredit": "Logo © {year} {artist}, korišćen uz dozvolu. Sva prava zadržana.",
+  "@aboutLogoCredit": {
+    "placeholders": {
+      "year": {"type": "String"},
+      "artist": {"type": "String"}
+    }
+  },
   "aboutOwnerRole": "Vlasnik projekta, arhitekt i glavni programer:",
   "aboutAiPartner": "AI razvojni partner:",
   "aboutNoTelemetry": "Nema telemetrije, analitike, naloga ni Gabbro servera. Gabbro uopšte ne uspostavlja mrežne veze — osim ako uključite passkey za aplikacije: tada je jedina veza jedno preuzimanje po prijavi, datoteka za proveru aplikacija samog sajta.",

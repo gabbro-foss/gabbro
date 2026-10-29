@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Render the launcher icon tree for the Linux desktop entry from the source SVG.
-# Placeholder for now; when the final logo lands, replace the source SVG (or
-# point GABBRO_ICON_SVG at it) and re-run -- the packaging recipes and their .desktop
-# entries are unchanged, they just reference the `gabbro` icon name.
+# Render the launcher icon tree for the Linux desktop entry from the source SVG:
+# the green launcher mark, same as Android (artwork: LOGO_LICENSE, not GPL).
+# The packaging recipes and their .desktop entries just reference the `gabbro`
+# icon name.
 #
 #   render_icons.sh <hicolor-output-dir>
 #
@@ -11,7 +11,7 @@ set -eu
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-SRC="${GABBRO_ICON_SVG:-$REPO_ROOT/assets/images/source/ic_launcher_light.svg}"
+SRC="${GABBRO_ICON_SVG:-$REPO_ROOT/assets/images/source/ic_launcher_dark.svg}"
 OUT="${1:?usage: render_icons.sh <hicolor-output-dir>}"
 SIZES="16 32 48 64 128 256 512"
 

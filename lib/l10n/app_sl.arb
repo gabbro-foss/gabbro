@@ -656,6 +656,13 @@
   "aboutReportIssue": "Prijavi težavo",
   "aboutSupportGabbro": "Podpri Gabbro",
   "aboutLicenceBody": "Gabbro je prosta programska oprema z odprtokodno kodo, licencirana pod GNU General Public License v3.0 only (GPL-3.0-only).\n\nImate svobodo to aplikacijo uporabljati, proučevati in distribuirati v skladu s pogoji licence.",
+  "aboutLogoCredit": "Logotip © {year} {artist}, uporabljen z dovoljenjem. Vse pravice pridržane.",
+  "@aboutLogoCredit": {
+    "placeholders": {
+      "year": {"type": "String"},
+      "artist": {"type": "String"}
+    }
+  },
   "aboutOwnerRole": "Lastnik projekta, arhitekt in glavni razvijalec:",
   "aboutAiPartner": "AI razvojni partner:",
   "aboutNoTelemetry": "Brez telemetrije, analitike, računov ali strežnika Gabbro. Gabbro sploh ne vzpostavlja omrežnih povezav — razen če vklopite passkey za aplikacije: takrat je edina povezava en prenos na prijavo, datoteka za preverjanje aplikacij samega spletnega mesta.",

@@ -307,6 +307,53 @@ void main() {
     });
   });
 
+  group('logo licence', () {
+    // The logo is not GPL: without the notice next to every copy, forks and
+    // package users would reasonably assume they may reuse it.
+    test('LOGO_LICENSE names the artist and reserves all rights', () {
+      final s = File('LOGO_LICENSE').readAsStringSync();
+      expect(s, contains('© 2026 Mike Manso, used with permission.'));
+      expect(s, contains('All rights reserved.'));
+      expect(s, contains('assets/images/source/'));
+    });
+
+    test('build-deb.sh adds a logo stanza read from LOGO_LICENSE', () {
+      final s = _debScript();
+      expect(s, contains(r'"$REPO_ROOT/LOGO_LICENSE"'));
+      expect(s, contains('Files: usr/share/icons/*'));
+      expect(s, contains('License: Gabbro-Logo'));
+      expect(s, contains('could not read LOGO_LICENSE'));
+    });
+
+    test('PKGBUILD declares, sources and installs LOGO_LICENSE', () {
+      final s = _pkgbuild();
+      expect(s, contains("license=('GPL-3.0-only' 'LicenseRef-Gabbro-Logo')"));
+      expect(s, contains(r'gabbro/v${_pkgver}/LOGO_LICENSE'));
+      expect(
+        s,
+        contains(
+          r'install -Dm644 "$srcdir/LOGO_LICENSE" '
+          r'"$pkgdir/usr/share/licenses/$pkgname/LOGO_LICENSE"',
+        ),
+      );
+    });
+
+    test('desktop icon renders from the green launcher mark', () {
+      // Same icon as Android's launcher (user choice, 2026-10-28).
+      expect(
+        File('linux/packaging/render_icons.sh').readAsStringSync(),
+        contains(r'assets/images/source/ic_launcher_dark.svg}'),
+      );
+    });
+
+    test('README licence section points at LOGO_LICENSE', () {
+      expect(
+        File('README.md').readAsStringSync(),
+        contains('Logo: all rights reserved — see [`LOGO_LICENSE`](LOGO_LICENSE).'),
+      );
+    });
+  });
+
   test('desktop entry is byte-identical across build-deb.sh and PKGBUILD', () {
     expect(
       _heredocBody(_debScript(), 'DESK'),

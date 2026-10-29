@@ -23,6 +23,18 @@ void main() {
     expect(find.textContaining('app passkeys'), findsOneWidget);
   });
 
+  testWidgets('the logo credit names the artist and reserves all rights',
+      (tester) async {
+    // The logo is not GPL (LOGO_LICENSE); the APK ships no licence file, so
+    // the credit must be visible in the app itself.
+    await tester.pumpWidget(testApp(const AboutScreen()));
+    await tester.pumpAndSettle();
+    const credit =
+        'Logo © 2026 Mike Manso, used with permission. All rights reserved.';
+    await tester.scrollUntilVisible(find.text(credit), 200);
+    expect(find.text(credit), findsOneWidget);
+  });
+
   testWidgets('AboutScreen shows app version string', (tester) async {
     await tester.pumpWidget(testApp(const AboutScreen()));
     await tester.pumpAndSettle();

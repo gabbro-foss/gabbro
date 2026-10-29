@@ -656,6 +656,13 @@
   "aboutReportIssue": "Rapportera problem",
   "aboutSupportGabbro": "Stöd Gabbro",
   "aboutLicenceBody": "Gabbro är fri och öppen källkod-programvara, licensierad under GNU General Public License v3.0 only (GPL-3.0-only).\n\nDu är fri att använda, studera och distribuera denna programvara under villkoren i den licensen.",
+  "aboutLogoCredit": "Logotyp © {year} {artist}, används med tillstånd. Alla rättigheter förbehållna.",
+  "@aboutLogoCredit": {
+    "placeholders": {
+      "year": {"type": "String"},
+      "artist": {"type": "String"}
+    }
+  },
   "aboutOwnerRole": "Projektägare, arkitekt och ledande utvecklare:",
   "aboutAiPartner": "AI-utvecklingspartner:",
   "aboutNoTelemetry": "Ingen telemetri, ingen analys, inga konton, ingen Gabbro-server. Gabbro gör inga nätverksanslutningar alls — såvida du inte slår på app-passkeys: då är den enda anslutningen en hämtning per app-inloggning, webbplatsens egen appverifieringsfil.",

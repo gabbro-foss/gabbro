@@ -656,6 +656,13 @@
   "aboutReportIssue": "Arazoa jakinarazi",
   "aboutSupportGabbro": "Gabbro lagundu",
   "aboutLicenceBody": "Gabbro kode irekiko software librea da, GNU General Public License v3.0 only (GPL-3.0-only) lizentziapean.\n\nLizentziaren baldintzen arabera aplikazio hau erabiltzeko, ikasteko eta banatzeko askatasuna duzu.",
+  "aboutLogoCredit": "Logotipoa © {year} {artist}, baimenarekin erabilia. Eskubide guztiak erreserbatuta.",
+  "@aboutLogoCredit": {
+    "placeholders": {
+      "year": {"type": "String"},
+      "artist": {"type": "String"}
+    }
+  },
   "aboutOwnerRole": "Proiektu-jabea, arkitektoa eta garatzaile nagusia:",
   "aboutAiPartner": "AI garapen-partnerra:",
   "aboutNoTelemetry": "Telemetriarik, analisirik, konturik eta Gabbro zerbitzaririk ez. Gabbrok ez du inolako sare-konexiorik egiten — aplikazioen passkeyak aktibatzen badituzu izan ezik: orduan konexio bakarra saio-hasiera bakoitzeko deskarga bat da, gunearen beraren aplikazioak egiaztatzeko fitxategia.",

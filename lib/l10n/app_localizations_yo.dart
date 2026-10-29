@@ -1578,6 +1578,11 @@ class AppLocalizationsYo extends AppLocalizations {
       'Gabbro jẹ sọfitiwia orisun ṣiṣi ọfẹ, ti a fun ni iwe-aṣẹ labẹ GNU General Public License v3.0 only (GPL-3.0-only).\n\nO ni ominira lati lo, ṣe iwadi ati pin ẹrọ yii labẹ awọn ofin iwe-aṣẹ.';
 
   @override
+  String aboutLogoCredit(String year, String artist) {
+    return 'Àmì © $year $artist, a lò ó pẹ̀lú àṣẹ. Gbogbo ẹ̀tọ́ wà ní ìpamọ́.';
+  }
+
+  @override
   String get aboutOwnerRole =>
       'Oniwun iṣẹ akanṣe, ayaworan, ati olupilẹṣẹ akọkọ:';
 

@@ -1541,6 +1541,11 @@ class AppLocalizationsZh extends AppLocalizations {
       'Gabbro 是在 GNU General Public License v3.0 only (GPL-3.0-only) 下授权的自由开源软件。\n\n您有权在许可证条款下使用、研究和分发此应用程序。';
 
   @override
+  String aboutLogoCredit(String year, String artist) {
+    return '标志 © $year $artist，经许可使用。保留所有权利。';
+  }
+
+  @override
   String get aboutOwnerRole => '项目所有者、架构师和主要开发者：';
 
   @override
@@ -3748,6 +3753,11 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
       'Gabbro 是在 GNU General Public License v3.0 only (GPL-3.0-only) 下授权的自由开源软件。\n\n您有权在许可证条款下使用、研究和分发此应用程序。';
 
   @override
+  String aboutLogoCredit(String year, String artist) {
+    return '标志 © $year $artist，经许可使用。保留所有权利。';
+  }
+
+  @override
   String get aboutOwnerRole => '项目所有者、架构师和主要开发者：';
 
   @override
@@ -5953,6 +5963,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String get aboutLicenceBody =>
       'Gabbro 是在 GNU General Public License v3.0 only (GPL-3.0-only) 下授權的自由開源軟體。\n\n您有權在授權條款下使用、研究和散布此應用程式。';
+
+  @override
+  String aboutLogoCredit(String year, String artist) {
+    return '標誌 © $year $artist，經授權使用。保留所有權利。';
+  }
 
   @override
   String get aboutOwnerRole => '專案所有者、架構師和主要開發者：';

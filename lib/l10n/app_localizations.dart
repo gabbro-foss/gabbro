@@ -3007,6 +3007,12 @@ abstract class AppLocalizations {
   /// **'Gabbro is free and open source software, licensed under the GNU General Public License v3.0 only (GPL-3.0-only).\n\nYou are free to use, study, and redistribute this software under the terms of that licence.'**
   String get aboutLicenceBody;
 
+  /// No description provided for @aboutLogoCredit.
+  ///
+  /// In en, this message translates to:
+  /// **'Logo © {year} {artist}, used with permission. All rights reserved.'**
+  String aboutLogoCredit(String year, String artist);
+
   /// No description provided for @aboutOwnerRole.
   ///
   /// In en, this message translates to:

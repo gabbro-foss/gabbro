@@ -886,15 +886,8 @@ class _UnlockScreenState extends State<UnlockScreen>
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                    // No vault-name line: the vault chooser below names it.
                     Center(child: GabbroLogo(withText: true, width: 200)),
-                    if (widget.vaultAlias != null) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        widget.vaultAlias!,
-                        style: Theme.of(context).textTheme.titleMedium,
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
                     const SizedBox(height: 8),
                     Text(
                       _isYubikeyMode

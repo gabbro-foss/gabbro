@@ -1144,12 +1144,12 @@ class _GabbroAppState extends State<GabbroApp>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.inactive:
-        // On Linux/macOS/Windows, switching workspaces or losing window focus
+        // On Linux/macOS, switching workspaces or losing window focus
         // fires inactive - hidden/paused are not sent. Record the backgrounding
         // timestamp so the elapsed check on resumed works.
         // On Android/iOS, inactive is a brief transition state (task switcher,
         // incoming call) that must NOT trigger background-lock timing.
-        if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
+        if (Platform.isLinux || Platform.isMacOS) {
           _foregroundTimer?.cancel();
           _backgroundedAt ??= widget.clock();
           // Start a real timer: app is still visible/running, so it will fire.

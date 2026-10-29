@@ -656,6 +656,13 @@
   "aboutReportIssue": "Problem melden",
   "aboutSupportGabbro": "Gabbro unterstützen",
   "aboutLicenceBody": "Gabbro ist freie und quelloffene Software, lizenziert unter der GNU General Public License v3.0 only (GPL-3.0-only).\n\nDiese Software darf gemäß den Bedingungen dieser Lizenz frei genutzt, studiert und weitergegeben werden.",
+  "aboutLogoCredit": "Logo © {year} {artist}, verwendet mit Genehmigung. Alle Rechte vorbehalten.",
+  "@aboutLogoCredit": {
+    "placeholders": {
+      "year": {"type": "String"},
+      "artist": {"type": "String"}
+    }
+  },
   "aboutOwnerRole": "Projektinhaber, Architekt und leitender Entwickler:",
   "aboutAiPartner": "KI-Entwicklungspartner:",
   "aboutNoTelemetry": "Keine Telemetrie, keine Analysen, keine Konten, kein Gabbro-Server. Gabbro stellt überhaupt keine Netzwerkverbindung her — außer Sie schalten App-Passkeys ein: dann ist die einzige Verbindung je ein Abruf pro App-Anmeldung, die App-Verifizierungsdatei der jeweiligen Website.",

@@ -1582,6 +1582,11 @@ class AppLocalizationsHu extends AppLocalizations {
       'A Gabbro szabad és nyílt forráskódú szoftver, a GNU General Public License v3.0 only (GPL-3.0-only) licence alatt.\n\nSzabadon felhasználhatod, tanulmányozhatod és terjesztheted ezt a szoftvert az adott licenc feltételei szerint.';
 
   @override
+  String aboutLogoCredit(String year, String artist) {
+    return 'Logó © $year $artist, engedéllyel használva. Minden jog fenntartva.';
+  }
+
+  @override
   String get aboutOwnerRole =>
       'Projekttulajdonos, tervező és vezető fejlesztő:';
 

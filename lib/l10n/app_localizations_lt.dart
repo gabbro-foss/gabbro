@@ -1585,6 +1585,11 @@ class AppLocalizationsLt extends AppLocalizations {
       'Gabbro yra nemokama atvirojo kodo programinė įranga, licencijuota pagal GNU General Public License v3.0 only (GPL-3.0-only).\n\nJūs galite laisvai naudoti, tyrinėti ir platinti šią programinę įrangą pagal tos licencijos sąlygas.';
 
   @override
+  String aboutLogoCredit(String year, String artist) {
+    return 'Logotipas © $year $artist, naudojamas gavus leidimą. Visos teisės saugomos.';
+  }
+
+  @override
   String get aboutOwnerRole =>
       'Projekto savininkas, architektas ir pagrindinis kūrėjas:';
 

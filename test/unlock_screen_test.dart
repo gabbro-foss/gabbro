@@ -939,14 +939,29 @@ void main() {
     expect(find.textContaining('Could not unlock vault'), findsOneWidget);
   });
 
-  testWidgets('shows vault alias below title when provided', (tester) async {
+  // The vault chooser names the vault; a second line under the logo read as
+  // the app name twice (legacy alias "Gabbro").
+  testWidgets('no vault alias line under the logo', (tester) async {
     await tester.pumpWidget(_buildScreen(vaultAlias: 'Work'));
-    expect(find.text('Work'), findsOneWidget);
+    expect(find.text('Work'), findsNothing);
   });
 
-  testWidgets('does not show alias text when vaultAlias is null', (tester) async {
-    await tester.pumpWidget(_buildScreen());
-    expect(find.text('Work'), findsNothing);
+  testWidgets('the vault chooser still names the vault', (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      vaultPath: '/tmp/a.gabbro',
+      vaultAlias: 'Work',
+      registry: VaultRegistry([
+        _vaultRecord(path: '/tmp/a.gabbro', alias: 'Work'),
+        _vaultRecord(path: '/tmp/b.gabbro', alias: 'Home'),
+      ]),
+    ));
+    expect(
+      find.descendant(
+        of: find.byType(DropdownButton<String>),
+        matching: find.text('Work'),
+      ),
+      findsWidgets,
+    );
   });
 
   testWidgets('no switch icon shown (switch icon removed in new design)', (tester) async {

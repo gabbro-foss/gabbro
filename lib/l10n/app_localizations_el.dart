@@ -1594,6 +1594,11 @@ class AppLocalizationsEl extends AppLocalizations {
       'Το Gabbro είναι ελεύθερο λογισμικό ανοιχτού κώδικα, αδειοδοτημένο υπό GNU General Public License v3.0 only (GPL-3.0-only).\n\nΈχετε την ελευθερία να χρησιμοποιείτε, να μελετάτε και να διανέμετε αυτή την εφαρμογή υπό τους όρους της άδειας.';
 
   @override
+  String aboutLogoCredit(String year, String artist) {
+    return 'Λογότυπο © $year $artist, χρησιμοποιείται με άδεια. Με την επιφύλαξη παντός δικαιώματος.';
+  }
+
+  @override
   String get aboutOwnerRole =>
       'Ιδιοκτήτης έργου, αρχιτέκτονας και κύριος προγραμματιστής:';
 

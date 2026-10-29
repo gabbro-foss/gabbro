@@ -1583,6 +1583,11 @@ class AppLocalizationsKk extends AppLocalizations {
       'Gabbro — GNU General Public License v3.0 only (GPL-3.0-only) бойынша лицензиаланған еркін ашық бастапқы бағдарламалық жасақтама.\n\nЛицензия шарттары бойынша бұл қосымшаны пайдалануға, зерттеуге және таратуға еркіндігіңіз бар.';
 
   @override
+  String aboutLogoCredit(String year, String artist) {
+    return 'Логотип © $year $artist, рұқсатпен пайдаланылады. Барлық құқықтар қорғалған.';
+  }
+
+  @override
   String get aboutOwnerRole => 'Жоба иесі, архитектор және бас әзірлеуші:';
 
   @override

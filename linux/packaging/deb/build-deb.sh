@@ -96,6 +96,11 @@ install -Dm644 "$REPO_ROOT/linux/packaging/modules-load.d/gabbro-uhid.conf" "$ro
 install -dm755 "$root/usr/share/doc/gabbro"
 holder="$(grep -m1 -iE '^copyright \(c\) ' "$REPO_ROOT/LICENSE" | sed -E 's/^[Cc]opyright \([Cc]\) //')"
 [ -n "$holder" ] || { echo "build-deb.sh: could not read copyright holder from LICENSE" >&2; exit 1; }
+# The logo is not GPL: its own stanza, holder and terms read from LOGO_LICENSE
+# (DEP-5 body: each line indented, blank lines as " .").
+logo_holder="$(grep -m1 '^© ' "$REPO_ROOT/LOGO_LICENSE" 2>/dev/null | sed -E 's/^© //; s/, used with permission\..*//')"
+[ -n "$logo_holder" ] || { echo "build-deb.sh: could not read LOGO_LICENSE" >&2; exit 1; }
+logo_text="$(sed -E 's/^/ /; s/^ $/ ./' "$REPO_ROOT/LOGO_LICENSE")"
 cat > "$root/usr/share/doc/gabbro/copyright" <<CR
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: Gabbro
@@ -114,6 +119,11 @@ License: GPL-3.0-only
  .
  On Debian systems, the full text of the GNU General Public License version 3
  can be found in /usr/share/common-licenses/GPL-3.
+
+Files: usr/share/icons/* usr/lib/gabbro/data/flutter_assets/assets/images/*
+Copyright: ${logo_holder}
+License: Gabbro-Logo
+${logo_text}
 CR
 
 cat > "$work/changelog.Debian" <<CL

@@ -656,6 +656,13 @@
   "aboutReportIssue": "Ilmoita ongelmasta",
   "aboutSupportGabbro": "Tue Gabbroa",
   "aboutLicenceBody": "Gabbro on vapaa ja avoimen lähdekoodin ohjelmisto, lisensoitu GNU General Public License v3.0 only (GPL-3.0-only) -lisenssillä.\n\nVoit vapaasti käyttää, tutkia ja jakaa tätä ohjelmistoa kyseisen lisenssin ehtojen mukaisesti.",
+  "aboutLogoCredit": "Logo © {year} {artist}, käytetty luvalla. Kaikki oikeudet pidätetään.",
+  "@aboutLogoCredit": {
+    "placeholders": {
+      "year": {"type": "String"},
+      "artist": {"type": "String"}
+    }
+  },
   "aboutOwnerRole": "Projektin omistaja, arkkitehti ja pääkehittäjä:",
   "aboutAiPartner": "Tekoälykehityskumppani:",
   "aboutNoTelemetry": "Ei telemetriaa, ei analytiikkaa, ei tilejä, ei Gabbro-palvelinta. Gabbro ei muodosta lainkaan verkkoyhteyksiä — paitsi jos otat sovellusten passkeyt käyttöön: silloin ainoa yhteys on yksi haku kirjautumista kohden, sivuston oma sovellusvarmennustiedosto.",

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 8+: the launcher crops this to its shape; colours are ours.
+     No one-colour layer, so themed-icon launchers keep the green mark.
+     The foreground PNG carries its own safe-zone padding (render_logo_assets.sh). -->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@color/ic_launcher_background" />
+    <foreground android:drawable="@mipmap/ic_launcher_foreground" />
+</adaptive-icon>

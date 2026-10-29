@@ -656,6 +656,13 @@
   "aboutReportIssue": "Hiba bejelentése",
   "aboutSupportGabbro": "Gabbro támogatása",
   "aboutLicenceBody": "A Gabbro szabad és nyílt forráskódú szoftver, a GNU General Public License v3.0 only (GPL-3.0-only) licence alatt.\n\nSzabadon felhasználhatod, tanulmányozhatod és terjesztheted ezt a szoftvert az adott licenc feltételei szerint.",
+  "aboutLogoCredit": "Logó © {year} {artist}, engedéllyel használva. Minden jog fenntartva.",
+  "@aboutLogoCredit": {
+    "placeholders": {
+      "year": {"type": "String"},
+      "artist": {"type": "String"}
+    }
+  },
   "aboutOwnerRole": "Projekttulajdonos, tervező és vezető fejlesztő:",
   "aboutAiPartner": "MI fejlesztési partner:",
   "aboutNoTelemetry": "Nincs telemetria, analitika, fiók, sem Gabbro-szerver. A Gabbro egyáltalán nem létesít hálózati kapcsolatot — hacsak be nem kapcsolja az alkalmazás-passkey-ket: ekkor az egyetlen kapcsolat bejelentkezésenként egy letöltés, az adott webhely saját alkalmazás-ellenőrző fájlja.",

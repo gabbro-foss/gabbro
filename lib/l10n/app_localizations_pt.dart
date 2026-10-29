@@ -1583,6 +1583,11 @@ class AppLocalizationsPt extends AppLocalizations {
       'O Gabbro é software livre e de código aberto, licenciado sob a GNU General Public License v3.0 only (GPL-3.0-only).\n\nVocê tem a liberdade de usar, estudar e redistribuir este software nos termos dessa licença.';
 
   @override
+  String aboutLogoCredit(String year, String artist) {
+    return 'Logotipo © $year $artist, usado com permissão. Todos os direitos reservados.';
+  }
+
+  @override
   String get aboutOwnerRole =>
       'Proprietário do projeto, arquiteto e desenvolvedor principal:';
 
@@ -3889,6 +3894,11 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
       'O Gabbro é software livre e de código aberto, licenciado sob a GNU General Public License v3.0 only (GPL-3.0-only).\n\nVocê tem a liberdade de usar, estudar e redistribuir este software nos termos dessa licença.';
 
   @override
+  String aboutLogoCredit(String year, String artist) {
+    return 'Logotipo © $year $artist, usado com permissão. Todos os direitos reservados.';
+  }
+
+  @override
   String get aboutOwnerRole =>
       'Proprietário do projeto, arquiteto e desenvolvedor principal:';
 
@@ -6191,6 +6201,11 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   @override
   String get aboutLicenceBody =>
       'O Gabbro é software livre e de código aberto, licenciado sob a GNU General Public License v3.0 only (GPL-3.0-only).\n\nTem a liberdade de usar, estudar e redistribuir este software nos termos dessa licença.';
+
+  @override
+  String aboutLogoCredit(String year, String artist) {
+    return 'Logótipo © $year $artist, usado com autorização. Todos os direitos reservados.';
+  }
 
   @override
   String get aboutOwnerRole =>
