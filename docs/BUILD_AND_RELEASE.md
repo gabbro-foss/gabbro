@@ -234,14 +234,23 @@ official Docker image, pulled fresh each run (nothing to install or update):
 
 ### Smoke test
 
-Run the freshly built bundle, never an installed copy from a prior release still on
-your PATH:
+Close any installed Gabbro first (it holds the passkey lock). Run the freshly built
+bundle, never an installed copy from a prior release still on your PATH:
 
 ```bash
 ./build/linux/x64/release/bundle/gabbro
 ```
 
 Unlock a vault, open an entry, confirm the About screen shows the new version.
+
+Android: install the arm64 APK over the previous release on the phone (USB debugging on).
+`-r` keeps the app's data; a signing-key mismatch fails here instead of on users' phones:
+
+```bash
+~/Android/Sdk/platform-tools/adb install -r "gabbro-$ver-android-arm64-v8a.apk"
+```
+
+Expect `Success`. Unlock a vault, confirm About shows the new version.
 
 ### Tag
 
@@ -274,7 +283,7 @@ control file, and the signature covers content, not the filename.
 
 The clone is a sibling of `gabbro/`, at `../gabbro-bin-aur/`, holding exactly
 `PKGBUILD` + `gabbro-bin.install` + `.SRCINFO` before and after this procedure (in between, `mkp` adds
-`LICENSE`, the downloaded tarball and `src/`; step 5 removes them).
+`LICENSE`, `LOGO_LICENSE`, the tarball, `src/`, `pkg/` and the built package; step 5 removes them).
 
 0. Update the clone (a stale one fails the push), then define `mkp`: run only your
    box's line (the second would override the first). On Arch it is
@@ -295,10 +304,18 @@ The clone is a sibling of `gabbro/`, at `../gabbro-bin-aur/`, holding exactly
    ```
 
 2. Edit `linux/packaging/aur/PKGBUILD`: set `pkgver` to the underscore form (e.g. `0.1.0_alpha.21`) and the **first** `sha256sums` entry to that hash (the second is LICENSE, the third LOGO_LICENSE, fetched from the release tag, so alpha.24+ only; each changes only if its file did). Commit and push it in `gabbro/`.
-3. Copy it across with the install hooks and check the published asset against the pinned sha; both source lines must say `Passed`. Run from `gabbro/`:
+3. Copy it across with the install hooks and build the package from the published assets
+   (a source-only check would miss a broken `package()`). All three source lines must say
+   `Passed`, then `Finished making`. Run from `gabbro/`:
 
    ```bash
-   cp linux/packaging/aur/PKGBUILD linux/packaging/aur/gabbro-bin.install ../gabbro-bin-aur/ && (cd ../gabbro-bin-aur && mkp --verifysource)
+   cp linux/packaging/aur/PKGBUILD linux/packaging/aur/gabbro-bin.install ../gabbro-bin-aur/ && (cd ../gabbro-bin-aur && mkp -f)
+   ```
+
+   **Verify** the package holds the binary, the launcher and both licence notices (4 lines):
+
+   ```bash
+   tar -tf ../gabbro-bin-aur/gabbro-bin-*.pkg.tar.zst usr/bin/gabbro usr/lib/gabbro/gabbro usr/share/licenses/gabbro-bin/LICENSE usr/share/licenses/gabbro-bin/LOGO_LICENSE
    ```
 
 4. Regenerate `.SRCINFO` (generated, lives only in the clone) and push to the AUR:
@@ -310,7 +327,7 @@ The clone is a sibling of `gabbro/`, at `../gabbro-bin-aur/`, holding exactly
 5. Clean up, restoring the clone state: `ls -a` must show only `.`, `..`, `.git`, `PKGBUILD`, `gabbro-bin.install`, `.SRCINFO`:
 
    ```bash
-   rm -f LICENSE gabbro-*-linux-x86_64.tar.gz && rm -rf src && ls -a
+   rm -f LICENSE LOGO_LICENSE gabbro-*-linux-x86_64.tar.gz gabbro-bin-*.pkg.tar.zst && rm -rf src pkg && ls -a
    ```
 
 **Gotchas:** pushes are SSH-only and master-branch-only. A maintenance banner over SSH
@@ -330,3 +347,13 @@ Mint's Update Manager (setup: README **Installation**):
 ```bash
 (cd ../gabbro-apt && git add -A && git commit -m "Publish $ver" && git push)
 ```
+
+**Verify** on a real Mint/Debian install with Gabbro from apt (the one check containers
+cannot do: the uhid rule activating). After a few minutes:
+
+```bash
+sudo apt update && sudo apt upgrade gabbro && apt-cache policy gabbro
+```
+
+Expect `Installed:` = the new version. Launch Gabbro from the menu (new icon), About shows
+the version, and a passkey sign-in on a test site works with no manual setup.

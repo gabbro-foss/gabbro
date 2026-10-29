@@ -136,6 +136,8 @@ warnings are not noise.**
 | Flutter: AGP 8.11.1 support "will soon be dropped" (wants >= 9.0.1) | Flutter tooling, new 2026-08-21 | A future Flutter upgrade refuses to build Android until AGP is bumped. No action yet: 8.11.1 still builds; bump AGP + Kotlin together when forced. |
 | Flutter: Kotlin 2.2.20 support "will soon be dropped" (wants >= 2.3.20) | Flutter tooling, new 2026-08-21 | Same consequence and plan as the AGP row above. |
 | "Caught exception: Already watching path: .../android" | Gradle 9.3.1 file watcher (`gradle-fileevents` native lib), new on Mint 2026-10-28 | Gradle catches it; APKs build. No action. |
+| "Woah! You appear to be trying to run flutter as root" | gate's `unshare -rn` (maps the user to uid 0 inside the offline namespace), new 2026-10-29 | Not real root; shows only when `compileFlutterBuildDebug` reruns (e.g. pubspec bump). No action. |
+| JVM restricted-method (`System::load`) by `conscrypt` | Robolectric test dep | Same class as the Gradle row above; shows when unit tests recompile. No action. |
 | "15 packages have newer versions" (`args`, `toml`, …) | cargokit's vendored `build_tool` pins | Info only; build tool, not shipped. No action. |
 | "understands SDK XML versions up to 3 but ... version 4 was encountered" | AGP 8.11.1's SDK reader vs newer Android Studio metadata | Cosmetic; AGP still installs what it needs. Clears with the AGP bump above. |
 
@@ -150,6 +152,8 @@ resolved but never applied — inert, emits no warning.
 > Update at the end of each session. First thing to read at the start of the next. Completed items are deleted from this section.
 
 ### Next task
+
+**Release alpha.24, the first from Mint.** Follow BUILD_AND_RELEASE.md top to bottom and fix the recipe where Mint differs. Must work on AUR, deb/Mint, Android.
 
 ---
 
