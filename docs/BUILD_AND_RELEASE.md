@@ -305,17 +305,19 @@ The clone is a sibling of `gabbro/`, at `../gabbro-bin-aur/`, holding exactly
 
 2. Edit `linux/packaging/aur/PKGBUILD`: set `pkgver` to the underscore form (e.g. `0.1.0_alpha.21`) and the **first** `sha256sums` entry to that hash (the second is LICENSE, the third LOGO_LICENSE, fetched from the release tag, so alpha.24+ only; each changes only if its file did). Commit and push it in `gabbro/`.
 3. Copy it across with the install hooks and build the package from the published assets
-   (a source-only check would miss a broken `package()`). All three source lines must say
+   (a source-only check would miss a broken `package()`). `-d` skips the runtime-deps check
+   (the build needs none; the Verify below installs them). All three source lines must say
    `Passed`, then `Finished making`. Run from `gabbro/`:
 
    ```bash
-   cp linux/packaging/aur/PKGBUILD linux/packaging/aur/gabbro-bin.install ../gabbro-bin-aur/ && (cd ../gabbro-bin-aur && mkp -f)
+   cp linux/packaging/aur/PKGBUILD linux/packaging/aur/gabbro-bin.install ../gabbro-bin-aur/ && (cd ../gabbro-bin-aur && mkp -fd)
    ```
 
-   **Verify** the package holds the binary, the launcher and both licence notices (4 lines):
+   **Verify** the package installs on a fresh Arch (its dependencies resolve) and holds the
+   launcher, the binary and both licence notices (5 lines: those 4 plus the licence folder):
 
    ```bash
-   tar -tf ../gabbro-bin-aur/gabbro-bin-*.pkg.tar.zst usr/bin/gabbro usr/lib/gabbro/gabbro usr/share/licenses/gabbro-bin/LICENSE usr/share/licenses/gabbro-bin/LOGO_LICENSE
+   docker run --rm -v "$PWD/../gabbro-bin-aur":/pkg:ro archlinux:latest bash -euc 'pacman -Syu --noconfirm >/dev/null 2>&1 && pacman -U --noconfirm /pkg/gabbro-bin-*.pkg.tar.zst >/dev/null 2>&1 && pacman -Ql gabbro-bin | grep -E "bin/gabbro$|lib/gabbro/gabbro$|licenses/gabbro-bin/"'
    ```
 
 4. Regenerate `.SRCINFO` (generated, lives only in the clone) and push to the AUR:
@@ -345,7 +347,7 @@ Pages serves it a minute or so later, and users get the release via `apt upgrade
 Mint's Update Manager (setup: README **Installation**):
 
 ```bash
-(cd ../gabbro-apt && git add -A && git commit -m "Publish $ver" && git push)
+(cd ../gabbro-apt && git add pool dists && git commit -m "Publish $ver" && git push)
 ```
 
 **Verify** on a real Mint/Debian install with Gabbro from apt (the one check containers

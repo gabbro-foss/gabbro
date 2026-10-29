@@ -153,7 +153,6 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**Release alpha.24, the first from Mint.** Follow BUILD_AND_RELEASE.md top to bottom and fix the recipe where Mint differs. Must work on AUR, deb/Mint, Android.
 
 ---
 
