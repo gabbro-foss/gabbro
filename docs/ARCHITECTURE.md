@@ -4,7 +4,7 @@
 
 A quantum-resistant password manager.
 Named after the intrusive igneous rock — hard, stable, enduring.
-Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
+Cross-platform: Linux (Arch, Mint), Android. FOSS, GPL-3.0-only.
 
 **Core principle:** all keys and cryptography live in Rust; the vault is decrypted there and the master keys never cross the bridge. Secrets the user actively views, generates, or autofills do reach Flutter in plaintext to be displayed (bounded by auto-lock; the Dart heap retains them until GC — see SECURITY.md / audit F-12) — the keys never do.
 
@@ -46,7 +46,7 @@ allowList pre-flights (`options.up=false`) are answered without consent.
 
 **Keyboard shortcuts (Linux desktop):** Ctrl+L lock, Ctrl+F / Ctrl+Shift+F search, Ctrl+N new entry, Ctrl+M menu, Ctrl+Q lock and quit (confirms first), Esc dismiss/cancel. No Ctrl+C (copying a secret stays a deliberate, auto-clearing action); no Super key. Listed in-app on the desktop-only Keyboard shortcuts screen.
 
-**Platforms:** v1: Linux (Arch + Mint/deb), Android, GrapheneOS. v2 maybe: Windows.
+**Platforms:** Linux (Arch + Mint/deb), Android, GrapheneOS.
 
 **Versioning:** SemVer (semver.org/spec/v2.0.0.html); the current version lives in `pubspec.yaml` (single source of truth). `1.0` is a public trust commitment; don't ship it prematurely. CHANGELOG.md follows Keep a Changelog 1.0.0.
 
@@ -79,9 +79,9 @@ gabbro/
 ├── docs/                 # ARCHITECTURE, SECURITY, VAULT_UPGRADE_PATH, VAULT_SYNC, AUTOTYPE_AND_AUTOFILL, EMERGENCY_SHEET.pdf (source .svg kept locally, gitignored), AI_*; decisions/ (ADRs); artefacts/
 ├── test/  integration_test/          # Flutter widget/unit + Linux real-FFI suites (dart test)
 ├── test_data/            # Sample import files + migration_vaults/ (refusal corpus at floor v11, one vault per VERSION + MIGRATION_TESTS.md + test_matrix.md)
-├── assets/               # fonts, images, help/ (public_suffix_list.dat is an Android asset)
+├── assets/               # fonts, images (logo PNGs rendered from images/source/ SVGs by render_logo_assets.sh), help/ (public_suffix_list.dat is an Android asset)
 ├── challenge/            # crack-me challenge vault + rules
-└── CHANGELOG.md  README.md
+└── CHANGELOG.md  README.md  LICENSE  LOGO_LICENSE (logo: all rights reserved, not GPL)
 ```
 
 ## Features
@@ -100,7 +100,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust sync merges a never-edited entry (`cargo test --release --lib sync_merges_a_never_edited_entry -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 2950 | 171 |
+| Flutter (`flutter test`) | 2961 | 171 |
 | Real-FFI suites (`dart test integration_test/ -j 1`) | 17 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 180 | 15 |
 
@@ -151,11 +151,6 @@ resolved but never applied — inert, emits no warning.
 
 ### Next task
 
-**Final launcher logo (logo now available).** `render_icons.sh` still renders a
-placeholder SVG. Replace `assets/images/source/ic_launcher_light.svg` with the
-new logo (user supplies it) and re-run it; same render covers the Windows `.ico`
-(still the stock Flutter template).
-
 ---
 
 ## Build & Release
@@ -192,7 +187,6 @@ emojis, plain wording.
 - **Wayland auto-type** - blocked: Wayland breaks global input injection
   (https://gist.github.com/probonopd/9feb7c20257af5dd915e3a9f2d1f2277).
   Revisit only if Mint defaults to Wayland.
-- **Windows support.**
 - **Yubico partnership.**
 - **Donation/sustainability model**: GitHub Sponsors is live; Monero possible later (a large, dedicated effort). Liberapay ruled out (2026-07-22 - Stripe forces business-type onboarding for individuals and has suspended Liberapay-linked accounts; no PayPal). Don't re-propose Liberapay.
 - **Support model** (GitHub Issues + SUPPORT.md for v1; revisit when user base exists).

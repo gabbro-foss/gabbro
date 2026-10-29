@@ -73,7 +73,6 @@ it lives in Rust. Everything else lives in Flutter.
 |---|---|
 | Linux (Arch, Mint) | v1 |
 | Android (incl. GrapheneOS) | v1 |
-| Windows | v2 (future) |
 
 ---
 
@@ -639,7 +638,8 @@ network. See **Prerequisites** above for what the gate requires.
 
 ## Licence
 
-GPL-3.0-only — see [`LICENSE`](LICENSE) for details.
+Code: GPL-3.0-only — see [`LICENSE`](LICENSE) for details.
+Logo: all rights reserved — see [`LOGO_LICENSE`](LOGO_LICENSE).
 
 ---
 

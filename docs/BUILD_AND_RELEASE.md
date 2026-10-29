@@ -109,10 +109,11 @@ dependency):
 (cd rust && cargo build --release --bin gabbro-autotype) && cp rust/target/release/gabbro-autotype build/linux/x64/release/bundle/
 ```
 
-Render the icon tree beside the bundle (placeholder SVG until the logo lands):
+Render the icon tree beside the bundle and add the logo notice (the logo is not GPL;
+without the notice, tarball users would assume it is):
 
 ```bash
-bash linux/packaging/render_icons.sh build/linux/x64/release/icons/hicolor
+bash linux/packaging/render_icons.sh build/linux/x64/release/icons/hicolor && cp LOGO_LICENSE build/linux/x64/release/bundle/
 ```
 
 Package bundle + icons, then sign (asks for the key passphrase):
@@ -121,14 +122,14 @@ Package bundle + icons, then sign (asks for the key passphrase):
 tar -czf "gabbro-$ver-linux-x86_64.tar.gz" -C build/linux/x64/release bundle icons && gpg --detach-sign --armor "gabbro-$ver-linux-x86_64.tar.gz"
 ```
 
-**Verify** the autotype binary is in, the signature is good, and the binary carries the
-right version:
+**Verify** the autotype binary and logo notice are in, the signature is good, and the
+binary carries the right version:
 
 ```bash
-tar -tzf "gabbro-$ver-linux-x86_64.tar.gz" | grep gabbro-autotype && gpg --verify "gabbro-$ver-linux-x86_64.tar.gz.asc" "gabbro-$ver-linux-x86_64.tar.gz" && strings build/linux/x64/release/bundle/lib/libapp.so | grep -m1 -oF "$ver"
+tar -tzf "gabbro-$ver-linux-x86_64.tar.gz" bundle/gabbro-autotype bundle/LOGO_LICENSE && gpg --verify "gabbro-$ver-linux-x86_64.tar.gz.asc" "gabbro-$ver-linux-x86_64.tar.gz" && strings build/linux/x64/release/bundle/lib/libapp.so | grep -m1 -oF "$ver"
 ```
 
-Expect `bundle/gabbro-autotype`, `Good signature from "Gabbro Releases"` on key
+Expect `bundle/gabbro-autotype` and `bundle/LOGO_LICENSE`, `Good signature from "Gabbro Releases"` on key
 `369B E2CE CFD0 A528 7155 895A 4775 4EEE 7F9A ABFC`, and the version echoed back.
 
 The bundle needs glibc >= 2.34 whether built on Arch or Mint (verified: Arch, and Mint
@@ -293,7 +294,7 @@ The clone is a sibling of `gabbro/`, at `../gabbro-bin-aur/`, holding exactly
    sha256sum "gabbro-$ver-linux-x86_64.tar.gz"
    ```
 
-2. Edit `linux/packaging/aur/PKGBUILD`: set `pkgver` to the underscore form (e.g. `0.1.0_alpha.21`) and the **first** `sha256sums` entry to that hash (the second is LICENSE, changes only if LICENSE did). Commit and push it in `gabbro/`.
+2. Edit `linux/packaging/aur/PKGBUILD`: set `pkgver` to the underscore form (e.g. `0.1.0_alpha.21`) and the **first** `sha256sums` entry to that hash (the second is LICENSE, the third LOGO_LICENSE, fetched from the release tag, so alpha.24+ only; each changes only if its file did). Commit and push it in `gabbro/`.
 3. Copy it across with the install hooks and check the published asset against the pinned sha; both source lines must say `Passed`. Run from `gabbro/`:
 
    ```bash

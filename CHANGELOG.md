@@ -11,8 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Passkey signing dependencies updated: crypto-bigint 0.7.10 (RUSTSEC-2026-0387) and ctutils 0.4.6 (RUSTSEC-2026-0385) fix timing leaks in constant-time code; tokio 1.54.1 (RUSTSEC-2026-0386), wnaf 0.14.1 (was yanked).
 
 ### Changed
+- New app logo by Mike Manso (all rights reserved, used with permission; see `LOGO_LICENSE`): green logo in light and dark themes (black/white in high contrast), green launcher icon on Android and Linux, credit on the About screen. Android 8+: icon on a black background in the launcher's shape.
+- Unlock screen no longer repeats the vault name under the logo (the vault chooser shows it).
 - Linux passkeys: the virtual security key now uses Gabbro's own USB id (0x1209:0x6ABB) instead of a shared test id another device could also use.
 - Crypto stack diagrams no longer pinned to format v11: labelled v11+ with a note that later bumps (v12) change the body schema, not the key path.
+
+### Fixed
+- High-contrast setting now also switches the logo to black/white (it followed only the system accessibility flag).
 
 ## [0.1.0-alpha.23] – 2026-08-27
 
