@@ -106,7 +106,7 @@ Add the auto-type trigger client to the bundle (links only libc/libgcc, no new r
 dependency):
 
 ```bash
-(cd rust && cargo build --release --bin gabbro-autotype) && cp rust/target/release/gabbro-autotype build/linux/x64/release/bundle/
+(cd rust && RUSTFLAGS="--remap-path-prefix=$HOME=~" cargo build --release --bin gabbro-autotype) && cp rust/target/release/gabbro-autotype build/linux/x64/release/bundle/
 ```
 
 Render the icon tree beside the bundle and add the logo notice (the logo is not GPL;
@@ -180,14 +180,14 @@ gpg --detach-sign --armor "$deb" && (cd ../gabbro-apt/dists/stable && rm -f InRe
 gpg --verify "$deb.asc" "$deb" && gpg --verify ../gabbro-apt/dists/stable/InRelease && grep -E '^(Package|Version):' ../gabbro-apt/dists/stable/main/binary-amd64/Packages
 ```
 
-**Verify** end to end on Mint's base: the one check that proves a user's machine will
-accept the repo:
+**Verify** end to end on Mint's base: proves a user's machine accepts the repo and can
+resolve the package's dependencies (install happens only in the throwaway container):
 
 ```bash
-docker run --rm -v "$PWD/../gabbro-apt":/repo ubuntu:24.04 bash -euc 'apt-get update -qq >/dev/null && apt-get install -y -qq gnupg >/dev/null && install -d /etc/apt/keyrings && cp /repo/gabbro-archive-keyring.gpg /etc/apt/keyrings/gabbro.gpg && printf "Types: deb\nURIs: file:///repo\nSuites: stable\nComponents: main\nArchitectures: amd64\nSigned-By: /etc/apt/keyrings/gabbro.gpg\n" > /etc/apt/sources.list.d/gabbro.sources && apt-get update && apt-cache policy gabbro'
+docker run --rm -v "$PWD/../gabbro-apt":/repo:ro ubuntu:24.04 bash -euc 'apt-get update -qq >/dev/null && apt-get install -y -qq gnupg >/dev/null && install -d /etc/apt/keyrings && cp /repo/gabbro-archive-keyring.gpg /etc/apt/keyrings/gabbro.gpg && printf "Types: deb\nURIs: file:///repo\nSuites: stable\nComponents: main\nArchitectures: amd64\nSigned-By: /etc/apt/keyrings/gabbro.gpg\n" > /etc/apt/sources.list.d/gabbro.sources && apt-get update && apt-cache policy gabbro && apt-get install -y -qq gabbro >/dev/null && dpkg -s gabbro | grep -E "^(Status|Version):"'
 ```
 
-Expect no signature warning and `Candidate:` matching the release. The `../gabbro-apt/`
+Expect no signature warning, `Candidate:` matching the release, then `Status: install ok installed`. The `../gabbro-apt/`
 push happens in **APT publish** below, after the GitHub release.
 
 ### Android

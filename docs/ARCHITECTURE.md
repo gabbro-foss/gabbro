@@ -174,6 +174,9 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   built-in passkey store, so Gabbro shows up as a USB key and gets the
   security-key prompt; no browser setting hides it (checked Brave 1.98, 2026-10-28).
   Users find it confusing: explain it in help.
+- **Android passkeys: Brave's autofill setting.** Unless Brave is set to use another
+  autofill service, its passkey calls go straight to Google and never reach Gabbro (S23,
+  Brave 1.97.59, 2026-10-29). Explain it in help.
 
 ### Housekeeping
 - **Delete `purgeLegacyRecentApps` at v1.0** (`MainActivity.kt` + `LegacyPurgeTest.kt`) - the one-shot cleanup of the removed suggestion-chip store. No pre-1.0 install will still be upgrading by then.
